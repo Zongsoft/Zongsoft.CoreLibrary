@@ -1,0 +1,475 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{D8BFAC6F-60BD-4A1A-BB4A-C1FE5043CDA8}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Zongsoft</RootNamespace>
+    <AssemblyName>Zongsoft.CoreLibrary</AssemblyName>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <IsWebBootstrapper>true</IsWebBootstrapper>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <PublishUrl>http://localhost/Zongsoft.CoreLibrary/</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Web</InstallFrom>
+    <UpdateEnabled>true</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
+    <SccProjectName />
+    <SccLocalPath />
+    <SccAuxPath />
+    <SccProvider />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\Zongsoft.CoreLibrary.XML</DocumentationFile>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>bin\Release\Zongsoft.CoreLibrary.XML</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Collections\CategoryBase.cs" />
+    <Compile Include="Collections\Collection.cs" />
+    <Compile Include="Collections\HierarchicalNode.cs" />
+    <Compile Include="Collections\HierarchicalNodeCollection.cs" />
+    <Compile Include="Collections\NamedCollection.cs" />
+    <Compile Include="Collections\BinaryComparer.cs" />
+    <Compile Include="Collections\NamedCollectionBase.cs" />
+    <Compile Include="Common\TypeExtension.cs" />
+    <Compile Include="Common\Buffer.cs" />
+    <Compile Include="Communication\ChannelAsyncEventArgs.cs" />
+    <Compile Include="Communication\IPacketizerFactory.cs" />
+    <Compile Include="Communication\Net\BufferEvaluator.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpAlloCommand.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpDateUtils.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpListFileFormater.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpMfmtCommand.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpMlsdCommand.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpMlstCommand.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpMlstFileFormater.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpPasvDataChannel.cs" />
+    <Compile Include="Communication\Net\Configuration\FtpServerOptionElement.cs" />
+    <Compile Include="Communication\Net\Configuration\FtpUserOptionElement.cs" />
+    <Compile Include="Communication\Net\Configuration\FtpUserOptionElementCollection.cs" />
+    <Compile Include="Common\ObjectPool.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpException.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpAborCommand.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpAppeCommand.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpCdupCommand.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpCommand.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpCommandContext.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpCwdCommand.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpDeleCommand.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpFeatCommand.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpHelpCommand.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpListCommand.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpMdtmCommand.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpMkdCommand.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpNoopCommand.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpOptsCommand.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpPassCommand.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpPortCommand.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpPortDataChannel.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpPwdCommand.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpQuitCommand.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpRestCommand.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpRetrCommand.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpRmdCommand.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpRnfrCommand.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpRntoCommand.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpSizeCommand.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpCommandLoader.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpPasvCommand.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpStorCommand.cs" />
+    <Compile Include="Communication\Net\FtpConfiguration.cs" />
+    <Compile Include="Communication\Net\FtpStatement.cs" />
+    <Compile Include="Communication\Net\FtpPacketizer.cs" />
+    <Compile Include="Communication\Net\FtpServer.cs" />
+    <Compile Include="Communication\Net\FtpServerChannel.cs" />
+    <Compile Include="Communication\Net\FtpServerChannelManager.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpSystCommand.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpTypeCommand.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpUserCommand.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpSessionStatus.cs" />
+    <Compile Include="Communication\Net\Ftp\FtpTransferMode.cs" />
+    <Compile Include="Communication\Net\FtpUserProfile.cs" />
+    <Compile Include="Communication\IPacketizer.cs" />
+    <Compile Include="Communication\Net\Ftp\IFtpDataChannel.cs" />
+    <Compile Include="Communication\Net\TcpPacketizer.cs" />
+    <Compile Include="Communication\Net\TcpChannel.cs" />
+    <Compile Include="Communication\Package.cs" />
+    <Compile Include="Communication\PackageContent.cs" />
+    <Compile Include="Communication\PackageContentCollection.cs" />
+    <Compile Include="Communication\PackageHeader.cs" />
+    <Compile Include="Communication\PackageHeaderCollection.cs" />
+    <Compile Include="Communication\PackageSerializer.cs" />
+    <Compile Include="Communication\PacketizerFactory.cs" />
+    <Compile Include="ComponentModel\NotifyObject.cs" />
+    <Compile Include="ComponentModel\SchemaCategory.cs" />
+    <Compile Include="ComponentModel\SchemaCategoryCollection.cs" />
+    <Compile Include="ComponentModel\SchemaProvider.cs" />
+    <Compile Include="Data\Clause.cs" />
+    <Compile Include="Data\ClauseCollection.cs" />
+    <Compile Include="Data\ClauseCombine.cs" />
+    <Compile Include="Data\ClauseOperator.cs" />
+    <Compile Include="Data\IClause.cs" />
+    <Compile Include="Data\Paging.cs" />
+    <Compile Include="Data\Sorting.cs" />
+    <Compile Include="Diagnostics\Configuration\TracerElement.cs" />
+    <Compile Include="IO\IDirectory.cs" />
+    <Compile Include="IO\IFile.cs" />
+    <Compile Include="IO\LocalFileSystem.cs" />
+    <Compile Include="Runtime\Caching\BufferManager.cs" />
+    <Compile Include="Runtime\Caching\BufferManagerBase.cs" />
+    <Compile Include="Runtime\Caching\BufferManagerSelector.cs" />
+    <Compile Include="Runtime\Caching\BufferUtility.cs" />
+    <Compile Include="Runtime\Caching\Cache.cs" />
+    <Compile Include="Runtime\Caching\FileBufferManager.cs" />
+    <Compile Include="Runtime\Caching\IBufferManager.cs" />
+    <Compile Include="Runtime\Caching\IBufferManagerSelector.cs" />
+    <Compile Include="Options\Configuration\OptionConfiguration.cs" />
+    <Compile Include="Options\Configuration\OptionConfigurationDeclaration.cs" />
+    <Compile Include="Options\Configuration\OptionConfigurationDeclarationCollection.cs" />
+    <Compile Include="Options\Configuration\OptionConfigurationElement.cs" />
+    <Compile Include="Options\Configuration\OptionConfigurationElementCollection.cs" />
+    <Compile Include="Options\Configuration\OptionConfigurationElementCollection`1.cs" />
+    <Compile Include="Options\Configuration\OptionConfigurationException.cs" />
+    <Compile Include="Options\Configuration\OptionConfigurationProperty.cs" />
+    <Compile Include="Options\Configuration\OptionConfigurationPropertyAttribute.cs" />
+    <Compile Include="Options\Configuration\OptionConfigurationPropertyBehavior.cs" />
+    <Compile Include="Options\Configuration\OptionConfigurationPropertyCollection.cs" />
+    <Compile Include="Options\Configuration\OptionConfigurationSection.cs" />
+    <Compile Include="Options\Configuration\OptionConfigurationSectionCollection.cs" />
+    <Compile Include="Options\Configuration\OptionConfigurationUtility.cs" />
+    <Compile Include="Options\Configuration\SettingElement.cs" />
+    <Compile Include="Options\Configuration\SettingElementCollection.cs" />
+    <Compile Include="Reporting\IReport.cs" />
+    <Compile Include="Reporting\IReportProvider.cs" />
+    <Compile Include="Reporting\IReportView.cs" />
+    <Compile Include="Runtime\Caching\IDictionaryCache.cs" />
+    <Compile Include="Runtime\Caching\IDictionaryCacheProvider.cs" />
+    <Compile Include="Runtime\Caching\MemoryDictionaryCache.cs" />
+    <Compile Include="Runtime\Caching\MemoryDictionaryCacheProvider.cs" />
+    <Compile Include="Runtime\Serialization\ISerializable.cs" />
+    <Compile Include="Runtime\Serialization\ISerializationWriter.cs" />
+    <Compile Include="Runtime\Serialization\ISerializer.cs" />
+    <Compile Include="Runtime\Serialization\SerializationDirection.cs" />
+    <Compile Include="Runtime\Serialization\SerializationMembers.cs" />
+    <Compile Include="Runtime\Serialization\SerializationWriter.cs" />
+    <Compile Include="Runtime\Serialization\SerializationWriterStep.cs" />
+    <Compile Include="Runtime\Serialization\Serializer.cs" />
+    <Compile Include="Runtime\Serialization\SerializationContext.cs" />
+    <Compile Include="Runtime\Serialization\SerializationEventArgs.cs" />
+    <Compile Include="Runtime\Serialization\SerializerProvider.cs" />
+    <Compile Include="Runtime\Serialization\SerializerSettings.cs" />
+    <Compile Include="Security\GenericIdentity.cs" />
+    <Compile Include="Security\GenericPrincipal.cs" />
+    <Compile Include="Security\Membership\AuthenticationAttribute.cs" />
+    <Compile Include="Security\Membership\Authentication.cs" />
+    <Compile Include="Security\Membership\AuthenticationException.cs" />
+    <Compile Include="Security\Membership\AuthenticationResult.cs" />
+    <Compile Include="Security\Membership\Authorization.cs" />
+    <Compile Include="Security\Membership\AuthorizationAttribute.cs" />
+    <Compile Include="Security\Membership\AuthorizedState.cs" />
+    <Compile Include="Security\Membership\Certification.cs" />
+    <Compile Include="Security\Membership\CertificationException.cs" />
+    <Compile Include="Security\Membership\CertificationProvider.cs" />
+    <Compile Include="Security\Membership\IAuthentication.cs" />
+    <Compile Include="Security\Membership\IAuthorization.cs" />
+    <Compile Include="Security\Membership\ICertificationProvider.cs" />
+    <Compile Include="Security\Membership\IPermissionProvider.cs" />
+    <Compile Include="Security\Membership\IRoleProvider.cs" />
+    <Compile Include="Security\Membership\IUserProvider.cs" />
+    <Compile Include="Security\Membership\Member.cs" />
+    <Compile Include="Security\Membership\MembershipHelper.cs" />
+    <Compile Include="Security\Membership\MemberType.cs" />
+    <Compile Include="Security\Membership\Permission.cs" />
+    <Compile Include="Security\Membership\PermissionFilter.cs" />
+    <Compile Include="Security\Membership\PermissionProvider.cs" />
+    <Compile Include="Security\Membership\Role.cs" />
+    <Compile Include="Security\Membership\RoleProvider.cs" />
+    <Compile Include="Security\Membership\User.cs" />
+    <Compile Include="Security\Membership\UserProvider.cs" />
+    <Compile Include="Security\PasswordUtility.cs" />
+    <Compile Include="Services\CommandContextBase.cs" />
+    <Compile Include="Services\CommandExecutorBase.cs" />
+    <Compile Include="Services\CommandExecutorContext.cs" />
+    <Compile Include="Services\CommandHelper.cs" />
+    <Compile Include="Services\CommandLine.cs" />
+    <Compile Include="Services\CommandOption.cs" />
+    <Compile Include="Services\CommandOptionAttribute.cs" />
+    <Compile Include="Services\CommandOptionCollection.cs" />
+    <Compile Include="Services\CommandOptionException.cs" />
+    <Compile Include="Services\CommandOptionMissingException.cs" />
+    <Compile Include="Services\CommandOptionValueException.cs" />
+    <Compile Include="Services\CommandContext.cs" />
+    <Compile Include="Services\CommandExecutor.cs" />
+    <Compile Include="Services\ICommandLineParser.cs" />
+    <Compile Include="Terminals\CommandHelper.cs" />
+    <Compile Include="Services\CommandNotFoundException.cs" />
+    <Compile Include="Services\CommandTreeNodeCollection.cs" />
+    <Compile Include="Services\CommandTreeNode.cs" />
+    <Compile Include="Services\Composition\ExecutionEventArgs.cs" />
+    <Compile Include="Runtime\Serialization\SerializerProviderFilter.cs" />
+    <Compile Include="Services\ICommandLoader.cs" />
+    <Compile Include="Services\ICommand`1.cs" />
+    <Compile Include="Services\PredicationCollection.cs" />
+    <Compile Include="Services\PredicationCombine.cs" />
+    <Compile Include="Services\Predicator.cs" />
+    <Compile Include="Options\ISettingProvider.cs" />
+    <Compile Include="Services\Composition\ExecutionContext.cs" />
+    <Compile Include="Services\Composition\ExecutionFilterCompositeCollection.cs" />
+    <Compile Include="Services\Composition\ExecutionFilteredContext.cs" />
+    <Compile Include="Services\Composition\ExecutionFilteringContext.cs" />
+    <Compile Include="Services\Composition\ExecutionPipeline.cs" />
+    <Compile Include="Services\Composition\ExecutionHandler.cs" />
+    <Compile Include="Services\Composition\ExecutionPipelineCollection.cs" />
+    <Compile Include="Services\Composition\Executor.cs" />
+    <Compile Include="Services\Composition\ExecutionFilterComposite.cs" />
+    <Compile Include="Services\Composition\ExecutionFilterCollection.cs" />
+    <Compile Include="Services\Composition\ExecutionHandlerBase.cs" />
+    <Compile Include="Services\Composition\IExecutionFilter.cs" />
+    <Compile Include="Services\Composition\IExecutionHandler.cs" />
+    <Compile Include="Services\Composition\IObservable.cs" />
+    <Compile Include="Services\Composition\IObserver.cs" />
+    <Compile Include="Common\UrlUtility.cs" />
+    <Compile Include="Communication\IPEndPointConverter.cs" />
+    <Compile Include="Communication\Net\FtpClient.cs" />
+    <Compile Include="Communication\ReceiverUtility.cs" />
+    <Compile Include="Services\CommandException.cs" />
+    <Compile Include="ComponentModel\ConditionClause.cs" />
+    <Compile Include="ComponentModel\ConditionClauseCollection.cs" />
+    <Compile Include="ComponentModel\GuidConverter.cs" />
+    <Compile Include="Diagnostics\EventLogTraceListener.cs" />
+    <Compile Include="Diagnostics\Utility.cs" />
+    <Compile Include="Services\IPredication.cs" />
+    <Compile Include="Resources\ResourceUtility.cs" />
+    <Compile Include="ComponentModel\ActionCollection.cs" />
+    <Compile Include="ComponentModel\ApplicationEventArgs.cs" />
+    <Compile Include="ComponentModel\AliasAttribute.cs" />
+    <Compile Include="ComponentModel\ISchemaProvider.cs" />
+    <Compile Include="ComponentModel\SchemaCollection.cs" />
+    <Compile Include="ComponentModel\Dispatcher.cs" />
+    <Compile Include="ComponentModel\DispatcherRepliedReason.cs" />
+    <Compile Include="Communication\IChannel.cs" />
+    <Compile Include="ComponentModel\DispatchEventArgs.cs" />
+    <Compile Include="ComponentModel\IDispatch.cs" />
+    <Compile Include="ComponentModel\IDispatcher`1.cs" />
+    <Compile Include="ComponentModel\DispatcherRepliedEventArgs.cs" />
+    <Compile Include="Communication\ListenerBase.cs" />
+    <Compile Include="Communication\ChannelEventArgs.cs" />
+    <Compile Include="Communication\Net\SocketAsyncEventArgsPool.cs" />
+    <Compile Include="Communication\Net\TcpClientChannel.cs" />
+    <Compile Include="Communication\ChannelFailureEventArgs.cs" />
+    <Compile Include="Communication\Net\TcpServerChannel.cs" />
+    <Compile Include="Communication\ChannelBase.cs" />
+    <Compile Include="Communication\Net\TcpServerChannelManager.cs" />
+    <Compile Include="Communication\Net\TcpServer.cs" />
+    <Compile Include="Communication\Net\TcpClient.cs" />
+    <Compile Include="Communication\RequestContext.cs" />
+    <Compile Include="Communication\RequestEventArgs.cs" />
+    <Compile Include="Communication\SentEventArgs.cs" />
+    <Compile Include="ComponentModel\IAssociable.cs" />
+    <Compile Include="Collections\DequeuedEventArgs.cs" />
+    <Compile Include="Collections\DequeuedReason.cs" />
+    <Compile Include="Collections\IQueue.cs" />
+    <Compile Include="Collections\Queue.cs" />
+    <Compile Include="Collections\QueueEventArgs.cs" />
+    <Compile Include="ComponentModel\IDispatcher.cs" />
+    <Compile Include="Communication\IListener.cs" />
+    <Compile Include="Services\CommandExecutedEventArgs.cs" />
+    <Compile Include="Services\CommandExecutingEventArgs.cs" />
+    <Compile Include="Common\StringExtension.cs" />
+    <Compile Include="Collections\CategoryCollection.cs" />
+    <Compile Include="Services\CommandBase.cs" />
+    <Compile Include="ComponentModel\ConditionResolver.cs" />
+    <Compile Include="ComponentModel\IDispatchProvider.cs" />
+    <Compile Include="ComponentModel\INotifyProgressChanged.cs" />
+    <Compile Include="Common\Pager.cs" />
+    <Compile Include="Common\PagingEvaluator.cs" />
+    <Compile Include="Services\ServiceDependencyConsumer.cs" />
+    <Compile Include="Services\ServiceDependencyConsumerCollection.cs" />
+    <Compile Include="Services\ServiceDependencyContainer.cs" />
+    <Compile Include="Services\ServiceDependencyProvider.cs" />
+    <Compile Include="Services\ServiceDependencyProviderCollection.cs" />
+    <Compile Include="Services\ServiceProvider.cs" />
+    <Compile Include="Services\ServiceProviderFactory.cs" />
+    <Compile Include="Services\ServiceProviderChangedEventArgs.cs" />
+    <Compile Include="Services\ServiceResolvedEventArgs.cs" />
+    <Compile Include="Services\ServiceResolvingEventArgs.cs" />
+    <Compile Include="Services\WorkerDecorator.cs" />
+    <Compile Include="Services\WorkerState.cs" />
+    <Compile Include="Diagnostics\Configuration\TraceListenerElement.cs" />
+    <Compile Include="Diagnostics\Configuration\TraceListenerElementCollection.cs" />
+    <Compile Include="Data\Entities\IObjectAccess.cs" />
+    <Compile Include="Data\Entities\ObjectAccessExtension.cs" />
+    <Compile Include="Diagnostics\ConsoleTraceListener.cs" />
+    <Compile Include="Diagnostics\FailureEventArgs.cs" />
+    <Compile Include="Services\ICommand.cs" />
+    <Compile Include="ComponentModel\ICondition.cs" />
+    <Compile Include="Services\IMatchable.cs" />
+    <Compile Include="Services\IServiceProvider.cs" />
+    <Compile Include="Services\IServiceProviderFactory.cs" />
+    <Compile Include="Services\IWorker.cs" />
+    <Compile Include="Services\WorkerBase.cs" />
+    <Compile Include="Data\Parameter.cs" />
+    <Compile Include="Data\ParameterCollection.cs" />
+    <Compile Include="Diagnostics\ExceptionHandledEventArgs.cs" />
+    <Compile Include="Diagnostics\ExceptionHandlerBase.cs" />
+    <Compile Include="Diagnostics\ExceptionHandlerManager.cs" />
+    <Compile Include="Diagnostics\ExceptionHandlingEventArgs.cs" />
+    <Compile Include="Diagnostics\ExceptionHandlingException.cs" />
+    <Compile Include="Diagnostics\FileLogTraceListener.cs" />
+    <Compile Include="Diagnostics\IExceptionHandler.cs" />
+    <Compile Include="ComponentModel\ApplicationContextBase.cs" />
+    <Compile Include="Diagnostics\ITraceFilter.cs" />
+    <Compile Include="Diagnostics\ITraceListener.cs" />
+    <Compile Include="Diagnostics\TraceEntry.cs" />
+    <Compile Include="Diagnostics\TraceEntryType.cs" />
+    <Compile Include="Diagnostics\TraceEventArgs.cs" />
+    <Compile Include="Diagnostics\TraceListenerBase.cs" />
+    <Compile Include="Diagnostics\TraceListenerCollection.cs" />
+    <Compile Include="Diagnostics\Tracer.cs" />
+    <Compile Include="Diagnostics\TracingEventArgs.cs" />
+    <Compile Include="ComponentModel\Condition.cs" />
+    <Compile Include="ComponentModel\ConditionCombine.cs" />
+    <Compile Include="Diagnostics\FailureHandleEventArgs.cs" />
+    <Compile Include="ComponentModel\IModule.cs" />
+    <Compile Include="ComponentModel\IRecentsProvider.cs" />
+    <Compile Include="ComponentModel\IObjectIdentity.cs" />
+    <Compile Include="ComponentModel\Reason.cs" />
+    <Compile Include="ComponentModel\RecentsManager.cs" />
+    <Compile Include="ComponentModel\IgnoreConditionAttribute.cs" />
+    <Compile Include="Communication\IReceiver.cs" />
+    <Compile Include="Communication\ISender.cs" />
+    <Compile Include="Communication\ReceivedEventArgs.cs" />
+    <Compile Include="IO\PathUtility.cs" />
+    <Compile Include="Options\IOption.cs" />
+    <Compile Include="Options\IOptionProvider.cs" />
+    <Compile Include="Options\IOptionView.cs" />
+    <Compile Include="Options\IOptionViewBuilder.cs" />
+    <Compile Include="Options\Option.cs" />
+    <Compile Include="Options\OptionHelper.cs" />
+    <Compile Include="Options\OptionManager.cs" />
+    <Compile Include="Options\OptionNode.cs" />
+    <Compile Include="Options\OptionNodeCollection.cs" />
+    <Compile Include="Common\Convert.cs" />
+    <Compile Include="ComponentModel\EnumConverter.cs" />
+    <Compile Include="Common\EnumEntry.cs" />
+    <Compile Include="ComponentModel\CustomBooleanConvert.cs" />
+    <Compile Include="ComponentModel\Action.cs" />
+    <Compile Include="Options\OptionProviderExtension.cs" />
+    <Compile Include="Options\Utility.cs" />
+    <Compile Include="Data\IDataAccess.cs" />
+    <Compile Include="ComponentModel\Schema.cs" />
+    <Compile Include="Collections\Category.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Common\EnumUtility.cs" />
+    <Compile Include="Terminals\Commands\ClearCommand.cs" />
+    <Compile Include="Terminals\Commands\ShellCommand.cs" />
+    <Compile Include="Terminals\ConsoleTerminal.cs" />
+    <Compile Include="Terminals\Commands\ExitCommand.cs" />
+    <Compile Include="Terminals\Commands\HelpCommand.cs" />
+    <Compile Include="Terminals\ITerminal.cs" />
+    <Compile Include="Terminals\TerminalColor.cs" />
+    <Compile Include="Terminals\TerminalCommandContext.cs" />
+    <Compile Include="Terminals\TerminalCommandExecutor.cs" />
+    <Compile Include="Terminals\TerminalStyles.cs" />
+    <Compile Include="Text\TextExpression.cs" />
+    <Compile Include="Text\TextExpressionArgument.cs" />
+    <Compile Include="Text\TextExpressionNode.cs" />
+    <Compile Include="Text\TextExpressionNodeCollection.cs" />
+    <Compile Include="Text\TextExpressionParser.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Options\Option.option">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Security\Membership\表结构设计文档.html" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
