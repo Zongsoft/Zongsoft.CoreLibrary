@@ -1,0 +1,94 @@
+﻿using System;
+using System.IO;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace ConsoleApplication1
+{
+	class Program
+	{
+		private const int LENGTH = 10000;
+
+		private static Random random = new Random();
+
+		private static int[] keys = new int[LENGTH];
+		private static int[] data = new int[LENGTH];
+
+		private static Zongsoft.Runtime.Caching.BufferManager bufferManager = new Zongsoft.Runtime.Caching.BufferManager(@"Z:\test.cache");
+
+		static void Main(string[] args)
+		{
+			var tasks = new Task[10];
+
+			for(int i = 0; i < tasks.Length; i++)
+			{
+				tasks[i] = Task.Factory.StartNew(Write, new Dictionary<string, int>()
+				{
+					{"startIndex", i * (LENGTH / tasks.Length)},
+					{"count", (i + 1) * (LENGTH / tasks.Length)}
+				});
+			}
+
+			Task.WaitAll(tasks);
+
+			Console.WriteLine();
+			Console.WriteLine("***********************");
+			Console.WriteLine();
+
+			//for(int i = 0; i < tasks.Length; i++)
+			//{
+			//	tasks[i] = Task.Factory.StartNew(Read, new Dictionary<string, int>()
+			//	{
+			//		{"startIndex", i * (LENGTH / tasks.Length)},
+			//		{"count", (i + 1) * (LENGTH / tasks.Length)}
+			//	});
+			//}
+
+			//Task.WaitAll(tasks);
+
+			Console.Write("Input enter to exit.");
+			Console.ReadLine();
+		}
+
+		private static void Write(object parameters)
+		{
+			int startIndex = ((IDictionary<string, int>)parameters)["startIndex"];
+			int count = ((IDictionary<string, int>)parameters)["count"];
+
+			for(int i = startIndex; i < count; i++)
+			{
+				data[i] = random.Next();
+				keys[i] = bufferManager.Allocate(4);
+
+				bufferManager.Write(keys[i], BitConverter.GetBytes(data[i]), 0, 4);
+
+				bufferManager.Release(keys[i]);
+
+				if(i % 100 == 0)
+					Console.WriteLine("Write #{0} @{1}", i, Thread.CurrentThread.ManagedThreadId);
+			}
+		}
+
+		private static void Read(object parameters)
+		{
+			int startIndex = ((IDictionary<string, int>)parameters)["startIndex"];
+			int count = ((IDictionary<string, int>)parameters)["count"];
+
+			byte[] buffer = new byte[4];
+
+			for(int i = startIndex; i < count; i++)
+			{
+				bufferManager.Read(keys[i], buffer, 0, buffer.Length);
+
+				if(BitConverter.ToInt32(buffer, 0) != data[i])
+					throw new InvalidProgramException();
+
+				if(i % 100 == 0)
+					Console.WriteLine("Read #{0} @{1}", i, Thread.CurrentThread.ManagedThreadId);
+			}
+		}
+	}
+}

@@ -1,0 +1,609 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Strict//EN">
+<HTML>
+<HEAD>
+<META http-equiv="Content-Type" content="text/html; charset=gb2312">
+<TITLE>iSecurity&reg; 安全控制系统数据库表结构定义</TITLE>
+<STYLE type="text/css">
+	TABLE {font-family:仿宋, 仿宋_gb2312; font-size:12pt}
+	UL {margin-top:5px; margin-bottom:5px}
+</STYLE>
+</HEAD>
+
+<BODY style="font-family:仿宋, 仿宋_gb2312; font-size:12pt">
+	<P style="font-family:黑体,楷体_gb2312; font-size:20pt; text-align:center; font-weight:bold">
+		<FONT face="Arial"><FONT face="Monotype Corsiva">i</FONT><FONT size="1"> </FONT>Security<SUP>&reg;</SUP></FONT> 安全控制系统数据库表结构定义</B>
+	</P>
+
+	<P style="font-family:Arial, 宋体; font-size:10pt; text-align:center">
+		版权所有 2001-2014 &nbsp;&nbsp;<A href="http://www.zongsoft.com">Zongsoft Corporation</A><BR>2014年2月27日　　版本3.5
+	</P>
+
+	<A name="Security.User"><P widht="0" height="15px"></A>
+	<TABLE BORDER="1" cellspacing="0" cellpadding="2" width="100%" bordercolorlight="#808080" bordercolordark="#FFFFFF">
+		<TR>
+			<TD colspan="6" width="100%" height="24px" bgcolor="#C0C0C0" bordercolorlight="#808080" bordercolordark="#C0C0C0" align="center">
+				<DIV style="float:left; width:120; margin-top:5px; text-align:center; font-family:Arial; font-size:12pt; color:#000080"><B>Security.User</B></DIV>
+				<DIV style="float:center; margin-top:3px"><FONT face="黑体" size="5">用户表</FONT></DIV>
+			</TD>
+		</TR>
+		<TR>
+			<TD width="20%" bgcolor="#C0C0C0" align="center">字段名称<BR><FONT face="Arial"><B>Field Name</B></FONT></TD>
+			<TD width="10%" bgcolor="#C0C0C0" align="center">字段类型<BR><FONT face="Arial"><B>Type</B></FONT></TD>
+			<TD width="10%" bgcolor="#C0C0C0" align="center">最大长度<BR><FONT face="Arial"><B>Length</B></FONT></TD>
+			<TD width="05%" bgcolor="#C0C0C0" align="center">空值<BR><FONT face="Arial"><B>Nullable</B></FONT></TD>
+			<TD width="10%" bgcolor="#C0C0C0" align="center">默认值<BR><FONT face="Arial"><B>Default</B></FONT></TD>
+			<TD width="45%" bgcolor="#C0C0C0" align="center">注释<BR><FONT face="Arial"><B>Description</B></FONT></TD>
+		</TR>
+
+		<TR>
+			<TD align="center"><FONT face="Arial"><B>(*PK)</B> ApplicationId</FONT></TD>
+			<TD align="center"><FONT face="Arial">varchar</FONT></TD>
+			<TD align="center"><FONT face="Arial">50</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1"></TD>
+			<TD align="center"><FONT face="Arial"></TD>
+			<TD>应用系统的名称，该名称必须保持全局唯一性。</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial"><B>(*PK)</B> Name</FONT></TD>
+			<TD align="center"><FONT face="Arial">varchar</FONT></TD>
+			<TD align="center"><FONT face="Arial">50</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1"></TD>
+			<TD align="center"><FONT face="Arial"></TD>
+			<TD>用户的名称，该名称必须保持全局唯一性。</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial">Password</FONT></TD>
+			<TD align="center"><FONT face="Arial">varbinary</FONT></TD>
+			<TD align="center"><FONT face="Arial">64</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1" checked="checked"></TD>
+			<TD align="center"><FONT face="Arial"></TD>
+			<TD>用户登录口令</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial">PasswordSalt</FONT></TD>
+			<TD align="center"><FONT face="Arial">varbinary</FONT></TD>
+			<TD align="center"><FONT face="Arial">8</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1" checked="checked"></TD>
+			<TD align="center"><FONT face="Arial"></TD>
+			<TD>口令随机数</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial">FullName</FONT></TD>
+			<TD align="center"><FONT face="Arial">nvarchar</FONT></TD>
+			<TD align="center"><FONT face="Arial">100</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1" checked="checked"></TD>
+			<TD align="center"><FONT face="Arial"></TD>
+			<TD>用户的全称</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial">Principal</FONT></TD>
+			<TD align="center"><FONT face="Arial">nvarchar</FONT></TD>
+			<TD align="center"><FONT face="Arial">100</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1" checked="checked"></TD>
+			<TD align="center"><FONT face="Arial"></TD>
+			<TD>用户或角色的负责人<BR><I>可通过该字段来关联对应于业务系统内的员工</I></TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial">EMail</FONT></TD>
+			<TD align="center"><FONT face="Arial">varchar</FONT></TD>
+			<TD align="center"><FONT face="Arial">100</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1" checked="checked"></TD>
+			<TD align="center"><FONT face="Arial"></TD>
+			<TD>用户的电子邮箱，唯一约束。系统可通过该字段来联系用户（如发送新密码等）。</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial">Approved</FONT></TD>
+			<TD align="center"><FONT face="Arial">bit</FONT></TD>
+			<TD align="center"><FONT face="Arial">-</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1"></TD>
+			<TD align="center"><FONT face="Arial"><B>False</B></TD>
+			<TD>帐户是否已审核通过</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial">Suspended</FONT></TD>
+			<TD align="center"><FONT face="Arial">bit</FONT></TD>
+			<TD align="center"><FONT face="Arial">-</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1"></TD>
+			<TD align="center"><FONT face="Arial"><B>False</B></TD>
+			<TD>帐户是否暂停使用</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial">ChangePasswordOnFirstTime</FONT></TD>
+			<TD align="center"><FONT face="Arial">bit</FONT></TD>
+			<TD align="center"><FONT face="Arial">-</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1"></TD>
+			<TD align="center"><FONT face="Arial"><B>True</B></TD>
+			<TD>用户第一次登入是否必须变更密码</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial">MaxInvalidPasswordAttempts</FONT></TD>
+			<TD align="center"><FONT face="Arial">tinyint</FONT></TD>
+			<TD align="center"><FONT face="Arial">1</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1" checked="checked"></TD>
+			<TD align="center"><FONT face="Arial"><B>3</B></TD>
+			<TD>锁定用户前允许的无效密码或无效密码提示问题答案尝试次数。</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial">MinRequiredPasswordLength</FONT></TD>
+			<TD align="center"><FONT face="Arial">tinyint</FONT></TD>
+			<TD align="center"><FONT face="Arial">1</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1" checked="checked"></TD>
+			<TD align="center"><FONT face="Arial"><B>6</B></TD>
+			<TD>密码所要求的最小长度。</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial">PasswordAttemptWindow</FONT></TD>
+			<TD align="center"><FONT face="Arial">int</FONT></TD>
+			<TD align="center"><FONT face="Arial">4</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1" checked="checked"></TD>
+			<TD align="center"><FONT face="Arial"><B>30</B></TD>
+			<TD>在锁定成员资格用户之前允许的最大无效密码或无效密码提示问题答案尝试次数的分钟数。</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial">PasswordExpires</FONT></TD>
+			<TD align="center"><FONT face="Arial">datetime</FONT></TD>
+			<TD align="center"><FONT face="Arial">8</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1"></TD>
+			<TD align="center"><FONT face="Arial"><B>&nbsp;</B></TD>
+			<TD>密码的过期时间。</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial">PasswordQuestion</FONT></TD>
+			<TD align="center"><FONT face="Arial">nvarchar</FONT></TD>
+			<TD align="center"><FONT face="Arial">100</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1" checked="checked"></TD>
+			<TD align="center"><FONT face="Arial">&nbsp;</TD>
+			<TD>用户的密码提示问题。</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial">PasswordAnswer</FONT></TD>
+			<TD align="center"><FONT face="Arial">varbinary</FONT></TD>
+			<TD align="center"><FONT face="Arial">64</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1" checked="checked"></TD>
+			<TD align="center"><FONT face="Arial">&nbsp;</TD>
+			<TD>用户的密码提示问题的答案。</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial">Creator</FONT></TD>
+			<TD align="center"><FONT face="Arial">varchar</FONT></TD>
+			<TD align="center"><FONT face="Arial">50</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1" checked="checked"></TD>
+			<TD align="center"><FONT face="Arial">&nbsp;</TD>
+			<TD>创建者</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial">CreatedTime</FONT></TD>
+			<TD align="center"><FONT face="Arial">datetime</FONT></TD>
+			<TD align="center"><FONT face="Arial">8</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1" checked="checked"></TD>
+			<TD align="center"><FONT face="Arial">getdate()</TD>
+			<TD>创建时间</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial">Modifier</FONT></TD>
+			<TD align="center"><FONT face="Arial">varchar</FONT></TD>
+			<TD align="center"><FONT face="Arial">50</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1" checked="checked"></TD>
+			<TD align="center"><FONT face="Arial">&nbsp;</TD>
+			<TD>最后的修改者</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial">ModifiedTime</FONT></TD>
+			<TD align="center"><FONT face="Arial">datetime</FONT></TD>
+			<TD align="center"><FONT face="Arial">8</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1" checked="checked"></TD>
+			<TD align="center"><FONT face="Arial">&nbsp;</TD>
+			<TD>最后的修改时间</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial">ApprovedTime</FONT></TD>
+			<TD align="center"><FONT face="Arial">datetime</FONT></TD>
+			<TD align="center"><FONT face="Arial">8</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1" checked="checked"></TD>
+			<TD align="center"><FONT face="Arial">&nbsp;</TD>
+			<TD>审核时间</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial">SuspendedTime</FONT></TD>
+			<TD align="center"><FONT face="Arial">datetime</FONT></TD>
+			<TD align="center"><FONT face="Arial">8</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1" checked="checked"></TD>
+			<TD align="center"><FONT face="Arial">&nbsp;</TD>
+			<TD>禁用时间</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial">Remark</FONT></TD>
+			<TD align="center"><FONT face="Arial">nvarchar</FONT></TD>
+			<TD align="center"><FONT face="Arial">500</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1" checked="checked"></TD>
+			<TD align="center"><FONT face="Arial"></TD>
+			<TD>用户的注释</TD>
+		</TR>
+	</TABLE>
+
+	<A name="Security.Role"><P widht="0" height="15px"></A>
+	<TABLE BORDER="1" cellspacing="0" cellpadding="2" width="100%" bordercolorlight="#808080" bordercolordark="#FFFFFF">
+		<TR>
+			<TD colspan="6" width="100%" height="24px" bgcolor="#C0C0C0" bordercolorlight="#808080" bordercolordark="#C0C0C0" align="center">
+				<DIV style="float:left; width:120; margin-top:5px; text-align:center; font-family:Arial; font-size:12pt; color:#000080"><B>Security.Role</B></DIV>
+				<DIV style="float:center; margin-top:3px"><FONT face="黑体" size="5">角色表</FONT></DIV>
+			</TD>
+		</TR>
+		<TR>
+			<TD width="20%" bgcolor="#C0C0C0" align="center">字段名称<BR><FONT face="Arial"><B>Field Name</B></FONT></TD>
+			<TD width="10%" bgcolor="#C0C0C0" align="center">字段类型<BR><FONT face="Arial"><B>Type</B></FONT></TD>
+			<TD width="10%" bgcolor="#C0C0C0" align="center">最大长度<BR><FONT face="Arial"><B>Length</B></FONT></TD>
+			<TD width="05%" bgcolor="#C0C0C0" align="center">空值<BR><FONT face="Arial"><B>Nullable</B></FONT></TD>
+			<TD width="10%" bgcolor="#C0C0C0" align="center">默认值<BR><FONT face="Arial"><B>Default</B></FONT></TD>
+			<TD width="45%" bgcolor="#C0C0C0" align="center">注释<BR><FONT face="Arial"><B>Description</B></FONT></TD>
+		</TR>
+
+		<TR>
+			<TD align="center"><FONT face="Arial"><B>(*PK)</B> ApplicationId</FONT></TD>
+			<TD align="center"><FONT face="Arial">varchar</FONT></TD>
+			<TD align="center"><FONT face="Arial">50</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1"></TD>
+			<TD align="center"><FONT face="Arial"></TD>
+			<TD>应用系统的名称，该名称必须保持全局唯一性。</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial"><B>(*PK)</B> Name</FONT></TD>
+			<TD align="center"><FONT face="Arial">varchar</FONT></TD>
+			<TD align="center"><FONT face="Arial">50</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1"></TD>
+			<TD align="center"><FONT face="Arial"></TD>
+			<TD>角色的名称，该名称必须保持全局唯一性。</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial">FullName</FONT></TD>
+			<TD align="center"><FONT face="Arial">nvarchar</FONT></TD>
+			<TD align="center"><FONT face="Arial">100</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1" checked="checked"></TD>
+			<TD align="center"><FONT face="Arial"></TD>
+			<TD>用户或角色的全称</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial">Creator</FONT></TD>
+			<TD align="center"><FONT face="Arial">varchar</FONT></TD>
+			<TD align="center"><FONT face="Arial">50</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1" checked="checked"></TD>
+			<TD align="center"><FONT face="Arial">&nbsp;</TD>
+			<TD>创建者</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial">CreatedTime</FONT></TD>
+			<TD align="center"><FONT face="Arial">datetime</FONT></TD>
+			<TD align="center"><FONT face="Arial">8</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1" checked="checked"></TD>
+			<TD align="center"><FONT face="Arial">getdate()</TD>
+			<TD>创建时间</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial">Modifier</FONT></TD>
+			<TD align="center"><FONT face="Arial">varchar</FONT></TD>
+			<TD align="center"><FONT face="Arial">50</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1" checked="checked"></TD>
+			<TD align="center"><FONT face="Arial">&nbsp;</TD>
+			<TD>最后的修改者ID</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial">ModifiedTime</FONT></TD>
+			<TD align="center"><FONT face="Arial">datetime</FONT></TD>
+			<TD align="center"><FONT face="Arial">8</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1" checked="checked"></TD>
+			<TD align="center"><FONT face="Arial">getdate()</TD>
+			<TD>最后的修改时间</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial">Remark</FONT></TD>
+			<TD align="center"><FONT face="Arial">nvarchar</FONT></TD>
+			<TD align="center"><FONT face="Arial">500</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1" checked="checked"></TD>
+			<TD align="center"><FONT face="Arial"></TD>
+			<TD>用户或角色的注释</TD>
+		</TR>
+	</TABLE>
+
+	<A name="Security.Member"><P widht="0" height="15px"></A>
+	<TABLE BORDER="1" cellspacing="0" cellpadding="2" width="100%" bordercolorlight="#808080" bordercolordark="#FFFFFF">
+		<TR>
+			<TD colspan="6" width="100%" height="24px" bgcolor="#C0C0C0" bordercolorlight="#808080" bordercolordark="#C0C0C0" align="center">
+				<DIV style="float:left; width:120; margin-top:5px; text-align:center; font-family:Arial; font-size:12pt; color:#000080"><B>Security.Member</B></DIV>
+				<DIV style="float:center; margin-top:3px"><FONT face="黑体" size="5">角色成员定义表</FONT></DIV>
+			</TD>
+		</TR>
+
+		<TR>
+			<TD width="20%" bgcolor="#C0C0C0" align="center">字段名称<BR><FONT face="Arial"><B>Field Name</B></FONT></TD>
+			<TD width="10%" bgcolor="#C0C0C0" align="center">字段类型<BR><FONT face="Arial"><B>Type</B></FONT></TD>
+			<TD width="10%" bgcolor="#C0C0C0" align="center">最大长度<BR><FONT face="Arial"><B>Length</B></FONT></TD>
+			<TD width="05%" bgcolor="#C0C0C0" align="center">空值<BR><FONT face="Arial"><B>Nullable</B></FONT></TD>
+			<TD width="10%" bgcolor="#C0C0C0" align="center">默认值<BR><FONT face="Arial"><B>Default</B></FONT></TD>
+			<TD width="45%" bgcolor="#C0C0C0" align="center">注释<BR><FONT face="Arial"><B>Description</B></FONT></TD>
+		</TR>
+
+		<TR>
+			<TD align="center"><FONT face="Arial"><B>(*PK)</B> ApplicationId</FONT></TD>
+			<TD align="center"><FONT face="Arial">varchar</FONT></TD>
+			<TD align="center"><FONT face="Arial">50</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1"></TD>
+			<TD align="center"><FONT face="Arial"></TD>
+			<TD>应用系统的名称，该名称必须保持全局唯一性。</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial"><B>(*PK)</B> RoleName</FONT></TD>
+			<TD align="center"><FONT face="Arial">varchar</FONT></TD>
+			<TD align="center"><FONT face="Arial">50</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1"></TD>
+			<TD align="center"><FONT face="Arial"></TD>
+			<TD>角色的编号</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial"><B>(*PK)</B> MemberName</FONT></TD>
+			<TD align="center"><FONT face="Arial">varchar</FONT></TD>
+			<TD align="center"><FONT face="Arial">50</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1"></TD>
+			<TD align="center"><FONT face="Arial"></TD>
+			<TD>用户或角色的编号</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial"><B>(*PK)</B> MemberType</FONT></TD>
+			<TD align="center"><FONT face="Arial">tinyint</FONT></TD>
+			<TD align="center"><FONT face="Arial">1</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1"></TD>
+			<TD align="center"><FONT face="Arial"></TD>
+			<TD>成员类型(0:用户;1:角色)</TD>
+		</TR>
+	</TABLE>
+
+	<A name="Security.Permission"><P widht="0" height="15px"></A>
+	<TABLE BORDER="1" cellspacing="0" cellpadding="2" width="100%" bordercolorlight="#808080" bordercolordark="#FFFFFF">
+		<TR>
+			<TD colspan="6" width="100%" height="24px" bgcolor="#C0C0C0" bordercolorlight="#808080" bordercolordark="#C0C0C0" align="center">
+				<DIV style="float:left; width:120; margin-top:5px; text-align:center; font-family:Arial; font-size:12pt; color:#000080"><B>Security.Permission</B></DIV>
+				<DIV style="float:center; margin-top:3px"><FONT face="黑体" size="5">系统权限定义表</FONT></DIV>
+			</TD>
+		</TR>
+
+		<TR>
+			<TD width="20%" bgcolor="#C0C0C0" align="center">字段名称<BR><FONT face="Arial"><B>Field Name</B></FONT></TD>
+			<TD width="10%" bgcolor="#C0C0C0" align="center">字段类型<BR><FONT face="Arial"><B>Type</B></FONT></TD>
+			<TD width="10%" bgcolor="#C0C0C0" align="center">最大长度<BR><FONT face="Arial"><B>Length</B></FONT></TD>
+			<TD width="05%" bgcolor="#C0C0C0" align="center">空值<BR><FONT face="Arial"><B>Nullable</B></FONT></TD>
+			<TD width="10%" bgcolor="#C0C0C0" align="center">默认值<BR><FONT face="Arial"><B>Default</B></FONT></TD>
+			<TD width="45%" bgcolor="#C0C0C0" align="center">注释<BR><FONT face="Arial"><B>Description</B></FONT></TD>
+		</TR>
+
+		<TR>
+			<TD align="center"><FONT face="Arial"><B>(*PK)</B> ApplicationId</FONT></TD>
+			<TD align="center"><FONT face="Arial">varchar</FONT></TD>
+			<TD align="center"><FONT face="Arial">50</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1"></TD>
+			<TD align="center"><FONT face="Arial"></TD>
+			<TD>应用系统的名称，该名称必须保持全局唯一性。</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial"><B>(*PK)</B> MemberName</FONT></TD>
+			<TD align="center"><FONT face="Arial">varchar</FONT></TD>
+			<TD align="center"><FONT face="Arial">50</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1"></TD>
+			<TD align="center"><FONT face="Arial"></TD>
+			<TD>用户或角色编号</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial"><B>(*PK)</B> MemberType</FONT></TD>
+			<TD align="center"><FONT face="Arial">tinyint</FONT></TD>
+			<TD align="center"><FONT face="Arial">1</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1"></TD>
+			<TD align="center"><FONT face="Arial"></TD>
+			<TD>目标类型(0:用户;1:角色)</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial"><B>(*PK)</B> SchemaId</FONT></TD>
+			<TD align="center"><FONT face="Arial">varchar</FONT></TD>
+			<TD align="center"><FONT face="Arial">50</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1"></TD>
+			<TD align="center"><FONT face="Arial"></TD>
+			<TD>应用编号</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial"><B>(*PK)</B> ActionId</FONT></TD>
+			<TD align="center"><FONT face="Arial">varchar</FONT></TD>
+			<TD align="center"><FONT face="Arial">50</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1"></TD>
+			<TD align="center"><FONT face="Arial"></TD>
+			<TD>权限编号</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial">Granted</FONT></TD>
+			<TD align="center"><FONT face="Arial">bit</FONT></TD>
+			<TD align="center"><FONT face="Arial">-</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1"></TD>
+			<TD align="center"><FONT face="Arial"></TD>
+			<TD>是否授权
+				<P style="margin-top:5px">　　表示该用户对指定的系统对象对应的权限字的保护类型，其取值范围定义如下：<BR>1)显示指定用户和角色对指定的系统对象拥有该权限；<BR>0)显示指定用户和角色对指定的系统对象拒绝该权限。</P>
+			</TD>
+		</TR>
+	</TABLE>
+
+	<A name="Security.PermissionFilter"><P widht="0" height="15px"></A>
+	<TABLE BORDER="1" cellspacing="0" cellpadding="2" width="100%" bordercolorlight="#808080" bordercolordark="#FFFFFF">
+		<TR>
+			<TD colspan="6" width="100%" height="24px" bgcolor="#C0C0C0" bordercolorlight="#808080" bordercolordark="#C0C0C0" align="center">
+				<DIV style="float:left; width:120; margin-top:5px; text-align:center; font-family:Arial; font-size:12pt; color:#000080"><B>Security.PermissionFilter</B></DIV>
+				<DIV style="float:center; margin-top:3px"><FONT face="黑体" size="5">系统权限过滤表</FONT></DIV>
+			</TD>
+		</TR>
+
+		<TR>
+			<TD width="20%" bgcolor="#C0C0C0" align="center">字段名称<BR><FONT face="Arial"><B>Field Name</B></FONT></TD>
+			<TD width="10%" bgcolor="#C0C0C0" align="center">字段类型<BR><FONT face="Arial"><B>Type</B></FONT></TD>
+			<TD width="10%" bgcolor="#C0C0C0" align="center">最大长度<BR><FONT face="Arial"><B>Length</B></FONT></TD>
+			<TD width="05%" bgcolor="#C0C0C0" align="center">空值<BR><FONT face="Arial"><B>Nullable</B></FONT></TD>
+			<TD width="10%" bgcolor="#C0C0C0" align="center">默认值<BR><FONT face="Arial"><B>Default</B></FONT></TD>
+			<TD width="45%" bgcolor="#C0C0C0" align="center">注释<BR><FONT face="Arial"><B>Description</B></FONT></TD>
+		</TR>
+
+		<TR>
+			<TD align="center"><FONT face="Arial"><B>(*PK)</B> ApplicationId</FONT></TD>
+			<TD align="center"><FONT face="Arial">varchar</FONT></TD>
+			<TD align="center"><FONT face="Arial">50</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1"></TD>
+			<TD align="center"><FONT face="Arial"></TD>
+			<TD>应用系统的名称，该名称必须保持全局唯一性。</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial"><B>(*PK)</B> MemberName</FONT></TD>
+			<TD align="center"><FONT face="Arial">varchar</FONT></TD>
+			<TD align="center"><FONT face="Arial">50</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1"></TD>
+			<TD align="center"><FONT face="Arial"></TD>
+			<TD>用户或角色编号</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial"><B>(*PK)</B> MemberType</FONT></TD>
+			<TD align="center"><FONT face="Arial">tinyint</FONT></TD>
+			<TD align="center"><FONT face="Arial">1</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1"></TD>
+			<TD align="center"><FONT face="Arial"></TD>
+			<TD>目标类型(0:用户;1:角色)</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial"><B>(*PK)</B> SchemaId</FONT></TD>
+			<TD align="center"><FONT face="Arial">varchar</FONT></TD>
+			<TD align="center"><FONT face="Arial">50</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1"></TD>
+			<TD align="center"><FONT face="Arial"></TD>
+			<TD>应用编号</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial"><B>(*PK)</B> ActionId</FONT></TD>
+			<TD align="center"><FONT face="Arial">varchar</FONT></TD>
+			<TD align="center"><FONT face="Arial">50</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1"></TD>
+			<TD align="center"><FONT face="Arial"></TD>
+			<TD>权限编号</TD>
+		</TR>
+		<TR>
+			<TD align="center"><FONT face="Arial"><FONT face="Arial">Filter</FONT></TD>
+			<TD align="center"><FONT face="Arial">nvarchar</FONT></TD>
+			<TD align="center"><FONT face="Arial">4000</FONT></TD>
+			<TD align="center"><INPUT type="checkbox" disabled="1"></TD>
+			<TD align="center"><FONT face="Arial"></TD>
+			<TD>拒绝授权的数据成员（如：<FONT face="Courier New" color="navy">TableName.FieldName</FONT>）</TD>
+		</TR>
+	</TABLE>
+
+	<A name="Remark"><P widht="0" height="15px"></A>
+	<TABLE BORDER="1" cellspacing="0" cellpadding="2" width="100%" bordercolorlight="#808080" bordercolordark="#FFFFFF">
+		<TR>
+			<TD bgcolor="#C0C0C0">其它说明&middot;<FONT face="Arial"><B>Remark</B></FONT></TD>
+		</TR>
+		<TR>
+			<TD style="font-family:宋体; font-size:9pt; text-indent:2em">
+				假设有角色 <FONT face="Arial" color="navy">Market</FONT> 和用户 <FONT face="Arial" color="navy">Jack</FONT>，其中 <FONT face="Arial" color="navy">Jack</FONT> 是 <FONT face="Arial" color="navy">Market</FONT> 的角色成员之一。在 <FONT face="Arial" color="navy">Permission</FONT> 授权表有记录如下：
+				<TABLE align="center" border="1" cellspacing="0" cellpadding="2" width="60%" bordercolorlight="#808080" bordercolordark="#FFFFFF" style="margin-top:5px; margin-bottom:5px">
+					<TR align="center" bgcolor="#C0C0C0" bordercolordark="#C0C0C0" style="font-family:Arial; color:navy">
+						<TD>MemberName</TD>
+						<TD>MemberType</TD>
+						<TD>SchemaId</TD>
+						<TD>ActionId</TD>
+						<TD>Protect</TD>
+					</TR>
+					<TR style="font-family:Courier New">
+						<TD align="center">Market</TD>
+						<TD align="center">1</TD>
+						<TD align="center">SalesOrder</TD>
+						<TD align="center"><FONT color="maroon"><I>Select</I></FONT></TD>
+						<TD align="center">1(Grant)</TD>
+					</TR>
+					<TR align="center">
+						<TD>...</TD>
+						<TD>...</TD>
+						<TD>...</TD>
+						<TD>...</TD>
+						<TD>...</TD>
+					</TR>
+				</TABLE>
+
+				其表示 <FONT face="Arial" color="navy">Market</FONT> 角色下属所有成员默认拥有对 <FONT face="Arial" color="navy">SalesOrder</FONT><I>（销售订单）</I>应用模块授权有 <FONT face="Arial" color="navy">Select</FONT><I>（读取）</I>业务数据的权力。且在 <FONT face="Arial" color="navy">PermissionFilter</FONT> 授权过滤表中有记录如下：
+
+				<TABLE align="center" border="1" cellspacing="0" cellpadding="2" width="60%" bordercolorlight="#808080" bordercolordark="#FFFFFF" style="margin-top:5px; margin-bottom:5px">
+					<TR align="center" bgcolor="#C0C0C0" bordercolordark="#C0C0C0" style="font-family:Arial; color:navy">
+						<TD>MemberName</TD>
+						<TD>MemberType</TD>
+						<TD>SchemaId</TD>
+						<TD>ActionId</TD>
+						<TD>Filter</TD>
+					</TR>
+
+					<TR style="font-family:Courier New">
+						<TD>Jack</TD>
+						<TD>0</TD>
+						<TD>SalesOrder</TD>
+						<TD><FONT color="maroon"><I>Select</I></FONT></TD>
+						<TD>TSalesOrder.CustomerNo</TD>
+					</TR>
+					<TR style="font-family:Courier New">
+						<TD>Jack</TD>
+						<TD>0</TD>
+						<TD>SalesOrder</TD>
+						<TD><FONT color="maroon"><I>Select</I></FONT></TD>
+						<TD>TSalesOrderDetail.Price</TD>
+					</TR>
+					<TR style="font-family:Courier New">
+						<TD>Jack</TD>
+						<TD>0</TD>
+						<TD>SalesOrder</TD>
+						<TD><FONT color="maroon"><I>Select</I></FONT></TD>
+						<TD>TSalesOrderDetail.Amount</TD>
+					</TR>
+					<TR style="font-family:Courier New">
+						<TD>Jack</TD>
+						<TD>0</TD>
+						<TD>SalesOrder</TD>
+						<TD><FONT color="maroon"><I>Select</I></FONT></TD>
+						<TD>TSalesOrderDetail.Quantity</TD>
+					</TR>
+					<TR align="center">
+						<TD>...</TD>
+						<TD>...</TD>
+						<TD>...</TD>
+						<TD>...</TD>
+						<TD>...</TD>
+					</TR>
+				</TABLE>
+				以上两个授权表中的数据指示出 <FONT face="Arial" color="navy">Jack</FONT> 默认拥有 <FONT face="Arial" color="maroon">Select</FONT><I>（读取）</I><FONT face="Arial" color="navy">SalesOrder</FONT><I>（销售订单）</I>应用模块中所有业务数据的权力（继承自 <FONT face="Arial" color="navy">Market</FONT> 角色的授权），但是他却被<B>拒绝</B> <FONT face="Arial" color="maroon">Select</FONT><I>（读取）</I><FONT face="Arial" color="navy">SalesOrder</FONT><I>（销售订单）</I>应用模块中如下字段的数据：<BR>
+				<UL>
+					<LI><FONT face="Courier New" color="navy">TSalesOrder.CustomerNo</FONT><I>（销售订单所属的客户编号）</I></LI>
+					<LI><FONT face="Courier New" color="navy">TSalesOrderDetail.Price</FONT><I>（产品单价）</I></LI>
+					<LI><FONT face="Courier New" color="navy">TSalesOrderDetail.Amount</FONT><I>（销售金额）</I></LI>
+					<LI><FONT face="Courier New" color="navy">TSalesOrderDetail.Quantity</FONT><I>（销售数量）</I></LI>
+				</UL>
+				<P style="margin-top:5px">
+				以上过滤器语法可以简写成一行：<SPAN style="font-family:Courier New; color:navy">TSalesOrder.CustomerNo; TSalesOrderDetail.Price, Amount, Quantity</SPAN>
+				</P>
+
+				<P style="margin-top:10px; margin-bottom:10px">
+					<FONT color="red"><B>注意：</B></FONT>在 <FONT face="Arial" color="maroon">PermissionFilter</FONT> 表中的记录始终表示的是拒绝授权的信息。
+				</P>
+			</TD>
+		</TR>
+	</TABLE>
+
+	<A name="SeeAlso"><P widht="0" height="15px"></A>
+	<TABLE BORDER="1" cellspacing="0" cellpadding="2" width="100%" bordercolorlight="#808080" bordercolordark="#FFFFFF">
+		<TR>
+			<TD bgcolor="#C0C0C0">其它参考&middot;<FONT face="Arial"><B>See Also</B></FONT></TD>
+		</TR>
+		<TR>
+			<TD>
+				<A href="系统权限与流程控制表结构定义.htm">系统权限与流程控制表结构定义(1.00)</A>，
+				<A href="SWPermission.htm">SWPermission 对象</A>，
+				<A href="SWWorkFlow.htm">SWWorkFlow 对象</A>，
+				<A href="系统权限与流程控制存储过程定义.htm">系统权限与流程控制存储过程/函数定义</A>
+			</TD>
+		</TR>
+	</TABLE>
+</BODY>
+</HTML>
