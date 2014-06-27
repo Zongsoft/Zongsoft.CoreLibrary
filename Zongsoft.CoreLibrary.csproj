@@ -398,7 +398,7 @@
     <Compile Include="Common\Convert.cs" />
     <Compile Include="ComponentModel\EnumConverter.cs" />
     <Compile Include="Common\EnumEntry.cs" />
-    <Compile Include="ComponentModel\CustomBooleanConvert.cs" />
+    <Compile Include="ComponentModel\CustomBooleanConverter.cs" />
     <Compile Include="ComponentModel\Action.cs" />
     <Compile Include="Options\OptionProviderExtension.cs" />
     <Compile Include="Options\Utility.cs" />

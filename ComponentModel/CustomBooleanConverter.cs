@@ -30,7 +30,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.ComponentModel
 {
-	public class CustomBooleanConvert : BooleanConverter
+	public class CustomBooleanConverter : BooleanConverter
 	{
 		#region 成员变量
 		private string _trueString;
@@ -38,11 +38,11 @@ namespace Zongsoft.ComponentModel
 		#endregion
 
 		#region 构造函数
-		public CustomBooleanConvert() : this("是", "否")
+		public CustomBooleanConverter() : this("是", "否")
 		{
 		}
 
-		public CustomBooleanConvert([LocalizableAttribute(true)]string trueString, [LocalizableAttribute(true)]string falseString)
+		public CustomBooleanConverter([LocalizableAttribute(true)]string trueString, [LocalizableAttribute(true)]string falseString)
 		{
 			if(string.IsNullOrEmpty(trueString))
 				_trueString = bool.TrueString;
