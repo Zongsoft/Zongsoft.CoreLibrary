@@ -111,7 +111,7 @@ Zongsoft.CoreLibrary 是 [Zongsoft](http://www.zongsoft.com) Corporation 的核�
 
 ## 关于我们
 
-目前 Zongsoft 的所有框架代码基本是由一个叫 [钟峰(Popeye Zhong)](<zongsoft@gmail.com>) 的家伙堆出来的，当然还有他的小伙伴们也贡献了一些，目前这些小伙伴有：
+目前 Zongsoft 的所有框架代码基本是由一个叫 [钟峰(Popeye Zhong)](https://github.com/PopeyeZhong) 的家伙堆出来的，当然还有他的小伙伴们也贡献了一些，目前这些小伙伴有：
 
 1. [祥子](<#>)			<https://github.com/superxz>
 2. [邓焱](<#>)			<https://github.com/WilfredDeng>
