@@ -109,21 +109,8 @@ Zongsoft.CoreLibrary 是 [Zongsoft](http://www.zongsoft.com) Corporation 的核�
 - Zongsoft.Terminals 是基于 [LGPL v2.1授权协议](http://www.gnu.org/licenses/lgpl-2.1.html)。
 - Zongsoft.Web 是基于 [LGPL v2.1授权协议](http://www.gnu.org/licenses/lgpl-2.1.html)。
 
-## 关于我们
-
-目前 Zongsoft 的所有框架代码基本是由一个叫 [钟峰(Popeye Zhong)](https://github.com/PopeyeZhong) 的家伙堆出来的，当然还有他的小伙伴们也贡献了一些，目前这些小伙伴有：
-
-1. [祥子](<#>)			<https://github.com/superxz>
-2. [邓焱](<#>)			<https://github.com/WilfredDeng>
-3. [星哥](<#>)			<https://github.com/yxzx>
-4. [阿宝](<#>)			<https://github.com/chendb>
-5. [罗总](<#>)			<https://github.com/Isego>
-
-
 ------------
 
 **为什么要开源？**
 
-就目前的局势而言，.NET 与 Java 阵营的最大差距就在于开源社区的深度和广度，.NET 阵营除了 [Microsoft](http://www.microsoft.com) 和 [Xamarin](http://xamarin.com/) 两个老大提供的一些基础框架的开源项目外，鲜有其他业界大耳参与；而 Java 阵营则囊括国内外几乎所有大佬(此处省略1000+字)，像 Hadoop、Android 这样的开源平台更是将 Java 阵营推向几乎无法企及的前所未有的高度， .NET 的缔造者 Microsoft 则一再因为 Windows 中心化战略令整个 .NET 阵营陷入迷茫几乎失去方向，好在 Ballmer 这个逗比终于下台了，但是 .NET 阵营面临的困扰依然没有随之减弱多少，未来依然艰险难料……
-
-我们深知自己只是沧海一栗、大漠一砂砾，不只是因为坚持才不舍离去，更因对 C#/.NET 的热爱，只希望能为此做点什么，**不求逆变但求滴水之源敢汇大海之心**。
+**不求逆变但求滴水之源敢汇大海之心**。
