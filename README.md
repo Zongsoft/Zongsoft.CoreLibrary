@@ -111,6 +111,6 @@ Zongsoft.CoreLibrary 是 [Zongsoft](http://www.zongsoft.com) Corporation 的核�
 
 ------------
 
-**为什么要开源？**
+## 为什么要开源？
 
 **不求逆变但求滴水之源敢汇大海之心**。
