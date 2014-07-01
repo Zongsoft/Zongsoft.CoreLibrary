@@ -5,7 +5,7 @@ The core library of [Zongsoft](http://www.zongsoft.com) corporation, with C#, cr
 
 ## 概述
 
-Zongsoft.CoreLibrary 是 [Zongsoft](http://www.zongsoft.com) Corporation 的核心开发库，采用C#语言开发，支持跨平台可运行在 Windows、Windows Phone 8.x 以及 Linux([Mono](http://www.mono-project.com)) 等平台中。
+Zongsoft.CoreLibrary 类库提供了.NET开发的常用功能集以及一些相对于.NET BCL中进行了功能强化的实现。采用C#语言开发，支持跨平台可运行在 Windows、Windows Phone 8.x 以及 Linux([Mono](http://www.mono-project.com)) 等平台中。
 
 -----
 
