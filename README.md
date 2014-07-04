@@ -1,4 +1,4 @@
-Zongsoft.CoreLibrary
+﻿Zongsoft.CoreLibrary
 ====================
 
 The core library of [Zongsoft](http://www.zongsoft.com) corporation, with C#, cross-platform, support Windows/Windows Phone 8.x & Linux based [Mono](http://www.mono-project.com).
