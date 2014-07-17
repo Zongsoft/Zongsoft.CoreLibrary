@@ -95,17 +95,21 @@ namespace Zongsoft.Transactions
 		/// <summary>
 		/// 向当前事务登记一个事务处理过程的回调。
 		/// </summary>
-		/// <param name="enlistment">处理事务处理过程的回调接口。</param>
+		/// <param name="enlistment">指定的事务处理过程的回调接口。</param>
 		public void Enlist(IEnlistment enlistment)
 		{
 			if(enlistment == null)
 				throw new ArgumentNullException("enlistment");
 
+			//如果指定的事务处理程序已经被登记过则返回
+			if(_enlistments.Contains(enlistment))
+				return;
+
+			//将指定的事务处理程序加入到列表中
 			_enlistments.Enqueue(enlistment);
 
-			//如果当前事务内被首次登记才需要处理事务范围的预处理回调
-			if(!_enlistments.Contains(enlistment))
-				enlistment.OnEnlist(new EnlistmentContext(this, EnlistmentPhase.Prepare));
+			//通知事务处理程序进入事务准备阶段
+			enlistment.OnEnlist(new EnlistmentContext(this, EnlistmentPhase.Prepare));
 		}
 
 		/// <summary>
@@ -128,9 +132,6 @@ namespace Zongsoft.Transactions
 		#region 私有方法
 		private void DoEnlistment(EnlistmentPhase phase)
 		{
-			if(_enlistments.Count < 1)
-				return;
-
 			while(_enlistments.Count > 0)
 			{
 				var enlistment = _enlistments.Dequeue();
