@@ -422,11 +422,6 @@
     <Compile Include="Text\TextExpressionNode.cs" />
     <Compile Include="Text\TextExpressionNodeCollection.cs" />
     <Compile Include="Text\TextExpressionParser.cs" />
-    <Compile Include="Transactions\EnlistmentContext.cs" />
-    <Compile Include="Transactions\IEnlistment.cs" />
-    <Compile Include="Transactions\Transaction.cs" />
-    <Compile Include="Transactions\EnlistmentPhase.cs" />
-    <Compile Include="Transactions\TransactionInformation.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Options\Option.option">
