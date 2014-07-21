@@ -39,9 +39,9 @@ using Zongsoft.Services;
 
 namespace Zongsoft.Communication.Net.Ftp
 {
-    internal class FtpCommandLoader : ICommandLoader
+    internal class FtpCommandLoader : CommandLoaderBase
     {
-        public void Load(CommandTreeNode node)
+        protected override bool OnLoad(CommandTreeNode node)
         {
             node.Children.Add(new FtpAborCommand());
             node.Children.Add(new FtpAlloCommand());
@@ -74,6 +74,9 @@ namespace Zongsoft.Communication.Net.Ftp
             node.Children.Add(new FtpSystCommand());
             node.Children.Add(new FtpTypeCommand());
             node.Children.Add(new FtpUserCommand());
+
+			//返回加载成功
+			return true;
         }
     }
 }

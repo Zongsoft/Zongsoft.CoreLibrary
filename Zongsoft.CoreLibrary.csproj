@@ -238,6 +238,7 @@
     <Compile Include="Services\CommandExecutorContext.cs" />
     <Compile Include="Services\CommandHelper.cs" />
     <Compile Include="Services\CommandLine.cs" />
+    <Compile Include="Services\CommandLoaderBase.cs" />
     <Compile Include="Services\CommandOption.cs" />
     <Compile Include="Services\CommandOptionAttribute.cs" />
     <Compile Include="Services\CommandOptionCollection.cs" />

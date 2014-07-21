@@ -34,6 +34,7 @@ namespace Zongsoft.Services
 		#region 成员字段
 		private string _name;
 		private ICommand _command;
+		private ICommandLoader _loader;
 		private CommandTreeNode _parent;
 		private CommandTreeNodeCollection _children;
 		#endregion
@@ -89,6 +90,18 @@ namespace Zongsoft.Services
 			}
 		}
 
+		public ICommandLoader Loader
+		{
+			get
+			{
+				return _loader;
+			}
+			set
+			{
+				_loader = value;
+			}
+		}
+
 		public CommandTreeNode Parent
 		{
 			get
@@ -105,6 +118,10 @@ namespace Zongsoft.Services
 		{
 			get
 			{
+				//确保当前加载器已经被加载过
+				this.EnsureLoaded();
+
+				//返回子节点集
 				return _children;
 			}
 		}
@@ -123,6 +140,9 @@ namespace Zongsoft.Services
 		{
 			if(parts == null || parts.Length == 0)
 				return null;
+
+			//确保当前加载器已经被加载过
+			this.EnsureLoaded();
 
 			var current = this;
 
@@ -162,6 +182,9 @@ namespace Zongsoft.Services
 			if(command == null)
 				return null;
 
+			//确保当前加载器已经被加载过
+			this.EnsureLoaded();
+
 			return this.FindDown(this, node => node._command == command);
 		}
 
@@ -170,11 +193,22 @@ namespace Zongsoft.Services
 			if(predicate == null)
 				return null;
 
+			//确保当前加载器已经被加载过
+			this.EnsureLoaded();
+
 			return this.FindDown(this, predicate);
 		}
 		#endregion
 
 		#region 私有方法
+		private void EnsureLoaded()
+		{
+			var loader = _loader;
+
+			if(loader != null && (!loader.IsLoaded))
+				loader.Load(this);
+		}
+
 		private CommandTreeNode FindDown(CommandTreeNode current, Predicate<CommandTreeNode> predicate)
 		{
 			if(current == null || predicate == null)

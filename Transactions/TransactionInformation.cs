@@ -82,6 +82,5 @@ namespace Zongsoft.Transactions
 			}
 		}
 		#endregion
-
 	}
 }

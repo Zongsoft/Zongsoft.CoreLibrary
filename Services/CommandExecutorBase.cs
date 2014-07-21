@@ -33,10 +33,6 @@ namespace Zongsoft.Services
 {
 	public class CommandExecutorBase : MarshalByRefObject
 	{
-		#region 私有变量
-		private int _isLoaded;
-		#endregion
-
 		#region 声明事件
 		public event EventHandler CurrentChanged;
 		public event EventHandler<CommandExecutingEventArgs> Executing;
@@ -57,21 +53,6 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 公共属性
-		public ICommandLoader Loader
-		{
-			get
-			{
-				return _loader;
-			}
-			set
-			{
-				if(_isLoaded != 0)
-					throw new InvalidOperationException("The CommandLoader was loaded.");
-
-				_loader = value;
-			}
-		}
-
 		public CommandTreeNode Root
 		{
 			get
@@ -127,16 +108,6 @@ namespace Zongsoft.Services
 		{
 			if(string.IsNullOrWhiteSpace(commandPath))
 				throw new ArgumentNullException("commandPath");
-
-			if(_loader != null)
-			{
-				//判断命令加载器是否加载过
-				var isLoaded = System.Threading.Interlocked.CompareExchange(ref _isLoaded, 1, 0);
-
-				//如果命令加载器从未加载过则调用加载器来加载命令
-				if(isLoaded == 0 && _loader != null)
-					_loader.Load(_root);
-			}
 
 			switch(commandPath.Trim())
 			{

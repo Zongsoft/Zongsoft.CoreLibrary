@@ -69,10 +69,7 @@ namespace Zongsoft.Communication.Net
 					return channel;
 				}, channel => channel.StopListener());
 
-			_commandExecutor = new FtpCommandExecutor()
-			{
-				Loader = new FtpCommandLoader(),
-			};
+			_commandExecutor = new FtpCommandExecutor();
 		}
         #endregion
 
@@ -175,6 +172,11 @@ namespace Zongsoft.Communication.Net
         #region 嵌套子类
         private class FtpCommandExecutor : CommandExecutorBase
         {
+			public FtpCommandExecutor()
+			{
+				this.Root.Loader = new FtpCommandLoader();
+			}
+
 			public object Execute(string name, ReceivedEventArgs args)
 			{
 				return base.Execute(name, args);
