@@ -42,7 +42,6 @@ namespace Zongsoft.Services
 		#region 成员字段
 		private readonly CommandTreeNode _root;
 		private CommandTreeNode _current;
-		private ICommandLoader _loader;
 		#endregion
 
 		#region 构造函数

@@ -97,7 +97,7 @@ namespace Zongsoft.Services
 
 		protected override void InsertItem(int index, CommandTreeNode item)
 		{
-			if(item.Parent != null && !object.ReferenceEquals(_owner, item.Parent))
+			if(item.Parent != null && (!object.ReferenceEquals(item.Parent, _owner)))
 				throw new InvalidOperationException();
 
 			item.Parent = _owner;
@@ -107,7 +107,7 @@ namespace Zongsoft.Services
 
 		protected override void SetItem(int index, CommandTreeNode item)
 		{
-			if(item.Parent != null && !object.ReferenceEquals(_owner, item.Parent))
+			if(item.Parent != null && (!object.ReferenceEquals(item.Parent, _owner)))
 				throw new InvalidOperationException();
 
 			item.Parent = _owner;

@@ -96,6 +96,10 @@ Zongsoft.CoreLibrary 类库提供了.NET开发的常用功能集以及一些相�
 - Text
 	> 该命名空间内包括一套基于正则表达式的文本表达式的解析、处理的类，我们在 [Zongsoft.Web](https://github.com/Zongsoft/Zongsoft.Web) 项目的视图引擎部分正是使用该文本表达式作为其数据绑定表达式的技术基础。
 
+- Transactions
+	> 该命名空间内包括有关事务的类和接口，有关应用事务支持的实现可参考 [Zongsoft.Data 数据引擎](https://github.com/Zongsoft.Zongsoft.Data) 中的事务支持。
+
+
 ## 引用说明
 
 本项目中的 `Common.UrlUtility` 和 `Collections.Collection<T>` 类的代码参考了[微软](http://www.microsoft.com).NET BCL中相应类的实现，如果遇有版权问题请通知我们，我们将再重新实现这部分代码。

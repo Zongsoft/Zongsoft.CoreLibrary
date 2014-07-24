@@ -9,6 +9,12 @@ namespace Zongsoft.Services
 		private readonly object _syncRoot = new object();
 		#endregion
 
+		#region 构造函数
+		protected CommandLoaderBase()
+		{
+		}
+		#endregion
+
 		#region 成员字段
 		private bool _isLoaded;
 		#endregion

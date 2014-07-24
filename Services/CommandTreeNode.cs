@@ -40,7 +40,7 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 构造函数
-		public CommandTreeNode(string name, CommandTreeNode parent)
+		public CommandTreeNode(string name, CommandTreeNode parent = null)
 		{
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException("name");
@@ -50,7 +50,7 @@ namespace Zongsoft.Services
 			_children = new CommandTreeNodeCollection(this);
 		}
 
-		public CommandTreeNode(ICommand command, CommandTreeNode parent)
+		public CommandTreeNode(ICommand command, CommandTreeNode parent = null)
 		{
 			_command = command;
 			_parent = parent;
