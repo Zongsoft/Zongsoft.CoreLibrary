@@ -82,7 +82,29 @@ namespace Zongsoft.Common
 			return false;
 		}
 
+		public static bool ContainsCharacters(this string text, char[] characters)
+		{
+			if(string.IsNullOrEmpty(text) || characters.Length < 1)
+				return false;
+
+			foreach(char character in characters)
+			{
+				foreach(char item in text)
+				{
+					if(character == item)
+						return true;
+				}
+			}
+
+			return false;
+		}
+
 		public static string RemoveCharacters(this string text, string invalidCharacters)
+		{
+			return RemoveCharacters(text, invalidCharacters, 0);
+		}
+
+		public static string RemoveCharacters(this string text, char[] invalidCharacters)
 		{
 			return RemoveCharacters(text, invalidCharacters, 0);
 		}
@@ -92,9 +114,19 @@ namespace Zongsoft.Common
 			return RemoveCharacters(text, invalidCharacters, startIndex, -1);
 		}
 
+		public static string RemoveCharacters(this string text, char[] invalidCharacters, int startIndex)
+		{
+			return RemoveCharacters(text, invalidCharacters, startIndex, -1);
+		}
+
 		public static string RemoveCharacters(this string text, string invalidCharacters, int startIndex, int count)
 		{
-			if(string.IsNullOrEmpty(text) || string.IsNullOrEmpty(invalidCharacters))
+			return RemoveCharacters(text, invalidCharacters.ToCharArray(), startIndex, count);
+		}
+
+		public static string RemoveCharacters(this string text, char[] invalidCharacters, int startIndex, int count)
+		{
+			if(string.IsNullOrEmpty(text) || invalidCharacters.Length < 1)
 				return text;
 
 			if(startIndex < 0)
