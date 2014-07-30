@@ -26,26 +26,34 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
+using System.Text.RegularExpressions;
 
-namespace Zongsoft.Services
+namespace Zongsoft.IO
 {
-	public class ServiceProvider : ServiceProviderBase
+	internal static class LocalPath
 	{
-		#region 构造函数
-		public ServiceProvider() : this(ServiceStorage.Default, null)
-		{
-		}
+		private static readonly Regex _winPathRegex = new Regex(@"^(\/?(?<drive>[a-zA-Z]))(?<path>(/[^\/\\]+)*\/?)$", RegexOptions.Compiled | RegexOptions.ExplicitCapture | RegexOptions.IgnorePatternWhitespace);
 
-		public ServiceProvider(IServiceBuilder builder) : this(ServiceStorage.Default, builder)
+		public static string ToLocalPath(string path)
 		{
-		}
+			if(string.IsNullOrWhiteSpace(path))
+				throw new PathException(string.Empty);
 
-		public ServiceProvider(IServiceStorage storage, IServiceBuilder builder) : base(storage, builder)
-		{
+			path = path.Trim();
+
+			switch(Environment.OSVersion.Platform)
+			{
+				case PlatformID.MacOSX:
+				case PlatformID.Unix:
+					return path;
+			}
+
+			var match = _winPathRegex.Match(path);
+
+			if(!match.Success)
+				throw new PathException(path);
+
+			return match.Groups["drive"].Value + ":" + match.Groups["path"].Value;
 		}
-		#endregion
 	}
 }

@@ -26,26 +26,22 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
 
 namespace Zongsoft.Services
 {
-	public class ServiceProvider : ServiceProviderBase
+	public class Matcher : IMatcher
 	{
-		#region 构造函数
-		public ServiceProvider() : this(ServiceStorage.Default, null)
+		public virtual bool Match(object target, object parameter)
 		{
-		}
+			if(target == null)
+				return false;
 
-		public ServiceProvider(IServiceBuilder builder) : this(ServiceStorage.Default, builder)
-		{
-		}
+			var matchable = target as IMatchable;
 
-		public ServiceProvider(IServiceStorage storage, IServiceBuilder builder) : base(storage, builder)
-		{
+			if(matchable != null)
+				return matchable.IsMatch(parameter);
+
+			return false;
 		}
-		#endregion
 	}
 }

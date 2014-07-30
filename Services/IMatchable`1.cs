@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2008-2011 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2013 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,30 +25,11 @@
  */
 
 using System;
-using System.Collections.Generic;
 
-namespace Zongsoft.IO
+namespace Zongsoft.Services
 {
-	/// <summary>
-	/// 公开用于创建、移动和遍历目录和子目录等功能的抽象接口，该接口将提供不同文件系统的目录支持。
-	/// </summary>
-	public interface IDirectory
+	public interface IMatchable<T> : IMatchable
 	{
-		void Create(string path);
-
-		void Delete(string path);
-		void Delete(string path, bool recursive);
-
-		void Move(string source, string destination);
-		bool Exists(string path);
-
-		IEnumerable<string> GetChildren(string path);
-		IEnumerable<string> GetChildren(string path, string pattern, bool recursive);
-
-		IEnumerable<string> GetDirectories(string path);
-		IEnumerable<string> GetDirectories(string path, string pattern, bool recursive);
-
-		IEnumerable<string> GetFiles(string path);
-		IEnumerable<string> GetFiles(string path, string pattern, bool recursive);
+		bool IsMatch(T parameter);
 	}
 }

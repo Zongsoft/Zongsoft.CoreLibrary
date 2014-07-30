@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2014 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,7 +25,6 @@
  */
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace Zongsoft.Services
@@ -33,42 +32,23 @@ namespace Zongsoft.Services
 	public interface IServiceProvider : System.IServiceProvider
 	{
 		#region 事件定义
-		event EventHandler<ServiceProviderChangedEventArgs> Registered;
-		event EventHandler<ServiceProviderChangedEventArgs> Unregistered;
-		#endregion
-
-		#region 公共属性
-		/// <summary>
-		/// 获取当前服务供应程序的名称。
-		/// </summary>
-		//string Name
-		//{
-		//    get;
-		//}
-
-		/// <summary>
-		/// 获取或设置当前服务供应程序的解析比对器。
-		/// </summary>
-		//Collections.IMatcher Matcher
-		//{
-		//    get;
-		//    set;
-		//}
+		event EventHandler<ServiceRegisteredEventArgs> Registered;
+		event EventHandler<ServiceUnregisteredEventArgs> Unregistered;
 		#endregion
 
 		#region 注册方法
-		void Register(string name, Type instanceType);
-		void Register(string name, Type instanceType, Type contractType);
-		void Register(string name, Type instanceType, Type[] contractTypes);
+		void Register(string name, Type serviceType);
+		void Register(string name, Type serviceType, Type contractType);
+		void Register(string name, Type serviceType, Type[] contractTypes);
 
-		void Register(string name, object instance);
-		void Register(string name, object instance, Type contractType);
-		void Register(string name, object instance, Type[] contractTypes);
+		void Register(string name, object service);
+		void Register(string name, object service, Type contractType);
+		void Register(string name, object service, Type[] contractTypes);
 
-		void Register(Type instanceType, Type contractType);
-		void Register(Type instanceType, Type[] contractTypes);
-		void Register(object instance, Type contractType);
-		void Register(object instance, Type[] contractTypes);
+		void Register(Type serviceType, Type contractType);
+		void Register(Type serviceType, Type[] contractTypes);
+		void Register(object service, Type contractType);
+		void Register(object service, Type[] contractTypes);
 
 		void Unregister(string name);
 		#endregion

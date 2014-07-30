@@ -95,10 +95,6 @@ namespace Zongsoft.Services
 			{
 				return _result;
 			}
-			set
-			{
-				_result = value;
-			}
 		}
 
 		public bool IsResolveAll

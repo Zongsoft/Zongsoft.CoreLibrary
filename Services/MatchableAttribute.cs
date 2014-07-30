@@ -29,70 +29,45 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Services
 {
-	public class ServiceProviderChangedEventArgs : EventArgs
+	[AttributeUsage(AttributeTargets.Class)]
+	public class MatchableAttribute : Attribute
 	{
 		#region 成员字段
-		private string _name;
-		private object _instance;
-		private Type _instanceType;
-		private Type[] _contractTypes;
+		private Type _type;
 		#endregion
 
 		#region 构造函数
-		public ServiceProviderChangedEventArgs(string name, object instance, Type[] contractTypes)
+		public MatchableAttribute(Type type)
 		{
-			if(instance == null)
-				throw new ArgumentNullException("instance");
+			if(type == null)
+				throw new ArgumentNullException("type");
 
-			_name = name;
-			_instance = instance;
-			_contractTypes = contractTypes;
+			if(!typeof(IMatchable).IsAssignableFrom(type))
+				throw new ArgumentException("The type is not a IMatchable.");
+
+			_type = type;
 		}
 
-		public ServiceProviderChangedEventArgs(string name, Type instanceType, Type[] contractTypes)
+		public MatchableAttribute(string typeName)
 		{
-			if(instanceType == null)
-				throw new ArgumentNullException("instanceType");
+			if(string.IsNullOrWhiteSpace(typeName))
+				throw new ArgumentNullException("typeName");
 
-			_name = name;
-			_instanceType = instanceType;
-			_contractTypes = contractTypes;
+			var type = Type.GetType(typeName, false);
+
+			if(type == null || !typeof(IMatchable).IsAssignableFrom(type))
+				throw new ArgumentException("The type is not a IMatchable.");
+
+			_type = type;
 		}
 		#endregion
 
 		#region 公共属性
-		public string Name
+		public Type Type
 		{
 			get
 			{
-				return _name;
-			}
-		}
-
-		public object Instance
-		{
-			get
-			{
-				return _instance;
-			}
-		}
-
-		public Type InstanceType
-		{
-			get
-			{
-				if(_instanceType == null && _instance != null)
-					_instanceType = _instance.GetType();
-
-				return _instanceType;
-			}
-		}
-
-		public Type[] ContractTypes
-		{
-			get
-			{
-				return _contractTypes ?? new Type[0];
+				return _type;
 			}
 		}
 		#endregion

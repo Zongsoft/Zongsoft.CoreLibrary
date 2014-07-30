@@ -26,26 +26,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
 
 namespace Zongsoft.Services
 {
-	public class ServiceProvider : ServiceProviderBase
+	public interface IMatcher
 	{
-		#region 构造函数
-		public ServiceProvider() : this(ServiceStorage.Default, null)
-		{
-		}
-
-		public ServiceProvider(IServiceBuilder builder) : this(ServiceStorage.Default, builder)
-		{
-		}
-
-		public ServiceProvider(IServiceStorage storage, IServiceBuilder builder) : base(storage, builder)
-		{
-		}
-		#endregion
+		bool Match(object target, object parameter);
 	}
 }

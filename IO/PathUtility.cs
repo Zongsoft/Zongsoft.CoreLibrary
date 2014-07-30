@@ -64,13 +64,13 @@ namespace Zongsoft.IO
 			if(string.IsNullOrEmpty(filePath))
 				throw new ArgumentNullException("filePath");
 
-			string directoryPath = Path.GetDirectoryName(filePath);
-			string fileName = GetFileNameOfMaxSerialNo(directoryPath, Path.GetFileName(filePath), out maxSerialNo);
+			string directoryPath = System.IO.Path.GetDirectoryName(filePath);
+			string fileName = GetFileNameOfMaxSerialNo(directoryPath, System.IO.Path.GetFileName(filePath), out maxSerialNo);
 
 			if(string.IsNullOrEmpty(fileName))
 				return null;
 
-			return Path.Combine(directoryPath, fileName);
+			return System.IO.Path.Combine(directoryPath, fileName);
 		}
 
 		public static string GetFileNameOfMaxSerialNo(string directoryPath, string fileName)
@@ -89,8 +89,8 @@ namespace Zongsoft.IO
 
 			maxSerialNo = null;
 			string fileNameOfMaxSerialNo = null;
-			string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
-			string extensionName = Path.GetExtension(fileName);
+			string fileNameWithoutExtension = System.IO.Path.GetFileNameWithoutExtension(fileName);
+			string extensionName = System.IO.Path.GetExtension(fileName);
 
 			string[] sameFileNames = Directory.GetFiles(directoryPath, fileNameWithoutExtension + "-*" + extensionName);
 
@@ -128,10 +128,10 @@ namespace Zongsoft.IO
 
 		public static string GetFilePathOfNextSerialNo(string filePath, int seed, int step)
 		{
-			string directoryPath = Path.GetDirectoryName(filePath);
-			string fileName = GetFileNameOfNextSerialNo(directoryPath, Path.GetFileName(filePath));
+			string directoryPath = System.IO.Path.GetDirectoryName(filePath);
+			string fileName = GetFileNameOfNextSerialNo(directoryPath, System.IO.Path.GetFileName(filePath));
 
-			return Path.Combine(directoryPath, fileName);
+			return System.IO.Path.Combine(directoryPath, fileName);
 		}
 
 		public static string GetFileNameOfNextSerialNo(string directoryPath, string fileName)
@@ -145,9 +145,9 @@ namespace Zongsoft.IO
 			GetFileNameOfMaxSerialNo(directoryPath, fileName, out maxSerialNo);
 
 			if(maxSerialNo.HasValue)
-				return string.Format("{0}-{2}{1}", Path.GetFileNameWithoutExtension(fileName), Path.GetExtension(fileName), maxSerialNo + step);
+				return string.Format("{0}-{2}{1}", System.IO.Path.GetFileNameWithoutExtension(fileName), System.IO.Path.GetExtension(fileName), maxSerialNo + step);
 			else
-				return string.Format("{0}-{2}{1}", Path.GetFileNameWithoutExtension(fileName), Path.GetExtension(fileName), seed);
+				return string.Format("{0}-{2}{1}", System.IO.Path.GetFileNameWithoutExtension(fileName), System.IO.Path.GetExtension(fileName), seed);
 		}
 	}
 }

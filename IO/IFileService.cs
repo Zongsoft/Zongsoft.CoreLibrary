@@ -25,27 +25,27 @@
  */
 
 using System;
+using System.IO;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
 
-namespace Zongsoft.Services
+namespace Zongsoft.IO
 {
-	public class ServiceProvider : ServiceProviderBase
+	/// <summary>
+	/// 提供用于创建、复制、删除、移动和打开文件等功能的抽象接口，该接口将提供不同文件系统的文件支持。
+	/// </summary>
+	public interface IFileService
 	{
-		#region 构造函数
-		public ServiceProvider() : this(ServiceStorage.Default, null)
-		{
-		}
+		void Delete(string path);
+		bool Exists(string path);
 
-		public ServiceProvider(IServiceBuilder builder) : this(ServiceStorage.Default, builder)
-		{
-		}
+		void Copy(string source, string destination);
+		void Copy(string source, string destination, bool overwrite);
 
-		public ServiceProvider(IServiceStorage storage, IServiceBuilder builder) : base(storage, builder)
-		{
-		}
-		#endregion
+		void Move(string source, string destination);
+
+		Stream Open(string path);
+		Stream Open(string path, FileMode mode);
+		Stream Open(string path, FileMode mode, FileAccess access);
+		Stream Open(string path, FileMode mode, FileAccess access, FileShare share);
 	}
 }

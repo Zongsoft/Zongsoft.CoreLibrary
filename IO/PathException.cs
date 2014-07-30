@@ -26,25 +26,30 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
 
-namespace Zongsoft.Services
+namespace Zongsoft.IO
 {
-	public class ServiceProvider : ServiceProviderBase
+	[Serializable]
+	public class PathException : ApplicationException
 	{
+		#region 成员字段
+		private string _path;
+		#endregion
+
 		#region 构造函数
-		public ServiceProvider() : this(ServiceStorage.Default, null)
+		public PathException(string path)
 		{
+			_path = path;
 		}
+		#endregion
 
-		public ServiceProvider(IServiceBuilder builder) : this(ServiceStorage.Default, builder)
+		#region 公共属性
+		public string Path
 		{
-		}
-
-		public ServiceProvider(IServiceStorage storage, IServiceBuilder builder) : base(storage, builder)
-		{
+			get
+			{
+				return _path;
+			}
 		}
 		#endregion
 	}

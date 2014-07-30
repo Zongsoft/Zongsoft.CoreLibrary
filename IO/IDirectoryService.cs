@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2008-2011 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2014 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,27 +25,38 @@
  */
 
 using System;
-using System.IO;
 using System.Collections.Generic;
 
 namespace Zongsoft.IO
 {
 	/// <summary>
-	/// 提供用于创建、复制、删除、移动和打开文件等功能的抽象接口，该接口将提供不同文件系统的文件支持。
+	/// 公开用于创建、移动和遍历目录和子目录等功能的抽象接口，该接口将提供不同文件系统的目录支持。
 	/// </summary>
-	public interface IFile
+	public interface IDirectoryService
 	{
-		void Delete(string path);
-		bool Exists(string path);
+		/// <summary>
+		/// 创建一个指定路径的目录。
+		/// </summary>
+		/// <param name="path">指定要创建的目录路径。</param>
+		/// <returns>如果创建成功则返回真(True)，否则返回假(False)。</returns>
+		/// <remarks>
+		///		<para>如果<paramref name="path"/>参数指定的路径不存在并且创建成功则返回真；如果指定的路径已存在则返回假。</para>
+		/// </remarks>
+		bool Create(string path);
 
-		void Copy(string source, string destination);
-		void Copy(string source, string destination, bool overwrite);
+		void Delete(string path);
+		void Delete(string path, bool recursive);
 
 		void Move(string source, string destination);
+		bool Exists(string path);
 
-		Stream Open(string path);
-		Stream Open(string path, FileMode mode);
-		Stream Open(string path, FileMode mode, FileAccess access);
-		Stream Open(string path, FileMode mode, FileAccess access, FileShare share);
+		IEnumerable<string> GetChildren(string path);
+		IEnumerable<string> GetChildren(string path, string pattern, bool recursive);
+
+		IEnumerable<string> GetDirectories(string path);
+		IEnumerable<string> GetDirectories(string path, string pattern, bool recursive);
+
+		IEnumerable<string> GetFiles(string path);
+		IEnumerable<string> GetFiles(string path, string pattern, bool recursive);
 	}
 }
