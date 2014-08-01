@@ -136,6 +136,14 @@ namespace Zongsoft.IO
 			services[0].Move(paths[0].FullPath, paths[1].FullPath);
 		}
 
+		public FileInfo GetInfo(string virtualPath)
+		{
+			Path path;
+			var service = this.GetService(virtualPath, out path);
+
+			return service.GetInfo(path.FullPath);
+		}
+
 		public System.IO.Stream Open(string virtualPath)
 		{
 			Path path;

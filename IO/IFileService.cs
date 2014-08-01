@@ -35,6 +35,13 @@ namespace Zongsoft.IO
 	/// </summary>
 	public interface IFileService
 	{
+		/// <summary>
+		/// 获取指定文件路径对应的<see cref="FileInfo"/>。
+		/// </summary>
+		/// <param name="path">指定的文件路径。</param>
+		/// <returns>如果指定的路径是存在的则返回对应的<see cref="FileInfo"/>，否则返回空(null)。</returns>
+		FileInfo GetInfo(string path);
+
 		void Delete(string path);
 		bool Exists(string path);
 

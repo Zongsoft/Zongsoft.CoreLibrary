@@ -133,6 +133,14 @@ namespace Zongsoft.IO
 			return service.Exists(path.FullPath);
 		}
 
+		public DirectoryInfo GetInfo(string virtualPath)
+		{
+			Path path;
+			var service = this.GetService(virtualPath, out path);
+
+			return service.GetInfo(path.FullPath);
+		}
+
 		public IEnumerable<string> GetChildren(string virtualPath)
 		{
 			return this.GetChildren(virtualPath, null, false);

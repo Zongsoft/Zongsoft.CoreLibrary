@@ -35,6 +35,13 @@ namespace Zongsoft.IO
 	public interface IDirectoryService
 	{
 		/// <summary>
+		/// 获取指定目录路径对应的<see cref="DirectoryInfo"/>。
+		/// </summary>
+		/// <param name="path">指定的目录路径。</param>
+		/// <returns>如果指定的路径是存在的则返回对应的<see cref="DirectoryInfo"/>，否则返回空(null)。</returns>
+		DirectoryInfo GetInfo(string path);
+
+		/// <summary>
 		/// 创建一个指定路径的目录。
 		/// </summary>
 		/// <param name="path">指定要创建的目录路径。</param>

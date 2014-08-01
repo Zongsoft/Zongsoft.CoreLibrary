@@ -160,7 +160,9 @@
     <Compile Include="Data\Paging.cs" />
     <Compile Include="Data\Sorting.cs" />
     <Compile Include="Diagnostics\Configuration\TracerElement.cs" />
+    <Compile Include="IO\DirectoryInfo.cs" />
     <Compile Include="IO\DirectoryProvider.cs" />
+    <Compile Include="IO\FileInfo.cs" />
     <Compile Include="IO\FileProvider.cs" />
     <Compile Include="IO\IDirectoryService.cs" />
     <Compile Include="IO\IFileService.cs" />

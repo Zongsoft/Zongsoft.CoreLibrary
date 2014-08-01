@@ -79,6 +79,17 @@ namespace Zongsoft.IO
 			return System.IO.Directory.Exists(fullPath);
 		}
 
+		public DirectoryInfo GetInfo(string path)
+		{
+			var fullPath = LocalPath.ToLocalPath(path);
+			var info = new System.IO.DirectoryInfo(fullPath);
+
+			if(info == null || !info.Exists)
+				return null;
+
+			return new DirectoryInfo(info.FullName, name : info.Name, createdTime : info.CreationTime);
+		}
+
 		public IEnumerable<string> GetChildren(string path)
 		{
 			return this.GetChildren(path, null, false);

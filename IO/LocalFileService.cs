@@ -76,6 +76,17 @@ namespace Zongsoft.IO
 			System.IO.File.Move(sourcePath, destinationPath);
 		}
 
+		public FileInfo GetInfo(string path)
+		{
+			var fullPath = LocalPath.ToLocalPath(path);
+			var info = new System.IO.FileInfo(fullPath);
+
+			if(info == null || !info.Exists)
+				return null;
+
+			return new FileInfo(info.FullName, name: info.Name, size: info.Length, createdTime: info.CreationTime, modifiedTime: info.LastWriteTime);
+		}
+
 		public Stream Open(string path)
 		{
 			var fullPath = LocalPath.ToLocalPath(path);
