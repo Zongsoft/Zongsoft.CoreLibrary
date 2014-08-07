@@ -25,14 +25,34 @@
  */
 
 using System;
-using System.ComponentModel;
+using System.Collections.Generic;
 
 namespace Zongsoft.Runtime.Serialization
 {
-	public enum SerializationWriterStep
+	public class SerializationWroteEventArgs : EventArgs
 	{
-		Wrote,
-		Serializing,
-		Serialized,
+		#region 成员字段
+		private SerializationWriterContext _context;
+		#endregion
+
+		#region 构造函数
+		public SerializationWroteEventArgs(SerializationWriterContext context)
+		{
+			if(context == null)
+				throw new ArgumentNullException("context");
+
+			_context = context;
+		}
+		#endregion
+
+		#region 公共属性
+		public SerializationWriterContext Context
+		{
+			get
+			{
+				return _context;
+			}
+		}
+		#endregion
 	}
 }

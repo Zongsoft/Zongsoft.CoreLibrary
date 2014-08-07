@@ -29,30 +29,21 @@ using System.IO;
 using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 
 namespace Zongsoft.Runtime.Serialization
 {
-	public class SerializationContext
+	public class SerializationContext : MarshalByRefObject
 	{
 		#region 成员字段
 		private ISerializer _serializer;
 		private Stream _serializationStream;
 		private object _serializationObject;
-		private object _value;
-		private object _container;
-		private MemberInfo _member;
-		private int _depth;
-		private bool _isCollection;
-		private bool _isCircularReference;
+		private IDictionary<string, object> _properties;
 		#endregion
 
 		#region 构造函数
-		public SerializationContext(ISerializer serializer, Stream serializationStream, object serializationObject, object value, int depth, bool isCircularReference)
-			: this(serializer, serializationStream, serializationObject, value, depth, isCircularReference, null, null)
-		{
-		}
-
-		public SerializationContext(ISerializer serializer, Stream serializationStream, object serializationObject, object value, int depth, bool isCircularReference, object container, MemberInfo member)
+		public SerializationContext(ISerializer serializer, Stream serializationStream, object serializationObject)
 		{
 			if(serializer == null)
 				throw new ArgumentNullException("serializer");
@@ -66,11 +57,6 @@ namespace Zongsoft.Runtime.Serialization
 			_serializer = serializer;
 			_serializationStream = serializationStream;
 			_serializationObject = serializationObject;
-			_value = value;
-			_depth = depth;
-			_member = member;
-			_container = container;
-			_isCircularReference = isCircularReference;
 		}
 		#endregion
 
@@ -99,117 +85,15 @@ namespace Zongsoft.Runtime.Serialization
 			}
 		}
 
-		public int Depth
+		public IDictionary<string, object> Properties
 		{
 			get
 			{
-				return _depth;
-			}
-		}
+				if(_properties == null)
+					System.Threading.Interlocked.CompareExchange(ref _properties, new ConcurrentDictionary<string, object>(StringComparer.OrdinalIgnoreCase), null);
 
-		public object Value
-		{
-			get
-			{
-				return _value;
+				return _properties;
 			}
-			internal set
-			{
-				_value = value;
-			}
-		}
-
-		public object Container
-		{
-			get
-			{
-				return _container;
-			}
-			internal protected set
-			{
-				_container = value;
-			}
-		}
-
-		public MemberInfo Member
-		{
-			get
-			{
-				return _member;
-			}
-			internal set
-			{
-				_member = value;
-			}
-		}
-
-		public string MemberName
-		{
-			get
-			{
-				return _member == null ? null : _member.Name;
-			}
-		}
-
-		public Type MemberType
-		{
-			get
-			{
-				if(_member != null)
-				{
-					switch(_member.MemberType)
-					{
-						case MemberTypes.Field:
-							return ((FieldInfo)_member).FieldType;
-						case MemberTypes.Property:
-							return ((PropertyInfo)_member).PropertyType;
-					}
-				}
-
-				return null;
-			}
-		}
-
-		public bool IsCollection
-		{
-			get
-			{
-				return _isCollection;
-			}
-			internal set
-			{
-				if(_value != null && value == true)
-				{
-					if(!typeof(System.Collections.IEnumerable).IsAssignableFrom(_value.GetType()))
-						throw new InvalidOperationException();
-				}
-
-				_isCollection = value;
-			}
-		}
-
-		public bool IsCircularReference
-		{
-			get
-			{
-				return _isCircularReference;
-			}
-			internal set
-			{
-				_isCircularReference = value;
-			}
-		}
-		#endregion
-
-		#region 内部方法
-		internal void IncrementDepth()
-		{
-			System.Threading.Interlocked.Increment(ref _depth);
-		}
-
-		internal void DecrementDepth()
-		{
-			System.Threading.Interlocked.Decrement(ref _depth);
 		}
 		#endregion
 	}

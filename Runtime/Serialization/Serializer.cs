@@ -36,7 +36,8 @@ namespace Zongsoft.Runtime.Serialization
 	public class Serializer : ISerializer
 	{
 		#region 单例模式
-		public static readonly Serializer Default = new Serializer(new SerializationWriter());
+		public static readonly Serializer Text = new Serializer(new TextSerializationWriter());
+		public static readonly Serializer Json = new Serializer(new JsonSerializationWriter());
 		#endregion
 
 		#region 事件定义
@@ -110,20 +111,20 @@ namespace Zongsoft.Runtime.Serialization
 			this.OnSerializing(new SerializationEventArgs(SerializationDirection.Output, serializationStream, graph));
 
 			//创建序列化上下文对象
-			var context = this.CreateContext(serializationStream, graph);
+			var context = new SerializationContext(this, serializationStream, graph);
 
 			try
 			{
 				//通知序列化写入器的当前所处步骤(序列化开始)
-				_writer.OnStep(context, SerializationWriterStep.Serializing);
+				_writer.OnSerializing(context);
 
 				//进行序列化写入操作
-				this.Write(context, new HashSet<object>(ObjectReferenceComparer.Instance));
+				this.Write(new SerializationWriterContext(_writer, context, null, graph, null, -1, 0, false, this.IsCollection(graph)), new Stack<object>());
 			}
 			finally
 			{
 				//通知序列化写入器的当前所处步骤(序列化结束)
-				_writer.OnStep(context, SerializationWriterStep.Serialized);
+				_writer.OnSerialized(context);
 			}
 
 			//激发“Serialized”事件
@@ -132,113 +133,138 @@ namespace Zongsoft.Runtime.Serialization
 		#endregion
 
 		#region 虚拟方法
-		protected virtual SerializationContext CreateContext(Stream serializationStream, object graph)
+		protected virtual void Write(SerializationWriterContext context, Stack<object> stack)
 		{
-			return new SerializationContext(this, serializationStream, graph, graph, 0, false);
-		}
-
-		protected virtual void Write(SerializationContext context, HashSet<object> stack)
-		{
-			//设置当前待序列化对象是否为集合类型
-			context.IsCollection = context.Value == null ? false : this.IsCollectionType(context.Value.GetType());
-			//设置当前待序列化对象是否为循环引用对象
-			context.IsCircularReference = context.Value != null && context.Value.GetType().IsValueType ? false : stack.Contains(context.Value);
-
-			//调用序列化写入器的写入方法，以进行实际的序列化写入
-			bool continued = _writer.Write(context);
-
-			//进行最大序列化层次的检测判断
-			if(_settings.MaximumDepth > -1 && context.Depth >= _settings.MaximumDepth)
-				return;
-
-			//进行是否需要继续序列化当前对象的检测判断
-			if((!continued) || context.Value == null || this.IsSimpleType(context.Value.GetType()))
-				return;
-
-			var originalContainer = context.Container;
-			var originalValue = context.Value;
-			var originalMember = context.Member;
-
 			try
 			{
-				context.IncrementDepth();
-				context.Container = context.Value;
+				//调用序列化写入器的写入方法，以进行实际的序列化写入
+				_writer.Write(context);
 
-				if(!context.IsCircularReference && !context.Value.GetType().IsValueType)
-					stack.Add(context.Value);
+				//如果当前序列化的成员是循环引用或者被强制终止则退出
+				if(context.IsCircularReference || context.Terminated)
+					return;
+
+				//判断该是否已经达到允许的序列化的层次
+				if(_settings.MaximumDepth > -1 && context.Depth >= _settings.MaximumDepth)
+					return;
+
+				//判断该是否需要继续序列化当前对象
+				if(context.Value == null || this.IsTermination(context))
+					return;
+
+				if(!context.Value.GetType().IsValueType)
+					stack.Push(context.Value);
 
 				if(context.IsCollection)
 				{
+					int index = 0;
+
 					foreach(var item in (System.Collections.IEnumerable)context.Value)
 					{
-						context.Value = item;
-
-						this.Write(context, stack);
+						this.Write(this.CreateWriterContext(stack, context, item, null, index++), stack);
 					}
-
-					return;
 				}
-
-				var target = context.Value;
-				var members = new List<MemberInfo>();
-
-				members.AddRange(target.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public));
-				members.AddRange(target.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public));
-
-				foreach(var member in members)
+				else
 				{
-					try
-					{
-						switch(member.MemberType)
-						{
-							case MemberTypes.Field:
-								context.Value = ((FieldInfo)member).GetValue(target);
-								break;
-							case MemberTypes.Property:
-								context.Value = ((PropertyInfo)member).GetValue(target, null);
-								break;
-						}
-					}
-					catch
-					{
-						continue;
-					}
-
-					context.Member = member;
-					this.Write(context, stack);
+					this.WriteMembers(context, stack);
 				}
 
-				stack.Remove(context.Value);
+				if(stack.Count > 0 && !context.Value.GetType().IsValueType)
+					stack.Pop();
 			}
 			finally
 			{
-				context.Value = originalValue;
-				context.Member = originalMember;
-				context.Container = originalContainer;
-				context.IsCollection = originalValue == null ? false : this.IsCollectionType(originalValue.GetType());
-				context.DecrementDepth();
-
 				//通知序列化写入器，本轮写入操作完成。
-				_writer.OnStep(context, SerializationWriterStep.Wrote);
+				_writer.OnWrote(context);
 			}
+		}
+
+		protected virtual bool IsTermination(SerializationWriterContext context)
+		{
+			if(context.Terminated || context.Value == null)
+				return true;
+
+			var type = context.Value.GetType();
+
+			return type.IsPrimitive || type.IsEnum ||
+			       type == typeof(decimal) || type == typeof(DateTime) || type == typeof(DBNull) || type == typeof(Guid) ||
+			       type == typeof(object) || type == typeof(string) || typeof(Type).IsAssignableFrom(type);
+		}
+
+		protected bool IsCollection(object value)
+		{
+			if(value == null)
+				return false;
+
+			return this.IsCollectionType(value.GetType());
+		}
+
+		protected virtual bool IsCollectionType(Type type)
+		{
+			if(type == null || type.IsPrimitive || type == typeof(string))
+				return false;
+
+			return typeof(System.Collections.IEnumerable).IsAssignableFrom(type);
 		}
 		#endregion
 
 		#region 私有方法
-		private bool IsSimpleType(Type type)
+		private void WriteMembers(SerializationWriterContext context, Stack<object> stack)
 		{
-			if(type.IsPrimitive || type.IsEnum || type.IsValueType || type == typeof(object) || type == typeof(string) || typeof(Type).IsAssignableFrom(type))
-				return true;
+			var target = context.Value;
+			var members = new List<MemberInfo>();
 
-			return false;
+			members.AddRange(target.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public));
+			members.AddRange(target.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public));
+
+			int index = 0;
+
+			foreach(var member in members)
+			{
+				object value = null;
+
+				try
+				{
+					switch(member.MemberType)
+					{
+						case MemberTypes.Field:
+							value = ((FieldInfo)member).GetValue(target);
+							break;
+						case MemberTypes.Property:
+							value = ((PropertyInfo)member).GetValue(target, null);
+							break;
+					}
+				}
+				catch
+				{
+					continue;
+				}
+
+				this.Write(this.CreateWriterContext(stack, context, value, member, index++), stack);
+			}
 		}
 
-		private bool IsCollectionType(Type type)
+		private bool IsCircularReference(object value, Stack<object> stack)
 		{
-			if(type.IsPrimitive || type == typeof(string))
+			if(value == null || stack == null || stack.Count < 1)
 				return false;
 
-			return typeof(System.Collections.IEnumerable).IsAssignableFrom(type);
+			return value.GetType().IsValueType ? false : stack.Contains(value);
+		}
+
+		private SerializationWriterContext CreateWriterContext(Stack<object> stack, SerializationWriterContext context, object value, MemberInfo member, int index)
+		{
+			return new SerializationWriterContext(
+						context.Writer,
+						context.SerializationContext,
+						context.Value,
+						value,
+						member,
+						index,
+						context.Depth + 1,
+						this.IsCircularReference(value, stack),
+						this.IsCollection(value));
+
 		}
 		#endregion
 
