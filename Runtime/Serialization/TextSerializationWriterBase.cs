@@ -243,36 +243,6 @@ namespace Zongsoft.Runtime.Serialization
 
 			return result;
 		}
-
-		protected string GetFriendlyTypeName(Type type)
-		{
-			if(type == null)
-				return string.Empty;
-
-			if(type.IsPrimitive || type == typeof(object) || type == typeof(string))
-				return type.Name;
-
-			if(type.IsGenericType)
-			{
-				string typeName = type.GetGenericTypeDefinition().FullName.Substring(0, type.GetGenericTypeDefinition().FullName.IndexOf('`')) + "<";
-				Type[] argumentTypes = type.GetGenericArguments();
-
-				for(int i = 0; i < argumentTypes.Length; i++)
-				{
-					typeName += this.GetFriendlyTypeName(argumentTypes[i]);
-
-					if(i < argumentTypes.Length - 1)
-						typeName += ", ";
-				}
-
-				return typeName + ">";
-			}
-
-			if(type.FullName.StartsWith("System.", StringComparison.Ordinal) || type.FullName.StartsWith("Zongsoft.", StringComparison.Ordinal))
-				return type.FullName;
-			else
-				return type.FullName + "@" + type.Assembly.GetName().Name;
-		}
 		#endregion
 	}
 }

@@ -49,9 +49,12 @@ namespace Zongsoft.Runtime.Serialization
 			if(writer == null)
 				throw new System.Runtime.Serialization.SerializationException("Can not obtain a text writer.");
 
-			var valueText = string.Empty;
-			var indentText = this.GetIndentText(context.Depth);
+			if(context.Index > 0)
+				writer.WriteLine(",");
+			else
+				writer.WriteLine();
 
+			var indentText = this.GetIndentText(context.Depth);
 			writer.Write(indentText);
 
 			if(context.Member != null)
@@ -66,24 +69,22 @@ namespace Zongsoft.Runtime.Serialization
 			if(context.IsCircularReference)
 			{
 				writer.WriteLine("<Circular Reference>");
-				context.Terminated = true;
 				return;
 			}
 
-			var isDirectedValue = this.GetDirectedValue(context.Value, out valueText);
+			var directedValue = string.Empty;
+			var isDirectedValue = this.GetDirectedValue(context.Value, out directedValue);
 
 			if(isDirectedValue)
 			{
-				writer.WriteLine(valueText);
+				writer.Write(directedValue);
 			}
 			else
 			{
-				writer.WriteLine(this.GetFriendlyTypeName(context.Value.GetType()));
-
 				if(context.IsCollection)
-					writer.WriteLine(indentText + "[");
+					writer.Write(writer.NewLine + indentText + "[");
 				else
-					writer.WriteLine(indentText + "{");
+					writer.Write("{");
 			}
 
 			context.Terminated = isDirectedValue;
@@ -107,9 +108,41 @@ namespace Zongsoft.Runtime.Serialization
 				return;
 
 			if(context.IsCollection)
-				writer.WriteLine(this.GetIndentText(context.Depth) + "]");
+				writer.Write(writer.NewLine + this.GetIndentText(context.Depth) + "]");
 			else
-				writer.WriteLine(this.GetIndentText(context.Depth) + "}");
+				writer.Write(writer.NewLine + this.GetIndentText(context.Depth) + "}");
+		}
+		#endregion
+
+		#region 保护方法
+		protected string GetFriendlyTypeName(Type type)
+		{
+			if(type == null)
+				return string.Empty;
+
+			if(type.IsPrimitive || type == typeof(object) || type == typeof(string))
+				return type.Name;
+
+			if(type.IsGenericType)
+			{
+				string typeName = type.GetGenericTypeDefinition().FullName.Substring(0, type.GetGenericTypeDefinition().FullName.IndexOf('`')) + "<";
+				Type[] argumentTypes = type.GetGenericArguments();
+
+				for(int i = 0; i < argumentTypes.Length; i++)
+				{
+					typeName += this.GetFriendlyTypeName(argumentTypes[i]);
+
+					if(i < argumentTypes.Length - 1)
+						typeName += ", ";
+				}
+
+				return typeName + ">";
+			}
+
+			if(type.FullName.StartsWith("System.", StringComparison.Ordinal) || type.FullName.StartsWith("Zongsoft.", StringComparison.Ordinal))
+				return type.FullName;
+			else
+				return type.FullName + "@" + type.Assembly.GetName().Name;
 		}
 		#endregion
 	}
