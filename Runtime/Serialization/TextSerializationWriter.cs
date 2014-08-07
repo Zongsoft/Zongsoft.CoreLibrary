@@ -49,9 +49,7 @@ namespace Zongsoft.Runtime.Serialization
 			if(writer == null)
 				throw new System.Runtime.Serialization.SerializationException("Can not obtain a text writer.");
 
-			if(context.Index > 0)
-				writer.WriteLine(",");
-			else
+			if(context.Index >= 0)
 				writer.WriteLine();
 
 			var indentText = this.GetIndentText(context.Depth);
@@ -62,13 +60,13 @@ namespace Zongsoft.Runtime.Serialization
 
 			if(context.Value == null)
 			{
-				writer.WriteLine("<NULL>");
+				writer.Write("<NULL>");
 				return;
 			}
 
 			if(context.IsCircularReference)
 			{
-				writer.WriteLine("<Circular Reference>");
+				writer.Write("<Circular Reference>");
 				return;
 			}
 
@@ -78,13 +76,16 @@ namespace Zongsoft.Runtime.Serialization
 			if(isDirectedValue)
 			{
 				writer.Write(directedValue);
+				writer.Write(" (" + this.GetFriendlyTypeName(context.Value.GetType()) + ")");
 			}
 			else
 			{
+				writer.Write(this.GetFriendlyTypeName(context.Value.GetType()));
+
 				if(context.IsCollection)
 					writer.Write(writer.NewLine + indentText + "[");
 				else
-					writer.Write("{");
+					writer.Write(writer.NewLine + indentText + "{");
 			}
 
 			context.Terminated = isDirectedValue;
@@ -92,16 +93,11 @@ namespace Zongsoft.Runtime.Serialization
 		#endregion
 
 		#region 重写方法
-		protected override void OnSerialized(SerializationContext context)
-		{
-			var writer = this.GetWriter(context);
-
-			if(writer != null)
-				writer.Flush();
-		}
-
 		protected override void OnWrote(SerializationWriterContext context)
 		{
+			if(context.Terminated || context.IsCircularReference)
+				return;
+
 			var writer = this.GetWriter(context);
 
 			if(writer == null)
@@ -142,7 +138,7 @@ namespace Zongsoft.Runtime.Serialization
 			if(type.FullName.StartsWith("System.", StringComparison.Ordinal) || type.FullName.StartsWith("Zongsoft.", StringComparison.Ordinal))
 				return type.FullName;
 			else
-				return type.FullName + "@" + type.Assembly.GetName().Name;
+				return type.FullName + ", " + type.Assembly.GetName().Name;
 		}
 		#endregion
 	}

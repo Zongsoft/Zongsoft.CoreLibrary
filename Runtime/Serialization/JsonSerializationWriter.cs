@@ -86,14 +86,6 @@ namespace Zongsoft.Runtime.Serialization
 		#endregion
 
 		#region 重写方法
-		protected override void OnSerialized(SerializationContext context)
-		{
-			var writer = this.GetWriter(context);
-
-			if(writer != null)
-				writer.Flush();
-		}
-
 		protected override void OnWrote(SerializationWriterContext context)
 		{
 			if(context.Terminated || context.IsCircularReference)

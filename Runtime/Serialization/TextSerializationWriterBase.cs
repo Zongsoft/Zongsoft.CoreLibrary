@@ -41,7 +41,7 @@ namespace Zongsoft.Runtime.Serialization
 		#endregion
 
 		#region 私有变量
-		private IDictionary<SerializationContext, TextWriter> _writers;
+		private static IDictionary<SerializationContext, TextWriter> _writers;
 		#endregion
 
 		#region 成员字段
@@ -54,7 +54,6 @@ namespace Zongsoft.Runtime.Serialization
 		{
 			_encoding = Encoding.UTF8;
 			_indentString = "	";
-			_writers = new ConcurrentDictionary<SerializationContext, TextWriter>();
 		}
 		#endregion
 
@@ -131,6 +130,10 @@ namespace Zongsoft.Runtime.Serialization
 
 		protected virtual void OnSerialized(SerializationContext context)
 		{
+			var writer = this.GetWriter(context);
+
+			if(writer != null)
+				writer.Flush();
 		}
 
 		protected virtual void OnWrote(SerializationWriterContext context)
@@ -217,6 +220,9 @@ namespace Zongsoft.Runtime.Serialization
 		{
 			if(context == null)
 				return null;
+
+			if(_writers == null)
+				System.Threading.Interlocked.CompareExchange(ref _writers, new ConcurrentDictionary<SerializationContext, TextWriter>(), null);
 
 			TextWriter writer;
 
