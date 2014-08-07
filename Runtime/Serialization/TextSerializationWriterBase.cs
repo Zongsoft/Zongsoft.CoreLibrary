@@ -133,7 +133,10 @@ namespace Zongsoft.Runtime.Serialization
 			var writer = this.GetWriter(context);
 
 			if(writer != null)
+			{
 				writer.Flush();
+				writer.Dispose();
+			}
 		}
 
 		protected virtual void OnWrote(SerializationWriterContext context)
