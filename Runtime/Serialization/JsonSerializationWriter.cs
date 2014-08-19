@@ -58,7 +58,7 @@ namespace Zongsoft.Runtime.Serialization
 			writer.Write(indentText);
 
 			if(context.Member != null)
-				writer.Write(context.MemberName + " : ");
+				writer.Write("\"" + context.MemberName + "\" : ");
 
 			if(context.Value == null || context.IsCircularReference)
 			{
