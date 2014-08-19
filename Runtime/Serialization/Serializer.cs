@@ -119,7 +119,7 @@ namespace Zongsoft.Runtime.Serialization
 				_writer.OnSerializing(context);
 
 				//进行序列化写入操作
-				this.Write(new SerializationWriterContext(_writer, context, null, graph, null, -1, 0, false, this.IsCollection(graph)), new Stack<object>());
+				this.Write(new SerializationWriterContext(_writer, context, null, graph, null, -1, 0, false, this.IsCollection(graph)), new HashSet<object>());
 			}
 			finally
 			{
@@ -133,7 +133,7 @@ namespace Zongsoft.Runtime.Serialization
 		#endregion
 
 		#region 虚拟方法
-		protected virtual void Write(SerializationWriterContext context, Stack<object> stack)
+		protected virtual void Write(SerializationWriterContext context, HashSet<object> stack)
 		{
 			try
 			{
@@ -152,8 +152,11 @@ namespace Zongsoft.Runtime.Serialization
 				if(context.Value == null || this.IsTermination(context))
 					return;
 
+				//表示当前序列化对象是否已经序列化过
+				bool exists = false;
+
 				if(!context.Value.GetType().IsValueType)
-					stack.Push(context.Value);
+					exists = stack.Add(context.Value);
 
 				if(context.IsCollection)
 				{
@@ -169,8 +172,8 @@ namespace Zongsoft.Runtime.Serialization
 					this.WriteMembers(context, stack);
 				}
 
-				if(stack.Count > 0 && !context.Value.GetType().IsValueType)
-					stack.Pop();
+				if(stack.Count > 0 && exists)
+					stack.Remove(context.Value);
 			}
 			finally
 			{
@@ -209,7 +212,7 @@ namespace Zongsoft.Runtime.Serialization
 		#endregion
 
 		#region 私有方法
-		private void WriteMembers(SerializationWriterContext context, Stack<object> stack)
+		private void WriteMembers(SerializationWriterContext context, HashSet<object> stack)
 		{
 			var target = context.Value;
 			var members = new List<MemberInfo>();
@@ -244,7 +247,7 @@ namespace Zongsoft.Runtime.Serialization
 			}
 		}
 
-		private bool IsCircularReference(object value, Stack<object> stack)
+		private bool IsCircularReference(object value, HashSet<object> stack)
 		{
 			if(value == null || stack == null || stack.Count < 1)
 				return false;
@@ -252,7 +255,7 @@ namespace Zongsoft.Runtime.Serialization
 			return value.GetType().IsValueType ? false : stack.Contains(value);
 		}
 
-		private SerializationWriterContext CreateWriterContext(Stack<object> stack, SerializationWriterContext context, object value, MemberInfo member, int index)
+		private SerializationWriterContext CreateWriterContext(HashSet<object> stack, SerializationWriterContext context, object value, MemberInfo member, int index)
 		{
 			return new SerializationWriterContext(
 						context.Writer,
