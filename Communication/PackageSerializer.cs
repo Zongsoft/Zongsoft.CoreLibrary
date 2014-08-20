@@ -36,6 +36,10 @@ namespace Zongsoft.Communication
 {
 	public class PackageSerializer : Zongsoft.Runtime.Serialization.ISerializer
 	{
+		#region 单例模式
+		public static readonly PackageSerializer Default = new PackageSerializer();
+		#endregion
+
 		#region 成员字段
 		private IBufferManager _bufferManager;
 		#endregion
@@ -136,6 +140,7 @@ namespace Zongsoft.Communication
 		{
 			int headerCount;
 			byte[] temp = new byte[4];
+			var bufferManager = this.BufferManager;
 
 			for(int i = 0; i < count; i++)
 			{
@@ -146,9 +151,9 @@ namespace Zongsoft.Communication
 				if(serializationStream.Read(temp, 0, 4) == 4)
 				{
 					int contentLength = BitConverter.ToInt32(temp, 0);
-					int id = _bufferManager.Allocate(contentLength);
-					_bufferManager.Write(id, serializationStream, contentLength);
-					content.ContentStream = _bufferManager.GetStream(id);
+					int id = bufferManager.Allocate(contentLength);
+					bufferManager.Write(id, serializationStream, contentLength);
+					content.ContentStream = bufferManager.GetStream(id);
 				}
 
 				package.Contents.Add(content);
@@ -156,7 +161,7 @@ namespace Zongsoft.Communication
 		}
 		#endregion
 
-		#region 序列化
+		#region 序列方法
 		public void Serialize(Stream serializationStream, object graph)
 		{
 			if(graph == null)
@@ -170,7 +175,90 @@ namespace Zongsoft.Communication
 			if(package == null)
 				throw new NotSupportedException();
 
-			package.Serialize(serializationStream);
+			byte[] value = Encoding.ASCII.GetBytes(Zongsoft.Common.UrlUtility.UrlEncode(package.Url));
+
+			if(value.Length > ushort.MaxValue)
+				throw new InvalidOperationException("The url length of the Package too large.");
+
+			serializationStream.Write(BitConverter.GetBytes((ushort)value.Length), 0, 2);
+			serializationStream.Write(value, 0, value.Length);
+
+			serializationStream.WriteByte((byte)package.Headers.Count);
+			serializationStream.WriteByte((byte)package.Contents.Count);
+
+			//序列化包头
+			this.SerializeHeaders(serializationStream, package.Headers);
+			//序列化包体
+			this.SerializeContents(serializationStream, package.Contents);
+		}
+
+		private void SerializeHeaders(Stream serializationStream, ICollection<PackageHeader> headers)
+		{
+			if(headers == null || headers.Count < 1)
+				return;
+
+			foreach(var header in headers)
+			{
+				var bufferName = Encoding.UTF8.GetBytes(header.Name);
+				var bufferValue = Encoding.UTF8.GetBytes(header.Value);
+
+				serializationStream.WriteByte((byte)bufferName.Length);
+				serializationStream.WriteByte((byte)bufferValue.Length);
+
+				serializationStream.Write(bufferName, 0, (byte)bufferName.Length);
+				serializationStream.Write(bufferValue, 0, (byte)bufferValue.Length);
+			}
+		}
+
+		private void SerializeContents(Stream serializationStream, ICollection<PackageContent> contents)
+		{
+			if(contents == null || contents.Count < 1)
+				return;
+
+			foreach(var content in contents)
+			{
+				this.SerializeContent(serializationStream, content);
+			}
+		}
+
+		private void SerializeContent(Stream serializationStream, PackageContent content)
+		{
+			var headers = content.Headers;
+
+			if(headers == null || headers.Count == 0)
+			{
+				serializationStream.WriteByte(0);
+			}
+			else
+			{
+				serializationStream.WriteByte((byte)headers.Count);
+				this.SerializeHeaders(serializationStream, headers);
+			}
+
+			if(content.ContentBuffer != null)
+			{
+				//写入内容数组的实际长度
+				serializationStream.Write(BitConverter.GetBytes(content.ContentLength), 0, 4);
+				//将内容数组全部写入序列化流
+				serializationStream.Write(content.ContentBuffer, 0, content.ContentLength);
+			}
+			else if(content.ContentStream != null)
+			{
+				var contentStream = content.ContentStream;
+
+				//写入内容流的实际长度
+				serializationStream.Write(BitConverter.GetBytes(content.ContentLength), 0, 4);
+
+				byte[] buffer = new byte[1024];
+				int bytesRead = 0;
+				int availableLength = content.ContentLength;
+
+				while(availableLength > 0 && (bytesRead = contentStream.Read(buffer, 0, Math.Min(buffer.Length, availableLength))) > 0)
+				{
+					serializationStream.Write(buffer, 0, bytesRead);
+					availableLength -= bytesRead;
+				}
+			}
 		}
 		#endregion
 	}

@@ -32,7 +32,7 @@ using System.Text;
 
 namespace Zongsoft.Communication
 {
-	public class PackageHeader : Zongsoft.Runtime.Serialization.ISerializable
+	public class PackageHeader
 	{
 		#region 成员变量
 		private string _name;
@@ -65,20 +65,6 @@ namespace Zongsoft.Communication
 			{
 				return _value;
 			}
-		}
-		#endregion
-
-		#region 序列方法
-		public virtual void Serialize(Stream serializationStream)
-		{
-			var bufferName = Encoding.UTF8.GetBytes(_name);
-			var bufferValue = Encoding.UTF8.GetBytes(_value);
-
-			serializationStream.WriteByte((byte)bufferName.Length);
-			serializationStream.WriteByte((byte)bufferValue.Length);
-
-			serializationStream.Write(bufferName, 0, (byte)bufferName.Length);
-			serializationStream.Write(bufferValue, 0, (byte)bufferValue.Length);
 		}
 		#endregion
 	}

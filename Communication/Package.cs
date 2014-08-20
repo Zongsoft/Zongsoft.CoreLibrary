@@ -85,32 +85,10 @@ namespace Zongsoft.Communication
 		}
 		#endregion
 
-		#region 序列化方法
+		#region 序列方法
 		public void Serialize(Stream serializationStream)
 		{
-			if(serializationStream == null)
-				throw new ArgumentNullException("serializationStream");
-
-			byte[] value = Encoding.ASCII.GetBytes(Zongsoft.Common.UrlUtility.UrlEncode(_url));
-
-			if(value.Length > ushort.MaxValue)
-				throw new InvalidOperationException("The length of Url too large.");
-
-			serializationStream.Write(BitConverter.GetBytes((ushort)value.Length), 0, 2);
-			serializationStream.Write(value, 0, value.Length);
-
-			serializationStream.WriteByte((byte)_headers.Count);
-			serializationStream.WriteByte((byte)_contents.Count);
-
-			foreach(var header in _headers)
-			{
-				header.Serialize(serializationStream);
-			}
-
-			foreach(var content in _contents)
-			{
-				content.Serialize(serializationStream);
-			}
+			PackageSerializer.Default.Serialize(serializationStream, this);
 		}
 		#endregion
 

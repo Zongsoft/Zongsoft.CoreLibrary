@@ -31,7 +31,7 @@ using System.Text;
 
 namespace Zongsoft.Communication
 {
-	public class PackageContent : Zongsoft.Runtime.Serialization.ISerializable
+	public class PackageContent
 	{
 		#region 私有变量
 		private readonly object _syncRoot;
@@ -107,45 +107,5 @@ namespace Zongsoft.Communication
 			}
 		}
 		#endregion
-
-		public virtual void Serialize(Stream serializationStream)
-		{
-			if(_headers == null || _headers.Count == 0)
-			{
-				serializationStream.WriteByte(0);
-			}
-			else
-			{
-				serializationStream.WriteByte((byte)_headers.Count);
-
-				foreach(var header in _headers)
-				{
-					header.Serialize(serializationStream);
-				}
-			}
-
-			if(_contentBuffer != null)
-			{
-				//写入内容数组的实际长度
-				serializationStream.Write(BitConverter.GetBytes(this.ContentLength), 0, 4);
-				//将内容数组全部写入序列化流
-				serializationStream.Write(_contentBuffer, 0, this.ContentLength);
-			}
-			else if(_contentStream != null)
-			{
-				//写入内容流的实际长度
-				serializationStream.Write(BitConverter.GetBytes(this.ContentLength), 0, 4);
-
-				byte[] buffer = new byte[1024];
-				int bytesRead = 0;
-				int availableLength = this.ContentLength;
-
-				while(availableLength > 0 && (bytesRead = _contentStream.Read(buffer, 0, Math.Min(buffer.Length, availableLength))) > 0)
-				{
-					serializationStream.Write(buffer, 0, bytesRead);
-					availableLength -= bytesRead;
-				}
-			}
-		}
 	}
 }
