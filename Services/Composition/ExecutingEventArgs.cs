@@ -31,24 +31,67 @@ using System.Text;
 
 namespace Zongsoft.Services.Composition
 {
-	public class ExecutionEventArgs : EventArgs
+	public class ExecutingEventArgs : EventArgs
 	{
-		private ExecutionContext _context;
+		#region 成员字段
+		private bool _cancel;
+		private Executor _executor;
+		private object _parameter;
+		private object _result;
+		#endregion
 
-		public ExecutionEventArgs(ExecutionContext context)
+		#region 构造函数
+		public ExecutingEventArgs(Executor executor, object parameter, bool cancel = false)
 		{
-			if(context == null)
-				throw new ArgumentNullException("context");
+			if(executor == null)
+				throw new ArgumentNullException("executor");
 
-			_context = context;
+			_executor = executor;
+			_parameter = parameter;
+			_cancel = cancel;
 		}
+		#endregion
 
-		public ExecutionContext Context
+		#region 公共属性
+		public Executor Executor
 		{
 			get
 			{
-				return _context;
+				return _executor;
 			}
 		}
+
+		public object Parameter
+		{
+			get
+			{
+				return _parameter;
+			}
+		}
+
+		public bool Cancel
+		{
+			get
+			{
+				return _cancel;
+			}
+			set
+			{
+				_cancel = value;
+			}
+		}
+
+		public object Result
+		{
+			get
+			{
+				return _result;
+			}
+			set
+			{
+				_result = value;
+			}
+		}
+		#endregion
 	}
 }

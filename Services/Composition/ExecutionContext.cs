@@ -39,6 +39,7 @@ namespace Zongsoft.Services.Composition
 		private Executor _executor;
 		private ExecutionPipeline _pipeline;
 		private Dictionary<string, object> _extendedProperties;
+		private object _result;
 		#endregion
 
 		#region 构造函数
@@ -139,6 +140,21 @@ namespace Zongsoft.Services.Composition
 					System.Threading.Interlocked.CompareExchange(ref _extendedProperties, new Dictionary<string, object>(), null);
 
 				return _extendedProperties;
+			}
+		}
+
+		/// <summary>
+		/// 获取或设置当前执行的返回结果。
+		/// </summary>
+		public object Result
+		{
+			get
+			{
+				return _result;
+			}
+			set
+			{
+				_result = value;
 			}
 		}
 		#endregion

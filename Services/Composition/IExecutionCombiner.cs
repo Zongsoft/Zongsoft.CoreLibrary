@@ -1,8 +1,8 @@
 ﻿/*
  * Authors:
- *   邓祥云(X.Z. Deng) <627825056@qq.com>
+ *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2011-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2013 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -26,25 +26,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace Zongsoft.Communication.Net.Ftp
+namespace Zongsoft.Services.Composition
 {
-    /// <summary>
-    /// 返回服务器使用的操作系统，指令的回应是该系统当前版本名的第一个单词
-    /// </summary>
-    internal class FtpSystCommand : FtpCommand
-    {
-        public FtpSystCommand() : base("SYST")
-        {
-        }
-
-        protected override void Run(FtpCommandContext context)
-        {
-            context.Channel.CheckLogin();
-
-            context.Channel.Send("215 UNIX emulated by Zongsoft.FtpServer");
-        }
-    }
+	public interface IExecutionCombiner
+	{
+		object Combine(IEnumerable<ExecutionContext> args);
+	}
 }

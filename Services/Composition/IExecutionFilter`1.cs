@@ -1,8 +1,8 @@
 ﻿/*
  * Authors:
- *   邓祥云(X.Z. Deng) <627825056@qq.com>
+ *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2011-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2013 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -26,25 +26,24 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace Zongsoft.Communication.Net.Ftp
+namespace Zongsoft.Services.Composition
 {
-    /// <summary>
-    /// 返回服务器使用的操作系统，指令的回应是该系统当前版本名的第一个单词
-    /// </summary>
-    internal class FtpSystCommand : FtpCommand
-    {
-        public FtpSystCommand() : base("SYST")
-        {
-        }
+	/// <summary>
+	/// 提供过滤执行管道的功能。
+	/// </summary>
+	public interface IExecutionFilter<TContext> : IExecutionFilter where TContext : ExecutionContext
+	{
+		/// <summary>
+		/// 表示在执行处理程序之前被激发调用。
+		/// </summary>
+		/// <param name="context">当前执行上下文对象。</param>
+		void OnExecuting(TContext context);
 
-        protected override void Run(FtpCommandContext context)
-        {
-            context.Channel.CheckLogin();
-
-            context.Channel.Send("215 UNIX emulated by Zongsoft.FtpServer");
-        }
-    }
+		/// <summary>
+		/// 表示在执行处理程序之后被激发调用。
+		/// </summary>
+		/// <param name="context">当前执行上下文对象。</param>
+		void OnExecuted(TContext context);
+	}
 }

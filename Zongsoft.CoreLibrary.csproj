@@ -260,6 +260,12 @@
     <Compile Include="Services\CommandOptionValueException.cs" />
     <Compile Include="Services\CommandContext.cs" />
     <Compile Include="Services\CommandExecutor.cs" />
+    <Compile Include="Services\Composition\ExecutedEventArgs.cs" />
+    <Compile Include="Services\Composition\ExecutionSelectorContext.cs" />
+    <Compile Include="Services\Composition\IExecutionCombiner.cs" />
+    <Compile Include="Services\Composition\IExecutionFilter`1.cs" />
+    <Compile Include="Services\Composition\IExecutionHandler`1.cs" />
+    <Compile Include="Services\Composition\IExecutionSelector.cs" />
     <Compile Include="Services\ICommandLineParser.cs" />
     <Compile Include="Services\IMatchable`1.cs" />
     <Compile Include="Services\IMatcher.cs" />
@@ -278,7 +284,7 @@
     <Compile Include="Services\CommandNotFoundException.cs" />
     <Compile Include="Services\CommandTreeNodeCollection.cs" />
     <Compile Include="Services\CommandTreeNode.cs" />
-    <Compile Include="Services\Composition\ExecutionEventArgs.cs" />
+    <Compile Include="Services\Composition\ExecutingEventArgs.cs" />
     <Compile Include="Services\ICommandLoader.cs" />
     <Compile Include="Services\ICommand`1.cs" />
     <Compile Include="Services\PredicationCollection.cs" />

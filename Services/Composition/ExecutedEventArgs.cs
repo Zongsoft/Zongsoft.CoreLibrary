@@ -1,8 +1,8 @@
 ﻿/*
  * Authors:
- *   邓祥云(X.Z. Deng) <627825056@qq.com>
+ *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2011-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2013 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -26,25 +26,57 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace Zongsoft.Communication.Net.Ftp
+namespace Zongsoft.Services.Composition
 {
-    /// <summary>
-    /// 返回服务器使用的操作系统，指令的回应是该系统当前版本名的第一个单词
-    /// </summary>
-    internal class FtpSystCommand : FtpCommand
-    {
-        public FtpSystCommand() : base("SYST")
-        {
-        }
+	public class ExecutedEventArgs : EventArgs
+	{
+		#region 成员字段
+		private Executor _executor;
+		private object _parameter;
+		private object _result;
+		#endregion
 
-        protected override void Run(FtpCommandContext context)
-        {
-            context.Channel.CheckLogin();
+		#region 构造函数
+		public ExecutedEventArgs(Executor executor, object parameter, object result = null)
+		{
+			if(executor == null)
+				throw new ArgumentNullException("executor");
 
-            context.Channel.Send("215 UNIX emulated by Zongsoft.FtpServer");
-        }
-    }
+			_executor = executor;
+			_parameter = parameter;
+			_result = result;
+		}
+		#endregion
+
+		#region 公共属性
+		public Executor Executor
+		{
+			get
+			{
+				return _executor;
+			}
+		}
+
+		public object Parameter
+		{
+			get
+			{
+				return _parameter;
+			}
+		}
+
+		public object Result
+		{
+			get
+			{
+				return _result;
+			}
+			set
+			{
+				_result = value;
+			}
+		}
+		#endregion
+	}
 }

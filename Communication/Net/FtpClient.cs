@@ -1,7 +1,6 @@
 ﻿/*
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
- *   邓祥云(X.Z. Deng) <627825056@qq.com>
  *
  * Copyright (C) 2011-2013 Zongsoft Corporation <http://www.zongsoft.com>
  *
@@ -34,18 +33,17 @@ using System.Text;
 
 namespace Zongsoft.Communication.Net
 {
+	[Obsolete]
 	public class FtpClient
 	{
 		#region 成员变量
 		private ICredentials _credentials;
 		#endregion
 
-        public bool KeepAlive { get; set; }
-
 		#region 构造函数
 		public FtpClient()
 		{
-		    KeepAlive = true;
+			KeepAlive = true;
 			_credentials = null;
 		}
 
@@ -60,6 +58,15 @@ namespace Zongsoft.Communication.Net
 		}
 		#endregion
 
+		#region 公共属性
+		public bool KeepAlive
+		{
+			get;
+			set;
+		}
+		#endregion
+
+		#region 公共方法
 		public void UploadFile(Uri url, string fileName)
 		{
 			using(var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read, 1024, FileOptions.Asynchronous))
@@ -75,16 +82,16 @@ namespace Zongsoft.Communication.Net
 			if(request == null)
 				throw new InvalidOperationException();
 
-            request.KeepAlive = KeepAlive;
+			request.KeepAlive = KeepAlive;
 			request.Method = WebRequestMethods.Ftp.UploadFile;
 			request.Credentials = _credentials;
 
 			var requestStream = request.GetRequestStream();
 			stream.CopyTo(requestStream);
-            requestStream.Close();
+			requestStream.Close();
 
-            if(closeStream)
-                stream.Close();
+			if(closeStream)
+				stream.Close();
 		}
 
 		public Stream Download(Uri url)
@@ -94,7 +101,7 @@ namespace Zongsoft.Communication.Net
 			if(request == null)
 				throw new InvalidOperationException();
 
-            request.KeepAlive = KeepAlive;
+			request.KeepAlive = KeepAlive;
 			request.Method = WebRequestMethods.Ftp.DownloadFile;
 			request.Credentials = _credentials;
 
@@ -114,5 +121,6 @@ namespace Zongsoft.Communication.Net
 				}
 			}
 		}
+		#endregion
 	}
 }

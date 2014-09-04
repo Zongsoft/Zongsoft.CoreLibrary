@@ -1,50 +1,41 @@
-﻿#region File Header
-
-// Authors:
-//    钟峰(Popeye Zhong) <zongsoft@gmail.com>
-//    邓祥云(X.Z. Deng) <627825056@qq.com>
-//  
-// Copyright (C) 2011-2013 Zongsoft Corporation <http://www.zongsoft.com>
-// 
-// This file is part of Zongsoft.CoreLibrary.
-// 
-// Zongsoft.CoreLibrary is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// 
-// Zongsoft.CoreLibrary is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-// Lesser General Public License for more details.
-// 
-// The above copyright notice and this permission notice shall be
-// included in all copies or substantial portions of the Software.
-// 
-// You should have received a copy of the GNU Lesser General Public
-// License along with Zongsoft.CoreLibrary; if not, write to the Free Software
-// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
-
-#endregion
-
-#region Using
+﻿/*
+ * Authors:
+ *   邓祥云(X.Z. Deng) <627825056@qq.com>
+ *
+ * Copyright (C) 2011-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ *
+ * This file is part of Zongsoft.CoreLibrary.
+ *
+ * Zongsoft.CoreLibrary is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * Zongsoft.CoreLibrary is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with Zongsoft.CoreLibrary; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ */
 
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Net.Sockets;
-using System.Text;
-
-#endregion
+using System.Collections.Generic;
 
 namespace Zongsoft.Communication.Net.Ftp
 {
+	#region 委托定义
 	internal delegate void ReceiveDataEventHandler(object sender, byte[] buffer, int offset, int count);
-
 	internal delegate void ErrorEventHandler(object sender, Exception exception);
+	#endregion
 
-    /// <summary>
+	/// <summary>
     /// 定义FTP数据通道接口
     /// </summary>
     internal interface IFtpDataChannel
@@ -77,7 +68,7 @@ namespace Zongsoft.Communication.Net.Ftp
         /// <summary>
         /// 获取Socket对像
         /// </summary>
-        Socket Socket { get; }
+        System.Net.Sockets.Socket Socket { get; }
 
         /// <summary>
         /// 获取或设置 数据通道对应的命令通道对像
