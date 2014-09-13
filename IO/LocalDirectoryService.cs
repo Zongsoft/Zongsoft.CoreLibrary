@@ -95,7 +95,7 @@ namespace Zongsoft.IO
 			return this.GetChildren(path, null, false);
 		}
 
-		public IEnumerable<string> GetChildren(string path, string pattern, bool recursive)
+		public IEnumerable<string> GetChildren(string path, string pattern, bool recursive = false)
 		{
 			var fullPath = LocalPath.ToLocalPath(path);
 			return System.IO.Directory.GetFileSystemEntries(fullPath, pattern, recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
@@ -106,7 +106,7 @@ namespace Zongsoft.IO
 			return this.GetDirectories(path, null, false);
 		}
 
-		public IEnumerable<string> GetDirectories(string path, string pattern, bool recursive)
+		public IEnumerable<string> GetDirectories(string path, string pattern, bool recursive = false)
 		{
 			var fullPath = LocalPath.ToLocalPath(path);
 			return System.IO.Directory.GetDirectories(fullPath, pattern, recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
@@ -117,7 +117,7 @@ namespace Zongsoft.IO
 			return this.GetFiles(path, null, false);
 		}
 
-		public IEnumerable<string> GetFiles(string path, string pattern, bool recursive)
+		public IEnumerable<string> GetFiles(string path, string pattern, bool recursive = false)
 		{
 			var fullPath = LocalPath.ToLocalPath(path);
 			return System.IO.Directory.GetFiles(fullPath, pattern, recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);

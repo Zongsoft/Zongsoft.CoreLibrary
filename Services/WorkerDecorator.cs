@@ -32,7 +32,7 @@ using System.Text;
 
 namespace Zongsoft.Services
 {
-	[Serializable]
+	[Obsolete]
 	public class WorkerDecorator : MarshalByRefObject, IWorker
 	{
 		#region 事件定义
@@ -62,11 +62,7 @@ namespace Zongsoft.Services
 			if(resolver == null)
 				throw new ArgumentNullException("resolver");
 
-			if(string.IsNullOrWhiteSpace(name))
-				_name = this.GetType().Name;
-			else
-				_name = name.Trim();
-
+			_name = name;
 			_disabled = false;
 			_resolver = resolver;
 		}
@@ -77,7 +73,15 @@ namespace Zongsoft.Services
 		{
 			get
 			{
-				return _name;
+				if(string.IsNullOrWhiteSpace(_name))
+				{
+					var worker = _resolver.Value;
+
+					if(worker != null)
+						return worker.Name;
+				}
+
+				return _name ?? string.Empty;
 			}
 		}
 

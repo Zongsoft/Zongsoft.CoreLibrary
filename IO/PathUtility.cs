@@ -35,6 +35,7 @@ namespace Zongsoft.IO
 	/// <summary>
 	/// 提供有关路径和文件操作功能的静态类。
 	/// </summary>
+	[Obsolete]
 	public static class PathUtility
 	{
 		public static string GetCurrentFilePathWithSerialNo(string filePath, Predicate<string> predicate)

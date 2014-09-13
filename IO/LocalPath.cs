@@ -32,7 +32,7 @@ namespace Zongsoft.IO
 {
 	internal static class LocalPath
 	{
-		private static readonly Regex _winPathRegex = new Regex(@"^(\/?(?<drive>[a-zA-Z]))(?<path>(/[^\/\\]+)*\/?)$", RegexOptions.Compiled | RegexOptions.ExplicitCapture | RegexOptions.IgnorePatternWhitespace);
+		private static readonly Regex _winPathRegex = new Regex(@"^(\/?(?<drive>[^\/\\\*\?:]+))(?<path>(/[^\/\\\*\?:]+)*\/?)$", RegexOptions.Compiled | RegexOptions.ExplicitCapture | RegexOptions.IgnorePatternWhitespace);
 
 		public static string ToLocalPath(string path)
 		{
@@ -53,7 +53,26 @@ namespace Zongsoft.IO
 			if(!match.Success)
 				throw new PathException(path);
 
-			return match.Groups["drive"].Value + ":" + match.Groups["path"].Value;
+			string driveName = match.Groups["drive"].Value.Trim();
+
+			if(string.IsNullOrWhiteSpace(driveName))
+				throw new PathException(path);
+
+			if(driveName.Length > 1)
+			{
+				var drives = System.IO.DriveInfo.GetDrives();
+
+				foreach(var drive in drives)
+				{
+					if(string.Equals(drive.VolumeLabel, driveName, StringComparison.OrdinalIgnoreCase))
+					{
+						driveName = drive.Name;
+						break;
+					}
+				}
+			}
+
+			return driveName + ":" + match.Groups["path"].Value.Replace('/', '\\');
 		}
 	}
 }

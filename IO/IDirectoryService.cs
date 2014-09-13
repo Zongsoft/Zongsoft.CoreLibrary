@@ -51,19 +51,18 @@ namespace Zongsoft.IO
 		/// </remarks>
 		bool Create(string path);
 
-		void Delete(string path);
-		void Delete(string path, bool recursive);
+		void Delete(string path, bool recursive = false);
 
 		void Move(string source, string destination);
 		bool Exists(string path);
 
 		IEnumerable<string> GetChildren(string path);
-		IEnumerable<string> GetChildren(string path, string pattern, bool recursive);
+		IEnumerable<string> GetChildren(string path, string pattern, bool recursive = false);
 
 		IEnumerable<string> GetDirectories(string path);
-		IEnumerable<string> GetDirectories(string path, string pattern, bool recursive);
+		IEnumerable<string> GetDirectories(string path, string pattern, bool recursive = false);
 
 		IEnumerable<string> GetFiles(string path);
-		IEnumerable<string> GetFiles(string path, string pattern, bool recursive);
+		IEnumerable<string> GetFiles(string path, string pattern, bool recursive = false);
 	}
 }
