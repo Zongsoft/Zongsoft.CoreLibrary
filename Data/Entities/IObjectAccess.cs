@@ -40,6 +40,11 @@ namespace Zongsoft.Data.Entities
 		object Execute(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters);
 		#endregion
 
+		#region 计数方法
+		int Count(string name, IClause where);
+		int Count(string name, IClause where, string[] includes);
+		#endregion
+
 		#region 查询方法
 		/// <summary>
 		/// 执行指定名称的数据查询操作。

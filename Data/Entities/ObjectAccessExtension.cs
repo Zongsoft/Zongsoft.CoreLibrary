@@ -50,38 +50,6 @@ namespace Zongsoft.Data.Entities
 
 			objectAccess.Execute(name, ResolveObjectToParameters(inParameters), out outParameters);
 		}
-
-		public static IEnumerable Select(this IObjectAccess objectAccess, string name, object inParameters)
-		{
-			if(objectAccess == null)
-				throw new ArgumentNullException("objectAccess");
-
-			return objectAccess.Select(name, ResolveObjectToParameters(inParameters));
-		}
-
-		public static IEnumerable Select(this IObjectAccess objectAccess, string name, object inParameters, out IDictionary<string, object> outParameters)
-		{
-			if(objectAccess == null)
-				throw new ArgumentNullException("objectAccess");
-
-			return objectAccess.Select(name, ResolveObjectToParameters(inParameters), out outParameters);
-		}
-
-		public static IEnumerable<TEntity> Select<TEntity>(this IObjectAccess objectAccess, object inParameters)
-		{
-			if(objectAccess == null)
-				throw new ArgumentNullException("objectAccess");
-
-			return objectAccess.Select<TEntity>(ResolveObjectToParameters(inParameters));
-		}
-
-		public static IEnumerable<TEntity> Select<TEntity>(this IObjectAccess objectAccess, object inParameters, out IDictionary<string, object> outParameters)
-		{
-			if(objectAccess == null)
-				throw new ArgumentNullException("objectAccess");
-
-			return objectAccess.Select<TEntity>(ResolveObjectToParameters(inParameters), out outParameters);
-		}
 		#endregion
 
 		#region 私有方法

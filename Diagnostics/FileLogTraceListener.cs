@@ -131,20 +131,20 @@ namespace Zongsoft.Diagnostics
 		/// <summary>
 		/// 将日志记录项追加到指定的日志文件中。
 		/// </summary>
-		/// <param name="fileName">要写入的日志文件，如果文件不存在则新建它。</param>
+		/// <param name="filePath">要写入的日志文件，如果文件不存在则新建它。</param>
 		/// <param name="entry">要写入的日志记录项。</param>
 		/// <exception cref="System.ArgumentNullException">filePath 是空(null)或空字符串("")，entry 是空(null)。</exception>
-		public void WriteEntry(string fileName, TraceEntry entry)
+		public void WriteEntry(string filePath, TraceEntry entry)
 		{
-			if(string.IsNullOrEmpty(fileName))
-				throw new ArgumentNullException("fileName");
+			if(string.IsNullOrEmpty(filePath))
+				throw new ArgumentNullException("filePath");
 
 			if(entry == null)
 				throw new ArgumentNullException("entry");
 
-			fileName = this.GetFileName(fileName);
+			filePath = this.GetFilePath(filePath);
 
-			using(FileStream stream = new FileStream(fileName, FileMode.Append, FileAccess.Write, FileShare.Read, DefaultBufferSize, false))
+			using(FileStream stream = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.Read, DefaultBufferSize, false))
 			{
 				using(var writer = new StreamWriter(stream, Encoding.UTF8, DefaultBufferSize))
 				{
@@ -167,7 +167,8 @@ namespace Zongsoft.Diagnostics
 						var serializer = this.Serializer;
 
 						//将实体的数据对象序列化到日志文件中
-						serializer.Serialize(stream, entry.Data);
+						if(serializer != null)
+							serializer.Serialize(stream, entry.Data);
 
 						writer.WriteLine("}");
 					}
@@ -183,9 +184,9 @@ namespace Zongsoft.Diagnostics
 				return type.AssemblyQualifiedName;
 		}
 
-		private string GetFileName(string fileName)
+		private string GetFilePath(string filePath)
 		{
-			return Zongsoft.IO.PathUtility.GetCurrentFilePathWithSerialNo(fileName, currentFilePath =>
+			return Zongsoft.IO.PathUtility.GetCurrentFilePathWithSerialNo(filePath, currentFilePath =>
 			{
 				if(!File.Exists(currentFilePath))
 					return false;
