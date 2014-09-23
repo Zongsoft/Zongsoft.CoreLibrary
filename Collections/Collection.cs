@@ -100,6 +100,20 @@ namespace Zongsoft.Collections
 			this.InsertItem(index, item);
 		}
 
+		public virtual void AddRange(IEnumerable<T> items)
+		{
+			if(_items.IsReadOnly)
+				throw new NotSupportedException();
+
+			if(items == null)
+				return;
+
+			foreach(var item in _items)
+			{
+				_items.Add(item);
+			}
+		}
+
 		public void Clear()
 		{
 			if(_items.IsReadOnly)
