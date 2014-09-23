@@ -180,6 +180,18 @@
   <data name="Text.HelpCommand.Title" xml:space="preserve">
     <value>帮助命令</value>
   </data>
+  <data name="Text.WorkerState.Running" xml:space="preserve">
+    <value>运行中</value>
+  </data>
+  <data name="Text.WorkerState.Starting" xml:space="preserve">
+    <value>启动中</value>
+  </data>
+  <data name="Text.WorkerState.Stopped" xml:space="preserve">
+    <value>未运行</value>
+  </data>
+  <data name="Text.WorkerState.Stopping" xml:space="preserve">
+    <value>停止中</value>
+  </data>
   <data name="ValueRange" xml:space="preserve">
     <value>取值范围：</value>
   </data>

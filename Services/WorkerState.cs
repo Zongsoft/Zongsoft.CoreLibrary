@@ -25,16 +25,27 @@
  */
 
 using System;
-using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Zongsoft.Services
 {
+	/// <summary>
+	/// 关于<see cref="Worker"/>的状态信息。
+	/// </summary>
 	public enum WorkerState
 	{
+		/// <summary>未运行/已停止。</summary>
+		[Description("${Text.WorkerState.Stopped}")]
 		Stopped = 0,
-		Stopping =1,
+		/// <summary>运行中。</summary>
+		[Description("${Text.WorkerState.Running}")]
+		Running = 1,
 
-		Started = 2,
-		Starting = 3,
+		/// <summary>正在启动中。</summary>
+		[Description("${Text.WorkerState.Starting}")]
+		Starting = 2,
+		/// <summary>正在停止中。</summary>
+		[Description("${Text.WorkerState.Stopping}")]
+		Stopping = 3,
 	}
 }

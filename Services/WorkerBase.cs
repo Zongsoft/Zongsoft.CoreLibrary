@@ -146,8 +146,8 @@ namespace Zongsoft.Services
 				//调用启动抽象方法，以执行实际的启动操作
 				this.OnStart(args);
 
-				//更新当前状态为已启动
-				_state = WorkerState.Started;
+				//更新当前状态为“运行中”
+				_state = WorkerState.Running;
 
 				//激发“Started”事件
 				this.OnStarted(EventArgs.Empty);
