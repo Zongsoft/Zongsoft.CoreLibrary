@@ -108,10 +108,7 @@ namespace Zongsoft.Collections
 			if(items == null)
 				return;
 
-			foreach(var item in _items)
-			{
-				_items.Add(item);
-			}
+			((List<T>)_items).AddRange(items);
 		}
 
 		public void Clear()

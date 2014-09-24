@@ -29,6 +29,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Services
 {
+	[Obsolete]
 	public class ServiceDependencyContainer
 	{
 		private ServiceDependencyConsumerCollection _consumers;
