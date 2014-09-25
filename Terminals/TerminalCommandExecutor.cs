@@ -37,12 +37,14 @@ namespace Zongsoft.Terminals
 	public class TerminalCommandExecutor : Zongsoft.Services.CommandExecutor
 	{
 		#region 事件声明
+		public event EventHandler CurrentChanged;
 		public event EventHandler<ExitEventArgs> Exit;
 		public event EventHandler<FailureEventArgs> Failed;
 		#endregion
 
-		#region 成员变量
+		#region 成员字段
 		private ITerminal _terminal;
+		private CommandTreeNode _current;
 		#endregion
 
 		#region 构造函数
@@ -66,6 +68,24 @@ namespace Zongsoft.Terminals
 			get
 			{
 				return _terminal;
+			}
+		}
+
+		public CommandTreeNode Current
+		{
+			get
+			{
+				return _current;
+			}
+			private set
+			{
+				if(object.ReferenceEquals(_current, value))
+					return;
+
+				_current = value;
+
+				//激发“CurrentChanged”事件
+				this.OnCurrentChanged(EventArgs.Empty);
 			}
 		}
 		#endregion
@@ -100,6 +120,32 @@ namespace Zongsoft.Terminals
 		#endregion
 
 		#region 重写方法
+		public override object Execute(string commandText, object parameter)
+		{
+			CommandTreeNode current = null;
+
+			switch(commandText.Trim())
+			{
+				case "/":
+					current = this.Root;
+					break;
+				case ".":
+					current = _current;
+					break;
+				case "..":
+					if(_current == null || _current.Parent == null)
+						return null;
+
+					current = _current.Parent;
+					break;
+			}
+
+			if(current != null)
+				return this.Execute(commandText, current, parameter);
+			else
+				return base.Execute(commandText, parameter);
+		}
+
 		protected override object OnExecute(CommandExecutorContext context)
 		{
 			var commandLine = context.Parameter as CommandLine;
@@ -109,9 +155,26 @@ namespace Zongsoft.Terminals
 
 			return context.Command.Execute(new TerminalCommandContext(context.Command, this, commandLine));
 		}
+
+		protected override void OnExecuted(CommandExecutorExecutedEventArgs args)
+		{
+			var commandNode = args.CommandNode;
+
+			//更新当前命令节点
+			if(commandNode != null && commandNode.Children.Count > 0 && args.Command != null)
+				this.Current = commandNode;
+
+			base.OnExecuted(args);
+		}
 		#endregion
 
 		#region 激发事件
+		protected virtual void OnCurrentChanged(EventArgs args)
+		{
+			if(this.CurrentChanged != null)
+				this.CurrentChanged(this, args);
+		}
+
 		private bool RaiseExit(int exitCode)
 		{
 			var args = new ExitEventArgs(exitCode);

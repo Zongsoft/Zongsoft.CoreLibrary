@@ -89,26 +89,27 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 执行方法
-		public override object Execute(string commandText)
+		public override object Execute(string commandText, object parameter)
 		{
 			if(string.IsNullOrWhiteSpace(commandText))
 				return null;
 
-			switch(commandText.Trim())
-			{
-				case "/":
-				case ".":
-				case "..":
-					return this.Execute(commandText, null);
-			}
-
-			//使用命令行解析器解析当前命令文本
-			var commandLine = this.Parser.Parse(commandText);
+			//解析当前命令文本
+			var commandLine = this.OnParse(commandText);
 
 			if(commandLine == null)
-				throw new ArgumentException("Invalid command-line format.");
+				throw new ArgumentException(string.Format("Invalid command-line text format of <{0}>.", commandText));
 
-			return this.Execute(commandLine.FullPath, commandLine);
+			return base.Execute(commandLine.FullPath, commandLine);
+		}
+		#endregion
+
+		#region 虚拟方法
+		protected virtual CommandLine OnParse(string commandText)
+		{
+			var parser = this.Parser;
+
+			return parser == null ? null : parser.Parse(commandText);
 		}
 		#endregion
 

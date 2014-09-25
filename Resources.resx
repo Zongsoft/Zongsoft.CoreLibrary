@@ -180,6 +180,9 @@
   <data name="Text.HelpCommand.Title" xml:space="preserve">
     <value>帮助命令</value>
   </data>
+  <data name="Text.ShellCommand.Options.Timeout" xml:space="preserve">
+    <value>运行外部命令的超时，单位：毫秒。</value>
+  </data>
   <data name="Text.WorkerState.Running" xml:space="preserve">
     <value>运行中</value>
   </data>

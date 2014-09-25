@@ -61,13 +61,12 @@ namespace Zongsoft.Terminals.Commands
 
 			foreach(var argument in context.Arguments)
 			{
-				CommandTreeNode node;
-				var command = context.Executor.Find(argument, out node);
+				CommandTreeNode node = context.Executor.Find(argument);
 
-				if(command != null)
+				if(node != null && node.Command != null)
 				{
 					context.Terminal.WriteLine(node.FullPath);
-					CommandHelper.DisplayCommandInfo(context.Terminal, command);
+					CommandHelper.DisplayCommandInfo(context.Terminal, node.Command);
 				}
 			}
 		}

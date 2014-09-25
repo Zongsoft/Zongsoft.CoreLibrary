@@ -34,14 +34,12 @@ namespace Zongsoft.Services
 	public class CommandExecutorBase : MarshalByRefObject
 	{
 		#region 声明事件
-		public event EventHandler CurrentChanged;
-		public event EventHandler<CommandExecutingEventArgs> Executing;
-		public event EventHandler<CommandExecutedEventArgs> Executed;
+		public event EventHandler<CommandExecutorExecutingEventArgs> Executing;
+		public event EventHandler<CommandExecutorExecutedEventArgs> Executed;
 		#endregion
 
 		#region 成员字段
 		private readonly CommandTreeNode _root;
-		private CommandTreeNode _current;
 		#endregion
 
 		#region 构造函数
@@ -59,100 +57,65 @@ namespace Zongsoft.Services
 				return _root;
 			}
 		}
-
-		public CommandTreeNode Current
-		{
-			get
-			{
-				return _current;
-			}
-			private set
-			{
-				if(object.ReferenceEquals(_current, value))
-					return;
-
-				_current = value;
-
-				//激发“CurrentChanged”事件
-				this.OnCurrentChanged(EventArgs.Empty);
-			}
-		}
 		#endregion
 
 		#region 查找方法
-		public ICommand Find(string path)
+		public virtual CommandTreeNode Find(string path)
 		{
-			CommandTreeNode node;
-			return this.Find(path, out node);
-		}
-
-		public ICommand Find(string path, out CommandTreeNode node)
-		{
-			node = (_current ?? _root).Find(path);
-
-			if(node != null)
-				return node.Command;
-
-			return null;
+			return _root.Find(path);
 		}
 		#endregion
 
 		#region 执行方法
-		public virtual object Execute(string commandPath)
+		public object Execute(string commandPath)
 		{
 			return this.Execute(commandPath, null);
 		}
 
-		protected object Execute(string commandPath, object parameter)
+		public virtual object Execute(string commandPath, object parameter)
 		{
 			if(string.IsNullOrWhiteSpace(commandPath))
 				throw new ArgumentNullException("commandPath");
 
-			switch(commandPath.Trim())
-			{
-				case "/":
-					return this.Execute(_root, parameter);
-				case ".":
-					return this.Execute(_current, parameter);
-				case "..":
-					if(_current == null || _current.Parent == null)
-						return null;
-
-					return this.Execute(_current.Parent, parameter);
-			}
-
-			CommandTreeNode commandNode;
-
 			//查找指定路径的命令对象
-			var command = this.Find(commandPath, out commandNode);
+			var commandNode = this.Find(commandPath);
 
 			//如果指定的路径在命令树中是不存在的则抛出异常
 			if(commandNode == null)
 				throw new CommandNotFoundException(commandPath);
 
-			return this.Execute(commandNode, parameter);
+			return this.Execute(commandPath, commandNode, parameter);
 		}
 
-		protected object Execute(CommandTreeNode commandNode, object parameter)
+		protected object Execute(string commandText, CommandTreeNode commandNode, object parameter)
 		{
-			if(commandNode == null)
-				return null;
+			//创建事件参数对象
+			var executingArgs = new CommandExecutorExecutingEventArgs(this, commandText, parameter, commandNode);
 
-			//更新当前命令节点
-			if(commandNode.Children.Count > 0)
-				this.Current = commandNode;
+			//激发“Executing”事件
+			this.OnExecuting(executingArgs);
 
-			var command = commandNode.Command;
+			if(executingArgs.Cancel || commandNode == null)
+				return executingArgs.Result;
+
+			//获取应该执行的命令对象
+			var command = executingArgs.Command;
 
 			//有可能找到的是空命令树节点，因此必须再判断对应的命令是否存在
 			if(command == null)
 				return null;
 
-			command.Executing += new EventHandler<CommandExecutingEventArgs>(Command_Executing);
-			command.Executed += new EventHandler<CommandExecutedEventArgs>(Command_Executed);
-
 			//执行当前命令
-			return this.OnExecute(new CommandExecutorContext(this, commandNode, command, parameter));
+			var result = this.OnExecute(new CommandExecutorContext(this, commandNode, command, parameter));
+
+			//创建事件参数对象
+			var executedArgs = new CommandExecutorExecutedEventArgs(this, commandText, parameter, commandNode, command, result);
+
+			//激发“Executed”事件
+			this.OnExecuted(executedArgs);
+
+			//返回最终的执行结果
+			return executedArgs.Result;
 		}
 		#endregion
 
@@ -164,40 +127,20 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 激发事件
-		protected virtual void OnCurrentChanged(EventArgs args)
+		protected virtual void OnExecuting(CommandExecutorExecutingEventArgs args)
 		{
-			if(this.CurrentChanged != null)
-				this.CurrentChanged(this, args);
+			var executing = this.Executing;
+
+			if(executing != null)
+				executing(this, args);
 		}
 
-		protected virtual void OnExecuting(CommandExecutingEventArgs args)
+		protected virtual void OnExecuted(CommandExecutorExecutedEventArgs args)
 		{
-			if(this.Executing != null)
-				this.Executing(this, args);
-		}
+			var executed = this.Executed;
 
-		protected virtual void OnExecuted(CommandExecutedEventArgs args)
-		{
-			if(this.Executed != null)
-				this.Executed(this, args);
-		}
-		#endregion
-
-		#region 命令事件
-		private void Command_Executing(object sender, CommandExecutingEventArgs e)
-		{
-			((ICommand)sender).Executing -= Command_Executing;
-
-			//调用命令准备执行虚拟方法
-			this.OnExecuting(e);
-		}
-
-		private void Command_Executed(object sender, CommandExecutedEventArgs e)
-		{
-			((ICommand)sender).Executed -= Command_Executed;
-
-			//调用命令执行完成虚拟方法
-			this.OnExecuted(e);
+			if(executed != null)
+				executed(this, args);
 		}
 		#endregion
 	}

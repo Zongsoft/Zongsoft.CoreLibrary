@@ -70,8 +70,7 @@ namespace Zongsoft.Data.Entities
 		///		       },
 		///		       new Paging(10, 20),
 		///		       new Sorting[]{new Sorting(SortingMode.Ascending, "Timestamp")},
-		///		       new string[]{"Creator.HomeAddress", "Corssing"},
-		///		       null);
+		///		       new string[]{"Creator.HomeAddress", "Corssing"});
 		///		</code>
 		/// </remarks>
 		IEnumerable Select(string name,
