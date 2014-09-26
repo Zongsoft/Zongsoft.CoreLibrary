@@ -86,5 +86,11 @@ namespace Zongsoft.Services
 		/// 停止工作器。
 		/// </summary>
 		void Stop();
+
+		/// <summary>
+		/// 停止工作器。
+		/// </summary>
+		/// <param name="args">停止的参数。</param>
+		void Stop(string[] args);
 	}
 }

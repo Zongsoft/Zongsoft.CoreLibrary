@@ -176,8 +176,13 @@ namespace Zongsoft.Services
 
 		public void Stop()
 		{
+			this.Stop(new string[0]);
+		}
+
+		public void Stop(string[] args)
+		{
 			if(_resolver.IsValueCreated)
-				_resolver.Value.Stop();
+				_resolver.Value.Stop(args);
 		}
 		#endregion
 	}

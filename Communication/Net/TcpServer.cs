@@ -152,7 +152,7 @@ namespace Zongsoft.Communication.Net
 			this.Accept();
 		}
 
-		protected override void OnStop()
+		protected override void OnStop(string[] args)
 		{
 			//原子性的将当前服务器的侦听Socket对象置空，并返回其原值引用
 			var socket = System.Threading.Interlocked.Exchange(ref _socket, null);

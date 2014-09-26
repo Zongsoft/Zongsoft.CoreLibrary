@@ -159,8 +159,13 @@ namespace Zongsoft.Services
 			}
 		}
 
+		public void Stop()
+		{
+			this.Stop(new string[0]);
+		}
+
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
-		public virtual void Stop()
+		public virtual void Stop(string[] args)
 		{
 			var state = _state;
 
@@ -184,7 +189,7 @@ namespace Zongsoft.Services
 			try
 			{
 				//调用停止抽象方法，以执行实际的停止操作
-				this.OnStop();
+				this.OnStop(args);
 
 				//更新当前状态为已停止
 				_state = WorkerState.Stopped;
@@ -202,7 +207,7 @@ namespace Zongsoft.Services
 
 		#region 抽象方法
 		protected abstract void OnStart(string[] args);
-		protected abstract void OnStop();
+		protected abstract void OnStop(string[] args);
 		#endregion
 
 		#region 事件激发

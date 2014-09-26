@@ -119,12 +119,12 @@ namespace Zongsoft.Communication.Net
 			base.OnStart(args);
 		}
 
-		protected override void OnStop()
+		protected override void OnStop(string[] args)
 		{
 			_pasvDataChannelPool.Clear();
 
 			//调用基类同名方法
-			base.OnStop();
+			base.OnStop(args);
 		}
 
 		protected override void OnReceived(ReceivedEventArgs args)
