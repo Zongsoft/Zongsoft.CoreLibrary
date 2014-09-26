@@ -84,13 +84,46 @@ namespace Zongsoft.Services
 			if(string.IsNullOrWhiteSpace(fullPath))
 				throw new ArgumentNullException("fullPath");
 
-			var commandLine = Parse(fullPath);
+			var parts = fullPath.Split('/', '.');
 
-			if(commandLine == null)
-				throw new ArgumentException("Invalid value of 'fullPath' parameter.");
+			for(int i = parts.Length - 1; i >= 0; i--)
+			{
+				if(string.IsNullOrWhiteSpace(parts[i]))
+					continue;
+
+				if(_name == null)
+					_name = parts[i].Trim();
+				else
+				{
+					if(_path == null)
+						_path = parts[i].Trim();
+					else
+						_path = parts[i].Trim() + "/" + _path;
+				}
+			}
+
+			if(_name == null)
+				_name = "/";
+			else
+				_path = "/" + _path;
+
+			if(_name == "/")
+				_fullPath = "/";
+			else
+			{
+				if(_path == "/")
+					_fullPath = _path + _name;
+				else
+					_fullPath = _path + "/" + _name;
+			}
 
 			if(_options == null)
-				_options = new Dictionary<string, string>(options, StringComparer.OrdinalIgnoreCase);
+			{
+				if(options == null)
+					_options = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+				else
+					_options = new Dictionary<string, string>(options, StringComparer.OrdinalIgnoreCase);
+			}
 			else
 			{
 				if(options != null && options.Count > 0)

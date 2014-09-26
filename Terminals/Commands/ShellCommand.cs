@@ -54,7 +54,7 @@ namespace Zongsoft.Terminals.Commands
 			if(context.Arguments.Length < 1)
 				return 0;
 
-			ProcessStartInfo info = new ProcessStartInfo(@"cmd.exe", " /K " + context.Arguments[0])
+			ProcessStartInfo info = new ProcessStartInfo(@"cmd.exe", " /C " + context.Arguments[0])
 			{
 				CreateNoWindow = true,
 				UseShellExecute = false,

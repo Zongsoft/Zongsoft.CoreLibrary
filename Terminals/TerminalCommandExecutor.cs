@@ -119,31 +119,32 @@ namespace Zongsoft.Terminals
 		}
 		#endregion
 
-		#region 重写方法
-		public override object Execute(string commandText, object parameter)
+		#region 查找方法
+		public override CommandTreeNode Find(string path)
 		{
-			CommandTreeNode current = null;
+			var current = _current;
 
+			if(current == null)
+				return base.Find(path);
+
+			return current.Find(path);
+		}
+		#endregion
+
+		#region 重写方法
+		protected override CommandLine OnParse(string commandText)
+		{
 			switch(commandText.Trim())
 			{
 				case "/":
-					current = this.Root;
-					break;
+					return new CommandLine("/", null, null);
 				case ".":
-					current = _current;
-					break;
+					return new CommandLine((_current ?? this.Root).FullPath, null, null);
 				case "..":
-					if(_current == null || _current.Parent == null)
-						return null;
-
-					current = _current.Parent;
-					break;
+					return new CommandLine((_current == null || _current.Parent == null ? this.Root : _current.Parent).FullPath, null, null);
 			}
 
-			if(current != null)
-				return this.Execute(commandText, current, parameter);
-			else
-				return base.Execute(commandText, parameter);
+			return base.OnParse(commandText);
 		}
 
 		protected override object OnExecute(CommandExecutorContext context)
@@ -160,8 +161,8 @@ namespace Zongsoft.Terminals
 		{
 			var commandNode = args.CommandNode;
 
-			//更新当前命令节点
-			if(commandNode != null && commandNode.Children.Count > 0 && args.Command != null)
+			//更新当前命令节点，只有当前命令树节点不是叶子节点并且为空命令节点
+			if(commandNode != null && commandNode.Children.Count > 0 && commandNode.Command == null)
 				this.Current = commandNode;
 
 			base.OnExecuted(args);

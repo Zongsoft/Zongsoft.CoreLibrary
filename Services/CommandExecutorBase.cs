@@ -84,10 +84,10 @@ namespace Zongsoft.Services
 			if(commandNode == null)
 				throw new CommandNotFoundException(commandPath);
 
-			return this.Execute(commandPath, commandNode, parameter);
+			return this.Execute(commandNode, parameter, commandPath);
 		}
 
-		protected object Execute(string commandText, CommandTreeNode commandNode, object parameter)
+		private object Execute(CommandTreeNode commandNode, object parameter, string commandText)
 		{
 			//创建事件参数对象
 			var executingArgs = new CommandExecutorExecutingEventArgs(this, commandText, parameter, commandNode);
@@ -95,18 +95,18 @@ namespace Zongsoft.Services
 			//激发“Executing”事件
 			this.OnExecuting(executingArgs);
 
-			if(executingArgs.Cancel || commandNode == null)
+			if(executingArgs.Cancel)
 				return executingArgs.Result;
 
-			//获取应该执行的命令对象
+			//获取应该执行的命令对象，因为在Executing事件中可能会更改待执行的命令对象
 			var command = executingArgs.Command;
 
-			//有可能找到的是空命令树节点，因此必须再判断对应的命令是否存在
-			if(command == null)
-				return null;
+			//定义返回结果的变量
+			var result = executingArgs.Result;
 
-			//执行当前命令
-			var result = this.OnExecute(new CommandExecutorContext(this, commandNode, command, parameter));
+			//有可能找到的是空命令树节点，因此必须再判断对应的命令是否存在
+			if(command != null)
+				result = this.OnExecute(new CommandExecutorContext(this, commandNode, command, parameter));
 
 			//创建事件参数对象
 			var executedArgs = new CommandExecutorExecutedEventArgs(this, commandText, parameter, commandNode, command, result);
