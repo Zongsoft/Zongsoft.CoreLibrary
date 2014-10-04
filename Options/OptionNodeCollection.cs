@@ -31,38 +31,11 @@ using System.Text;
 
 namespace Zongsoft.Options
 {
-	public class OptionNodeCollection : Zongsoft.Collections.NamedCollectionBase<OptionNode>
+	public class OptionNodeCollection : Zongsoft.Collections.HierarchicalNodeCollection<OptionNode>
 	{
-		#region 成员变量
-		private OptionNode _owner;
-		#endregion
-
 		#region 构造函数
-		internal OptionNodeCollection(OptionNode owner)
+		internal OptionNodeCollection(OptionNode owner) : base(owner)
 		{
-			if(owner == null)
-				throw new ArgumentNullException("owner");
-
-			_owner = owner;
-		}
-		#endregion
-
-		#region 重写方法
-		protected override string GetKeyForItem(OptionNode item)
-		{
-			return item.Name;
-		}
-
-		protected override void InsertItem(int index, OptionNode item)
-		{
-			item.Parent = _owner;
-			base.InsertItem(index, item);
-		}
-
-		protected override void SetItem(int index, OptionNode item)
-		{
-			item.Parent = _owner;
-			base.SetItem(index, item);
 		}
 		#endregion
 	}

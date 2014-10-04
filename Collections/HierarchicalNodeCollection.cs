@@ -29,6 +29,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Collections
 {
+	[Serializable]
 	public class HierarchicalNodeCollection<T> : NamedCollectionBase<T> where T : HierarchicalNode
 	{
 		#region 成员变量
@@ -42,6 +43,16 @@ namespace Zongsoft.Collections
 				throw new ArgumentNullException("owner");
 
 			_owner = owner;
+		}
+		#endregion
+
+		#region 保护属性
+		protected T Owner
+		{
+			get
+			{
+				return _owner;
+			}
 		}
 		#endregion
 
@@ -61,6 +72,30 @@ namespace Zongsoft.Collections
 		{
 			item.InnerParent = _owner;
 			base.SetItem(index, item);
+		}
+
+		protected override void RemoveItem(int index)
+		{
+			if(index >= 0 && index < this.Count)
+			{
+				var item = this.Items[index];
+
+				if(item != null)
+					item.InnerParent = null;
+			}
+
+			base.RemoveItem(index);
+		}
+
+		protected override void ClearItems()
+		{
+			foreach(var item in this.Items)
+			{
+				if(item != null)
+					item.InnerParent = null;
+			}
+
+			base.ClearItems();
 		}
 		#endregion
 	}

@@ -140,8 +140,18 @@ namespace Zongsoft.Options
 		{
 			get
 			{
+				//确认子节点集合是否已经加载过
+				this.EnsureChildren();
+
 				return _children;
 			}
+		}
+		#endregion
+
+		#region 重写方法
+		protected override Collections.HierarchicalNode GetChild(string name)
+		{
+			return _children[name];
 		}
 		#endregion
 	}

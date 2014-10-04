@@ -30,19 +30,11 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Services
 {
-	public class CommandTreeNodeCollection : Zongsoft.Collections.NamedCollectionBase<CommandTreeNode>
+	public class CommandTreeNodeCollection : Zongsoft.Collections.HierarchicalNodeCollection<CommandTreeNode>
 	{
-		#region 成员字段
-		private CommandTreeNode _owner;
-		#endregion
-
 		#region 构造函数
-		public CommandTreeNodeCollection(CommandTreeNode owner)
+		public CommandTreeNodeCollection(CommandTreeNode owner) : base(owner)
 		{
-			if(owner == null)
-				throw new ArgumentNullException("owner");
-
-			_owner = owner;
 		}
 		#endregion
 
@@ -52,7 +44,7 @@ namespace Zongsoft.Services
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException("name");
 
-			var node = new CommandTreeNode(name, _owner);
+			var node = new CommandTreeNode(name, this.Owner);
 			this.Add(node);
 			return node;
 		}
@@ -62,57 +54,22 @@ namespace Zongsoft.Services
 			if(command == null)
 				throw new ArgumentNullException("command");
 
-			var node = new CommandTreeNode(command, _owner);
+			var node = new CommandTreeNode(command, this.Owner);
 			this.Add(node);
 			return node;
 		}
 		#endregion
 
 		#region 重写方法
-		protected override string GetKeyForItem(CommandTreeNode item)
-		{
-			return item.Name;
-		}
-
 		protected override bool TryConvertItem(object value, out CommandTreeNode item)
 		{
 			if(value is ICommand)
 			{
-				item = new CommandTreeNode((ICommand)value, _owner);
+				item = new CommandTreeNode((ICommand)value, this.Owner);
 				return true;
 			}
 
 			return base.TryConvertItem(value, out item);
-		}
-
-		protected override void RemoveItem(int index)
-		{
-			var item = this.Items[index];
-
-			if(item != null)
-				item.Parent = null;
-
-			base.RemoveItem(index);
-		}
-
-		protected override void InsertItem(int index, CommandTreeNode item)
-		{
-			if(item.Parent != null && (!object.ReferenceEquals(item.Parent, _owner)))
-				throw new InvalidOperationException();
-
-			item.Parent = _owner;
-
-			base.InsertItem(index, item);
-		}
-
-		protected override void SetItem(int index, CommandTreeNode item)
-		{
-			if(item.Parent != null && (!object.ReferenceEquals(item.Parent, _owner)))
-				throw new InvalidOperationException();
-
-			item.Parent = _owner;
-
-			base.SetItem(index, item);
 		}
 		#endregion
 	}

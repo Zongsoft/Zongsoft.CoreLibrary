@@ -29,55 +29,36 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Services
 {
-	public class CommandTreeNode : MarshalByRefObject
+	public class CommandTreeNode : Zongsoft.Collections.HierarchicalNode
 	{
 		#region 成员字段
-		private string _name;
 		private ICommand _command;
 		private ICommandLoader _loader;
-		private CommandTreeNode _parent;
 		private CommandTreeNodeCollection _children;
 		#endregion
 
 		#region 构造函数
-		public CommandTreeNode(string name, CommandTreeNode parent = null)
+		public CommandTreeNode()
 		{
-			if(string.IsNullOrWhiteSpace(name))
-				throw new ArgumentNullException("name");
-
-			_name = name;
-			_parent = parent;
 			_children = new CommandTreeNodeCollection(this);
 		}
 
-		public CommandTreeNode(ICommand command, CommandTreeNode parent = null)
+		public CommandTreeNode(string name, CommandTreeNode parent = null) : base(name, parent)
 		{
+			_children = new CommandTreeNodeCollection(this);
+		}
+
+		public CommandTreeNode(ICommand command, CommandTreeNode parent = null) : base(command.Name, parent)
+		{
+			if(command == null)
+				throw new ArgumentNullException("command");
+
 			_command = command;
-			_parent = parent;
 			_children = new CommandTreeNodeCollection(this);
 		}
 		#endregion
 
 		#region 公共属性
-		public string Name
-		{
-			get
-			{
-				return _command == null ? _name : _command.Name;
-			}
-		}
-
-		public string FullPath
-		{
-			get
-			{
-				if(_parent == null)
-					return this.Name;
-				else
-					return _parent.FullPath.Trim('/') + "/" + this.Name;
-			}
-		}
-
 		public ICommand Command
 		{
 			get
@@ -106,11 +87,7 @@ namespace Zongsoft.Services
 		{
 			get
 			{
-				return _parent;
-			}
-			internal set
-			{
-				_parent = value;
+				return (CommandTreeNode)this.InnerParent;
 			}
 		}
 
@@ -119,7 +96,7 @@ namespace Zongsoft.Services
 			get
 			{
 				//确保当前加载器已经被加载过
-				this.EnsureLoaded();
+				this.EnsureChildren();
 
 				//返回子节点集
 				return _children;
@@ -130,51 +107,12 @@ namespace Zongsoft.Services
 		#region 公共方法
 		public CommandTreeNode Find(string path)
 		{
-			if(string.IsNullOrWhiteSpace(path))
-				return null;
-
-			return this.Find(path.Split('/'));
+			return (CommandTreeNode)base.FindNode(path);
 		}
 
 		public CommandTreeNode Find(string[] parts)
 		{
-			if(parts == null || parts.Length == 0)
-				return null;
-
-			//确保当前加载器已经被加载过
-			this.EnsureLoaded();
-
-			var current = this;
-
-			for(int i = 0; i < parts.Length; i++ )
-			{
-				var part = string.IsNullOrWhiteSpace(parts[i]) ? string.Empty : parts[i].Trim();
-
-				if(i == 0 && part == string.Empty)
-				{
-					current = this.FindRoot();
-				}
-				else
-				{
-					switch(part)
-					{
-						case "":
-						case ".":
-							continue;
-						case "..":
-							current = current._parent;
-							break;
-						default:
-							current = current._children[part];
-							break;
-					}
-
-					if(current == null)
-						return null;
-				}
-			}
-
-			return current;
+			return (CommandTreeNode)base.FindNode(parts);
 		}
 
 		public CommandTreeNode Find(ICommand command)
@@ -183,7 +121,7 @@ namespace Zongsoft.Services
 				return null;
 
 			//确保当前加载器已经被加载过
-			this.EnsureLoaded();
+			this.EnsureChildren();
 
 			return this.FindDown(this, node => node._command == command);
 		}
@@ -194,21 +132,28 @@ namespace Zongsoft.Services
 				return null;
 
 			//确保当前加载器已经被加载过
-			this.EnsureLoaded();
+			this.EnsureChildren();
 
 			return this.FindDown(this, predicate);
 		}
 		#endregion
 
-		#region 私有方法
-		private void EnsureLoaded()
+		#region 重写方法
+		protected override Collections.HierarchicalNode GetChild(string name)
+		{
+			return _children[name];
+		}
+
+		protected override void LoadChildren()
 		{
 			var loader = _loader;
 
 			if(loader != null && (!loader.IsLoaded))
 				loader.Load(this);
 		}
+		#endregion
 
+		#region 私有方法
 		private CommandTreeNode FindDown(CommandTreeNode current, Predicate<CommandTreeNode> predicate)
 		{
 			if(current == null || predicate == null)
@@ -224,21 +169,6 @@ namespace Zongsoft.Services
 			}
 
 			return null;
-		}
-
-		private CommandTreeNode FindRoot()
-		{
-			var current = this;
-
-			while(current != null)
-			{
-				if(current._parent == null)
-					return current;
-
-				current = current._parent;
-			}
-
-			return current;
 		}
 		#endregion
 	}

@@ -45,7 +45,7 @@ namespace Zongsoft.Services
 		#region 构造函数
 		protected CommandExecutorBase()
 		{
-			_root = new CommandTreeNode("/", null);
+			_root = new CommandTreeNode();
 		}
 		#endregion
 

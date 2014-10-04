@@ -32,8 +32,13 @@ namespace Zongsoft.Collections
 	/// <summary>
 	/// 表示层次结构的节点类。
 	/// </summary>
-	public class HierarchicalNode
+	[Serializable]
+	public class HierarchicalNode : MarshalByRefObject
 	{
+		#region 私有变量
+		private int _childrenLoaded;
+		#endregion
+
 		#region 成员变量
 		private string _name;
 		private string _path;
@@ -67,7 +72,7 @@ namespace Zongsoft.Collections
 		/// <summary>
 		/// 获取层次结构节点的名称，名称不可为空或空字符串，根节点的名称固定为斜杠(即“/”)。
 		/// </summary>
-		public string Name
+		public virtual string Name
 		{
 			get
 			{
@@ -138,6 +143,111 @@ namespace Zongsoft.Collections
 				//更新层次结构节点的路径
 				_path = null;
 			}
+		}
+		#endregion
+
+		#region 保护方法
+		protected HierarchicalNode FindNode(string path)
+		{
+			if(string.IsNullOrWhiteSpace(path))
+				return null;
+
+			return this.FindNode(path.Split('/'));
+		}
+
+		protected HierarchicalNode FindNode(string[] parts)
+		{
+			if(parts == null || parts.Length == 0)
+				return null;
+
+			//确保当前子节点集合已经被加载过
+			this.EnsureChildren();
+
+			var current = this;
+
+			for(int i = 0; i < parts.Length; i++)
+			{
+				var part = string.IsNullOrWhiteSpace(parts[i]) ? string.Empty : parts[i].Trim();
+
+				if(i == 0 && part == string.Empty)
+				{
+					current = this.FindRoot();
+				}
+				else
+				{
+					switch(part)
+					{
+						case "":
+						case ".":
+							continue;
+						case "..":
+							current = current._parent;
+							break;
+						default:
+							current = current.GetChild(part);
+							break;
+					}
+
+					if(current == null)
+						return null;
+				}
+			}
+
+			return current;
+		}
+		#endregion
+
+		#region 虚拟方法
+		/// <summary>
+		/// 确认子节点集合是否被加载，如果未曾被加载则加载子节点集合。
+		/// </summary>
+		/// <returns>如果子节点集合未曾被加载则加载当前子节点集合并返回真(true)，否则返回假(false)。</returns>
+		/// <remarks>
+		///		<para>在<seealso cref="FindNode"/>方法中会调用该方法以确保子节点被加载。</para>
+		///		<para>建议：在子类的<see cref="Children"/>属性中建议先调用该方法以确保子节点集合被加载后，再返回特定的节点集合。</para>
+		/// </remarks>
+		protected bool EnsureChildren()
+		{
+			var childrenLoaded = System.Threading.Interlocked.Exchange(ref _childrenLoaded, 1);
+
+			if(childrenLoaded == 0)
+				this.LoadChildren();
+
+			return childrenLoaded == 0;
+		}
+
+		/// <summary>
+		/// 加载当前节点的子节点集合。
+		/// </summary>
+		protected virtual void LoadChildren()
+		{
+		}
+
+		/// <summary>
+		/// 获取指定名称的子节点对象。
+		/// </summary>
+		/// <param name="name">指定要查找的子节点名称。</param>
+		/// <returns>如果找到指定名称的子节点则返回它，否则返回空(null)。</returns>
+		protected virtual HierarchicalNode GetChild(string name)
+		{
+			return null;
+		}
+		#endregion
+
+		#region 私有方法
+		private HierarchicalNode FindRoot()
+		{
+			var current = this;
+
+			while(current != null)
+			{
+				if(current._parent == null)
+					return current;
+
+				current = current._parent;
+			}
+
+			return current;
 		}
 		#endregion
 	}
