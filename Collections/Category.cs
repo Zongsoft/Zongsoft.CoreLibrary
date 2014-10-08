@@ -78,6 +78,16 @@ namespace Zongsoft.Collections
 		#endregion
 
 		#region 公共方法
+		public Category Find(string path)
+		{
+			return (Category)base.FindNode(path);
+		}
+
+		public Category Find(string[] parts)
+		{
+			return (Category)base.FindNode(parts);
+		}
+
 		public Category[] GetVisibleChildren()
 		{
 			var children = _children;
@@ -94,6 +104,18 @@ namespace Zongsoft.Collections
 			}
 
 			return visibleCategories.ToArray();
+		}
+		#endregion
+
+		#region 重写方法
+		protected override HierarchicalNode GetChild(string name)
+		{
+			var children = _children;
+
+			if(children == null)
+				return null;
+
+			return children[name];
 		}
 		#endregion
 	}
