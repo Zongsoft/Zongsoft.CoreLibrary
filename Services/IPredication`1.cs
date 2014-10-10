@@ -25,62 +25,16 @@
  */
 
 using System;
-using System.ComponentModel;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Zongsoft.Services
 {
-	/// <summary>
-	/// 关于工作器的接口。
-	/// </summary>
-	public interface IWorker
+	public interface IPredication<T> : IPredication
 	{
-		/// <summary>表示已经启动。</summary>
-		event EventHandler Started;
-		/// <summary>表示准备启动。</summary>
-		event CancelEventHandler Starting;
-
-		/// <summary>表示已经停止。</summary>
-		event EventHandler Stopped;
-		/// <summary>表示准备停止。</summary>
-		event CancelEventHandler Stopping;
-
 		/// <summary>
-		/// 获取当前工作器的名称。
+		/// 确定指定对象是否符合某种条件。
 		/// </summary>
-		string Name
-		{
-			get;
-		}
-
-		/// <summary>
-		/// 获取当前工作器的状态。
-		/// </summary>
-		WorkerState State
-		{
-			get;
-		}
-
-		/// <summary>
-		/// 获取或设置是否禁用工作器。
-		/// </summary>
-		bool Disabled
-		{
-			get;
-			set;
-		}
-
-		/// <summary>
-		/// 启动工作器。
-		/// </summary>
-		/// <param name="args">启动的参数。</param>
-		void Start(params string[] args);
-
-		/// <summary>
-		/// 停止工作器。
-		/// </summary>
-		/// <param name="args">停止的参数。</param>
-		void Stop(params string[] args);
+		/// <param name="parameter">指定的条件参数对象。</param>
+		/// <returns>如果符合某种条件则返回真(true)，否则返回假(false)。</returns>
+		bool Predicate(T parameter);
 	}
 }
