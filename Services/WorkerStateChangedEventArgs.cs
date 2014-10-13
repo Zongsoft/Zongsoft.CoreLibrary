@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2011-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2014 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,47 +25,58 @@
  */
 
 using System;
-using System.Net;
+using System.Collections.Generic;
 
-namespace Zongsoft.Communication
+namespace Zongsoft.Services
 {
-	/// <summary>
-	/// 提供关于通讯侦听的功能的接口。
-	/// </summary>
-	public interface IListener : IDisposable
+	public class WorkerStateChangedEventArgs : EventArgs
 	{
-		/// <summary>
-		/// 获取当前是否处于侦听状态。
-		/// </summary>
-		bool IsListening
+		#region 成员字段
+		private string _actionName;
+		private WorkerState _state;
+		private Exception _exception;
+		#endregion
+
+		#region 构造函数
+		public WorkerStateChangedEventArgs(string actionName, WorkerState state) : this(actionName, state, null)
 		{
-			get;
 		}
 
-		/// <summary>
-		/// 获取通讯侦听器的信息接收处理器对象。
-		/// </summary>
-		IReceiver Receiver
+		public WorkerStateChangedEventArgs(string actionName, WorkerState state, Exception exception)
 		{
-			get;
+			if(string.IsNullOrWhiteSpace(actionName))
+				throw new ArgumentNullException("actionName");
+
+			_actionName = actionName.Trim();
+			_state = state;
+			_exception = exception;
+		}
+		#endregion
+
+		#region 公共属性
+		public string ActionName
+		{
+			get
+			{
+				return _actionName;
+			}
 		}
 
-		/// <summary>
-		/// 获取通讯侦听的地址。
-		/// </summary>
-		IPEndPoint Address
+		public WorkerState State
 		{
-			get;
+			get
+			{
+				return _state;
+			}
 		}
 
-		/// <summary>
-		/// 开启侦听。
-		/// </summary>
-		void Start(params string[] args);
-
-		/// <summary>
-		/// 停止侦听。
-		/// </summary>
-		void Stop(params string[] args);
+		public Exception Exception
+		{
+			get
+			{
+				return _exception;
+			}
+		}
+		#endregion
 	}
 }

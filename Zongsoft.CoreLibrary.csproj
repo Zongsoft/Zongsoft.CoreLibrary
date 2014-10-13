@@ -272,16 +272,19 @@
     <Compile Include="Services\IMatchable`1.cs" />
     <Compile Include="Services\IMatcher.cs" />
     <Compile Include="Services\IMatcher`1.cs" />
+    <Compile Include="Services\IPredication`1.cs" />
     <Compile Include="Services\IServiceBuilder.cs" />
     <Compile Include="Services\IServiceLifetime.cs" />
     <Compile Include="Services\IServiceStorage.cs" />
     <Compile Include="Services\MatchableAttribute.cs" />
     <Compile Include="Services\Matcher.cs" />
+    <Compile Include="Services\PredicationCollection`1.cs" />
     <Compile Include="Services\ServiceProviderBase.cs" />
     <Compile Include="Services\ServiceEntry.cs" />
     <Compile Include="Services\ServiceRegisteredEventArgs.cs" />
     <Compile Include="Services\ServiceStorage.cs" />
     <Compile Include="Services\ServiceUnregisteredEventArgs.cs" />
+    <Compile Include="Services\WorkerStateChangedEventArgs.cs" />
     <Compile Include="Terminals\CommandHelper.cs" />
     <Compile Include="Services\CommandNotFoundException.cs" />
     <Compile Include="Services\CommandTreeNodeCollection.cs" />
@@ -372,7 +375,6 @@
     <Compile Include="Services\ServiceProviderFactory.cs" />
     <Compile Include="Services\ServiceResolvedEventArgs.cs" />
     <Compile Include="Services\ServiceResolvingEventArgs.cs" />
-    <Compile Include="Services\WorkerDecorator.cs" />
     <Compile Include="Services\WorkerState.cs" />
     <Compile Include="Diagnostics\Configuration\TraceListenerElement.cs" />
     <Compile Include="Diagnostics\Configuration\TraceListenerElementCollection.cs" />

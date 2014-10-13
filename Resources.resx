@@ -183,6 +183,15 @@
   <data name="Text.ShellCommand.Options.Timeout" xml:space="preserve">
     <value>运行外部命令的超时，单位：毫秒。</value>
   </data>
+  <data name="Text.WorkerState.Paused" xml:space="preserve">
+    <value>已暂停</value>
+  </data>
+  <data name="Text.WorkerState.Pausing" xml:space="preserve">
+    <value>暂停中</value>
+  </data>
+  <data name="Text.WorkerState.Resuming" xml:space="preserve">
+    <value>恢复中</value>
+  </data>
   <data name="Text.WorkerState.Running" xml:space="preserve">
     <value>运行中</value>
   </data>

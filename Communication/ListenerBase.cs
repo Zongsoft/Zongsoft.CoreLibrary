@@ -50,7 +50,6 @@ namespace Zongsoft.Communication
 		#endregion
 
 		#region 成员变量
-		private bool _isListening;
 		private IPEndPoint _address;
 		private IReceiver _receiver;
 		private Executor _executor;
@@ -69,7 +68,6 @@ namespace Zongsoft.Communication
 			_syncRoot = new object();
 			_address = address;
 			_receiver = null;
-			_isListening = false;
 		}
 		#endregion
 
@@ -78,11 +76,7 @@ namespace Zongsoft.Communication
 		{
 			get
 			{
-				return _isListening;
-			}
-			protected set
-			{
-				_isListening = value;
+				return this.State == WorkerState.Running;
 			}
 		}
 
@@ -98,8 +92,8 @@ namespace Zongsoft.Communication
 				if(value == null)
 					throw new ArgumentNullException();
 
-				if(_isListening)
-					throw new InvalidOperationException();
+				if(this.IsListening)
+					throw new InvalidOperationException("The service state is listening.");
 
 				_address = value;
 			}
@@ -154,26 +148,6 @@ namespace Zongsoft.Communication
 				//设置属性的成员字段
 				_executor = value;
 			}
-		}
-		#endregion
-
-		#region 重写方法
-		protected override void OnStarted(EventArgs args)
-		{
-			//设置侦听状态为真
-			_isListening = true;
-
-			//调用基类同名方法
-			base.OnStarted(args);
-		}
-
-		protected override void OnStopped(EventArgs args)
-		{
-			//设置侦听状态为假
-			_isListening = false;
-
-			//调用基类同名方法
-			base.OnStopped(args);
 		}
 		#endregion
 

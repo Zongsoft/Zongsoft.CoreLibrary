@@ -34,16 +34,15 @@ namespace Zongsoft.Services
 	public abstract class WorkerBase : MarshalByRefObject, IWorker, IDisposable
 	{
 		#region 事件声明
-		public event EventHandler Started;
-		public event CancelEventHandler Starting;
-		public event EventHandler Stopped;
-		public event CancelEventHandler Stopping;
+		public event EventHandler<WorkerStateChangedEventArgs> StateChanged;
 		#endregion
 
 		#region 成员变量
 		private string _name;
 		private bool _disabled;
+		private bool _canPauseAndContinue;
 		private WorkerState _state;
+		private int _isDisposed;
 		#endregion
 
 		#region 构造函数
@@ -51,6 +50,7 @@ namespace Zongsoft.Services
 		{
 			_name = this.GetType().Name;
 			_disabled = false;
+			_canPauseAndContinue = false;
 			_state = WorkerState.Stopped;
 		}
 
@@ -61,6 +61,7 @@ namespace Zongsoft.Services
 
 			_name = name.Trim();
 			_disabled = false;
+			_canPauseAndContinue = false;
 			_state = WorkerState.Stopped;
 		}
 		#endregion
@@ -103,6 +104,27 @@ namespace Zongsoft.Services
 			}
 		}
 
+		/// <summary>
+		/// 获取或设置工作器工作器是否可以暂停和继续。
+		/// </summary>
+		public bool CanPauseAndContinue
+		{
+			get
+			{
+				return _canPauseAndContinue;
+			}
+			protected set
+			{
+				if(_state != WorkerState.Stopped)
+					throw new InvalidOperationException();
+
+				_canPauseAndContinue = value;
+			}
+		}
+
+		/// <summary>
+		/// 获取工作器的状态。
+		/// </summary>
 		public WorkerState State
 		{
 			get
@@ -110,36 +132,31 @@ namespace Zongsoft.Services
 				return _state;
 			}
 		}
+
+		/// <summary>
+		/// 获取一个值表示工作器是否已经被处置了。
+		/// </summary>
+		public bool IsDisposed
+		{
+			get
+			{
+				return _isDisposed != 0;
+			}
+		}
 		#endregion
 
 		#region 公共方法
-		public void Start()
-		{
-			this.Start(new string[0]);
-		}
-
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
-		public virtual void Start(string[] args)
+		public void Start(params string[] args)
 		{
+			if(this.IsDisposed)
+				throw new ObjectDisposedException(_name);
+
 			if(_disabled || _state != WorkerState.Stopped)
 				return;
 
-			try
-			{
-				_state = WorkerState.Starting;
-
-				//激发“Starting”事件，如果该事件处理程序返回真表示取消后续的启动操作
-				if(this.OnStarting())
-				{
-					_state = WorkerState.Stopped;
-					return;
-				}
-			}
-			catch
-			{
-				_state = WorkerState.Stopped;
-				throw;
-			}
+			//更新当前状态为“整体启动中”
+			_state = WorkerState.Starting;
 
 			try
 			{
@@ -149,42 +166,34 @@ namespace Zongsoft.Services
 				//更新当前状态为“运行中”
 				_state = WorkerState.Running;
 
-				//激发“Started”事件
-				this.OnStarted(EventArgs.Empty);
+				//激发“StateChanged”事件
+				this.OnStateChanged(new WorkerStateChangedEventArgs("Start", WorkerState.Running));
 			}
-			catch
+			catch(Exception ex)
 			{
 				_state = WorkerState.Stopped;
+
+				//激发“StateChanged”事件
+				this.OnStateChanged(new WorkerStateChangedEventArgs("Start", WorkerState.Stopped, ex));
+
 				throw;
 			}
-		}
-
-		public void Stop()
-		{
-			this.Stop(new string[0]);
 		}
 
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
-		public virtual void Stop(string[] args)
+		public void Stop(params string[] args)
 		{
-			var state = _state;
+			if(this.IsDisposed)
+				throw new ObjectDisposedException(_name);
 
-			try
-			{
-				_state = WorkerState.Stopping;
+			if(_disabled || _state == WorkerState.Stopping || _state == WorkerState.Stopped)
+				return;
 
-				//激发“Stopping”事件，如果该事件处理程序返回真表示取消后续的停止操作
-				if(this.OnStopping())
-				{
-					_state = state;
-					return;
-				}
-			}
-			catch
-			{
-				_state = state;
-				throw;
-			}
+			//保存原来的状态
+			var originalState = _state;
+
+			//更新当前状态为“正在停止中”
+			_state = WorkerState.Stopping;
 
 			try
 			{
@@ -194,12 +203,98 @@ namespace Zongsoft.Services
 				//更新当前状态为已停止
 				_state = WorkerState.Stopped;
 
-				//激发“Stopped”事件
-				this.OnStopped(EventArgs.Empty);
+				//激发“StateChanged”事件
+				this.OnStateChanged(new WorkerStateChangedEventArgs("Stop", WorkerState.Stopped));
 			}
-			catch
+			catch(Exception ex)
 			{
-				_state = state;
+				//还原状态
+				_state = originalState;
+
+				//激发“StateChanged”事件
+				this.OnStateChanged(new WorkerStateChangedEventArgs("Stop", originalState, ex));
+
+				throw;
+			}
+		}
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
+		public void Pause()
+		{
+			if(this.IsDisposed)
+				throw new ObjectDisposedException(_name);
+
+			if(_disabled || (!_canPauseAndContinue))
+				return;
+
+			if(_state != WorkerState.Running)
+				return;
+
+			//保存原来的状态
+			var originalState = _state;
+
+			//更新当前状态为“正在暂停中”
+			_state = WorkerState.Pausing;
+
+			try
+			{
+				//执行暂停操作
+				this.OnPause();
+
+				//更新当前状态为“已经暂停”
+				_state = WorkerState.Paused;
+
+				//激发“StateChanged”事件
+				this.OnStateChanged(new WorkerStateChangedEventArgs("Pause", WorkerState.Paused));
+			}
+			catch(Exception ex)
+			{
+				//还原状态
+				_state = originalState;
+
+				//激发“StateChanged”事件
+				this.OnStateChanged(new WorkerStateChangedEventArgs("Pause", originalState, ex));
+
+				throw;
+			}
+		}
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
+		public void Resume()
+		{
+			if(this.IsDisposed)
+				throw new ObjectDisposedException(_name);
+
+			if(_disabled || (!_canPauseAndContinue))
+				return;
+
+			if(_state != WorkerState.Paused)
+				return;
+
+			//保存原来的状态
+			var originalState = _state;
+
+			//更新当前状态为“正在恢复中”
+			_state = WorkerState.Resuming;
+
+			try
+			{
+				//执行恢复操作
+				this.OnResume();
+
+				_state = WorkerState.Running;
+
+				//激发“StateChanged”事件
+				this.OnStateChanged(new WorkerStateChangedEventArgs("Resume", WorkerState.Running));
+			}
+			catch(Exception ex)
+			{
+				//还原状态
+				_state = originalState;
+
+				//激发“StateChanged”事件
+				this.OnStateChanged(new WorkerStateChangedEventArgs("Resume", originalState, ex));
+
 				throw;
 			}
 		}
@@ -208,49 +303,23 @@ namespace Zongsoft.Services
 		#region 抽象方法
 		protected abstract void OnStart(string[] args);
 		protected abstract void OnStop(string[] args);
+
+		protected virtual void OnPause()
+		{
+		}
+
+		protected virtual void OnResume()
+		{
+		}
 		#endregion
 
 		#region 事件激发
-		protected virtual void OnStarted(EventArgs args)
+		protected virtual void OnStateChanged(WorkerStateChangedEventArgs args)
 		{
-			if(this.Started != null)
-				this.Started(this, args);
-		}
+			var stateChanged = this.StateChanged;
 
-		protected bool OnStarting()
-		{
-			CancelEventArgs args = new CancelEventArgs();
-
-			this.OnStarting(args);
-
-			return args.Cancel;
-		}
-
-		protected virtual void OnStarting(CancelEventArgs args)
-		{
-			if(this.Starting != null)
-				this.Starting(this, args);
-		}
-
-		protected virtual void OnStopped(EventArgs args)
-		{
-			if(this.Stopped != null)
-				this.Stopped(this, args);
-		}
-
-		protected bool OnStopping()
-		{
-			CancelEventArgs args = new CancelEventArgs();
-
-			this.OnStopping(args);
-
-			return args.Cancel;
-		}
-
-		protected virtual void OnStopping(CancelEventArgs args)
-		{
-			if(this.Stopping != null)
-				this.Stopping(this, args);
+			if(stateChanged != null)
+				stateChanged(this, args);
 		}
 		#endregion
 
@@ -262,7 +331,10 @@ namespace Zongsoft.Services
 
 		void IDisposable.Dispose()
 		{
-			this.Dispose(true);
+			var isDisposed = System.Threading.Interlocked.CompareExchange(ref _isDisposed, 1, 0);
+
+			if(isDisposed == 0)
+				this.Dispose(true);
 		}
 		#endregion
 	}

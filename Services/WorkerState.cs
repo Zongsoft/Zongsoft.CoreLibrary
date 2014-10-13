@@ -43,9 +43,21 @@ namespace Zongsoft.Services
 
 		/// <summary>正在启动中。</summary>
 		[Description("${Text.WorkerState.Starting}")]
-		Starting = 2,
+		Starting,
 		/// <summary>正在停止中。</summary>
 		[Description("${Text.WorkerState.Stopping}")]
-		Stopping = 3,
+		Stopping,
+
+		/// <summary>正在暂停中。</summary>
+		[Description("${Text.WorkerState.Pausing}")]
+		Pausing,
+
+		/// <summary>暂停中。</summary>
+		[Description("${Text.WorkerState.Paused}")]
+		Paused,
+
+		/// <summary>正在恢复中。</summary>
+		[Description("${Text.WorkerState.Resuming}")]
+		Resuming,
 	}
 }

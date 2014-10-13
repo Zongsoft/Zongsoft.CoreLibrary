@@ -27,11 +27,16 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 
 namespace Zongsoft.Collections
 {
-	public class Collection<T> : IList<T>, IList
+	public class Collection<T> : IList<T>, IList, INotifyCollectionChanged
 	{
+		#region 事件定义
+		public event NotifyCollectionChangedEventHandler CollectionChanged;
+		#endregion
+
 		#region 成员字段
 		private object _syncRoot;
 		private IList<T> _items;
@@ -109,6 +114,9 @@ namespace Zongsoft.Collections
 				return;
 
 			((List<T>)_items).AddRange(items);
+
+			//激发“CollectionChanged”事件
+			this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, items));
 		}
 
 		public void Clear()
@@ -174,26 +182,52 @@ namespace Zongsoft.Collections
 		protected virtual void ClearItems()
 		{
 			_items.Clear();
+
+			//激发“CollectionChanged”事件
+			this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
 		}
 
 		protected virtual void InsertItem(int index, T item)
 		{
 			_items.Insert(index, item);
+
+			//激发“CollectionChanged”事件
+			this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, index));
 		}
 
 		protected virtual void RemoveItem(int index)
 		{
+			var item = _items[index];
+
 			_items.RemoveAt(index);
+
+			//激发“CollectionChanged”事件
+			this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, index));
 		}
 
 		protected virtual void SetItem(int index, T item)
 		{
+			var oldItem = _items[index];
+
 			_items[index] = item;
+
+			//激发“CollectionChanged”事件
+			this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, item, oldItem, index));
 		}
 
 		protected virtual bool TryConvertItem(object value, out T item)
 		{
 			return Zongsoft.Common.Convert.TryConvertValue<T>(value, out item);
+		}
+		#endregion
+
+		#region 激发事件
+		protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs args)
+		{
+			var collectionChanged = this.CollectionChanged;
+
+			if(collectionChanged != null)
+				collectionChanged(this, args);
 		}
 		#endregion
 

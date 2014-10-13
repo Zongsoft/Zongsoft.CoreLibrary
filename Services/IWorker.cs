@@ -36,15 +36,8 @@ namespace Zongsoft.Services
 	/// </summary>
 	public interface IWorker
 	{
-		/// <summary>表示已经启动。</summary>
-		event EventHandler Started;
-		/// <summary>表示准备启动。</summary>
-		event CancelEventHandler Starting;
-
-		/// <summary>表示已经停止。</summary>
-		event EventHandler Stopped;
-		/// <summary>表示准备停止。</summary>
-		event CancelEventHandler Stopping;
+		/// <summary>表示状态发生了改变。</summary>
+		event EventHandler<WorkerStateChangedEventArgs> StateChanged;
 
 		/// <summary>
 		/// 获取当前工作器的名称。
@@ -72,6 +65,14 @@ namespace Zongsoft.Services
 		}
 
 		/// <summary>
+		/// 获取工作器是否允许暂停和继续。
+		/// </summary>
+		bool CanPauseAndContinue
+		{
+			get;
+		}
+
+		/// <summary>
 		/// 启动工作器。
 		/// </summary>
 		/// <param name="args">启动的参数。</param>
@@ -82,5 +83,15 @@ namespace Zongsoft.Services
 		/// </summary>
 		/// <param name="args">停止的参数。</param>
 		void Stop(params string[] args);
+
+		/// <summary>
+		/// 暂停工作器。
+		/// </summary>
+		void Pause();
+
+		/// <summary>
+		/// 恢复工作器，继续运行。
+		/// </summary>
+		void Resume();
 	}
 }
