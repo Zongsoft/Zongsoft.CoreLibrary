@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 
 using Zongsoft.Data;
-using Zongsoft.Data.Entities;
 
 namespace Zongsoft.Security.Membership
 {
 	public class Authentication : IAuthentication
 	{
 		#region 成员字段
-		private IObjectAccess _objectAccess;
+		private IDataAccess _objectAccess;
 		private ICertificationProvider _certificationProvider;
 		#endregion
 
@@ -19,7 +18,7 @@ namespace Zongsoft.Security.Membership
 		{
 		}
 
-		public Authentication(IObjectAccess objectAccess, ICertificationProvider certificationProvider)
+		public Authentication(IDataAccess objectAccess, ICertificationProvider certificationProvider)
 		{
 			if(objectAccess == null)
 				throw new ArgumentNullException("objectAccess");
@@ -34,9 +33,9 @@ namespace Zongsoft.Security.Membership
 
 		#region 公共属性
 		/// <summary>
-		/// 获取或设置<see cref="Zongsoft.Data.Entities.IObjectAccess"/>数据访问对象。
+		/// 获取或设置<see cref="Zongsoft.Data.Entities.IDataAccess"/>数据访问对象。
 		/// </summary>
-		public IObjectAccess ObjectAccess
+		public IDataAccess ObjectAccess
 		{
 			get
 			{

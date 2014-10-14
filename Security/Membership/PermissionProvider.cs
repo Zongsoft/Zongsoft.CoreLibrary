@@ -28,19 +28,18 @@ using System;
 using System.Collections.Generic;
 
 using Zongsoft.Data;
-using Zongsoft.Data.Entities;
 
 namespace Zongsoft.Security.Membership
 {
 	public class PermissionProvider : IPermissionProvider
 	{
 		#region 成员字段
-		private IObjectAccess _objectAccess;
+		private IDataAccess _objectAccess;
 		private ICertificationProvider _certificationProvider;
 		#endregion
 
 		#region 公共属性
-		public IObjectAccess ObjectAccess
+		public IDataAccess ObjectAccess
 		{
 			get
 			{
@@ -150,7 +149,7 @@ namespace Zongsoft.Security.Membership
 		#endregion
 
 		#region 私有方法
-		private IObjectAccess GetObjectAccess()
+		private IDataAccess GetObjectAccess()
 		{
 			if(_objectAccess == null)
 				throw new InvalidOperationException("The value of 'ObjectAccess' property is null.");

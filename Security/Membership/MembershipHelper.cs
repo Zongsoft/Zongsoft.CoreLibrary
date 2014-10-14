@@ -5,13 +5,12 @@ using System.Linq;
 using System.Text;
 
 using Zongsoft.Data;
-using Zongsoft.Data.Entities;
 
 namespace Zongsoft.Security.Membership
 {
 	internal static class MembershipHelper
 	{
-		public static bool GetPassword(IObjectAccess objectAccess, string applicationId, string userName, out byte[] password, out byte[] passwordSalt)
+		public static bool GetPassword(IDataAccess objectAccess, string applicationId, string userName, out byte[] password, out byte[] passwordSalt)
 		{
 			if(objectAccess == null)
 				throw new ArgumentNullException("objectAccess");

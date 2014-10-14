@@ -379,8 +379,8 @@
     <Compile Include="Services\WorkerState.cs" />
     <Compile Include="Diagnostics\Configuration\TraceListenerElement.cs" />
     <Compile Include="Diagnostics\Configuration\TraceListenerElementCollection.cs" />
-    <Compile Include="Data\Entities\IObjectAccess.cs" />
-    <Compile Include="Data\Entities\ObjectAccessExtension.cs" />
+    <Compile Include="Data\IDataAccess.cs" />
+    <Compile Include="Data\DataAccessExtension.cs" />
     <Compile Include="Diagnostics\ConsoleTraceListener.cs" />
     <Compile Include="Diagnostics\FailureEventArgs.cs" />
     <Compile Include="Services\ICommand.cs" />
@@ -438,7 +438,6 @@
     <Compile Include="ComponentModel\Action.cs" />
     <Compile Include="Options\OptionProviderExtension.cs" />
     <Compile Include="Options\Utility.cs" />
-    <Compile Include="Data\IDataAccess.cs" />
     <Compile Include="ComponentModel\Schema.cs" />
     <Compile Include="Collections\Category.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

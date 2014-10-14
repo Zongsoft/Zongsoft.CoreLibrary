@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2014 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -28,14 +28,13 @@ using System;
 using System.ComponentModel;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 
-namespace Zongsoft.Data.Entities
+namespace Zongsoft.Data
 {
-	public static class ObjectAccessExtension
+	public static class DataAccessExtension
 	{
 		#region 扩展方法
-		public static void Execute(this IObjectAccess objectAccess, string name, object inParameters)
+		public static void Execute(this IDataAccess objectAccess, string name, object inParameters)
 		{
 			if(objectAccess == null)
 				throw new ArgumentNullException("objectAccess");
@@ -43,7 +42,7 @@ namespace Zongsoft.Data.Entities
 			objectAccess.Execute(name, ResolveObjectToParameters(inParameters));
 		}
 
-		public static void Execute(this IObjectAccess objectAccess, string name, object inParameters, out IDictionary<string, object> outParameters)
+		public static void Execute(this IDataAccess objectAccess, string name, object inParameters, out IDictionary<string, object> outParameters)
 		{
 			if(objectAccess == null)
 				throw new ArgumentNullException("objectAccess");
@@ -62,7 +61,7 @@ namespace Zongsoft.Data.Entities
 				throw new ArgumentException();
 
 			IDictionary<string, object> parameters = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-			var properties = TypeDescriptor.GetProperties(data);
+			var properties = System.ComponentModel.TypeDescriptor.GetProperties(data);
 
 			foreach(PropertyDescriptor property in properties)
 			{

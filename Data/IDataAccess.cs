@@ -1,8 +1,8 @@
-/*
+ï»¿/*
  * Authors:
- *   ÖÓ·å(Popeye Zhong) <zongsoft@gmail.com>
+ *   é’Ÿå³°(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2003-2010 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2014 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,90 +25,98 @@
  */
 
 using System;
-using System.Data;
-using System.ComponentModel;
+using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 
 namespace Zongsoft.Data
 {
 	/// <summary>
-	/// ±íÊ¾Êı¾İ·ÃÎÊµÄ¹«¹²½Ó¿Ú¡£
+	/// è¡¨ç¤ºå®ä½“æ•°æ®è®¿é—®çš„å…¬å…±æ¥å£ã€‚
 	/// </summary>
-	[Obsolete]
 	public interface IDataAccess
 	{
+		#region æ‰§è¡Œæ–¹æ³•
+		object Execute(string name, IDictionary<string, object> inParameters);
+		object Execute(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters);
+		#endregion
+
+		#region è®¡æ•°æ–¹æ³•
+		int Count(string name, IClause where);
+		int Count(string name, IClause where, string[] includes);
+		#endregion
+
+		#region æŸ¥è¯¢æ–¹æ³•
 		/// <summary>
-		/// ÔÚÓ³ÉäÖĞ¸ù¾İÖ¸¶¨µÄÊÊÅäÆ÷Ãû³Æ£¬¹¹½¨´ø²ÎÊı²éÑ¯²¢·µ»Ø²éÑ¯µÄÊı¾İ¼¯¡£
+		/// æ‰§è¡ŒæŒ‡å®šåç§°çš„æ•°æ®æŸ¥è¯¢æ“ä½œã€‚
 		/// </summary>
-		/// <param name="adapterName">²éÑ¯ÊÊÅäÆ÷µÄÃû³Æ¡£</param>
-		/// <param name="parameterNames">°üº¬²éÑ¯²ÎÊıÃû³ÆµÄÊı×é¡£</param>
-		/// <param name="parameterValues">°üº¬²éÑ¯²ÎÊıÖµµÄÊı×é</param>
-		/// <returns>·µ»ØÊÊÅäÆ÷µÄ´ø²ÎÊı²éÑ¯µÄÊı¾İ¼¯¡£</returns>
-		//DataSet Select(string adapterName, string[] parameterNames, object[] parameterValues);
+		/// <param name="name">æŒ‡å®šçš„æŸ¥è¯¢åç§°ï¼Œå¯¹åº”æ•°æ®æ˜ å°„çš„åç§°ã€‚</param>
+		/// <param name="where">æŒ‡å®šçš„æŸ¥è¯¢æ¡ä»¶ã€‚</param>
+		/// <param name="paging">æŒ‡å®šçš„åˆ†é¡µè®¾ç½®ã€‚</param>
+		/// <param name="sorting">æŒ‡å®šçš„æ’åºå­—æ®µå’Œæ’åºæ–¹å¼ã€‚</param>
+		/// <param name="includes">æŒ‡å®šè¦åŒ…å«çš„ç»“æœå®ä½“ä¸­çš„å¯¼èˆªå±æ€§åã€‚</param>
+		/// <returns>è¿”å›çš„ç»“æœé›†ã€‚</returns>
+		/// <remarks>
+		///		<code>
+		///		Select("VehiclePassing",
+		///		       new ClauseCollection(ClauseCombine.And)
+		///		       {
+		///		           new Clause("PlateNo", "é„‚A12345"),
+		///		           new Clause("Timestamp", ClauseOperator.Between, DateTime.Parse("2014-1-1"), DateTime.Parse("2014-1-31")),
+		///		           new ClauseCollection(ClauseCombine.Or)
+		///		           {
+		///		               new Clause("Speed", ClauseOperator.GreaterThanEqual, 80),
+		///		               new Clause("PlateColor", PlateColor.Blue),
+		///		           }
+		///		       },
+		///		       new Paging(10, 20),
+		///		       new Sorting[]{new Sorting(SortingMode.Ascending, "Timestamp")},
+		///		       new string[]{"Creator.HomeAddress", "Corssing"});
+		///		</code>
+		/// </remarks>
+		IEnumerable Select(string name,
+		                   IClause where = null,
+		                   Paging paging = null,
+		                   Sorting[] sorting = null,
+		                   string[] includes = null);
+
+		IEnumerable<TEntity> Select<TEntity>(string name,
+						   IClause where = null,
+						   Paging paging = null,
+						   Sorting[] sorting = null,
+						   string[] includes = null);
+		#endregion
+
+		#region åˆ é™¤æ–¹æ³•
+		int Delete(string name, IClause where);
+		int Delete(string name, IDictionary<string, object> where);
+		int Delete(string name, object where);
+		#endregion
+
+		#region æ’å…¥æ–¹æ³•
+		int Insert(string name, object entity);
+		int Insert(string name, IEnumerable entities);
+		#endregion
+
+		#region æ›´æ–°æ–¹æ³•
+		/// <summary>
+		/// æ›´æ–°æŒ‡å®šå®ä½“åˆ°æ•°æ®æºï¼Œæ›´æ–°çš„ä¾æ®ä¸ºæŒ‡å®š<paramref name="name"/>æ˜ å°„çš„ä¸»é”®å€¼ã€‚
+		/// </summary>
+		/// <param name="name">æŒ‡å®šçš„å®ä½“æ˜ å°„åã€‚</param>
+		/// <param name="entity">è¦æ›´æ–°çš„å®ä½“å¯¹è±¡ã€‚</param>
+		/// <returns>è¿”å›å—å½±å“çš„è®°å½•è¡Œæ•°ï¼Œæœ¬æ–¹æ³•æ‰§è¡ŒæˆåŠŸè¿”å›1ï¼Œå¤±è´¥åˆ™è¿”å›é›¶ã€‚</returns>
+		int Update(string name, object entity);
 
 		/// <summary>
-		/// ÔÚÓ³ÉäÖĞ¸ù¾İÖ¸¶¨µÄÊÊÅäÆ÷Ãû³Æ£¬¹¹½¨´ø²ÎÊı²éÑ¯²¢·µ»Ø²éÑ¯µÄÊı¾İ¼¯¡£
+		/// æ ¹æ®æŒ‡å®šçš„æ¡ä»¶å°†æŒ‡å®šçš„å®ä½“æ›´æ–°åˆ°æ•°æ®æºã€‚
 		/// </summary>
-		/// <param name="adapterName">²éÑ¯ÊÊÅäÆ÷µÄÃû³Æ¡£</param>
-		/// <param name="inningParameters">°üº¬²éÑ¯²ÎÊıµÄÁĞ±í¡£</param>
-		/// <returns>·µ»ØÊÊÅäÆ÷µÄ´ø²ÎÊı²éÑ¯µÄÊı¾İ¼¯¡£</returns>
-		DataSet Select(string adapterName, IDictionary<string, object> inningParameters);
+		/// <param name="name">æŒ‡å®šçš„å®ä½“æ˜ å°„åã€‚</param>
+		/// <param name="entity">è¦æ›´æ–°çš„å®ä½“å¯¹è±¡ã€‚</param>
+		/// <param name="where">è¦æ›´æ–°çš„æ¡ä»¶å­å¥ã€‚</param>
+		/// <returns>è¿”å›å—å½±å“çš„è®°å½•è¡Œæ•°ï¼Œæ‰§è¡ŒæˆåŠŸè¿”å›å¤§äºé›¶çš„æ•´æ•°ï¼Œå¤±è´¥åˆ™è¿”å›é›¶ã€‚</returns>
+		int Update(string name, object entity, IClause where);
 
-		/// <summary>
-		/// ÔÚÓ³ÉäÖĞ¸ù¾İÖ¸¶¨µÄÊÊÅäÆ÷Ãû³Æ£¬¹¹½¨´ø²ÎÊı²éÑ¯²¢·µ»Ø²éÑ¯µÄÊı¾İ¼¯¡£
-		/// </summary>
-		/// <param name="adapterName">²éÑ¯ÊÊÅäÆ÷µÄÃû³Æ¡£</param>
-		/// <param name="inningParameters">°üº¬²éÑ¯²ÎÊıµÄÁĞ±í¡£</param>
-		/// <param name="outingParameters">Êä³ö²ÎÊı£¬Ö¸Ê¾²éÑ¯ÃüÁî·µ»ØµÄËùÓĞ²ÎÊıÁĞ±í¡£</param>
-		/// <returns>·µ»ØÊÊÅäÆ÷µÄ´ø²ÎÊı²éÑ¯µÄÊı¾İ¼¯¡£</returns>
-		DataSet Select(string adapterName, IDictionary<string, object> inningParameters, out IDictionary<string, object> outingParameters);
-
-		/// <summary>
-		/// ÔÚÓ³ÉäÖĞ¸ù¾İÖ¸¶¨µÄÊÊÅäÆ÷Ãû³Æ£¬¹¹½¨²éÑ¯²¢·µ»Ø²éÑ¯µÄÊı¾İ¼¯¡£
-		/// <para>
-		///		×¢Òâ£º¸Ã²éÑ¯·½·¨²»´ø²ÎÊı£¬·µ»Ø²éÑ¯½á¹ûÖĞµÄËùÓĞ¼ÇÂ¼¡£
-		/// </para>
-		/// </summary>
-		/// <param name="adapterName">²éÑ¯ÊÊÅäÆ÷µÄÃû³Æ¡£</param>
-		/// <returns>·µ»ØÊÊÅäµÄ²éÑ¯µÄÊı¾İ¼¯¡£</returns>
-		DataSet SelectAll(string adapterName);
-
-		/// <summary>
-		/// ÔÚÓ³ÉäÖĞ¸ù¾İÖ¸¶¨µÄÊÊÅäÆ÷Ãû³Æ£¬¹¹½¨²éÑ¯²¢·µ»Ø²éÑ¯µÄÊı¾İ¼¯¡£
-		/// <para>
-		///		×¢Òâ£º¸Ã²éÑ¯·½·¨²»´ø²ÎÊı£¬·µ»Ø²éÑ¯½á¹ûÖĞµÄËùÓĞ¼ÇÂ¼¡£
-		/// </para>
-		/// </summary>
-		/// <param name="adapterName">²éÑ¯ÊÊÅäÆ÷µÄÃû³Æ¡£</param>
-		/// <param name="outingParameters">Êä³ö²ÎÊı£¬Ö¸Ê¾²éÑ¯ÃüÁî·µ»ØµÄËùÓĞ²ÎÊıÁĞ±í¡£</param>
-		/// <returns>·µ»ØÊÊÅäµÄ²éÑ¯µÄÊı¾İ¼¯¡£</returns>
-		DataSet SelectAll(string adapterName, out IDictionary<string, object> outingParameters);
-
-		/// <summary>
-		/// ÔÚÓ³ÉäÖĞ¸ù¾İÖ¸¶¨µÄÊÊÅäÆ÷Ãû³Æ£¬¹¹½¨²éÑ¯²¢·µ»Ø²éÑ¯µÄ¿ÕÊı¾İ¼¯(·µ»Ø½á¹û²»´øÊı¾İ£¬Ö»º¬ÓĞÊı¾İ¼¯µÄ½á¹¹)¡£
-		/// </summary>
-		/// <param name="adapterName">²éÑ¯ÊÊÅäÆ÷µÄÃû³Æ¡£</param>
-		/// <returns>·µ»ØÊÊÅäÆ÷²éÑ¯µÄ¿ÕÊı¾İ¼¯¡£</returns>
-		DataSet SelectSchema(string adapterName);
-
-		/// <summary>
-		/// ÔÚÓ³ÉäÖĞ¸ù¾İÖ¸¶¨µÄÊÊÅäÆ÷Ãû³Æ£¬¹¹½¨²éÑ¯²¢·µ»Ø²éÑ¯µÄ¿ÕÊı¾İ¼¯(·µ»Ø½á¹û²»´øÊı¾İ£¬Ö»º¬ÓĞÊı¾İ¼¯µÄ½á¹¹)¡£
-		/// </summary>
-		/// <param name="adapterName">²éÑ¯ÊÊÅäÆ÷µÄÃû³Æ¡£</param>
-		/// <param name="outingParameters">Êä³ö²ÎÊı£¬Ö¸Ê¾²éÑ¯ÃüÁî·µ»ØµÄËùÓĞ²ÎÊıÁĞ±í¡£</param>
-		/// <returns>·µ»ØÊÊÅäÆ÷²éÑ¯µÄ¿ÕÊı¾İ¼¯¡£</returns>
-		DataSet SelectSchema(string adapterName, out IDictionary<string, object> outingParameters);
-
-		/// <summary>
-		/// ÔÚÓ³ÉäÖĞ¸ù¾İÖÆ¶¨µÄ·ÃÎÊÆ÷Ãû³Æ£¬¹¹½¨ÏàÓ¦µÄÃüÁî½«´«ÈëµÄÊı¾İ¼¯²ÎÊı±£´æÖÁÊı¾İÔ´ÖĞ¡£
-		/// <para>
-		///		×¢Òâ£ºÈç¹ûÖ¸¶¨µÄ·ÃÎÊÆ÷ÔÚÓ³ÉäÎÄ¼şÖĞµÄ·ÃÎÊÆ÷¶¨ÒåÇø²»´æÔÚ£¬ÔòÔÚÊÊÅäÆ÷¶¨ÒåÇøÖĞ½øĞĞ²éÕÒ¡£
-		/// </para>
-		/// </summary>
-		/// <param name="accessorName">¸üĞÂÊı¾İ¼¯µÄ·ÃÎÊÆ÷»òÊÊÅäÆ÷Ãû³Æ¡£</param>
-		/// <param name="dataSet">Òª½øĞĞ±£´æµÄÊı¾İ¼¯¶ÔÏó¡£</param>
-		/// <returns>·µ»Ø±£´æ³É¹¦µÄÊÜÓ°ÏìµÄ¼ÇÂ¼Êı£¬¸Ã·µ»ØÖµÎªÖ¸¶¨Êı¾İ¼¯µÄËùÓĞ±íµÄÊÜÓ°ÏìµÄ¼ÇÂ¼Êı¡£</returns>
-		int Update(string accessorName, DataSet dataSet);
+		int Update(string name, object entity, IDictionary<string, object> where);
+		int Update(string name, object entity, object where);
+		#endregion
 	}
 }
