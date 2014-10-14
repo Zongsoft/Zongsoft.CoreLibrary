@@ -38,6 +38,7 @@ namespace Zongsoft.Communication
 	{
 		#region 成员变量
 		private IChannel _channel;
+		private object _receivedObject;
 		#endregion
 
 		#region 构造函数
@@ -47,12 +48,13 @@ namespace Zongsoft.Communication
 				throw new ArgumentNullException("args");
 
 			_channel = args.Channel;
-			this.Parameter = args.ReceivedObject;
+			_receivedObject = args.ReceivedObject;
 		}
 
 		public RequestContext(Executor executor, IChannel channel, object receivedObject) : base(executor, receivedObject)
 		{
 			_channel = channel;
+			_receivedObject = receivedObject;
 		}
 		#endregion
 
@@ -69,7 +71,7 @@ namespace Zongsoft.Communication
 		{
 			get
 			{
-				return this.Parameter;
+				return _receivedObject;
 			}
 		}
 		#endregion
