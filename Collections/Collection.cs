@@ -137,6 +137,14 @@ namespace Zongsoft.Collections
 			return _items.Contains(item);
 		}
 
+		public bool IsReadOnly
+		{
+			get
+			{
+				return _items.IsReadOnly;
+			}
+		}
+
 		public int IndexOf(T item)
 		{
 			return _items.IndexOf(item);
@@ -298,14 +306,6 @@ namespace Zongsoft.Collections
 			}
 		}
 
-		bool ICollection<T>.IsReadOnly
-		{
-			get
-			{
-				return _items.IsReadOnly;
-			}
-		}
-
 		object IList.this[int index]
 		{
 			get
@@ -323,14 +323,6 @@ namespace Zongsoft.Collections
 					this.SetItem(index, result);
 				else
 					throw new InvalidCastException();
-			}
-		}
-
-		bool IList.IsReadOnly
-		{
-			get
-			{
-				return _items.IsReadOnly;
 			}
 		}
 

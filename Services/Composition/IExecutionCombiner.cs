@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2014 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -31,6 +31,6 @@ namespace Zongsoft.Services.Composition
 {
 	public interface IExecutionCombiner
 	{
-		object Combine(IEnumerable<ExecutionContext> args);
+		object Combine(IEnumerable<ExecutionPipelineContext> contexts);
 	}
 }

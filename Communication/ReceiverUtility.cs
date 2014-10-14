@@ -35,17 +35,36 @@ namespace Zongsoft.Communication
 {
 	internal static class ReceiverUtility
 	{
-		public static void ProcessReceive(Executor executor, ReceivedEventArgs args)
+		public static void ProcessReceive(IExecutor executor, ReceivedEventArgs args)
 		{
+			if(args == null)
+				throw new ArgumentNullException("args");
+
 			//如果执行器参数为空，不抛出异常，直接退出
 			if(executor == null)
 				return;
 
-			if(args == null)
-				throw new ArgumentNullException("args");
-
 			//通过执行器执行当前请求
-			executor.Execute((pipeline) => new RequestContext(executor, args, pipeline));
+			executor.Execute(args);
 		}
+
+		#region 嵌套子类
+		public class CommunicationExecutor : Zongsoft.Services.Composition.Executor
+		{
+			internal CommunicationExecutor(object host) : base(host)
+			{
+			}
+
+			protected override ExecutorContext CreateContext(object parameter)
+			{
+				var args = parameter as ReceivedEventArgs;
+
+				if(args != null)
+					return new RequestContext(this, args);
+
+				return base.CreateContext(parameter);
+			}
+		}
+		#endregion
 	}
 }

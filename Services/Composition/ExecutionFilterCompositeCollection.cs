@@ -27,14 +27,33 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace Zongsoft.Services.Composition
 {
-	public class ExecutionFilterCompositeCollection : Zongsoft.Collections.NamedCollectionBase<ExecutionFilterComposite>
+	public class ExecutionFilterCompositeCollection : Zongsoft.Collections.NamedCollectionBase<ExecutionFilterComposite>, ICollection<IExecutionFilter>
 	{
 		#region 构造函数
 		public ExecutionFilterCompositeCollection() : base(StringComparer.OrdinalIgnoreCase)
 		{
+		}
+		#endregion
+
+		#region 公共方法
+		public ExecutionFilterComposite Add(IExecutionFilter filter)
+		{
+			return this.Add(filter, null);
+		}
+
+		public ExecutionFilterComposite Add(IExecutionFilter filter, IPredication predication)
+		{
+			if(filter == null)
+				throw new ArgumentNullException("filter");
+
+			var result = new ExecutionFilterComposite(filter, predication);
+			base.Add(result);
+
+			return result;
 		}
 		#endregion
 
@@ -56,21 +75,63 @@ namespace Zongsoft.Services.Composition
 		}
 		#endregion
 
-		#region 公共方法
-		public ExecutionFilterComposite Add(IExecutionFilter filter)
+		#region 接口实现
+		void ICollection<IExecutionFilter>.Add(IExecutionFilter item)
 		{
-			return this.Add(filter, null);
+			if(item == null)
+				throw new ArgumentNullException("item");
+
+			base.Add(new ExecutionFilterComposite(item, null));
 		}
 
-		public ExecutionFilterComposite Add(IExecutionFilter filter, IPredication predication)
+		public bool Contains(IExecutionFilter item)
 		{
-			if(filter == null)
-				throw new ArgumentNullException("filter");
+			if(item == null)
+				return false;
 
-			var result = new ExecutionFilterComposite(filter, predication);
-			base.Add(result);
+			return base.Items.Any(p => p.Filter == item);
+		}
 
-			return result;
+		public void CopyTo(IExecutionFilter[] array, int arrayIndex)
+		{
+			if(array == null)
+				throw new ArgumentNullException("array");
+
+			if(arrayIndex < 0 || arrayIndex >= array.Length)
+				throw new ArgumentOutOfRangeException("arrayIndex");
+
+			for(int i = arrayIndex; i < array.Length; i++)
+			{
+				array[i] = base.Items[i - arrayIndex];
+			}
+		}
+
+		public bool Remove(IExecutionFilter item)
+		{
+			if(item == null)
+				return false;
+
+			for(int i = 0; i < base.Items.Count; i++)
+			{
+				if(base.Items[i].Filter == item)
+				{
+					base.Items.RemoveAt(i);
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		IEnumerator<IExecutionFilter> IEnumerable<IExecutionFilter>.GetEnumerator()
+		{
+			foreach(var item in base.Items)
+				yield return item.Filter;
+		}
+
+		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+		{
+			return base.GetEnumerator();
 		}
 		#endregion
 	}

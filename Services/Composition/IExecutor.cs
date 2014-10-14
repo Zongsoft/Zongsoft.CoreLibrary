@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2014 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -29,29 +29,59 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Services.Composition
 {
-	/// <summary>
-	/// 提供过滤执行管道的功能。
-	/// </summary>
-	public interface IExecutionFilter
+	public interface IExecutor
 	{
 		/// <summary>
-		/// 获取执行过滤器的名称。
+		/// 获取或设置一个<see cref="IExecutionInvoker"/>管道调用器。
 		/// </summary>
-		string Name
+		IExecutionInvoker Invoker
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// 获取或设置一个<see cref="IExecutionSelector"/>管道执行选择器。
+		/// </summary>
+		IExecutionSelector Selector
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// 获取或设置一个<see cref="IExecutionCombiner"/>执行结果合并器。
+		/// </summary>
+		IExecutionCombiner Combiner
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// 获取当前执行器的管道集合。
+		/// </summary>
+		ExecutionPipelineCollection Pipelines
 		{
 			get;
 		}
 
 		/// <summary>
-		/// 表示在执行处理程序之前被激发调用。
+		/// 获取当前执行器的全局过滤器集合。
 		/// </summary>
-		/// <param name="context">当前执行上下文对象。</param>
-		void OnExecuting(ExecutionPipelineContext context);
+		/// <remarks>
+		///		<para>全局过滤器即表示，当执行器被执行时全局过滤器优先于管道自身的过滤器被执行。</para>
+		/// </remarks>
+		ExecutionFilterCompositeCollection Filters
+		{
+			get;
+		}
 
 		/// <summary>
-		/// 表示在执行处理程序之后被激发调用。
+		/// 执行方法。
 		/// </summary>
-		/// <param name="context">当前执行上下文对象。</param>
-		void OnExecuted(ExecutionPipelineContext context);
+		/// <param name="parameter">指定的执行参数对象。</param>
+		/// <returns>返回一个执行的结果。</returns>
+		object Execute(object parameter = null);
 	}
 }

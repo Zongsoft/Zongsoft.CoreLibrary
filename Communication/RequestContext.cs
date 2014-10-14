@@ -34,20 +34,25 @@ using Zongsoft.Services.Composition;
 
 namespace Zongsoft.Communication
 {
-	public class RequestContext : Zongsoft.Services.Composition.ExecutionContext
+	public class RequestContext : Zongsoft.Services.Composition.ExecutorContext
 	{
 		#region 成员变量
 		private IChannel _channel;
 		#endregion
 
 		#region 构造函数
-		internal RequestContext(Executor executor, ReceivedEventArgs args, ExecutionPipeline pipeline) : base(executor, args, pipeline)
+		internal RequestContext(Executor executor, ReceivedEventArgs args) : base(executor, args)
 		{
 			if(args == null)
 				throw new ArgumentNullException("args");
 
 			_channel = args.Channel;
 			this.Parameter = args.ReceivedObject;
+		}
+
+		public RequestContext(Executor executor, IChannel channel, object receivedObject) : base(executor, receivedObject)
+		{
+			_channel = channel;
 		}
 		#endregion
 

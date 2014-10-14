@@ -52,7 +52,7 @@ namespace Zongsoft.Communication
 		#region 成员变量
 		private IPEndPoint _address;
 		private IReceiver _receiver;
-		private Executor _executor;
+		private IExecutor _executor;
 		#endregion
 
 		#region 构造函数
@@ -131,12 +131,12 @@ namespace Zongsoft.Communication
 			}
 		}
 
-		public Executor Executor
+		public IExecutor Executor
 		{
 			get
 			{
 				if(_executor == null)
-					System.Threading.Interlocked.CompareExchange(ref _executor, new Executor(this), null);
+					System.Threading.Interlocked.CompareExchange(ref _executor, this.CreateExecutor(), null);
 
 				return _executor;
 			}
@@ -155,6 +155,11 @@ namespace Zongsoft.Communication
 		protected virtual IReceiver CreateReceiver()
 		{
 			return this;
+		}
+
+		protected virtual IExecutor CreateExecutor()
+		{
+			return new ReceiverUtility.CommunicationExecutor(this);
 		}
 
 		protected virtual void OnFailed(ChannelFailureEventArgs args)

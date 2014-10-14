@@ -49,7 +49,7 @@ namespace Zongsoft.Communication.Net
 		#region 成员字段
 		private IPEndPoint _remoteEP;
 		private TcpClientChannel _channel;
-		private Executor _executor;
+		private IExecutor _executor;
 		private IBufferManagerSelector _bufferSelector;
 		#endregion
 
@@ -158,12 +158,12 @@ namespace Zongsoft.Communication.Net
 			}
 		}
 
-		public Executor Executor
+		public IExecutor Executor
 		{
 			get
 			{
 				if(_executor == null)
-					Interlocked.CompareExchange(ref _executor, new Executor(this), null);
+					Interlocked.CompareExchange(ref _executor, this.CreateExecutor(), null);
 
 				return _executor;
 			}
@@ -261,6 +261,13 @@ namespace Zongsoft.Communication.Net
 		public void Send(Stream stream, object asyncState = null)
 		{
 			this.Channel.Send(stream, asyncState);
+		}
+		#endregion
+
+		#region 虚拟方法
+		protected virtual IExecutor CreateExecutor()
+		{
+			return new ReceiverUtility.CommunicationExecutor(this);
 		}
 		#endregion
 

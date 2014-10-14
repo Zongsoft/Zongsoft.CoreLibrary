@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2014 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -29,36 +29,44 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Services.Composition
 {
-	public class ExecutionFilteredContext : ExecutionContext
+	public class ExecutionPipelineContext : ExecutorContext
 	{
 		#region 成员字段
-		private bool _isHandled;
+		private ExecutionPipeline _pipeline;
+		private ExecutorContext _executorContext;
 		#endregion
 
 		#region 构造函数
-		internal ExecutionFilteredContext(ExecutionContext context, bool isHandled) : base(context)
+		public ExecutionPipelineContext(ExecutorContext context, ExecutionPipeline pipeline) : base(context)
 		{
-			_isHandled = isHandled;
-		}
+			if(pipeline == null)
+				throw new ArgumentNullException("pipeline");
 
-		internal ExecutionFilteredContext(Executor executor, object parameter, ExecutionPipeline pipeline, bool isHandled) : base(executor, parameter, pipeline)
-		{
-			_isHandled = isHandled;
+			_pipeline = pipeline;
+			_executorContext = context;
 		}
 		#endregion
 
 		#region 公共属性
 		/// <summary>
-		/// 获取一个值，表示当前执行管道中的处理程序是否通过执行。
+		/// 获取当前的<see cref="ExecutionPipeline"/>执行管道。
 		/// </summary>
-		/// <remarks>
-		///		<para>由于执行管道中的处理程序可能没有通过其条件检测，因此其未必会得到执行。那么在管道中的过滤器的后置事件中可通过该属性来获取其是否成功被调用的指示。</para>
-		/// </remarks>
-		public bool IsHandled
+		public ExecutionPipeline Pipeline
 		{
 			get
 			{
-				return _isHandled;
+				return _pipeline;
+			}
+		}
+
+		/// <summary>
+		/// 获取原始的<see cref="ExecutorContext"/>执行器上下文对象。
+		/// </summary>
+		public ExecutorContext ExecutorContext
+		{
+			get
+			{
+				return _executorContext;
 			}
 		}
 		#endregion

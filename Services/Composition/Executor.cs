@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2014 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -30,7 +30,7 @@ using System.Linq;
 
 namespace Zongsoft.Services.Composition
 {
-	public class Executor
+	public class Executor : IExecutor
 	{
 		#region 事件定义
 		/// <summary>
@@ -49,6 +49,7 @@ namespace Zongsoft.Services.Composition
 
 		#region 成员字段
 		private object _host;
+		private IExecutionInvoker _invoker;
 		private IExecutionSelector _selector;
 		private IExecutionCombiner _combiner;
 		private ExecutionPipelineCollection _pipelines;
@@ -77,6 +78,24 @@ namespace Zongsoft.Services.Composition
 			get
 			{
 				return _host;
+			}
+		}
+
+		/// <summary>
+		/// 获取或设置一个<see cref="IExecutionInvoker"/>管道调用器。
+		/// </summary>
+		public IExecutionInvoker Invoker
+		{
+			get
+			{
+				if(_invoker == null)
+					_invoker = this.CreateInvoker();
+
+				return _invoker;
+			}
+			set
+			{
+				_invoker = value;
 			}
 		}
 
@@ -136,24 +155,21 @@ namespace Zongsoft.Services.Composition
 		}
 		#endregion
 
-		#region 公共方法
-		public object Execute()
+		#region 执行方法
+		public object Execute(object parameter = null)
 		{
-			return this.Execute((pipeline) => this.CreateContext(null, pipeline));
+			return this.Execute(this.CreateContext(parameter));
 		}
 
-		public object Execute(object parameter)
+		protected virtual object Execute(ExecutorContext context)
 		{
-			return this.Execute((pipeline) => this.CreateContext(parameter, pipeline));
-		}
+			if(context == null)
+				throw new ArgumentNullException("context");
 
-		public object Execute(Func<ExecutionPipeline, ExecutionContext> createContext)
-		{
 			if(_pipelines.Count < 1)
 				return null;
 
-			object parameter = createContext == null ? null : createContext(null).Parameter;
-			ExecutingEventArgs executingArgs = new ExecutingEventArgs(this, parameter);
+			ExecutingEventArgs executingArgs = new ExecutingEventArgs(this, context.Parameter);
 
 			//激发“Executing”事件
 			this.OnExecuting(executingArgs);
@@ -161,9 +177,16 @@ namespace Zongsoft.Services.Composition
 			if(executingArgs.Cancel)
 				return executingArgs.Result;
 
+			//获取可用的管道调用器
+			var invoker = this.Invoker;
+
+			if(invoker == null)
+				throw new InvalidOperationException("The invoker of the executor is null.");
+
+			var contexts = new System.Collections.Concurrent.ConcurrentBag<ExecutionPipelineContext>();
+
 			//通过选择器获取当前请求对应的管道集
-			var pipelines = this.GetPipelines(parameter);
-			var contexts = new System.Collections.Concurrent.ConcurrentBag<ExecutionContext>();
+			var pipelines = this.SelectPipelines(context);
 
 			var parallelling = System.Threading.Tasks.Parallel.ForEach(pipelines, pipeline =>
 			{
@@ -171,72 +194,23 @@ namespace Zongsoft.Services.Composition
 				if(pipeline.Handler == null)
 					return;
 
-				//创建当前执行管道的上下文对象
-				ExecutionContext context = createContext != null ? createContext(pipeline) : new ExecutionContext(this, null, pipeline);
+				//创建管道上下文对象
+				var pipelineContext = new ExecutionPipelineContext(context, pipeline);
 
-				//将当前管道执行上下文加入到执行器的对应的集合中
-				contexts.Add(context);
-
-				//计算当前管道的执行条件，如果管道的条件评估器不为空则使用管道的评估器进行验证，否则使用管道的处理程序的CanHandle方法进行验证
-				var enabled = pipeline.Predication != null ? pipeline.Predication.Predicate(context) : pipeline.Handler.CanHandle(context);
-
-				if(!enabled)
-					return;
-
-				//获取当前管道的所有过滤器(包含全局过滤器)
-				var filters = this.GetFilters(pipeline);
-				IList<IExecutionFilter> executableFilters = null;
-
-				if(filters != null && filters.Count > 0)
-				{
-					var filteringContext = new ExecutionFilteringContext(context);
-					executableFilters = new List<IExecutionFilter>(filters.Count);
-
-					foreach(var filter in filters)
-					{
-						if(filter.Predication == null || filter.Predication.Predicate(context))
-						{
-							//调用过滤器的OnExecuting方法
-							filter.Filter.OnExecuting(filteringContext);
-
-							//如果过滤器返回取消后续方法，则不将当前过滤器加入到后续处理列表中
-							if(!filteringContext.Cancel)
-								executableFilters.Add(filter.Filter);
-
-							//重置过滤器上下文对象中的Cancel属性值
-							filteringContext.Cancel = false;
-						}
-					}
-				}
-
-				//调用处理器的CanHandle方法，以判断当前管道的处理程序能否执行
-				var canHandle = pipeline.Handler.CanHandle(context);
-
-				if(canHandle)
-					pipeline.Handler.Handle(context);
-
-				if(executableFilters != null && executableFilters.Count > 0)
-				{
-					var filteredContext = new ExecutionFilteredContext(context, canHandle);
-
-					foreach(var filter in executableFilters)
-						filter.OnExecuted(filteredContext);
-				}
+				//通过管道调用器来调用管道处理程序，如果调用成功则将管道上下文加入到上下文集合中
+				if(invoker.Invoke(pipelineContext))
+					contexts.Add(pipelineContext);
 			});
 
 			object result = null;
 
 			if(parallelling.IsCompleted)
 			{
-				var combiner = _combiner;
-
-				if(combiner != null)
-					result = combiner.Combine(contexts.ToArray());
-				else
-					result = contexts.Where(p => p.Result != null).Select(ctx => ctx.Result);
+				//合并结果集
+				result = this.CombineResult(contexts);
 
 				//激发“Executed”事件
-				this.OnExecuted(new ExecutedEventArgs(this, parameter, result));
+				this.OnExecuted(new ExecutedEventArgs(this, context.Parameter, result));
 			}
 
 			return result;
@@ -244,34 +218,50 @@ namespace Zongsoft.Services.Composition
 		#endregion
 
 		#region 虚拟方法
-		protected virtual ExecutionContext CreateContext(object parameter, ExecutionPipeline pipeline)
+		protected virtual ExecutorContext CreateContext(object parameter)
 		{
-			return new ExecutionContext(this, parameter, pipeline);
-		}
-		#endregion
-
-		#region 私有方法
-		private IEnumerable<ExecutionPipeline> GetPipelines(object parameter)
-		{
-			var selector = _selector;
-
-			if(selector == null)
-				return _pipelines.ToArray();
-
-			return selector.GetPipelines(new ExecutionSelectorContext(this, parameter));
+			return new ExecutorContext(this, parameter);
 		}
 
-		private ICollection<ExecutionFilterComposite> GetFilters(ExecutionPipeline pipeline)
+		protected virtual IExecutionInvoker CreateInvoker()
 		{
-			if(_filters.Count + pipeline.Filters.Count == 0)
-				return null;
+			return new ExecutionInvoker();
+		}
 
-			var filters = new List<ExecutionFilterComposite>(_filters.Count + pipeline.Filters.Count);
+		protected virtual IEnumerable<ExecutionPipeline> SelectPipelines(ExecutorContext context)
+		{
+			var selector = this.Selector;
 
-			filters.AddRange(_filters);
-			filters.AddRange(pipeline.Filters);
+			if(selector != null)
+				return selector.SelectPipelines(context);
 
-			return filters;
+			return _pipelines.ToArray();
+		}
+
+		protected virtual object CombineResult(IEnumerable<ExecutionPipelineContext> contexts)
+		{
+			var combiner = this.Combiner;
+
+			if(combiner != null)
+				return combiner.Combine(contexts.ToArray());
+			else
+			{
+				var result = new List<object>(contexts.Count());
+
+				foreach(var context in contexts)
+				{
+					if(context.Result != null)
+						result.Add(context.Result);
+				}
+
+				if(result.Count == 0)
+					return null;
+
+				if(result.Count == 1)
+					return result[0];
+
+				return result.ToArray();
+			}
 		}
 		#endregion
 

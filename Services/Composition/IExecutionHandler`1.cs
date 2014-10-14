@@ -6,7 +6,7 @@ namespace Zongsoft.Services.Composition
 	/// <summary>
 	/// 提供执行处理程序的功能。
 	/// </summary>
-	public interface IExecutionHandler<TContext> : IExecutionHandler where TContext : ExecutionContext
+	public interface IExecutionHandler<TContext> : IExecutionHandler where TContext : ExecutionPipelineContext
 	{
 		/// <summary>
 		/// 确认当前处理程序能否处理本次执行请求。

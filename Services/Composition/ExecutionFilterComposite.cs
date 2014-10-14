@@ -29,7 +29,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Services.Composition
 {
-	public class ExecutionFilterComposite
+	public class ExecutionFilterComposite : IExecutionFilter
 	{
 		#region 成员字段
 		private IExecutionFilter _filter;
@@ -52,6 +52,14 @@ namespace Zongsoft.Services.Composition
 		#endregion
 
 		#region 公共属性
+		public virtual string Name
+		{
+			get
+			{
+				return _filter.Name;
+			}
+		}
+
 		public IPredication Predication
 		{
 			get
@@ -77,6 +85,24 @@ namespace Zongsoft.Services.Composition
 
 				_filter = value;
 			}
+		}
+		#endregion
+
+		#region 显式实现
+		void IExecutionFilter.OnExecuting(ExecutionPipelineContext context)
+		{
+			var predication = this.Predication;
+
+			if(predication == null || predication.Predicate(context))
+				_filter.OnExecuting(context);
+		}
+
+		void IExecutionFilter.OnExecuted(ExecutionPipelineContext context)
+		{
+			var predication = this.Predication;
+
+			if(predication == null || predication.Predicate(context))
+				_filter.OnExecuted(context);
 		}
 		#endregion
 	}

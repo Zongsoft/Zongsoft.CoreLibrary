@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2014 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -26,70 +26,46 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Zongsoft.Services.Composition
 {
-	[Serializable]
-	public class ExecutionContext : MarshalByRefObject
+	public class ExecutorContext : MarshalByRefObject
 	{
 		#region 成员字段
-		private object _parameter;
 		private Executor _executor;
-		private ExecutionPipeline _pipeline;
+		private object _parameter;
 		private Dictionary<string, object> _extendedProperties;
 		private object _result;
 		#endregion
 
 		#region 构造函数
-		internal protected ExecutionContext(Executor executor) : this(executor, null, null)
-		{
-		}
-
-		internal protected ExecutionContext(Executor executor, object parameter) : this(executor, parameter, null)
-		{
-		}
-
-		internal ExecutionContext(Executor executor, object parameter, ExecutionPipeline pipeline)
+		public ExecutorContext(Executor executor, object parameter = null, IDictionary<string, object> extendedProperties = null)
 		{
 			if(executor == null)
 				throw new ArgumentNullException("executor");
 
 			_executor = executor;
 			_parameter = parameter;
-			_pipeline = pipeline;
-			_extendedProperties = null;
+
+			if(extendedProperties != null && extendedProperties.Count > 0)
+				_extendedProperties = new Dictionary<string, object>(extendedProperties);
 		}
 
-		protected ExecutionContext(ExecutionContext context)
+		protected ExecutorContext(ExecutorContext context)
 		{
 			if(context == null)
 				throw new ArgumentNullException("context");
 
 			_executor = context.Executor;
 			_parameter = context.Parameter;
-			_pipeline = context.Pipeline;
-			_extendedProperties = context._extendedProperties;
+			_result = context.Result;
+
+			if(context.HasExtendedProperties)
+				_extendedProperties = new Dictionary<string, object>(context.ExtendedProperties);
 		}
 		#endregion
 
 		#region 公共属性
-		/// <summary>
-		/// 获取或设置本次执行请求的调用参数。
-		/// </summary>
-		public virtual object Parameter
-		{
-			get
-			{
-				return _parameter;
-			}
-			set
-			{
-				_parameter = value;
-			}
-		}
-
 		/// <summary>
 		/// 获取本次执行请求的执行器。
 		/// </summary>
@@ -102,16 +78,17 @@ namespace Zongsoft.Services.Composition
 		}
 
 		/// <summary>
-		/// 获取本次执行请求的处理器。
+		/// 获取或设置本次执行请求的调用参数。
 		/// </summary>
-		public IExecutionHandler Handler
+		public virtual object Parameter
 		{
 			get
 			{
-				if(_pipeline == null)
-					return null;
-
-				return _pipeline.Handler;
+				return _parameter;
+			}
+			set
+			{
+				_parameter = value;
 			}
 		}
 
@@ -159,16 +136,6 @@ namespace Zongsoft.Services.Composition
 		}
 		#endregion
 
-		#region 保护属性
-		protected internal ExecutionPipeline Pipeline
-		{
-			get
-			{
-				return _pipeline;
-			}
-		}
-		#endregion
-
 		#region 公共方法
 		/// <summary>
 		/// 将本次执行请求的调用参数对象转换为指定类型。
@@ -202,16 +169,6 @@ namespace Zongsoft.Services.Composition
 				return Zongsoft.Common.Convert.ConvertValue<T>(parameter);
 			else
 				return convert(parameter);
-		}
-		#endregion
-
-		#region 内部方法
-		internal void SetPipeline(ExecutionPipeline pipeline)
-		{
-			if(_pipeline != null)
-				throw new InvalidOperationException();
-
-			_pipeline = pipeline;
 		}
 		#endregion
 	}

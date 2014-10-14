@@ -263,11 +263,15 @@
     <Compile Include="Services\CommandContext.cs" />
     <Compile Include="Services\CommandExecutor.cs" />
     <Compile Include="Services\Composition\ExecutedEventArgs.cs" />
-    <Compile Include="Services\Composition\ExecutionSelectorContext.cs" />
+    <Compile Include="Services\Composition\ExecutionInvoker.cs" />
+    <Compile Include="Services\Composition\ExecutionPipelineContext.cs" />
+    <Compile Include="Services\Composition\ExecutorContext.cs" />
     <Compile Include="Services\Composition\IExecutionCombiner.cs" />
     <Compile Include="Services\Composition\IExecutionFilter`1.cs" />
     <Compile Include="Services\Composition\IExecutionHandler`1.cs" />
+    <Compile Include="Services\Composition\IExecutionInvoker.cs" />
     <Compile Include="Services\Composition\IExecutionSelector.cs" />
+    <Compile Include="Services\Composition\IExecutor.cs" />
     <Compile Include="Services\ICommandLineParser.cs" />
     <Compile Include="Services\IMatchable`1.cs" />
     <Compile Include="Services\IMatcher.cs" />
@@ -296,10 +300,7 @@
     <Compile Include="Services\PredicationCombine.cs" />
     <Compile Include="Services\Predicator.cs" />
     <Compile Include="Options\ISettingProvider.cs" />
-    <Compile Include="Services\Composition\ExecutionContext.cs" />
     <Compile Include="Services\Composition\ExecutionFilterCompositeCollection.cs" />
-    <Compile Include="Services\Composition\ExecutionFilteredContext.cs" />
-    <Compile Include="Services\Composition\ExecutionFilteringContext.cs" />
     <Compile Include="Services\Composition\ExecutionPipeline.cs" />
     <Compile Include="Services\Composition\ExecutionHandler.cs" />
     <Compile Include="Services\Composition\ExecutionPipelineCollection.cs" />
