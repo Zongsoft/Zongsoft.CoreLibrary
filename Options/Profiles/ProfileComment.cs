@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2014 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -26,76 +26,76 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-namespace Zongsoft.Collections
+namespace Zongsoft.Options.Profiles
 {
-	[Serializable]
-	public class HierarchicalNodeCollection<T> : NamedCollectionBase<T> where T : HierarchicalNode
+	public class ProfileComment : ProfileItem
 	{
-		#region 成员变量
-		private T _owner;
+		#region 私有变量
+		private StringBuilder _text;
 		#endregion
 
 		#region 构造函数
-		protected HierarchicalNodeCollection(T owner)
+		public ProfileComment(string text, int lineNumber = -1) : base(lineNumber)
 		{
-			_owner = owner;
+			if(string.IsNullOrEmpty(text))
+				_text = new StringBuilder();
+			else
+				_text = new StringBuilder(text);
 		}
 		#endregion
 
-		#region 保护属性
-		protected T Owner
+		#region 公共属性
+		public string Text
 		{
 			get
 			{
-				return _owner;
+				return _text.ToString();
+			}
+		}
+
+		public string[] Lines
+		{
+			get
+			{
+				return _text.ToString().Split('\r', '\n');
+			}
+		}
+
+		public override ProfileItemType ItemType
+		{
+			get
+			{
+				return ProfileItemType.Comment;
 			}
 		}
 		#endregion
 
-		#region 重写方法
-		protected override string GetKeyForItem(T item)
+		#region 公共方法
+		public void Append(string text)
 		{
-			return item.Name;
+			if(string.IsNullOrEmpty(text))
+				return;
+
+			_text.Append(text);
 		}
 
-		protected override void InsertItem(int index, T item)
+		public void AppendFormat(string format, params object[] args)
 		{
-			item.InnerParent = _owner;
-			base.InsertItem(index, item);
+			if(string.IsNullOrEmpty(format))
+				return;
+
+			_text.AppendFormat(format, args);
 		}
 
-		protected override void SetItem(int index, T item)
+		public void AppendLine(string text)
 		{
-			var oldItem = this.Items[index];
-
-			if(oldItem != null)
-				oldItem.InnerParent = null;
-
-			item.InnerParent = _owner;
-
-			base.SetItem(index, item);
-		}
-
-		protected override void RemoveItem(int index)
-		{
-			var item = this.Items[index];
-
-			if(item != null)
-				item.InnerParent = null;
-
-			base.RemoveItem(index);
-		}
-
-		protected override void ClearItems()
-		{
-			foreach(var item in this.Items)
-			{
-				if(item != null)
-					item.InnerParent = null;
-			}
-
-			base.ClearItems();
+			if(text == null)
+				_text.AppendLine();
+			else
+				_text.AppendLine(text);
 		}
 		#endregion
 	}

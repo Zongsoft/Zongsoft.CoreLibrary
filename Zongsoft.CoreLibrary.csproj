@@ -79,6 +79,7 @@
     <Compile Include="Collections\NamedCollection.cs" />
     <Compile Include="Collections\BinaryComparer.cs" />
     <Compile Include="Collections\NamedCollectionBase.cs" />
+    <Compile Include="Collections\NamedCollectionWrapper.cs" />
     <Compile Include="Common\TypeExtension.cs" />
     <Compile Include="Common\Buffer.cs" />
     <Compile Include="Communication\ChannelAsyncEventArgs.cs" />
@@ -171,6 +172,17 @@
     <Compile Include="IO\Path.cs" />
     <Compile Include="IO\PathException.cs" />
     <Compile Include="IO\LocalPath.cs" />
+    <Compile Include="Options\Profiles\Profile.cs" />
+    <Compile Include="Options\Profiles\ProfileComment.cs" />
+    <Compile Include="Options\Profiles\ProfileCommentCollection.cs" />
+    <Compile Include="Options\Profiles\ProfileEntry.cs" />
+    <Compile Include="Options\Profiles\ProfileEntryCollection.cs" />
+    <Compile Include="Options\Profiles\ProfileException.cs" />
+    <Compile Include="Options\Profiles\ProfileItem.cs" />
+    <Compile Include="Options\Profiles\ProfileItemCollection.cs" />
+    <Compile Include="Options\Profiles\ProfileItemType.cs" />
+    <Compile Include="Options\Profiles\ProfileSection.cs" />
+    <Compile Include="Options\Profiles\ProfileSectionCollection.cs" />
     <Compile Include="Runtime\Caching\BufferManager.cs" />
     <Compile Include="Runtime\Caching\BufferManagerBase.cs" />
     <Compile Include="Runtime\Caching\BufferManagerSelector.cs" />
@@ -467,6 +479,7 @@
     <None Include="Options\Option.option">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Options\Profiles\Profile.ini" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

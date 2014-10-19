@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2014 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -27,75 +27,34 @@
 using System;
 using System.Collections.Generic;
 
-namespace Zongsoft.Collections
+namespace Zongsoft.Options.Profiles
 {
-	[Serializable]
-	public class HierarchicalNodeCollection<T> : NamedCollectionBase<T> where T : HierarchicalNode
+	public class ProfileSectionCollection : Zongsoft.Collections.NamedCollectionWrapper<ProfileSection, ProfileItem>
 	{
-		#region 成员变量
-		private T _owner;
-		#endregion
-
 		#region 构造函数
-		protected HierarchicalNodeCollection(T owner)
+		public ProfileSectionCollection(ProfileItemCollection items) : base(items)
 		{
-			_owner = owner;
 		}
 		#endregion
 
-		#region 保护属性
-		protected T Owner
+		#region 公共方法
+		public ProfileSection Add(string name, int lineNumber = -1)
 		{
-			get
-			{
-				return _owner;
-			}
+			var item = new ProfileSection(name, lineNumber);
+			base.Add(item);
+			return item;
 		}
 		#endregion
 
 		#region 重写方法
-		protected override string GetKeyForItem(T item)
+		protected override string GetKeyForItem(ProfileSection item)
 		{
 			return item.Name;
 		}
 
-		protected override void InsertItem(int index, T item)
+		protected override bool OnItemMatch(ProfileItem item)
 		{
-			item.InnerParent = _owner;
-			base.InsertItem(index, item);
-		}
-
-		protected override void SetItem(int index, T item)
-		{
-			var oldItem = this.Items[index];
-
-			if(oldItem != null)
-				oldItem.InnerParent = null;
-
-			item.InnerParent = _owner;
-
-			base.SetItem(index, item);
-		}
-
-		protected override void RemoveItem(int index)
-		{
-			var item = this.Items[index];
-
-			if(item != null)
-				item.InnerParent = null;
-
-			base.RemoveItem(index);
-		}
-
-		protected override void ClearItems()
-		{
-			foreach(var item in this.Items)
-			{
-				if(item != null)
-					item.InnerParent = null;
-			}
-
-			base.ClearItems();
+			return item.ItemType == ProfileItemType.Section;
 		}
 		#endregion
 	}

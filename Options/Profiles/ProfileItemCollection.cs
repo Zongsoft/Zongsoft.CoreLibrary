@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2014 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -26,53 +26,60 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-namespace Zongsoft.Collections
+namespace Zongsoft.Options.Profiles
 {
-	[Serializable]
-	public class HierarchicalNodeCollection<T> : NamedCollectionBase<T> where T : HierarchicalNode
+	public class ProfileItemCollection : Zongsoft.Collections.Collection<ProfileItem>
 	{
-		#region 成员变量
-		private T _owner;
+		#region 成员字段
+		private object _owner;
 		#endregion
 
 		#region 构造函数
-		protected HierarchicalNodeCollection(T owner)
+		public ProfileItemCollection(object owner)
 		{
+			if(owner == null)
+				throw new ArgumentNullException("owner");
+
 			_owner = owner;
 		}
 		#endregion
 
-		#region 保护属性
-		protected T Owner
+		#region 内部属性
+		internal object Owner
 		{
 			get
 			{
 				return _owner;
 			}
+			set
+			{
+				if(object.ReferenceEquals(_owner, value))
+					return;
+
+				foreach(var item in this.Items)
+					item.Owner = value;
+			}
 		}
 		#endregion
 
 		#region 重写方法
-		protected override string GetKeyForItem(T item)
+		protected override void InsertItem(int index, ProfileItem item)
 		{
-			return item.Name;
-		}
-
-		protected override void InsertItem(int index, T item)
-		{
-			item.InnerParent = _owner;
+			item.Owner = _owner;
 			base.InsertItem(index, item);
 		}
 
-		protected override void SetItem(int index, T item)
+		protected override void SetItem(int index, ProfileItem item)
 		{
 			var oldItem = this.Items[index];
 
 			if(oldItem != null)
-				oldItem.InnerParent = null;
+				oldItem.Owner = null;
 
-			item.InnerParent = _owner;
+			item.Owner = _owner;
 
 			base.SetItem(index, item);
 		}
@@ -82,7 +89,7 @@ namespace Zongsoft.Collections
 			var item = this.Items[index];
 
 			if(item != null)
-				item.InnerParent = null;
+				item.Owner = null;
 
 			base.RemoveItem(index);
 		}
@@ -92,7 +99,7 @@ namespace Zongsoft.Collections
 			foreach(var item in this.Items)
 			{
 				if(item != null)
-					item.InnerParent = null;
+					item.Owner = null;
 			}
 
 			base.ClearItems();

@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2014 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -27,75 +27,78 @@
 using System;
 using System.Collections.Generic;
 
-namespace Zongsoft.Collections
+namespace Zongsoft.Options.Profiles
 {
 	[Serializable]
-	public class HierarchicalNodeCollection<T> : NamedCollectionBase<T> where T : HierarchicalNode
+	public class ProfileEntry : ProfileItem
 	{
-		#region 成员变量
-		private T _owner;
+		#region 构造函数
+		private string _name;
+		private string _value;
 		#endregion
 
 		#region 构造函数
-		protected HierarchicalNodeCollection(T owner)
+		public ProfileEntry(string name, string value = null) : this(-1, name, value)
 		{
-			_owner = owner;
+		}
+
+		public ProfileEntry(int lineNumber, string name, string value = null) : base(lineNumber)
+		{
+			if(string.IsNullOrWhiteSpace(name))
+				throw new ArgumentNullException("name");
+
+			_name = name.Trim();
+
+			if(value != null)
+				_value = value.Trim();
 		}
 		#endregion
 
-		#region 保护属性
-		protected T Owner
+		#region 公共属性
+		public string Name
 		{
 			get
 			{
-				return _owner;
+				return _name;
+			}
+		}
+
+		public string Value
+		{
+			get
+			{
+				return _value;
+			}
+			set
+			{
+				_value = value;
+			}
+		}
+
+		public ProfileSection Section
+		{
+			get
+			{
+				return (ProfileSection)base.Owner;
+			}
+		}
+
+		public override ProfileItemType ItemType
+		{
+			get
+			{
+				return ProfileItemType.Entry;
 			}
 		}
 		#endregion
 
 		#region 重写方法
-		protected override string GetKeyForItem(T item)
+		public override string ToString()
 		{
-			return item.Name;
-		}
+			if(_value == null)
+				return _name;
 
-		protected override void InsertItem(int index, T item)
-		{
-			item.InnerParent = _owner;
-			base.InsertItem(index, item);
-		}
-
-		protected override void SetItem(int index, T item)
-		{
-			var oldItem = this.Items[index];
-
-			if(oldItem != null)
-				oldItem.InnerParent = null;
-
-			item.InnerParent = _owner;
-
-			base.SetItem(index, item);
-		}
-
-		protected override void RemoveItem(int index)
-		{
-			var item = this.Items[index];
-
-			if(item != null)
-				item.InnerParent = null;
-
-			base.RemoveItem(index);
-		}
-
-		protected override void ClearItems()
-		{
-			foreach(var item in this.Items)
-			{
-				if(item != null)
-					item.InnerParent = null;
-			}
-
-			base.ClearItems();
+			return string.Format("{0}={1}", _name, _value);
 		}
 		#endregion
 	}
