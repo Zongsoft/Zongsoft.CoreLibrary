@@ -233,6 +233,14 @@ namespace Zongsoft.Collections
 			return thunk(item);
 		}
 
+		/// <summary>
+		/// 当需要过滤集合元素时调用此方法被调用。
+		/// </summary>
+		/// <param name="item">指定要匹配的集合元素。</param>
+		/// <returns>如果匹配成功则返回真(true)，否则返回假(false)。</returns>
+		/// <remarks>
+		///		<para>对实现者的要求：当该方法返回真(true)，则必须确保参数<paramref name="item"/>是可被直接转换为<typeparamref name="T"/>类型的。</para>
+		/// </remarks>
 		protected virtual bool OnItemMatch(TBase item)
 		{
 			var thunk = _onItemMatch;
