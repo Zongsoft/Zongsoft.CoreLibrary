@@ -29,7 +29,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Options.Profiles
 {
-	public class ProfileSectionCollection : Zongsoft.Collections.NamedCollectionWrapper<ProfileSection, ProfileItem>
+	public class ProfileSectionCollection : Zongsoft.Collections.NamedCollection<ProfileSection, ProfileItem>
 	{
 		#region 构造函数
 		public ProfileSectionCollection(ProfileItemCollection items) : base(items)
