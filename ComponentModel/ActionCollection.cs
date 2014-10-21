@@ -32,7 +32,7 @@ using System.Text;
 
 namespace Zongsoft.ComponentModel
 {
-	public class ActionCollection : KeyedCollection<string, Action>
+	public class ActionCollection : Zongsoft.Collections.NamedCollectionBase<Action>
 	{
 		#region 构造函数
 		public ActionCollection() : base(StringComparer.OrdinalIgnoreCase)
@@ -44,24 +44,6 @@ namespace Zongsoft.ComponentModel
 		protected override string GetKeyForItem(Action item)
 		{
 			return item.Name;
-		}
-		#endregion
-
-		#region 公共属性
-		public new Action this[string name]
-		{
-			get
-			{
-				Action result = null;
-
-				if(base.Dictionary != null && base.Dictionary.TryGetValue(name, out result))
-					return result;
-
-				if(base.Items != null)
-					return base.Items.FirstOrDefault(p => string.Equals(p.Name, name, StringComparison.OrdinalIgnoreCase));
-
-				return null;
-			}
 		}
 		#endregion
 	}

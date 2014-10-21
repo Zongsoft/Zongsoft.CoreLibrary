@@ -44,9 +44,11 @@ namespace Zongsoft.Options.Configuration
 		#endregion
 
 		#region 构造函数
-		public OptionConfiguration(string filePath)
+		public OptionConfiguration(string filePath = null)
 		{
-			_filePath = filePath ?? string.Empty;
+			if(filePath != null)
+				_filePath = filePath.Trim();
+
 			_sections = new OptionConfigurationSectionCollection();
 		}
 		#endregion

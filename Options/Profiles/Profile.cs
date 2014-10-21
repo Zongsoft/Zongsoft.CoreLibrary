@@ -65,7 +65,7 @@ namespace Zongsoft.Options.Profiles
 		#endregion
 
 		#region 构造函数
-		public Profile(string filePath)
+		public Profile(string filePath = null)
 		{
 			if(filePath != null)
 				_filePath = filePath.Trim();
@@ -245,6 +245,14 @@ namespace Zongsoft.Options.Profiles
 		#endregion
 
 		#region 接口实现
+		/// <summary>
+		/// 获取指定路径的配置数据。
+		/// </summary>
+		/// <param name="path">指定的配置项路径，路径是以“/”斜杠分隔的文本。</param>
+		/// <returns>如果找到则返回配置结果，否则返回空(null)。</returns>
+		/// <remarks>
+		///		<para>如果<paramref name="path"/>参数指定的配置路径以“/”斜杠结尾则将返回指定配置段的所有条目集；否则返回指定的配置条目的值。</para>
+		/// </remarks>
 		public object GetOptionObject(string path)
 		{
 			string name;
