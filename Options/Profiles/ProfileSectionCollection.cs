@@ -29,7 +29,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Options.Profiles
 {
-	public class ProfileSectionCollection : Zongsoft.Collections.NamedCollection<ProfileSection, ProfileItem>
+	public class ProfileSectionCollection : Zongsoft.Collections.NamedCollection<ProfileSection>
 	{
 		#region 构造函数
 		public ProfileSectionCollection(ProfileItemCollection items) : base(items)
@@ -52,9 +52,9 @@ namespace Zongsoft.Options.Profiles
 			return item.Name;
 		}
 
-		protected override bool OnItemMatch(ProfileItem item)
+		protected override bool OnItemMatch(object item)
 		{
-			return item.ItemType == ProfileItemType.Section;
+			return ((ProfileItem)item).ItemType == ProfileItemType.Section;
 		}
 		#endregion
 	}

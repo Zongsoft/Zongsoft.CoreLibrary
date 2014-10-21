@@ -31,7 +31,7 @@ using System.Collections.Specialized;
 
 namespace Zongsoft.Collections
 {
-	public class Collection<T> : IList<T>, IList, INotifyCollectionChanged
+	public class Collection<T> : IList<T>, IList, IReadOnlyCollection<T>, IReadOnlyList<T>, INotifyCollectionChanged
 	{
 		#region 事件定义
 		public event NotifyCollectionChangedEventHandler CollectionChanged;

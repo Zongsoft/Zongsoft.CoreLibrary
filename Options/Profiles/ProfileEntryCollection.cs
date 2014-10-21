@@ -30,7 +30,7 @@ using System.Collections.Specialized;
 
 namespace Zongsoft.Options.Profiles
 {
-	public class ProfileEntryCollection : Zongsoft.Collections.NamedCollection<ProfileEntry, ProfileItem>
+	public class ProfileEntryCollection : Zongsoft.Collections.NamedCollection<ProfileEntry>
 	{
 		#region 构造函数
 		public ProfileEntryCollection(ProfileItemCollection items) : base(items)
@@ -60,9 +60,9 @@ namespace Zongsoft.Options.Profiles
 			return item.Name;
 		}
 
-		protected override bool OnItemMatch(ProfileItem item)
+		protected override bool OnItemMatch(object item)
 		{
-			return item.ItemType == ProfileItemType.Entry;
+			return ((ProfileItem)item).ItemType == ProfileItemType.Entry;
 		}
 		#endregion
 	}

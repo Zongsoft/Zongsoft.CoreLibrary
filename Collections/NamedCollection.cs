@@ -25,27 +25,47 @@
  */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 
 namespace Zongsoft.Collections
 {
-	public class NamedCollection<T, TBase> : ICollection<T> where T : TBase
+	public class NamedCollection<T> : ICollection<T>
 	{
 		#region 私有变量
 		private Func<T, string> _getKeyForItem;
-		private Func<TBase, bool> _onItemMatch;
+		private Func<object, bool> _onItemMatch;
 		#endregion
 
 		#region 成员字段
 		private StringComparer _comparer;
-		private ICollection<TBase> _items;
+		private IList _items;
 		private Dictionary<string, T> _innerDictionary;
 		#endregion
 
 		#region 构造函数
-		protected NamedCollection(ICollection<TBase> items, StringComparer comparer = null)
+		protected NamedCollection(IList items, StringComparer comparer = null)
+		{
+			this.Initialize(items, comparer);
+		}
+
+		public NamedCollection(IList items, Func<T, string> getKeyForItem, Func<object, bool> onItemMatch = null, StringComparer comparer = null)
+		{
+			if(getKeyForItem == null)
+				throw new ArgumentNullException("getKeyForItem");
+
+			_getKeyForItem = getKeyForItem;
+			_onItemMatch = onItemMatch;
+
+			//在初始化之前必须先为委托赋值
+			this.Initialize(items, comparer);
+		}
+		#endregion
+
+		#region 初始化器
+		private void Initialize(IList items, StringComparer comparer = null)
 		{
 			if(items == null)
 				throw new ArgumentNullException("items");
@@ -65,15 +85,6 @@ namespace Zongsoft.Collections
 
 				((INotifyCollectionChanged)items).CollectionChanged += Items_CollectionChanged;
 			}
-		}
-
-		public NamedCollection(ICollection<TBase> items, Func<T, string> getKeyForItem, Func<TBase, bool> onItemMatch = null, StringComparer comparer = null) : this(items, comparer)
-		{
-			if(getKeyForItem == null)
-				throw new ArgumentNullException("getKeyForItem");
-
-			_getKeyForItem = getKeyForItem;
-			_onItemMatch = onItemMatch;
 		}
 		#endregion
 
@@ -102,7 +113,7 @@ namespace Zongsoft.Collections
 
 				if(_innerDictionary == null)
 				{
-					foreach(TBase item in _items)
+					foreach(var item in _items)
 					{
 						if(this.OnItemMatch(item) && _comparer.Compare(this.GetKeyForItem((T)item), name) == 0)
 							return (T)item;
@@ -123,9 +134,19 @@ namespace Zongsoft.Collections
 			get
 			{
 				if(_innerDictionary == null)
-					return _items.Count(item => this.OnItemMatch(item));
-				else
-					return _innerDictionary.Count;
+				{
+					int count = 0;
+
+					foreach(var item in _items)
+					{
+						if(this.OnItemMatch(item))
+							count++;
+					}
+
+					return count;
+				}
+
+				return _innerDictionary.Count;
 			}
 		}
 
@@ -154,7 +175,9 @@ namespace Zongsoft.Collections
 
 		public bool Remove(T item)
 		{
-			return _items.Remove(item);
+			var result = _items.Contains(item);
+			_items.Remove(item);
+			return result;
 		}
 
 		public bool Contains(string name)
@@ -163,9 +186,17 @@ namespace Zongsoft.Collections
 				return false;
 
 			if(_innerDictionary == null)
-				return _items.Any(item => this.OnItemMatch(item) && _comparer.Compare(this.GetKeyForItem((T)item), name) == 0);
-			else
-				return _innerDictionary.ContainsKey(name);
+			{
+				foreach(var item in _items)
+				{
+					if(this.OnItemMatch(item) && _comparer.Compare(this.GetKeyForItem((T)item), name) == 0)
+						return true;
+				}
+
+				return false;
+			}
+
+			return _innerDictionary.ContainsKey(name);
 		}
 
 		public bool Contains(T item)
@@ -200,7 +231,7 @@ namespace Zongsoft.Collections
 
 			if(_innerDictionary == null)
 			{
-				foreach(TBase item in _items)
+				foreach(var item in _items)
 				{
 					if(arrayIndex + index >= array.Length)
 						return;
@@ -241,12 +272,12 @@ namespace Zongsoft.Collections
 		/// <remarks>
 		///		<para>对实现者的要求：当该方法返回真(true)，则必须确保参数<paramref name="item"/>是可被直接转换为<typeparamref name="T"/>类型的。</para>
 		/// </remarks>
-		protected virtual bool OnItemMatch(TBase item)
+		protected virtual bool OnItemMatch(object item)
 		{
 			var thunk = _onItemMatch;
 
 			if(thunk == null)
-				return true;
+				return item is T;
 
 			return thunk(item);
 		}
@@ -258,7 +289,7 @@ namespace Zongsoft.Collections
 			switch(e.Action)
 			{
 				case NotifyCollectionChangedAction.Add:
-					foreach(TBase item in e.NewItems)
+					foreach(var item in e.NewItems)
 					{
 						if(this.OnItemMatch(item))
 						{
@@ -267,7 +298,7 @@ namespace Zongsoft.Collections
 					}
 					break;
 				case NotifyCollectionChangedAction.Remove:
-					foreach(TBase item in e.OldItems)
+					foreach(var item in e.OldItems)
 					{
 						if(this.OnItemMatch(item))
 						{
@@ -276,7 +307,7 @@ namespace Zongsoft.Collections
 					}
 					break;
 				case NotifyCollectionChangedAction.Replace:
-					foreach(TBase item in e.OldItems)
+					foreach(var item in e.OldItems)
 					{
 						if(this.OnItemMatch(item))
 						{
@@ -284,7 +315,7 @@ namespace Zongsoft.Collections
 						}
 					}
 
-					foreach(TBase item in e.NewItems)
+					foreach(var item in e.NewItems)
 					{
 						if(this.OnItemMatch(item))
 						{
@@ -304,7 +335,7 @@ namespace Zongsoft.Collections
 		{
 			if(_innerDictionary == null)
 			{
-				foreach(TBase item in _items)
+				foreach(var item in _items)
 				{
 					if(this.OnItemMatch(item))
 						yield return (T)item;
