@@ -34,8 +34,8 @@ namespace Zongsoft.Common
 		/// <summary>
 		/// 提供比<see cref="System.Type.IsAssignableFrom"/>加强的功能，支持对泛型定义接口或类的匹配。
 		/// </summary>
-		/// <param name="instanceType">指定的实例类型。</param>
 		/// <param name="type">指定的接口或基类的类型。</param>
+		/// <param name="instanceType">指定的实例类型。</param>
 		/// <returns>如果当满足如下条件之一则返回真(true)：
 		/// <list type="bullet">
 		///		<item>
@@ -57,16 +57,18 @@ namespace Zongsoft.Common
 		/// </returns>
 		/// <remarks>
 		///		<para>除了 <see cref="System.Type.IsAssignableFrom"/> 支持的特性外，增加了如下特性：</para>
+		///		<example>
 		///		<code>
-		///		TypeExtension.IsAssignableFrom(typeof(IDictionary<,>), typeof(Dictionary<string, object>));	// true
-		///		TypeExtension.IsAssignableFrom(typeof(Dictionary<,>), typeof(Dictioanry<string, int>));		//true
+		///		TypeExtension.IsAssignableFrom(typeof(IDictionary&lt;,&gt;), typeof(Dictionary&lt;string, object&gt;));	// true
+		///		TypeExtension.IsAssignableFrom(typeof(Dictionary&lt;,&gt;), typeof(Dictioanry&lt;string, int&gt;));		//true
 		///		
-		///		public class MyNamedCollection<T> : Collection<T>, IDictionary<string, T>
+		///		public class MyNamedCollection&lt;T&gt; : Collection&lt;T&gt;, IDictionary&lt;string, T&gt;
 		///		{
 		///		}
 		///		
-		///		TypeExtension.IsAssignableFrom(typeof(IDictionary<,>), typeof(MyNamedCollection<string, object>)); //true
+		///		TypeExtension.IsAssignableFrom(typeof(IDictionary&lt;,&gt;), typeof(MyNamedCollection&lt;string, object&gt;)); //true
 		///		</code>
+		///		</example>
 		/// </remarks>
 		public static bool IsAssignableFrom(this Type type, Type instanceType)
 		{
