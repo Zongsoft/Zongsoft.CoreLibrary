@@ -36,7 +36,11 @@ namespace Zongsoft.Options.Configuration
 		{
 		}
 
-		public OptionConfigurationElementCollection(string elementName, IEqualityComparer<string> comparer) : base(elementName, comparer)
+		public OptionConfigurationElementCollection(string elementName, IEqualityComparer<string> comparer = null) : base(elementName, comparer)
+		{
+		}
+
+		protected OptionConfigurationElementCollection()
 		{
 		}
 		#endregion
