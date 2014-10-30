@@ -32,10 +32,6 @@ namespace Zongsoft.Options.Configuration
 	public class OptionConfigurationElementCollection<T> : OptionConfigurationElementCollection where T : OptionConfigurationElement
 	{
 		#region 构造函数
-		public OptionConfigurationElementCollection(string elementName) : this(elementName, null)
-		{
-		}
-
 		public OptionConfigurationElementCollection(string elementName, IEqualityComparer<string> comparer = null) : base(elementName, comparer)
 		{
 		}
