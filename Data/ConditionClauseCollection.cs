@@ -25,13 +25,44 @@
  */
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
-	/// <summary>
-	/// 标记接口，仅用来约定子句类型。
-	/// </summary>
-	public interface IClause
+	public class ConditionClauseCollection : Zongsoft.Collections.Collection<IConditionClause>, IConditionClause
 	{
+		#region 成员字段
+		private ConditionClauseCombine _clauseCombine;
+		#endregion
+
+		#region 构造函数
+		public ConditionClauseCollection(ConditionClauseCombine clauseCombine)
+		{
+			_clauseCombine = clauseCombine;
+		}
+
+		public ConditionClauseCollection(ConditionClauseCombine clauseCombine, IEnumerable<IConditionClause> items) : base(items)
+		{
+			_clauseCombine = clauseCombine;
+		}
+		#endregion
+
+		#region 公共属性
+		/// <summary>
+		/// 获取或设置查询条件的组合方式。
+		/// </summary>
+		public ConditionClauseCombine ClauseCombine
+		{
+			get
+			{
+				return _clauseCombine;
+			}
+			set
+			{
+				_clauseCombine = value;
+			}
+		}
+		#endregion
 	}
 }

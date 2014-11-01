@@ -152,11 +152,11 @@
     <Compile Include="ComponentModel\SchemaCategory.cs" />
     <Compile Include="ComponentModel\SchemaCategoryCollection.cs" />
     <Compile Include="ComponentModel\SchemaProvider.cs" />
-    <Compile Include="Data\Clause.cs" />
-    <Compile Include="Data\ClauseCollection.cs" />
-    <Compile Include="Data\ClauseCombine.cs" />
-    <Compile Include="Data\ClauseOperator.cs" />
-    <Compile Include="Data\IClause.cs" />
+    <Compile Include="Data\ConditionClause.cs" />
+    <Compile Include="Data\ConditionClauseCollection.cs" />
+    <Compile Include="Data\ConditionClauseCombine.cs" />
+    <Compile Include="Data\ConditionClauseOperator.cs" />
+    <Compile Include="Data\IConditionClause.cs" />
     <Compile Include="Data\Paging.cs" />
     <Compile Include="Data\Sorting.cs" />
     <Compile Include="Diagnostics\Configuration\TracerElement.cs" />
@@ -283,6 +283,7 @@
     <Compile Include="Services\Composition\IExecutionInvoker.cs" />
     <Compile Include="Services\Composition\IExecutionSelector.cs" />
     <Compile Include="Services\Composition\IExecutor.cs" />
+    <Compile Include="Services\Composition\Utility.cs" />
     <Compile Include="Services\ICommandLineParser.cs" />
     <Compile Include="Services\IMatchable`1.cs" />
     <Compile Include="Services\IMatcher.cs" />

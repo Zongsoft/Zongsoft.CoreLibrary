@@ -1,6 +1,6 @@
-/*
+ï»¿/*
  * Authors:
- *   ÖÓ·å(Popeye Zhong) <zongsoft@gmail.com>
+ *   é’Ÿå³°(Popeye Zhong) <zongsoft@gmail.com>
  *
  * Copyright (C) 2008-2013 Zongsoft Corporation <http://www.zongsoft.com>
  *
@@ -25,22 +25,29 @@
  */
 
 using System;
-using System.ComponentModel;
 using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
-	/// <summary>
-	/// ±íÊ¾²éÑ¯Ìõ¼şµÄ×éºÏ·½Ê½¡£
-	/// </summary>
-	public enum ClauseCombine
+	public enum ConditionClauseOperator
 	{
-		/// <summary>Ìõ¼ş¡°Óë¡±×éºÏ¡£</summary>
-		[Description("¡¸Óë¡¹×éºÏ")]
-		And,
-
-		/// <summary>Ìõ¼ş¡°»ò¡±×éºÏ¡£</summary>
-		[Description("¡¸»ò¡¹×éºÏ")]
-		Or
+		/// <summary>ç­‰äº</summary>
+		Equal,
+		/// <summary>ä¸ç­‰äº</summary>
+		NotEqual,
+		/// <summary>å¤§äº</summary>
+		GreaterThan,
+		/// <summary>å¤§äºæˆ–ç­‰äº</summary>
+		GreaterThanEqual,
+		/// <summary>å°äº</summary>
+		LessThan,
+		/// <summary>å°äºæˆ–ç­‰äº</summary>
+		LessThanEqual,
+		/// <summary>ä»‹äº</summary>
+		Between,
+		/// <summary>èŒƒå›´</summary>
+		In,
+		/// <summary>æ’é™¤èŒƒå›´</summary>
+		NotIn,
 	}
 }

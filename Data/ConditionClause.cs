@@ -29,20 +29,20 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
-	public class Clause : IClause
+	public class ConditionClause : IConditionClause
 	{
 		#region 成员字段
 		private string _name;
 		private object[] _values;
-		private ClauseOperator _operator;
+		private ConditionClauseOperator _operator;
 		#endregion
 
 		#region 构造函数
-		public Clause(string name, params object[] values) : this(name, ClauseOperator.Equal, values)
+		public ConditionClause(string name, params object[] values) : this(name, ConditionClauseOperator.Equal, values)
 		{
 		}
 
-		public Clause(string name, ClauseOperator @operator, params object[] values)
+		public ConditionClause(string name, ConditionClauseOperator @operator, params object[] values)
 		{
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException("name");
@@ -90,7 +90,7 @@ namespace Zongsoft.Data
 		/// <summary>
 		/// 获取或设置子句的标量操作符。
 		/// </summary>
-		public ClauseOperator Operator
+		public ConditionClauseOperator Operator
 		{
 			get
 			{

@@ -77,10 +77,10 @@ namespace Zongsoft.Security.Membership
 		{
 			var objectAccess = this.GetObjectAccess();
 
-			return objectAccess.Select<Role>("Security.Role", new ClauseCollection(ClauseCombine.And)
+			return objectAccess.Select<Role>("Security.Role", new ConditionClauseCollection(ConditionClauseCombine.And)
 			{
-				new Clause("ApplicationId", this.GetApplicationId(certificationId)),
-				new Clause("Name", name),
+				new ConditionClause("ApplicationId", this.GetApplicationId(certificationId)),
+				new ConditionClause("Name", name),
 			}).FirstOrDefault();
 		}
 
@@ -88,9 +88,9 @@ namespace Zongsoft.Security.Membership
 		{
 			var objectAccess = this.GetObjectAccess();
 
-			return objectAccess.Select<Role>("Security.Role", new ClauseCollection(ClauseCombine.And)
+			return objectAccess.Select<Role>("Security.Role", new ConditionClauseCollection(ConditionClauseCombine.And)
 			{
-				new Clause("ApplicationId", this.GetApplicationId(certificationId)),
+				new ConditionClause("ApplicationId", this.GetApplicationId(certificationId)),
 			});
 		}
 
@@ -126,10 +126,10 @@ namespace Zongsoft.Security.Membership
 				if(string.IsNullOrWhiteSpace(name))
 					continue;
 
-				count += objectAccess.Delete("Security.Role", new ClauseCollection(ClauseCombine.And)
+				count += objectAccess.Delete("Security.Role", new ConditionClauseCollection(ConditionClauseCombine.And)
 				{
-					new Clause("ApplicationId", this.GetApplicationId(certificationId)),
-					new Clause("Name", name),
+					new ConditionClause("ApplicationId", this.GetApplicationId(certificationId)),
+					new ConditionClause("Name", name),
 				});
 			}
 
@@ -157,10 +157,10 @@ namespace Zongsoft.Security.Membership
 				if(user == null)
 					continue;
 
-				objectAccess.Update("Security.Role", user, new ClauseCollection(ClauseCombine.And)
+				objectAccess.Update("Security.Role", user, new ConditionClauseCollection(ConditionClauseCombine.And)
 				{
-					new Clause("ApplicationId", this.GetApplicationId(certificationId)),
-					new Clause("Name", user.Name),
+					new ConditionClause("ApplicationId", this.GetApplicationId(certificationId)),
+					new ConditionClause("Name", user.Name),
 				});
 			}
 		}
@@ -208,12 +208,12 @@ namespace Zongsoft.Security.Membership
 
 			var objectAccess = this.GetObjectAccess();
 
-			objectAccess.Delete("Security.Member", new ClauseCollection(ClauseCombine.And)
+			objectAccess.Delete("Security.Member", new ConditionClauseCollection(ConditionClauseCombine.And)
 			{
-				new Clause("ApplicationId", this.GetApplicationId(certificationId)),
-				new Clause("RoleName", roleName),
-				new Clause("MemberName", memberName),
-				new Clause("MemberType", memberType),
+				new ConditionClause("ApplicationId", this.GetApplicationId(certificationId)),
+				new ConditionClause("RoleName", roleName),
+				new ConditionClause("MemberName", memberName),
+				new ConditionClause("MemberType", memberType),
 			});
 		}
 

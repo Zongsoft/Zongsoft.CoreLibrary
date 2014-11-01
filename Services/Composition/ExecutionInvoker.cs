@@ -19,13 +19,8 @@ namespace Zongsoft.Services.Composition
 			if(!enabled)
 				return false;
 
-			//获取当前管道的所有过滤器(包含全局过滤器)
-			var filters = this.GetFilters(context);
-
-			foreach(var filter in filters)
-			{
-				filter.OnExecuting(context);
-			}
+			//调用当前管道过滤器的前半截
+			var stack = Utility.InvokeFiltersExecuting(context.Pipeline.Filters, filter => this.OnFilterExecuting(filter, context));
 
 			//调用管道处理器处理当前请求
 			var isHandled = this.InvokeHandler(context);
@@ -33,10 +28,8 @@ namespace Zongsoft.Services.Composition
 			//设置是否处理成功的值到到上下文的扩展属性集中
 			context.ExtendedProperties["__IsHandled__"] = isHandled;
 
-			foreach(var filter in filters)
-			{
-				filter.OnExecuting(context);
-			}
+			//调用当前管道过滤器的后半截
+			Utility.InvokeFiltersExecuted(stack, filter => this.OnFilterExecuted(filter, context));
 
 			return isHandled;
 		}
@@ -54,20 +47,14 @@ namespace Zongsoft.Services.Composition
 			return canHandle;
 		}
 
-		protected virtual IEnumerable<IExecutionFilter> GetFilters(ExecutionPipelineContext context)
+		protected virtual void OnFilterExecuting(IExecutionFilter filter, ExecutionPipelineContext context)
 		{
-			var pipeline = context.Pipeline;
-			var globalFilters = context.Executor.Filters;
+			filter.OnExecuting(context);
+		}
 
-			if(globalFilters.Count + pipeline.Filters.Count < 1)
-				return null;
-
-			var result = new List<IExecutionFilter>(globalFilters.Count + pipeline.Filters.Count);
-
-			result.AddRange(globalFilters);
-			result.AddRange(pipeline.Filters);
-
-			return result;
+		protected virtual void OnFilterExecuted(IExecutionFilter filter, ExecutionPipelineContext context)
+		{
+			filter.OnExecuted(context);
 		}
 		#endregion
 	}

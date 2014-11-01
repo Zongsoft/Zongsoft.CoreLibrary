@@ -32,7 +32,7 @@ namespace Zongsoft.Services.Composition
 	/// <summary>
 	/// 提供过滤执行管道的功能。
 	/// </summary>
-	public interface IExecutionFilter<TContext> : IExecutionFilter where TContext : ExecutionPipelineContext
+	public interface IExecutionFilter<TContext> : IExecutionFilter where TContext : ExecutorContext
 	{
 		/// <summary>
 		/// 表示在执行处理程序之前被激发调用。

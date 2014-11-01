@@ -46,12 +46,12 @@ namespace Zongsoft.Services.Composition
 		/// 表示在执行处理程序之前被激发调用。
 		/// </summary>
 		/// <param name="context">当前执行上下文对象。</param>
-		void OnExecuting(ExecutionPipelineContext context);
+		void OnExecuting(ExecutorContext context);
 
 		/// <summary>
 		/// 表示在执行处理程序之后被激发调用。
 		/// </summary>
 		/// <param name="context">当前执行上下文对象。</param>
-		void OnExecuted(ExecutionPipelineContext context);
+		void OnExecuted(ExecutorContext context);
 	}
 }

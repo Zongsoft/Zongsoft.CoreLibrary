@@ -41,8 +41,8 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 计数方法
-		int Count(string name, IClause where);
-		int Count(string name, IClause where, string[] includes);
+		int Count(string name, IConditionClause condition);
+		int Count(string name, IConditionClause condition, string[] includes);
 		#endregion
 
 		#region 查询方法
@@ -50,7 +50,7 @@ namespace Zongsoft.Data
 		/// 执行指定名称的数据查询操作。
 		/// </summary>
 		/// <param name="name">指定的查询名称，对应数据映射的名称。</param>
-		/// <param name="where">指定的查询条件。</param>
+		/// <param name="condition">指定的查询条件。</param>
 		/// <param name="paging">指定的分页设置。</param>
 		/// <param name="sorting">指定的排序字段和排序方式。</param>
 		/// <param name="includes">指定要包含的结果实体中的导航属性名。</param>
@@ -69,54 +69,58 @@ namespace Zongsoft.Data
 		///		           }
 		///		       },
 		///		       new Paging(10, 20),
-		///		       new Sorting[]{new Sorting(SortingMode.Ascending, "Timestamp")},
-		///		       new string[]{"Creator.HomeAddress", "Corssing"});
+		///		       new Sorting[] {new Sorting(SortingMode.Ascending, "Timestamp")},
+		///		       new string[] {"Creator.HomeAddress", "Corssing"},
+		///		       new string[] {"Owner.PhoneNumber"});
 		///		</code>
 		/// </remarks>
 		IEnumerable Select(string name,
-		                   IClause where = null,
+						   IConditionClause condition = null,
 		                   Paging paging = null,
 		                   Sorting[] sorting = null,
-		                   string[] includes = null);
+		                   string[] includes = null,
+						   string[] excludes = null);
 
-		IEnumerable<TEntity> Select<TEntity>(string name,
-						   IClause where = null,
+		IEnumerable<T> Select<T>(string name,
+						   IConditionClause condition = null,
 						   Paging paging = null,
 						   Sorting[] sorting = null,
-						   string[] includes = null);
+						   string[] includes = null,
+		                   string[] excludes = null);
 		#endregion
 
 		#region 删除方法
-		int Delete(string name, IClause where);
-		int Delete(string name, IDictionary<string, object> where);
-		int Delete(string name, object where);
+		int Delete(string name, IConditionClause condition, params string[] includes);
 		#endregion
 
 		#region 插入方法
-		int Insert(string name, object entity);
-		int Insert(string name, IEnumerable entities);
+		int Insert(string name, object entity, string[] includes = null, string[] excludes = null);
+		int Insert<T>(string name, IEnumerable<T> entities, string[] includes = null, string[] excludes = null);
 		#endregion
 
 		#region 更新方法
-		/// <summary>
-		/// 更新指定实体到数据源，更新的依据为指定<paramref name="name"/>映射的主键值。
-		/// </summary>
-		/// <param name="name">指定的实体映射名。</param>
-		/// <param name="entity">要更新的实体对象。</param>
-		/// <returns>返回受影响的记录行数，本方法执行成功返回1，失败则返回零。</returns>
-		int Update(string name, object entity);
-
 		/// <summary>
 		/// 根据指定的条件将指定的实体更新到数据源。
 		/// </summary>
 		/// <param name="name">指定的实体映射名。</param>
 		/// <param name="entity">要更新的实体对象。</param>
-		/// <param name="where">要更新的条件子句。</param>
-		/// <returns>返回受影响的记录行数，执行成功返回大于零的整数，失败则返回零。</returns>
-		int Update(string name, object entity, IClause where);
+		/// <param name="condition">要更新的条件子句，如果为空(null)则根据实体的主键进行更新。</param>
+		/// <param name="includes"></param>
+		/// <param name="excludes"></param>
+		/// <returns>返回受影响的记录行数，执行成功返回大于零的整数，失败则返回负数。</returns>
+		int Update(string name, object entity, IConditionClause condition = null, string[] includes = null, string[] excludes = null);
 
-		int Update(string name, object entity, IDictionary<string, object> where);
-		int Update(string name, object entity, object where);
+		/// <summary>
+		/// 根据指定的条件将指定的实体集更新到数据源。
+		/// </summary>
+		/// <typeparam name="T">指定的实体集中的实体的类型。</typeparam>
+		/// <param name="name">指定的实体映射名。</param>
+		/// <param name="entities">要更新的实体集。</param>
+		/// <param name="condition">要更新的条件子句，如果为空(null)则根据实体的主键进行更新。</param>
+		/// <param name="includes">显式指定的要更新的导航属性名的数组，如果未指定该参数则不会更新导航属性的实体数据。</param>
+		/// <param name="excludes">显式指定的不要更新的属性(包括“单值属性”、“导航属性”或“导航属性的子属性”)名的数组，如果未指定该参数则默认更新实体的所有单值属性。</param>
+		/// <returns>返回受影响的记录行数，执行成功返回大于零的整数，失败则返回负数。</returns>
+		int Update<T>(string name, IEnumerable<T> entities, IConditionClause condition = null, string[] includes = null, string[] excludes = null);
 		#endregion
 	}
 }

@@ -183,6 +183,9 @@ namespace Zongsoft.Services.Composition
 			if(invoker == null)
 				throw new InvalidOperationException("The invoker of the executor is null.");
 
+			//调用执行器过滤器的前半截
+			var stack = Utility.InvokeFiltersExecuting(context.Executor.Filters, filter => this.OnFilterExecuting(filter, context));
+
 			var contexts = new System.Collections.Concurrent.ConcurrentBag<ExecutionPipelineContext>();
 
 			//通过选择器获取当前请求对应的管道集
@@ -202,18 +205,19 @@ namespace Zongsoft.Services.Composition
 					contexts.Add(pipelineContext);
 			});
 
-			object result = null;
-
 			if(parallelling.IsCompleted)
 			{
-				//合并结果集
-				result = this.CombineResult(contexts);
+				//合并结果集，并将最终合并的结果设置到上下文的结果属性中
+				context.Result = this.CombineResult(contexts);
+
+				//调用执行器过滤器的后半截
+				Utility.InvokeFiltersExecuted(stack, filter => this.OnFilterExecuted(filter, context));
 
 				//激发“Executed”事件
-				this.OnExecuted(new ExecutedEventArgs(this, context.Parameter, result));
+				this.OnExecuted(new ExecutedEventArgs(this, context.Parameter, context.Result));
 			}
 
-			return result;
+			return context.Result;
 		}
 		#endregion
 
@@ -226,6 +230,16 @@ namespace Zongsoft.Services.Composition
 		protected virtual IExecutionInvoker CreateInvoker()
 		{
 			return new ExecutionInvoker();
+		}
+
+		protected virtual void OnFilterExecuting(IExecutionFilter filter, ExecutorContext context)
+		{
+			filter.OnExecuting(context);
+		}
+
+		protected virtual void OnFilterExecuted(IExecutionFilter filter, ExecutorContext context)
+		{
+			filter.OnExecuted(context);
 		}
 
 		protected virtual IEnumerable<ExecutionPipeline> SelectPipelines(ExecutorContext context)

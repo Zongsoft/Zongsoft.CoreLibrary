@@ -28,47 +28,173 @@ using System;
 using System.ComponentModel;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 
 namespace Zongsoft.Data
 {
 	public static class DataAccessExtension
 	{
 		#region 扩展方法
-		public static void Execute(this IDataAccess objectAccess, string name, object inParameters)
+		public static void Execute(this IDataAccess dataAccess, string name, object inParameters)
 		{
-			if(objectAccess == null)
-				throw new ArgumentNullException("objectAccess");
+			if(dataAccess == null)
+				throw new ArgumentNullException("dataAccess");
 
-			objectAccess.Execute(name, ResolveObjectToParameters(inParameters));
+			dataAccess.Execute(name, ResolveConditionToDictionary(inParameters));
 		}
 
-		public static void Execute(this IDataAccess objectAccess, string name, object inParameters, out IDictionary<string, object> outParameters)
+		public static void Execute(this IDataAccess dataAccess, string name, object inParameters, out IDictionary<string, object> outParameters)
 		{
-			if(objectAccess == null)
-				throw new ArgumentNullException("objectAccess");
+			if(dataAccess == null)
+				throw new ArgumentNullException("dataAccess");
 
-			objectAccess.Execute(name, ResolveObjectToParameters(inParameters), out outParameters);
+			dataAccess.Execute(name, ResolveConditionToDictionary(inParameters), out outParameters);
+		}
+
+		public static int Delete(this IDataAccess dataAccess, string name, IDictionary<string, object> condition, params string[] includes)
+		{
+			if(dataAccess == null)
+				throw new ArgumentNullException("dataAccess");
+
+			return dataAccess.Delete(name, ResolveCondition(condition), includes);
+		}
+
+		public static int Delete(this IDataAccess dataAccess, string name, object condition, params string[] includes)
+		{
+			if(dataAccess == null)
+				throw new ArgumentNullException("dataAccess");
+
+			return dataAccess.Delete(name, ResolveCondition(condition), includes);
+		}
+
+		public static int Update(this IDataAccess dataAccess, string name, object entity, IDictionary<string, object> condition, string[] includes = null, string[] excludes = null)
+		{
+			if(dataAccess == null)
+				throw new ArgumentNullException("dataAccess");
+
+			return dataAccess.Update(name, entity, ResolveCondition(condition), includes, excludes);
+		}
+
+		public static int Update(this IDataAccess dataAccess, string name, object entity, object condition, string[] includes = null, string[] excludes = null)
+		{
+			if(dataAccess == null)
+				throw new ArgumentNullException("dataAccess");
+
+			return dataAccess.Update(name, entity, ResolveCondition(condition), includes, excludes);
+		}
+
+		public static int Update<T>(this IDataAccess dataAccess, string name, IEnumerable<T> entities, IDictionary<string, object> condition, string[] includes = null, string[] excludes = null)
+		{
+			if(dataAccess == null)
+				throw new ArgumentNullException("dataAccess");
+
+			return dataAccess.Update(name, entities, ResolveCondition(condition), includes, excludes);
+		}
+
+		public static int Update<T>(this IDataAccess dataAccess, string name, IEnumerable<T> entities, object condition, string[] includes = null, string[] excludes = null)
+		{
+			if(dataAccess == null)
+				throw new ArgumentNullException("dataAccess");
+
+			return dataAccess.Update(name, entities, ResolveCondition(condition), includes, excludes);
 		}
 		#endregion
 
 		#region 私有方法
-		private static IDictionary<string, object> ResolveObjectToParameters(object data)
+		private static ConditionClauseCollection ResolveCondition(object condition)
 		{
-			if(data == null)
+			if(condition == null)
 				return null;
 
-			if(data.GetType().IsValueType)
-				throw new ArgumentException();
+			var properties = TypeDescriptor.GetProperties(condition);
 
-			IDictionary<string, object> parameters = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-			var properties = System.ComponentModel.TypeDescriptor.GetProperties(data);
+			if(properties == null || properties.Count < 1)
+				return null;
+
+			var result = new ConditionClauseCollection(ConditionClauseCombine.Or);
 
 			foreach(PropertyDescriptor property in properties)
 			{
-				parameters.Add(property.Name, property.GetValue(data));
+				result.Add(GetClause(property.Name, property.GetValue(condition)));
 			}
 
-			return parameters;
+			return result;
+		}
+
+		private static ConditionClauseCollection ResolveCondition(IDictionary<string, object> condition)
+		{
+			if(condition == null || condition.Count < 1)
+				return null;
+
+			var result = new ConditionClauseCollection(ConditionClauseCombine.Or);
+
+			foreach(var parameter in condition)
+			{
+				result.Add(GetClause(parameter.Key, parameter.Value));
+			}
+
+			return result;
+		}
+
+		private static IConditionClause GetClause(string name, object value)
+		{
+			if(value == null)
+				return new ConditionClause(name, null);
+
+			Type valueType = value.GetType();
+
+			if(valueType.IsEnum)
+				return new ConditionClause(name, Zongsoft.Common.Convert.ConvertValue(value, Enum.GetUnderlyingType(valueType)));
+
+			if(valueType.IsArray || typeof(ICollection).IsAssignableFrom(valueType))
+				return new ConditionClause(name, ConditionClauseOperator.In, value);
+
+			if(typeof(IDictionary).IsAssignableFrom(valueType))
+			{
+				var clauses = new ConditionClauseCollection(ConditionClauseCombine.Or);
+
+				foreach(DictionaryEntry entry in (IDictionary)value)
+				{
+					if(entry.Key != null)
+						clauses.Add(GetClause(entry.Key.ToString(), entry.Value));
+				}
+
+				return clauses;
+			}
+
+			if(typeof(IDictionary<string, object>).IsAssignableFrom(valueType))
+			{
+				var clauses = new ConditionClauseCollection(ConditionClauseCombine.Or);
+
+				foreach(var entry in (IDictionary<string, object>)value)
+				{
+					if(entry.Key != null)
+						clauses.Add(GetClause(entry.Key, entry.Value));
+				}
+
+				return clauses;
+			}
+
+			return new ConditionClause(name, value);
+		}
+
+		private static IDictionary<string, object> ResolveConditionToDictionary(object condition)
+		{
+			if(condition == null)
+				return null;
+
+			if(condition.GetType().IsValueType)
+				throw new ArgumentException();
+
+			var dictionary = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+			var properties = System.ComponentModel.TypeDescriptor.GetProperties(condition);
+
+			foreach(PropertyDescriptor property in properties)
+			{
+				dictionary.Add(property.Name, property.GetValue(condition));
+			}
+
+			return dictionary;
 		}
 		#endregion
 	}
