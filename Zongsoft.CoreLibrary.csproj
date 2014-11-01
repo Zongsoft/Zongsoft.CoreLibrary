@@ -154,8 +154,8 @@
     <Compile Include="ComponentModel\SchemaProvider.cs" />
     <Compile Include="Data\ConditionClause.cs" />
     <Compile Include="Data\ConditionClauseCollection.cs" />
-    <Compile Include="Data\ConditionClauseCombine.cs" />
-    <Compile Include="Data\ConditionClauseOperator.cs" />
+    <Compile Include="Data\ConditionCombine.cs" />
+    <Compile Include="Data\ConditionOperator.cs" />
     <Compile Include="Data\IConditionClause.cs" />
     <Compile Include="Data\Paging.cs" />
     <Compile Include="Data\Sorting.cs" />

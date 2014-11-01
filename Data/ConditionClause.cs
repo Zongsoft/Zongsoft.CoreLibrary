@@ -34,15 +34,15 @@ namespace Zongsoft.Data
 		#region 成员字段
 		private string _name;
 		private object[] _values;
-		private ConditionClauseOperator _operator;
+		private ConditionOperator _operator;
 		#endregion
 
 		#region 构造函数
-		public ConditionClause(string name, params object[] values) : this(name, ConditionClauseOperator.Equal, values)
+		public ConditionClause(string name, params object[] values) : this(name, ConditionOperator.Equal, values)
 		{
 		}
 
-		public ConditionClause(string name, ConditionClauseOperator @operator, params object[] values)
+		public ConditionClause(string name, ConditionOperator @operator, params object[] values)
 		{
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException("name");
@@ -90,7 +90,7 @@ namespace Zongsoft.Data
 		/// <summary>
 		/// 获取或设置子句的标量操作符。
 		/// </summary>
-		public ConditionClauseOperator Operator
+		public ConditionOperator Operator
 		{
 			get
 			{

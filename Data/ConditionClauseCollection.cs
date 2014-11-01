@@ -33,16 +33,16 @@ namespace Zongsoft.Data
 	public class ConditionClauseCollection : Zongsoft.Collections.Collection<IConditionClause>, IConditionClause
 	{
 		#region 成员字段
-		private ConditionClauseCombine _clauseCombine;
+		private ConditionCombine _clauseCombine;
 		#endregion
 
 		#region 构造函数
-		public ConditionClauseCollection(ConditionClauseCombine clauseCombine)
+		public ConditionClauseCollection(ConditionCombine clauseCombine)
 		{
 			_clauseCombine = clauseCombine;
 		}
 
-		public ConditionClauseCollection(ConditionClauseCombine clauseCombine, IEnumerable<IConditionClause> items) : base(items)
+		public ConditionClauseCollection(ConditionCombine clauseCombine, IEnumerable<IConditionClause> items) : base(items)
 		{
 			_clauseCombine = clauseCombine;
 		}
@@ -52,7 +52,7 @@ namespace Zongsoft.Data
 		/// <summary>
 		/// 获取或设置查询条件的组合方式。
 		/// </summary>
-		public ConditionClauseCombine ClauseCombine
+		public ConditionCombine ClauseCombine
 		{
 			get
 			{

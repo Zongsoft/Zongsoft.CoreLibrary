@@ -76,7 +76,7 @@ namespace Zongsoft.Security.Membership
 			var objectAccess = this.GetObjectAccess();
 
 			return objectAccess.Select<Permission>("Security.Permission",
-			                                       new ConditionClauseCollection(ConditionClauseCombine.And)
+			                                       new ConditionClauseCollection(ConditionCombine.And)
 			                                       {
 													   new ConditionClause("ApplicationId", this.GetApplicationId(certificationId)),
 													   new ConditionClause("MemberName", memberName),
@@ -114,7 +114,7 @@ namespace Zongsoft.Security.Membership
 			var objectAccess = this.GetObjectAccess();
 
 			return objectAccess.Select<PermissionFilter>("Security.PermissionFilter",
-												         new ConditionClauseCollection(ConditionClauseCombine.And)
+												         new ConditionClauseCollection(ConditionCombine.And)
 			                                             {
 															 new ConditionClause("ApplicationId", this.GetApplicationId(certificationId)),
 															 new ConditionClause("MemberName", memberName),

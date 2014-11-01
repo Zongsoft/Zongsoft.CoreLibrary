@@ -77,7 +77,7 @@ namespace Zongsoft.Security.Membership
 		{
 			var objectAccess = this.GetObjectAccess();
 
-			return objectAccess.Select<Role>("Security.Role", new ConditionClauseCollection(ConditionClauseCombine.And)
+			return objectAccess.Select<Role>("Security.Role", new ConditionClauseCollection(ConditionCombine.And)
 			{
 				new ConditionClause("ApplicationId", this.GetApplicationId(certificationId)),
 				new ConditionClause("Name", name),
@@ -88,7 +88,7 @@ namespace Zongsoft.Security.Membership
 		{
 			var objectAccess = this.GetObjectAccess();
 
-			return objectAccess.Select<Role>("Security.Role", new ConditionClauseCollection(ConditionClauseCombine.And)
+			return objectAccess.Select<Role>("Security.Role", new ConditionClauseCollection(ConditionCombine.And)
 			{
 				new ConditionClause("ApplicationId", this.GetApplicationId(certificationId)),
 			});
@@ -126,7 +126,7 @@ namespace Zongsoft.Security.Membership
 				if(string.IsNullOrWhiteSpace(name))
 					continue;
 
-				count += objectAccess.Delete("Security.Role", new ConditionClauseCollection(ConditionClauseCombine.And)
+				count += objectAccess.Delete("Security.Role", new ConditionClauseCollection(ConditionCombine.And)
 				{
 					new ConditionClause("ApplicationId", this.GetApplicationId(certificationId)),
 					new ConditionClause("Name", name),
@@ -157,7 +157,7 @@ namespace Zongsoft.Security.Membership
 				if(user == null)
 					continue;
 
-				objectAccess.Update("Security.Role", user, new ConditionClauseCollection(ConditionClauseCombine.And)
+				objectAccess.Update("Security.Role", user, new ConditionClauseCollection(ConditionCombine.And)
 				{
 					new ConditionClause("ApplicationId", this.GetApplicationId(certificationId)),
 					new ConditionClause("Name", user.Name),
@@ -208,7 +208,7 @@ namespace Zongsoft.Security.Membership
 
 			var objectAccess = this.GetObjectAccess();
 
-			objectAccess.Delete("Security.Member", new ConditionClauseCollection(ConditionClauseCombine.And)
+			objectAccess.Delete("Security.Member", new ConditionClauseCollection(ConditionCombine.And)
 			{
 				new ConditionClause("ApplicationId", this.GetApplicationId(certificationId)),
 				new ConditionClause("RoleName", roleName),

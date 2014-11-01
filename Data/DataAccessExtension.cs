@@ -111,7 +111,7 @@ namespace Zongsoft.Data
 			if(properties == null || properties.Count < 1)
 				return null;
 
-			var result = new ConditionClauseCollection(ConditionClauseCombine.Or);
+			var result = new ConditionClauseCollection(ConditionCombine.Or);
 
 			foreach(PropertyDescriptor property in properties)
 			{
@@ -126,7 +126,7 @@ namespace Zongsoft.Data
 			if(condition == null || condition.Count < 1)
 				return null;
 
-			var result = new ConditionClauseCollection(ConditionClauseCombine.Or);
+			var result = new ConditionClauseCollection(ConditionCombine.Or);
 
 			foreach(var parameter in condition)
 			{
@@ -147,11 +147,11 @@ namespace Zongsoft.Data
 				return new ConditionClause(name, Zongsoft.Common.Convert.ConvertValue(value, Enum.GetUnderlyingType(valueType)));
 
 			if(valueType.IsArray || typeof(ICollection).IsAssignableFrom(valueType))
-				return new ConditionClause(name, ConditionClauseOperator.In, value);
+				return new ConditionClause(name, ConditionOperator.In, value);
 
 			if(typeof(IDictionary).IsAssignableFrom(valueType))
 			{
-				var clauses = new ConditionClauseCollection(ConditionClauseCombine.Or);
+				var clauses = new ConditionClauseCollection(ConditionCombine.Or);
 
 				foreach(DictionaryEntry entry in (IDictionary)value)
 				{
@@ -164,7 +164,7 @@ namespace Zongsoft.Data
 
 			if(typeof(IDictionary<string, object>).IsAssignableFrom(valueType))
 			{
-				var clauses = new ConditionClauseCollection(ConditionClauseCombine.Or);
+				var clauses = new ConditionClauseCollection(ConditionCombine.Or);
 
 				foreach(var entry in (IDictionary<string, object>)value)
 				{
