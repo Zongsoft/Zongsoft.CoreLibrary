@@ -41,8 +41,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 计数方法
-		int Count(string name, IConditionClause condition);
-		int Count(string name, IConditionClause condition, string[] includes);
+		int Count(string name, IConditionClause condition, params string[] includes);
 		#endregion
 
 		#region 查询方法
