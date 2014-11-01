@@ -31,7 +31,7 @@ using System.Collections.Generic;
 namespace Zongsoft.Data
 {
 	/// <summary>
-	/// 表示实体数据访问的公共接口。
+	/// 表示数据访问的公共接口。
 	/// </summary>
 	public interface IDataAccess
 	{
@@ -55,11 +55,12 @@ namespace Zongsoft.Data
 		/// <param name="includes">指定要包含的结果实体中的导航属性名。</param>
 		/// <returns>返回的结果集。</returns>
 		/// <remarks>
+		///		<example>
 		///		<code>
 		///		Select("VehiclePassing",
 		///		       new ClauseCollection(ClauseCombine.And)
 		///		       {
-		///		           new Clause("PlateNo", "鄂A12345"),
+		///		           new Clause("PlateNo", "粤B12345"),
 		///		           new Clause("Timestamp", ClauseOperator.Between, DateTime.Parse("2014-1-1"), DateTime.Parse("2014-1-31")),
 		///		           new ClauseCollection(ClauseCombine.Or)
 		///		           {
@@ -72,20 +73,21 @@ namespace Zongsoft.Data
 		///		       new string[] {"Creator.HomeAddress", "Corssing"},
 		///		       new string[] {"Owner.PhoneNumber"});
 		///		</code>
+		///		</example>
 		/// </remarks>
 		IEnumerable Select(string name,
-						   IConditionClause condition = null,
-		                   Paging paging = null,
-		                   Sorting[] sorting = null,
-		                   string[] includes = null,
-						   string[] excludes = null);
-
-		IEnumerable<T> Select<T>(string name,
-						   IConditionClause condition = null,
+		                   IConditionClause condition = null,
 						   Paging paging = null,
 						   Sorting[] sorting = null,
 						   string[] includes = null,
-		                   string[] excludes = null);
+						   string[] excludes = null);
+
+		IEnumerable<T> Select<T>(string name,
+		                         IConditionClause condition = null,
+								 Paging paging = null,
+								 Sorting[] sorting = null,
+								 string[] includes = null,
+								 string[] excludes = null);
 		#endregion
 
 		#region 删除方法
