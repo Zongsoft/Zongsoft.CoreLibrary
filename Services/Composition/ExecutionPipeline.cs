@@ -29,13 +29,14 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Services.Composition
 {
-	public class ExecutionPipeline
+	public class ExecutionPipeline : MarshalByRefObject
 	{
 		#region 成员字段
 		private string _name;
 		private ExecutionFilterCompositeCollection _filters;
 		private IPredication _predication;
 		private IExecutionHandler _handler;
+		private ExecutionPipeline _next;
 		#endregion
 
 		#region 构造函数
@@ -60,11 +61,36 @@ namespace Zongsoft.Services.Composition
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取或设置管道的名称。
+		/// </summary>
 		public string Name
 		{
 			get
 			{
 				return _name;
+			}
+			set
+			{
+				if(string.IsNullOrWhiteSpace(value))
+					throw new ArgumentNullException();
+
+				_name = value.Trim();
+			}
+		}
+
+		/// <summary>
+		/// 获取或设置当前管道的后续管道。
+		/// </summary>
+		public ExecutionPipeline Next
+		{
+			get
+			{
+				return _next;
+			}
+			set
+			{
+				_next = value;
 			}
 		}
 
