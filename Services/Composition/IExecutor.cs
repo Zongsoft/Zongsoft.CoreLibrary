@@ -41,9 +41,9 @@ namespace Zongsoft.Services.Composition
 		}
 
 		/// <summary>
-		/// 获取或设置一个<see cref="IExecutionSelector"/>管道执行选择器。
+		/// 获取或设置一个<see cref="IExecutionPipelineSelector"/>管道执行选择器。
 		/// </summary>
-		IExecutionSelector Selector
+		IExecutionPipelineSelector PipelineSelector
 		{
 			get;
 			set;

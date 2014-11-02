@@ -26,6 +26,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 
 namespace Zongsoft.Services.Composition
@@ -50,7 +51,7 @@ namespace Zongsoft.Services.Composition
 		#region 成员字段
 		private object _host;
 		private IExecutionInvoker _invoker;
-		private IExecutionSelector _selector;
+		private IExecutionPipelineSelector _selector;
 		private IExecutionCombiner _combiner;
 		private ExecutionPipelineCollection _pipelines;
 		private ExecutionFilterCompositeCollection _filters;
@@ -100,9 +101,9 @@ namespace Zongsoft.Services.Composition
 		}
 
 		/// <summary>
-		/// 获取或设置一个<see cref="IExecutionSelector"/>管道执行选择器。
+		/// 获取或设置一个<see cref="IExecutionPipelineSelector"/>管道执行选择器。
 		/// </summary>
-		public IExecutionSelector Selector
+		public IExecutionPipelineSelector PipelineSelector
 		{
 			get
 			{
@@ -166,9 +167,13 @@ namespace Zongsoft.Services.Composition
 			if(context == null)
 				throw new ArgumentNullException("context");
 
-			if(_pipelines.Count < 1)
-				return null;
+			//获取可用的管道调用器
+			var invoker = this.Invoker;
 
+			if(invoker == null)
+				throw new InvalidOperationException("The invoker of the executor is null.");
+
+			//创建“Executing”事件的调用参数
 			ExecutingEventArgs executingArgs = new ExecutingEventArgs(this, context.Parameter);
 
 			//激发“Executing”事件
@@ -177,19 +182,18 @@ namespace Zongsoft.Services.Composition
 			if(executingArgs.Cancel)
 				return executingArgs.Result;
 
-			//获取可用的管道调用器
-			var invoker = this.Invoker;
+			//通过选择器获取当前请求对应的管道集
+			var pipelines = this.SelectPipelines(context);
 
-			if(invoker == null)
-				throw new InvalidOperationException("The invoker of the executor is null.");
+			//如果当前执行的处理管道数为零则退出
+			if(pipelines == null || pipelines.Count() < 1)
+				return null;
 
 			//调用执行器过滤器的前半截
 			var stack = Utility.InvokeFiltersExecuting(context.Executor.Filters, filter => this.OnFilterExecuting(filter, context));
 
-			var contexts = new System.Collections.Concurrent.ConcurrentBag<IExecutionPipelineContext>();
-
-			//通过选择器获取当前请求对应的管道集
-			var pipelines = this.SelectPipelines(context);
+			//创建管道上下文集合
+			var pipelineContexts = new ConcurrentBag<IExecutionPipelineContext>();
 
 			var parallelling = System.Threading.Tasks.Parallel.ForEach(pipelines, pipeline =>
 			{
@@ -202,13 +206,13 @@ namespace Zongsoft.Services.Composition
 
 				//通过管道调用器来调用管道处理程序，如果调用成功则将管道上下文加入到上下文集合中
 				if(invoker.Invoke(pipelineContext))
-					contexts.Add(pipelineContext);
+					pipelineContexts.Add(pipelineContext);
 			});
 
 			if(parallelling.IsCompleted)
 			{
 				//合并结果集，并将最终合并的结果设置到上下文的结果属性中
-				context.Result = this.CombineResult(contexts);
+				context.Result = this.CombineResult(pipelineContexts);
 
 				//调用执行器过滤器的后半截
 				Utility.InvokeFiltersExecuted(stack, filter => this.OnFilterExecuted(filter, context));
@@ -249,7 +253,7 @@ namespace Zongsoft.Services.Composition
 
 		protected virtual IEnumerable<ExecutionPipeline> SelectPipelines(IExecutorContext context)
 		{
-			var selector = this.Selector;
+			var selector = this.PipelineSelector;
 
 			if(selector != null)
 				return selector.SelectPipelines(context);
@@ -263,24 +267,22 @@ namespace Zongsoft.Services.Composition
 
 			if(combiner != null)
 				return combiner.Combine(contexts.ToArray());
-			else
+
+			var result = new List<object>(contexts.Count());
+
+			foreach(var context in contexts)
 			{
-				var result = new List<object>(contexts.Count());
-
-				foreach(var context in contexts)
-				{
-					if(context.Result != null)
-						result.Add(context.Result);
-				}
-
-				if(result.Count == 0)
-					return null;
-
-				if(result.Count == 1)
-					return result[0];
-
-				return result.ToArray();
+				if(context.Result != null)
+					result.Add(context.Result);
 			}
+
+			if(result.Count == 0)
+				return null;
+
+			if(result.Count == 1)
+				return result[0];
+
+			return result.ToArray();
 		}
 		#endregion
 

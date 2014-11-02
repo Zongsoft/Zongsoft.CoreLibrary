@@ -29,7 +29,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Services.Composition
 {
-	public interface IExecutionSelector
+	public interface IExecutionPipelineSelector
 	{
 		IEnumerable<ExecutionPipeline> SelectPipelines(IExecutorContext context);
 	}

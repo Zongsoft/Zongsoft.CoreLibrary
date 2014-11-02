@@ -285,8 +285,8 @@
     <Compile Include="Services\Composition\IExecutionHandler`1.cs" />
     <Compile Include="Services\Composition\IExecutionInvoker.cs" />
     <Compile Include="Services\Composition\IExecutionPipelineContext.cs" />
-    <Compile Include="Services\Composition\IExecutionSelector.cs" />
-    <Compile Include="Services\Composition\IExecutionSelector`1.cs" />
+    <Compile Include="Services\Composition\IExecutionPipelineSelector.cs" />
+    <Compile Include="Services\Composition\IExecutionPipelineSelector`1.cs" />
     <Compile Include="Services\Composition\IExecutor.cs" />
     <Compile Include="Services\Composition\Utility.cs" />
     <Compile Include="Services\ICommandLineParser.cs" />
