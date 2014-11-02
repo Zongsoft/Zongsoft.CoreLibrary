@@ -278,10 +278,15 @@
     <Compile Include="Services\Composition\ExecutionPipelineContext.cs" />
     <Compile Include="Services\Composition\ExecutorContext.cs" />
     <Compile Include="Services\Composition\IExecutionCombiner.cs" />
+    <Compile Include="Services\Composition\IExecutionContext.cs" />
+    <Compile Include="Services\Composition\IExecutionInvoker`1.cs" />
+    <Compile Include="Services\Composition\IExecutorContext.cs" />
     <Compile Include="Services\Composition\IExecutionFilter`1.cs" />
     <Compile Include="Services\Composition\IExecutionHandler`1.cs" />
     <Compile Include="Services\Composition\IExecutionInvoker.cs" />
+    <Compile Include="Services\Composition\IExecutionPipelineContext.cs" />
     <Compile Include="Services\Composition\IExecutionSelector.cs" />
+    <Compile Include="Services\Composition\IExecutionSelector`1.cs" />
     <Compile Include="Services\Composition\IExecutor.cs" />
     <Compile Include="Services\Composition\Utility.cs" />
     <Compile Include="Services\ICommandLineParser.cs" />

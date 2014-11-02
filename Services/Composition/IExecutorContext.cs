@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2011-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2014 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,46 +25,21 @@
  */
 
 using System;
-using System.IO;
 using System.Collections.Generic;
 
-using Zongsoft.Services;
-using Zongsoft.Services.Composition;
-
-namespace Zongsoft.Communication
+namespace Zongsoft.Services.Composition
 {
-	internal static class ReceiverUtility
+	/// <summary>
+	/// 表示执行上下文的接口。
+	/// </summary>
+	public interface IExecutorContext : IExecutionContext
 	{
-		public static void ProcessReceive(IExecutor executor, ReceivedEventArgs args)
+		/// <summary>
+		/// 获取本次执行请求的调用参数。
+		/// </summary>
+		object Parameter
 		{
-			if(args == null)
-				throw new ArgumentNullException("args");
-
-			//如果执行器参数为空，不抛出异常，直接退出
-			if(executor == null)
-				return;
-
-			//通过执行器执行当前请求
-			executor.Execute(args);
+			get;
 		}
-
-		#region 嵌套子类
-		public class CommunicationExecutor : Zongsoft.Services.Composition.Executor
-		{
-			internal CommunicationExecutor(object host) : base(host)
-			{
-			}
-
-			protected override IExecutorContext CreateContext(object parameter)
-			{
-				var args = parameter as ReceivedEventArgs;
-
-				if(args != null)
-					return new RequestContext(this, args);
-
-				return base.CreateContext(parameter);
-			}
-		}
-		#endregion
 	}
 }

@@ -31,6 +31,6 @@ namespace Zongsoft.Services.Composition
 {
 	public interface IExecutionCombiner
 	{
-		object Combine(IEnumerable<ExecutionPipelineContext> contexts);
+		object Combine(IEnumerable<IExecutionPipelineContext> contexts);
 	}
 }

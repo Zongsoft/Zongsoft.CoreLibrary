@@ -9,14 +9,14 @@ namespace Zongsoft.Services.Composition
 	public class ExecutionInvoker : IExecutionInvoker
 	{
 		#region 执行方法
-		public bool Invoke(ExecutionPipelineContext context)
+		public bool Invoke(IExecutionPipelineContext context)
 		{
 			return this.InvokePipeline(context, context.Pipeline);
 		}
 		#endregion
 
 		#region 虚拟方法
-		protected virtual bool InvokePipeline(ExecutionPipelineContext context, ExecutionPipeline pipeline)
+		protected virtual bool InvokePipeline(IExecutionPipelineContext context, ExecutionPipeline pipeline)
 		{
 			if(pipeline == null)
 				return false;
@@ -46,7 +46,7 @@ namespace Zongsoft.Services.Composition
 			return isHandled;
 		}
 
-		protected virtual bool InvokeHandler(ExecutionPipelineContext context)
+		protected virtual bool InvokeHandler(IExecutionPipelineContext context)
 		{
 			var handler = context.Pipeline.Handler;
 			var canHandle = handler != null && handler.CanHandle(context);
@@ -57,12 +57,12 @@ namespace Zongsoft.Services.Composition
 			return canHandle;
 		}
 
-		protected virtual void OnFilterExecuting(IExecutionFilter filter, ExecutionPipelineContext context)
+		protected virtual void OnFilterExecuting(IExecutionFilter filter, IExecutionPipelineContext context)
 		{
 			filter.OnExecuting(context);
 		}
 
-		protected virtual void OnFilterExecuted(IExecutionFilter filter, ExecutionPipelineContext context)
+		protected virtual void OnFilterExecuted(IExecutionFilter filter, IExecutionPipelineContext context)
 		{
 			filter.OnExecuted(context);
 		}

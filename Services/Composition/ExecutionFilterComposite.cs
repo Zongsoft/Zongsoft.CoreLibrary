@@ -89,7 +89,7 @@ namespace Zongsoft.Services.Composition
 		#endregion
 
 		#region 显式实现
-		void IExecutionFilter.OnExecuting(ExecutorContext context)
+		void IExecutionFilter.OnExecuting(IExecutionContext context)
 		{
 			var predication = this.Predication;
 
@@ -97,7 +97,7 @@ namespace Zongsoft.Services.Composition
 				_filter.OnExecuting(context);
 		}
 
-		void IExecutionFilter.OnExecuted(ExecutorContext context)
+		void IExecutionFilter.OnExecuted(IExecutionContext context)
 		{
 			var predication = this.Predication;
 

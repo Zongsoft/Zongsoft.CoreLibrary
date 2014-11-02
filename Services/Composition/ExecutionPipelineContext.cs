@@ -29,21 +29,27 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Services.Composition
 {
-	public class ExecutionPipelineContext : ExecutorContext
+	public class ExecutionPipelineContext : MarshalByRefObject, IExecutionPipelineContext
 	{
 		#region 成员字段
 		private ExecutionPipeline _pipeline;
-		private ExecutorContext _executorContext;
+		private IExecutorContext _executorContext;
+		private IDictionary<string, object> _extendedProperties;
+		private object _result;
 		#endregion
 
 		#region 构造函数
-		public ExecutionPipelineContext(ExecutorContext context, ExecutionPipeline pipeline) : base(context)
+		public ExecutionPipelineContext(IExecutorContext executorContext, ExecutionPipeline pipeline)
 		{
+			if(executorContext == null)
+				throw new ArgumentNullException("executorContext");
+
 			if(pipeline == null)
 				throw new ArgumentNullException("pipeline");
 
 			_pipeline = pipeline;
-			_executorContext = context;
+			_executorContext = executorContext;
+			_result = executorContext.Result;
 		}
 		#endregion
 
@@ -60,13 +66,67 @@ namespace Zongsoft.Services.Composition
 		}
 
 		/// <summary>
-		/// 获取原始的<see cref="ExecutorContext"/>执行器上下文对象。
+		/// 获取处理本次执行请求的执行器。
 		/// </summary>
-		public ExecutorContext ExecutorContext
+		public IExecutor Executor
+		{
+			get
+			{
+				return _executorContext.Executor;
+			}
+		}
+
+		/// <summary>
+		/// 获取原始的<see cref="IExecutorContext"/>执行器上下文对象。
+		/// </summary>
+		public IExecutorContext ExecutorContext
 		{
 			get
 			{
 				return _executorContext;
+			}
+		}
+
+		/// <summary>
+		/// 获取扩展属性集是否有内容。
+		/// </summary>
+		/// <remarks>
+		///		<para>在不确定扩展属性集是否含有内容之前，建议先使用该属性来检测。</para>
+		/// </remarks>
+		public virtual bool HasExtendedProperties
+		{
+			get
+			{
+				return (_extendedProperties != null);
+			}
+		}
+
+		/// <summary>
+		/// 获取扩展属性集。
+		/// </summary>
+		public virtual IDictionary<string, object> ExtendedProperties
+		{
+			get
+			{
+				if(_extendedProperties == null)
+					System.Threading.Interlocked.CompareExchange(ref _extendedProperties, new Dictionary<string, object>(), null);
+
+				return _extendedProperties;
+			}
+		}
+
+		/// <summary>
+		/// 获取或设置当前执行管道的返回结果。
+		/// </summary>
+		public object Result
+		{
+			get
+			{
+				return _result;
+			}
+			set
+			{
+				_result = value;
 			}
 		}
 		#endregion

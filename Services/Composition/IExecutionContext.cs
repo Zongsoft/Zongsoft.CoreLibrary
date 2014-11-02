@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2011-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2014 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,46 +25,46 @@
  */
 
 using System;
-using System.IO;
 using System.Collections.Generic;
 
-using Zongsoft.Services;
-using Zongsoft.Services.Composition;
-
-namespace Zongsoft.Communication
+namespace Zongsoft.Services.Composition
 {
-	internal static class ReceiverUtility
+	public interface IExecutionContext
 	{
-		public static void ProcessReceive(IExecutor executor, ReceivedEventArgs args)
+		/// <summary>
+		/// 获取处理本次执行请求的执行器。
+		/// </summary>
+		IExecutor Executor
 		{
-			if(args == null)
-				throw new ArgumentNullException("args");
-
-			//如果执行器参数为空，不抛出异常，直接退出
-			if(executor == null)
-				return;
-
-			//通过执行器执行当前请求
-			executor.Execute(args);
+			get;
 		}
 
-		#region 嵌套子类
-		public class CommunicationExecutor : Zongsoft.Services.Composition.Executor
+		/// <summary>
+		/// 获取扩展属性集是否有内容。
+		/// </summary>
+		/// <remarks>
+		///		<para>在不确定扩展属性集是否含有内容之前，建议先使用该属性来检测。</para>
+		/// </remarks>
+		bool HasExtendedProperties
 		{
-			internal CommunicationExecutor(object host) : base(host)
-			{
-			}
-
-			protected override IExecutorContext CreateContext(object parameter)
-			{
-				var args = parameter as ReceivedEventArgs;
-
-				if(args != null)
-					return new RequestContext(this, args);
-
-				return base.CreateContext(parameter);
-			}
+			get;
 		}
-		#endregion
+
+		/// <summary>
+		/// 获取扩展属性集。
+		/// </summary>
+		IDictionary<string, object> ExtendedProperties
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取或设置当前执行的返回结果。
+		/// </summary>
+		object Result
+		{
+			get;
+			set;
+		}
 	}
 }

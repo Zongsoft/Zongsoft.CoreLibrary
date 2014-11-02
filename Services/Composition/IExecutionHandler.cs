@@ -39,12 +39,12 @@ namespace Zongsoft.Services.Composition
 		/// </summary>
 		/// <param name="context">当前执行上下文对象。</param>
 		/// <returns>如果能处理本次执行请求则返回真(true)，否则返回假(false)。</returns>
-		bool CanHandle(ExecutionPipelineContext context);
+		bool CanHandle(IExecutionPipelineContext context);
 
 		/// <summary>
 		/// 处理本次执行请求。
 		/// </summary>
 		/// <param name="context">当前执行上下文对象。</param>
-		void Handle(ExecutionPipelineContext context);
+		void Handle(IExecutionPipelineContext context);
 	}
 }

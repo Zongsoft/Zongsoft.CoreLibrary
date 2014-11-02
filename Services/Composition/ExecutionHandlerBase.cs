@@ -31,7 +31,7 @@ using System.Text;
 
 namespace Zongsoft.Services.Composition
 {
-	public abstract class ExecutionHandlerBase : CommandBase<ExecutionPipelineContext>, IExecutionHandler
+	public abstract class ExecutionHandlerBase : CommandBase<IExecutionPipelineContext>, IExecutionHandler
 	{
 		#region 成员字段
 		private ExecutionFilterCollection _filters;
@@ -64,7 +64,7 @@ namespace Zongsoft.Services.Composition
 		protected override void OnExecuting(CommandExecutingEventArgs e)
 		{
 			//处理过滤器的前趋动作
-			this.InvokeFilters((ExecutionPipelineContext)e.Parameter, (filter, context) => filter.OnExecuting(context));
+			this.InvokeFilters((IExecutionPipelineContext)e.Parameter, (filter, context) => filter.OnExecuting(context));
 
 			//先执行过滤器，再激发处理器的“Executing”事件
 			base.OnExecuting(e);
@@ -72,7 +72,7 @@ namespace Zongsoft.Services.Composition
 			if(e.Cancel)
 			{
 				//处理过滤器的后续动作
-				this.InvokeFilters((ExecutionPipelineContext)e.Parameter, (filter, context) => filter.OnExecuted(context));
+				this.InvokeFilters((IExecutionPipelineContext)e.Parameter, (filter, context) => filter.OnExecuted(context));
 			}
 		}
 
@@ -82,24 +82,24 @@ namespace Zongsoft.Services.Composition
 			base.OnExecuted(e);
 
 			//处理过滤器的后续动作
-			this.InvokeFilters((ExecutionPipelineContext)e.Parameter, (filter, context) => filter.OnExecuted(context));
+			this.InvokeFilters((IExecutionPipelineContext)e.Parameter, (filter, context) => filter.OnExecuted(context));
 		}
 		#endregion
 
 		#region 显式实现
-		bool IExecutionHandler.CanHandle(ExecutionPipelineContext context)
+		bool IExecutionHandler.CanHandle(IExecutionPipelineContext context)
 		{
 			return this.CanExecute(context);
 		}
 
-		void IExecutionHandler.Handle(ExecutionPipelineContext context)
+		void IExecutionHandler.Handle(IExecutionPipelineContext context)
 		{
 			this.Execute(context);
 		}
 		#endregion
 
 		#region 私有方法
-		private void InvokeFilters(ExecutionPipelineContext context, Action<IExecutionFilter, ExecutionPipelineContext> invoke)
+		private void InvokeFilters(IExecutionPipelineContext context, Action<IExecutionFilter, IExecutionPipelineContext> invoke)
 		{
 			if(_filters == null || invoke == null)
 				return;

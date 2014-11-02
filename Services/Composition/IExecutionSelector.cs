@@ -31,6 +31,6 @@ namespace Zongsoft.Services.Composition
 {
 	public interface IExecutionSelector
 	{
-		IEnumerable<ExecutionPipeline> SelectPipelines(ExecutorContext context);
+		IEnumerable<ExecutionPipeline> SelectPipelines(IExecutorContext context);
 	}
 }

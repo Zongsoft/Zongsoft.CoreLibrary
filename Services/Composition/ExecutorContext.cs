@@ -29,17 +29,17 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Services.Composition
 {
-	public class ExecutorContext : MarshalByRefObject
+	public class ExecutorContext : MarshalByRefObject, IExecutorContext
 	{
 		#region 成员字段
-		private Executor _executor;
+		private IExecutor _executor;
 		private object _parameter;
 		private Dictionary<string, object> _extendedProperties;
 		private object _result;
 		#endregion
 
 		#region 构造函数
-		public ExecutorContext(Executor executor, object parameter = null, IDictionary<string, object> extendedProperties = null)
+		public ExecutorContext(IExecutor executor, object parameter = null, IDictionary<string, object> extendedProperties = null)
 		{
 			if(executor == null)
 				throw new ArgumentNullException("executor");
@@ -50,26 +50,13 @@ namespace Zongsoft.Services.Composition
 			if(extendedProperties != null && extendedProperties.Count > 0)
 				_extendedProperties = new Dictionary<string, object>(extendedProperties);
 		}
-
-		protected ExecutorContext(ExecutorContext context)
-		{
-			if(context == null)
-				throw new ArgumentNullException("context");
-
-			_executor = context.Executor;
-			_parameter = context.Parameter;
-			_result = context.Result;
-
-			if(context.HasExtendedProperties)
-				_extendedProperties = new Dictionary<string, object>(context.ExtendedProperties);
-		}
 		#endregion
 
 		#region 公共属性
 		/// <summary>
-		/// 获取本次执行请求的执行器。
+		/// 获取处理本次执行请求的执行器。
 		/// </summary>
-		public Executor Executor
+		public IExecutor Executor
 		{
 			get
 			{
@@ -121,7 +108,7 @@ namespace Zongsoft.Services.Composition
 		}
 
 		/// <summary>
-		/// 获取或设置当前执行的返回结果。
+		/// 获取或设置当前执行器的返回结果。
 		/// </summary>
 		public object Result
 		{

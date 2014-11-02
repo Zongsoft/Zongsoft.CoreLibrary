@@ -31,6 +31,6 @@ namespace Zongsoft.Services.Composition
 {
 	public interface IExecutionInvoker
 	{
-		bool Invoke(ExecutionPipelineContext context);
+		bool Invoke(IExecutionPipelineContext context);
 	}
 }
