@@ -292,7 +292,7 @@ namespace Zongsoft.Options.Configuration
 
 					//根据配置属性定义项的类型创建其对应的目标对象
 					if(property.Type.IsGenericType && property.Type.GetGenericTypeDefinition() == typeof(OptionConfigurationElementCollection<>))
-						value = Activator.CreateInstance(property.Type, new object[] { property.ElementName });
+						value = Activator.CreateInstance(property.Type, new object[] { property.ElementName, null });
 					else
 						value = Activator.CreateInstance(property.Type);
 
