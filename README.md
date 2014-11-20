@@ -1,15 +1,13 @@
 ﻿Zongsoft.CoreLibrary
 ====================
 
-The core library of [Zongsoft](http://www.zongsoft.com) corporation, with C#, cross-platform, support Windows/Windows Phone 8.x & Linux based [Mono](http://www.mono-project.com).
-
 ## 概述
 
 Zongsoft.CoreLibrary 类库提供了.NET开发的常用功能集以及一些相对于.NET BCL中进行了功能强化的实现。采用C#语言开发，支持跨平台可运行在 Windows、Windows Phone 8.x 以及 Linux([Mono](http://www.mono-project.com)) 等平台中。
 
 -----
 
-我们会优先解决在 Linux(CnetOS 6.x X64/Mono 3.4) 平台出现的问题，请在 [GitHub](https://githug.com/Zongsoft) 提交问题给我们，更期待各位大牛加入我们。
+我们会优先解决在 Linux(CnetOS 6.x|7.x X64/Mono 3.x) 平台出现的问题，请在 [GitHub](https://githug.com/Zongsoft) 提交问题给我们，更期待各位大牛加入我们。
 
 
 **如果你愿意帮助我们完善、翻译文档，或写范例代码都请致信给我：<zongsoft@gmail.com>、<sw515@21cn.com>**
@@ -43,14 +41,11 @@ Zongsoft.CoreLibrary 类库提供了.NET开发的常用功能集以及一些相�
 - Data
 	> 该命名空间内包括进行数据访问相关类和接口，我们提供了一个支持多库同时访问、横向分表的分布式关系型数据库ORM引擎，有关这个引擎的详细信息请访问 **[Zongsoft.Data](https://github.com/Zongsoft/Zongsoft.Data)** 项目。
 
-	- Entities
-		> 该命名空间内包括 ORM 数据访问的应用层接口。
-
 - Diagnostics
 	> 该命名空间内包括诊断跟踪、异常处理的类和接口。
 
 - IO
-	> 该命名空间内包括一个IO路径处理的 `PathUtility` 工具类，以及抽象出来的文件和目录访问的接口：`IFile`、`IDirectory`。
+	> 该命名空间内包括一个IO路径处理的 `PathUtility` 工具类，以及抽象出来的文件和目录访问的接口：`IFileService`、`IDirectoryService`。
 
 - Options
 	> 该命名空间内包含了一套选项配置处理的类和接口，这套选项配置以树型结构来组织应用内的所有选项配置数据，访问这些配置数据以通用的逻辑路径的方式来进行。
@@ -59,6 +54,9 @@ Zongsoft.CoreLibrary 类库提供了.NET开发的常用功能集以及一些相�
 		> 该命名空间内包括一套全新的配置文件的开发接口，该套接口完全兼容 .NET BCL 中的 `System.Configuration` 的编程模式。
 
 		> 为什么我们要重新编写一套类似的配置开发接口？因为 .NET BCL 自带的配置的机制太过臃肿复杂、并且扩展性也不是太友好，我们希望应用模块的配置应该和该应用模块一样是可被插件化的，它们必须可随意插拔并且保证模块之间的隔离性，当不同模块被组装在一起的时候，这些分离的选项配置数据将自动组织成一个完整的逻辑树。
+
+	- Profiles
+		> 该命名空间内包括一套对Windows中INI配置文件的开发接口，并且支持对 Section 以层次结构的访问方式。
 
 - Reporting
 	> 该命名空间内包括关于对报表访问、操作的基础接口。
