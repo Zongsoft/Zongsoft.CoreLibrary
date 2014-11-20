@@ -107,7 +107,10 @@ namespace Zongsoft.Services
 		#region 公共方法
 		public CommandTreeNode Find(string path)
 		{
-			return (CommandTreeNode)base.FindNode(path);
+			if(string.IsNullOrWhiteSpace(path))
+				return null;
+
+			return this.Find(path.Split('/', '.'));
 		}
 
 		public CommandTreeNode Find(string[] parts)

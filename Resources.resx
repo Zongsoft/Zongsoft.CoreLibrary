@@ -162,17 +162,17 @@
   <data name="Required" xml:space="preserve">
     <value>必须</value>
   </data>
-  <data name="Text.Exit.Command.Description" xml:space="preserve">
-    <value>退出当前终端命令执行器。</value>
-  </data>
-  <data name="Text.Exit.Command.Title" xml:space="preserve">
-    <value>退出命令</value>
-  </data>
   <data name="Text.ExitCommand.Confirm" xml:space="preserve">
     <value>您确认是否要退出(输入Yes则退出)？</value>
   </data>
+  <data name="Text.ExitCommand.Description" xml:space="preserve">
+    <value>退出当前应用程序。</value>
+  </data>
   <data name="Text.ExitCommand.Options.Confirm" xml:space="preserve">
     <value>直接退出，不提示确认信息。</value>
+  </data>
+  <data name="Text.ExitCommand.Title" xml:space="preserve">
+    <value>退出命令</value>
   </data>
   <data name="Text.HelpCommand.Description" xml:space="preserve">
     <value>提供对命令的相关使用信息的命令。</value>
@@ -180,8 +180,14 @@
   <data name="Text.HelpCommand.Title" xml:space="preserve">
     <value>帮助命令</value>
   </data>
+  <data name="Text.ShellCommand.Description" xml:space="preserve">
+    <value>通过系统Shell来执行外部命令。</value>
+  </data>
   <data name="Text.ShellCommand.Options.Timeout" xml:space="preserve">
     <value>运行外部命令的超时，单位：毫秒。</value>
+  </data>
+  <data name="Text.ShellCommand.Title" xml:space="preserve">
+    <value>外部命令执行者</value>
   </data>
   <data name="Text.WorkerState.Paused" xml:space="preserve">
     <value>已暂停</value>

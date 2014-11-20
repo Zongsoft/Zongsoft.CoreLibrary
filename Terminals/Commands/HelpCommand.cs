@@ -61,7 +61,19 @@ namespace Zongsoft.Terminals.Commands
 
 			foreach(var argument in context.Arguments)
 			{
+				if(argument == "?")
+				{
+					CommandHelper.DisplayCommandInfo(context.Terminal, this);
+					continue;
+				}
+
 				CommandTreeNode node = context.Executor.Find(argument);
+
+				if(node == null)
+				{
+					context.Terminal.WriteLine(TerminalColor.Red, ResourceUtility.GetString("CommandNotFound", argument));
+					continue;
+				}
 
 				if(node != null && node.Command != null)
 				{

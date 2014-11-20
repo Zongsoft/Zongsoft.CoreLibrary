@@ -45,7 +45,7 @@ namespace Zongsoft.Terminals
 			DisplayNameAttribute displayName = (DisplayNameAttribute)TypeDescriptor.GetAttributes(command)[typeof(DisplayNameAttribute)];
 			DescriptionAttribute description = (DescriptionAttribute)TypeDescriptor.GetAttributes(command)[typeof(DescriptionAttribute)];
 
-			terminal.Write(command.Name.ToLowerInvariant() + " ");
+			terminal.Write(TerminalColor.Blue, command.Name + " ");
 
 			if(!command.Enabled)
 				terminal.Write(TerminalColor.DarkGray, "({0})", ResourceUtility.GetString("${Disabled}"));
@@ -53,133 +53,123 @@ namespace Zongsoft.Terminals
 			if(displayName == null || string.IsNullOrWhiteSpace(displayName.DisplayName))
 				terminal.Write(ResourceUtility.GetString("${Command}"));
 			else
-				terminal.Write(TerminalColor.DarkYellow, ResourceUtility.GetString(displayName.DisplayName, command.GetType().Assembly));
+				terminal.Write(ResourceUtility.GetString(displayName.DisplayName, command.GetType().Assembly));
 
-			CommandOptionAttribute[] attributes = (CommandOptionAttribute[])command.GetType().GetCustomAttributes(typeof(CommandOptionAttribute), true);
-			if(attributes != null && attributes.Length > 0)
+			CommandOptionAttribute[] optionAttributes = (CommandOptionAttribute[])command.GetType().GetCustomAttributes(typeof(CommandOptionAttribute), true);
+
+			if(optionAttributes != null && optionAttributes.Length > 0)
 			{
-				terminal.WriteLine("," + ResourceUtility.GetString("${CommandUsages}"), attributes.Length);
+				terminal.WriteLine("," + ResourceUtility.GetString("${CommandUsages}"), optionAttributes.Length);
 				terminal.WriteLine();
 
 				string commandName = command.Name;
 
-				//if(command is Command)
-				//    commandName = ((Command)command).FullName;
+				terminal.Write(TerminalColor.Blue, commandName + " ");
 
-				terminal.Write(commandName.ToLowerInvariant() + " ");
-
-				foreach(var attribute in attributes)
+				foreach(var optionAttribute in optionAttributes)
 				{
-					if(attribute.Required)
-						terminal.Write("-{0} ", attribute.Name);
+					if(optionAttribute.Required)
+					{
+						terminal.Write("<-");
+						terminal.Write(TerminalColor.DarkYellow, optionAttribute.Name);
+						terminal.Write("> ");
+					}
 					else
-						terminal.Write("[-{0}] ", attribute.Name);
+					{
+						terminal.Write("[-");
+						terminal.Write(TerminalColor.DarkYellow, optionAttribute.Name);
+						terminal.Write("] ");
+					}
 				}
 
 				terminal.WriteLine();
 
-				int maxLength = GetMaxOptionLength(attributes) + 2;
+				int maxOptionLength = GetMaxOptionLength(optionAttributes) + 2;
 
-				foreach(var attribute in attributes)
+				foreach(var optionAttribute in optionAttributes)
 				{
-					terminal.Write("\t-");
-					terminal.Write(TerminalColor.DarkYellow, attribute.Name);
-					int padding = maxLength - attribute.Name.Length;
+					int optionPadding = maxOptionLength - optionAttribute.Name.Length;
 
-					if(attribute.Type != null)
+					terminal.Write("\t-");
+					terminal.Write(TerminalColor.DarkYellow, optionAttribute.Name);
+
+					if(optionAttribute.Type != null)
 					{
 						terminal.Write(":");
-						terminal.Write(TerminalColor.DarkYellow, GetSimpleTypeName(attribute.Type));
-						padding -= (GetSimpleTypeName(attribute.Type).Length + 1);
+						terminal.Write(TerminalColor.Magenta, GetSimpleTypeName(optionAttribute.Type));
+						optionPadding -= (GetSimpleTypeName(optionAttribute.Type).Length + 1);
 					}
 
-					terminal.Write(" [".PadLeft(padding));
-					if(attribute.Required)
-						terminal.Write(TerminalColor.DarkMagenta, ResourceUtility.GetString("${Required}"));
+					terminal.Write(" (".PadLeft(optionPadding));
+
+					if(optionAttribute.Required)
+						terminal.Write(TerminalColor.DarkRed, ResourceUtility.GetString("${Required}"));
 					else
 						terminal.Write(TerminalColor.DarkGreen, ResourceUtility.GetString("${Optional}"));
-					terminal.Write("] ");
 
-					if(!string.IsNullOrWhiteSpace(attribute.Description))
+					terminal.Write(") ");
+
+					if(!string.IsNullOrWhiteSpace(optionAttribute.Description))
+						terminal.Write(ResourceUtility.GetString(optionAttribute.Description, command.GetType().Assembly));
+
+					if(optionAttribute.Type != null && optionAttribute.Type.IsEnum)
 					{
-						terminal.Write(TerminalColor.DarkYellow, ResourceUtility.GetString(attribute.Description, command.GetType().Assembly));
+						var entries = Zongsoft.Common.EnumUtility.GetEnumEntries(optionAttribute.Type, false);
+						var maxEnumLength = entries.Max(entry => string.IsNullOrWhiteSpace(entry.Alias) ? entry.Name.Length : entry.Name.Length + entry.Alias.Length + 2);
+
+						foreach(var entry in entries)
+						{
+							var enumPadding = maxEnumLength - entry.Name.Length;
+
+							terminal.WriteLine();
+							terminal.Write("\t".PadRight(optionAttribute.Name.Length + 3));
+							terminal.Write(TerminalColor.DarkMagenta, entry.Name.ToLowerInvariant());
+
+							if(!string.IsNullOrWhiteSpace(entry.Alias))
+							{
+								terminal.Write(TerminalColor.DarkGray, "(");
+								terminal.Write(TerminalColor.DarkMagenta, entry.Alias);
+								terminal.Write(TerminalColor.DarkGray, ")");
+
+								enumPadding -= entry.Alias.Length + 2;
+							}
+
+							if(!string.IsNullOrWhiteSpace(entry.Description))
+								terminal.Write(new string(' ', enumPadding + 1) + entry.Description);
+						}
 					}
 
-					//if(string.IsNullOrWhiteSpace(attribute.Values))
-					//    terminal.WriteLine();
-					//else
-					//{
-					//    terminal.Write(ResourceUtility.GetString("${ValueRange}"));
-					//    terminal.WriteLine(TerminalColor.DarkYellow, attribute.Values);
-					//}
+					terminal.WriteLine();
 				}
 			}
 
 			if(description != null && !string.IsNullOrWhiteSpace(description.Description))
 			{
 				terminal.WriteLine();
-				terminal.WriteLine(TerminalColor.DarkGray, ResourceUtility.GetString(description.Description, command.GetType().Assembly));
+				terminal.WriteLine(TerminalColor.DarkYellow, ResourceUtility.GetString(description.Description, command.GetType().Assembly));
 			}
+
+			terminal.WriteLine();
 		}
 
-		public static void DisplayCommandInfo(ICommand command, TextWriter writer)
+		private static int GetMaxStringLength(IEnumerable<string> values)
 		{
-			if(command == null || writer == null)
-				return;
+			if(values == null)
+				return 0;
 
-			var description = (DescriptionAttribute)command.GetType().GetCustomAttributes(typeof(DescriptionAttribute), true).FirstOrDefault();
+			int max = 0;
 
-			if(description != null)
+			foreach(var value in values)
 			{
-				writer.WriteLine(Resources.ResourceUtility.GetString("CommandDescription"));
-				writer.WriteLine("\t" + Resources.ResourceUtility.GetString(description.Description));
+				if(value == null)
+					continue;
+
+				max = Math.Max(max, value.Length);
 			}
 
-			writer.WriteLine(Resources.ResourceUtility.GetString("CommandUsages"));
-			writer.Write("\t" + command.Name);
+			string[] sa;
 
-			var options = Zongsoft.Services.CommandHelper.GetOptions(command);
-
-			foreach(var option in options)
-			{
-				if(option.Required)
-					writer.Write(" -{0}", option.Name);
-				else
-					writer.Write(" [-{0}]", option.Name);
-			}
-
-			writer.WriteLine();
-
-			if(options.Length > 0)
-			{
-				writer.WriteLine(Resources.ResourceUtility.GetString("CommandOptions"));
-
-				foreach(var option in options)
-				{
-					writer.Write("\t-{0}", option.Name);
-
-					if(option.Type != null)
-					{
-						writer.Write(":{0}", GetSimpleTypeName(option.Type));
-
-						if(option.DefaultValue != null)
-							writer.Write(" [{0}]", option.DefaultValue);
-					}
-
-					writer.WriteLine(" " + option.Description);
-
-					if(option.Type != null && option.Type.IsEnum)
-					{
-						string indentText = new string(' ', option.Name.Length + 2);
-
-						var entries = Common.EnumUtility.GetEnumEntries(option.Type, false);
-						foreach(var entry in entries)
-						{
-							writer.WriteLine("\t{0}{1}\t{2}", indentText, entry.Name, entry.Description);
-						}
-					}
-				}
-			}
+			return max;
 		}
 
 		private static int GetMaxOptionLength(IEnumerable<CommandOptionAttribute> attributes)
