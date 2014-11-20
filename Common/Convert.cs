@@ -37,12 +37,17 @@ namespace Zongsoft.Common
 		#region ¶ÔÏó×ª»»
 		public static T ConvertValue<T>(object value)
 		{
-			return ConvertValue<T>(value, default(T));
+			return (T)ConvertValue(value, typeof(T), () => default(T));
 		}
 
 		public static T ConvertValue<T>(object value, T defaultValue)
 		{
 			return (T)ConvertValue(value, typeof(T), () => defaultValue);
+		}
+
+		public static T ConvertValue<T>(object value, Func<object> getDefaultValue)
+		{
+			return (T)ConvertValue(value, typeof(T), getDefaultValue);
 		}
 
 		public static object ConvertValue(object value, Type conversionType)
@@ -57,6 +62,9 @@ namespace Zongsoft.Common
 
 		public static object ConvertValue(object value, Type conversionType, Func<object> getDefaultValue)
 		{
+			if(getDefaultValue == null)
+				throw new ArgumentNullException("getDefaultValue");
+
 			if(conversionType == null)
 				return value;
 
