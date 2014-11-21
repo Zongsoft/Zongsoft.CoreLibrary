@@ -31,7 +31,7 @@ using System.Text;
 
 namespace Zongsoft.Services
 {
-	public class CommandExecutorBase : MarshalByRefObject
+	public class CommandExecutorBase : MarshalByRefObject, ICommandExecutor
 	{
 		#region 声明事件
 		public event EventHandler<CommandExecutorExecutingEventArgs> Executing;

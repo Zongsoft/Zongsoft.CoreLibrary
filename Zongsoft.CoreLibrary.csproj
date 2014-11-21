@@ -289,6 +289,7 @@
     <Compile Include="Services\Composition\IExecutionPipelineSelector`1.cs" />
     <Compile Include="Services\Composition\IExecutor.cs" />
     <Compile Include="Services\Composition\Utility.cs" />
+    <Compile Include="Services\ICommandExecutor.cs" />
     <Compile Include="Services\ICommandLineParser.cs" />
     <Compile Include="Services\IMatchable`1.cs" />
     <Compile Include="Services\IMatcher.cs" />

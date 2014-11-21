@@ -39,7 +39,7 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 构造函数
-		public CommandContext(ICommand command, CommandExecutorBase executor, CommandLine commandLine) : base(command, executor)
+		public CommandContext(ICommand command, ICommandExecutor executor, CommandLine commandLine) : base(command, executor)
 		{
 			_commandLine = commandLine;
 

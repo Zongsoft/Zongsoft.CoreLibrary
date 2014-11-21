@@ -32,7 +32,7 @@ namespace Zongsoft.Services
 	public class CommandExecutorExecutingEventArgs : EventArgs
 	{
 		#region 成员字段
-		private CommandExecutorBase _commandExecutor;
+		private ICommandExecutor _commandExecutor;
 		private string _commandText;
 		private object _parameter;
 		private CommandTreeNode _commandNode;
@@ -42,7 +42,7 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 构造函数
-		public CommandExecutorExecutingEventArgs(CommandExecutorBase commandExecutor, string commandText, object parameter, CommandTreeNode commandNode)
+		public CommandExecutorExecutingEventArgs(ICommandExecutor commandExecutor, string commandText, object parameter, CommandTreeNode commandNode)
 		{
 			if(commandExecutor == null)
 				throw new ArgumentNullException("commandExecutor");
@@ -57,7 +57,7 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 公共属性
-		public CommandExecutorBase CommandExecutor
+		public ICommandExecutor CommandExecutor
 		{
 			get
 			{

@@ -33,8 +33,8 @@ namespace Zongsoft.Services
 	{
 		#region 成员字段
 		private ICommand _command;
-		private CommandExecutorBase _executor;
-		private IDictionary<CommandExecutorBase, Dictionary<string, object>> _statesProvider;
+		private ICommandExecutor _executor;
+		private IDictionary<ICommandExecutor, Dictionary<string, object>> _statesProvider;
 		private object _result;
 		#endregion
 
@@ -43,7 +43,7 @@ namespace Zongsoft.Services
 		{
 		}
 
-		protected CommandContextBase(ICommand command, CommandExecutorBase executor)
+		protected CommandContextBase(ICommand command, ICommandExecutor executor)
 		{
 			if(command == null)
 				throw new ArgumentNullException("command");
@@ -68,7 +68,7 @@ namespace Zongsoft.Services
 		/// <summary>
 		/// 获取执行命令所在的命令执行器。
 		/// </summary>
-		public CommandExecutorBase Executor
+		public ICommandExecutor Executor
 		{
 			get
 			{
@@ -80,14 +80,14 @@ namespace Zongsoft.Services
 		/// 获取一个由当前命令执行器为宿主的字典容器。
 		/// </summary>
 		/// <remarks>
-		///		<para>在本属性返回的字典集合中的内容对于相同<see cref="CommandExecutorBase"/>中的命令而言都是可见(读写)的，但对于不同<seealso cref="CommandExecutorBase"/>下的命令而言，这些字典集合内的内容则是不可见的。</para>
+		///		<para>在本属性返回的字典集合中的内容对于相同<see cref="ICommandExecutor"/>中的命令而言都是可见(读写)的，但对于不同<seealso cref="ICommandExecutor"/>下的命令而言，这些字典集合内的内容则是不可见的。</para>
 		/// </remarks>
 		public IDictionary<string, object> States
 		{
 			get
 			{
 				if(_statesProvider == null)
-					System.Threading.Interlocked.CompareExchange(ref _statesProvider, new Dictionary<CommandExecutorBase, Dictionary<string, object>>(), null);
+					System.Threading.Interlocked.CompareExchange(ref _statesProvider, new Dictionary<ICommandExecutor, Dictionary<string, object>>(), null);
 
 				Dictionary<string, object> states;
 				if(_statesProvider.TryGetValue(_executor, out states))

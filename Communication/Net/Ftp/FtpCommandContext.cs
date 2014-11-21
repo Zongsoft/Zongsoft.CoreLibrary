@@ -40,7 +40,7 @@ namespace Zongsoft.Communication.Net.Ftp
 		#endregion
 
 		#region 构造函数
-		internal FtpCommandContext(ICommand command, CommandExecutorBase executor, FtpServerChannel channel, FtpStatement statement) : base(command, executor)
+		internal FtpCommandContext(ICommand command, ICommandExecutor executor, FtpServerChannel channel, FtpStatement statement) : base(command, executor)
 		{
 			_channel = channel;
 			_statement = statement;

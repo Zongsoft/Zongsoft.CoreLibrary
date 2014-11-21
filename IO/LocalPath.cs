@@ -72,7 +72,7 @@ namespace Zongsoft.IO
 				}
 			}
 
-			return driveName + ":" + match.Groups["path"].Value.Replace('/', '\\');
+			return driveName[0] + ":" + match.Groups["path"].Value.Replace('/', '\\');
 		}
 	}
 }

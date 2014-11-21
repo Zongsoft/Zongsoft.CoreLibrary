@@ -32,14 +32,14 @@ namespace Zongsoft.Services
 	public class CommandExecutorContext
 	{
 		#region 成员字段
-		private CommandExecutorBase _executor;
+		private ICommandExecutor _executor;
 		private CommandTreeNode _commandNode;
 		private ICommand _command;
 		private object _parameter;
 		#endregion
 
 		#region 构造函数
-		public CommandExecutorContext(CommandExecutorBase executor, CommandTreeNode commandNode, ICommand command, object parameter)
+		public CommandExecutorContext(ICommandExecutor executor, CommandTreeNode commandNode, ICommand command, object parameter)
 		{
 			_executor = executor;
 			_command = command;
@@ -52,7 +52,7 @@ namespace Zongsoft.Services
 		/// <summary>
 		/// 获取当前命令执行器对象。
 		/// </summary>
-		public CommandExecutorBase Executor
+		public ICommandExecutor Executor
 		{
 			get
 			{
