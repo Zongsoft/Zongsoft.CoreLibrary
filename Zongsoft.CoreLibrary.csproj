@@ -74,6 +74,7 @@
   <ItemGroup>
     <Compile Include="Collections\CategoryBase.cs" />
     <Compile Include="Collections\Collection.cs" />
+    <Compile Include="Collections\EnqueuedEventArgs.cs" />
     <Compile Include="Collections\HierarchicalNode.cs" />
     <Compile Include="Collections\HierarchicalNodeCollection.cs" />
     <Compile Include="Collections\BinaryComparer.cs" />
@@ -372,7 +373,6 @@
     <Compile Include="Collections\DequeuedReason.cs" />
     <Compile Include="Collections\IQueue.cs" />
     <Compile Include="Collections\Queue.cs" />
-    <Compile Include="Collections\QueueEventArgs.cs" />
     <Compile Include="ComponentModel\IDispatcher.cs" />
     <Compile Include="Communication\IListener.cs" />
     <Compile Include="Services\CommandExecutedEventArgs.cs" />

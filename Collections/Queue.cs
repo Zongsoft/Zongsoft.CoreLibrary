@@ -45,7 +45,7 @@ namespace Zongsoft.Collections
 		/// <summary>
 		/// 表示入队成功的事件。
 		/// </summary>
-		public event EventHandler<QueueEventArgs> Enqueued;
+		public event EventHandler<EnqueuedEventArgs> Enqueued;
 
 		/// <summary>
 		/// 表示出队成功的事件。
@@ -277,7 +277,7 @@ namespace Zongsoft.Collections
 			_size--;
 
 			//激发“Dequeued”出队事件
-			this.OnDequeued(new DequeuedEventArgs(removed, DequeuedReason.Calling));
+			this.OnDequeued(new DequeuedEventArgs(removed, false, DequeuedReason.Calling));
 
 			return removed;
 		}
@@ -304,7 +304,7 @@ namespace Zongsoft.Collections
 			_size -= actualLength;
 
 			//激发“Dequeued”出队事件
-			this.OnDequeued(new DequeuedEventArgs(result, reason));
+			this.OnDequeued(new DequeuedEventArgs(result, true, reason));
 
 			return result;
 		}
@@ -359,7 +359,7 @@ namespace Zongsoft.Collections
 			_size++;
 
 			//激发“Enqueued”入队事件
-			this.OnEnqueued(new QueueEventArgs(item));
+			this.OnEnqueued(new EnqueuedEventArgs(item, false));
 		}
 		#endregion
 
@@ -452,7 +452,7 @@ namespace Zongsoft.Collections
 				this.Dequeued(this, args);
 		}
 
-		protected virtual void OnEnqueued(Zongsoft.Collections.QueueEventArgs args)
+		protected virtual void OnEnqueued(Zongsoft.Collections.EnqueuedEventArgs args)
 		{
 			if(this.Enqueued != null)
 				this.Enqueued(this, args);

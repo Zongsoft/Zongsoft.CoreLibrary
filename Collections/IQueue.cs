@@ -41,7 +41,7 @@ namespace Zongsoft.Collections
 		/// <summary>
 		/// 当入队成功后激发的事件。
 		/// </summary>
-		event EventHandler<QueueEventArgs> Enqueued;
+		event EventHandler<EnqueuedEventArgs> Enqueued;
 		/// <summary>
 		/// 当出队成功后激发的事件。
 		/// </summary>
