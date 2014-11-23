@@ -78,8 +78,10 @@
     <Compile Include="Collections\HierarchicalNode.cs" />
     <Compile Include="Collections\HierarchicalNodeCollection.cs" />
     <Compile Include="Collections\BinaryComparer.cs" />
+    <Compile Include="Collections\IQueueProvider.cs" />
     <Compile Include="Collections\NamedCollectionBase.cs" />
     <Compile Include="Collections\NamedCollection.cs" />
+    <Compile Include="Common\ObjectCache.cs" />
     <Compile Include="Common\TypeExtension.cs" />
     <Compile Include="Common\Buffer.cs" />
     <Compile Include="Communication\ChannelAsyncEventArgs.cs" />
