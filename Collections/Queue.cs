@@ -277,7 +277,7 @@ namespace Zongsoft.Collections
 			_size--;
 
 			//激发“Dequeued”出队事件
-			this.OnDequeued(new DequeuedEventArgs(removed, false, DequeuedReason.Calling));
+			this.OnDequeued(new DequeuedEventArgs(removed, false, CollectionRemovedReason.Remove));
 
 			return removed;
 		}
@@ -292,10 +292,10 @@ namespace Zongsoft.Collections
 		/// <remarks>如果<paramref name="length"/>参数指定的数值超出队列中可用的元素数，则忽略该参数值，而应用可用的元素数。</remarks>
 		public IEnumerable Dequeue(int length)
 		{
-			return this.Dequeue(length, DequeuedReason.Calling);
+			return this.Dequeue(length, CollectionRemovedReason.Remove);
 		}
 
-		private IEnumerable Dequeue(int length, DequeuedReason reason)
+		private IEnumerable Dequeue(int length, CollectionRemovedReason reason)
 		{
 			int actualLength;
 			var result = this.GetElements(0, length, true, out actualLength);
@@ -350,7 +350,7 @@ namespace Zongsoft.Collections
 				}
 				else
 				{
-					this.Dequeue(_minimumGrow, DequeuedReason.Overflow);
+					this.Dequeue(_minimumGrow, CollectionRemovedReason.Overflow);
 				}
 			}
 

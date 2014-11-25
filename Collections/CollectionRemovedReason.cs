@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2011-2014 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2014 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,60 +25,29 @@
  */
 
 using System;
+using System.ComponentModel;
 
 namespace Zongsoft.Collections
 {
-	[Serializable]
-	public class DequeuedEventArgs : EventArgs
+	/// <summary>
+	/// 表示集合元素被删除的原因。
+	/// </summary>
+	public enum CollectionRemovedReason
 	{
-		#region 成员变量
-		private object _value;
-		private bool _isMultiple;
-		private CollectionRemovedReason _reason;
-		#endregion
+		/// <summary>通过删除方法。</summary>
+		[Description("${Text.CollectionRemovedReason.Remove}")]
+		Remove,
 
-		#region 构造函数
-		public DequeuedEventArgs(object value, bool isMultiple, CollectionRemovedReason reason)
-		{
-			_value = value;
-			_isMultiple = isMultiple;
-			_reason = reason;
-		}
-		#endregion
+		/// <summary>因为集合溢出而激发的自动删除。</summary>
+		[Description("${Text.CollectionRemovedReason.Overflow}")]
+		Overflow,
 
-		#region 公共属性
-		/// <summary>
-		/// 获取出队的内容值。
-		/// </summary>
-		public object Value
-		{
-			get
-			{
-				return _value;
-			}
-		}
+		/// <summary>因为缓存项过期而被删除。</summary>
+		[Description("${Text.CollectionRemovedReason.Expired}")]
+		Expired,
 
-		/// <summary>
-		/// 获取一个指示本次出队是否为批量出队操作，如果为批量出队则<see cref="Value"/>属性返回的则是多值。
-		/// </summary>
-		public bool IsMultiple
-		{
-			get
-			{
-				return _isMultiple;
-			}
-		}
-
-		/// <summary>
-		/// 获取出队事件被激发的原因。
-		/// </summary>
-		public CollectionRemovedReason Reason
-		{
-			get
-			{
-				return _reason;
-			}
-		}
-		#endregion
+		/// <summary>其他原因。</summary>
+		[Description("${Text.CollectionRemovedReason.Other}")]
+		Other,
 	}
 }
