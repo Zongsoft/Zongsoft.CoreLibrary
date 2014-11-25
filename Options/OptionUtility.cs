@@ -31,7 +31,7 @@ using System.Text;
 
 namespace Zongsoft.Options
 {
-	internal static class Utility
+	internal static class OptionUtility
 	{
 		internal static bool ResolveOptionPath(string fullPath, out string path, out string name)
 		{

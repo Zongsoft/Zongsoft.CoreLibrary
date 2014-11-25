@@ -148,6 +148,18 @@ namespace Zongsoft.Options
 		}
 		#endregion
 
+		#region 公共方法
+		public OptionNode Find(string path)
+		{
+			return base.FindNode(path) as OptionNode;
+		}
+
+		public OptionNode Find(params string[] parts)
+		{
+			return base.FindNode(parts) as OptionNode;
+		}
+		#endregion
+
 		#region 重写方法
 		protected override Collections.HierarchicalNode GetChild(string name)
 		{

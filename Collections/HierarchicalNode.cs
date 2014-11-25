@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2013-2014 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -147,18 +147,28 @@ namespace Zongsoft.Collections
 		#endregion
 
 		#region 保护方法
-		protected HierarchicalNode FindNode(string path)
+		internal protected HierarchicalNode FindNode(string path, Func<HierarchicalNodeToken, HierarchicalNode> onStep = null)
 		{
 			if(string.IsNullOrWhiteSpace(path))
 				return null;
 
-			return this.FindNode(path.Split('/'));
+			return this.FindNode(path.Split('/'), onStep);
 		}
 
-		protected HierarchicalNode FindNode(string[] parts)
+		internal protected HierarchicalNode FindNode(string[] parts, Func<HierarchicalNodeToken, HierarchicalNode> onStep = null)
 		{
 			if(parts == null || parts.Length == 0)
 				return null;
+
+			var list = new List<string>(parts.Length);
+
+			foreach(var part in parts)
+			{
+				if(!string.IsNullOrWhiteSpace(part))
+					list.AddRange(part.Split('/'));
+			}
+
+			parts = list.ToArray();
 
 			//确保当前子节点集合已经被加载过
 			this.EnsureChildren();
@@ -167,6 +177,7 @@ namespace Zongsoft.Collections
 
 			for(int i = 0; i < parts.Length; i++)
 			{
+				HierarchicalNode parent = null;
 				var part = string.IsNullOrWhiteSpace(parts[i]) ? string.Empty : parts[i].Trim();
 
 				if(i == 0 && part == string.Empty)
@@ -182,11 +193,18 @@ namespace Zongsoft.Collections
 							continue;
 						case "..":
 							current = current._parent;
+							parent = current != null ? current._parent : null;
 							break;
 						default:
+							parent = current;
 							current = current.GetChild(part);
 							break;
 					}
+				}
+
+				if(onStep != null)
+				{
+					current = onStep(new HierarchicalNodeToken(part, current, parent));
 
 					if(current == null)
 						return null;
@@ -248,6 +266,23 @@ namespace Zongsoft.Collections
 			}
 
 			return current;
+		}
+		#endregion
+
+		#region 嵌套子类
+		public class HierarchicalNodeToken
+		{
+			public readonly string Name;
+			public readonly HierarchicalNode Parent;
+			public readonly HierarchicalNode Current;
+
+			internal HierarchicalNodeToken(string name, HierarchicalNode current, HierarchicalNode parent = null)
+			{
+				this.Name = name;
+				this.Current = current;
+
+				this.Parent = parent ?? (current != null ? current.InnerParent : null);
+			}
 		}
 		#endregion
 	}
