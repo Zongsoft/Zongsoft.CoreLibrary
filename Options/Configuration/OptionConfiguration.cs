@@ -189,14 +189,14 @@ namespace Zongsoft.Options.Configuration
 								element = OptionConfigurationUtility.GetGlobalElement(reader.Name);
 
 								if(element == null)
-									throw new OptionConfigurationException();
+									throw new OptionConfigurationException(string.Format("The '{0}' is a undeclared option element in the '{1}' file.", reader.Name, storage._filePath));
 							}
 							else
 							{
 								Type type = Type.GetType(typeName, false, true);
 
 								if(!typeof(OptionConfigurationElement).IsAssignableFrom(type))
-									throw new OptionConfigurationException();
+									throw new OptionConfigurationException(string.Format("The '{0}' is not a OptionConfigurationElement type, in the '{0}' file.", typeName, storage._filePath));
 
 								element = (OptionConfigurationElement)Activator.CreateInstance(type);
 							}

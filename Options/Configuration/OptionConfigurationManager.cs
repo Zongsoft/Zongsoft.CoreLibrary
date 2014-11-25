@@ -42,15 +42,15 @@ namespace Zongsoft.Options.Configuration
 			if(string.IsNullOrWhiteSpace(filePath))
 				throw new ArgumentNullException("filePath");
 
-			if(!createNotExists)
-				return _cache.Get(filePath);
-
 			return _cache.Get(filePath.Trim(), key =>
 			{
 				if(File.Exists(key))
 					return OptionConfiguration.Load(key);
-				else
+
+				if(createNotExists)
 					return new OptionConfiguration(key);
+
+				return null;
 			});
 		}
 

@@ -126,12 +126,19 @@ namespace Zongsoft.Options
 			if(!typeof(IOptionLoader).IsAssignableFrom(type))
 				throw new ArgumentException("The parameter is not a IOptionLoader type.");
 
-			var constructor = type.GetConstructor(BindingFlags.Public | BindingFlags.NonPublic, null, new Type[] { typeof(OptionNode) }, null);
+			var constructor = type.GetConstructor(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[] { typeof(OptionNode) }, null);
 
-			if(constructor != null)
-				return (IOptionLoader)constructor.Invoke(new object[] { _root });
+			try
+			{
+				if(constructor != null)
+					return (IOptionLoader)constructor.Invoke(new object[] { _root });
 
-			return (IOptionLoader)Activator.CreateInstance(type, true);
+				return (IOptionLoader)Activator.CreateInstance(type, true);
+			}
+			catch(Exception ex)
+			{
+				throw new InvalidOperationException(string.Format("Can create a option-loader instance from the '{0}' type.", type), ex);
+			}
 		}
 		#endregion
 	}
