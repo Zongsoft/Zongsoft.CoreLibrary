@@ -32,6 +32,7 @@ using System.Xml;
 
 namespace Zongsoft.Options.Configuration
 {
+	[OptionLoader(LoaderType = typeof(OptionConfigurationLoader))]
 	public class OptionConfiguration : IOptionProvider
 	{
 		#region 静态字段
@@ -113,7 +114,7 @@ namespace Zongsoft.Options.Configuration
 
 			string sectionPath, nodeName;
 
-			if(!Utility.ResolveOptionPath(path, out sectionPath, out nodeName))
+			if(!OptionUtility.ResolveOptionPath(path, out sectionPath, out nodeName))
 				return null;
 
 			var section = this.GetSection(sectionPath);

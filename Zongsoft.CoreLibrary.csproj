@@ -74,6 +74,8 @@
   <ItemGroup>
     <Compile Include="Collections\CategoryBase.cs" />
     <Compile Include="Collections\Collection.cs" />
+    <Compile Include="Collections\CollectionRemovedEventArgs.cs" />
+    <Compile Include="Collections\CollectionRemovedReason.cs" />
     <Compile Include="Collections\EnqueuedEventArgs.cs" />
     <Compile Include="Collections\HierarchicalNode.cs" />
     <Compile Include="Collections\HierarchicalNodeCollection.cs" />
@@ -81,7 +83,7 @@
     <Compile Include="Collections\IQueueProvider.cs" />
     <Compile Include="Collections\NamedCollectionBase.cs" />
     <Compile Include="Collections\NamedCollection.cs" />
-    <Compile Include="Common\ObjectCache.cs" />
+    <Compile Include="Collections\ObjectCache.cs" />
     <Compile Include="Common\TypeExtension.cs" />
     <Compile Include="Common\Buffer.cs" />
     <Compile Include="Communication\ChannelAsyncEventArgs.cs" />
@@ -98,7 +100,7 @@
     <Compile Include="Communication\Net\Configuration\FtpServerOptionElement.cs" />
     <Compile Include="Communication\Net\Configuration\FtpUserOptionElement.cs" />
     <Compile Include="Communication\Net\Configuration\FtpUserOptionElementCollection.cs" />
-    <Compile Include="Common\ObjectPool.cs" />
+    <Compile Include="Collections\ObjectPool.cs" />
     <Compile Include="Communication\Net\Ftp\FtpException.cs" />
     <Compile Include="Communication\Net\Ftp\FtpAborCommand.cs" />
     <Compile Include="Communication\Net\Ftp\FtpAppeCommand.cs" />
@@ -174,6 +176,12 @@
     <Compile Include="IO\Path.cs" />
     <Compile Include="IO\PathException.cs" />
     <Compile Include="IO\LocalPath.cs" />
+    <Compile Include="Options\Configuration\OptionConfigurationLoader.cs" />
+    <Compile Include="Options\Configuration\OptionConfigurationManager.cs" />
+    <Compile Include="Options\IOptionLoader.cs" />
+    <Compile Include="Options\IOptionLoaderSelector.cs" />
+    <Compile Include="Options\OptionLoaderSelector.cs" />
+    <Compile Include="Options\OptionLoaderAttribute.cs" />
     <Compile Include="Options\Profiles\Profile.cs" />
     <Compile Include="Options\Profiles\ProfileComment.cs" />
     <Compile Include="Options\Profiles\ProfileCommentCollection.cs" />
@@ -372,7 +380,6 @@
     <Compile Include="Communication\SentEventArgs.cs" />
     <Compile Include="ComponentModel\IAssociable.cs" />
     <Compile Include="Collections\DequeuedEventArgs.cs" />
-    <Compile Include="Collections\DequeuedReason.cs" />
     <Compile Include="Collections\IQueue.cs" />
     <Compile Include="Collections\Queue.cs" />
     <Compile Include="ComponentModel\IDispatcher.cs" />
@@ -457,7 +464,7 @@
     <Compile Include="ComponentModel\CustomBooleanConverter.cs" />
     <Compile Include="ComponentModel\Action.cs" />
     <Compile Include="Options\OptionProviderExtension.cs" />
-    <Compile Include="Options\Utility.cs" />
+    <Compile Include="Options\OptionUtility.cs" />
     <Compile Include="ComponentModel\Schema.cs" />
     <Compile Include="Collections\Category.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

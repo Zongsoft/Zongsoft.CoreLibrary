@@ -162,6 +162,18 @@
   <data name="Required" xml:space="preserve">
     <value>必须</value>
   </data>
+  <data name="Text.CollectionRemovedReason.Expired" xml:space="preserve">
+    <value>缓存过期</value>
+  </data>
+  <data name="Text.CollectionRemovedReason.Other" xml:space="preserve">
+    <value>其他原因</value>
+  </data>
+  <data name="Text.CollectionRemovedReason.Overflow" xml:space="preserve">
+    <value>集合溢出</value>
+  </data>
+  <data name="Text.CollectionRemovedReason.Remove" xml:space="preserve">
+    <value>手动删除</value>
+  </data>
   <data name="Text.ExitCommand.Confirm" xml:space="preserve">
     <value>您确认是否要退出(输入Yes则退出)？</value>
   </data>
