@@ -34,16 +34,26 @@ namespace Zongsoft.ComponentModel
 	{
 		#region 成员变量
 		private string[] _args;
+		private ApplicationContextBase _applicationContext;
 		#endregion
 
 		#region 构造函数
-		public ApplicationEventArgs(string[] args)
+		public ApplicationEventArgs(ApplicationContextBase applicationContext, string[] args)
 		{
+			_applicationContext = applicationContext;
 			_args = args ?? new string[0];
 		}
 		#endregion
 
 		#region 公共属性
+		public ApplicationContextBase ApplicationContext
+		{
+			get
+			{
+				return _applicationContext;
+			}
+		}
+
 		public string[] Arguments
 		{
 			get

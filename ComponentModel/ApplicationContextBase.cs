@@ -38,6 +38,8 @@ namespace Zongsoft.ComponentModel
 		public event CancelEventHandler Exiting;
 		public event EventHandler<ApplicationEventArgs> Starting;
 		public event EventHandler<ApplicationEventArgs> Started;
+		public event EventHandler<ApplicationEventArgs> Initializing;
+		public event EventHandler<ApplicationEventArgs> Initialized;
 		public event PropertyChangedEventHandler PropertyChanged;
 		#endregion
 
@@ -50,8 +52,8 @@ namespace Zongsoft.ComponentModel
 		private string _title;
 		private string _description;
 		private IPrincipal _user;
+		private ICollection<IModule> _modules;
 		private Options.ISettingProvider _settings;
-		private Options.OptionManager _optionManager;
 		private Options.Configuration.OptionConfiguration _configuration;
 		#endregion
 
@@ -182,10 +184,7 @@ namespace Zongsoft.ComponentModel
 		{
 			get
 			{
-				if(_optionManager == null)
-					System.Threading.Interlocked.CompareExchange(ref _optionManager, new Options.OptionManager(), null);
-
-				return _optionManager;
+				return Zongsoft.Options.OptionManager.Default;
 			}
 		}
 
@@ -226,6 +225,20 @@ namespace Zongsoft.ComponentModel
 			get
 			{
 				return null;
+			}
+		}
+
+		/// <summary>
+		/// 获取当前应用程序的模块集合。
+		/// </summary>
+		public virtual ICollection<IModule> Modules
+		{
+			get
+			{
+				if(_modules == null)
+					System.Threading.Interlocked.CompareExchange(ref _modules, new Zongsoft.Collections.Collection<IModule>(), null);
+
+				return _modules;
 			}
 		}
 
@@ -292,26 +305,50 @@ namespace Zongsoft.ComponentModel
 
 		protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
 		{
-			if(PropertyChanged != null)
-				PropertyChanged(this, e);
+			var propertyChanged = this.PropertyChanged;
+
+			if(propertyChanged != null)
+				propertyChanged(this, e);
 		}
 
 		protected virtual void OnExiting(CancelEventArgs args)
 		{
-			if(Exiting != null)
-				Exiting(null, args);
+			var exiting = this.Exiting;
+
+			if(exiting != null)
+				exiting(null, args);
 		}
 
 		protected virtual void OnStarting(ApplicationEventArgs args)
 		{
-			if(Starting != null)
-				Starting(null, args);
+			var starting = this.Starting;
+
+			if(starting != null)
+				starting(null, args);
 		}
 
 		protected virtual void OnStarted(ApplicationEventArgs args)
 		{
-			if(Started != null)
-				Started(null, args);
+			var started = this.Started;
+
+			if(started != null)
+				started(null, args);
+		}
+
+		protected virtual void OnInitializing(ApplicationEventArgs args)
+		{
+			var initializing = this.Initializing;
+
+			if(initializing != null)
+				initializing(this, args);
+		}
+
+		protected virtual void OnInitialized(ApplicationEventArgs args)
+		{
+			var initialized = this.Initialized;
+
+			if(initialized != null)
+				initialized(this, args);
 		}
 		#endregion
 	}
