@@ -33,7 +33,7 @@ using System.Text;
 
 namespace Zongsoft.Communication.Net
 {
-	internal class SocketAsyncEventArgsPool : Zongsoft.Common.ObjectPool<SocketAsyncEventArgs>
+	internal class SocketAsyncEventArgsPool : Zongsoft.Collections.ObjectPool<SocketAsyncEventArgs>
 	{
 		#region 成员变量
 		private Action<object, SocketAsyncEventArgs> _completedCallback;

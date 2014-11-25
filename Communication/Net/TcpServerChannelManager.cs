@@ -40,7 +40,7 @@ namespace Zongsoft.Communication.Net
 		#region 私有变量
 		private int _channelId;
 		private ConcurrentDictionary<int, TcpServerChannel> _activedChannels;
-		private Zongsoft.Common.ObjectPool<TcpServerChannel> _channelPool;
+		private Zongsoft.Collections.ObjectPool<TcpServerChannel> _channelPool;
 		#endregion
 
 		#region 成员变量
@@ -70,7 +70,7 @@ namespace Zongsoft.Communication.Net
 			_server.Accepted += new EventHandler<ChannelEventArgs>(Server_Accepted);
 
 			//创建通道对象池
-			_channelPool = new Common.ObjectPool<TcpServerChannel>(() =>
+			_channelPool = new Collections.ObjectPool<TcpServerChannel>(() =>
 			{
 				var channel = this.CreateChannel(System.Threading.Interlocked.Increment(ref _channelId));
 

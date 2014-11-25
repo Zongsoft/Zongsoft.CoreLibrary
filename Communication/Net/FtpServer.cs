@@ -32,7 +32,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
-using Zongsoft.Common;
+using Zongsoft.Collections;
 using Zongsoft.Communication.Net.Ftp;
 using Zongsoft.Services;
 using Zongsoft.Services.Composition;

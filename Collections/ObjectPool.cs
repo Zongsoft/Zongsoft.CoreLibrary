@@ -29,7 +29,7 @@ using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Threading;
 
-namespace Zongsoft.Common
+namespace Zongsoft.Collections
 {
     /// <summary>
     /// 提供通用对象池的相关功能。
