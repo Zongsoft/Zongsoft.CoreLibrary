@@ -117,12 +117,24 @@ namespace Zongsoft.Collections
 
 		#region 公共方法
 		/// <summary>
+		/// 返回指定的键是否存在。
+		/// </summary>
+		/// <param name="name">指定要检测的键。</param>
+		/// <returns>如果指定键的缓存项是存在的则返回真(true)，否则返回假(false)。</returns>
+		public bool Contains(string name)
+		{
+			if(string.IsNullOrWhiteSpace(name))
+				throw new ArgumentNullException("name");
+
+			return _cache.ContainsKey(name);
+		}
+
+		/// <summary>
 		/// 获取指定名称的缓存项。
 		/// </summary>
 		/// <param name="name">指定要获取的缓存项名称。</param>
-		/// <param name="valueFactory">用于为指定缓存键生成缓存项的函数，如果为空(null)则不会为不存在的键创建缓存项。</param>
-		/// <returns>返回获取到的缓存项，如果返回值为空(null)并且<paramref name="valueFactory"/>参数为空，则表示没有获取到对应的</returns>
-		public T Get(string name, Func<string, T> valueFactory = null)
+		/// <returns>返回获取到的缓存项，如果返回值为空(null)则表示指定的缓存项不存在。</returns>
+		public T Get(string name)
 		{
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException("name");
@@ -132,20 +144,42 @@ namespace Zongsoft.Collections
 			if(cache == null)
 				throw new ObjectDisposedException(this.GetType().Name);
 
+			ObjectCacheItem result;
+
+			if(cache.TryGetValue(name, out result) && result != null)
+				return result.Value;
+
+			return null;
+		}
+
+		/// <summary>
+		/// 获取指定名称的缓存项，如果指定的键值不存在则创建它并缓存。
+		/// </summary>
+		/// <param name="name">指定要获取的缓存项名称。</param>
+		/// <param name="valueFactory">用于为指定缓存键生成缓存项的函数，如果该函数返回值为空(null)则不会缓存该空值。</param>
+		/// <returns>返回获取到的或新加的缓存项，如果返回值为空(null)则表示<paramref name="valueFactory"/>参数指定的生成函数返回值为空。</returns>
+		public T Get(string name, Func<string, T> valueFactory)
+		{
+			if(string.IsNullOrWhiteSpace(name))
+				throw new ArgumentNullException("name");
+
 			if(valueFactory == null)
-			{
-				ObjectCacheItem result;
+				throw new ArgumentNullException("valueFactory");
 
-				if(cache.TryGetValue(name, out result) && result != null)
-					return result.Value;
+			var cache = _cache;
 
-				return null;
-			}
+			if(cache == null)
+				throw new ObjectDisposedException(this.GetType().Name);
 
 			var keys = _keys;
 
 			var item = cache.GetOrAdd(name, key =>
 			{
+				var value = valueFactory(key);
+
+				if(value == null)
+					return null;
+
 				if(_limit > 0 && cache.Count >= _limit)
 				{
 					var removedKey = keys[keys.Length - 1];
@@ -160,9 +194,14 @@ namespace Zongsoft.Collections
 					}
 				}
 
-				var value = valueFactory(key);
 				return new ObjectCacheItem(value);
 			});
+
+			if(item == null)
+			{
+				((IDictionary<string, ObjectCacheItem>)cache).Remove(name);
+				return null;
+			}
 
 			if(_limit > 0)
 			{
