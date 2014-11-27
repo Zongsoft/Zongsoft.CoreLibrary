@@ -64,10 +64,7 @@ namespace Zongsoft.Communication
 			get
 			{
 				if(_bufferManager == null)
-				{
-					string filePath = Path.Combine(Path.GetTempPath(), this.GetType().FullName + ".cache");
-					System.Threading.Interlocked.CompareExchange(ref _bufferManager, new BufferManager(filePath), null);
-				}
+					System.Threading.Interlocked.CompareExchange(ref _bufferManager, Zongsoft.Runtime.Caching.BufferManager.GetBufferManager(this.GetType().FullName + ".cache"), null);
 
 				return _bufferManager;
 			}
@@ -88,7 +85,7 @@ namespace Zongsoft.Communication
 				throw new ArgumentNullException("serializationStream");
 
 			if(this.BufferManager == null)
-				throw new InvalidOperationException("No available BufferManager object.");
+				throw new InvalidOperationException("The value of BufferManager property is null.");
 
 			int lower = serializationStream.ReadByte();
 			int upper = serializationStream.ReadByte();
@@ -138,9 +135,13 @@ namespace Zongsoft.Communication
 
 		private void DeserializeContents(Stream serializationStream, Package package, int count)
 		{
+			var bufferManager = this.BufferManager;
+
+			if(bufferManager == null)
+				throw new InvalidOperationException("The value of BufferManager property is null.");
+
 			int headerCount;
 			byte[] temp = new byte[4];
-			var bufferManager = this.BufferManager;
 
 			for(int i = 0; i < count; i++)
 			{
