@@ -1310,20 +1310,21 @@ namespace Zongsoft.Runtime.Caching
 			return GetBufferManager(name, null);
 		}
 
-		public static BufferManager GetBufferManager(string name, string path)
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
+		public static BufferManager GetBufferManager(string name, string directoryPath)
 		{
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException("name");
 
-			return _items.GetOrAdd(name.Trim(), key => new BufferManager(GetCacheFilePath(key, path)));
+			return _items.GetOrAdd(name.Trim(), key => new BufferManager(GetCacheFilePath(key, directoryPath)));
 		}
 
-		private static string GetCacheFilePath(string name, string path)
+		private static string GetCacheFilePath(string name, string directoryPath)
 		{
 			name = string.IsNullOrWhiteSpace(name) ? "Zongsoft.BufferManager" : name.Trim();
-			path = string.IsNullOrWhiteSpace(path) ? Path.GetTempPath() : path.Trim();
+			directoryPath = string.IsNullOrWhiteSpace(directoryPath) ? Path.GetTempPath() : directoryPath.Trim();
 
-			var directory = new DirectoryInfo(path);
+			var directory = new DirectoryInfo(directoryPath);
 			var files = directory.GetFiles(name + "*.cache");
 			var regex = new System.Text.RegularExpressions.Regex(name.Replace(".", @"\.") + @"(#(?<no>\d+))\.cache");
 
