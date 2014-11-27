@@ -37,7 +37,7 @@ namespace Zongsoft.Terminals
 {
 	internal static class CommandHelper
 	{
-		public static void DisplayCommandInfo(ITerminal terminal, ICommand command)
+		internal static void DisplayCommandInfo(ITerminal terminal, ICommand command)
 		{
 			if(terminal == null || command == null)
 				return;

@@ -35,6 +35,10 @@ namespace Zongsoft.Collections
 	[Serializable]
 	public class HierarchicalNode : MarshalByRefObject
 	{
+		#region 公共常量
+		public static readonly char PathSeparatorChar = '/';
+		#endregion
+
 		#region 私有变量
 		private int _childrenLoaded;
 		#endregion
@@ -152,54 +156,65 @@ namespace Zongsoft.Collections
 			if(string.IsNullOrWhiteSpace(path))
 				return null;
 
-			return this.FindNode(path.Split('/'), onStep);
+			return this.FindNode(path.Split(PathSeparatorChar), onStep);
 		}
 
-		internal protected HierarchicalNode FindNode(string[] parts, Func<HierarchicalNodeToken, HierarchicalNode> onStep = null)
+		internal protected HierarchicalNode FindNode(string[] paths, Func<HierarchicalNodeToken, HierarchicalNode> onStep = null)
 		{
-			if(parts == null || parts.Length == 0)
+			if(paths == null || paths.Length == 0)
 				return null;
-
-			var list = new List<string>(parts.Length);
-
-			foreach(var part in parts)
-			{
-				if(!string.IsNullOrWhiteSpace(part))
-					list.AddRange(part.Split('/'));
-			}
-
-			parts = list.ToArray();
 
 			//确保当前子节点集合已经被加载过
 			this.EnsureChildren();
 
+			//当前节点默认为本节点
 			var current = this;
 
-			for(int i = 0; i < parts.Length; i++)
-			{
-				HierarchicalNode parent = null;
-				var part = string.IsNullOrWhiteSpace(parts[i]) ? string.Empty : parts[i].Trim();
+			//如果第一个部分是空字符则表示路径是以斜杠(/)打头或第一个部分是以斜杠(/)打头则从根节点开始查找
+			if(string.IsNullOrWhiteSpace(paths[0]) || paths[0].Trim()[0] == PathSeparatorChar)
+				current = this.FindRoot();
 
-				if(i == 0 && part == string.Empty)
+			int pathIndex = 0, partIndex = 0;
+			string[] parts = null;
+
+			while(current != null && pathIndex < paths.Length)
+			{
+				var part = string.Empty;
+				HierarchicalNode parent = null;
+
+				if(parts == null && paths[pathIndex].Contains("/"))
 				{
-					current = this.FindRoot();
+					parts = paths[pathIndex].Split(PathSeparatorChar);
+					partIndex = 0;
 				}
+
+				if(parts == null)
+					part = paths[pathIndex++].Trim();
 				else
 				{
-					switch(part)
+					if(partIndex < parts.Length)
+						part = parts[partIndex++].Trim();
+					else
 					{
-						case "":
-						case ".":
-							continue;
-						case "..":
-							current = current._parent;
-							parent = current != null ? current._parent : null;
-							break;
-						default:
-							parent = current;
-							current = current.GetChild(part);
-							break;
+						parts = null;
+						pathIndex++;
+						continue;
 					}
+				}
+
+				switch(part)
+				{
+					case "":
+					case ".":
+						continue;
+					case "..":
+						current = current._parent;
+						parent = current != null ? current._parent : null;
+						break;
+					default:
+						parent = current;
+						current = current.GetChild(part);
+						break;
 				}
 
 				if(onStep != null)

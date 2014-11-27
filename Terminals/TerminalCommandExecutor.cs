@@ -122,6 +122,9 @@ namespace Zongsoft.Terminals
 		#region 查找方法
 		public override CommandTreeNode Find(string path)
 		{
+			if(string.IsNullOrWhiteSpace(path))
+				return null;
+
 			var current = _current;
 
 			if(current == null)
