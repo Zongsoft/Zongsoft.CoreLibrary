@@ -206,6 +206,7 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 虚拟方法
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
 		protected virtual object CreateService()
 		{
 			var builder = _builder;

@@ -101,7 +101,7 @@ namespace Zongsoft.Services.Composition
 			get
 			{
 				if(_extendedProperties == null)
-					System.Threading.Interlocked.CompareExchange(ref _extendedProperties, new Dictionary<string, object>(), null);
+					System.Threading.Interlocked.CompareExchange(ref _extendedProperties, new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase), null);
 
 				return _extendedProperties;
 			}
