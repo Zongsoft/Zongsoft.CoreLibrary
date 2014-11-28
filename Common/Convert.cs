@@ -491,7 +491,7 @@ namespace Zongsoft.Common
 				var member = GetMember(ctx.Container.GetType(), ctx.Name, (BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetField | BindingFlags.GetProperty), true);
 
 				if(member == null)
-					throw new ArgumentException("Invalid path of target object.");
+					throw new ArgumentException(string.Format("The '{0}' member is not exists in the '{1}' type.", ctx.Name, ctx.Container.GetType().FullName));
 
 				switch(member.MemberType)
 				{
@@ -511,7 +511,7 @@ namespace Zongsoft.Common
 				var member = GetMember(ctx.Container.GetType(), ctx.Name, (BindingFlags.Instance | BindingFlags.Public | BindingFlags.SetField | BindingFlags.SetProperty), true);
 
 				if(member == null)
-					throw new ArgumentException("Invalid path of target object.");
+					throw new ArgumentException(string.Format("The '{0}' member is not exists in the '{1}' type.", ctx.Name, ctx.Container.GetType().FullName));
 
 				switch(member.MemberType)
 				{
