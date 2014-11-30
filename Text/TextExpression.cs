@@ -106,6 +106,7 @@ namespace Zongsoft.Text
 	///			</item>
 	///		</list>
 	/// </remarks>
+	[Obsolete()]
 	public class TextExpression
 	{
 		#region 私有变量

@@ -32,6 +32,7 @@ using System.Text;
 
 namespace Zongsoft.Text
 {
+	[Obsolete()]
 	public class TextExpressionParser
 	{
 		#region 正则表达式
@@ -80,7 +81,7 @@ namespace Zongsoft.Text
 		//)(?(open)(?!))
 		private static readonly Regex _regex = new Regex(@"
 		                        (?<express>(?'open'\$\{)\s*(((?<name>\w+)\s*:\s*)?\s*(((?<text>(((?'openText'\$\{)[^\$\{\}]*(?'-openText'\}))(?(openText)(?!)))|[^:\$\{\}\s\#]+)(\#(?<format>\w+))?))(\s+(?<args>((((?'openArg'\$\{)[^\$\{\}]*(?'-openArg'\}))(?(openArg)(?!)))|[^:\$\{\}\s\#]+)(\#[^:\$\{\}\s\#]+)?))*)\s*(?'-open'\}))(?(open)(?!))",
-								RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+								RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.ExplicitCapture, TimeSpan.FromSeconds(10));
 
 		//(?<value>
 		//  (
@@ -95,7 +96,7 @@ namespace Zongsoft.Text
 		//(\#(?<format>\w+))?
 		private static readonly Regex _partRegex = new Regex(@"
 		                        (?<value>(((?'open'\$\{)[^\$\{\}]*(?'-open'\}))(?(open)(?!)))|[^:\$\{\}\s\#]+)(\#(?<format>\w+))?",
-								RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+								RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.ExplicitCapture, TimeSpan.FromSeconds(10));
 		#endregion
 
 		#region 公共方法
@@ -103,6 +104,8 @@ namespace Zongsoft.Text
 		{
 			if(stream == null)
 				throw new ArgumentNullException("stream");
+
+			encoding = encoding ?? Encoding.UTF8;
 
 			using(var reader = new StreamReader(stream, encoding))
 			{

@@ -32,6 +32,7 @@ namespace Zongsoft.Text
 	/// <summary>
 	/// 表示表达式节点的集合类。
 	/// </summary>
+	[Obsolete()]
 	public class TextExpressionNodeCollection : Zongsoft.Collections.Collection<TextExpressionNode>
 	{
 		/// <summary>

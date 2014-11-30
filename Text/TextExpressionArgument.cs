@@ -29,6 +29,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Text
 {
+	[Obsolete()]
 	public class TextExpressionArgument
 	{
 		#region 私有变量
