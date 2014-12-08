@@ -42,6 +42,7 @@ namespace Zongsoft.Collections
 		/// 当入队成功后激发的事件。
 		/// </summary>
 		event EventHandler<EnqueuedEventArgs> Enqueued;
+
 		/// <summary>
 		/// 当出队成功后激发的事件。
 		/// </summary>
@@ -74,11 +75,12 @@ namespace Zongsoft.Collections
 		/// </summary>
 		/// <param name="item">要入队的对象，该值可以为空(null)。</param>
 		void Enqueue(object item);
+
 		/// <summary>
 		/// 将指定集合中的所有元素依次添加到队列的结尾处。
 		/// </summary>
 		/// <param name="items">要入队的集合。</param>
-		void Enqueue(IEnumerable items);
+		void Enqueue<T>(IEnumerable<T> items);
 		#endregion
 
 		#region 出队方法
@@ -88,6 +90,7 @@ namespace Zongsoft.Collections
 		/// <returns>从队列的开头处移除的对象。</returns>
 		/// <exception cref="System.InvalidOperationException">当队列为空，即<see cref="Count"/>属性为零。</exception>
 		object Dequeue();
+
 		/// <summary>
 		/// 移除并返回从开始处的由<paramref name="length"/>参数指定的连续多个对象。
 		/// </summary>
@@ -109,6 +112,7 @@ namespace Zongsoft.Collections
 		///		<para>此方法类似于<seealso cref="Dequeue"/>出队方法，但本方法不修改<seealso cref="Zongsoft.Collections.Queue"/>队列。</para>
 		/// </remarks>
 		object Peek();
+
 		/// <summary>
 		/// 返回从开始处的由<paramref name="length"/>参数指定的连续多个对象。
 		/// </summary>
@@ -125,6 +129,7 @@ namespace Zongsoft.Collections
 		/// <param name="startOffset">从队列开头处往后偏移的长度。</param>
 		/// <returns>位于开头处偏移后的值。</returns>
 		object Take(int startOffset);
+
 		/// <summary>
 		/// 返回从队列开头处往后偏移由<paramref name="startOffset"/>参数指定长度后开始的由<paramref name="length"/>参数指定的连续多个对象。
 		/// </summary>
