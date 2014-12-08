@@ -25,28 +25,42 @@
  */
 
 using System;
-using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Zongsoft.Data
 {
 	public enum ConditionOperator
 	{
 		/// <summary>等于</summary>
+		[Zongsoft.ComponentModel.Alias("==")]
 		Equal,
+
 		/// <summary>不等于</summary>
+		[Zongsoft.ComponentModel.Alias("!=")]
 		NotEqual,
+
 		/// <summary>大于</summary>
+		[Zongsoft.ComponentModel.Alias(">")]
 		GreaterThan,
+
 		/// <summary>大于或等于</summary>
+		[Zongsoft.ComponentModel.Alias(">=")]
 		GreaterThanEqual,
+
 		/// <summary>小于</summary>
+		[Zongsoft.ComponentModel.Alias("<")]
 		LessThan,
+
 		/// <summary>小于或等于</summary>
+		[Zongsoft.ComponentModel.Alias("<=")]
 		LessThanEqual,
+
 		/// <summary>介于</summary>
 		Between,
+
 		/// <summary>范围</summary>
 		In,
+
 		/// <summary>排除范围</summary>
 		NotIn,
 	}
