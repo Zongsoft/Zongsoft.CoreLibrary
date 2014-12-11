@@ -46,5 +46,20 @@ namespace Zongsoft.Services.Composition
 		{
 			get;
 		}
+
+		/// <summary>
+		/// 获取当前上下文的前一个管道。
+		/// </summary>
+		ExecutionPipeline Previous
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 切换当前上下文到下一个管道。
+		/// </summary>
+		/// <param name="updatePrevious">是否更新<seealso cref="Previous"/>属性值。</param>
+		/// <returns>如果切换成功则返回真(true)，否则返回假(false)。</returns>
+		bool ToNext(bool updatePrevious);
 	}
 }

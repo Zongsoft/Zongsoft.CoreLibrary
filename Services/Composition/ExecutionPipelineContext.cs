@@ -33,6 +33,7 @@ namespace Zongsoft.Services.Composition
 	{
 		#region 成员字段
 		private ExecutionPipeline _pipeline;
+		private ExecutionPipeline _previous;
 		private IExecutorContext _executorContext;
 		private IDictionary<string, object> _extendedProperties;
 		private object _result;
@@ -62,6 +63,21 @@ namespace Zongsoft.Services.Composition
 			get
 			{
 				return _pipeline;
+			}
+		}
+
+		/// <summary>
+		/// 获取当前上下文的前一个管道。
+		/// </summary>
+		public ExecutionPipeline Previous
+		{
+			get
+			{
+				return _previous;
+			}
+			set
+			{
+				_previous = value;
 			}
 		}
 
@@ -128,6 +144,28 @@ namespace Zongsoft.Services.Composition
 			{
 				_result = value;
 			}
+		}
+		#endregion
+
+		#region 内部方法
+		bool IExecutionPipelineContext.ToNext(bool updatePrevious)
+		{
+			var current = _pipeline;
+
+			if(current == null)
+				return false;
+
+			var next = current.Next;
+
+			if(next == null)
+				return false;
+
+			if(updatePrevious)
+				_previous = current;
+
+			_pipeline = next;
+
+			return next != null;
 		}
 		#endregion
 	}

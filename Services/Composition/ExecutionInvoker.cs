@@ -11,13 +11,8 @@ namespace Zongsoft.Services.Composition
 		#region 执行方法
 		public bool Invoke(IExecutionPipelineContext context)
 		{
-			return this.InvokePipeline(context, context.Pipeline);
-		}
-		#endregion
+			var pipeline = context.Pipeline;
 
-		#region 虚拟方法
-		protected virtual bool InvokePipeline(IExecutionPipelineContext context, ExecutionPipeline pipeline)
-		{
 			if(pipeline == null)
 				return false;
 
@@ -28,7 +23,7 @@ namespace Zongsoft.Services.Composition
 				return false;
 
 			//调用当前管道过滤器的前半截
-			var stack = Utility.InvokeFiltersExecuting(context.Pipeline.Filters, filter => this.OnFilterExecuting(filter, context));
+			var stack = Utility.InvokeFiltersExecuting(pipeline.Filters, filter => this.OnFilterExecuting(filter, context));
 
 			//调用管道处理器处理当前请求
 			var isHandled = this.InvokeHandler(context);
@@ -38,14 +33,21 @@ namespace Zongsoft.Services.Composition
 
 			//如果当前管道还有后续管道，则调用后续管道
 			if(pipeline.Next != null)
-				isHandled |= this.InvokePipeline(context, pipeline.Next);
+			{
+				//切换当前上下文到下一个管道
+				context.ToNext(isHandled);
+
+				isHandled |= this.Invoke(context);
+			}
 
 			//调用当前管道过滤器的后半截
 			Utility.InvokeFiltersExecuted(stack, filter => this.OnFilterExecuted(filter, context));
 
 			return isHandled;
 		}
+		#endregion
 
+		#region 虚拟方法
 		protected virtual bool InvokeHandler(IExecutionPipelineContext context)
 		{
 			var handler = context.Pipeline.Handler;
