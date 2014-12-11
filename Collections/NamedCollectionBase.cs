@@ -54,8 +54,7 @@ namespace Zongsoft.Collections
 		{
 			get
 			{
-				if(string.IsNullOrEmpty(name))
-					throw new ArgumentNullException("name");
+				name = name ?? string.Empty;
 
 				T result;
 
@@ -66,8 +65,7 @@ namespace Zongsoft.Collections
 			}
 			set
 			{
-				if(string.IsNullOrEmpty(name))
-					throw new ArgumentNullException("name");
+				name = name ?? string.Empty;
 
 				T result;
 
@@ -111,22 +109,18 @@ namespace Zongsoft.Collections
 		#region 公共方法
 		public bool Contains(string name)
 		{
-			if(string.IsNullOrEmpty(name))
-				throw new ArgumentNullException("name");
-
-			return _innerDictionary.ContainsKey(name);
+			return _innerDictionary.ContainsKey(name ?? string.Empty);
 		}
 
-		public bool Remove(string key)
+		public bool Remove(string name)
 		{
-			if(string.IsNullOrWhiteSpace(key))
-				throw new ArgumentNullException("key");
+			name = name ?? string.Empty;
 
 			T value;
 
-			if(_innerDictionary.TryGetValue(key, out value))
+			if(_innerDictionary.TryGetValue(name, out value))
 			{
-				_innerDictionary.Remove(key);
+				_innerDictionary.Remove(name);
 				base.Remove(value);
 				return true;
 			}
