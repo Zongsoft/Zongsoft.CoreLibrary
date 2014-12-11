@@ -53,8 +53,9 @@ namespace Zongsoft.Data
 		}
 		#endregion
 
+		#region 公共属性
 		/// <summary>
-		/// 获取或设置页大小。
+		/// 获取或设置页大小，如果该属性值为零则表示不分页。
 		/// </summary>
 		public int PageSize
 		{
@@ -64,7 +65,7 @@ namespace Zongsoft.Data
 			}
 			set
 			{
-				if(value < 1)
+				if(value < 0)
 					throw new ArgumentOutOfRangeException();
 
 				_pageSize = value;
@@ -72,7 +73,7 @@ namespace Zongsoft.Data
 		}
 
 		/// <summary>
-		/// 获取或设置当前查询的页号。
+		/// 获取或设置当前查询的页号，页号从1开始。
 		/// </summary>
 		public int PageIndex
 		{
@@ -114,5 +115,6 @@ namespace Zongsoft.Data
 				_totalCount = Math.Max(value, -1);
 			}
 		}
+		#endregion
 	}
 }
