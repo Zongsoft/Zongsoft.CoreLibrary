@@ -125,11 +125,11 @@
 			<property name="ModifiedTime" type="datetime" nullable="true" />
 			<property name="Description" type="string" length="500" nullable="true" />
 
-			<complexProperty name="Creator" relationship="Role_Creator" principal="Role" dependent="User" />
-			<complexProperty name="Modifier" relationship="Role_Modifier" principal="Role" dependent="User" />
+			<complexProperty name="Creator" relationship="Role_Creator" from="Role" to="User" />
+			<complexProperty name="Modifier" relationship="Role_Modifier" from="Role" to="User" />
 
-			<complexProperty name="Users" relationship="Member_Users" principal="Role" dependent="Member" />
-			<complexProperty name="Roles" relationship="Member_Roles" principal="Role" dependent="Member" />
+			<complexProperty name="Users" relationship="Member_Users" from="Role" to="Member" />
+			<complexProperty name="Roles" relationship="Member_Roles" from="Role" to="Member" />
 		</entity>
 
 		<entity name="User">
@@ -164,8 +164,8 @@
 			<property name="SuspendedTime" type="datetime" nullable="true" />
 			<property name="Description" type="string" length="500" nullable="true" />
 
-			<complexProperty name="Creator" relationship="User_Creator" principal="Owner" dependent="Foreign" />
-			<complexProperty name="Modifier" relationship="User_Modifier" principal="Owner" dependent="Foreign" />
+			<complexProperty name="Creator" relationship="User_Creator" from="Owner" to="Foreign" />
+			<complexProperty name="Modifier" relationship="User_Modifier" from="Owner" to="Foreign" />
 		</entity>
 
 		<entity name="UserProfile" inherits="User">
