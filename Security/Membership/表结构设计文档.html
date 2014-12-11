@@ -116,6 +116,14 @@
 			<td>用户的电子邮箱，唯一约束。系统可通过该字段来联系用户（如发送新密码等）。</td>
 		</tr>
 		<tr>
+			<td align="center"><font face="Arial">PhoneNumber</font></td>
+			<td align="center"><font face="Arial">varchar</font></td>
+			<td align="center"><font face="Arial">50</font></td>
+			<td align="center"><input type="checkbox" disabled="1" checked="checked" /></td>
+			<td align="center"></td>
+			<td>用户的手机号码，唯一约束。系统可通过该字段来联系用户（如发送验证码等）。</td>
+		</tr>
+		<tr>
 			<td align="center"><font face="Arial">Approved</font></td>
 			<td align="center"><font face="Arial">bool</font></td>
 			<td align="center"><font face="Arial">-</font></td>
@@ -167,7 +175,7 @@
 			<td align="center"><font face="Arial">PasswordExpires</font></td>
 			<td align="center"><font face="Arial">datetime</font></td>
 			<td align="center"><font face="Arial">-</font></td>
-			<td align="center"><input type="checkbox" disabled="1" /></td>
+			<td align="center"><input type="checkbox" disabled="1" checked="checked" /></td>
 			<td align="center"></td>
 			<td>密码的过期时间。</td>
 		</tr>
@@ -188,7 +196,7 @@
 			<td>用户的密码提示问题的答案。</td>
 		</tr>
 		<tr>
-			<td align="center"><font face="Arial">Creator</font></td>
+			<td align="center"><font face="Arial">CreatorId</font></td>
 			<td align="center"><font face="Arial">long</font></td>
 			<td align="center"><font face="Arial">8</font></td>
 			<td align="center"><input type="checkbox" disabled="1" checked="checked" /></td>
@@ -204,7 +212,7 @@
 			<td>创建时间</td>
 		</tr>
 		<tr>
-			<td align="center"><font face="Arial">Modifier</font></td>
+			<td align="center"><font face="Arial">ModifierId</font></td>
 			<td align="center"><font face="Arial">long</font></td>
 			<td align="center"><font face="Arial">8</font></td>
 			<td align="center"><input type="checkbox" disabled="1" checked="checked" /></td>
@@ -236,7 +244,7 @@
 			<td>禁用时间</td>
 		</tr>
 		<tr>
-			<td align="center"><font face="Arial">Remark</font></td>
+			<td align="center"><font face="Arial">Description</font></td>
 			<td align="center"><font face="Arial">nvarchar</font></td>
 			<td align="center"><font face="Arial">500</font></td>
 			<td align="center"><input type="checkbox" disabled="1" checked="checked" /></td>
@@ -295,7 +303,7 @@
 			<td>用户或角色的全称</td>
 		</tr>
 		<tr>
-			<td align="center"><font face="Arial">Creator</font></td>
+			<td align="center"><font face="Arial">CreatorId</font></td>
 			<td align="center"><font face="Arial">long</font></td>
 			<td align="center"><font face="Arial">8</font></td>
 			<td align="center"><input type="checkbox" disabled="1" checked="checked" /></td>
@@ -311,7 +319,7 @@
 			<td>创建时间</td>
 		</tr>
 		<tr>
-			<td align="center"><font face="Arial">Modifier</font></td>
+			<td align="center"><font face="Arial">ModifierId</font></td>
 			<td align="center"><font face="Arial">long</font></td>
 			<td align="center"><font face="Arial">8</font></td>
 			<td align="center"><input type="checkbox" disabled="1" checked="checked" /></td>
@@ -327,7 +335,7 @@
 			<td>最后的修改时间</td>
 		</tr>
 		<tr>
-			<td align="center"><font face="Arial">Remark</font></td>
+			<td align="center"><font face="Arial">Description</font></td>
 			<td align="center"><font face="Arial">nvarchar</font></td>
 			<td align="center"><font face="Arial">500</font></td>
 			<td align="center"><input type="checkbox" disabled="1" checked="checked" /></td>
@@ -518,14 +526,14 @@
 					<td>MemberType</td>
 					<td>SchemaId</td>
 					<td>ActionId</td>
-					<td>Protect</td>
+					<td>Granted</td>
 				</tr>
 				<tr style="font-family:Courier New">
 					<td align="center">#(Market)</td>
 					<td align="center">1</td>
 					<td align="center">SalesOrder</td>
 					<td align="center"><font color="maroon"><em>Select</em></font></td>
-					<td align="center">1(Grant)</td>
+					<td align="center">1(Granted)</td>
 				</tr>
 				<tr align="center">
 					<td>...</td>
