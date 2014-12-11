@@ -111,5 +111,163 @@ namespace Zongsoft.Common
 
 			return type.IsAssignableFrom(instanceType);
 		}
+
+		public static Type GetType(string typeName, bool throwOnError = false, bool ignoreCase = true)
+		{
+			if(string.IsNullOrWhiteSpace(typeName))
+				return null;
+
+			typeName = typeName.Replace(" ", "");
+
+			switch(typeName.ToLowerInvariant())
+			{
+				case "string":
+					return typeof(string);
+				case "string[]":
+					return typeof(string[]);
+
+				case "int":
+					return typeof(int);
+				case "int?":
+					return typeof(int?);
+				case "int[]":
+					return typeof(int[]);
+
+				case "long":
+					return typeof(long);
+				case "long?":
+					return typeof(long?);
+				case "long[]":
+					return typeof(long[]);
+
+				case "short":
+					return typeof(short);
+				case "short?":
+					return typeof(short?);
+				case "short[]":
+					return typeof(short[]);
+
+				case "byte":
+					return typeof(byte);
+				case "byte?":
+					return typeof(byte?);
+				case "binary":
+				case "byte[]":
+					return typeof(byte[]);
+
+				case "bool":
+				case "boolean":
+					return typeof(bool);
+				case "bool?":
+				case "boolean?":
+					return typeof(bool?);
+				case "bool[]":
+				case "boolean[]":
+					return typeof(bool[]);
+
+				case "money":
+				case "currency":
+				case "decimal":
+					return typeof(decimal);
+				case "money?":
+				case "currency?":
+				case "decimal?":
+					return typeof(decimal?);
+				case "money[]":
+				case "currency[]":
+				case "decimal[]":
+					return typeof(decimal[]);
+
+				case "float":
+				case "single":
+					return typeof(float);
+				case "float?":
+				case "single?":
+					return typeof(float?);
+				case "float[]":
+				case "single[]":
+					return typeof(float[]);
+
+				case "double":
+				case "number":
+					return typeof(double);
+				case "double?":
+				case "number?":
+					return typeof(double?);
+				case "double[]":
+				case "number[]":
+					return typeof(double[]);
+
+				case "uint":
+					return typeof(uint);
+				case "uint?":
+					return typeof(uint?);
+				case "uint[]":
+					return typeof(uint[]);
+
+				case "ulong":
+					return typeof(ulong);
+				case "ulong?":
+					return typeof(ulong?);
+				case "ulong[]":
+					return typeof(ulong[]);
+
+				case "ushort":
+					return typeof(ushort);
+				case "ushort?":
+					return typeof(ushort?);
+				case "ushort[]":
+					return typeof(ushort[]);
+
+				case "sbyte":
+					return typeof(sbyte);
+				case "sbyte?":
+					return typeof(sbyte?);
+				case "sbyte[]":
+					return typeof(sbyte[]);
+
+				case "char":
+					return typeof(char);
+				case "char?":
+					return typeof(char?);
+				case "char[]":
+					return typeof(char[]);
+
+				case "date":
+				case "time":
+				case "datetime":
+					return typeof(DateTime);
+				case "date?":
+				case "time?":
+				case "datetime?":
+					return typeof(DateTime?);
+				case "date[]":
+				case "time[]":
+				case "datetime[]":
+					return typeof(DateTime[]);
+
+				case "timespan":
+					return typeof(TimeSpan);
+				case "timespan?":
+					return typeof(TimeSpan?);
+				case "timespan[]":
+					return typeof(TimeSpan[]);
+
+				case "guid":
+					return typeof(Guid);
+				case "guid?":
+					return typeof(Guid?);
+				case "guid[]":
+					return typeof(Guid[]);
+
+				case "void":
+					return typeof(void);
+			}
+
+			if(!typeName.Contains("."))
+				typeName = "System." + typeName;
+
+			return Type.GetType(typeName, throwOnError, ignoreCase);
+		}
 	}
 }
