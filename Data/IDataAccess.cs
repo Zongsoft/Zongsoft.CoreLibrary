@@ -41,7 +41,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 计数方法
-		int Count(string name, IConditionClause condition, string scope = null);
+		int Count(string name, ICondition condition, string scope = null);
 		#endregion
 
 		#region 查询方法
@@ -75,20 +75,20 @@ namespace Zongsoft.Data
 		///		</example>
 		/// </remarks>
 		IEnumerable Select(string name,
-		                   IConditionClause condition = null,
-						   string scope = null,
-						   Paging paging = null,
-						   params Sorting[] sorting);
+		                   ICondition condition = null,
+		                   string scope = null,
+		                   Paging paging = null,
+		                   params Sorting[] sorting);
 
 		IEnumerable<T> Select<T>(string name,
-		                         IConditionClause condition = null,
-								 string scope = null,
-								 Paging paging = null,
-								 params Sorting[] sorting);
+		                         ICondition condition = null,
+		                         string scope = null,
+		                         Paging paging = null,
+		                         params Sorting[] sorting);
 		#endregion
 
 		#region 删除方法
-		int Delete(string name, IConditionClause condition, string scope = null);
+		int Delete(string name, ICondition condition, string scope = null);
 		#endregion
 
 		#region 插入方法
@@ -105,7 +105,7 @@ namespace Zongsoft.Data
 		/// <param name="condition">要更新的条件子句，如果为空(null)则根据实体的主键进行更新。</param>
 		/// <param name="scope">指定的要更新的和排除更新的属性名列表，如果指定的是多个属性则属性名之间使用逗号(,)分隔；要排除的属性以减号(-)打头，星号(*)表示所有属性，感叹号(!)表示排除所有属性；如果未指定该参数则默认只会更新所有单值属性而不会更新导航属性。</param>
 		/// <returns>返回受影响的记录行数，执行成功返回大于零的整数，失败则返回负数。</returns>
-		int Update(string name, object entity, IConditionClause condition = null, string scope = null);
+		int Update(string name, object entity, ICondition condition = null, string scope = null);
 
 		/// <summary>
 		/// 根据指定的条件将指定的实体集更新到数据源。
@@ -116,7 +116,7 @@ namespace Zongsoft.Data
 		/// <param name="condition">要更新的条件子句，如果为空(null)则根据实体的主键进行更新。</param>
 		/// <param name="scope">指定的要更新的和排除更新的属性名列表，如果指定的是多个属性则属性名之间使用逗号(,)分隔；要排除的属性以减号(-)打头，星号(*)表示所有属性，感叹号(!)表示排除所有属性；如果未指定该参数则默认只会更新所有单值属性而不会更新导航属性。</param>
 		/// <returns>返回受影响的记录行数，执行成功返回大于零的整数，失败则返回负数。</returns>
-		int Update<T>(string name, IEnumerable<T> entities, IConditionClause condition = null, string scope = null);
+		int Update<T>(string name, IEnumerable<T> entities, ICondition condition = null, string scope = null);
 		#endregion
 	}
 }

@@ -29,7 +29,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
-	public class ConditionClause : IConditionClause
+	public class ConditionClause : ICondition
 	{
 		#region 成员字段
 		private string _name;
@@ -100,6 +100,20 @@ namespace Zongsoft.Data
 			{
 				_operator = value;
 			}
+		}
+		#endregion
+
+		#region 接口实现
+		public ConditionClauseCollection ToClauses()
+		{
+			return this.ToClauses(ConditionCombine.And);
+		}
+
+		public ConditionClauseCollection ToClauses(ConditionCombine combine)
+		{
+			var result = new ConditionClauseCollection(combine);
+			result.Add(this);
+			return result;
 		}
 		#endregion
 	}

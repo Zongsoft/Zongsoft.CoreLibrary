@@ -51,52 +51,52 @@ namespace Zongsoft.Data
 			dataAccess.Execute(name, ResolveConditionToDictionary(inParameters), out outParameters);
 		}
 
-		public static int Delete(this IDataAccess dataAccess, string name, IDictionary<string, object> condition, params string[] includes)
+		public static int Delete(this IDataAccess dataAccess, string name, IDictionary<string, object> condition, string scope)
 		{
 			if(dataAccess == null)
 				throw new ArgumentNullException("dataAccess");
 
-			return dataAccess.Delete(name, ResolveCondition(condition), includes);
+			return dataAccess.Delete(name, ResolveCondition(condition), scope);
 		}
 
-		public static int Delete(this IDataAccess dataAccess, string name, object condition, params string[] includes)
+		public static int Delete(this IDataAccess dataAccess, string name, object condition, params string[] scope)
 		{
 			if(dataAccess == null)
 				throw new ArgumentNullException("dataAccess");
 
-			return dataAccess.Delete(name, ResolveCondition(condition), includes);
+			return dataAccess.Delete(name, ResolveCondition(condition), scope);
 		}
 
-		public static int Update(this IDataAccess dataAccess, string name, object entity, IDictionary<string, object> condition, string[] includes = null, string[] excludes = null)
+		public static int Update(this IDataAccess dataAccess, string name, object entity, IDictionary<string, object> condition, string scope = null)
 		{
 			if(dataAccess == null)
 				throw new ArgumentNullException("dataAccess");
 
-			return dataAccess.Update(name, entity, ResolveCondition(condition), includes, excludes);
+			return dataAccess.Update(name, entity, ResolveCondition(condition), scope);
 		}
 
-		public static int Update(this IDataAccess dataAccess, string name, object entity, object condition, string[] includes = null, string[] excludes = null)
+		public static int Update(this IDataAccess dataAccess, string name, object entity, object condition, string scope = null)
 		{
 			if(dataAccess == null)
 				throw new ArgumentNullException("dataAccess");
 
-			return dataAccess.Update(name, entity, ResolveCondition(condition), includes, excludes);
+			return dataAccess.Update(name, entity, ResolveCondition(condition), scope);
 		}
 
-		public static int Update<T>(this IDataAccess dataAccess, string name, IEnumerable<T> entities, IDictionary<string, object> condition, string[] includes = null, string[] excludes = null)
+		public static int Update<T>(this IDataAccess dataAccess, string name, IEnumerable<T> entities, IDictionary<string, object> condition, string scope = null)
 		{
 			if(dataAccess == null)
 				throw new ArgumentNullException("dataAccess");
 
-			return dataAccess.Update(name, entities, ResolveCondition(condition), includes, excludes);
+			return dataAccess.Update(name, entities, ResolveCondition(condition), scope);
 		}
 
-		public static int Update<T>(this IDataAccess dataAccess, string name, IEnumerable<T> entities, object condition, string[] includes = null, string[] excludes = null)
+		public static int Update<T>(this IDataAccess dataAccess, string name, IEnumerable<T> entities, object condition, string scope = null)
 		{
 			if(dataAccess == null)
 				throw new ArgumentNullException("dataAccess");
 
-			return dataAccess.Update(name, entities, ResolveCondition(condition), includes, excludes);
+			return dataAccess.Update(name, entities, ResolveCondition(condition), scope);
 		}
 		#endregion
 
@@ -136,7 +136,7 @@ namespace Zongsoft.Data
 			return result;
 		}
 
-		private static IConditionClause GetClause(string name, object value)
+		private static ICondition GetClause(string name, object value)
 		{
 			if(value == null)
 				return new ConditionClause(name, null);

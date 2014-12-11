@@ -29,9 +29,11 @@ using System;
 namespace Zongsoft.Data
 {
 	/// <summary>
-	/// 标记接口，仅用来约定子句类型。
+	/// 条件接口。
 	/// </summary>
-	public interface IConditionClause
+	public interface ICondition
 	{
+		ConditionClauseCollection ToClauses();
+		ConditionClauseCollection ToClauses(ConditionCombine combine);
 	}
 }

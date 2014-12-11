@@ -30,7 +30,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
-	public class ConditionClauseCollection : Zongsoft.Collections.Collection<IConditionClause>, IConditionClause
+	public class ConditionClauseCollection : Zongsoft.Collections.Collection<ICondition>, ICondition
 	{
 		#region 成员字段
 		private ConditionCombine _clauseCombine;
@@ -42,7 +42,7 @@ namespace Zongsoft.Data
 			_clauseCombine = clauseCombine;
 		}
 
-		public ConditionClauseCollection(ConditionCombine clauseCombine, IEnumerable<IConditionClause> items) : base(items)
+		public ConditionClauseCollection(ConditionCombine clauseCombine, IEnumerable<ICondition> items) : base(items)
 		{
 			_clauseCombine = clauseCombine;
 		}
@@ -62,6 +62,18 @@ namespace Zongsoft.Data
 			{
 				_clauseCombine = value;
 			}
+		}
+		#endregion
+
+		#region 接口实现
+		public ConditionClauseCollection ToClauses()
+		{
+			return this;
+		}
+
+		public ConditionClauseCollection ToClauses(ConditionCombine combine)
+		{
+			return new ConditionClauseCollection(combine, this.Items);
 		}
 		#endregion
 	}
