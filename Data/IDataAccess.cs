@@ -41,7 +41,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 计数方法
-		int Count(string name, IConditionClause condition, params string[] includes);
+		int Count(string name, IConditionClause condition, string scope = null);
 		#endregion
 
 		#region 查询方法
@@ -50,9 +50,9 @@ namespace Zongsoft.Data
 		/// </summary>
 		/// <param name="name">指定的查询名称，对应数据映射的名称。</param>
 		/// <param name="condition">指定的查询条件。</param>
+		/// <param name="scope">指定的要获取的和排除获取的属性名列表，如果指定的是多个属性则属性名之间使用逗号(,)分隔；要排除的属性以减号(-)打头，星号(*)表示所有属性，感叹号(!)表示排除所有属性；如果未指定该参数则默认只会获取所有单值属性而不会获取导航属性。</param>
 		/// <param name="paging">指定的分页设置。</param>
-		/// <param name="sorting">指定的排序字段和排序方式。</param>
-		/// <param name="includes">指定要包含的结果实体中的导航属性名。</param>
+		/// <param name="sorting">指定的排序设置(包括排序的方式和字段)。</param>
 		/// <returns>返回的结果集。</returns>
 		/// <remarks>
 		///		<example>
@@ -68,35 +68,32 @@ namespace Zongsoft.Data
 		///		               new Clause("PlateColor", PlateColor.Blue),
 		///		           }
 		///		       },
-		///		       new Paging(10, 20),
-		///		       new Sorting[] {new Sorting(SortingMode.Ascending, "Timestamp")},
-		///		       new string[] {"Creator.HomeAddress", "Corssing"},
-		///		       new string[] {"Owner.PhoneNumber"});
+		///		       "Creator.HomeAddress, Corssing, -Owner.PhoneNumber",
+		///		       new Paging(1, 20),
+		///		       Sorting.Ascending("Timestamp"));
 		///		</code>
 		///		</example>
 		/// </remarks>
 		IEnumerable Select(string name,
 		                   IConditionClause condition = null,
+						   string scope = null,
 						   Paging paging = null,
-						   Sorting[] sorting = null,
-						   string[] includes = null,
-						   string[] excludes = null);
+						   params Sorting[] sorting);
 
 		IEnumerable<T> Select<T>(string name,
 		                         IConditionClause condition = null,
+								 string scope = null,
 								 Paging paging = null,
-								 Sorting[] sorting = null,
-								 string[] includes = null,
-								 string[] excludes = null);
+								 params Sorting[] sorting);
 		#endregion
 
 		#region 删除方法
-		int Delete(string name, IConditionClause condition, params string[] includes);
+		int Delete(string name, IConditionClause condition, string scope = null);
 		#endregion
 
 		#region 插入方法
-		int Insert(string name, object entity, string[] includes = null, string[] excludes = null);
-		int Insert<T>(string name, IEnumerable<T> entities, string[] includes = null, string[] excludes = null);
+		int Insert(string name, object entity, string scope = null);
+		int Insert<T>(string name, IEnumerable<T> entities, string scope = null);
 		#endregion
 
 		#region 更新方法
@@ -106,10 +103,9 @@ namespace Zongsoft.Data
 		/// <param name="name">指定的实体映射名。</param>
 		/// <param name="entity">要更新的实体对象。</param>
 		/// <param name="condition">要更新的条件子句，如果为空(null)则根据实体的主键进行更新。</param>
-		/// <param name="includes"></param>
-		/// <param name="excludes"></param>
+		/// <param name="scope">指定的要更新的和排除更新的属性名列表，如果指定的是多个属性则属性名之间使用逗号(,)分隔；要排除的属性以减号(-)打头，星号(*)表示所有属性，感叹号(!)表示排除所有属性；如果未指定该参数则默认只会更新所有单值属性而不会更新导航属性。</param>
 		/// <returns>返回受影响的记录行数，执行成功返回大于零的整数，失败则返回负数。</returns>
-		int Update(string name, object entity, IConditionClause condition = null, string[] includes = null, string[] excludes = null);
+		int Update(string name, object entity, IConditionClause condition = null, string scope = null);
 
 		/// <summary>
 		/// 根据指定的条件将指定的实体集更新到数据源。
@@ -118,10 +114,9 @@ namespace Zongsoft.Data
 		/// <param name="name">指定的实体映射名。</param>
 		/// <param name="entities">要更新的实体集。</param>
 		/// <param name="condition">要更新的条件子句，如果为空(null)则根据实体的主键进行更新。</param>
-		/// <param name="includes">显式指定的要更新的导航属性名的数组，如果未指定该参数则不会更新导航属性的实体数据。</param>
-		/// <param name="excludes">显式指定的不要更新的属性(包括“单值属性”、“导航属性”或“导航属性的子属性”)名的数组，如果未指定该参数则默认更新实体的所有单值属性。</param>
+		/// <param name="scope">指定的要更新的和排除更新的属性名列表，如果指定的是多个属性则属性名之间使用逗号(,)分隔；要排除的属性以减号(-)打头，星号(*)表示所有属性，感叹号(!)表示排除所有属性；如果未指定该参数则默认只会更新所有单值属性而不会更新导航属性。</param>
 		/// <returns>返回受影响的记录行数，执行成功返回大于零的整数，失败则返回负数。</returns>
-		int Update<T>(string name, IEnumerable<T> entities, IConditionClause condition = null, string[] includes = null, string[] excludes = null);
+		int Update<T>(string name, IEnumerable<T> entities, IConditionClause condition = null, string scope = null);
 		#endregion
 	}
 }
