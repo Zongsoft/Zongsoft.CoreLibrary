@@ -50,8 +50,8 @@ namespace Zongsoft.Data
 			if(fields == null || fields.Length == 0)
 				throw new ArgumentNullException("fields");
 
-			_mode = mode;
-			_fields = fields;
+			this.Mode = mode;
+			this.Fields = fields;
 		}
 		#endregion
 
@@ -75,14 +75,14 @@ namespace Zongsoft.Data
 				if(_fields == null || _fields.Length < 1)
 					return string.Empty;
 
-				return string.Join(",", _fields);
+				return string.Join(", ", _fields);
 			}
 			set
 			{
 				if(string.IsNullOrWhiteSpace(value))
 					throw new ArgumentNullException();
 
-				_fields = value.Split(',');
+				this.Fields = value.Split(',');
 			}
 		}
 
@@ -97,8 +97,96 @@ namespace Zongsoft.Data
 				if(value == null || value.Length == 0)
 					throw new ArgumentNullException();
 
-				_fields = value;
+				var hashset = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+				foreach(var field in value)
+				{
+					if(!string.IsNullOrWhiteSpace(field))
+						hashset.Add(field.Trim());
+				}
+
+				if(hashset == null)
+					throw new ArgumentException();
+
+				string[] fields = new string[hashset.Count];
+				hashset.CopyTo(fields);
+
+				_fields = fields;
 			}
+		}
+		#endregion
+
+		#region 静态方法
+		public static Sorting Ascending(params string[] fields)
+		{
+			if(fields == null || fields.Length < 1)
+				throw new ArgumentNullException("fields");
+
+			return new Sorting(SortingMode.Ascending, fields);
+		}
+
+		public static Sorting Descending(params string[] fields)
+		{
+			if(fields == null || fields.Length < 1)
+				throw new ArgumentNullException("fields");
+
+			return new Sorting(SortingMode.Descending, fields);
+		}
+		#endregion
+
+		#region 重写方法
+		public override string ToString()
+		{
+			return string.Format("{0} ({1})", _mode, this.FieldsText);
+		}
+		#endregion
+
+		#region 操作符重载
+		public static Sorting[] operator +(Sorting[] values, Sorting value)
+		{
+			if((values == null || values.Length == 0) && value == null)
+				return new Sorting[0];
+
+			if(values == null || values.Length == 0)
+				return new Sorting[] { value };
+
+			if(value == null)
+				return values;
+
+			var result = new Sorting[values.Length + 1];
+			Array.Copy(values, 0, result, 0, values.Length);
+			result[result.Length - 1] = value;
+
+			return result;
+		}
+
+		public static Sorting[] operator +(Sorting a, Sorting b)
+		{
+			if(a == null && b == null)
+				return new Sorting[0];
+
+			if(a == null)
+				return new Sorting[] { b };
+
+			if(b == null)
+				return new Sorting[] { a };
+
+			if(a.Mode == b.Mode)
+			{
+				var hashset = new HashSet<string>(a.Fields, StringComparer.OrdinalIgnoreCase);
+
+				foreach(var field in b.Fields)
+				{
+					hashset.Add(field);
+				}
+
+				string[] fields = new string[hashset.Count];
+				hashset.CopyTo(fields);
+
+				return new Sorting[] { new Sorting(a.Mode, fields) };
+			}
+
+			return new Sorting[] { a, b };
 		}
 		#endregion
 	}
