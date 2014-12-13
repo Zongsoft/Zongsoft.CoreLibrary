@@ -161,7 +161,7 @@
     <Compile Include="Data\ConditionClauseCollection.cs" />
     <Compile Include="Data\ConditionCombine.cs" />
     <Compile Include="Data\ConditionOperator.cs" />
-    <Compile Include="Data\IConditionClause.cs" />
+    <Compile Include="Data\ICondition.cs" />
     <Compile Include="Data\Paging.cs" />
     <Compile Include="Data\Sorting.cs" />
     <Compile Include="Diagnostics\Configuration\TracerElement.cs" />
