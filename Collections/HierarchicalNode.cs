@@ -35,8 +35,12 @@ namespace Zongsoft.Collections
 	[Serializable]
 	public class HierarchicalNode : MarshalByRefObject
 	{
+		#region 私有常量
+		private const char DefaultPathSeparatorChar = '/';
+		#endregion
+
 		#region 公共常量
-		public static readonly char PathSeparatorChar = '/';
+		public readonly char PathSeparatorChar = '/';
 		#endregion
 
 		#region 私有变量
@@ -52,23 +56,28 @@ namespace Zongsoft.Collections
 		#region 构造函数
 		protected HierarchicalNode()
 		{
-			_name = "/";
+			_name = DefaultPathSeparatorChar.ToString();
+			PathSeparatorChar = DefaultPathSeparatorChar;
 		}
 
-		protected HierarchicalNode(string name) : this(name, null)
+		protected HierarchicalNode(string name) : this(name, null, DefaultPathSeparatorChar)
 		{
 		}
 
-		protected HierarchicalNode(string name, HierarchicalNode parent)
+		protected HierarchicalNode(string name, HierarchicalNode parent, char pathSeparatorChar = DefaultPathSeparatorChar)
 		{
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException("name");
+
+			if(name.Contains(pathSeparatorChar.ToString()))
+				throw new ArgumentException("The name contains path separator char.");
 
 			if(Zongsoft.Common.StringExtension.ContainsCharacters(name, @"./\*?!@#$%^&"))
 				throw new ArgumentException("The name contains invalid character(s).");
 
 			_name = name.Trim();
 			_parent = parent;
+			PathSeparatorChar = pathSeparatorChar;
 		}
 		#endregion
 
@@ -119,10 +128,11 @@ namespace Zongsoft.Collections
 				{
 					case "":
 						return _name;
-					case "/":
-						return path + _name;
 					default:
-						return path + "/" + _name;
+						if(path.Length == 1 && path[0] == PathSeparatorChar)
+							return path + _name;
+						else
+							return path + PathSeparatorChar + _name;
 				}
 			}
 		}
@@ -182,7 +192,7 @@ namespace Zongsoft.Collections
 				var part = string.Empty;
 				HierarchicalNode parent = null;
 
-				if(parts == null && paths[pathIndex].Contains("/"))
+				if(parts == null && paths[pathIndex].Contains(PathSeparatorChar.ToString()))
 				{
 					parts = paths[pathIndex].Split(PathSeparatorChar);
 					partIndex = 0;
