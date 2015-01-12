@@ -128,8 +128,8 @@
 			<complexProperty name="Creator" relationship="Role_Creator" from="Role" to="User" />
 			<complexProperty name="Modifier" relationship="Role_Modifier" from="Role" to="User" />
 
-			<complexProperty name="Users" relationship="Member_Users" from="Role" to="Member" />
-			<complexProperty name="Roles" relationship="Member_Roles" from="Role" to="Member" />
+			<complexProperty name="Users" relationship="Role_Users" from="Role" to="Member" />
+			<complexProperty name="Roles" relationship="Role_Roles" from="Role" to="Member" />
 		</entity>
 
 		<entity name="User">
@@ -191,6 +191,10 @@
 			<property name="RoleId" type="int" nullable="false" />
 			<property name="MemberId" type="int" nullable="false" />
 			<property name="MemberType" type="byte" nullable="false" />
+
+			<complexProperty name="Role" relationship="Member_Role" from="Member" to="Role" />
+			<complexProperty name="MemberRole" relationship="Member_MemberRole" from="Member" to="Role" />
+			<complexProperty name="MemberUser" relationship="Member_MemberUser" from="Member" to="User" />
 		</entity>
 
 		<entity name="Permission">
@@ -263,7 +267,7 @@
 			</end>
 		</association>
 
-		<association name="Member_Role">
+		<association name="Role_Members">
 			<end entity="Role" multiplicity="One">
 				<propertyRef name="RoleId" />
 			</end>
@@ -273,12 +277,50 @@
 			</end>
 		</association>
 
-		<association name="Member_Roles">
-			<end entity="Role" multiplicity="0..1">
+		<association name="Role_Roles">
+			<end entity="Role" multiplicity="One">
 				<propertyRef name="RoleId" />
 			</end>
 
 			<end entity="Member" multiplicity="Many">
+				<propertyRef name="RoleId" />
+
+				<constraints>
+					<constraint propertyName="MemberType" value="1" operator="equal" />
+				</constraints>
+			</end>
+		</association>
+
+		<association name="Role_Users">
+			<end entity="Role" multiplicity="One">
+				<propertyRef name="RoleId" />
+			</end>
+
+			<end entity="Member" multiplicity="Many">
+				<propertyRef name="RoleId" />
+
+				<constraints>
+					<constraint propertyName="MemberType" value="0" operator="equal" />
+				</constraints>
+			</end>
+		</association>
+
+		<association name="Member_Role">
+			<end entity="Role" multiplicity="One">
+				<propertyRef name="RoleId" />
+			</end>
+
+			<end entity="Member" multiplicity="One">
+				<propertyRef name="RoleId" />
+			</end>
+		</association>
+
+		<association name="Member_MemberRole">
+			<end entity="Role" multiplicity="One">
+				<propertyRef name="RoleId" />
+			</end>
+
+			<end entity="Member" multiplicity="One">
 				<propertyRef name="MemberId" />
 
 				<constraints>
@@ -287,12 +329,12 @@
 			</end>
 		</association>
 
-		<association name="Member_Users">
-			<end entity="User" multiplicity="0..1">
+		<association name="Member_MemberUser">
+			<end entity="User" multiplicity="One">
 				<propertyRef name="UserId" />
 			</end>
 
-			<end entity="Member" multiplicity="Many">
+			<end entity="Member" multiplicity="One">
 				<propertyRef name="MemberId" />
 
 				<constraints>
