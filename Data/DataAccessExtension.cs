@@ -40,7 +40,7 @@ namespace Zongsoft.Data
 			if(dataAccess == null)
 				throw new ArgumentNullException("dataAccess");
 
-			dataAccess.Execute(name, ResolveConditionToDictionary(inParameters));
+			dataAccess.Execute(name, ConvertToDictionary(inParameters));
 		}
 
 		public static void Execute(this IDataAccess dataAccess, string name, object inParameters, out IDictionary<string, object> outParameters)
@@ -48,10 +48,10 @@ namespace Zongsoft.Data
 			if(dataAccess == null)
 				throw new ArgumentNullException("dataAccess");
 
-			dataAccess.Execute(name, ResolveConditionToDictionary(inParameters), out outParameters);
+			dataAccess.Execute(name, ConvertToDictionary(inParameters), out outParameters);
 		}
 
-		public static int Delete(this IDataAccess dataAccess, string name, IDictionary<string, object> condition, string scope)
+		public static int Delete(this IDataAccess dataAccess, string name, IDictionary<string, object> condition, string scope = null)
 		{
 			if(dataAccess == null)
 				throw new ArgumentNullException("dataAccess");
@@ -59,7 +59,7 @@ namespace Zongsoft.Data
 			return dataAccess.Delete(name, ResolveCondition(condition), scope);
 		}
 
-		public static int Delete(this IDataAccess dataAccess, string name, object condition, params string[] scope)
+		public static int Delete(this IDataAccess dataAccess, string name, object condition, string scope = null)
 		{
 			if(dataAccess == null)
 				throw new ArgumentNullException("dataAccess");
@@ -101,7 +101,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 私有方法
-		private static ConditionClauseCollection ResolveCondition(object condition)
+		private static ConditionCollection ResolveCondition(object condition)
 		{
 			if(condition == null)
 				return null;
@@ -111,52 +111,52 @@ namespace Zongsoft.Data
 			if(properties == null || properties.Count < 1)
 				return null;
 
-			var result = new ConditionClauseCollection(ConditionCombine.Or);
+			var result = new ConditionCollection(ConditionCombine.Or);
 
 			foreach(PropertyDescriptor property in properties)
 			{
-				result.Add(GetClause(property.Name, property.GetValue(condition)));
+				result.Add(ConvertToCondition(property.Name, property.GetValue(condition)));
 			}
 
 			return result;
 		}
 
-		private static ConditionClauseCollection ResolveCondition(IDictionary<string, object> condition)
+		private static ConditionCollection ResolveCondition(IDictionary<string, object> condition)
 		{
 			if(condition == null || condition.Count < 1)
 				return null;
 
-			var result = new ConditionClauseCollection(ConditionCombine.Or);
+			var result = new ConditionCollection(ConditionCombine.Or);
 
 			foreach(var parameter in condition)
 			{
-				result.Add(GetClause(parameter.Key, parameter.Value));
+				result.Add(ConvertToCondition(parameter.Key, parameter.Value));
 			}
 
 			return result;
 		}
 
-		private static ICondition GetClause(string name, object value)
+		private static ICondition ConvertToCondition(string name, object value)
 		{
 			if(value == null)
-				return new ConditionClause(name, null);
+				return new Condition(name, null);
 
 			Type valueType = value.GetType();
 
 			if(valueType.IsEnum)
-				return new ConditionClause(name, Zongsoft.Common.Convert.ConvertValue(value, Enum.GetUnderlyingType(valueType)));
+				return new Condition(name, Zongsoft.Common.Convert.ConvertValue(value, Enum.GetUnderlyingType(valueType)));
 
 			if(valueType.IsArray || typeof(ICollection).IsAssignableFrom(valueType))
-				return new ConditionClause(name, ConditionOperator.In, value);
+				return new Condition(name, value, ConditionOperator.In);
 
 			if(typeof(IDictionary).IsAssignableFrom(valueType))
 			{
-				var clauses = new ConditionClauseCollection(ConditionCombine.Or);
+				var clauses = new ConditionCollection(ConditionCombine.Or);
 
 				foreach(DictionaryEntry entry in (IDictionary)value)
 				{
 					if(entry.Key != null)
-						clauses.Add(GetClause(entry.Key.ToString(), entry.Value));
+						clauses.Add(ConvertToCondition(entry.Key.ToString(), entry.Value));
 				}
 
 				return clauses;
@@ -164,21 +164,21 @@ namespace Zongsoft.Data
 
 			if(typeof(IDictionary<string, object>).IsAssignableFrom(valueType))
 			{
-				var clauses = new ConditionClauseCollection(ConditionCombine.Or);
+				var clauses = new ConditionCollection(ConditionCombine.Or);
 
 				foreach(var entry in (IDictionary<string, object>)value)
 				{
 					if(entry.Key != null)
-						clauses.Add(GetClause(entry.Key, entry.Value));
+						clauses.Add(ConvertToCondition(entry.Key, entry.Value));
 				}
 
 				return clauses;
 			}
 
-			return new ConditionClause(name, value);
+			return new Condition(name, value);
 		}
 
-		private static IDictionary<string, object> ResolveConditionToDictionary(object condition)
+		private static IDictionary<string, object> ConvertToDictionary(object condition)
 		{
 			if(condition == null)
 				return null;

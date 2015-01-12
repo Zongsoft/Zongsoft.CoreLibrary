@@ -29,26 +29,32 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
-	public class ConditionClause : ICondition
+	public class Condition : ICondition
 	{
 		#region 成员字段
 		private string _name;
-		private object[] _values;
+		private object _value;
 		private ConditionOperator _operator;
 		#endregion
 
 		#region 构造函数
-		public ConditionClause(string name, params object[] values) : this(name, ConditionOperator.Equal, values)
+		public Condition(Condition condition)
 		{
+			if(condition == null)
+				throw new ArgumentNullException("condition");
+
+			_name = condition.Name;
+			_value = condition.Value;
+			_operator = condition.Operator;
 		}
 
-		public ConditionClause(string name, ConditionOperator @operator, params object[] values)
+		public Condition(string name, object value, ConditionOperator @operator = ConditionOperator.Equal)
 		{
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException("name");
 
 			_name = name.Trim();
-			_values = values;
+			_value = value;
 			_operator = @operator;
 		}
 		#endregion
@@ -75,15 +81,15 @@ namespace Zongsoft.Data
 		/// <summary>
 		/// 获取或设置子句的标量值。
 		/// </summary>
-		public object[] Values
+		public object Value
 		{
 			get
 			{
-				return _values;
+				return _value;
 			}
 			set
 			{
-				_values = value;
+				_value = value;
 			}
 		}
 
@@ -103,17 +109,18 @@ namespace Zongsoft.Data
 		}
 		#endregion
 
-		#region 接口实现
-		public ConditionClauseCollection ToClauses()
+		#region 公共方法
+		public IEnumerable<T> GetValues<T>()
 		{
-			return this.ToClauses(ConditionCombine.And);
-		}
+			var values = _value as IEnumerable<T>;
 
-		public ConditionClauseCollection ToClauses(ConditionCombine combine)
-		{
-			var result = new ConditionClauseCollection(combine);
-			result.Add(this);
-			return result;
+			if(values == null)
+				yield return (T)_value;
+			else
+			{
+				foreach(T value in values)
+					yield return value;
+			}
 		}
 		#endregion
 	}

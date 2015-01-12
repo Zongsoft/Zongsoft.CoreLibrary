@@ -31,7 +31,7 @@ using System.Collections.Generic;
 namespace Zongsoft.Data
 {
 	/// <summary>
-	/// 表示查询条件的组合方式。
+	/// 表示条件的组合方式。
 	/// </summary>
 	public enum ConditionCombine
 	{

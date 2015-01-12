@@ -33,7 +33,5 @@ namespace Zongsoft.Data
 	/// </summary>
 	public interface ICondition
 	{
-		ConditionClauseCollection ToClauses();
-		ConditionClauseCollection ToClauses(ConditionCombine combine);
 	}
 }

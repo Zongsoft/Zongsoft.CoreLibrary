@@ -30,21 +30,21 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
-	public class ConditionClauseCollection : Zongsoft.Collections.Collection<ICondition>, ICondition
+	public class ConditionCollection : Zongsoft.Collections.Collection<ICondition>, ICondition
 	{
 		#region 成员字段
-		private ConditionCombine _clauseCombine;
+		private ConditionCombine _conditionCombine;
 		#endregion
 
 		#region 构造函数
-		public ConditionClauseCollection(ConditionCombine clauseCombine)
+		public ConditionCollection(ConditionCombine conditionCombine)
 		{
-			_clauseCombine = clauseCombine;
+			_conditionCombine = conditionCombine;
 		}
 
-		public ConditionClauseCollection(ConditionCombine clauseCombine, IEnumerable<ICondition> items) : base(items)
+		public ConditionCollection(ConditionCombine conditionCombine, IEnumerable<ICondition> items) : base(items)
 		{
-			_clauseCombine = clauseCombine;
+			_conditionCombine = conditionCombine;
 		}
 		#endregion
 
@@ -52,28 +52,16 @@ namespace Zongsoft.Data
 		/// <summary>
 		/// 获取或设置查询条件的组合方式。
 		/// </summary>
-		public ConditionCombine ClauseCombine
+		public ConditionCombine ConditionCombine
 		{
 			get
 			{
-				return _clauseCombine;
+				return _conditionCombine;
 			}
 			set
 			{
-				_clauseCombine = value;
+				_conditionCombine = value;
 			}
-		}
-		#endregion
-
-		#region 接口实现
-		public ConditionClauseCollection ToClauses()
-		{
-			return this;
-		}
-
-		public ConditionClauseCollection ToClauses(ConditionCombine combine)
-		{
-			return new ConditionClauseCollection(combine, this.Items);
 		}
 		#endregion
 	}
