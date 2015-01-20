@@ -55,14 +55,14 @@ namespace Zongsoft.Communication
 			{
 			}
 
-			protected override IExecutorContext CreateContext(object parameter)
+			protected override IExecutorContext CreateExecutorContext(object parameter)
 			{
 				var args = parameter as ReceivedEventArgs;
 
 				if(args != null)
 					return new RequestContext(this, args);
 
-				return base.CreateContext(parameter);
+				return base.CreateExecutorContext(parameter);
 			}
 		}
 		#endregion
