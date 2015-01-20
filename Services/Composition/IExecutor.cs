@@ -32,9 +32,9 @@ namespace Zongsoft.Services.Composition
 	public interface IExecutor
 	{
 		/// <summary>
-		/// 获取或设置一个<see cref="IExecutionInvoker"/>管道调用器。
+		/// 获取或设置一个<see cref="IExecutionCombiner"/>执行结果合并器。
 		/// </summary>
-		IExecutionInvoker Invoker
+		IExecutionCombiner Combiner
 		{
 			get;
 			set;
@@ -44,15 +44,6 @@ namespace Zongsoft.Services.Composition
 		/// 获取或设置一个<see cref="IExecutionPipelineSelector"/>管道执行选择器。
 		/// </summary>
 		IExecutionPipelineSelector PipelineSelector
-		{
-			get;
-			set;
-		}
-
-		/// <summary>
-		/// 获取或设置一个<see cref="IExecutionCombiner"/>执行结果合并器。
-		/// </summary>
-		IExecutionCombiner Combiner
 		{
 			get;
 			set;

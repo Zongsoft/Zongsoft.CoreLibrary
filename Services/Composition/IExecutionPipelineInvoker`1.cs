@@ -29,8 +29,8 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Services.Composition
 {
-	public interface IExecutionInvoker
+	public interface IExecutionInvoker<in TContext> : IExecutionPipelineInvoker where TContext : IExecutionPipelineContext
 	{
-		bool Invoke(IExecutionPipelineContext context);
+		bool Invoke(TContext context);
 	}
 }

@@ -84,6 +84,9 @@
     <Compile Include="Collections\NamedCollectionBase.cs" />
     <Compile Include="Collections\NamedCollection.cs" />
     <Compile Include="Collections\ObjectCache.cs" />
+    <Compile Include="Common\IDisposableObject.cs" />
+    <Compile Include="Common\IObjectReference.cs" />
+    <Compile Include="Common\ObjectReference.cs" />
     <Compile Include="Common\TypeExtension.cs" />
     <Compile Include="Common\Buffer.cs" />
     <Compile Include="Communication\ChannelAsyncEventArgs.cs" />
@@ -285,21 +288,21 @@
     <Compile Include="Services\CommandContext.cs" />
     <Compile Include="Services\CommandExecutor.cs" />
     <Compile Include="Services\Composition\ExecutedEventArgs.cs" />
-    <Compile Include="Services\Composition\ExecutionInvoker.cs" />
+    <Compile Include="Services\Composition\ExecutionPipelineInvoker.cs" />
     <Compile Include="Services\Composition\ExecutionPipelineContext.cs" />
     <Compile Include="Services\Composition\ExecutorContext.cs" />
     <Compile Include="Services\Composition\IExecutionCombiner.cs" />
     <Compile Include="Services\Composition\IExecutionContext.cs" />
-    <Compile Include="Services\Composition\IExecutionInvoker`1.cs" />
+    <Compile Include="Services\Composition\IExecutionPipelineInvoker`1.cs" />
     <Compile Include="Services\Composition\IExecutorContext.cs" />
     <Compile Include="Services\Composition\IExecutionFilter`1.cs" />
     <Compile Include="Services\Composition\IExecutionHandler`1.cs" />
-    <Compile Include="Services\Composition\IExecutionInvoker.cs" />
+    <Compile Include="Services\Composition\IExecutionPipelineInvoker.cs" />
     <Compile Include="Services\Composition\IExecutionPipelineContext.cs" />
     <Compile Include="Services\Composition\IExecutionPipelineSelector.cs" />
     <Compile Include="Services\Composition\IExecutionPipelineSelector`1.cs" />
     <Compile Include="Services\Composition\IExecutor.cs" />
-    <Compile Include="Services\Composition\Utility.cs" />
+    <Compile Include="Services\Composition\ExecutionUtility.cs" />
     <Compile Include="Services\ICommandExecutor.cs" />
     <Compile Include="Services\ICommandLineParser.cs" />
     <Compile Include="Services\IMatchable`1.cs" />
@@ -514,11 +517,12 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="Security\Membership\表结构设计文档.html" />
-  </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

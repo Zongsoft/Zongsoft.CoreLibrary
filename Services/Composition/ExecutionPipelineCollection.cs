@@ -30,30 +30,24 @@ using System.Collections.ObjectModel;
 
 namespace Zongsoft.Services.Composition
 {
-	public class ExecutionPipelineCollection : Zongsoft.Collections.NamedCollectionBase<ExecutionPipeline>
+	public class ExecutionPipelineCollection : Zongsoft.Collections.Collection<ExecutionPipeline>
 	{
-		#region 私有变量
-		private int _index;
-		#endregion
-
 		#region 构造函数
 		public ExecutionPipelineCollection()
+		{
+		}
+
+		public ExecutionPipelineCollection(IEnumerable<ExecutionPipeline> pipelines) : base(pipelines)
 		{
 		}
 		#endregion
 
 		#region 重写方法
-		protected override string GetKeyForItem(ExecutionPipeline item)
-		{
-			return item.Name;
-		}
-
 		protected override bool TryConvertItem(object value, out ExecutionPipeline item)
 		{
 			if(value is IExecutionHandler)
 			{
-				var index = System.Threading.Interlocked.Increment(ref _index);
-				item = new ExecutionPipeline(string.Format("{0}#{1}", value.GetType().FullName, index), (IExecutionHandler)value);
+				item = new ExecutionPipeline((IExecutionHandler)value);
 				return true;
 			}
 
@@ -62,17 +56,12 @@ namespace Zongsoft.Services.Composition
 		#endregion
 
 		#region 公共方法
-		public ExecutionPipeline Add(string name, IExecutionHandler handler)
-		{
-			return this.Add(name, handler, null);
-		}
-
-		public ExecutionPipeline Add(string name, IExecutionHandler handler, IPredication predication)
+		public ExecutionPipeline Add(IExecutionHandler handler, IPredication predication = null)
 		{
 			if(handler == null)
 				throw new ArgumentNullException("handler");
 
-			var item = new ExecutionPipeline(name, handler, predication);
+			var item = new ExecutionPipeline(handler, predication);
 			base.Add(item);
 
 			return item;

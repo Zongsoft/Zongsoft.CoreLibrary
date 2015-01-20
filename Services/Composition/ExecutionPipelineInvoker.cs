@@ -6,8 +6,12 @@ using System.Threading.Tasks;
 
 namespace Zongsoft.Services.Composition
 {
-	public class ExecutionInvoker : IExecutionInvoker
+	public class ExecutionPipelineInvoker : IExecutionPipelineInvoker
 	{
+		#region 单例字段
+		public static readonly ExecutionPipelineInvoker Default = new ExecutionPipelineInvoker();
+		#endregion
+
 		#region 执行方法
 		public bool Invoke(IExecutionPipelineContext context)
 		{
@@ -23,25 +27,28 @@ namespace Zongsoft.Services.Composition
 				return false;
 
 			//调用当前管道过滤器的前半截
-			var stack = Utility.InvokeFiltersExecuting(pipeline.Filters, filter => this.OnFilterExecuting(filter, context));
+			var stack = ExecutionUtility.InvokeFiltersExecuting(pipeline.Filters, filter => this.OnFilterExecuting(filter, context));
 
 			//调用管道处理器处理当前请求
 			var isHandled = this.InvokeHandler(context);
 
 			//设置是否处理成功的值到到上下文的扩展属性集中
-			context.ExtendedProperties[string.Format("__{0}.IsHandled__", pipeline.Name)] = isHandled;
+			context.ExtendedProperties["__IsHandled__"] = isHandled;
+
+			//获取当前管道的后续管道
+			var next = context.Next ?? pipeline.Next;
 
 			//如果当前管道还有后续管道，则调用后续管道
-			if(pipeline.Next != null)
+			if(next != null)
 			{
 				//切换当前上下文到下一个管道
 				context.ToNext(isHandled);
 
-				isHandled |= this.Invoke(context);
+				this.Invoke(context);
 			}
 
 			//调用当前管道过滤器的后半截
-			Utility.InvokeFiltersExecuted(stack, filter => this.OnFilterExecuted(filter, context));
+			ExecutionUtility.InvokeFiltersExecuted(stack, filter => this.OnFilterExecuted(filter, context));
 
 			return isHandled;
 		}
@@ -68,6 +75,10 @@ namespace Zongsoft.Services.Composition
 		{
 			filter.OnExecuted(context);
 		}
+		#endregion
+
+		#region 私有方法
+
 		#endregion
 	}
 }

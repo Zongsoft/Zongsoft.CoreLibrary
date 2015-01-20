@@ -50,7 +50,6 @@ namespace Zongsoft.Services.Composition
 
 		#region 成员字段
 		private object _host;
-		private IExecutionInvoker _invoker;
 		private IExecutionPipelineSelector _selector;
 		private IExecutionCombiner _combiner;
 		private ExecutionPipelineCollection _pipelines;
@@ -79,24 +78,6 @@ namespace Zongsoft.Services.Composition
 			get
 			{
 				return _host;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置一个<see cref="IExecutionInvoker"/>管道调用器。
-		/// </summary>
-		public IExecutionInvoker Invoker
-		{
-			get
-			{
-				if(_invoker == null)
-					_invoker = this.CreateInvoker();
-
-				return _invoker;
-			}
-			set
-			{
-				_invoker = value;
 			}
 		}
 
@@ -144,9 +125,6 @@ namespace Zongsoft.Services.Composition
 		/// <summary>
 		/// 获取当前执行器的全局过滤器集合。
 		/// </summary>
-		/// <remarks>
-		///		<para>全局过滤器即表示，当执行器被执行时全局过滤器优先于管道自身的过滤器被执行。</para>
-		/// </remarks>
 		public ExecutionFilterCompositeCollection Filters
 		{
 			get
@@ -159,19 +137,13 @@ namespace Zongsoft.Services.Composition
 		#region 执行方法
 		public object Execute(object parameter = null)
 		{
-			return this.Execute(this.CreateContext(parameter));
+			return this.Execute(this.CreateExecutorContext(parameter));
 		}
 
-		protected virtual object Execute(IExecutorContext context)
+		protected object Execute(IExecutorContext context)
 		{
 			if(context == null)
 				throw new ArgumentNullException("context");
-
-			//获取可用的管道调用器
-			var invoker = this.Invoker;
-
-			if(invoker == null)
-				throw new InvalidOperationException("The invoker of the executor is null.");
 
 			//创建“Executing”事件的调用参数
 			ExecutingEventArgs executingArgs = new ExecutingEventArgs(this, context.Parameter);
@@ -190,8 +162,22 @@ namespace Zongsoft.Services.Composition
 				return null;
 
 			//调用执行器过滤器的前半截
-			var stack = Utility.InvokeFiltersExecuting(context.Executor.Filters, filter => this.OnFilterExecuting(filter, context));
+			var stack = ExecutionUtility.InvokeFiltersExecuting(context.Executor.Filters, filter => this.OnFilterExecuting(filter, context));
 
+			//执行管道集，并将其执行的最终结果保存到执行器上下文的Result属性中
+			context.Result = this.Execute(context, pipelines);
+
+			//调用执行器过滤器的后半截
+			ExecutionUtility.InvokeFiltersExecuted(stack, filter => this.OnFilterExecuted(filter, context));
+
+			//激发“Executed”事件
+			this.OnExecuted(new ExecutedEventArgs(this, context.Parameter, context.Result));
+
+			return context.Result;
+		}
+
+		protected virtual object Execute(IExecutorContext context, IEnumerable<ExecutionPipeline> pipelines)
+		{
 			//创建管道上下文集合
 			var pipelineContexts = new ConcurrentBag<IExecutionPipelineContext>();
 
@@ -204,8 +190,11 @@ namespace Zongsoft.Services.Composition
 				//创建管道上下文对象
 				var pipelineContext = this.CreatePipelineContext(context, pipeline);
 
+				//根据当前管道上下文对象获取对应的调用器
+				var invoker = this.GetPipelineInvoker(pipelineContext);
+
 				//通过管道调用器来调用管道处理程序，如果调用成功则将管道上下文加入到上下文集合中
-				if(invoker.Invoke(pipelineContext))
+				if(invoker != null && invoker.Invoke(pipelineContext))
 					pipelineContexts.Add(pipelineContext);
 			});
 
@@ -213,12 +202,6 @@ namespace Zongsoft.Services.Composition
 			{
 				//合并结果集，并将最终合并的结果设置到上下文的结果属性中
 				context.Result = this.CombineResult(pipelineContexts);
-
-				//调用执行器过滤器的后半截
-				Utility.InvokeFiltersExecuted(stack, filter => this.OnFilterExecuted(filter, context));
-
-				//激发“Executed”事件
-				this.OnExecuted(new ExecutedEventArgs(this, context.Parameter, context.Result));
 			}
 
 			return context.Result;
@@ -226,7 +209,7 @@ namespace Zongsoft.Services.Composition
 		#endregion
 
 		#region 虚拟方法
-		protected virtual IExecutorContext CreateContext(object parameter)
+		protected virtual IExecutorContext CreateExecutorContext(object parameter)
 		{
 			return new ExecutorContext(this, parameter);
 		}
@@ -236,9 +219,9 @@ namespace Zongsoft.Services.Composition
 			return new ExecutionPipelineContext(context, pipeline);
 		}
 
-		protected virtual IExecutionInvoker CreateInvoker()
+		protected virtual IExecutionPipelineInvoker GetPipelineInvoker(IExecutionPipelineContext context)
 		{
-			return new ExecutionInvoker();
+			return ExecutionPipelineInvoker.Default;
 		}
 
 		protected virtual void OnFilterExecuting(IExecutionFilter filter, IExecutorContext context)
@@ -263,26 +246,7 @@ namespace Zongsoft.Services.Composition
 
 		protected virtual object CombineResult(IEnumerable<IExecutionPipelineContext> contexts)
 		{
-			var combiner = this.Combiner;
-
-			if(combiner != null)
-				return combiner.Combine(contexts.ToArray());
-
-			var result = new List<object>(contexts.Count());
-
-			foreach(var context in contexts)
-			{
-				if(context.Result != null)
-					result.Add(context.Result);
-			}
-
-			if(result.Count == 0)
-				return null;
-
-			if(result.Count == 1)
-				return result[0];
-
-			return result.ToArray();
+			return ExecutionUtility.CombineResult(this.Combiner, contexts);
 		}
 		#endregion
 

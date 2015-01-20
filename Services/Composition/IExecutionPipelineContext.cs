@@ -56,6 +56,15 @@ namespace Zongsoft.Services.Composition
 		}
 
 		/// <summary>
+		/// 获取或设置当前上下文的下一个管道。
+		/// </summary>
+		ExecutionPipeline Next
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
 		/// 切换当前上下文到下一个管道。
 		/// </summary>
 		/// <param name="updatePrevious">是否更新<seealso cref="Previous"/>属性值。</param>

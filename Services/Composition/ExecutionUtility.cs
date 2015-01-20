@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Zongsoft.Services.Composition
 {
-	internal static class Utility
+	internal static class ExecutionUtility
 	{
 		public static Stack<IExecutionFilter> InvokeFiltersExecuting(ICollection<IExecutionFilter> filters, Action<IExecutionFilter> invoke)
 		{
@@ -37,6 +38,28 @@ namespace Zongsoft.Services.Composition
 				if(filter != null)
 					invoke(filter);
 			}
+		}
+
+		public static object CombineResult(IExecutionCombiner combiner, IEnumerable<IExecutionPipelineContext> contexts)
+		{
+			if(combiner != null)
+				return combiner.Combine(contexts);
+
+			var result = new List<object>(contexts.Count());
+
+			foreach(var context in contexts)
+			{
+				if(context.Result != null)
+					result.Add(context.Result);
+			}
+
+			if(result.Count == 0)
+				return null;
+
+			if(result.Count == 1)
+				return result[0];
+
+			return result.ToArray();
 		}
 	}
 }
