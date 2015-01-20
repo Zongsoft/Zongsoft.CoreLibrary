@@ -256,7 +256,6 @@ namespace Zongsoft.Communication.Net.Ftp
         #endregion
 
         #region 私有方法
-
         private void OnAcceptCompleted(object sender, SocketAsyncEventArgs e)
         {
             if (e.SocketError != SocketError.Success)
