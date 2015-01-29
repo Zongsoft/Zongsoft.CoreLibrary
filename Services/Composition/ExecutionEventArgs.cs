@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2014 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -29,8 +29,30 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Services.Composition
 {
-	public interface IExecutionPipelineSelector<in TContext> : IExecutionPipelineSelector where TContext : IExecutorContext
+	public class ExecutionEventArgs<TContext> : EventArgs where TContext : IExecutionContext
 	{
-		ExecutionPipelineCollection SelectPipelines(TContext context);
+		#region 成员字段
+		private TContext _context;
+		#endregion
+
+		#region 构造函数
+		public ExecutionEventArgs(TContext context)
+		{
+			if(context == null)
+				throw new ArgumentNullException("context");
+
+			_context = context;
+		}
+		#endregion
+
+		#region 公共属性
+		public TContext Context
+		{
+			get
+			{
+				return _context;
+			}
+		}
+		#endregion
 	}
 }

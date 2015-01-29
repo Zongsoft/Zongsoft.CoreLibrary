@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2014 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,12 +25,17 @@
  */
 
 using System;
-using System.Collections.Generic;
 
-namespace Zongsoft.Services.Composition
+namespace Zongsoft.Communication
 {
-	public interface IExecutionPipelineInvoker
+	public interface IChannelContext : Zongsoft.Services.Composition.IExecutionContext
 	{
-		bool Invoke(IExecutionPipelineContext context);
+		/// <summary>
+		/// 获取当前通讯的<seealso cref="IChannel"/>通道。
+		/// </summary>
+		IChannel Channel
+		{
+			get;
+		}
 	}
 }

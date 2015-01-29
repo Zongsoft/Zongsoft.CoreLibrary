@@ -32,14 +32,6 @@ namespace Zongsoft.Services.Composition
 	public interface IExecutionPipelineContext : IExecutionContext
 	{
 		/// <summary>
-		/// 获取原始的<see cref="IExecutorContext"/>执行器上下文对象。
-		/// </summary>
-		IExecutorContext ExecutorContext
-		{
-			get;
-		}
-
-		/// <summary>
 		/// 获取当前上下文所属的执行管道。
 		/// </summary>
 		ExecutionPipeline Pipeline
@@ -48,27 +40,19 @@ namespace Zongsoft.Services.Composition
 		}
 
 		/// <summary>
-		/// 获取当前上下文的前一个管道。
+		/// 判断当前管道是否有子管道集。
 		/// </summary>
-		ExecutionPipeline Previous
+		bool HasChildren
 		{
 			get;
 		}
 
 		/// <summary>
-		/// 获取或设置当前上下文的下一个管道。
+		/// 获取当前管道的子管道集合。
 		/// </summary>
-		ExecutionPipeline Next
+		ExecutionPipelineCollection Children
 		{
 			get;
-			set;
 		}
-
-		/// <summary>
-		/// 切换当前上下文到下一个管道。
-		/// </summary>
-		/// <param name="updatePrevious">是否更新<seealso cref="Previous"/>属性值。</param>
-		/// <returns>如果切换成功则返回真(true)，否则返回假(false)。</returns>
-		bool ToNext(bool updatePrevious);
 	}
 }

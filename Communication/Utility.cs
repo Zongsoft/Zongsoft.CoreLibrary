@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2011-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2011-2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -33,8 +33,9 @@ using Zongsoft.Services.Composition;
 
 namespace Zongsoft.Communication
 {
-	internal static class ReceiverUtility
+	internal static class Utility
 	{
+		#region 公共方法
 		public static void ProcessReceive(IExecutor executor, ReceivedEventArgs args)
 		{
 			if(args == null)
@@ -47,6 +48,7 @@ namespace Zongsoft.Communication
 			//通过执行器执行当前请求
 			executor.Execute(args);
 		}
+		#endregion
 
 		#region 嵌套子类
 		public class CommunicationExecutor : Zongsoft.Services.Composition.Executor
@@ -55,14 +57,24 @@ namespace Zongsoft.Communication
 			{
 			}
 
-			protected override IExecutorContext CreateExecutorContext(object parameter)
+			protected override IExecutionContext CreateContext(object parameter)
 			{
 				var args = parameter as ReceivedEventArgs;
 
 				if(args != null)
-					return new RequestContext(this, args);
+					return new ChannelContext(this, args.ReceivedObject, args.Channel);
 
-				return base.CreateExecutorContext(parameter);
+				return base.CreateContext(parameter);
+			}
+
+			protected override IExecutionPipelineContext CreatePipelineContext(IExecutionContext context, ExecutionPipeline pipeline, object parameter)
+			{
+				var channelContext = context as IChannelContext;
+
+				if(channelContext != null)
+					return new ChannelPipelineContext(this, pipeline, parameter, channelContext.Channel);
+
+				return base.CreatePipelineContext(context, pipeline, parameter);
 			}
 		}
 		#endregion

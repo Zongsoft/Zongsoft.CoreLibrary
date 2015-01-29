@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2014 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2011-2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -27,19 +27,32 @@
 using System;
 using System.Collections.Generic;
 
-namespace Zongsoft.Services.Composition
+using Zongsoft.Services;
+using Zongsoft.Services.Composition;
+
+namespace Zongsoft.Communication
 {
-	/// <summary>
-	/// 表示执行上下文的接口。
-	/// </summary>
-	public interface IExecutorContext : IExecutionContext
+	public class ChannelContext : Zongsoft.Services.Composition.ExecutionContext, IChannelContext
 	{
-		/// <summary>
-		/// 获取本次执行请求的调用参数。
-		/// </summary>
-		object Parameter
+		#region 成员变量
+		private IChannel _channel;
+		#endregion
+
+		#region 构造函数
+		public ChannelContext(IExecutor executor, object data, IChannel channel) : base(executor, data)
 		{
-			get;
+			_channel = channel;
 		}
+		#endregion
+
+		#region 公共属性
+		public IChannel Channel
+		{
+			get
+			{
+				return _channel;
+			}
+		}
+		#endregion
 	}
 }

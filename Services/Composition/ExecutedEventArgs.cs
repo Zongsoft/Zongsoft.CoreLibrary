@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -29,53 +29,11 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Services.Composition
 {
-	public class ExecutedEventArgs : EventArgs
+	public class ExecutedEventArgs : ExecutionEventArgs<IExecutionContext>
 	{
-		#region 成员字段
-		private Executor _executor;
-		private object _parameter;
-		private object _result;
-		#endregion
-
 		#region 构造函数
-		public ExecutedEventArgs(Executor executor, object parameter, object result = null)
+		public ExecutedEventArgs(IExecutionContext context) : base(context)
 		{
-			if(executor == null)
-				throw new ArgumentNullException("executor");
-
-			_executor = executor;
-			_parameter = parameter;
-			_result = result;
-		}
-		#endregion
-
-		#region 公共属性
-		public Executor Executor
-		{
-			get
-			{
-				return _executor;
-			}
-		}
-
-		public object Parameter
-		{
-			get
-			{
-				return _parameter;
-			}
-		}
-
-		public object Result
-		{
-			get
-			{
-				return _result;
-			}
-			set
-			{
-				_result = value;
-			}
 		}
 		#endregion
 	}

@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -26,12 +26,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Zongsoft.Services.Composition
 {
-	public class ExecutingEventArgs : EventArgs
+	public class ExecutingEventArgs : ExecutionEventArgs<IExecutionContext>
 	{
 		#region 成员字段
 		private bool _cancel;
@@ -41,34 +39,13 @@ namespace Zongsoft.Services.Composition
 		#endregion
 
 		#region 构造函数
-		public ExecutingEventArgs(Executor executor, object parameter, bool cancel = false)
+		public ExecutingEventArgs(IExecutionContext context, bool cancel = false) : base(context)
 		{
-			if(executor == null)
-				throw new ArgumentNullException("executor");
-
-			_executor = executor;
-			_parameter = parameter;
 			_cancel = cancel;
 		}
 		#endregion
 
 		#region 公共属性
-		public Executor Executor
-		{
-			get
-			{
-				return _executor;
-			}
-		}
-
-		public object Parameter
-		{
-			get
-			{
-				return _parameter;
-			}
-		}
-
 		public bool Cancel
 		{
 			get
@@ -78,18 +55,6 @@ namespace Zongsoft.Services.Composition
 			set
 			{
 				_cancel = value;
-			}
-		}
-
-		public object Result
-		{
-			get
-			{
-				return _result;
-			}
-			set
-			{
-				_result = value;
 			}
 		}
 		#endregion

@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2014 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -29,8 +29,31 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Services.Composition
 {
-	public interface IExecutionInvoker<in TContext> : IExecutionPipelineInvoker where TContext : IExecutionPipelineContext
+	public class ExecutionPipelineExecutingEventArgs : ExecutionEventArgs<IExecutionPipelineContext>
 	{
-		bool Invoke(TContext context);
+		#region 成员字段
+		private bool _cancel;
+		#endregion
+
+		#region 构造函数
+		public ExecutionPipelineExecutingEventArgs(IExecutionPipelineContext context, bool cancel = false) : base(context)
+		{
+			_cancel = cancel;
+		}
+		#endregion
+
+		#region 公共属性
+		public bool Cancel
+		{
+			get
+			{
+				return _cancel;
+			}
+			set
+			{
+				_cancel = value;
+			}
+		}
+		#endregion
 	}
 }

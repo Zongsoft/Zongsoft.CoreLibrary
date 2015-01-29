@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2011-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,55 +25,14 @@
  */
 
 using System;
-using System.IO;
 using System.Collections.Generic;
-using System.Text;
 
-using Zongsoft.Services;
-using Zongsoft.Services.Composition;
-
-namespace Zongsoft.Communication
+namespace Zongsoft.Services.Composition
 {
-	public class RequestContext : Zongsoft.Services.Composition.ExecutorContext
+	public class ExecutionPipelineExecutedEventArgs : ExecutionEventArgs<IExecutionPipelineContext>
 	{
-		#region 成员变量
-		private IChannel _channel;
-		private object _receivedObject;
-		#endregion
-
-		#region 构造函数
-		internal RequestContext(Executor executor, ReceivedEventArgs args) : base(executor, args)
+		public ExecutionPipelineExecutedEventArgs(IExecutionPipelineContext context) : base(context)
 		{
-			if(args == null)
-				throw new ArgumentNullException("args");
-
-			_channel = args.Channel;
-			_receivedObject = args.ReceivedObject;
 		}
-
-		public RequestContext(Executor executor, IChannel channel, object receivedObject) : base(executor, receivedObject)
-		{
-			_channel = channel;
-			_receivedObject = receivedObject;
-		}
-		#endregion
-
-		#region 公共属性
-		public IChannel Channel
-		{
-			get
-			{
-				return _channel;
-			}
-		}
-
-		public object ReceivedObject
-		{
-			get
-			{
-				return _receivedObject;
-			}
-		}
-		#endregion
 	}
 }

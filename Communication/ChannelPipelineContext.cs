@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -27,23 +27,32 @@
 using System;
 using System.Collections.Generic;
 
-namespace Zongsoft.Services.Composition
-{
-	/// <summary>
-	/// 提供过滤执行管道的功能。
-	/// </summary>
-	public interface IExecutionFilter<in TContext> : IExecutionFilter where TContext : IExecutionContext
-	{
-		/// <summary>
-		/// 表示在执行处理程序之前被激发调用。
-		/// </summary>
-		/// <param name="context">当前执行上下文对象。</param>
-		void OnExecuting(TContext context);
+using Zongsoft.Services;
+using Zongsoft.Services.Composition;
 
-		/// <summary>
-		/// 表示在执行处理程序之后被激发调用。
-		/// </summary>
-		/// <param name="context">当前执行上下文对象。</param>
-		void OnExecuted(TContext context);
+namespace Zongsoft.Communication
+{
+	public class ChannelPipelineContext : ExecutionPipelineContext, IChannelContext
+	{
+		#region 成员字段
+		private IChannel _channel;
+		#endregion
+
+		#region 构造函数
+		public ChannelPipelineContext(IExecutor executor, ExecutionPipeline pipeline, object data, IChannel channel) : base(executor, pipeline, data)
+		{
+			_channel = channel;
+		}
+		#endregion
+
+		#region 公共属性
+		public IChannel Channel
+		{
+			get
+			{
+				return _channel;
+			}
+		}
+		#endregion
 	}
 }

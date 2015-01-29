@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2014 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2014-2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -40,6 +40,14 @@ namespace Zongsoft.Services.Composition
 		}
 
 		/// <summary>
+		/// 获取处理本次执行请求的输入参数。
+		/// </summary>
+		object Parameter
+		{
+			get;
+		}
+
+		/// <summary>
 		/// 获取扩展属性集是否有内容。
 		/// </summary>
 		/// <remarks>
@@ -59,7 +67,7 @@ namespace Zongsoft.Services.Composition
 		}
 
 		/// <summary>
-		/// 获取或设置当前执行的返回结果。
+		/// 获取或设置本次执行的返回结果。
 		/// </summary>
 		object Result
 		{

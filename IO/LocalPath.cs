@@ -37,7 +37,7 @@ namespace Zongsoft.IO
 		public static string ToLocalPath(string path)
 		{
 			if(string.IsNullOrWhiteSpace(path))
-				throw new PathException(string.Empty);
+				throw new ArgumentNullException("path");
 
 			path = path.Trim();
 
@@ -51,12 +51,12 @@ namespace Zongsoft.IO
 			var match = _winPathRegex.Match(path);
 
 			if(!match.Success)
-				throw new PathException(path);
+				throw new PathException(string.Format("Invalid format of the '{0}' path.", path));
 
 			string driveName = match.Groups["drive"].Value.Trim();
 
 			if(string.IsNullOrWhiteSpace(driveName))
-				throw new PathException(path);
+				throw new PathException(string.Format("The '{0}' path not cantians drive.", path));
 
 			if(driveName.Length > 1)
 			{

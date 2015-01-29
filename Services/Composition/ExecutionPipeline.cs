@@ -32,10 +32,10 @@ namespace Zongsoft.Services.Composition
 	public class ExecutionPipeline : MarshalByRefObject
 	{
 		#region 成员字段
-		private ExecutionFilterCompositeCollection _filters;
 		private IPredication _predication;
 		private IExecutionHandler _handler;
-		private ExecutionPipeline _next;
+		private ExecutionPipelineCollection _children;
+		private ExecutionFilterCompositeCollection _filters;
 		#endregion
 
 		#region 构造函数
@@ -47,30 +47,50 @@ namespace Zongsoft.Services.Composition
 		{
 			_handler = handler;
 			_predication = predication;
-			_filters = new ExecutionFilterCompositeCollection();
 		}
 		#endregion
 
 		#region 公共属性
-		/// <summary>
-		/// 获取或设置当前管道的后续管道。
-		/// </summary>
-		public ExecutionPipeline Next
+		public bool HasChildren
 		{
 			get
 			{
-				return _next;
-			}
-			set
-			{
-				_next = value;
+				return _children != null && _children.Count > 0;
 			}
 		}
 
+		/// <summary>
+		/// 获取当前管道的后续管道集合。
+		/// </summary>
+		public ExecutionPipelineCollection Children
+		{
+			get
+			{
+				if(_children == null)
+					System.Threading.Interlocked.CompareExchange(ref _children, new ExecutionPipelineCollection(), null);
+
+				return _children;
+			}
+		}
+
+		public bool HasFilters
+		{
+			get
+			{
+				return _filters != null && _filters.Count > 0;
+			}
+		}
+
+		/// <summary>
+		/// 获取当前管道的过滤器集合。
+		/// </summary>
 		public ExecutionFilterCompositeCollection Filters
 		{
 			get
 			{
+				if(_filters == null)
+					System.Threading.Interlocked.CompareExchange(ref _filters, new ExecutionFilterCompositeCollection(), null);
+
 				return _filters;
 			}
 		}

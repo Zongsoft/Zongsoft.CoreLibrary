@@ -267,7 +267,7 @@ namespace Zongsoft.Communication.Net
 		#region 虚拟方法
 		protected virtual IExecutor CreateExecutor()
 		{
-			return new ReceiverUtility.CommunicationExecutor(this);
+			return new Utility.CommunicationExecutor(this);
 		}
 		#endregion
 
@@ -287,7 +287,7 @@ namespace Zongsoft.Communication.Net
 		protected virtual void OnReceived(ReceivedEventArgs args)
 		{
 			//处理接收到的数据
-			ReceiverUtility.ProcessReceive(_executor, args);
+			Utility.ProcessReceive(_executor, args);
 
 			if(this.Received != null)
 				this.Received(this, args);

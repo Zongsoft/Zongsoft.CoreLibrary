@@ -159,7 +159,7 @@ namespace Zongsoft.Communication
 
 		protected virtual IExecutor CreateExecutor()
 		{
-			return new ReceiverUtility.CommunicationExecutor(this);
+			return new Utility.CommunicationExecutor(this);
 		}
 
 		protected virtual void OnFailed(ChannelFailureEventArgs args)
@@ -171,7 +171,7 @@ namespace Zongsoft.Communication
 		protected virtual void OnReceived(ReceivedEventArgs args)
 		{
 			//处理接收到的数据
-			ReceiverUtility.ProcessReceive(_executor, args);
+			Utility.ProcessReceive(_executor, args);
 
 			if(this.Received != null)
 				this.Received(this, args);

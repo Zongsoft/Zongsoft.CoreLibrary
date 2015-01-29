@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2014 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2014-2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -29,17 +29,17 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Services.Composition
 {
-	public class ExecutorContext : MarshalByRefObject, IExecutorContext
+	public class ExecutionContext : MarshalByRefObject, IExecutionContext
 	{
 		#region 成员字段
 		private IExecutor _executor;
 		private object _parameter;
-		private Dictionary<string, object> _extendedProperties;
 		private object _result;
+		private IDictionary<string, object> _extendedProperties;
 		#endregion
 
 		#region 构造函数
-		public ExecutorContext(IExecutor executor, object parameter = null, IDictionary<string, object> extendedProperties = null)
+		public ExecutionContext(IExecutor executor, object parameter = null, IDictionary<string, object> extendedProperties = null)
 		{
 			if(executor == null)
 				throw new ArgumentNullException("executor");
@@ -56,7 +56,7 @@ namespace Zongsoft.Services.Composition
 		/// <summary>
 		/// 获取处理本次执行请求的执行器。
 		/// </summary>
-		public IExecutor Executor
+		public virtual IExecutor Executor
 		{
 			get
 			{
@@ -65,17 +65,13 @@ namespace Zongsoft.Services.Composition
 		}
 
 		/// <summary>
-		/// 获取或设置本次执行请求的调用参数。
+		/// 获取处理本次执行请求的输入参数。
 		/// </summary>
-		public virtual object Parameter
+		public object Parameter
 		{
 			get
 			{
 				return _parameter;
-			}
-			set
-			{
-				_parameter = value;
 			}
 		}
 
@@ -108,7 +104,7 @@ namespace Zongsoft.Services.Composition
 		}
 
 		/// <summary>
-		/// 获取或设置当前执行器的返回结果。
+		/// 获取或设置本次执行的返回结果。
 		/// </summary>
 		public object Result
 		{
@@ -120,42 +116,6 @@ namespace Zongsoft.Services.Composition
 			{
 				_result = value;
 			}
-		}
-		#endregion
-
-		#region 公共方法
-		/// <summary>
-		/// 将本次执行请求的调用参数对象转换为指定类型。
-		/// </summary>
-		/// <typeparam name="T">泛型参数，表示转换后的参数类型。</typeparam>
-		/// <returns>返回类型转换后的参数对象。</returns>
-		/// <remarks>
-		///		<para>该方法使用<seealso cref="Zongsoft.Common.Convert"/>类的ConvertValue<typeparamref name="T"/>方法进行类型转换，详细的转换逻辑请参考其说明。</para>
-		/// </remarks>
-		public T GetParameter<T>()
-		{
-			object parameter = this.Parameter;
-
-			return Zongsoft.Common.Convert.ConvertValue<T>(parameter);
-		}
-
-		/// <summary>
-		/// 通过指定的转换委托将本次执行请求的调用参数对象转换为指定类型。
-		/// </summary>
-		/// <typeparam name="T">泛型参数，表示转换后的参数类型。</typeparam>
-		/// <param name="convert">指定的参数类型转换的委托。</param>
-		/// <returns>返回类型转换后的参数对象。</returns>
-		/// <remarks>
-		///		<para>如果类型转换委托<paramref name="convert"/>参数值为空，则使用<seealso cref="Zongsoft.Common.Convert"/>类的ConvertValue<typeparamref name="T"/>方法进行类型转换，详细的转换逻辑请参考其说明。</para>
-		/// </remarks>
-		public T GetParameter<T>(Func<object, T> convert)
-		{
-			object parameter = this.Parameter;
-
-			if(convert == null)
-				return Zongsoft.Common.Convert.ConvertValue<T>(parameter);
-			else
-				return convert(parameter);
 		}
 		#endregion
 	}
