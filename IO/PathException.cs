@@ -25,7 +25,7 @@
  */
 
 using System;
-using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace Zongsoft.IO
 {
@@ -37,26 +37,16 @@ namespace Zongsoft.IO
 		#endregion
 
 		#region 构造函数
-		public PathException(string path)
+		public PathException(string message) : base(message)
 		{
-			_path = path;
 		}
-		#endregion
 
-		#region 公共属性
-		public string Path
+		public PathException(string message, Exception innerException) : base(message, innerException)
 		{
-			get
-			{
-				return _path;
-			}
 		}
-		#endregion
 
-		#region 重写方法
-		public override string ToString()
+		protected PathException(SerializationInfo info, StreamingContext context) : base(info, context)
 		{
-			return _path ?? string.Empty;
 		}
 		#endregion
 	}
