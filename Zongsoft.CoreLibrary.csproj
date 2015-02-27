@@ -84,6 +84,7 @@
     <Compile Include="Collections\NamedCollectionBase.cs" />
     <Compile Include="Collections\NamedCollection.cs" />
     <Compile Include="Collections\ObjectCache.cs" />
+    <Compile Include="Common\BitVector32.cs" />
     <Compile Include="Common\IDisposableObject.cs" />
     <Compile Include="Common\IObjectReference.cs" />
     <Compile Include="Common\ObjectReference.cs" />
