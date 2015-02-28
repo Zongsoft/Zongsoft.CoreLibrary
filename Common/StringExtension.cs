@@ -26,6 +26,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Zongsoft.Common
@@ -228,13 +229,7 @@ namespace Zongsoft.Common
 			if(collection == null)
 				return false;
 
-			foreach(var item in collection)
-			{
-				if(string.Equals(item, text, comparisonType))
-					return true;
-			}
-
-			return false;
+			return collection.Any(item => string.Equals(item, text, comparisonType));
 		}
 	}
 }
