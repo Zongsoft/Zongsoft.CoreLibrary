@@ -40,12 +40,18 @@ namespace Zongsoft.Common
 		/// 获取指定枚举项对应的<see cref="Zongsoft.ComponentModel.EnumEntry"/>描述对象。
 		/// </summary>
 		/// <param name="enumValue">要获取的枚举项。</param>
-		/// <returns>如果指定的枚举项含有<see cref="System.ComponentModel.DescriptionAttribute"/>自定义属性则返回其值，否则返回该枚举项的定义文本。</returns>
+		/// <returns>返回指定枚举值对应的<see cref="EnumEntry"/>对象。</returns>
 		public static EnumEntry GetEnumEntry(Enum enumValue)
 		{
 			return GetEnumEntry(enumValue, false);
 		}
 
+		/// <summary>
+		/// 获取指定枚举项对应的<see cref="Zongsoft.ComponentModel.EnumEntry"/>描述对象。
+		/// </summary>
+		/// <param name="enumValue">要获取的枚举项。</param>
+		/// <param name="underlyingType">是否将生成的 <see cref="EnumEntry"/> 元素的 <see cref="EnumEntry.Value"/> 属性值置为 enumType 参数对应的枚举项基类型值。</param>
+		/// <returns>返回指定枚举值对应的<see cref="EnumEntry"/>对象。</returns>
 		public static EnumEntry GetEnumEntry(Enum enumValue, bool underlyingType)
 		{
 			FieldInfo field = enumValue.GetType().GetField(enumValue.ToString());
@@ -122,31 +128,6 @@ namespace Zongsoft.Common
 			}
 
 			return entries;
-		}
-
-		[Obsolete]
-		internal static Enum ConvertFrom(object value, Type enumType)
-		{
-			if(enumType == null || (!enumType.IsEnum))
-				throw new ArgumentException();
-
-			if(value == null || value == DBNull.Value)
-				return (Enum)Zongsoft.Common.Convert.GetDefaultValue(enumType);
-
-			if(value.GetType().IsPrimitive)
-			{
-				value = System.Convert.ChangeType(value, Enum.GetUnderlyingType(enumType), System.Globalization.CultureInfo.CurrentCulture);
-
-				if(Enum.IsDefined(enumType, value))
-					return (Enum)Enum.Parse(enumType, value.ToString(), true);
-				else
-					return (Enum)Zongsoft.Common.Convert.GetDefaultValue(enumType);
-			}
-
-			if(Enum.IsDefined(enumType, value.ToString()))
-				return (Enum)Enum.Parse(enumType, value.ToString(), true);
-			else
-				return (Enum)Zongsoft.Common.Convert.GetDefaultValue(enumType);
 		}
 	}
 }
