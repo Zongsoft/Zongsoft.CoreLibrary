@@ -188,13 +188,16 @@ namespace Zongsoft.Common
 		private static int _initialized;
 		private static void InitializeTypeConverters()
 		{
-			var initialized = System.Threading.Interlocked.CompareExchange(ref _initialized, 1, 0);
-
-			if(initialized == 0)
+			if(_initialized == 0)
 			{
-				TypeDescriptor.AddAttributes(typeof(System.Enum), new Attribute[] { new TypeConverterAttribute(typeof(Zongsoft.ComponentModel.EnumConverter)) });
-				TypeDescriptor.AddAttributes(typeof(System.Guid), new Attribute[] { new TypeConverterAttribute(typeof(Zongsoft.ComponentModel.GuidConverter)) });
-				TypeDescriptor.AddAttributes(typeof(System.Net.IPEndPoint), new Attribute[] { new TypeConverterAttribute(typeof(Zongsoft.Communication.IPEndPointConverter)) });
+				var initialized = System.Threading.Interlocked.CompareExchange(ref _initialized, 1, 0);
+
+				if(initialized == 0)
+				{
+					TypeDescriptor.AddAttributes(typeof(System.Enum), new Attribute[] { new TypeConverterAttribute(typeof(Zongsoft.ComponentModel.EnumConverter)) });
+					TypeDescriptor.AddAttributes(typeof(System.Guid), new Attribute[] { new TypeConverterAttribute(typeof(Zongsoft.ComponentModel.GuidConverter)) });
+					TypeDescriptor.AddAttributes(typeof(System.Net.IPEndPoint), new Attribute[] { new TypeConverterAttribute(typeof(Zongsoft.Communication.IPEndPointConverter)) });
+				}
 			}
 		}
 		#endregion
