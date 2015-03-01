@@ -34,7 +34,7 @@ namespace Zongsoft.IO
 	/// 表示不依赖操作系统的路径。
 	/// </summary>
 	/// <remarks>
-	///		<para>路径格式分为<seealso cref="DirectoryName.Schema"/>和<seealso cref="DirectoryName.FullPath"/>这两个部分，其中 Schema 与 Path 中间使用冒号(:)分隔，路径分层使用正斜杠(/)分隔。如果是目录的话则应该以正斜杠结尾。路径示例如下：</para>
+	///		<para>路径格式分为<seealso cref="DirectoryInfo.Schema"/>和<seealso cref="DirectoryInfo.FullPath"/>这两个部分，其中 Schema 与 Path 中间使用冒号(:)分隔，路径分层使用正斜杠(/)分隔。如果是目录的话则应该以正斜杠结尾。路径示例如下：</para>
 	///		<list type="bullet">
 	///			<item>
 	///				<term>某个文件：zfs:/data/attachments/2014/07/file-name.ext</term>
