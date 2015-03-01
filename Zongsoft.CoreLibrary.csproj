@@ -159,6 +159,7 @@
     <Compile Include="Communication\PackageSerializer.cs" />
     <Compile Include="Communication\PacketizerFactory.cs" />
     <Compile Include="Communication\ChannelPipelineContext.cs" />
+    <Compile Include="ComponentModel\EncodingConverter.cs" />
     <Compile Include="ComponentModel\NotifyObject.cs" />
     <Compile Include="ComponentModel\SchemaCategory.cs" />
     <Compile Include="ComponentModel\SchemaCategoryCollection.cs" />
