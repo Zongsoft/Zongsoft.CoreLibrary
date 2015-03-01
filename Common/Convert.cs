@@ -45,9 +45,9 @@ namespace Zongsoft.Common
 			return (T)ConvertValue(value, typeof(T), () => defaultValue);
 		}
 
-		public static T ConvertValue<T>(object value, Func<object> getDefaultValue)
+		public static T ConvertValue<T>(object value, Func<object> defaultValueThunk)
 		{
-			return (T)ConvertValue(value, typeof(T), getDefaultValue);
+			return (T)ConvertValue(value, typeof(T), defaultValueThunk);
 		}
 
 		public static object ConvertValue(object value, Type conversionType)
@@ -60,10 +60,10 @@ namespace Zongsoft.Common
 			return ConvertValue(value, conversionType, () => defaultValue);
 		}
 
-		public static object ConvertValue(object value, Type conversionType, Func<object> getDefaultValue)
+		public static object ConvertValue(object value, Type conversionType, Func<object> defaultValueThunk)
 		{
-			if(getDefaultValue == null)
-				throw new ArgumentNullException("getDefaultValue");
+			if(defaultValueThunk == null)
+				throw new ArgumentNullException("defaultValueThunk");
 
 			if(conversionType == null)
 				return value;
@@ -73,7 +73,7 @@ namespace Zongsoft.Common
 				if(conversionType == typeof(DBNull))
 					return DBNull.Value;
 				else
-					return getDefaultValue();
+					return defaultValueThunk();
 			}
 
 			Type type = conversionType;
@@ -86,65 +86,8 @@ namespace Zongsoft.Common
 
 			try
 			{
-				if(type == typeof(Encoding))
-				{
-					if(value == null)
-						return getDefaultValue();
-
-					if(value.GetType() == typeof(string))
-					{
-						switch(((string)value).ToLowerInvariant())
-						{
-							case "utf8":
-							case "utf-8":
-								return Encoding.UTF8;
-							case "utf7":
-							case "utf-7":
-								return Encoding.UTF7;
-							case "utf32":
-								return Encoding.UTF32;
-							case "unicode":
-								return Encoding.Unicode;
-							case "ascii":
-								return Encoding.ASCII;
-							case "bigend":
-							case "bigendian":
-								return Encoding.BigEndianUnicode;
-							default:
-								try
-								{
-									return Encoding.GetEncoding((string)value);
-								}
-								catch
-								{
-									return getDefaultValue();
-								}
-						}
-					}
-					else
-					{
-						switch(Type.GetTypeCode(value.GetType()))
-						{
-							case TypeCode.Byte:
-							case TypeCode.Decimal:
-							case TypeCode.Double:
-							case TypeCode.Int16:
-							case TypeCode.Int32:
-							case TypeCode.Int64:
-							case TypeCode.SByte:
-							case TypeCode.Single:
-							case TypeCode.UInt16:
-							case TypeCode.UInt32:
-							case TypeCode.UInt64:
-								return Encoding.GetEncoding((int)System.Convert.ChangeType(value, typeof(int)));
-						}
-					}
-				}
-
-				//初始化特定类型转换器的映射
-				InitializeTypeConverters();
-
-				TypeConverter converter = TypeDescriptor.GetConverter(type);
+				//获取指定的类型转换器
+				var converter = GetTypeConverter(type);
 
 				if(converter != null && converter.CanConvertFrom(value.GetType()))
 					return converter.ConvertFrom(value);
@@ -153,7 +96,7 @@ namespace Zongsoft.Common
 			}
 			catch
 			{
-				return getDefaultValue();
+				return defaultValueThunk();
 			}
 		}
 
@@ -184,9 +127,9 @@ namespace Zongsoft.Common
 		}
 		#endregion
 
-		#region 转换映射
+		#region 获取转换器
 		private static int _initialized;
-		private static void InitializeTypeConverters()
+		private static TypeConverter GetTypeConverter(Type type)
 		{
 			if(_initialized == 0)
 			{
@@ -196,9 +139,12 @@ namespace Zongsoft.Common
 				{
 					TypeDescriptor.AddAttributes(typeof(System.Enum), new Attribute[] { new TypeConverterAttribute(typeof(Zongsoft.ComponentModel.EnumConverter)) });
 					TypeDescriptor.AddAttributes(typeof(System.Guid), new Attribute[] { new TypeConverterAttribute(typeof(Zongsoft.ComponentModel.GuidConverter)) });
+					TypeDescriptor.AddAttributes(typeof(Encoding), new Attribute[] { new TypeConverterAttribute(typeof(Zongsoft.ComponentModel.EncodingConverter)) });
 					TypeDescriptor.AddAttributes(typeof(System.Net.IPEndPoint), new Attribute[] { new TypeConverterAttribute(typeof(Zongsoft.Communication.IPEndPointConverter)) });
 				}
 			}
+
+			return TypeDescriptor.GetConverter(type);
 		}
 		#endregion
 
@@ -213,19 +159,18 @@ namespace Zongsoft.Common
 
 			if(type.IsEnum)
 			{
-				var attributes = type.GetCustomAttributes(typeof(DefaultValueAttribute), true);
+				//var attributes = type.GetCustomAttributes(typeof(DefaultValueAttribute), true);
+				//if(attributes.Length > 0)
+				//	return ((DefaultValueAttribute)attributes[0]).Value;
 
-				if(attributes.Length > 0)
-				{
-					return ((DefaultValueAttribute)attributes[0]).Value;
-				}
-				else
-				{
-					Array values = Enum.GetValues(type);
+				var attribute = Attribute.GetCustomAttribute(type, typeof(DefaultValueAttribute), true);
+				if(attribute != null)
+					return ((DefaultValueAttribute)attribute).Value;
 
-					if(values.Length > 0)
-						return values.GetValue(0);
-				}
+				Array values = Enum.GetValues(type);
+
+				if(values.Length > 0)
+					return values.GetValue(0);
 			}
 
 			return Activator.CreateInstance(type);
@@ -483,56 +428,6 @@ namespace Zongsoft.Common
 
 		#region 对象解析
 
-		#region 默认解析
-		private static readonly Action<ObjectResolvingContext> DefaultResolve = (ctx) =>
-		{
-			if(ctx.Container == null)
-				return;
-
-			if(ctx.Direction == ObjectResolvingDirection.Get)
-			{
-				var member = GetMember(ctx.Container.GetType(), ctx.Name, (BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetField | BindingFlags.GetProperty), true);
-
-				if(member == null)
-					throw new ArgumentException(string.Format("The '{0}' member is not exists in the '{1}' type.", ctx.Name, ctx.Container.GetType().FullName));
-
-				switch(member.MemberType)
-				{
-					case MemberTypes.Field:
-						ctx.Value = ((FieldInfo)member).GetValue(ctx.Container);
-						break;
-					case MemberTypes.Property:
-						ctx.Value = ((PropertyInfo)member).GetValue(ctx.Container, null);
-						break;
-				}
-
-				ctx.Handled = true;
-			}
-			else if(ctx.Direction == ObjectResolvingDirection.Set)
-			{
-				var value = ctx.Value;
-				var member = GetMember(ctx.Container.GetType(), ctx.Name, (BindingFlags.Instance | BindingFlags.Public | BindingFlags.SetField | BindingFlags.SetProperty), true);
-
-				if(member == null)
-					throw new ArgumentException(string.Format("The '{0}' member is not exists in the '{1}' type.", ctx.Name, ctx.Container.GetType().FullName));
-
-				switch(member.MemberType)
-				{
-					case MemberTypes.Field:
-						value = Zongsoft.Common.Convert.ConvertValue(ctx.Value, ((FieldInfo)member).FieldType);
-						((FieldInfo)member).SetValue(ctx.Container, value);
-						break;
-					case MemberTypes.Property:
-						value = Zongsoft.Common.Convert.ConvertValue(ctx.Value, ((PropertyInfo)member).PropertyType);
-						((PropertyInfo)member).SetValue(ctx.Container, value, null);
-						break;
-				}
-
-				ctx.Handled = true;
-			}
-		};
-		#endregion
-
 		#region 获取方法
 		public static object GetValue(object target, string path)
 		{
@@ -658,6 +553,54 @@ namespace Zongsoft.Common
 		#endregion
 
 		#region 私有方法
+		private static readonly Action<ObjectResolvingContext> DefaultResolve = (ctx) =>
+		{
+			if(ctx.Container == null)
+				return;
+
+			if(ctx.Direction == ObjectResolvingDirection.Get)
+			{
+				var member = GetMember(ctx.Container.GetType(), ctx.Name, (BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetField | BindingFlags.GetProperty), true);
+
+				if(member == null)
+					throw new ArgumentException(string.Format("The '{0}' member is not exists in the '{1}' type.", ctx.Name, ctx.Container.GetType().FullName));
+
+				switch(member.MemberType)
+				{
+					case MemberTypes.Field:
+						ctx.Value = ((FieldInfo)member).GetValue(ctx.Container);
+						break;
+					case MemberTypes.Property:
+						ctx.Value = ((PropertyInfo)member).GetValue(ctx.Container, null);
+						break;
+				}
+
+				ctx.Handled = true;
+			}
+			else if(ctx.Direction == ObjectResolvingDirection.Set)
+			{
+				var value = ctx.Value;
+				var member = GetMember(ctx.Container.GetType(), ctx.Name, (BindingFlags.Instance | BindingFlags.Public | BindingFlags.SetField | BindingFlags.SetProperty), true);
+
+				if(member == null)
+					throw new ArgumentException(string.Format("The '{0}' member is not exists in the '{1}' type.", ctx.Name, ctx.Container.GetType().FullName));
+
+				switch(member.MemberType)
+				{
+					case MemberTypes.Field:
+						value = Zongsoft.Common.Convert.ConvertValue(ctx.Value, ((FieldInfo)member).FieldType);
+						((FieldInfo)member).SetValue(ctx.Container, value);
+						break;
+					case MemberTypes.Property:
+						value = Zongsoft.Common.Convert.ConvertValue(ctx.Value, ((PropertyInfo)member).PropertyType);
+						((PropertyInfo)member).SetValue(ctx.Container, value, null);
+						break;
+				}
+
+				ctx.Handled = true;
+			}
+		};
+
 		private static MemberInfo GetMember(Type type, string name, BindingFlags binding, bool ignoreCase)
 		{
 			if(type == null || string.IsNullOrWhiteSpace(name))
