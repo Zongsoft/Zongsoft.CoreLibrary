@@ -1,6 +1,6 @@
-/*
+ï»¿/*
  * Authors:
- *   ÖÓ·å(Popeye Zhong) <zongsoft@gmail.com>
+ *   é’Ÿå³°(Popeye Zhong) <zongsoft@gmail.com>
  *
  * Copyright (C) 2008-2012 Zongsoft Corporation <http://www.zongsoft.com>
  *
@@ -37,21 +37,21 @@ namespace Zongsoft.Common
 	public static class EnumUtility
 	{
 		/// <summary>
-		/// »ñÈ¡Ö¸¶¨Ã¶¾ÙÏî¶ÔÓ¦µÄ<see cref="Zongsoft.ComponentModel.EnumEntry"/>ÃèÊö¶ÔÏó¡£
+		/// è·å–æŒ‡å®šæšä¸¾é¡¹å¯¹åº”çš„<see cref="EnumEntry"/>æè¿°å¯¹è±¡ã€‚
 		/// </summary>
-		/// <param name="enumValue">Òª»ñÈ¡µÄÃ¶¾ÙÏî¡£</param>
-		/// <returns>·µ»ØÖ¸¶¨Ã¶¾ÙÖµ¶ÔÓ¦µÄ<see cref="EnumEntry"/>¶ÔÏó¡£</returns>
+		/// <param name="enumValue">è¦è·å–çš„æšä¸¾é¡¹ã€‚</param>
+		/// <returns>è¿”å›æŒ‡å®šæšä¸¾å€¼å¯¹åº”çš„<see cref="EnumEntry"/>å¯¹è±¡ã€‚</returns>
 		public static EnumEntry GetEnumEntry(Enum enumValue)
 		{
 			return GetEnumEntry(enumValue, false);
 		}
 
 		/// <summary>
-		/// »ñÈ¡Ö¸¶¨Ã¶¾ÙÏî¶ÔÓ¦µÄ<see cref="Zongsoft.ComponentModel.EnumEntry"/>ÃèÊö¶ÔÏó¡£
+		/// è·å–æŒ‡å®šæšä¸¾é¡¹å¯¹åº”çš„<see cref="EnumEntry"/>æè¿°å¯¹è±¡ã€‚
 		/// </summary>
-		/// <param name="enumValue">Òª»ñÈ¡µÄÃ¶¾ÙÏî¡£</param>
-		/// <param name="underlyingType">ÊÇ·ñ½«Éú³ÉµÄ <see cref="EnumEntry"/> ÔªËØµÄ <see cref="EnumEntry.Value"/> ÊôĞÔÖµÖÃÎª enumType ²ÎÊı¶ÔÓ¦µÄÃ¶¾ÙÏî»ùÀàĞÍÖµ¡£</param>
-		/// <returns>·µ»ØÖ¸¶¨Ã¶¾ÙÖµ¶ÔÓ¦µÄ<see cref="EnumEntry"/>¶ÔÏó¡£</returns>
+		/// <param name="enumValue">è¦è·å–çš„æšä¸¾é¡¹ã€‚</param>
+		/// <param name="underlyingType">æ˜¯å¦å°†ç”Ÿæˆçš„ <see cref="EnumEntry"/> å…ƒç´ çš„ <see cref="EnumEntry.Value"/> å±æ€§å€¼ç½®ä¸º enumType å‚æ•°å¯¹åº”çš„æšä¸¾é¡¹åŸºç±»å‹å€¼ã€‚</param>
+		/// <returns>è¿”å›æŒ‡å®šæšä¸¾å€¼å¯¹åº”çš„<see cref="EnumEntry"/>å¯¹è±¡ã€‚</returns>
 		public static EnumEntry GetEnumEntry(Enum enumValue, bool underlyingType)
 		{
 			FieldInfo field = enumValue.GetType().GetField(enumValue.ToString());
@@ -65,36 +65,36 @@ namespace Zongsoft.Common
 		}
 
 		/// <summary>
-		/// »ñÈ¡Ö¸¶¨Ã¶¾ÙµÄÃèÊö¶ÔÏóÊı×é¡£
+		/// è·å–æŒ‡å®šæšä¸¾çš„æè¿°å¯¹è±¡æ•°ç»„ã€‚
 		/// </summary>
-		/// <param name="enumType">Òª»ñÈ¡µÄÃ¶¾ÙÀàĞÍ¡£</param>
-		/// <param name="underlyingType">ÊÇ·ñ½«Éú³ÉµÄ <see cref="EnumEntry"/> ÔªËØµÄ <see cref="EnumEntry.Value"/> ÊôĞÔÖµÖÃÎª enumType ²ÎÊı¶ÔÓ¦µÄÃ¶¾ÙÏî»ùÀàĞÍÖµ¡£</param>
-		/// <returns>·µ»ØµÄÃ¶¾ÙÃèÊö¶ÔÏóÊı×é¡£</returns>
+		/// <param name="enumType">è¦è·å–çš„æšä¸¾ç±»å‹ã€‚</param>
+		/// <param name="underlyingType">æ˜¯å¦å°†ç”Ÿæˆçš„ <see cref="EnumEntry"/> å…ƒç´ çš„ <see cref="EnumEntry.Value"/> å±æ€§å€¼ç½®ä¸º enumType å‚æ•°å¯¹åº”çš„æšä¸¾é¡¹åŸºç±»å‹å€¼ã€‚</param>
+		/// <returns>è¿”å›çš„æšä¸¾æè¿°å¯¹è±¡æ•°ç»„ã€‚</returns>
 		public static EnumEntry[] GetEnumEntries(Type enumType, bool underlyingType)
 		{
 			return GetEnumEntries(enumType, underlyingType, null, string.Empty);
 		}
 
 		/// <summary>
-		/// »ñÈ¡Ö¸¶¨Ã¶¾ÙµÄÃèÊö¶ÔÏóÊı×é¡£
+		/// è·å–æŒ‡å®šæšä¸¾çš„æè¿°å¯¹è±¡æ•°ç»„ã€‚
 		/// </summary>
-		/// <param name="enumType">Òª»ñÈ¡µÄÃ¶¾ÙÀàĞÍ£¬¿ÉÎª<seealso cref="System.Nullable<>"/>ÀàĞÍ¡£</param>
-		/// <param name="underlyingType">ÊÇ·ñ½«Éú³ÉµÄ <see cref="EnumEntry"/> ÔªËØµÄ <see cref="EnumDescription.Value"/> ÊôĞÔÖµÖÃÎª enumType ²ÎÊı¶ÔÓ¦µÄÃ¶¾ÙÏî»ùÀàĞÍÖµ¡£</param>
-		/// <param name="nullValue">Èç¹û²ÎÊı<paramref name="enumType"/>Îª¿É¿ÕÀàĞÍÊ±£¬¸Ã¿ÕÖµ¶ÔÓ¦µÄ<see cref="EnumDescription.Value"/>ÊôĞÔµÄÖµ¡£</param>
-		/// <returns>·µ»ØµÄÃ¶¾ÙÃèÊö¶ÔÏóÊı×é¡£</returns>
+		/// <param name="enumType">è¦è·å–çš„æšä¸¾ç±»å‹ï¼Œå¯ä¸º<seealso cref="System.Nullable<>"/>ç±»å‹ã€‚</param>
+		/// <param name="underlyingType">æ˜¯å¦å°†ç”Ÿæˆçš„ <see cref="EnumEntry"/> å…ƒç´ çš„ <see cref="EnumDescription.Value"/> å±æ€§å€¼ç½®ä¸º enumType å‚æ•°å¯¹åº”çš„æšä¸¾é¡¹åŸºç±»å‹å€¼ã€‚</param>
+		/// <param name="nullValue">å¦‚æœå‚æ•°<paramref name="enumType"/>ä¸ºå¯ç©ºç±»å‹æ—¶ï¼Œè¯¥ç©ºå€¼å¯¹åº”çš„<see cref="EnumDescription.Value"/>å±æ€§çš„å€¼ã€‚</param>
+		/// <returns>è¿”å›çš„æšä¸¾æè¿°å¯¹è±¡æ•°ç»„ã€‚</returns>
 		public static EnumEntry[] GetEnumEntries(Type enumType, bool underlyingType, object nullValue)
 		{
 			return GetEnumEntries(enumType, underlyingType, nullValue, string.Empty);
 		}
 
 		/// <summary>
-		/// »ñÈ¡Ö¸¶¨Ã¶¾ÙµÄÃèÊö¶ÔÏóÊı×é¡£
+		/// è·å–æŒ‡å®šæšä¸¾çš„æè¿°å¯¹è±¡æ•°ç»„ã€‚
 		/// </summary>
-		/// <param name="enumType">Òª»ñÈ¡µÄÃ¶¾ÙÀàĞÍ£¬¿ÉÎª<seealso cref="System.Nullable<>"/>ÀàĞÍ¡£</param>
-		/// <param name="underlyingType">ÊÇ·ñ½«Éú³ÉµÄ <see cref="EnumEntry"/> ÔªËØµÄ <see cref="EnumEntry.Value"/> ÊôĞÔÖµÖÃÎª enumType ²ÎÊı¶ÔÓ¦µÄÃ¶¾ÙÏî»ùÀàĞÍÖµ¡£</param>
-		/// <param name="nullValue">Èç¹û²ÎÊı<paramref name="enumType"/>Îª¿É¿ÕÀàĞÍÊ±£¬¸Ã¿ÕÖµ¶ÔÓ¦µÄ<see cref="EnumEntry.Value"/>ÊôĞÔµÄÖµ¡£</param>
-		/// <param name="nullText">Èç¹û²ÎÊı<paramref name="enumType"/>Îª¿É¿ÕÀàĞÍÊ±£¬¸Ã¿ÕÖµ¶ÔÓ¦µÄ<see cref="EnumEntry.Description"/>ÊôĞÔµÄÖµ¡£</param>
-		/// <returns>·µ»ØµÄÃ¶¾ÙÃèÊö¶ÔÏóÊı×é¡£</returns>
+		/// <param name="enumType">è¦è·å–çš„æšä¸¾ç±»å‹ï¼Œå¯ä¸º<seealso cref="System.Nullable<>"/>ç±»å‹ã€‚</param>
+		/// <param name="underlyingType">æ˜¯å¦å°†ç”Ÿæˆçš„ <see cref="EnumEntry"/> å…ƒç´ çš„ <see cref="EnumEntry.Value"/> å±æ€§å€¼ç½®ä¸º enumType å‚æ•°å¯¹åº”çš„æšä¸¾é¡¹åŸºç±»å‹å€¼ã€‚</param>
+		/// <param name="nullValue">å¦‚æœå‚æ•°<paramref name="enumType"/>ä¸ºå¯ç©ºç±»å‹æ—¶ï¼Œè¯¥ç©ºå€¼å¯¹åº”çš„<see cref="EnumEntry.Value"/>å±æ€§çš„å€¼ã€‚</param>
+		/// <param name="nullText">å¦‚æœå‚æ•°<paramref name="enumType"/>ä¸ºå¯ç©ºç±»å‹æ—¶ï¼Œè¯¥ç©ºå€¼å¯¹åº”çš„<see cref="EnumEntry.Description"/>å±æ€§çš„å€¼ã€‚</param>
+		/// <returns>è¿”å›çš„æšä¸¾æè¿°å¯¹è±¡æ•°ç»„ã€‚</returns>
 		public static EnumEntry[] GetEnumEntries(Type enumType, bool underlyingType, object nullValue, string nullText)
 		{
 			if(enumType == null)
