@@ -43,7 +43,15 @@ namespace Zongsoft.Common
 		#endregion
 
 		#region 公共属性
-		internal bool this[int bit]
+		public int Data
+		{
+			get
+			{
+				return _data;
+			}
+		}
+
+		public bool this[int bit]
 		{
 			get
 			{
@@ -68,6 +76,25 @@ namespace Zongsoft.Common
 						break;
 				}
 			}
+		}
+		#endregion
+
+		#region 类型转换
+		public static implicit operator int(BitVector32 vector)
+		{
+			return vector._data;
+		}
+
+		public static implicit operator BitVector32(int data)
+		{
+			return new BitVector32(data);
+		}
+		#endregion
+
+		#region 重写方法
+		public override string ToString()
+		{
+			return _data.ToString();
 		}
 		#endregion
 	}
