@@ -60,7 +60,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Zongsoft.CoreLibrary.csproj">
+    <ProjectReference Include="..\src\Zongsoft.CoreLibrary.csproj">
       <Project>{d8bfac6f-60bd-4a1a-bb4a-c1fe5043cda8}</Project>
       <Name>Zongsoft.CoreLibrary</Name>
     </ProjectReference>
