@@ -61,7 +61,7 @@ namespace Zongsoft.Common
 			return new EnumEntry(field.Name,
 								underlyingType ? System.Convert.ChangeType(field.GetValue(null), Enum.GetUnderlyingType(enumValue.GetType())) : field.GetValue(null),
 								alias == null ? string.Empty : alias.Alias,
-								description == null ? string.Empty : description.Description);
+								description == null ? string.Empty : Zongsoft.Resources.ResourceUtility.GetString(description.Description, enumValue.GetType().Assembly));
 		}
 
 		/// <summary>
