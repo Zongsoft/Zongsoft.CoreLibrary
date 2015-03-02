@@ -1,7 +1,11 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zongsoft.CoreLibrary", "Zongsoft.CoreLibrary.csproj", "{D8BFAC6F-60BD-4A1A-BB4A-C1FE5043CDA8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zongsoft.CoreLibrary.Tests", "..\tests\Zongsoft.CoreLibrary.Tests\Zongsoft.CoreLibrary.Tests.csproj", "{AF95F5C7-B672-4A08-ABAB-6F677C9E5C58}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -12,6 +16,10 @@ Global
 		{D8BFAC6F-60BD-4A1A-BB4A-C1FE5043CDA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D8BFAC6F-60BD-4A1A-BB4A-C1FE5043CDA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D8BFAC6F-60BD-4A1A-BB4A-C1FE5043CDA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF95F5C7-B672-4A08-ABAB-6F677C9E5C58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF95F5C7-B672-4A08-ABAB-6F677C9E5C58}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF95F5C7-B672-4A08-ABAB-6F677C9E5C58}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF95F5C7-B672-4A08-ABAB-6F677C9E5C58}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
