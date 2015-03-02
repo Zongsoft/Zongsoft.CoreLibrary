@@ -1,6 +1,6 @@
 /*
  * Authors:
- *   ÖÓ·å(Popeye Zhong) <zongsoft@gmail.com>
+ *   é’Ÿå³°(Popeye Zhong) <zongsoft@gmail.com>
  *
  * Copyright (C) 2010-2013 Zongsoft Corporation <http://www.zongsoft.com>
  *
@@ -34,7 +34,7 @@ namespace Zongsoft.Common
 {
 	public static class Convert
 	{
-		#region ¶ÔÏó×ª»»
+		#region ç±»å‹è½¬æ¢
 		public static T ConvertValue<T>(object value)
 		{
 			return (T)ConvertValue(value, typeof(T), () => default(T));
@@ -86,7 +86,7 @@ namespace Zongsoft.Common
 
 			try
 			{
-				//»ñÈ¡Ö¸¶¨µÄÀàĞÍ×ª»»Æ÷
+				//è·å–æŒ‡å®šçš„ç±»å‹è½¬æ¢å™¨
 				var converter = GetTypeConverter(type);
 
 				if(converter != null && converter.CanConvertFrom(value.GetType()))
@@ -127,7 +127,7 @@ namespace Zongsoft.Common
 		}
 		#endregion
 
-		#region »ñÈ¡×ª»»Æ÷
+		#region è·å–è½¬æ¢å™¨
 		private static int _initialized;
 		private static TypeConverter GetTypeConverter(Type type)
 		{
@@ -148,7 +148,7 @@ namespace Zongsoft.Common
 		}
 		#endregion
 
-		#region È¡Ä¬ÈÏÖµ
+		#region å–é»˜è®¤å€¼
 		public static object GetDefaultValue(Type type)
 		{
 			if(type == typeof(DBNull))
@@ -177,77 +177,23 @@ namespace Zongsoft.Common
 		}
 		#endregion
 
-		#region ¿ÕÖµÅĞ¶Ï
+		#region å­—èŠ‚æ–‡æœ¬
 		/// <summary>
-		/// ÅĞ¶ÏÖ¸¶¨µÄÖµÊÇ·ñÎª¿Õ»òÕßDBNull£¬Èç¹ûÊÇÔò·µ»ØÕæ(True)£¬·ñÔò·µ»Ø¼Ù(False)¡£
+		/// å°†æŒ‡å®šçš„å­—èŠ‚æ•°ç»„è½¬æ¢ä¸ºå…¶ç”¨åå…­è¿›åˆ¶æ•°å­—ç¼–ç çš„ç­‰æ•ˆå­—ç¬¦ä¸²è¡¨ç¤ºå½¢å¼ã€‚
 		/// </summary>
-		/// <param name="value">ÒªÅĞ¶ÏµÄÖµ¡£</param>
-		/// <returns>·µ»ØµÄ½á¹û¡£</returns>
-		public static bool IsNullOrDBNull(object value)
-		{
-			return (value == null || System.Convert.IsDBNull(value));
-		}
-
-		/// <summary>
-		/// ÅĞ¶ÏÖ¸¶¨µÄÖµÊÇ·ñÎª¿Õ»òÕßDBNull£¬Èç¹ûÊÇÔò·µ»ØÖ¸¶¨·ºĞÍÀàĞÍµÄÄ¬ÈÏÖµ£¬·ñÔò·µ»Ø²ÎÊı±¾Éí¡£
-		/// </summary>
-		/// <typeparam name="T">Ö¸¶¨µÄ²ÎÊıµÄ·ºĞÍ¡£</typeparam>
-		/// <param name="value">Ö¸¶¨µÄ²ÎÊıÖµ¡£</param>
-		/// <returns>·µ»ØµÄ½á¹û¡£</returns>
-		public static T IsNullOrDBNull<T>(object value)
-		{
-			return IsNullOrDBNull<T>(value, default(T));
-		}
-
-		/// <summary>
-		/// ÅĞ¶ÏÖ¸¶¨µÄÖµÊÇ·ñÎª¿Õ»òÕßDBNull£¬Èç¹ûÊÇÔò·µ»ØÖ¸¶¨µÄÄ¬ÈÏÖµ£¬·ñÔò·µ»Ø²ÎÊı±¾Éí¡£
-		/// </summary>
-		/// <typeparam name="T">Ö¸¶¨µÄ²ÎÊıµÄ·ºĞÍ¡£</typeparam>
-		/// <param name="value">Ö¸¶¨µÄ²ÎÊıÖµ¡£</param>
-		/// <param name="defaultValue">Ä¬ÈÏÖµ¡£</param>
-		/// <returns>²ÎÊıÖµ»òÄ¬ÈÏÖµ¡£</returns>
-		public static T IsNullOrDBNull<T>(object value, T defaultValue)
-		{
-			if(value == null || System.Convert.IsDBNull(value))
-				return defaultValue;
-
-			try
-			{
-				return (T)value;
-			}
-			catch
-			{
-			}
-
-			try
-			{
-				return (T)System.Convert.ChangeType(value, typeof(T));
-			}
-			catch
-			{
-			}
-
-			return defaultValue;
-		}
-		#endregion
-
-		#region ×Ö½ÚÎÄ±¾
-		/// <summary>
-		/// ½«Ö¸¶¨µÄ×Ö½ÚÊı×é×ª»»ÎªÆäÓÃÊ®Áù½øÖÆÊı×Ö±àÂëµÄµÈĞ§×Ö·û´®±íÊ¾ĞÎÊ½¡£
-		/// </summary>
-		/// <param name="buffer">Ò»¸ö 8 Î»ÎŞ·ûºÅ×Ö½ÚÊı×é¡£</param>
-		/// <returns>²ÎÊıÖĞÔªËØµÄ×Ö·û´®±íÊ¾ĞÎÊ½£¬ÒÔÊ®Áù½øÖÆÎÄ±¾±íÊ¾¡£</returns>
+		/// <param name="buffer">ä¸€ä¸ª 8 ä½æ— ç¬¦å·å­—èŠ‚æ•°ç»„ã€‚</param>
+		/// <returns>å‚æ•°ä¸­å…ƒç´ çš„å­—ç¬¦ä¸²è¡¨ç¤ºå½¢å¼ï¼Œä»¥åå…­è¿›åˆ¶æ–‡æœ¬è¡¨ç¤ºã€‚</returns>
 		public static string ToHexString(byte[] buffer)
 		{
 			return ToHexString(buffer, '\0');
 		}
 
 		/// <summary>
-		/// ½«Ö¸¶¨µÄ×Ö½ÚÊı×é×ª»»ÎªÆäÓÃÊ®Áù½øÖÆÊı×Ö±àÂëµÄµÈĞ§×Ö·û´®±íÊ¾ĞÎÊ½¡£²ÎÊıÖ¸¶¨ÊÇ·ñÔÚ·µ»ØÖµÖĞ²åÈë·Ö¸ô·û¡£
+		/// å°†æŒ‡å®šçš„å­—èŠ‚æ•°ç»„è½¬æ¢ä¸ºå…¶ç”¨åå…­è¿›åˆ¶æ•°å­—ç¼–ç çš„ç­‰æ•ˆå­—ç¬¦ä¸²è¡¨ç¤ºå½¢å¼ã€‚å‚æ•°æŒ‡å®šæ˜¯å¦åœ¨è¿”å›å€¼ä¸­æ’å…¥åˆ†éš”ç¬¦ã€‚
 		/// </summary>
-		/// <param name="buffer">Ò»¸ö 8 Î»ÎŞ·ûºÅ×Ö½ÚÊı×é¡£</param>
-		/// <param name="separator">Ã¿×Ö½Ú¶ÔÓ¦µÄÊ®Áù½øÖÆÎÄ±¾ÖĞ¼äµÄ·Ö¸ô·û¡£</param>
-		/// <returns>²ÎÊıÖĞÔªËØµÄ×Ö·û´®±íÊ¾ĞÎÊ½£¬ÒÔÊ®Áù½øÖÆÎÄ±¾±íÊ¾¡£</returns>
+		/// <param name="buffer">ä¸€ä¸ª 8 ä½æ— ç¬¦å·å­—èŠ‚æ•°ç»„ã€‚</param>
+		/// <param name="separator">æ¯å­—èŠ‚å¯¹åº”çš„åå…­è¿›åˆ¶æ–‡æœ¬ä¸­é—´çš„åˆ†éš”ç¬¦ã€‚</param>
+		/// <returns>å‚æ•°ä¸­å…ƒç´ çš„å­—ç¬¦ä¸²è¡¨ç¤ºå½¢å¼ï¼Œä»¥åå…­è¿›åˆ¶æ–‡æœ¬è¡¨ç¤ºã€‚</returns>
 		public static string ToHexString(byte[] buffer, char separator)
 		{
 			if(buffer == null || buffer.Length < 1)
@@ -267,39 +213,39 @@ namespace Zongsoft.Common
 		}
 
 		/// <summary>
-		/// ½«Ö¸¶¨µÄÊ®Áù½øÖÆ¸ñÊ½µÄ×Ö·û´®×ª»»ÎªµÈĞ§µÄ×Ö½ÚÊı×é¡£
+		/// å°†æŒ‡å®šçš„åå…­è¿›åˆ¶æ ¼å¼çš„å­—ç¬¦ä¸²è½¬æ¢ä¸ºç­‰æ•ˆçš„å­—èŠ‚æ•°ç»„ã€‚
 		/// </summary>
-		/// <param name="text">Òª×ª»»µÄÊ®Áù½øÖÆ¸ñÊ½µÄ×Ö·û´®¡£</param>
-		/// <returns>Óë<paramref name="text"/>µÈĞ§µÄ×Ö½ÚÊı×é¡£</returns>
-		/// <exception cref="System.FormatException"><paramref name="text"/>²ÎÊıÖĞº¬ÓĞ·Ç¿Õ°××Ö·û¡£</exception>
-		/// <remarks>¸Ã·½·¨µÄÊµÏÖÊ¼ÖÕºöÂÔ<paramref name="text"/>²ÎÊıÖĞµÄ¿Õ°××Ö·û¡£</remarks>
+		/// <param name="text">è¦è½¬æ¢çš„åå…­è¿›åˆ¶æ ¼å¼çš„å­—ç¬¦ä¸²ã€‚</param>
+		/// <returns>ä¸<paramref name="text"/>ç­‰æ•ˆçš„å­—èŠ‚æ•°ç»„ã€‚</returns>
+		/// <exception cref="System.FormatException"><paramref name="text"/>å‚æ•°ä¸­å«æœ‰éç©ºç™½å­—ç¬¦ã€‚</exception>
+		/// <remarks>è¯¥æ–¹æ³•çš„å®ç°å§‹ç»ˆå¿½ç•¥<paramref name="text"/>å‚æ•°ä¸­çš„ç©ºç™½å­—ç¬¦ã€‚</remarks>
 		public static byte[] FromHexString(string text)
 		{
 			return FromHexString(text, '\0', true);
 		}
 
 		/// <summary>
-		/// ½«Ö¸¶¨µÄÊ®Áù½øÖÆ¸ñÊ½µÄ×Ö·û´®×ª»»ÎªµÈĞ§µÄ×Ö½ÚÊı×é¡£
+		/// å°†æŒ‡å®šçš„åå…­è¿›åˆ¶æ ¼å¼çš„å­—ç¬¦ä¸²è½¬æ¢ä¸ºç­‰æ•ˆçš„å­—èŠ‚æ•°ç»„ã€‚
 		/// </summary>
-		/// <param name="text">Òª×ª»»µÄÊ®Áù½øÖÆ¸ñÊ½µÄ×Ö·û´®¡£</param>
-		/// <param name="separator">Òª¹ıÂËµôµÄ·Ö¸ô·û×Ö·û¡£</param>
-		/// <returns>Óë<paramref name="text"/>µÈĞ§µÄ×Ö½ÚÊı×é¡£</returns>
-		/// <exception cref="System.FormatException"><paramref name="text"/>²ÎÊıÖĞº¬ÓĞ·Ç¿Õ°××Ö·û»ò·ÇÖ¸¶¨µÄ·Ö¸ô·û¡£</exception>
-		/// <remarks>¸Ã·½·¨µÄÊµÏÖÊ¼ÖÕºöÂÔ<paramref name="text"/>²ÎÊıÖĞµÄ¿Õ°××Ö·û¡£</remarks>
+		/// <param name="text">è¦è½¬æ¢çš„åå…­è¿›åˆ¶æ ¼å¼çš„å­—ç¬¦ä¸²ã€‚</param>
+		/// <param name="separator">è¦è¿‡æ»¤æ‰çš„åˆ†éš”ç¬¦å­—ç¬¦ã€‚</param>
+		/// <returns>ä¸<paramref name="text"/>ç­‰æ•ˆçš„å­—èŠ‚æ•°ç»„ã€‚</returns>
+		/// <exception cref="System.FormatException"><paramref name="text"/>å‚æ•°ä¸­å«æœ‰éç©ºç™½å­—ç¬¦æˆ–éæŒ‡å®šçš„åˆ†éš”ç¬¦ã€‚</exception>
+		/// <remarks>è¯¥æ–¹æ³•çš„å®ç°å§‹ç»ˆå¿½ç•¥<paramref name="text"/>å‚æ•°ä¸­çš„ç©ºç™½å­—ç¬¦ã€‚</remarks>
 		public static byte[] FromHexString(string text, char separator)
 		{
 			return FromHexString(text, separator, true);
 		}
 
 		/// <summary>
-		/// ½«Ö¸¶¨µÄÊ®Áù½øÖÆ¸ñÊ½µÄ×Ö·û´®×ª»»ÎªµÈĞ§µÄ×Ö½ÚÊı×é¡£
+		/// å°†æŒ‡å®šçš„åå…­è¿›åˆ¶æ ¼å¼çš„å­—ç¬¦ä¸²è½¬æ¢ä¸ºç­‰æ•ˆçš„å­—èŠ‚æ•°ç»„ã€‚
 		/// </summary>
-		/// <param name="text">Òª×ª»»µÄÊ®Áù½øÖÆ¸ñÊ½µÄ×Ö·û´®¡£</param>
-		/// <param name="separator">Òª¹ıÂËµôµÄ·Ö¸ô·û×Ö·û¡£</param>
-		/// <param name="throwExceptionOnFormat">Ö¸¶¨µ±ÊäÈëÎÄ±¾ÖĞº¬ÓĞ·Ç·¨×Ö·ûÊ±ÊÇ·ñÅ×³ö<seealso cref="System.FormatException"/>Òì³£¡£</param>
-		/// <returns>Óë<paramref name="text"/>µÈĞ§µÄ×Ö½ÚÊı×é¡£</returns>
-		/// <exception cref="System.FormatException">µ±<param name="throwExceptionOnFormat"²ÎÊıÎªÕæ£¬²¢ÇÒ<paramref name="text"/>²ÎÊıÖĞº¬ÓĞ·Ç¿Õ°××Ö·û»ò·ÇÖ¸¶¨µÄ·Ö¸ô·û¡£</exception>
-		/// <remarks>¸Ã·½·¨µÄÊµÏÖÊ¼ÖÕºöÂÔ<paramref name="text"/>²ÎÊıÖĞµÄ¿Õ°××Ö·û¡£</remarks>
+		/// <param name="text">è¦è½¬æ¢çš„åå…­è¿›åˆ¶æ ¼å¼çš„å­—ç¬¦ä¸²ã€‚</param>
+		/// <param name="separator">è¦è¿‡æ»¤æ‰çš„åˆ†éš”ç¬¦å­—ç¬¦ã€‚</param>
+		/// <param name="throwExceptionOnFormat">æŒ‡å®šå½“è¾“å…¥æ–‡æœ¬ä¸­å«æœ‰éæ³•å­—ç¬¦æ—¶æ˜¯å¦æŠ›å‡º<seealso cref="System.FormatException"/>å¼‚å¸¸ã€‚</param>
+		/// <returns>ä¸<paramref name="text"/>ç­‰æ•ˆçš„å­—èŠ‚æ•°ç»„ã€‚</returns>
+		/// <exception cref="System.FormatException">å½“<param name="throwExceptionOnFormat"å‚æ•°ä¸ºçœŸï¼Œå¹¶ä¸”<paramref name="text"/>å‚æ•°ä¸­å«æœ‰éç©ºç™½å­—ç¬¦æˆ–éæŒ‡å®šçš„åˆ†éš”ç¬¦ã€‚</exception>
+		/// <remarks>è¯¥æ–¹æ³•çš„å®ç°å§‹ç»ˆå¿½ç•¥<paramref name="text"/>å‚æ•°ä¸­çš„ç©ºç™½å­—ç¬¦ã€‚</remarks>
 		public static byte[] FromHexString(string text, char separator, bool throwExceptionOnFormat)
 		{
 			if(string.IsNullOrEmpty(text))
@@ -426,9 +372,9 @@ namespace Zongsoft.Common
 		}
 		#endregion
 
-		#region ¶ÔÏó½âÎö
+		#region å¯¹è±¡è§£æ
 
-		#region »ñÈ¡·½·¨
+		#region è·å–æ–¹æ³•
 		public static object GetValue(object target, string path)
 		{
 			if(target == null || path == null || path.Length < 1)
@@ -469,7 +415,7 @@ namespace Zongsoft.Common
 			if(start < 0 || start >= memberNames.Length)
 				throw new ArgumentOutOfRangeException("start");
 
-			//´´½¨½âÎöÉÏÏÂÎÄ¶ÔÏó
+			//åˆ›å»ºè§£æä¸Šä¸‹æ–‡å¯¹è±¡
 			ObjectResolvingContext context = new ObjectResolvingContext(target, string.Join(".", memberNames));
 
 			for(int i = 0; i < Math.Min(memberNames.Length - start, length); i++)
@@ -486,7 +432,7 @@ namespace Zongsoft.Common
 				context.Name = memberName;
 				context.Container = context.Value;
 
-				//½âÎö¶ÔÏó³ÉÔ±
+				//è§£æå¯¹è±¡æˆå‘˜
 				if(resolve == null)
 					DefaultResolve(context);
 				else
@@ -502,7 +448,7 @@ namespace Zongsoft.Common
 		}
 		#endregion
 
-		#region ÉèÖÃ·½·¨
+		#region è®¾ç½®æ–¹æ³•
 		public static void SetValue(object target, string path, object value)
 		{
 			SetValue(target, path, value, null);
@@ -536,10 +482,10 @@ namespace Zongsoft.Common
 					throw new InvalidOperationException(string.Format("The '{0}' member is not exists in object of '{1}' type.", string.Join(".", memberNames), target.GetType().FullName));
 			}
 
-			//´´½¨¹¹¼ş½âÎöÉÏÏÂÎÄ¶ÔÏó
+			//åˆ›å»ºæ„ä»¶è§£æä¸Šä¸‹æ–‡å¯¹è±¡
 			var context = new ObjectResolvingContext(target, container, memberNames[memberNames.Length - 1], value, string.Join(".", memberNames));
 
-			//µ÷ÓÃ½âÎö»Øµ÷·½·¨
+			//è°ƒç”¨è§£æå›è°ƒæ–¹æ³•
 			if(resolve == null)
 				DefaultResolve(context);
 			else
@@ -552,7 +498,7 @@ namespace Zongsoft.Common
 		}
 		#endregion
 
-		#region Ë½ÓĞ·½·¨
+		#region ç§æœ‰æ–¹æ³•
 		private static readonly Action<ObjectResolvingContext> DefaultResolve = (ctx) =>
 		{
 			if(ctx.Container == null)
@@ -622,24 +568,24 @@ namespace Zongsoft.Common
 		}
 		#endregion
 
-		#region Ç¶Ì××ÓÀà
+		#region åµŒå¥—å­ç±»
 		/// <summary>
-		/// ±íÊ¾¶ÔÏó³ÉÔ±µÄ½âÎö·½Ïò¡£
+		/// è¡¨ç¤ºå¯¹è±¡æˆå‘˜çš„è§£ææ–¹å‘ã€‚
 		/// </summary>
 		public enum ObjectResolvingDirection
 		{
-			/// <summary>»ñÈ¡¶ÔÏóµÄ³ÉÔ±Öµ¡£</summary>
+			/// <summary>è·å–å¯¹è±¡çš„æˆå‘˜å€¼ã€‚</summary>
 			Get,
-			/// <summary>ÉèÖÃ¶ÔÏóµÄ³ÉÔ±Öµ¡£</summary>
+			/// <summary>è®¾ç½®å¯¹è±¡çš„æˆå‘˜å€¼ã€‚</summary>
 			Set,
 		}
 
 		/// <summary>
-		/// ±íÊ¾ÔÚ¶ÔÏó³ÉÔ±½âÎö³ÌĞòÖĞµÄ²Ù×÷ÉÏÏÂÎÄ¡£
+		/// è¡¨ç¤ºåœ¨å¯¹è±¡æˆå‘˜è§£æç¨‹åºä¸­çš„æ“ä½œä¸Šä¸‹æ–‡ã€‚
 		/// </summary>
 		public class ObjectResolvingContext : MarshalByRefObject
 		{
-			#region ³ÉÔ±×Ö¶Î
+			#region æˆå‘˜å­—æ®µ
 			private ObjectResolvingDirection _direction;
 			private object _target;
 			private object _container;
@@ -649,7 +595,7 @@ namespace Zongsoft.Common
 			private bool _handled;
 			#endregion
 
-			#region ¹¹Ôìº¯Êı
+			#region æ„é€ å‡½æ•°
 			internal ObjectResolvingContext(object target, string path)
 			{
 				if(target == null)
@@ -682,9 +628,9 @@ namespace Zongsoft.Common
 			}
 			#endregion
 
-			#region ¹«¹²ÊôĞÔ
+			#region å…¬å…±å±æ€§
 			/// <summary>
-			/// »ñÈ¡½âÎö¹ı³ÌÖĞµ±Ç°´¦ÀíµÄ·½Ïò¡£
+			/// è·å–è§£æè¿‡ç¨‹ä¸­å½“å‰å¤„ç†çš„æ–¹å‘ã€‚
 			/// </summary>
 			public ObjectResolvingDirection Direction
 			{
@@ -695,7 +641,7 @@ namespace Zongsoft.Common
 			}
 
 			/// <summary>
-			/// »ñÈ¡½âÎö³ÌĞòµÄÄ¿±ê¸ù¶ÔÏó¡£
+			/// è·å–è§£æç¨‹åºçš„ç›®æ ‡æ ¹å¯¹è±¡ã€‚
 			/// </summary>
 			public object Target
 			{
@@ -706,7 +652,7 @@ namespace Zongsoft.Common
 			}
 
 			/// <summary>
-			/// »ñÈ¡½âÎö¹ı³ÌÖĞµ±Ç°³ÉÔ±µÄÈİÆ÷¶ÔÏó¡£
+			/// è·å–è§£æè¿‡ç¨‹ä¸­å½“å‰æˆå‘˜çš„å®¹å™¨å¯¹è±¡ã€‚
 			/// </summary>
 			public object Container
 			{
@@ -721,7 +667,7 @@ namespace Zongsoft.Common
 			}
 
 			/// <summary>
-			/// »ñÈ¡½âÎöµÄÍêÕû³ÉÔ±Â·¾¶£¬·µ»ØÒ»¸öÒÔ¡°.¡±·Ö¸ôµÄ×Ö·û´®¡£
+			/// è·å–è§£æçš„å®Œæ•´æˆå‘˜è·¯å¾„ï¼Œè¿”å›ä¸€ä¸ªä»¥â€œ.â€åˆ†éš”çš„å­—ç¬¦ä¸²ã€‚
 			/// </summary>
 			public string Path
 			{
@@ -732,13 +678,13 @@ namespace Zongsoft.Common
 			}
 
 			/// <summary>
-			/// »ñÈ¡»òÉèÖÃÒ»¸ö²Ù×÷µÄÖµ£¬¸ÃÊôĞÔÔÚ²»Í¬³¡¾°ÖĞËù±íÊ¾µÄº¬ÒåºÍ¿ÉÉèÖÃĞÔ¾ù²»Í¬¡£ÏêÇéÇë²Î¿¼±¸×¢¡£
+			/// è·å–æˆ–è®¾ç½®ä¸€ä¸ªæ“ä½œçš„å€¼ï¼Œè¯¥å±æ€§åœ¨ä¸åŒåœºæ™¯ä¸­æ‰€è¡¨ç¤ºçš„å«ä¹‰å’Œå¯è®¾ç½®æ€§å‡ä¸åŒã€‚è¯¦æƒ…è¯·å‚è€ƒå¤‡æ³¨ã€‚
 			/// </summary>
 			/// <remarks>
-			///		<para>µ±<see cref="Direction"/>ÊôĞÔÖµµÈÓÚ<seealso cref="ObjectResolvingDirection.Get"/>Ê±£¬¸ÃÊôĞÔ¿ÉÉèÖÃ£¬±íÊ¾´¦Àí³ÌĞòËù½âÎö³öÀ´µÄ³ÉÔ±Öµ¡£</para>
-			///		<para>µ±<see cref="Direction"/>ÊôĞÔÖµµÈÓÚ<seealso cref="ObjectResolvingDirection.Set"/>Ê±£¬¸ÃÊôĞÔ²»¿ÉÉèÖÃ£¬±íÊ¾ÊÇÓÉÓÃ»§Ö¸¶¨ÒªÉèÖÃµÄÄ¿±êÖµ¡£</para>
+			///		<para>å½“<see cref="Direction"/>å±æ€§å€¼ç­‰äº<seealso cref="ObjectResolvingDirection.Get"/>æ—¶ï¼Œè¯¥å±æ€§å¯è®¾ç½®ï¼Œè¡¨ç¤ºå¤„ç†ç¨‹åºæ‰€è§£æå‡ºæ¥çš„æˆå‘˜å€¼ã€‚</para>
+			///		<para>å½“<see cref="Direction"/>å±æ€§å€¼ç­‰äº<seealso cref="ObjectResolvingDirection.Set"/>æ—¶ï¼Œè¯¥å±æ€§ä¸å¯è®¾ç½®ï¼Œè¡¨ç¤ºæ˜¯ç”±ç”¨æˆ·æŒ‡å®šè¦è®¾ç½®çš„ç›®æ ‡å€¼ã€‚</para>
 			/// </remarks>
-			/// <exception cref="System.InvalidOperationException">µ±<see cref="Direction"/>ÊôĞÔÖµ²»µÈÓÚ<seealso cref="ObjectResolvingDirection.Get"/>Ê±¼¤·¢¡£</exception>
+			/// <exception cref="System.InvalidOperationException">å½“<see cref="Direction"/>å±æ€§å€¼ä¸ç­‰äº<seealso cref="ObjectResolvingDirection.Get"/>æ—¶æ¿€å‘ã€‚</exception>
 			public object Value
 			{
 				get
@@ -755,7 +701,7 @@ namespace Zongsoft.Common
 			}
 
 			/// <summary>
-			/// »ñÈ¡µ±Ç°½âÎöµÄ³ÉÔ±Ãû³Æ¡£
+			/// è·å–å½“å‰è§£æçš„æˆå‘˜åç§°ã€‚
 			/// </summary>
 			public string Name
 			{
@@ -770,11 +716,11 @@ namespace Zongsoft.Common
 			}
 
 			/// <summary>
-			/// »ñÈ¡»òÉèÖÃ´¦ÀíÍê³É±ê¼Ç¡£
+			/// è·å–æˆ–è®¾ç½®å¤„ç†å®Œæˆæ ‡è®°ã€‚
 			/// </summary>
 			/// <remarks>
-			///		<para>Èç¹ûÉèÖÃ¸ÃÊôĞÔÎªÕæ(true)£¬±íÊ¾×Ô¶¨Òå½âÎö³ÌĞòÒÑ¾­Íê³É¶Ôµ±Ç°³ÉÔ±µÄ½âÎö£¬Ôò±íÊ¾¸æÖªÏµÍ³²»ÒªÔÙ¶Ôµ±Ç°³ÉÔ±µÄ½øĞĞ½âÎö´¦ÀíÁË£»</para>
-			///		<para>Èç¹ûÉèÖÃ¸ÃÊôĞÔÎª¼Ù(false)£¬¼´Ä¬ÈÏÖµ¡£±íÊ¾×Ô¶¨Òå×Ô¶¨Òå½âÎö³ÌĞòÎ´¶Ôµ±Ç°³ÉÔ±½øĞĞ½âÎö£¬ÔòÒâÎ¶½«ÓÉÏµÍ³¶Ôµ±Ç°³ÉÔ±½øĞĞ½âÎö´¦Àí¡£</para>
+			///		<para>å¦‚æœè®¾ç½®è¯¥å±æ€§ä¸ºçœŸ(true)ï¼Œè¡¨ç¤ºè‡ªå®šä¹‰è§£æç¨‹åºå·²ç»å®Œæˆå¯¹å½“å‰æˆå‘˜çš„è§£æï¼Œåˆ™è¡¨ç¤ºå‘ŠçŸ¥ç³»ç»Ÿä¸è¦å†å¯¹å½“å‰æˆå‘˜çš„è¿›è¡Œè§£æå¤„ç†äº†ï¼›</para>
+			///		<para>å¦‚æœè®¾ç½®è¯¥å±æ€§ä¸ºå‡(false)ï¼Œå³é»˜è®¤å€¼ã€‚è¡¨ç¤ºè‡ªå®šä¹‰è‡ªå®šä¹‰è§£æç¨‹åºæœªå¯¹å½“å‰æˆå‘˜è¿›è¡Œè§£æï¼Œåˆ™æ„å‘³å°†ç”±ç³»ç»Ÿå¯¹å½“å‰æˆå‘˜è¿›è¡Œè§£æå¤„ç†ã€‚</para>
 			/// </remarks>
 			public bool Handled
 			{
