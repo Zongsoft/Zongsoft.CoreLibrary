@@ -43,7 +43,7 @@ namespace Zongsoft.Common
 		{
 		}
 
-		public Buffer(byte[] value, int offset) : this(value, 0, -1)
+		public Buffer(byte[] value, int offset) : this(value, offset, -1)
 		{
 		}
 
