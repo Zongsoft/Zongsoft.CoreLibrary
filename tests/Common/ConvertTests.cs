@@ -29,7 +29,7 @@ namespace Zongsoft.Common.Tests
 			Assert.AreEqual(Gender.Female, Zongsoft.Common.Convert.ConvertValue<Gender>("F"));
 
 			//根据枚举项的 DescriptionAttribute 值来解析
-			Assert.AreEqual(Gender.Male, Zongsoft.Common.Convert.ConvertValue<Gender>("男士"));
+			Assert.AreEqual(Gender.Male, Zongsoft.Common.Convert.ConvertValue<Gender>("先生"));
 			Assert.AreEqual(Gender.Female, Zongsoft.Common.Convert.ConvertValue<Gender>("女士"));
 		}
 

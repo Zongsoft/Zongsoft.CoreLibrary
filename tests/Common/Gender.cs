@@ -6,11 +6,13 @@ namespace Zongsoft.Common.Tests
 	public enum Gender
 	{
 		[Zongsoft.ComponentModel.Alias("M")]
-		[Description("男士")]
+		//[Description("先生")]
+		[Description("${Text.Gender.Male}")]
 		Male,
 
 		[Zongsoft.ComponentModel.Alias("F")]
-		[Description("女士")]
+		//[Description("女士")]
+		[Description("${Text.Gender.Female}")]
 		Female,
 	}
 }

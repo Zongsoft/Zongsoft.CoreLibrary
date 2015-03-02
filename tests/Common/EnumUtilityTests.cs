@@ -27,7 +27,7 @@ namespace Zongsoft.Common.Tests
 			Assert.AreEqual("Male", entry.Name);
 			Assert.AreEqual(0, entry.Value); //注意：entry.Value 为枚举项的基元类型
 			Assert.AreEqual("M", entry.Alias);
-			Assert.AreEqual("男士", entry.Description);
+			Assert.AreEqual("先生", entry.Description);
 		}
 
 		[TestMethod]
