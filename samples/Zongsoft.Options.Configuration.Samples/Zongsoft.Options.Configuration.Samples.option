@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<options>
+	<option path="Environment/Examples">
+		<general general.type="Zongsoft.Options.Configuration.Samples.GeneralOptionElement, Zongsoft.Options.Configuration.Samples"
+						 text="文本属性值"
+						 int="100"
+						 datetime="1979/5/15">
+			<cmdlets>
+				<cmdlet name="cmdlet#1" type="Object" text="Table#1" />
+				<cmdlet name="cmdlet#2" type="StoredProcedure" text="StoredProcedure#1" />
+				<cmdlet name="cmdlet#3" type="Text" text="SELECT * FROM Table" />
+			</cmdlets>
+
+			<setting name="k1" value="v1" />
+			<setting name="k2" value="v2" />
+		</general>
+
+		<advance advance.type="Zongsoft.Options.Configuration.Samples.AdvanceOptionElement, Zongsoft.Options.Configuration.Samples"
+						 name="My name is Popeye." />
+
+		<settings>
+			<setting name="global-key#1" value="global-value#1" />
+			<setting name="global-key#2" value="global-value#2" />
+		</settings>
+	</option>
+</options>

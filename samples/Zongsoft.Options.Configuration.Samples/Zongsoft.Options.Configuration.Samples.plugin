@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<plugin name="Zongsoft.Options.Configuration.Samples"
+				title="Zongsoft.Options.Configuration.Samples Plugin"
+				author="Popeye Zhong"
+				version="1.0">
+
+	<manifest>
+		<assemblies>
+			<assembly name="Zongsoft.Options.Configuration.Samples"/>
+		</assemblies>
+	</manifest>
+
+	<extension path="/Workbench/Options/Environment">
+		<option name="Examples" title="选项测试">
+			<option name="General" title="常规" provider="." />
+			<option name="Advance" title="高级" provider="." />
+		</option>
+	</extension>
+
+	<extension path="/Workbench/Examples">
+		<object name="UseGeneralElement"
+		        general="{opt:/Environment/Examples/General}"
+		        type="Zongsoft.Options.Configuration.Samples.UseOptionElementExample, Zongsoft.Options.Configuration.Samples" />
+	</extension>
+</plugin>

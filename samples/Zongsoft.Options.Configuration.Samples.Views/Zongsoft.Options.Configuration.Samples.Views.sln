@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zongsoft.Options.Configuration.Samples.Views", "Zongsoft.Options.Configuration.Samples.Views.csproj", "{F91A14BD-727F-4FE1-942E-B997BBA0E27C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zongsoft.Options.Configuration.Samples", "..\Zongsoft.Options.Configuration.Samples\Zongsoft.Options.Configuration.Samples.csproj", "{CA815A8B-D577-4127-8073-819F788B6325}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F91A14BD-727F-4FE1-942E-B997BBA0E27C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F91A14BD-727F-4FE1-942E-B997BBA0E27C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F91A14BD-727F-4FE1-942E-B997BBA0E27C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F91A14BD-727F-4FE1-942E-B997BBA0E27C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA815A8B-D577-4127-8073-819F788B6325}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA815A8B-D577-4127-8073-819F788B6325}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA815A8B-D577-4127-8073-819F788B6325}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA815A8B-D577-4127-8073-819F788B6325}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

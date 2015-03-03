@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<plugin name="Zongsoft.Options.Configuration.Samples.Views"
+				title="Zongsoft.Options.Configuration.Samples.Views Plugin"
+				author="Popeye Zhong(Zongsoft Corporation)"
+				version="1.0">
+
+	<manifest>
+		<assemblies>
+			<assembly name="Zongsoft.Options.Configuration.Samples.Views"/>
+		</assemblies>
+
+		<dependencies>
+			<dependency name="Zongsoft.Options.Configuration.Samples"/>
+		</dependencies>
+	</manifest>
+
+	<extension path="/Workbench/Options/Environment/Examples">
+		<general.view>
+			<object name="view" type="Zongsoft.Options.Configuration.Samples.Views.GeneralOptionView, Zongsoft.Options.Configuration.Samples.Views">
+				<object.constructor>
+					<parameter type="Zongsoft.Configuration.Options.IOption, Zongsoft.CoreLibrary"
+										 value="/Workbench/Options/Environment/Examples/General" />
+				</object.constructor>
+			</object>
+		</general.view>
+	</extension>
+</plugin>
