@@ -59,10 +59,14 @@ namespace Zongsoft.Collections
 			return item.Name;
 		}
 
-		protected override void InsertItem(int index, T item)
+		protected override void InsertItems(int index, IEnumerable<T> items)
 		{
-			item.InnerParent = _owner;
-			base.InsertItem(index, item);
+			foreach(var item in items)
+			{
+				item.InnerParent = _owner;
+			}
+
+			base.InsertItems(index, items);
 		}
 
 		protected override void SetItem(int index, T item)

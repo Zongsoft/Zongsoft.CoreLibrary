@@ -136,10 +136,14 @@ namespace Zongsoft.Collections
 			base.ClearItems();
 		}
 
-		protected override void InsertItem(int index, T item)
+		protected override void InsertItems(int index, IEnumerable<T> items)
 		{
-			_innerDictionary.Add(this.GetKeyForItem(item), item);
-			base.InsertItem(index, item);
+			foreach(var item in items)
+			{
+				_innerDictionary.Add(this.GetKeyForItem(item), item);
+			}
+
+			base.InsertItems(index, items);
 		}
 
 		protected override void RemoveItem(int index)

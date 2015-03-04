@@ -66,10 +66,14 @@ namespace Zongsoft.Options.Profiles
 		#endregion
 
 		#region 重写方法
-		protected override void InsertItem(int index, ProfileItem item)
+		protected override void InsertItems(int index, IEnumerable<ProfileItem> items)
 		{
-			item.Owner = _owner;
-			base.InsertItem(index, item);
+			foreach(var item in items)
+			{
+				item.Owner = _owner;
+			}
+
+			base.InsertItems(index, items);
 		}
 
 		protected override void SetItem(int index, ProfileItem item)

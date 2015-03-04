@@ -101,22 +101,18 @@ namespace Zongsoft.Collections
 			if(_items.IsReadOnly)
 				throw new NotSupportedException();
 
-			int index = _items.Count;
-			this.InsertItem(index, item);
+			this.InsertItems(_items.Count, new T[] { item });
 		}
 
 		public virtual void AddRange(IEnumerable<T> items)
 		{
+			if(items == null)
+				throw new ArgumentNullException("items");
+
 			if(_items.IsReadOnly)
 				throw new NotSupportedException();
 
-			if(items == null)
-				return;
-
-			((List<T>)_items).AddRange(items);
-
-			//激发“CollectionChanged”事件
-			this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, items));
+			this.InsertItems(_items.Count, items);
 		}
 
 		public void Clear()
@@ -158,7 +154,7 @@ namespace Zongsoft.Collections
 			if(index < 0 || index > _items.Count)
 				throw new ArgumentOutOfRangeException();
 
-			this.InsertItem(index, item);
+			this.InsertItems(index, new T[] { item });
 		}
 
 		public bool Remove(T item)
@@ -195,12 +191,15 @@ namespace Zongsoft.Collections
 			this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
 		}
 
-		protected virtual void InsertItem(int index, T item)
+		protected virtual void InsertItems(int index, IEnumerable<T> items)
 		{
-			_items.Insert(index, item);
+			if(items == null)
+				return;
+
+			((List<T>)_items).AddRange(items);
 
 			//激发“CollectionChanged”事件
-			this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, index));
+			this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, items, index));
 		}
 
 		protected virtual void RemoveItem(int index)
