@@ -198,8 +198,16 @@ namespace Zongsoft.Collections
 
 			((List<T>)_items).AddRange(items);
 
+			var list = items as IList;
+
+			if(list == null)
+			{
+				foreach(var item in items)
+					list.Add(item);
+			}
+
 			//激发“CollectionChanged”事件
-			this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, items, index));
+			this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, list, index));
 		}
 
 		protected virtual void RemoveItem(int index)
