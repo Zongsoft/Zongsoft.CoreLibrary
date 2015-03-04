@@ -71,19 +71,10 @@ namespace Zongsoft.Common
 			if(string.IsNullOrEmpty(text) || string.IsNullOrEmpty(characters))
 				return false;
 
-			foreach(char character in characters)
-			{
-				foreach(char item in text)
-				{
-					if(character == item)
-						return true;
-				}
-			}
-
-			return false;
+			return ContainsCharacters(text, characters.ToArray());
 		}
 
-		public static bool ContainsCharacters(this string text, char[] characters)
+		public static bool ContainsCharacters(this string text, params char[] characters)
 		{
 			if(string.IsNullOrEmpty(text) || characters.Length < 1)
 				return false;
@@ -142,29 +133,9 @@ namespace Zongsoft.Common
 			string result = text;
 
 			for(int i = startIndex; i < startIndex + count; i++)
-				result = text.Replace(invalidCharacters[i].ToString(), "");
+				result = result.Replace(invalidCharacters[i].ToString(), "");
 
 			return result;
-		}
-
-		public static bool IsNullOrSpace(this string text)
-		{
-			string temp;
-			return IsNullOrSpace(text, out temp);
-		}
-
-		public static bool IsNullOrSpace(this string text, out string trimmedString)
-		{
-			bool result = string.IsNullOrEmpty(text);
-
-			if(result)
-			{
-				trimmedString = text;
-				return result;
-			}
-
-			trimmedString = text.Trim();
-			return (trimmedString.Length == 0);
 		}
 
 		public static string TrimString(this string text, string trimString)
