@@ -31,13 +31,12 @@ namespace Zongsoft.Common
 	public class ObjectReference<T> : MarshalByRefObject, IDisposableObject, IObjectReference<T> where T : class
 	{
 		#region 事件定义
-		public event EventHandler Disposed;
+		public event EventHandler<DisposedEventArgs> Disposed;
 		#endregion
 
 		#region 常量定义
 		private const int NORMAL_STATE = 0;
-		private const int INVALID_STATE = 1;
-		private const int DISPOSED_STATE = 2;
+		private const int DISPOSED_STATE = 1;
 		#endregion
 
 		#region 同步变量
@@ -88,11 +87,11 @@ namespace Zongsoft.Common
 				if(_state == DISPOSED_STATE)
 					throw new ObjectDisposedException(this.GetType().FullName);
 
-				if(_state == INVALID_STATE || _target == null)
+				if(_target == null)
 				{
 					lock(_syncRoot)
 					{
-						if(_state == INVALID_STATE || _target == null)
+						if(_target == null)
 						{
 							var target = _targetFactory();
 
@@ -113,30 +112,8 @@ namespace Zongsoft.Common
 		}
 		#endregion
 
-		#region 公共方法
-		public void Invalidate()
-		{
-			if(_state == DISPOSED_STATE)
-				throw new ObjectDisposedException(this.GetType().FullName);
-
-			var original = System.Threading.Interlocked.CompareExchange(ref _state, INVALID_STATE, NORMAL_STATE);
-
-			if(original != NORMAL_STATE)
-				return;
-
-			var disposable = this.Target as IDisposable;
-
-			//处置目标对象
-			if(disposable != null)
-				disposable.Dispose();
-
-			//设置目标对象引用为空
-			_target = null;
-		}
-		#endregion
-
 		#region 激发事件
-		protected virtual void OnDisposed(EventArgs args)
+		protected virtual void OnDisposed(DisposedEventArgs args)
 		{
 			var disposed = this.Disposed;
 
@@ -146,8 +123,9 @@ namespace Zongsoft.Common
 		#endregion
 
 		#region 私有方法
-		private void DisposableObject_Disposed(object sender, EventArgs e)
+		private void DisposableObject_Disposed(object sender, DisposedEventArgs e)
 		{
+			_state = DISPOSED_STATE;
 			_target = null;
 
 			var target = sender as IDisposableObject;
@@ -180,7 +158,7 @@ namespace Zongsoft.Common
 
 			_target = null;
 
-			this.OnDisposed(EventArgs.Empty);
+			this.OnDisposed(new DisposedEventArgs(disposing));
 		}
 		#endregion
 	}
