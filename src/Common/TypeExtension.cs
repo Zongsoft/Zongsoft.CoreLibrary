@@ -260,6 +260,8 @@ namespace Zongsoft.Common
 				case "guid[]":
 					return typeof(Guid[]);
 
+				case "object":
+					return typeof(object);
 				case "void":
 					return typeof(void);
 			}
