@@ -170,7 +170,57 @@ namespace Zongsoft.Collections
 
 		public void Clear()
 		{
-			_items.Clear();
+			if(_innerDictionary == null)
+			{
+				var removedItems = new List<T>();
+
+				foreach(var item in _items)
+				{
+					if(this.OnItemMatch(item))
+						removedItems.Add((T)item);
+				}
+
+				foreach(var item in removedItems)
+				{
+					_items.Remove(item);
+				}
+			}
+			else
+			{
+				foreach(var value in _innerDictionary.Values)
+				{
+					_items.Remove(value);
+				}
+			}
+		}
+
+		public bool Remove(string name)
+		{
+			if(_innerDictionary == null)
+			{
+				foreach(var item in _items)
+				{
+					if(this.OnItemMatch(item) && _comparer.Compare(this.GetKeyForItem((T)item), name) == 0)
+					{
+						_items.Remove(item);
+						return true;
+					}
+				}
+
+				return false;
+			}
+			else
+			{
+				T item;
+
+				if(_innerDictionary.TryGetValue(name, out item))
+				{
+					_items.Remove(item);
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 		public bool Remove(T item)
