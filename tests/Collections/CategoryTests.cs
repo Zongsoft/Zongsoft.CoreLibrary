@@ -51,8 +51,13 @@ namespace Zongsoft.Collections.Tests
 			Assert.IsNotNull(_root.Find("/File/Recents/Document-2"));
 
 			Assert.IsNotNull(_root.Find("File").Find("Open"));
-			Assert.IsNotNull(_root.Find("File").Find("Recents"));
+			Assert.IsNotNull(_root.Find("File").Find("./Recents"));
 			Assert.IsNotNull(_root.Find("File").Find("Recents").Find("Document-2"));
+
+			var node = _root.Find("Edit").Find("../File/Save");
+
+			Assert.IsNotNull(node);
+			Assert.AreEqual("Save", node.Name);
 		}
 	}
 }

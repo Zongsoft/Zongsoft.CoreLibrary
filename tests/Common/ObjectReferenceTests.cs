@@ -28,6 +28,7 @@ namespace Zongsoft.Common.Tests
 		public void DisposeTest()
 		{
 			var reference = new ObjectReference<Person>(() => new Person());
+			reference.Disposed += Reference_Disposed;
 
 			Assert.IsFalse(reference.HasTarget);
 			Assert.IsFalse(reference.IsDisposed);
@@ -36,6 +37,13 @@ namespace Zongsoft.Common.Tests
 			Assert.IsTrue(reference.IsDisposed);
 
 			var target = reference.Target;
+		}
+
+		private void Reference_Disposed(object sender, DisposedEventArgs e)
+		{
+			var disposableObject = (IDisposableObject)sender;
+
+			Assert.IsTrue(disposableObject.IsDisposed);
 		}
 	}
 }
