@@ -51,16 +51,18 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Collections\CategoryTests.cs" />
-    <Compile Include="Common\Address.cs" />
+    <Compile Include="Collections\NamedCollectionTests.cs" />
+    <Compile Include="Address.cs" />
     <Compile Include="Common\BufferTests.cs" />
     <Compile Include="Common\ConvertTests.cs" />
     <Compile Include="Common\EnumUtilityTests.cs" />
-    <Compile Include="Common\Gender.cs" />
+    <Compile Include="Gender.cs" />
     <Compile Include="Common\ObjectReferenceTests.cs" />
-    <Compile Include="Common\Person.cs" />
+    <Compile Include="Person.cs" />
     <Compile Include="Common\StringExtensionTests.cs" />
     <Compile Include="Common\TypeExtensionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\CommandTreeNodeCollectionTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\src\Zongsoft.CoreLibrary.csproj">

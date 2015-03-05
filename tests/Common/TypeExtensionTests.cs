@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 
 using Zongsoft.Common;
+using Zongsoft.Tests;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Zongsoft.Common.Tests

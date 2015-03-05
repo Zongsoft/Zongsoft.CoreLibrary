@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 
-namespace Zongsoft.Common.Tests
+namespace Zongsoft.Tests
 {
 	public enum Gender
 	{

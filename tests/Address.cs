@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Zongsoft.Common.Tests
+namespace Zongsoft.Tests
 {
 	public class Address
 	{
