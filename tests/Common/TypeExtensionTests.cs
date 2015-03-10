@@ -59,7 +59,7 @@ namespace Zongsoft.Common.Tests
 			Assert.AreSame(typeof(Guid?), Zongsoft.Common.TypeExtension.GetType("guid?"));
 			Assert.AreSame(typeof(Guid[]), Zongsoft.Common.TypeExtension.GetType("guid[]"));
 
-			Assert.AreSame(typeof(Person), Zongsoft.Common.TypeExtension.GetType("Zongsoft.Common.Tests.Person, Zongsoft.CoreLibrary.Tests"));
+			Assert.AreSame(typeof(Person), Zongsoft.Common.TypeExtension.GetType("Zongsoft.Tests.Person, Zongsoft.CoreLibrary.Tests"));
 		}
 	}
 }
