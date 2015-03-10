@@ -32,7 +32,7 @@ using System.Threading;
 namespace Zongsoft.Collections
 {
 	/// <summary>
-	/// 提供了对象缓存的功能。
+	/// 提供了一个线程安全的对象缓存的功能。
 	/// </summary>
 	/// <typeparam name="T">缓存的对象类型。</typeparam>
 	public class ObjectCache<T> : MarshalByRefObject, IDisposable, IEnumerable<T> where T : class
@@ -49,9 +49,9 @@ namespace Zongsoft.Collections
 
 		#region 构造函数
 		/// <summary>
-		/// 创建一个对象缓存容器，默认限制数为31。
+		/// 创建一个对象缓存容器，默认限制数为32。
 		/// </summary>
-		public ObjectCache() : this(null, 31)
+		public ObjectCache() : this(null, 32)
 		{
 		}
 
@@ -68,11 +68,11 @@ namespace Zongsoft.Collections
 		/// </summary>
 		/// <param name="comparer">对键进行比较时要使用的<see cref="System.Collections.Generic.IEqualityComparer<System.String>"/>比较器。</param>
 		/// <param name="limit">指定的最大缓存数，如果为零则表示不做限制。</param>
-		public ObjectCache(IEqualityComparer<string> comparer, int limit = 31)
+		public ObjectCache(IEqualityComparer<string> comparer, int limit = 32)
 		{
 			if(limit > 0)
 			{
-				_limit = Math.Max(10, limit);
+				_limit = Math.Max(3, limit);
 				_keys = new string[_limit];
 			}
 
@@ -125,6 +125,11 @@ namespace Zongsoft.Collections
 		{
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException("name");
+
+			var cache = _cache;
+
+			if(cache == null)
+				throw new ObjectDisposedException(this.GetType().Name);
 
 			return _cache.ContainsKey(name);
 		}
@@ -305,13 +310,18 @@ namespace Zongsoft.Collections
 		protected virtual void Dispose(bool disposing)
 		{
 			var cache = System.Threading.Interlocked.Exchange(ref _cache, null);
-			this.Clear(cache);
-			_keys = null;
+
+			if(cache != null)
+			{
+				this.Clear(cache);
+				_keys = null;
+			}
 		}
 
 		public void Dispose()
 		{
 			this.Dispose(true);
+			GC.SuppressFinalize(this);
 		}
 		#endregion
 
