@@ -53,6 +53,8 @@
     <Compile Include="Collections\CategoryTests.cs" />
     <Compile Include="Collections\NamedCollectionTests.cs" />
     <Compile Include="Address.cs" />
+    <Compile Include="Collections\ObjectCacheTests.cs" />
+    <Compile Include="Collections\QueueTests.cs" />
     <Compile Include="Common\BufferTests.cs" />
     <Compile Include="Common\ConvertTests.cs" />
     <Compile Include="Common\EnumUtilityTests.cs" />
