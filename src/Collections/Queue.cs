@@ -325,6 +325,18 @@ namespace Zongsoft.Collections
 		}
 
 		/// <summary>
+		/// 将字符串文本添加到<seealso cref="Zongsoft.Collections.Queue"/>的结尾处。
+		/// </summary>
+		/// <param name="text">要入队的字符串文本，该值可以为空(null)。</param>
+		/// <remarks>
+		///		<para>该重载可以优先<see cref="Enqueue"/>重载的匹配。</para>
+		/// </remarks>
+		public void Enqueue(string text)
+		{
+			this.Enqueue((object)text);
+		}
+
+		/// <summary>
 		/// 将对象添加到<seealso cref="Zongsoft.Collections.Queue"/>的结尾处。
 		/// </summary>
 		/// <param name="item">要入队的对象，该值可以为空(null)。</param>
@@ -516,7 +528,7 @@ namespace Zongsoft.Collections
 
 		private void SetCapacity(int capacity)
 		{
-			if(capacity == _size)
+			if(capacity == this.Capacity)
 				return;
 
 			object[] array = new object[capacity];
@@ -547,7 +559,7 @@ namespace Zongsoft.Collections
 				yield break;
 
 			long finishIndex = _head < _tail ? _tail : _tail + _buffer.Length;
-			long length = finishIndex - _head + 1;
+			long length = finishIndex - _head;
 
 			for(long i = 0; i < length; i++)
 				yield return _buffer[(_head + i) % _buffer.Length];
