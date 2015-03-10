@@ -32,7 +32,7 @@ using System.Threading;
 namespace Zongsoft.Collections
 {
     /// <summary>
-    /// 提供通用对象池的相关功能。
+    /// 提供了一个线程安全的通用对象池的相关功能。
     /// </summary>
     public class ObjectPool<T> : MarshalByRefObject, IDisposable
     {
@@ -72,7 +72,7 @@ namespace Zongsoft.Collections
 		/// </summary>
 		/// <param name="creator">对象的创建方法。</param>
 		/// <param name="remover">对象移除时的回调，该参数值可以为空(null)。</param>
-		/// <param name="maximumLimit">对象池的最大容量。</param>
+		/// <param name="maximumLimit">对象池的最大容量，如果小于一则表示不控制池的大小。</param>
 		public ObjectPool(Func<T> creator, Action<T> remover, int maximumLimit)
         {
             if (creator == null)
@@ -213,6 +213,7 @@ namespace Zongsoft.Collections
 		public void Dispose()
         {
             this.Dispose(true);
+			GC.SuppressFinalize(this);
         }
 
 		protected virtual void Dispose(bool disposing)
