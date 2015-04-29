@@ -157,7 +157,7 @@ namespace Zongsoft.Terminals
 			if(commandLine == null)
 				throw new InvalidOperationException();
 
-			return context.Command.Execute(new TerminalCommandContext(context.Command, this, commandLine));
+			return context.Command.Execute(new TerminalCommandContext(context.CommandNode, this, commandLine));
 		}
 
 		protected override void OnExecuted(CommandExecutorExecutedEventArgs args)

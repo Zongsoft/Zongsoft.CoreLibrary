@@ -116,7 +116,7 @@ namespace Zongsoft.Services
 		#region 重写方法
 		protected override object OnExecute(CommandExecutorContext context)
 		{
-			return context.Command.Execute(new CommandContext(context.Command, this, (CommandLine)context.Parameter));
+			return context.Command.Execute(new CommandContext(context.CommandNode, this, (CommandLine)context.Parameter));
 		}
 		#endregion
 	}

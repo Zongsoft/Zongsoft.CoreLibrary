@@ -48,6 +48,16 @@ namespace Zongsoft.Services
 			else
 				_options = new CommandOptionCollection(command, (System.Collections.IDictionary)commandLine.Options);
 		}
+
+		public CommandContext(CommandTreeNode commandNode, ICommandExecutor executor, CommandLine commandLine) : base(commandNode, executor)
+		{
+			_commandLine = commandLine;
+
+			if(commandLine == null)
+				_options = new CommandOptionCollection(this.Command);
+			else
+				_options = new CommandOptionCollection(this.Command, (System.Collections.IDictionary)commandLine.Options);
+		}
 		#endregion
 
 		#region 公共属性

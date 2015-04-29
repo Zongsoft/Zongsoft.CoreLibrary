@@ -37,6 +37,10 @@ namespace Zongsoft.Terminals
 		public TerminalCommandContext(ICommand command, TerminalCommandExecutor executor, CommandLine commandLine) : base(command, executor, commandLine)
 		{
 		}
+
+		public TerminalCommandContext(CommandTreeNode commandNode, TerminalCommandExecutor executor, CommandLine commandLine) : base(commandNode, executor, commandLine)
+		{
+		}
 		#endregion
 
 		#region 公共属性

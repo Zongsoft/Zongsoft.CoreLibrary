@@ -33,6 +33,7 @@ namespace Zongsoft.Services
 	{
 		#region 成员字段
 		private ICommand _command;
+		private CommandTreeNode _commandNode;
 		private ICommandExecutor _executor;
 		private IDictionary<ICommandExecutor, Dictionary<string, object>> _statesProvider;
 		private object _result;
@@ -51,6 +52,23 @@ namespace Zongsoft.Services
 			_command = command;
 			_executor = executor;
 		}
+
+		protected CommandContextBase(CommandTreeNode commandNode) : this(commandNode, null)
+		{
+		}
+
+		protected CommandContextBase(CommandTreeNode commandNode, ICommandExecutor executor)
+		{
+			if(commandNode == null)
+				throw new ArgumentNullException("commandNode");
+
+			if(commandNode.Command == null)
+				throw new ArgumentException(string.Format("The Command property of '{0}' command-node is null.", commandNode.FullPath));
+
+			_commandNode = commandNode;
+			_command = commandNode.Command;
+			_executor = executor;
+		}
 		#endregion
 
 		#region 公共属性
@@ -62,6 +80,17 @@ namespace Zongsoft.Services
 			get
 			{
 				return _command;
+			}
+		}
+
+		/// <summary>
+		/// 获取执行的命令所在节点。
+		/// </summary>
+		public CommandTreeNode CommandNode
+		{
+			get
+			{
+				return _commandNode;
 			}
 		}
 
