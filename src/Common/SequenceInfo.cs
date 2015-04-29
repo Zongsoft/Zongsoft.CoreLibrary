@@ -117,7 +117,7 @@ namespace Zongsoft.Common
 		///				<description>表示由“No:”这个常量接上当前序列号的数值，并且格式化后的数字文本至少为5位，不足5位的在前面补零。里面的“00000”表示格式修饰，详细说明请参考<seealso cref="System.String.Format"/>方法。</description>
 		///			</item>
 		///			<item>
-		///				<term>No:{#}-{0:00}-{1:yyMMdd}-{Zongsoft.CRM.Customer.Id}</term>
+		///				<term>No:{#}-{0:00}-{1:G}-{Zongsoft.CRM.Customer.Id}</term>
 		///				<description>表示由“No:”这个常量接上当前序列号的数值，再接上“-{0}-{1}-”常量(有效的变量名必须以字母和下划线打头，否则视为常量)，再接上名为“Zongsoft.CRM.Customer.Id”的这个序列号数值。</description>
 		///			</item>
 		///		</list>
