@@ -32,23 +32,47 @@ using System.Linq.Expressions;
 namespace Zongsoft.Data
 {
 	/// <summary>
-	/// 表示数据访问的公共接口。
+	/// 表示数据访问的抽象基类。
 	/// </summary>
-	public interface IDataAccess
+	public abstract class DataAccessBase : MarshalByRefObject, IDataAccess
 	{
 		#region 执行方法
-		object Execute(string name, IDictionary<string, object> inParameters);
-		object Execute(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters);
+		public object Execute(string name, IDictionary<string, object> inParameters)
+		{
+			IDictionary<string, object> outParameters;
+			return this.Execute(name, inParameters, out outParameters);
+		}
+
+		public abstract object Execute(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters);
 		#endregion
 
 		#region 计数方法
-		int Count(string name, ICondition condition);
-		int Count(string name, ICondition condition, string includes);
-		int Count<T>(string name, ICondition condition, Expression<Func<T, object>> includes);
+		public int Count(string name, ICondition condition)
+		{
+			return this.Count(name, condition, (string[])null);
+		}
+
+		public int Count(string name, ICondition condition, string includes)
+		{
+			if(includes == null)
+				return this.Count(name, condition, (string[])null);
+
+			return this.Count(name, condition, includes.Split(',', ';'));
+		}
+
+		public int Count<T>(string name, ICondition condition, Expression<Func<T, object>> includes)
+		{
+			throw new NotImplementedException();
+		}
+
+		protected abstract int Count(string name, ICondition condition, string[] includes);
 		#endregion
 
 		#region 查询方法
-		IEnumerable<T> Select<T>(string name, ICondition condition = null);
+		public IEnumerable<T> Select<T>(string name, ICondition condition = null)
+		{
+			throw new NotImplementedException();
+		}
 
 		/// <summary>
 		/// 执行指定名称的数据查询操作。
@@ -79,44 +103,107 @@ namespace Zongsoft.Data
 		///		</code>
 		///		</example>
 		/// </remarks>
-		IEnumerable Select(string name,
-		                   ICondition condition,
-		                   string scope = null,
-		                   Paging paging = null,
-		                   params Sorting[] sorting);
+		public IEnumerable Select(string name,
+						   ICondition condition = null,
+						   string scope = null,
+						   Paging paging = null,
+						   params Sorting[] sorting)
+		{
+			throw new NotImplementedException();
+		}
 
-		IEnumerable<T> Select<T>(string name,
-		                         ICondition condition,
-		                         string scope = null,
-		                         Paging paging = null,
-		                         params Sorting[] sorting);
+		public IEnumerable<T> Select<T>(string name,
+								 ICondition condition = null,
+								 string scope = null,
+								 Paging paging = null,
+								 params Sorting[] sorting)
+		{
+			throw new NotImplementedException();
+		}
 
-		IEnumerable<T> Select<T>(string name,
-								 ICondition condition,
+		public IEnumerable<T> Select<T>(string name,
+								 ICondition condition = null,
 								 Expression<Func<T, object>> includes = null,
 								 Expression<Func<T, object>> excludes = null,
+								 Paging paging = null,
+								 params Sorting[] sorting)
+		{
+			throw new NotImplementedException();
+		}
+
+		protected abstract IEnumerable<T> Select<T>(string name,
+								 ICondition condition = null,
+								 string[] members = null,
 								 Paging paging = null,
 								 params Sorting[] sorting);
 		#endregion
 
 		#region 删除方法
-		int Delete(string name, ICondition condition);
-		int Delete(string name, ICondition condition, string includes);
-		int Delete<T>(string name, ICondition condition, Expression<Func<T, object>> includes);
+		public int Delete(string name, ICondition condition)
+		{
+			throw new NotImplementedException();
+		}
+
+		public int Delete(string name, ICondition condition, string includes)
+		{
+			throw new NotImplementedException();
+		}
+
+		public int Delete<T>(string name, ICondition condition, Expression<Func<T, object>> includes)
+		{
+			throw new NotImplementedException();
+		}
+
+		protected abstract int Delete<T>(string name, ICondition condition, string[] includes);
 		#endregion
 
 		#region 插入方法
-		int Insert<T>(string name, T entity);
-		int Insert<T>(string name, T entity, string includes);
-		int Insert<T>(string name, T entity, Expression<Func<T, object>> includes);
+		public int Insert<T>(string name, T entity)
+		{
+			throw new NotImplementedException();
+		}
 
-		int Insert<T>(string name, IEnumerable<T> entities);
-		int Insert<T>(string name, IEnumerable<T> entities, string includes);
-		int Insert<T>(string name, IEnumerable<T> entities, Expression<Func<T, object>> includes);
+		public int Insert<T>(string name, T entity, string includes)
+		{
+			if(includes == null)
+				return this.Insert(name, entity, (string[])null);
+
+			return this.Insert(name, entity, includes.Split(',', ';'));
+		}
+
+		public int Insert<T>(string name, T entity, Expression<Func<T, object>> includes)
+		{
+			throw new NotImplementedException();
+		}
+
+		protected abstract int Insert(string name, object entity, string[] includes);
+
+		public int Insert<T>(string name, IEnumerable<T> entities)
+		{
+			throw new NotImplementedException();
+		}
+
+		public int Insert<T>(string name, IEnumerable<T> entities, string includes)
+		{
+			if(includes == null)
+				return this.Insert(name, entities, (string[])null);
+
+			return this.Insert(name, entities, includes.Split(',', ';'));
+		}
+
+		public int Insert<T>(string name, IEnumerable<T> entities, Expression<Func<T, object>> includes)
+		{
+			throw new NotImplementedException();
+		}
+
+		protected abstract int Insert<T>(string name, IEnumerable<T> entities, string[] includes);
 		#endregion
 
 		#region 更新方法
-		int Update<T>(string name, T entity, ICondition condition = null);
+		public int Update<T>(string name, T entity, ICondition condition = null)
+		{
+			throw new NotImplementedException();
+		}
 
 		/// <summary>
 		/// 根据指定的条件将指定的实体更新到数据源。
@@ -126,11 +213,22 @@ namespace Zongsoft.Data
 		/// <param name="condition">要更新的条件子句，如果为空(null)则根据实体的主键进行更新。</param>
 		/// <param name="scope">指定的要更新的和排除更新的属性名列表，如果指定的是多个属性则属性名之间使用逗号(,)分隔；要排除的属性以减号(-)打头，星号(*)表示所有属性，感叹号(!)表示排除所有属性；如果未指定该参数则默认只会更新所有单值属性而不会更新导航属性。</param>
 		/// <returns>返回受影响的记录行数，执行成功返回大于零的整数，失败则返回负数。</returns>
-		int Update<T>(string name, T entity, ICondition condition, string scope = null);
+		public int Update<T>(string name, T entity, ICondition condition, string scope = null)
+		{
+			throw new NotImplementedException();
+		}
 
-		int Update<T>(string name, T entity, ICondition condition, Expression<Func<T, object>> includes = null, Expression<Func<T, object>> excludes = null);
+		public int Update<T>(string name, T entity, ICondition condition, Expression<Func<T, object>> includes = null, Expression<Func<T, object>> excludes = null)
+		{
+			throw new NotImplementedException();
+		}
 
-		int Update<T>(string name, IEnumerable<T> entities, ICondition condition = null);
+		protected abstract int Update<T>(string name, T entity, ICondition condition = null, string[] includes = null, string[] excludes = null);
+
+		public int Update<T>(string name, IEnumerable<T> entities, ICondition condition = null)
+		{
+			throw new NotImplementedException();
+		}
 
 		/// <summary>
 		/// 根据指定的条件将指定的实体集更新到数据源。
@@ -141,9 +239,17 @@ namespace Zongsoft.Data
 		/// <param name="condition">要更新的条件子句，如果为空(null)则根据实体的主键进行更新。</param>
 		/// <param name="scope">指定的要更新的和排除更新的属性名列表，如果指定的是多个属性则属性名之间使用逗号(,)分隔；要排除的属性以减号(-)打头，星号(*)表示所有属性，感叹号(!)表示排除所有属性；如果未指定该参数则默认只会更新所有单值属性而不会更新导航属性。</param>
 		/// <returns>返回受影响的记录行数，执行成功返回大于零的整数，失败则返回负数。</returns>
-		int Update<T>(string name, IEnumerable<T> entities, ICondition condition, string scope = null);
+		public int Update<T>(string name, IEnumerable<T> entities, ICondition condition, string scope = null)
+		{
+			throw new NotImplementedException();
+		}
 
-		int Update<T>(string name, IEnumerable<T> entities, ICondition condition, Expression<Func<T, object>> includes = null, Expression<Func<T, object>> excludes = null);
+		public int Update<T>(string name, IEnumerable<T> entities, ICondition condition, Expression<Func<T, object>> includes = null, Expression<Func<T, object>> excludes = null)
+		{
+			throw new NotImplementedException();
+		}
+
+		protected abstract int Update<T>(string name, IEnumerable<T> entities, ICondition condition, string[] includes, string[] excludes);
 		#endregion
 	}
 }

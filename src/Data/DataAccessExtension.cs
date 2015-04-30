@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2014 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -99,6 +99,53 @@ namespace Zongsoft.Data
 			return dataAccess.Update(name, entities, ResolveCondition(condition), scope);
 		}
 		#endregion
+
+		public static void ResolveScopeString(string scope, out string[] includes, out string[] excludes)
+		{
+			//设置输出参数的默认返回值
+			includes = excludes = new string[0];
+
+			if(string.IsNullOrWhiteSpace(scope))
+				return;
+
+			var includeSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+			var excludeSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+			var parts = scope.Split(',', ';');
+
+			for(int i = 0; i < parts.Length; i++)
+			{
+				var part = parts[i].Trim();
+
+				if(part.Length == 0)
+					continue;
+
+				switch(part[0])
+				{
+					case '-':
+					case '!':
+						if(part.Length > 1)
+							excludeSet.Add(part.Substring(1));
+						else
+							excludeSet.Add("!");
+
+						break;
+					case '*':
+						if(part.Length != 1)
+							throw new ArgumentException("scope");
+
+						includeSet.Add("*");
+						break;
+					default:
+						if((part[0] >= 'A' && part[0] <= 'Z') || (part[0] >= 'a' && part[0] <= 'z') || part[0] == '_')
+							includeSet.Add(part);
+						else
+							throw new ArgumentException("scope");
+
+						break;
+				}
+			}
+		}
 
 		#region 私有方法
 		private static ConditionCollection ResolveCondition(object condition)
