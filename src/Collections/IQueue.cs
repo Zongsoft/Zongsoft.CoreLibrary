@@ -51,6 +51,14 @@ namespace Zongsoft.Collections
 
 		#region 属性定义
 		/// <summary>
+		/// 获取队列的名称，该名称应该为队列的唯一标识。
+		/// </summary>
+		string Name
+		{
+			get;
+		}
+
+		/// <summary>
 		/// 获取队列容量值，即队列中已分配的可用元素数，该值在扩容时可能会增加。
 		/// </summary>
 		int Capacity

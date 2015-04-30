@@ -41,6 +41,10 @@ namespace Zongsoft.Collections
 	/// </remarks>
 	public class Queue : Zongsoft.Collections.IQueue
 	{
+		#region 静态变量
+		private static int _id;
+		#endregion
+
 		#region 事件声明
 		/// <summary>
 		/// 表示入队成功的事件。
@@ -59,6 +63,7 @@ namespace Zongsoft.Collections
 		private int _tail;
 		private int _size;
 		private int _growFactor;
+		private string _name;
 		private object[] _buffer;
 		private int _maximumLimit;
 		private int _minimumGrow = 0xFF;
@@ -100,10 +105,23 @@ namespace Zongsoft.Collections
 			_minimumGrow = 0xFF;
 			_growFactor = (int)(growFactor * 100);
 			_buffer = new object[capacity];
+			_name = this.GetType().FullName + "#" + System.Threading.Interlocked.Increment(ref _id).ToString();
 		}
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取队列名称。
+		/// </summary>
+		/// <remarks>该队列名称确保进程范围内的唯一性。</remarks>
+		public string Name
+		{
+			get
+			{
+				return _name;
+			}
+		}
+
 		/// <summary>
 		/// 获取队列中实际包含的元素数。
 		/// </summary>
@@ -446,14 +464,15 @@ namespace Zongsoft.Collections
 		/// </summary>
 		/// <returns>
 		///		<para>该方法重写了<seealso cref="System.Object"/>的同名方法，该重写返回如下格式的文本信息：</para>
-		///		<para>(队头位置)-(队尾位置)[大小/容量]{最大限制, 最小成长量}</para>
+		///		<para>(队头位置-队尾位置)[大小/容量]{最大限制, 最小成长量}</para>
 		/// </returns>
 		public override string ToString()
 		{
-			return string.Format("({0})-({1})[{2}/{3}]{{{4}, {5}}}",
-									_head, _tail,
-									_size, _buffer.Length,
-									_maximumLimit, _minimumGrow);
+			return string.Format("{0}({1}-{2}) [{3}/{4}] {{{5}, {6}}}",
+			                     _name + Environment.NewLine,
+								 _head, _tail,
+								 _size, _buffer.Length,
+								 _maximumLimit, _minimumGrow);
 		}
 		#endregion
 
