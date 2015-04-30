@@ -134,5 +134,12 @@ namespace Zongsoft.Common
 			}
 		}
 		#endregion
+
+		#region 重写方法
+		public override string ToString()
+		{
+			return string.Format("{0} ({1}, {2}, {3})", _name, _value, _interval, _formatString);
+		}
+		#endregion
 	}
 }
