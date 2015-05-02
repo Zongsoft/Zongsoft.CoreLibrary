@@ -58,6 +58,7 @@
     <Compile Include="Common\BufferTests.cs" />
     <Compile Include="Common\ConvertTests.cs" />
     <Compile Include="Common\EnumUtilityTests.cs" />
+    <Compile Include="Data\DataAccessBaseTest.cs" />
     <Compile Include="Gender.cs" />
     <Compile Include="Common\ObjectReferenceTests.cs" />
     <Compile Include="Person.cs" />

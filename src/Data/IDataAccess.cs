@@ -101,18 +101,16 @@ namespace Zongsoft.Data
 
 		#region 删除方法
 		int Delete(string name, ICondition condition);
-		int Delete(string name, ICondition condition, string includes);
-		int Delete<T>(string name, ICondition condition, Expression<Func<T, object>> includes);
+		int Delete(string name, ICondition condition, string cascades);
+		int Delete<T>(string name, ICondition condition, Expression<Func<T, object>> cascades);
 		#endregion
 
 		#region 插入方法
-		int Insert<T>(string name, T entity);
-		int Insert<T>(string name, T entity, string includes);
-		int Insert<T>(string name, T entity, Expression<Func<T, object>> includes);
+		int Insert<T>(string name, T entity, string scope = null);
+		int Insert<T>(string name, T entity, Expression<Func<T, object>> includes, Expression<Func<T, object>> excludes);
 
-		int Insert<T>(string name, IEnumerable<T> entities);
-		int Insert<T>(string name, IEnumerable<T> entities, string includes);
-		int Insert<T>(string name, IEnumerable<T> entities, Expression<Func<T, object>> includes);
+		int Insert<T>(string name, IEnumerable<T> entities, string scope = null);
+		int Insert<T>(string name, IEnumerable<T> entities, Expression<Func<T, object>> includes, Expression<Func<T, object>> excludes = null);
 		#endregion
 
 		#region 更新方法
