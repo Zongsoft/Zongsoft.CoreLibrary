@@ -160,7 +160,10 @@ namespace Zongsoft.Data
 			throw new NotImplementedException();
 		}
 
-		protected abstract int Insert<T>(string name, T entity, string[] members);
+		protected virtual int Insert<T>(string name, T entity, string[] members)
+		{
+			return this.Insert<T>(name, new T[] { entity }, members);
+		}
 
 		public int Insert<T>(string name, IEnumerable<T> entities, string scope = null)
 		{
@@ -199,7 +202,10 @@ namespace Zongsoft.Data
 			throw new NotImplementedException();
 		}
 
-		protected abstract int Update<T>(string name, T entity, ICondition condition, string[] members);
+		protected virtual int Update<T>(string name, T entity, ICondition condition, string[] members)
+		{
+			return this.Update<T>(name, new T[] { entity }, condition, members);
+		}
 
 		public int Update<T>(string name, IEnumerable<T> entities, ICondition condition = null)
 		{
