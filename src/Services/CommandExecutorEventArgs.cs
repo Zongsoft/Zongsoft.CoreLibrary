@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2013 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,40 +25,84 @@
  */
 
 using System;
-using System.Collections.Generic;
 
 namespace Zongsoft.Services
 {
-	public class CommandExecutorContext : CommandExecutorContextBase
+	[Serializable]
+	public class CommandExecutorEventArgs : EventArgs
 	{
 		#region 成员字段
-		private CommandLine _commandLine;
+		private CommandExecutorContextBase _context;
 		#endregion
 
 		#region 构造函数
-		public CommandExecutorContext(ICommandExecutor executor, CommandLine commandLine, CommandTreeNode commandNode, object parameter) : base(executor, null, commandNode, parameter)
+		public CommandExecutorEventArgs(CommandExecutorContextBase context)
 		{
-			if(commandLine == null)
-				throw new ArgumentNullException("commandLine");
+			if(context == null)
+				throw new ArgumentNullException("context");
 
-			_commandLine = commandLine;
+			_context = context;
 		}
 		#endregion
 
 		#region 公共属性
-		public override string CommandText
+		public CommandExecutorContextBase Context
 		{
 			get
 			{
-				return _commandLine.ToString();
+				return _context;
 			}
 		}
 
-		public CommandLine CommandLine
+		public ICommandExecutor CommandExecutor
 		{
 			get
 			{
-				return _commandLine;
+				return _context.Executor;
+			}
+		}
+
+		public string CommandText
+		{
+			get
+			{
+				return _context.CommandText;
+			}
+		}
+
+		public object Parameter
+		{
+			get
+			{
+				return _context.Parameter;
+			}
+		}
+
+		public CommandTreeNode CommandNode
+		{
+			get
+			{
+				return _context.CommandNode;
+			}
+		}
+
+		public ICommand Command
+		{
+			get
+			{
+				return _context.Command;
+			}
+		}
+
+		public object Result
+		{
+			get
+			{
+				return _context.Result;
+			}
+			set
+			{
+				_context.Result = value;
 			}
 		}
 		#endregion

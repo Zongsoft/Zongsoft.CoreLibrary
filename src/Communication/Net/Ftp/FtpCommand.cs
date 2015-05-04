@@ -42,19 +42,17 @@ namespace Zongsoft.Communication.Net.Ftp
 		#endregion
 
 		#region 重写方法
-		protected override object OnExecute(FtpCommandContext parameter)
+		protected override void OnExecuted(CommandExecutedEventArgs e)
 		{
-			try
+			if(e.Exception != null)
 			{
-				//parameter.Result = parameter.Statement;
-				base.OnExecute(parameter);
-			}
-			catch(FtpException ex)
-			{
-				parameter.Channel.Send(ex.Message);
+				e.ExceptionHandled = (e.Exception is FtpException);
+
+				if(e.ExceptionHandled)
+					((FtpCommandContext)e.Context).Channel.Send(e.Exception.ToString());
 			}
 
-			return parameter.Result;
+			base.OnExecuted(e);
 		}
 		#endregion
 	}

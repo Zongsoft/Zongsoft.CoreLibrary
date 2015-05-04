@@ -150,14 +150,12 @@ namespace Zongsoft.Terminals
 			return base.OnParse(commandText);
 		}
 
-		protected override object OnExecute(CommandExecutorContext context)
+		protected override void OnExecute(CommandExecutorContext context)
 		{
-			var commandLine = context.Parameter as CommandLine;
+			var command = context.Command;
 
-			if(commandLine == null)
-				throw new InvalidOperationException();
-
-			return context.Command.Execute(new TerminalCommandContext(context.CommandNode, this, commandLine));
+			if(command != null)
+				context.Result = command.Execute(new TerminalCommandContext(this, context.CommandLine, context.CommandNode, context.Parameter));
 		}
 
 		protected override void OnExecuted(CommandExecutorExecutedEventArgs args)
@@ -175,8 +173,10 @@ namespace Zongsoft.Terminals
 		#region 激发事件
 		protected virtual void OnCurrentChanged(EventArgs args)
 		{
-			if(this.CurrentChanged != null)
-				this.CurrentChanged(this, args);
+			var currentChanged = this.CurrentChanged;
+
+			if(currentChanged != null)
+				currentChanged(this, args);
 		}
 
 		private bool RaiseExit(int exitCode)
@@ -191,14 +191,18 @@ namespace Zongsoft.Terminals
 
 		protected virtual void OnExit(ExitEventArgs args)
 		{
-			if(this.Exit != null)
-				this.Exit(this, args);
+			var exit = this.Exit;
+
+			if(exit != null)
+				exit(this, args);
 		}
 
 		protected virtual void OnFailed(FailureEventArgs args)
 		{
-			if(this.Failed != null)
-				this.Failed(this, args);
+			var failed = this.Failed;
+
+			if(failed != null)
+				failed(this, args);
 		}
 		#endregion
 

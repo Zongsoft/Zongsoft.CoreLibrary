@@ -29,83 +29,11 @@ using System;
 namespace Zongsoft.Services
 {
 	[Serializable]
-	public class CommandExecutorExecutedEventArgs : EventArgs
+	public class CommandExecutorExecutedEventArgs : CommandExecutorEventArgs
 	{
-		#region 成员字段
-		private ICommandExecutor _commandExecutor;
-		private string _commandText;
-		private object _parameter;
-		private CommandTreeNode _commandNode;
-		private ICommand _command;
-		private object _result;
-		#endregion
-
 		#region 构造函数
-		public CommandExecutorExecutedEventArgs(ICommandExecutor commandExecutor, string commandText, object parameter, CommandTreeNode commandNode, ICommand command, object result)
+		public CommandExecutorExecutedEventArgs(CommandExecutorContextBase context) : base(context)
 		{
-			if(commandExecutor == null)
-				throw new ArgumentNullException("commandExecutor");
-
-			_commandExecutor = commandExecutor;
-			_commandText = commandText;
-			_parameter = parameter;
-			_commandNode = commandNode;
-			_command = command;
-			_result = result;
-		}
-		#endregion
-
-		#region 公共属性
-		public ICommandExecutor CommandExecutor
-		{
-			get
-			{
-				return _commandExecutor;
-			}
-		}
-
-		public string CommandText
-		{
-			get
-			{
-				return _commandText;
-			}
-		}
-
-		public object Parameter
-		{
-			get
-			{
-				return _parameter;
-			}
-		}
-
-		public CommandTreeNode CommandNode
-		{
-			get
-			{
-				return _commandNode;
-			}
-		}
-
-		public ICommand Command
-		{
-			get
-			{
-				return _command;
-			}
-		}
-
-		public object Result
-		{
-			get
-			{
-				return _result;
-			}
-			set
-			{
-				_result = value;
-			}
 		}
 		#endregion
 	}

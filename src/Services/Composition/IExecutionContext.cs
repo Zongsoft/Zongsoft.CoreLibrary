@@ -59,7 +59,7 @@ namespace Zongsoft.Services.Composition
 		}
 
 		/// <summary>
-		/// 获取扩展属性集。
+		/// 获取可用于在本次执行过程中在各处理模块之间组织和共享数据的键/值集合。
 		/// </summary>
 		IDictionary<string, object> ExtendedProperties
 		{

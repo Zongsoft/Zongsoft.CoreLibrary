@@ -33,8 +33,8 @@ namespace Zongsoft.Services
 	/// <summary>
 	/// 提供实现<see cref="ICommand"/>接口功能的基类，建议需要完成<see cref="ICommand"/>接口功能的实现者从此类继承。
 	/// </summary>
-	/// <typeparam name="T">指定命令执行参数的类型。</typeparam>
-	public class CommandBase<T> : MarshalByRefObject, ICommand<T>, IPredication, IMatchable, INotifyPropertyChanged
+	/// <typeparam name="TContext">指定命令的执行上下文类型。</typeparam>
+	public abstract class CommandBase<TContext> : MarshalByRefObject, ICommand<TContext>, IPredication<TContext>, IMatchable, INotifyPropertyChanged where TContext : CommandContextBase
 	{
 		#region 事件定义
 		public event EventHandler EnabledChanged;
@@ -152,7 +152,7 @@ namespace Zongsoft.Services
 		protected virtual bool IsMatch(object parameter)
 		{
 			if(parameter == null)
-				return true;
+				return false;
 
 			if(parameter is string)
 				return string.Equals((string)parameter, _name, StringComparison.OrdinalIgnoreCase);
@@ -162,20 +162,26 @@ namespace Zongsoft.Services
 
 		protected virtual void OnEnabledChanged(EventArgs e)
 		{
-			if(this.EnabledChanged != null)
-				this.EnabledChanged(this, e);
+			var enabledChanged = this.EnabledChanged;
+
+			if(enabledChanged != null)
+				enabledChanged(this, e);
 		}
 
 		protected virtual void OnExecuted(CommandExecutedEventArgs e)
 		{
-			if(this.Executed != null)
-				this.Executed(this, e);
+			var executed = this.Executed;
+
+			if(executed != null)
+				executed(this, e);
 		}
 
 		protected virtual void OnExecuting(CommandExecutingEventArgs e)
 		{
-			if(this.Executing != null)
-				this.Executing(this, e);
+			var executing = this.Executing;
+
+			if(executing != null)
+				executing(this, e);
 		}
 
 		protected void OnPropertyChanged(string propertyName)
@@ -185,8 +191,10 @@ namespace Zongsoft.Services
 
 		protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
 		{
-			if(this.PropertyChanged != null)
-				this.PropertyChanged(this, e);
+			var propertyChanged = this.PropertyChanged;
+
+			if(propertyChanged != null)
+				propertyChanged(this, e);
 		}
 		#endregion
 
@@ -200,32 +208,32 @@ namespace Zongsoft.Services
 		///		<para>本方法为虚拟方法，可由子类更改基类的默认实现方式。</para>
 		///		<para>如果<seealso cref="Predication"/>属性为空(null)，则返回<see cref="Enabled"/>属性值；否则返回由<see cref="Predication"/>属性指定的断言对象的断言方法的值。</para>
 		/// </remarks>
-		public virtual bool CanExecute(T parameter)
+		public virtual bool CanExecute(TContext context)
 		{
 			//如果断言对象是空则返回是否可用变量的值
 			if(_predication == null)
 				return _enabled;
 
 			//返回断言对象的断言测试的值
-			return _enabled && _predication.Predicate(parameter);
+			return _enabled && _predication.Predicate(context);
 		}
 
 		/// <summary>
 		/// 执行命令。
 		/// </summary>
-		/// <param name="parameter">执行命令的参数对象。</param>
+		/// <param name="context">执行命令的上下文对象。</param>
 		/// <returns>返回执行的返回结果。</returns>
 		/// <remarks>
 		///		<para>本方法的实现中首先调用<see cref="CanExecute"/>方法，以确保阻止非法的调用。</para>
 		/// </remarks>
-		public object Execute(T parameter)
+		public object Execute(TContext context)
 		{
 			//在执行之前首先判断是否可以执行
-			if(!this.CanExecute(parameter))
+			if(!this.CanExecute(context))
 				return null;
 
 			//创建事件参数对象
-			var executingArgs = new CommandExecutingEventArgs(parameter);
+			var executingArgs = new CommandExecutingEventArgs(context);
 			//激发“Executing”事件
 			this.OnExecuting(executingArgs);
 
@@ -233,16 +241,14 @@ namespace Zongsoft.Services
 			if(executingArgs.Cancel)
 				return executingArgs.Result;
 
-			object result = null;
-
 			try
 			{
 				//执行具体的工作
-				result = this.OnExecute(parameter);
+				this.OnExecute(context);
 			}
 			catch(Exception ex)
 			{
-				var executedArgs = new CommandExecutedEventArgs(parameter, ex);
+				var executedArgs = new CommandExecutedEventArgs(context, ex);
 
 				//激发“Executed”事件
 				this.OnExecuted(executedArgs);
@@ -254,31 +260,20 @@ namespace Zongsoft.Services
 			}
 
 			//激发“Executed”事件
-			this.OnExecuted(new CommandExecutedEventArgs(parameter, result));
+			this.OnExecuted(new CommandExecutedEventArgs(context));
 
 			//返回执行成功的结果
-			return result;
+			return context == null ? null : context.Result;
 		}
 		#endregion
 
-		#region 执行实现
-		protected virtual object OnExecute(T parameter)
+		#region 抽象方法
+		protected virtual TContext CreateContext(object parameter, IDictionary<string, object> items)
 		{
-			var commandContext = parameter as CommandContextBase;
-
-			if(commandContext != null)
-			{
-				this.Run(parameter);
-				return commandContext.Result;
-			}
-
-			this.Run(parameter);
-			return null;
+			return parameter as TContext;
 		}
 
-		protected virtual void Run(T context)
-		{
-		}
+		protected abstract void OnExecute(TContext context);
 		#endregion
 
 		#region 显式实现
@@ -293,18 +288,24 @@ namespace Zongsoft.Services
 		/// </remarks>
 		bool ICommand.CanExecute(object parameter)
 		{
-			if(parameter == null && default(T) == null)
-				return this.CanExecute(default(T));
+			if(parameter == null && default(TContext) == null)
+				return this.CanExecute(default(TContext));
 
-			if(parameter is T)
-				return this.CanExecute((T)parameter);
+			if(parameter is TContext)
+				return this.CanExecute((TContext)parameter);
 
-			return false;
+			return this.CanExecute(this.CreateContext(parameter, null));
 		}
 
 		object ICommand.Execute(object parameter)
 		{
-			return this.Execute((T)parameter);
+			if(parameter == null && default(TContext) == null)
+				return this.Execute(default(TContext));
+
+			if(parameter is TContext)
+				return this.Execute((TContext)parameter);
+
+			return this.Execute(this.CreateContext(parameter, null));
 		}
 
 		/// <summary>
@@ -318,6 +319,11 @@ namespace Zongsoft.Services
 		bool IPredication.Predicate(object parameter)
 		{
 			return ((ICommand)this).CanExecute(parameter);
+		}
+
+		bool IPredication<TContext>.Predicate(TContext context)
+		{
+			return this.CanExecute(context);
 		}
 
 		/// <summary>

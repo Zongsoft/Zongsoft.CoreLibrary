@@ -34,30 +34,26 @@ namespace Zongsoft.Services
 		#region 成员字段
 		private ICommand _command;
 		private CommandTreeNode _commandNode;
+		private object _parameter;
+		private IDictionary<string, object> _extendedProperties;
 		private ICommandExecutor _executor;
 		private IDictionary<ICommandExecutor, Dictionary<string, object>> _statesProvider;
 		private object _result;
 		#endregion
 
 		#region 构造函数
-		protected CommandContextBase(ICommand command) : this(command, null)
-		{
-		}
-
-		protected CommandContextBase(ICommand command, ICommandExecutor executor)
+		protected CommandContextBase(ICommandExecutor executor, ICommand command, object parameter, IDictionary<string, object> extendedProperties = null)
 		{
 			if(command == null)
 				throw new ArgumentNullException("command");
 
 			_command = command;
+			_parameter = parameter;
+			_extendedProperties = extendedProperties;
 			_executor = executor;
 		}
 
-		protected CommandContextBase(CommandTreeNode commandNode) : this(commandNode, null)
-		{
-		}
-
-		protected CommandContextBase(CommandTreeNode commandNode, ICommandExecutor executor)
+		protected CommandContextBase(ICommandExecutor executor, CommandTreeNode commandNode, object parameter, IDictionary<string, object> extendedProperties = null)
 		{
 			if(commandNode == null)
 				throw new ArgumentNullException("commandNode");
@@ -67,6 +63,8 @@ namespace Zongsoft.Services
 
 			_commandNode = commandNode;
 			_command = commandNode.Command;
+			_parameter = parameter;
+			_extendedProperties = extendedProperties;
 			_executor = executor;
 		}
 		#endregion
@@ -91,6 +89,45 @@ namespace Zongsoft.Services
 			get
 			{
 				return _commandNode;
+			}
+		}
+
+		/// <summary>
+		/// 获取命令执行的传入参数。
+		/// </summary>
+		public object Parameter
+		{
+			get
+			{
+				return _parameter;
+			}
+		}
+
+		/// <summary>
+		/// 获取扩展属性集是否有内容。
+		/// </summary>
+		/// <remarks>
+		///		<para>在不确定扩展属性集是否含有内容之前，建议先使用该属性来检测。</para>
+		/// </remarks>
+		public bool HasExtendedProperties
+		{
+			get
+			{
+				return _extendedProperties != null && _extendedProperties.Count > 0;
+			}
+		}
+
+		/// <summary>
+		/// 获取可用于在本次执行过程中在各处理模块之间组织和共享数据的键/值集合。
+		/// </summary>
+		public IDictionary<string, object> ExtendedProperties
+		{
+			get
+			{
+				if(_extendedProperties == null)
+					System.Threading.Interlocked.CompareExchange(ref _extendedProperties, new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase), null);
+
+				return _extendedProperties;
 			}
 		}
 

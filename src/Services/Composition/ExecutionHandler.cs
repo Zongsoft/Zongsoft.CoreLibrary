@@ -68,20 +68,18 @@ namespace Zongsoft.Services.Composition
 		#endregion
 
 		#region 重写方法
-		public override bool CanExecute(IExecutionPipelineContext parameter)
+		public override bool CanHandle(IExecutionPipelineContext context)
 		{
 			if(_command == null)
 				return false;
 
-			return base.CanExecute(parameter) && _command.CanExecute(parameter);
+			return base.CanHandle(context) && _command.CanExecute(context);
 		}
 
-		protected override object OnExecute(IExecutionPipelineContext context)
+		protected override void OnExecute(IExecutionPipelineContext context)
 		{
 			if(_command != null)
-				return _command.Execute(context);
-
-			return null;
+				context.Result = _command.Execute(context);
 		}
 		#endregion
 	}

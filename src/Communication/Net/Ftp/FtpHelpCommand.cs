@@ -36,12 +36,11 @@ namespace Zongsoft.Communication.Net.Ftp
 	/// </summary>
 	internal class FtpHelpCommand : FtpCommand
 	{
-		public FtpHelpCommand()
-			: base("HELP")
+		public FtpHelpCommand() : base("HELP")
 		{
 		}
 
-		protected override void Run(FtpCommandContext context)
+		protected override void OnExecute(FtpCommandContext context)
 		{
 			if(string.IsNullOrEmpty(context.Statement.Argument))
 			{

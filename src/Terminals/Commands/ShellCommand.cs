@@ -47,14 +47,17 @@ namespace Zongsoft.Terminals.Commands
 		#endregion
 
 		#region 重写方法
-		protected override object OnExecute(TerminalCommandContext context)
+		protected override void OnExecute(TerminalCommandContext context)
 		{
 			if(Environment.OSVersion.Platform == PlatformID.MacOSX ||
 			   Environment.OSVersion.Platform == PlatformID.Unix)
 				throw new NotSupportedException(string.Format("Not supported in the {0} OS.", Environment.OSVersion));
 
 			if(context.Arguments.Length < 1)
-				return 0;
+			{
+				context.Result = 0;
+				return;
+			}
 
 			ProcessStartInfo info = new ProcessStartInfo(@"cmd.exe", " /C " + context.Arguments[0])
 			{
@@ -90,11 +93,13 @@ namespace Zongsoft.Terminals.Commands
 					if(!process.WaitForExit(timeout > 0 ? timeout : int.MaxValue))
 					{
 						process.Close();
-						return -1;
+						context.Result = -1;
+						return;
 					}
 				}
 
-				return process.ExitCode;
+				context.Result = process.ExitCode;
+				return;
 			}
 		}
 		#endregion

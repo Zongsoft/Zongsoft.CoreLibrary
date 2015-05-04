@@ -39,7 +39,7 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 构造函数
-		public CommandContext(ICommand command, ICommandExecutor executor, CommandLine commandLine) : base(command, executor)
+		public CommandContext(ICommandExecutor executor, CommandLine commandLine, ICommand command, object parameter, IDictionary<string, object> items = null) : base(executor, command, parameter, items)
 		{
 			_commandLine = commandLine;
 
@@ -49,7 +49,7 @@ namespace Zongsoft.Services
 				_options = new CommandOptionCollection(command, (System.Collections.IDictionary)commandLine.Options);
 		}
 
-		public CommandContext(CommandTreeNode commandNode, ICommandExecutor executor, CommandLine commandLine) : base(commandNode, executor)
+		public CommandContext(ICommandExecutor executor, CommandLine commandLine, CommandTreeNode commandNode, object parameter, IDictionary<string, object> items = null) : base(executor, commandNode, parameter, items)
 		{
 			_commandLine = commandLine;
 

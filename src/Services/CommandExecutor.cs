@@ -34,7 +34,7 @@ using Zongsoft.Services;
 
 namespace Zongsoft.Services
 {
-	public class CommandExecutor : Zongsoft.Services.CommandExecutorBase
+	public class CommandExecutor : Zongsoft.Services.CommandExecutorBase<CommandExecutorContext>
 	{
 		#region 静态字段
 		private static CommandExecutor _default;
@@ -88,19 +88,31 @@ namespace Zongsoft.Services
 		}
 		#endregion
 
-		#region 执行方法
-		public override object Execute(string commandText, object parameter)
+		#region 重写方法
+		protected override void OnExecute(CommandExecutorContext context)
 		{
-			if(string.IsNullOrWhiteSpace(commandText))
-				return null;
+			var command = context.Command;
 
+			if(command != null)
+				context.Result = command.Execute(new CommandContext(this, context.CommandLine, context.CommandNode, context.Parameter));
+		}
+
+		protected override CommandExecutorContext CreateContext(string commandText, object parameter)
+		{
 			//解析当前命令文本
 			var commandLine = this.OnParse(commandText);
 
 			if(commandLine == null)
 				throw new ArgumentException(string.Format("Invalid command-line text format of <{0}>.", commandText));
 
-			return base.Execute(commandLine.FullPath, commandLine);
+			//查找指定路径的命令对象
+			var commandNode = this.Find(commandLine.FullPath);
+
+			//如果指定的路径在命令树中是不存在的则抛出异常
+			if(commandNode == null)
+				throw new CommandNotFoundException(commandText);
+
+			return new CommandExecutorContext(this, commandLine, commandNode, parameter);
 		}
 		#endregion
 
@@ -110,13 +122,6 @@ namespace Zongsoft.Services
 			var parser = this.Parser;
 
 			return parser == null ? null : parser.Parse(commandText);
-		}
-		#endregion
-
-		#region 重写方法
-		protected override object OnExecute(CommandExecutorContext context)
-		{
-			return context.Command.Execute(new CommandContext(context.CommandNode, this, (CommandLine)context.Parameter));
 		}
 		#endregion
 	}

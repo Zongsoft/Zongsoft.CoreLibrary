@@ -38,7 +38,7 @@ namespace Zongsoft.Communication.Net.Ftp
         {
         }
 
-        protected override void Run(FtpCommandContext context)
+		protected override void OnExecute(FtpCommandContext context)
         {
 			var user = context.Server.Configuration.Users[context.Channel.UserName];
 

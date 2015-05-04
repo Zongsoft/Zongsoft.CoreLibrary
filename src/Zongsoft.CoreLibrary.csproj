@@ -282,6 +282,8 @@
     <Compile Include="Services\CommandContextBase.cs" />
     <Compile Include="Services\CommandExecutorBase.cs" />
     <Compile Include="Services\CommandExecutorContext.cs" />
+    <Compile Include="Services\CommandExecutorContextBase.cs" />
+    <Compile Include="Services\CommandExecutorEventArgs.cs" />
     <Compile Include="Services\CommandExecutorExecutedEventArgs.cs" />
     <Compile Include="Services\CommandExecutorExecutingEventArgs.cs" />
     <Compile Include="Services\CommandHelper.cs" />

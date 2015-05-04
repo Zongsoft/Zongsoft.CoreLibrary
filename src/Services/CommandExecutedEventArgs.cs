@@ -34,21 +34,37 @@ namespace Zongsoft.Services
 	public class CommandExecutedEventArgs : EventArgs
 	{
 		#region 成员变量
-		private bool _exceptionHandled;
-		private Exception _exception;
+		private CommandContextBase _context;
 		private object _parameter;
 		private object _result;
+		private IDictionary<string, object> _extendedProperties;
+		private bool _exceptionHandled;
+		private Exception _exception;
 		#endregion
 
 		#region 构造函数
+		public CommandExecutedEventArgs(CommandContextBase context, Exception exception = null)
+		{
+			if(context != null)
+			{
+				_context = context;
+				_parameter = context.Parameter;
+				_result = context.Result;
+				_extendedProperties = context.HasExtendedProperties ? context.ExtendedProperties : null;
+			}
+
+			_exception = exception;
+		}
+
 		/// <summary>
 		/// 构造一个命令执行成功的事件参数对象。
 		/// </summary>
 		/// <param name="parameter">命令执行参数对象。</param>
-		public CommandExecutedEventArgs(object parameter, object result)
+		public CommandExecutedEventArgs(object parameter, object result, IDictionary<string, object> extendedProperties = null)
 		{
 			_parameter = parameter;
 			_result = result;
+			_extendedProperties = extendedProperties;
 		}
 
 		/// <summary>
@@ -56,10 +72,11 @@ namespace Zongsoft.Services
 		/// </summary>
 		/// <param name="parameter">命令执行参数对象。</param>
 		/// <param name="exception">命令执行失败的异常对象。</param>
-		public CommandExecutedEventArgs(object parameter, Exception exception)
+		public CommandExecutedEventArgs(object parameter, Exception exception, IDictionary<string, object> extendedProperties = null)
 		{
 			_parameter = parameter;
 			_exception = exception;
+			_extendedProperties = extendedProperties;
 		}
 		#endregion
 
@@ -91,6 +108,17 @@ namespace Zongsoft.Services
 		}
 
 		/// <summary>
+		/// 获取命令的执行上下文对象。
+		/// </summary>
+		public CommandContextBase Context
+		{
+			get
+			{
+				return _context;
+			}
+		}
+
+		/// <summary>
 		/// 获取命令的执行参数对象。
 		/// </summary>
 		public object Parameter
@@ -110,6 +138,31 @@ namespace Zongsoft.Services
 			set
 			{
 				_result = value;
+
+				if(_context != null)
+					_context.Result = value;
+			}
+		}
+
+		public bool HasExtendedProperties
+		{
+			get
+			{
+				return _extendedProperties != null && _extendedProperties.Count > 0;
+			}
+		}
+
+		/// <summary>
+		/// 获取可用于在命令执行过程中在各处理模块之间组织和共享数据的键/值集合。
+		/// </summary>
+		public IDictionary<string, object> ExtendedProperties
+		{
+			get
+			{
+				if(_extendedProperties == null)
+					System.Threading.Interlocked.CompareExchange(ref _extendedProperties, new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase), null);
+
+				return _extendedProperties;
 			}
 		}
 		#endregion

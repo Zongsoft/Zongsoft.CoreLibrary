@@ -44,7 +44,7 @@ namespace Zongsoft.Terminals.Commands
 		#endregion
 
 		#region 重写方法
-		protected override void Run(TerminalCommandContext context)
+		protected override void OnExecute(TerminalCommandContext context)
 		{
 			//清空当前终端的显示缓存
 			context.Terminal.Clear();

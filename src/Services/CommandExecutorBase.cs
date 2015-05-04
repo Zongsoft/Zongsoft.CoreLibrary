@@ -31,7 +31,7 @@ using System.Text;
 
 namespace Zongsoft.Services
 {
-	public class CommandExecutorBase : MarshalByRefObject, ICommandExecutor
+	public abstract class CommandExecutorBase<TContext> : MarshalByRefObject, ICommandExecutor where TContext : CommandExecutorContextBase
 	{
 		#region 声明事件
 		public event EventHandler<CommandExecutorExecutingEventArgs> Executing;
@@ -67,30 +67,28 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 执行方法
-		public object Execute(string commandPath)
+		public object Execute(string commandText, object parameter = null)
 		{
-			return this.Execute(commandPath, null);
+			if(string.IsNullOrWhiteSpace(commandText))
+				throw new ArgumentNullException("commandText");
+
+			//创建命令执行器上下文对象
+			var context = this.CreateContext(commandText, parameter);
+
+			if(context == null)
+				throw new InvalidOperationException("The context of command-executor is null.");
+
+			//调用执行请求
+			return this.Execute(context);
 		}
 
-		public virtual object Execute(string commandPath, object parameter)
+		protected virtual object Execute(TContext context)
 		{
-			if(string.IsNullOrWhiteSpace(commandPath))
-				throw new ArgumentNullException("commandPath");
+			if(context == null)
+				throw new ArgumentNullException("context");
 
-			//查找指定路径的命令对象
-			var commandNode = this.Find(commandPath);
-
-			//如果指定的路径在命令树中是不存在的则抛出异常
-			if(commandNode == null)
-				throw new CommandNotFoundException(commandPath);
-
-			return this.Execute(commandNode, parameter, commandPath);
-		}
-
-		private object Execute(CommandTreeNode commandNode, object parameter, string commandText)
-		{
 			//创建事件参数对象
-			var executingArgs = new CommandExecutorExecutingEventArgs(this, commandText, parameter, commandNode);
+			var executingArgs = new CommandExecutorExecutingEventArgs(context);
 
 			//激发“Executing”事件
 			this.OnExecuting(executingArgs);
@@ -98,31 +96,29 @@ namespace Zongsoft.Services
 			if(executingArgs.Cancel)
 				return executingArgs.Result;
 
-			//获取应该执行的命令对象，因为在Executing事件中可能会更改待执行的命令对象
-			var command = executingArgs.Command;
-
-			//定义返回结果的变量
-			var result = executingArgs.Result;
-
-			//有可能找到的是空命令树节点，因此必须再判断对应的命令是否存在
-			if(command != null)
-				result = this.OnExecute(new CommandExecutorContext(this, commandNode, command, parameter));
+			//执行命令
+			this.OnExecute(context);
 
 			//创建事件参数对象
-			var executedArgs = new CommandExecutorExecutedEventArgs(this, commandText, parameter, commandNode, command, result);
+			var executedArgs = new CommandExecutorExecutedEventArgs(context);
 
 			//激发“Executed”事件
 			this.OnExecuted(executedArgs);
 
 			//返回最终的执行结果
-			return executedArgs.Result;
+			return context.Result;
 		}
 		#endregion
 
 		#region 执行实践
-		protected virtual object OnExecute(CommandExecutorContext context)
+		protected abstract TContext CreateContext(string commandText, object parameter);
+
+		protected virtual void OnExecute(TContext context)
 		{
-			return context.Command.Execute(context.Parameter);
+			var command = context.Command;
+
+			if(command != null)
+				context.Result = command.Execute(context.Parameter);
 		}
 		#endregion
 

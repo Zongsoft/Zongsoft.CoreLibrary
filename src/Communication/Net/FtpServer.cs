@@ -177,7 +177,7 @@ namespace Zongsoft.Communication.Net
 		#endregion
 
 		#region 嵌套子类
-		private class FtpCommandExecutor : CommandExecutorBase
+		private class FtpCommandExecutor : CommandExecutor
 		{
 			public FtpCommandExecutor()
 			{
@@ -189,14 +189,17 @@ namespace Zongsoft.Communication.Net
 				return base.Execute(name, args);
 			}
 
-			protected override object OnExecute(CommandExecutorContext context)
+			protected override void OnExecute(CommandExecutorContext context)
 			{
-				var args = (ReceivedEventArgs)context.Parameter;
+				var args = context.Parameter as ReceivedEventArgs;
 
-				return context.Command.Execute(
+				if(args == null)
+					throw new InvalidOperationException("Invalid execution parameter.");
+
+				context.Result = context.Command.Execute(
 					new FtpCommandContext(
-						context.Command,
 						this,
+						context.Command,
 						(FtpServerChannel)args.Channel,
 						(FtpStatement)args.ReceivedObject));
 			}

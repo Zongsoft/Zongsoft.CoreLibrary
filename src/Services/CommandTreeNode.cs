@@ -176,6 +176,11 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 重写方法
+		public override string ToString()
+		{
+			return this.FullPath;
+		}
+
 		protected override Collections.HierarchicalNode GetChild(string name)
 		{
 			return _children[name];

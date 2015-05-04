@@ -47,7 +47,7 @@ namespace Zongsoft.Terminals.Commands
 		#endregion
 
 		#region 重写方法
-		protected override void Run(TerminalCommandContext context)
+		protected override void OnExecute(TerminalCommandContext context)
 		{
 			if(context.Arguments.Length < 1)
 			{

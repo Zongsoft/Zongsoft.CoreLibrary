@@ -34,11 +34,11 @@ namespace Zongsoft.Terminals
 	public class TerminalCommandContext : Zongsoft.Services.CommandContext
 	{
 		#region 构造函数
-		public TerminalCommandContext(ICommand command, TerminalCommandExecutor executor, CommandLine commandLine) : base(command, executor, commandLine)
+		public TerminalCommandContext(TerminalCommandExecutor executor, CommandLine commandLine, ICommand command, object parameter, IDictionary<string, object> items = null) : base(executor, commandLine, command, parameter, items)
 		{
 		}
 
-		public TerminalCommandContext(CommandTreeNode commandNode, TerminalCommandExecutor executor, CommandLine commandLine) : base(commandNode, executor, commandLine)
+		public TerminalCommandContext(TerminalCommandExecutor executor, CommandLine commandLine, CommandTreeNode commandNode, object parameter, IDictionary<string, object> items = null) : base(executor, commandLine, commandNode, parameter, items)
 		{
 		}
 		#endregion

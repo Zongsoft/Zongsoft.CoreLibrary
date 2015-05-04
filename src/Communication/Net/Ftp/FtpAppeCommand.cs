@@ -40,7 +40,7 @@ namespace Zongsoft.Communication.Net.Ftp
         {
         }
 
-        protected override void Run(FtpCommandContext context)
+		protected override void OnExecute(FtpCommandContext context)
         {
             context.Result = null;
 
