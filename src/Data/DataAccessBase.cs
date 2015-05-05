@@ -368,6 +368,7 @@ namespace Zongsoft.Data
 			{
 				this.PropertyName = propertyName;
 				this.PropertyType = propertyType;
+				this.IsScalarType = isScalarType;
 			}
 		}
 		#endregion
