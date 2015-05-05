@@ -208,7 +208,6 @@
     <Compile Include="Runtime\Caching\BufferManagerBase.cs" />
     <Compile Include="Runtime\Caching\BufferManagerSelector.cs" />
     <Compile Include="Runtime\Caching\BufferUtility.cs" />
-    <Compile Include="Runtime\Caching\Cache.cs" />
     <Compile Include="Runtime\Caching\FileBufferManager.cs" />
     <Compile Include="Runtime\Caching\IBufferManager.cs" />
     <Compile Include="Runtime\Caching\IBufferManagerSelector.cs" />
@@ -231,10 +230,9 @@
     <Compile Include="Reporting\IReport.cs" />
     <Compile Include="Reporting\IReportProvider.cs" />
     <Compile Include="Reporting\IReportView.cs" />
-    <Compile Include="Runtime\Caching\IDictionaryCache.cs" />
-    <Compile Include="Runtime\Caching\IDictionaryCacheProvider.cs" />
-    <Compile Include="Runtime\Caching\MemoryDictionaryCache.cs" />
-    <Compile Include="Runtime\Caching\MemoryDictionaryCacheProvider.cs" />
+    <Compile Include="Runtime\Caching\ICache.cs" />
+    <Compile Include="Runtime\Caching\ICacheCreator.cs" />
+    <Compile Include="Runtime\Caching\ICacheProvider.cs" />
     <Compile Include="Runtime\Serialization\ISerializable.cs" />
     <Compile Include="Runtime\Serialization\ISerializationWriter.cs" />
     <Compile Include="Runtime\Serialization\ISerializer.cs" />

@@ -38,7 +38,7 @@ namespace Zongsoft.Security.Membership
 		#endregion
 
 		#region 成员字段
-		private Zongsoft.Runtime.Caching.IDictionaryCacheProvider _cache;
+		private Zongsoft.Runtime.Caching.ICacheProvider _cache;
 		#endregion
 
 		#region 构造函数
@@ -46,7 +46,7 @@ namespace Zongsoft.Security.Membership
 		{
 		}
 
-		public CertificationProvider(Zongsoft.Runtime.Caching.IDictionaryCacheProvider cache)
+		public CertificationProvider(Zongsoft.Runtime.Caching.ICacheProvider cache)
 		{
 			if(cache == null)
 				throw new ArgumentNullException("cache");
@@ -56,7 +56,7 @@ namespace Zongsoft.Security.Membership
 		#endregion
 
 		#region 公共属性
-		public Zongsoft.Runtime.Caching.IDictionaryCacheProvider Cache
+		public Zongsoft.Runtime.Caching.ICacheProvider Cache
 		{
 			get
 			{
@@ -121,7 +121,7 @@ namespace Zongsoft.Security.Membership
 
 		public int GetCount(string applicationId)
 		{
-			Zongsoft.Runtime.Caching.IDictionaryCache cache;
+			Zongsoft.Runtime.Caching.ICache cache;
 
 			if(applicationId == null)
 				cache = _cache.GetDictionaryCache(DefaultCacheName);
