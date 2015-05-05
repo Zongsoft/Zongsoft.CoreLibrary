@@ -336,18 +336,82 @@ namespace Zongsoft.Data
 			var members = new HashSet<string>();
 
 			if(includes == null)
-			{
 				members.UnionWith(this.ResolveScope(entityName, null, typeof(T)));
-			}
 			else
-			{
-			}
+				members.UnionWith(this.ResolveExpression(includes));
 
 			if(excludes != null)
-			{
-			}
+				members.ExceptWith(this.ResolveExpression(excludes));
 
 			return members.ToArray();
+		}
+
+		private IEnumerable<string> ResolveExpression<T>(Expression<Func<T, object>> expression)
+		{
+			return this.ResolveExpression(expression.Body, expression.Parameters[0]);
+		}
+
+		private string[] ResolveExpression(Expression expression, ParameterExpression parameter)
+		{
+			if(expression == parameter)
+				return GetMembers(expression.Type);
+
+			if(expression.GetType().FullName == "System.Linq.Expressions.PropertyExpression")
+			{
+				if(IsScalarType(expression.Type))
+					return new string[] { ExpressionToString(expression, parameter) };
+
+				var memberName = GetMemberName(expression, parameter);
+				return GetMembers(expression.Type, memberName);
+			}
+
+			if(expression is NewExpression)
+			{
+				HashSet<string> list = new HashSet<string>();
+				var ne = (NewExpression)expression;
+				foreach(var argument in ne.Arguments)
+				{
+					list.UnionWith(ResolveExpression(argument, parameter));
+				}
+				return list.ToArray();
+			}
+
+			throw new NotSupportedException();
+		}
+
+		private string ExpressionToString(Expression expression, Expression stop)
+		{
+			if(expression == stop)
+				return string.Empty;
+
+			dynamic propertyExpression = expression;
+
+			var str = ExpressionToString(propertyExpression.Expression, stop);
+
+			if(string.IsNullOrEmpty(str))
+				return propertyExpression.Member.Name;
+
+			return str + "." + propertyExpression.Member.Name;
+		}
+
+		private string GetMemberName(Expression expression, ParameterExpression parameter)
+		{
+			dynamic propertyExpression = expression;
+
+			var temp = (Expression)propertyExpression.Expression;
+
+			if(temp == parameter)
+				return propertyExpression.Member.Name;
+
+			return GetMemberName(temp, parameter) + "." + propertyExpression.Member.Name;
+		}
+
+		private string[] GetMembers(Type type, string prev = null)
+		{
+			if(prev == null)
+				prev = string.Empty;
+
+			return type.GetProperties(BindingFlags.Instance | BindingFlags.Public).Where(p => IsScalarType(p.PropertyType)).Select(p => prev + "." + p.Name).ToArray();
 		}
 		#endregion
 
