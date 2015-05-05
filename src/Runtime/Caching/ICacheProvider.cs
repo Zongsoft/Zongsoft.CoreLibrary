@@ -29,15 +29,15 @@ using System;
 namespace Zongsoft.Runtime.Caching
 {
 	/// <summary>
-	/// 表示缓存字典的容器的接口。
+	/// 表示缓存容器的提供程序的接口。
 	/// </summary>
 	public interface ICacheProvider
 	{
 		/// <summary>
-		/// 获取指定名称的缓存字典。
+		/// 获取指定名称的缓存容器。
 		/// </summary>
-		/// <param name="name">指定要获取的缓存字典的名称。</param>
-		/// <returns>返回指定名称的缓存字典名称，如果指定名称的缓存字典不存在则返回由<see cref="ICacheProvider"/>实现者的<see cref="OnCreate"/>方法返回的缓存字典。</returns>
-		ICache GetDictionaryCache(string name);
+		/// <param name="name">指定要获取的缓存容器的名称。</param>
+		/// <returns>返回指定名称的缓存容，如果指定名称的缓存容器不存在则返回空(null)。</returns>
+		ICache GetCache(string name);
 	}
 }
