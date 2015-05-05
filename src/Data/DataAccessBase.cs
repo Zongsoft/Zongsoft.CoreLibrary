@@ -77,7 +77,10 @@ namespace Zongsoft.Data
 
 		public int Count<T>(string name, ICondition condition, Expression<Func<T, object>> includes)
 		{
-			throw new NotImplementedException();
+			if(includes == null)
+				return this.Count(name, condition, (string[])null);
+
+			return this.Count(name, condition, this.ResolveScopeExpression(name, includes, null));
 		}
 
 		protected abstract int Count(string name, ICondition condition, string[] includes);
@@ -114,7 +117,7 @@ namespace Zongsoft.Data
 								 Paging paging = null,
 								 params Sorting[] sorting)
 		{
-			throw new NotImplementedException();
+			return this.Select<T>(name, condition, this.ResolveScopeExpression(name, includes, excludes), paging, sorting);
 		}
 
 		protected abstract IEnumerable<T> Select<T>(string name,
@@ -143,7 +146,7 @@ namespace Zongsoft.Data
 			if(cascades == null)
 				return this.Delete(name, condition, (string[])null);
 
-			throw new NotImplementedException();
+			return this.Delete(name, condition, this.ResolveScopeExpression(name, cascades, null));
 		}
 
 		protected abstract int Delete(string name, ICondition condition, string[] cascades);
@@ -157,7 +160,7 @@ namespace Zongsoft.Data
 
 		public int Insert<T>(string name, T entity, Expression<Func<T, object>> includes, Expression<Func<T, object>> excludes = null)
 		{
-			throw new NotImplementedException();
+			return this.Insert(name, entity, this.ResolveScopeExpression(name, includes, excludes));
 		}
 
 		protected virtual int Insert<T>(string name, T entity, string[] members)
@@ -172,7 +175,7 @@ namespace Zongsoft.Data
 
 		public int Insert<T>(string name, IEnumerable<T> entities, Expression<Func<T, object>> includes, Expression<Func<T, object>> excludes = null)
 		{
-			throw new NotImplementedException();
+			return this.Insert(name, entities, this.ResolveScopeExpression(name, includes, excludes));
 		}
 
 		protected abstract int Insert<T>(string name, IEnumerable<T> entities, string[] members);
@@ -199,7 +202,7 @@ namespace Zongsoft.Data
 
 		public int Update<T>(string name, T entity, ICondition condition, Expression<Func<T, object>> includes = null, Expression<Func<T, object>> excludes = null)
 		{
-			throw new NotImplementedException();
+			return this.Update(name, entity, condition, this.ResolveScopeExpression(name, includes, excludes));
 		}
 
 		protected virtual int Update<T>(string name, T entity, ICondition condition, string[] members)
@@ -228,7 +231,7 @@ namespace Zongsoft.Data
 
 		public int Update<T>(string name, IEnumerable<T> entities, ICondition condition, Expression<Func<T, object>> includes = null, Expression<Func<T, object>> excludes = null)
 		{
-			throw new NotImplementedException();
+			return this.Update(name, entities, condition, this.ResolveScopeExpression(name, includes, excludes));
 		}
 
 		protected abstract int Update<T>(string name, IEnumerable<T> entities, ICondition condition, string[] members);
@@ -297,7 +300,7 @@ namespace Zongsoft.Data
 								return new string[] { p.PropertyName };
 
 							var list = new List<string>();
-							this.GetComplexPropertyMembers(p.PropertyName, p.PropertyType, list);
+							this.GetComplexPropertyMembers(entity.EntityName, p.PropertyName, p.PropertyType, list);
 							return list.ToArray();
 						}));
 
@@ -315,17 +318,36 @@ namespace Zongsoft.Data
 			return result;
 		}
 
-		private void GetComplexPropertyMembers(string prefix, Type type, ICollection<string> collection)
+		private void GetComplexPropertyMembers(string entityName, string memberPrefix, Type memberType, ICollection<string> collection)
 		{
-			var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
+			var entityDescriptor = _entityCache.GetOrAdd(memberType, type => new EntityDesciptior(this, entityName + "!" + memberPrefix, type));
 
-			foreach(var property in properties)
+			foreach(var property in entityDescriptor.Properties)
 			{
 				if(this.IsScalarType(property.PropertyType))
-					collection.Add(prefix + "." + property.Name);
+					collection.Add(memberPrefix + "." + property.PropertyName);
 				else
-					GetComplexPropertyMembers(prefix + "." + property.Name, property.PropertyType, collection);
+					GetComplexPropertyMembers(entityName, memberPrefix + "." + property.PropertyName, property.PropertyType, collection);
 			}
+		}
+
+		private string[] ResolveScopeExpression<T>(string entityName, Expression<Func<T, object>> includes, Expression<Func<T, object>> excludes)
+		{
+			var members = new HashSet<string>();
+
+			if(includes == null)
+			{
+				members.UnionWith(this.ResolveScope(entityName, null, typeof(T)));
+			}
+			else
+			{
+			}
+
+			if(excludes != null)
+			{
+			}
+
+			return members.ToArray();
 		}
 		#endregion
 
