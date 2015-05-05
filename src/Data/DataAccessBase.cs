@@ -291,7 +291,15 @@ namespace Zongsoft.Data
 						if(part.Length != 1)
 							throw new ArgumentException("scope");
 
-						result.UnionWith(entity.Properties.Select(p => p.PropertyName));
+						result.UnionWith(entity.Properties.SelectMany(p =>
+						{
+							if(p.IsScalarType)
+								return new string[] { p.PropertyName };
+
+							var list = new List<string>();
+							this.GetComplexPropertyMembers(p.PropertyName, p.PropertyType, list);
+							return list.ToArray();
+						}));
 
 						break;
 					default:
@@ -305,6 +313,19 @@ namespace Zongsoft.Data
 			}
 
 			return result;
+		}
+
+		private void GetComplexPropertyMembers(string prefix, Type type, ICollection<string> collection)
+		{
+			var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
+
+			foreach(var property in properties)
+			{
+				if(this.IsScalarType(property.PropertyType))
+					collection.Add(prefix + "." + property.Name);
+				else
+					GetComplexPropertyMembers(prefix + "." + property.Name, property.PropertyType, collection);
+			}
 		}
 		#endregion
 
