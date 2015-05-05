@@ -59,6 +59,7 @@
     <Compile Include="Common\ConvertTests.cs" />
     <Compile Include="Common\EnumUtilityTests.cs" />
     <Compile Include="Data\DataAccessBaseTest.cs" />
+    <Compile Include="Data\SortingTest.cs" />
     <Compile Include="Gender.cs" />
     <Compile Include="Common\ObjectReferenceTests.cs" />
     <Compile Include="Person.cs" />
