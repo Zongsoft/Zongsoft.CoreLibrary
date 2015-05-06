@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2003-2014 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2003-2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -41,7 +41,7 @@ namespace Zongsoft.Security.Membership
 		private int _userId;
 		private DateTime _expires;
 		private DateTime _issuedTime;
-		private IList<DateTime> _slidingList;
+		private IReadOnlyList<DateTime> _slidingList;
 		private IDictionary<string, object> _extendedProperties;
 		#endregion
 
@@ -133,11 +133,15 @@ namespace Zongsoft.Security.Membership
 		/// <remarks>
 		///		<para>每续约一次，就会在滑动记录列表中追加一条记录。</para>
 		/// </remarks>
-		public IList<DateTime> SlidingList
+		public IReadOnlyList<DateTime> SlidingList
 		{
 			get
 			{
 				return _slidingList;
+			}
+			internal set
+			{
+				_slidingList = value;
 			}
 		}
 

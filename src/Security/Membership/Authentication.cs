@@ -150,7 +150,7 @@ namespace Zongsoft.Security.Membership
 						throw new AuthenticationException(string.Format("Register certification faild for '{0}'.", identity));
 
 					//验证成功，返回验证结果
-					return new AuthenticationResult(certification.CertificationId, certification.Expires);
+					return new AuthenticationResult(certification);
 				}
 
 				//密码校验失败则抛出验证异常

@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2003-2014 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2003-2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -36,47 +36,31 @@ namespace Zongsoft.Security.Membership
 	public class AuthenticationResult
 	{
 		#region 成员字段
-		private string _certificationId;
+		public Certification _certification;
 		private string _message;
-		private DateTime _expires;
 		#endregion
 
 		#region 构造函数
-		public AuthenticationResult(string certificationId, DateTime expires) : this(certificationId, expires, string.Empty)
+		public AuthenticationResult(Certification certification) : this(certification, string.Empty)
 		{
 		}
 
-		public AuthenticationResult(string certificationId, DateTime expires, string message)
+		public AuthenticationResult(Certification certification, string message)
 		{
-			if(string.IsNullOrWhiteSpace(certificationId))
-				throw new ArgumentNullException("certificationId");
-
-			_certificationId = certificationId;
-			_expires = expires;
+			_certification = certification;
 			_message = message ?? string.Empty;
 		}
 		#endregion
 
 		#region 公共属性
 		/// <summary>
-		/// 获取验证通过后的安全凭证号。
+		/// 获取验证通过后的安全凭证，如果验证失败则返回空(null)。
 		/// </summary>
-		public string CertificationId
+		public Certification Certification
 		{
 			get
 			{
-				return _certificationId;
-			}
-		}
-
-		/// <summary>
-		/// 获取安全凭证的过期时间。
-		/// </summary>
-		public DateTime Expires
-		{
-			get
-			{
-				return _expires;
+				return _certification;
 			}
 		}
 
