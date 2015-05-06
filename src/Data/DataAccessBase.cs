@@ -410,8 +410,10 @@ namespace Zongsoft.Data
 		{
 			if(prev == null)
 				prev = string.Empty;
+			else
+				prev += ".";
 
-			return type.GetProperties(BindingFlags.Instance | BindingFlags.Public).Where(p => IsScalarType(p.PropertyType)).Select(p => prev + "." + p.Name).ToArray();
+			return type.GetProperties(BindingFlags.Instance | BindingFlags.Public).Where(p => IsScalarType(p.PropertyType)).Select(p => prev + p.Name).ToArray();
 		}
 		#endregion
 
