@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2013-2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -35,9 +35,9 @@ namespace Zongsoft.Runtime.Serialization
 {
 	public class Serializer : ISerializer
 	{
-		#region 单例模式
-		public static readonly Serializer Text = new Serializer(new TextSerializationWriter());
-		public static readonly Serializer Json = new Serializer(new JsonSerializationWriter());
+		#region 静态字段
+		private static ISerializer _text = new Serializer(new TextSerializationWriter());
+		private static ISerializer _json = new Serializer(new JsonSerializationWriter());
 		#endregion
 
 		#region 事件定义
@@ -62,6 +62,38 @@ namespace Zongsoft.Runtime.Serialization
 
 			_writer = writer;
 			_settings = settings ?? new SerializerSettings();
+		}
+		#endregion
+
+		#region 静态属性
+		public static ISerializer Text
+		{
+			get
+			{
+				return _text;
+			}
+			set
+			{
+				if(value == null)
+					throw new ArgumentNullException();
+
+				_text = value;
+			}
+		}
+
+		public static ISerializer Json
+		{
+			get
+			{
+				return _json;
+			}
+			set
+			{
+				if(value == null)
+					throw new ArgumentNullException();
+
+				_json = value;
+			}
 		}
 		#endregion
 
@@ -91,10 +123,23 @@ namespace Zongsoft.Runtime.Serialization
 		#endregion
 
 		#region 公共方法
+		public T Deserialize<T>(Stream serializationStream)
+		{
+			return (T)this.Deserialize(serializationStream, typeof(Type));
+		}
+
 		public object Deserialize(Stream serializationStream)
+		{
+			throw new NotImplementedException();
+		}
+
+		public object Deserialize(Stream serializationStream, Type type)
 		{
 			if(serializationStream == null)
 				throw new ArgumentNullException("serializationStream");
+
+			if(type == null)
+				throw new ArgumentNullException("type");
 
 			throw new NotImplementedException();
 		}

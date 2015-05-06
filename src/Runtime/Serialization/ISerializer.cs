@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2013-2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -35,11 +35,28 @@ namespace Zongsoft.Runtime.Serialization
 	public interface ISerializer
 	{
 		/// <summary>
-		/// 反序列化指定<seealso cref="System.IO.Stream"/>包含的对象。
+		/// 反序列化指定<paramref name="serializationStream"/>包含的对象。
 		/// </summary>
 		/// <param name="serializationStream">待反序列化的流。</param>
+		/// <param name="type">反序列化的结果类型。</param>
 		/// <returns>反序列化的结果。</returns>
 		object Deserialize(Stream serializationStream);
+
+		/// <summary>
+		/// 反序列化指定<paramref name="serializationStream"/>包含的对象。
+		/// </summary>
+		/// <param name="serializationStream">待反序列化的流。</param>
+		/// <param name="type">反序列化的结果类型。</param>
+		/// <returns>反序列化的结果。</returns>
+		object Deserialize(Stream serializationStream, Type type);
+
+		/// <summary>
+		/// 反序列化指定<paramref name="serializationStream"/>包含的对象。
+		/// </summary>
+		/// <typeparam name="T">指定的反序列化结果的泛类型。</typeparam>
+		/// <param name="serializationStream">待反序列化的流。</param>
+		/// <returns>反序列化的结果。</returns>
+		T Deserialize<T>(Stream serializationStream);
 
 		/// <summary>
 		/// 将指定的对象序列化到指定的<seealso cref="System.IO.Stream"/>流中。

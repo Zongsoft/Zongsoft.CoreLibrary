@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2011-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2011-2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -79,6 +79,22 @@ namespace Zongsoft.Communication
 		#endregion
 
 		#region 反序列化
+		T Zongsoft.Runtime.Serialization.ISerializer.Deserialize<T>(Stream serializationStream)
+		{
+			if(typeof(T) == typeof(Package))
+				return (T)this.Deserialize(serializationStream);
+
+			throw new NotSupportedException();
+		}
+
+		object Zongsoft.Runtime.Serialization.ISerializer.Deserialize(Stream serializationStream, Type type)
+		{
+			if(type == null || type == typeof(Package))
+				return this.Deserialize(serializationStream);
+
+			throw new NotSupportedException();
+		}
+
 		public object Deserialize(Stream serializationStream)
 		{
 			if(serializationStream == null)

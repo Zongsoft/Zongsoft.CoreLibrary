@@ -237,6 +237,7 @@
     <Compile Include="Runtime\Serialization\ISerializable.cs" />
     <Compile Include="Runtime\Serialization\ISerializationWriter.cs" />
     <Compile Include="Runtime\Serialization\ISerializer.cs" />
+    <Compile Include="Runtime\Serialization\ITextSerializer.cs" />
     <Compile Include="Runtime\Serialization\JsonSerializationWriter.cs" />
     <Compile Include="Runtime\Serialization\SerializationDirection.cs" />
     <Compile Include="Runtime\Serialization\SerializationMembers.cs" />
