@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2003-2014 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2003-2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -39,21 +39,21 @@ namespace Zongsoft.Security.Membership
 		/// 获取指定名称对应的用户对象。
 		/// </summary>
 		/// <param name="certificationId">调用者的安全凭证号。</param>
-		/// <param name="name">要查找的用户名。</param>
-		/// <returns>返回由<paramref name="name"/>参数指定的用户对象，如果没有找到指定名称的用户则返回空。</returns>
-		/// <exception cref="System.ArgumentNullException">当<paramref name="name"/>参数为空(null)或者全空格字符。</exception>
-		User GetUser(string certificationId, string name);
+		/// <param name="userId">要查找的用户编号。</param>
+		/// <returns>返回由<paramref name="userId"/>参数指定的用户对象，如果没有找到指定名称的用户则返回空。</returns>
+		User GetUser(string certificationId, int userId);
 
 		/// <summary>
-		/// 获取指定电子邮箱地址(EMail)的用户。
+		/// 获取指定标识对应的用户对象。
 		/// </summary>
 		/// <param name="certificationId">调用者的安全凭证号。</param>
-		/// <param name="email">要查找的用户电子邮箱地址。</param>
-		/// <returns>返回匹配查找条件的用户对象，如果没有找到则返回空(null)。</returns>
-		User GetUserByEmail(string certificationId, string email);
+		/// <param name="identity">要查找的用户标识(用户名或邮箱或手机号码)。</param>
+		/// <returns>返回由<paramref name="identity"/>参数指定的用户对象，如果没有找到指定名称的用户则返回空。</returns>
+		/// <exception cref="System.ArgumentNullException">当<paramref name="identity"/>参数为空(null)或者全空格字符。</exception>
+		User GetUser(string certificationId, string identity);
 
 		/// <summary>
-		/// 获取当前系统中的所有用户，包括被禁用的。
+		/// 获取当前命名空间中的所有用户。
 		/// </summary>
 		/// <param name="certificationId">调用者的安全凭证号。</param>
 		/// <returns>返回当前系统中的所有用户对象集。</returns>
@@ -63,9 +63,9 @@ namespace Zongsoft.Security.Membership
 		/// 删除指定名称集的多个用户。
 		/// </summary>
 		/// <param name="certificationId">调用者的安全凭证号。</param>
-		/// <param name="names">要删除的用户名数组。</param>
+		/// <param name="userIds">要删除的用户编号数组。</param>
 		/// <returns>如果删除成功则返回删除的数量，否则返回零。</returns>
-		int DeleteUsers(string certificationId, params string[] names);
+		int DeleteUsers(string certificationId, params int[] userIds);
 
 		/// <summary>
 		/// 创建单个或者多个用户。

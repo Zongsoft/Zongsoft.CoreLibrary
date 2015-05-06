@@ -36,11 +36,10 @@ namespace Zongsoft.Security.Membership
 		/// <summary>
 		/// 验证指定名称的用户是否有效并且和指定的密码是否完全匹配。
 		/// </summary>
-		/// <param name="applicationId">要验证的系统编号。</param>
-		/// <param name="userName">要验证的用户的名称。</param>
+		/// <param name="identity">要验证的用户名或Email或手机号码。</param>
 		/// <param name="password">指定用户的密码。</param>
 		/// <returns>如果验证成功则返回一个有效的<see cref="AuthenticationResult"/>对象。验证失败会抛出<seealso cref="Zongsoft.Security.Membership.AuthenticationException"/>异常。</returns>
 		/// <exception cref="Zongsoft.Security.Membership.AuthenticationException">当验证失败。</exception>
-		AuthenticationResult Authenticate(string applicationId, string userName, string password);
+		AuthenticationResult Authenticate(string identity, string password);
 	}
 }

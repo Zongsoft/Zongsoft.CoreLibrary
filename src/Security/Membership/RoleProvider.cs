@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2003-2014 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2003-2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -36,23 +36,23 @@ namespace Zongsoft.Security.Membership
 	public class RoleProvider : IRoleProvider
 	{
 		#region 成员字段
-		private IDataAccess _objectAccess;
+		private IDataAccess _dataAccess;
 		private ICertificationProvider _certificationProvider;
 		#endregion
 
 		#region 公共属性
-		public IDataAccess ObjectAccess
+		public IDataAccess DataAccess
 		{
 			get
 			{
-				return _objectAccess;
+				return _dataAccess;
 			}
 			set
 			{
 				if(value == null)
 					throw new ArgumentNullException();
 
-				_objectAccess = value;
+				_dataAccess = value;
 			}
 		}
 
@@ -73,67 +73,53 @@ namespace Zongsoft.Security.Membership
 		#endregion
 
 		#region 角色管理
-		public Role GetRole(string certificationId, string name)
+		public Role GetRole(string certificationId, int roleId)
 		{
-			var objectAccess = this.GetObjectAccess();
+			var objectAccess = this.GetDataAccess();
 
 			return objectAccess.Select<Role>("Security.Role", new ConditionCollection(ConditionCombine.And)
 			{
-				new Condition("ApplicationId", this.GetApplicationId(certificationId)),
-				new Condition("Name", name),
+				new Condition("RoleId", roleId),
 			}).FirstOrDefault();
 		}
 
 		public IEnumerable<Role> GetAllRoles(string certificationId)
 		{
-			var objectAccess = this.GetObjectAccess();
+			var objectAccess = this.GetDataAccess();
 
 			return objectAccess.Select<Role>("Security.Role", new ConditionCollection(ConditionCombine.And)
 			{
-				new Condition("ApplicationId", this.GetApplicationId(certificationId)),
+				new Condition("Namespace", this.GetNamespace(certificationId)),
 			});
 		}
 
-		public IEnumerable<Role> GetRoles(string certificationId, string memberName, MemberType memberType)
+		public IEnumerable<Role> GetRoles(string certificationId, int memberId, MemberType memberType)
 		{
-			var objectAccess = this.GetObjectAccess();
+			var objectAccess = this.GetDataAccess();
 
 			var roles = objectAccess.Execute("Security.GetRoles", new Dictionary<string, object>
 			{
-				{"ApplicationId", this.GetApplicationId(certificationId)},
-				{"MemberName", memberName},
+				{"ApplicationId", this.GetNamespace(certificationId)},
+				{"MemberId", memberId},
 				{"MemberType", memberType},
 			}) as IEnumerable<Role>;
 
 			return roles;
 		}
 
-		public IEnumerable<Role> GetRoles(string certificationId, string memberName, MemberType memberType, int depth)
+		public IEnumerable<Role> GetRoles(string certificationId, int memberId, MemberType memberType, int depth)
 		{
 			throw new NotImplementedException();
 		}
 
-		public int DeleteRoles(string certificationId, params string[] names)
+		public int DeleteRoles(string certificationId, params int[] roleIds)
 		{
-			if(names == null || names.Length < 1)
+			if(roleIds == null || roleIds.Length < 1)
 				return 0;
 
-			var count = 0;
-			var objectAccess = this.GetObjectAccess();
+			var objectAccess = this.GetDataAccess();
 
-			foreach(var name in names)
-			{
-				if(string.IsNullOrWhiteSpace(name))
-					continue;
-
-				count += objectAccess.Delete("Security.Role", new ConditionCollection(ConditionCombine.And)
-				{
-					new Condition("ApplicationId", this.GetApplicationId(certificationId)),
-					new Condition("Name", name),
-				});
-			}
-
-			return count;
+			return objectAccess.Delete("Security.Role", new Condition("RoleId", roleIds, ConditionOperator.In));
 		}
 
 		public void CreateRoles(string certificationId, IEnumerable<Role> roles)
@@ -141,7 +127,7 @@ namespace Zongsoft.Security.Membership
 			if(roles == null)
 				return;
 
-			var objectAccess = this.GetObjectAccess();
+			var objectAccess = this.GetDataAccess();
 			objectAccess.Insert("Security.Role", roles);
 		}
 
@@ -150,85 +136,61 @@ namespace Zongsoft.Security.Membership
 			if(roles == null)
 				return;
 
-			var objectAccess = this.GetObjectAccess();
+			var objectAccess = this.GetDataAccess();
 
-			foreach(var user in roles)
+			foreach(var role in roles)
 			{
-				if(user == null)
+				if(role == null)
 					continue;
 
-				objectAccess.Update("Security.Role", user, new ConditionCollection(ConditionCombine.And)
+				objectAccess.Update("Security.Role", role, new ConditionCollection(ConditionCombine.And)
 				{
-					new Condition("ApplicationId", this.GetApplicationId(certificationId)),
-					new Condition("Name", user.Name),
+					new Condition("RoleId", role.RoleId),
 				});
 			}
 		}
 		#endregion
 
 		#region 成员管理
-		public bool InRole(string certificationId, string roleName)
+		public bool InRole(string certificationId, int userId, int roleId)
 		{
-			return this.InRole(certificationId, roleName, 0);
+			return this.GetRoles(certificationId, userId, MemberType.User, -1).Any(role => role.RoleId == roleId);
 		}
 
-		public bool InRole(string certificationId, string roleName, int depth)
+		public IEnumerable<Member> GetMembers(string certificationId, int roleId)
 		{
-			var certification = this.GetCertification(certificationId);
-
-			return this.GetRoles(certificationId, certification.UserName, MemberType.User, depth)
-			           .Any(role => string.Equals(role.Name, roleName, StringComparison.OrdinalIgnoreCase));
-		}
-
-		public IEnumerable<Member> GetMembers(string certificationId, string roleName)
-		{
-			var objectAccess = this.GetObjectAccess();
+			var objectAccess = this.GetDataAccess();
 
 			var members = objectAccess.Execute("Security.GetMembers", new Dictionary<string, object>
 			{
-				{"ApplicationId", this.GetApplicationId(certificationId)},
-				{"RoleName", roleName},
+				{"RoleId", roleId},
 			}) as IEnumerable<Member>;
 
 			return members;
 		}
 
-		public IEnumerable<Member> GetMembers(string certificationId, string roleName, int depth)
+		public IEnumerable<Member> GetMembers(string certificationId, int roleId, int depth)
 		{
 			throw new NotImplementedException();
 		}
 
-		public void DeleteMember(string certificationId, string roleName, string memberName, MemberType memberType)
+		public void DeleteMember(string certificationId, int roleId, int memberId, MemberType memberType)
 		{
-			if(string.IsNullOrWhiteSpace(roleName))
-				throw new ArgumentNullException("roleName");
-
-			if(string.IsNullOrWhiteSpace(memberName))
-				throw new ArgumentNullException("memberName");
-
-			var objectAccess = this.GetObjectAccess();
+			var objectAccess = this.GetDataAccess();
 
 			objectAccess.Delete("Security.Member", new ConditionCollection(ConditionCombine.And)
 			{
-				new Condition("ApplicationId", this.GetApplicationId(certificationId)),
-				new Condition("RoleName", roleName),
-				new Condition("MemberName", memberName),
+				new Condition("RoleId", roleId),
+				new Condition("MemberId", memberId),
 				new Condition("MemberType", memberType),
 			});
 		}
 
-		public void CreateMember(string certificationId, string roleName, string memberName, MemberType memberType)
+		public void CreateMember(string certificationId, int roleId, int memberId, MemberType memberType)
 		{
-			if(string.IsNullOrWhiteSpace(roleName))
-				throw new ArgumentNullException("roleName");
+			var objectAccess = this.GetDataAccess();
 
-			if(string.IsNullOrWhiteSpace(memberName))
-				throw new ArgumentNullException("memberName");
-
-			var objectAccess = this.GetObjectAccess();
-
-			objectAccess.Insert("Security.Member",
-			                    new Member(this.GetApplicationId(certificationId), roleName, memberName, memberType));
+			objectAccess.Insert("Security.Member", new Member(roleId, memberId, memberType));
 		}
 
 		public void SetMembers(string certificationId, IEnumerable<Member> members)
@@ -236,16 +198,14 @@ namespace Zongsoft.Security.Membership
 			if(members == null)
 				return;
 
-			var objectAccess = this.GetObjectAccess();
-			var applicationId = this.GetApplicationId(certificationId);
+			var dataAccess = this.GetDataAccess();
 
-			foreach(var member in members.Where(m => string.Equals(m.ApplicationId, applicationId, StringComparison.OrdinalIgnoreCase)))
+			foreach(var member in members)
 			{
-				objectAccess.Execute("Security.SetMember", new Dictionary<string, object>
+				dataAccess.Execute("Security.SetMember", new Dictionary<string, object>
 				{
-					{"ApplicationId", applicationId},
-					{"RoleName", member.RoleName},
-					{"MemberName", member.MemberName},
+					{"RoleId", member.RoleId},
+					{"MemberName", member.MemberId},
 					{"MemberType", member.MemberType},
 				});
 			}
@@ -253,12 +213,12 @@ namespace Zongsoft.Security.Membership
 		#endregion
 
 		#region 私有方法
-		private IDataAccess GetObjectAccess()
+		private IDataAccess GetDataAccess()
 		{
-			if(_objectAccess == null)
-				throw new InvalidOperationException("The value of 'ObjectAccess' property is null.");
+			if(_dataAccess == null)
+				throw new InvalidOperationException("The value of 'DataAccess' property is null.");
 
-			return _objectAccess;
+			return _dataAccess;
 		}
 
 		private Certification GetCertification(string certificationId)
@@ -271,14 +231,14 @@ namespace Zongsoft.Security.Membership
 			return certificationProvider.GetCertification(certificationId);
 		}
 
-		private string GetApplicationId(string certificationId)
+		private string GetNamespace(string certificationId)
 		{
 			var certificationProvider = _certificationProvider;
 
 			if(certificationProvider == null)
 				throw new InvalidOperationException("The value of 'CertificationProvider' property is null.");
 
-			return certificationProvider.GetApplicationId(certificationId);
+			return certificationProvider.GetNamespace(certificationId);
 		}
 		#endregion
 	}

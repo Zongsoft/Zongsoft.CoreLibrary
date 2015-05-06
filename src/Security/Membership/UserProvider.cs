@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2003-2014 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2003-2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -36,23 +36,23 @@ namespace Zongsoft.Security.Membership
 	public class UserProvider : IUserProvider
 	{
 		#region 成员字段
-		private IDataAccess _objectAccess;
+		private IDataAccess _dataAccess;
 		private ICertificationProvider _certificationProvider;
 		#endregion
 
 		#region 公共属性
-		public IDataAccess ObjectAccess
+		public IDataAccess DataAccess
 		{
 			get
 			{
-				return _objectAccess;
+				return _dataAccess;
 			}
 			set
 			{
 				if(value == null)
 					throw new ArgumentNullException();
 
-				_objectAccess = value;
+				_dataAccess = value;
 			}
 		}
 
@@ -73,59 +73,58 @@ namespace Zongsoft.Security.Membership
 		#endregion
 
 		#region 用户管理
-		public User GetUser(string certificationId, string name)
+		public User GetUser(string certificationId, int userId)
 		{
-			var objectAccess = this.GetObjectAccess();
+			var objectAccess = this.GetDataAccess();
 
 			return objectAccess.Select<User>("Security.User", new ConditionCollection(ConditionCombine.And)
 			{
-				new Condition("ApplicationId", this.GetApplicationId(certificationId)),
-				new Condition("Name", name),
+				new Condition("UserId", userId),
 			}).FirstOrDefault();
 		}
 
-		public User GetUserByEmail(string certificationId, string email)
+		public User GetUser(string certificationId, string identity)
 		{
-			var objectAccess = this.GetObjectAccess();
+			ICondition condition = null;
+			var identityType = MembershipHelper.GetUserIdentityType(identity);
 
-			return objectAccess.Select<User>("Security.User", new ConditionCollection(ConditionCombine.And)
+			switch(identityType)
 			{
-				new Condition("ApplicationId", this.GetApplicationId(certificationId)),
-				new Condition("EMail", email),
-			}).FirstOrDefault();
+				case UserIdentityType.Email:
+					condition = new Condition("Email", identity);
+					break;
+				case UserIdentityType.PhoneNumber:
+					condition = new Condition("PhoneNumber", identity);
+					break;
+				default:
+					condition = new Condition("Name", identity);
+					break;
+			}
+
+			var objectAccess = this.GetDataAccess();
+
+			return objectAccess.Select<User>("Security.User", condition).FirstOrDefault();
 		}
 
 		public IEnumerable<User> GetAllUsers(string certificationId)
 		{
-			var objectAccess = this.GetObjectAccess();
+			var dataAccess = this.GetDataAccess();
+			var @namespace = this.GetNamespace(certificationId);
 
-			return objectAccess.Select<User>("Security.User", new ConditionCollection(ConditionCombine.And)
-			{
-				new Condition("ApplicationId", this.GetApplicationId(certificationId)),
-			});
+			if(string.IsNullOrWhiteSpace(@namespace))
+				return dataAccess.Select<User>("Security.User");
+			else
+				return dataAccess.Select<User>("Security.User", new Condition("Namespace", @namespace));
 		}
 
-		public int DeleteUsers(string certificationId, params string[] names)
+		public int DeleteUsers(string certificationId, params int[] userIds)
 		{
-			if(names == null || names.Length < 1)
+			if(userIds == null || userIds.Length < 1)
 				return 0;
 
-			var count = 0;
-			var objectAccess = this.GetObjectAccess();
+			var dataAccess = this.GetDataAccess();
 
-			foreach(var name in names)
-			{
-				if(string.IsNullOrWhiteSpace(name))
-					continue;
-
-				count += objectAccess.Delete("Security.User", new ConditionCollection(ConditionCombine.And)
-				{
-					new Condition("ApplicationId", this.GetApplicationId(certificationId)),
-					new Condition("Name", name),
-				});
-			}
-
-			return count;
+			return dataAccess.Delete("Security.User", new Condition("UserId", userIds, ConditionOperator.In));
 		}
 
 		public void CreateUsers(string certificationId, IEnumerable<User> users)
@@ -133,7 +132,7 @@ namespace Zongsoft.Security.Membership
 			if(users == null)
 				return;
 
-			var objectAccess = this.GetObjectAccess();
+			var objectAccess = this.GetDataAccess();
 			objectAccess.Insert("Security.User", users);
 		}
 
@@ -142,7 +141,7 @@ namespace Zongsoft.Security.Membership
 			if(users == null)
 				return;
 
-			var objectAccess = this.GetObjectAccess();
+			var objectAccess = this.GetDataAccess();
 
 			foreach(var user in users)
 			{
@@ -151,8 +150,7 @@ namespace Zongsoft.Security.Membership
 
 				objectAccess.Update("Security.User", user, new ConditionCollection(ConditionCombine.And)
 				{
-					new Condition("ApplicationId", this.GetApplicationId(certificationId)),
-					new Condition("Name", user.Name),
+					new Condition("UserId", user.UserId),
 				});
 			}
 		}
@@ -161,13 +159,15 @@ namespace Zongsoft.Security.Membership
 		#region 密码管理
 		public void ChangePassword(string certificationId, string oldPassword, string newPassword)
 		{
-			var objectAccess = this.GetObjectAccess();
+			var dataAccess = this.GetDataAccess();
 			var certification = this.GetCertification(certificationId);
 
 			byte[] storedPassword;
 			byte[] storedPasswordSalt;
 
-			if(!MembershipHelper.GetPassword(objectAccess, certification.ApplicationId, certification.UserName, out storedPassword, out storedPasswordSalt))
+			var user = MembershipHelper.GetPassword(dataAccess, certification.UserId, out storedPassword, out storedPasswordSalt);
+
+			if(user == null)
 				throw new InvalidOperationException("Invalid account.");
 
 			if(!PasswordUtility.VerifyPassword(oldPassword, storedPassword, storedPasswordSalt))
@@ -176,10 +176,9 @@ namespace Zongsoft.Security.Membership
 			//重新生成密码随机数
 			storedPasswordSalt = PasswordUtility.GeneratePasswordSalt(4);
 
-			objectAccess.Execute("Security.User.SetPassword", new Dictionary<string, object>
+			dataAccess.Execute("Security.User.SetPassword", new Dictionary<string, object>
 			{
-				{"ApplicationId", certification.ApplicationId},
-				{"Name", certification.UserName},
+				{"UserId", certification.UserId},
 				{"Password", PasswordUtility.HashPassword(newPassword, storedPasswordSalt)},
 				{"PasswordSalt", storedPasswordSalt},
 			});
@@ -187,15 +186,14 @@ namespace Zongsoft.Security.Membership
 
 		public string ResetPassword(string certificationId, string passwordAnswer)
 		{
-			var objectAccess = this.GetObjectAccess();
+			var objectAccess = this.GetDataAccess();
 			var certification = this.GetCertification(certificationId);
 
 			IDictionary<string, object> outParameters;
 
 			objectAccess.Execute("Security.User.GetPasswordAnswer", new Dictionary<string, object>
 			{
-				{"ApplicationId", certification.ApplicationId},
-				{"Name", certification.UserName},
+				{"UserId", certification.UserId},
 			}, out outParameters);
 
 			object answerValue;
@@ -211,8 +209,7 @@ namespace Zongsoft.Security.Membership
 
 			objectAccess.Execute("Security.User.SetPassword", new Dictionary<string, object>
 			{
-				{"ApplicationId", certification.ApplicationId},
-				{"Name", certification.UserName},
+				{"UserId", certification.UserId},
 				{"Password", PasswordUtility.HashPassword(password, passwordSalt)},
 				{"PasswordSalt", passwordSalt},
 			});
@@ -222,15 +219,14 @@ namespace Zongsoft.Security.Membership
 
 		public string GetPasswordQuestion(string certificationId)
 		{
-			var objectAccess = this.GetObjectAccess();
+			var objectAccess = this.GetDataAccess();
 			var certification = this.GetCertification(certificationId);
 
 			IDictionary<string, object> outParameters;
 
 			objectAccess.Execute("Security.User.GetPasswordQuestion", new Dictionary<string, object>
 			{
-				{"ApplicationId", certification.ApplicationId},
-				{"Name", certification.UserName},
+				{"UserId", certification.UserId},
 			}, out outParameters);
 
 			object questionValue;
@@ -243,13 +239,15 @@ namespace Zongsoft.Security.Membership
 
 		public void SetPasswordQuestionAndAnswer(string certificationId, string password, string passwordQuestion, string passwordAnswer)
 		{
-			var objectAccess = this.GetObjectAccess();
+			var objectAccess = this.GetDataAccess();
 			var certification = this.GetCertification(certificationId);
 
 			byte[] storedPassword;
 			byte[] storedPasswordSalt;
 
-			if(!MembershipHelper.GetPassword(objectAccess, certification.ApplicationId, certification.UserName, out storedPassword, out storedPasswordSalt))
+			var user = MembershipHelper.GetPassword(objectAccess, certification.UserId, out storedPassword, out storedPasswordSalt);
+
+			if(user == null)
 				throw new InvalidOperationException("Invalid account.");
 
 			if(!PasswordUtility.VerifyPassword(password, storedPassword, storedPasswordSalt))
@@ -257,8 +255,8 @@ namespace Zongsoft.Security.Membership
 
 			objectAccess.Execute("Security.User.SetPasswordQuestionAndAnswer", new Dictionary<string, object>
 			{
-				{"ApplicationId", certification.ApplicationId},
-				{"Name", certification.UserName},
+				{"ApplicationId", certification.Namespace},
+				{"Name", certification.UserId},
 				{"PasswordQuestion", passwordQuestion},
 				{"PasswordAnswer", PasswordUtility.HashPassword(passwordAnswer)},
 			});
@@ -266,12 +264,12 @@ namespace Zongsoft.Security.Membership
 		#endregion
 
 		#region 私有方法
-		private IDataAccess GetObjectAccess()
+		private IDataAccess GetDataAccess()
 		{
-			if(_objectAccess == null)
-				throw new InvalidOperationException("The value of 'ObjectAccess' property is null.");
+			if(_dataAccess == null)
+				throw new InvalidOperationException("The value of 'DataAccess' property is null.");
 
-			return _objectAccess;
+			return _dataAccess;
 		}
 
 		private Certification GetCertification(string certificationId)
@@ -284,14 +282,14 @@ namespace Zongsoft.Security.Membership
 			return certificationProvider.GetCertification(certificationId);
 		}
 
-		private string GetApplicationId(string certificationId)
+		private string GetNamespace(string certificationId)
 		{
 			var certificationProvider = _certificationProvider;
 
 			if(certificationProvider == null)
 				throw new InvalidOperationException("The value of 'CertificationProvider' property is null.");
 
-			return certificationProvider.GetApplicationId(certificationId);
+			return certificationProvider.GetNamespace(certificationId);
 		}
 		#endregion
 	}

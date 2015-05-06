@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2003-2014 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2003-2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -131,7 +131,7 @@ namespace Zongsoft.Security.Membership
 			if(!certification.ExtendedProperties.TryGetValue("AuthorizedStates", out states))
 			{
 				//从数据源获取最新的授权状态集
-				states = this.GetAuthorizedStates(certificationId, certification.UserName, MemberType.User);
+				states = this.GetAuthorizedStates(certificationId, certification.UserId, MemberType.User);
 
 				//将获取到的最新授权状态集更新到当前凭证对象的扩展包中
 				certification.ExtendedProperties["AuthorizedStates"] = states;
@@ -140,7 +140,7 @@ namespace Zongsoft.Security.Membership
 			return states as IEnumerable<AuthorizedState>;
 		}
 
-		public IEnumerable<AuthorizedState> GetAuthorizedStates(string certificationId, string memberName, MemberType memberType)
+		public IEnumerable<AuthorizedState> GetAuthorizedStates(string certificationId, int memberId, MemberType memberType)
 		{
 			if(_certificationProvider == null)
 				throw new InvalidOperationException("The value of 'CertificationProvider' property is null.");
@@ -151,16 +151,13 @@ namespace Zongsoft.Security.Membership
 			//验证指定的安全凭证是否有效
 			_certificationProvider.Validate(certificationId);
 
-			return this.GetAuthorizedStatesCore(certificationId, memberName, memberType);
+			return this.GetAuthorizedStatesCore(certificationId, memberId, memberType);
 		}
 		#endregion
 
 		#region 虚拟方法
-		protected virtual IEnumerable<AuthorizedState> GetAuthorizedStatesCore(string certificationId, string memberName, MemberType memberType)
+		protected virtual IEnumerable<AuthorizedState> GetAuthorizedStatesCore(string certificationId, int memberId, MemberType memberType)
 		{
-			if(string.IsNullOrWhiteSpace(memberName))
-				throw new ArgumentNullException("memberName");
-
 			if(_roleProvider == null)
 				throw new InvalidOperationException("The value of 'RoleProvider' property is null.");
 
@@ -173,7 +170,7 @@ namespace Zongsoft.Security.Membership
 			this.RecursiveRoles(certificationId,
 				                null,
 				                stack,
-				                _roleProvider.GetRoles(certificationId, memberName, memberType));
+				                _roleProvider.GetRoles(certificationId, memberId, memberType));
 
 			//创建被显式授予的授权状态集合
 			var grantedStates = new HashSet<AuthorizedState>();
@@ -189,7 +186,7 @@ namespace Zongsoft.Security.Membership
 				{
 					//获取指定角色的授权集合
 					this.SlicePermission(certificationId,
-					                       role.Name, MemberType.Role,
+					                       role.RoleId, MemberType.Role,
 					                       grantedStates, deniedStates);
 				}
 
@@ -206,7 +203,7 @@ namespace Zongsoft.Security.Membership
 
 			//获取指定成员的授权集合
 			this.SlicePermission(certificationId,
-			                       memberName, memberType,
+			                       memberId, memberType,
 			                       grantedStates, deniedStates);
 
 			//将最终的授权结果集与显式授予集进行合并
@@ -224,16 +221,16 @@ namespace Zongsoft.Security.Membership
 		#endregion
 
 		#region 私有方法
-		private void SlicePermission(string certificationId, string memberName, MemberType memberType, HashSet<AuthorizedState> grantedStates, HashSet<AuthorizedState> deniedStates)
+		private void SlicePermission(string certificationId, int memberId, MemberType memberType, HashSet<AuthorizedState> grantedStates, HashSet<AuthorizedState> deniedStates)
 		{
-			var permissions = _permissionProvider.GetPermissions(certificationId, memberName, memberType);
+			var permissions = _permissionProvider.GetPermissions(certificationId, memberId, memberType);
 
 			foreach(var permission in permissions)
 			{
 				if(permission.Granted)
-					grantedStates.Add(new AuthorizedState(permission.ApplicationId, permission.SchemaId, permission.ActionId));
+					grantedStates.Add(new AuthorizedState(permission.SchemaId, permission.ActionId));
 				else
-					deniedStates.Add(new AuthorizedState(permission.ApplicationId, permission.SchemaId, permission.ActionId));
+					deniedStates.Add(new AuthorizedState(permission.SchemaId, permission.ActionId));
 			}
 		}
 
@@ -250,7 +247,7 @@ namespace Zongsoft.Security.Membership
 			//对传入的角色集进行是否有循环引用的检测和过滤
 			foreach(var role in roles)
 			{
-				string key = (role.ApplicationId + ":" + role.Name).ToLowerInvariant();
+				string key = (role.Namespace + ":" + role.Name).ToLowerInvariant();
 
 				//如果当前角色没有循环引用
 				if(!hashSet.Contains(key))
@@ -269,7 +266,7 @@ namespace Zongsoft.Security.Membership
 			foreach(var role in availableRoles)
 			{
 				//获取指定角色所属的的父级角色集
-				roles = _roleProvider.GetRoles(certificationId, role.Name, MemberType.Role);
+				roles = _roleProvider.GetRoles(certificationId, role.RoleId, MemberType.Role);
 
 				if(roles != null)
 					parents.AddRange(roles);

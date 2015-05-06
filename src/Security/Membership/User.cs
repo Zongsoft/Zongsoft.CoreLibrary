@@ -41,12 +41,14 @@ namespace Zongsoft.Security.Membership
 		#endregion
 
 		#region 成员字段
-		private string _applicationId;
+		private int _userId;
 		private string _name;
 		private string _fullName;
 		private string _description;
+		private string _namespace;
 		private string _principal;
 		private string _email;
+		private string _phoneNumber;
 		private bool _approved;
 		private bool _suspended;
 		private bool _changePasswordOnFirstTime;
@@ -60,33 +62,31 @@ namespace Zongsoft.Security.Membership
 		#endregion
 
 		#region 构造函数
-		public User(string applicationId, string name) : this(applicationId, name, string.Empty)
+		public User(int userId, string name) : this(userId, name, null)
 		{
 		}
 
-		public User(string applicationId, string name, string fullName)
+		public User(int userId, string name, string @namespace)
 		{
-			if(string.IsNullOrWhiteSpace(applicationId))
-				throw new ArgumentNullException("applicationId");
-
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException("name");
 
-			_applicationId = applicationId.Trim();
+			_userId = userId;
 			_name = name.Trim();
-			_fullName = fullName;
+			_namespace = @namespace;
+			_createdTime = DateTime.Now;
 		}
 		#endregion
 
 		#region 公共属性
 		/// <summary>
-		/// 获取当前用户所属的系统代号。
+		/// 获取用户的编号。
 		/// </summary>
-		public string ApplicationId
+		public int UserId
 		{
 			get
 			{
-				return _applicationId;
+				return _userId;
 			}
 		}
 
@@ -120,6 +120,21 @@ namespace Zongsoft.Security.Membership
 			set
 			{
 				_fullName = value;
+			}
+		}
+
+		/// <summary>
+		/// 获取或设置当前用户所属的命名空间。
+		/// </summary>
+		public string Namespace
+		{
+			get
+			{
+				return _namespace;
+			}
+			set
+			{
+				_namespace = value;
 			}
 		}
 
@@ -165,6 +180,21 @@ namespace Zongsoft.Security.Membership
 			set
 			{
 				_email = value;
+			}
+		}
+
+		/// <summary>
+		/// 获取或设置用户的手机号码。
+		/// </summary>
+		public string PhoneNumber
+		{
+			get
+			{
+				return _phoneNumber;
+			}
+			set
+			{
+				_phoneNumber = value;
 			}
 		}
 
@@ -325,20 +355,22 @@ namespace Zongsoft.Security.Membership
 			if(obj == null || obj.GetType() != this.GetType())
 				return false;
 
-			var user = (User)obj;
+			var other = (User)obj;
 
-			return string.Equals(_applicationId, user._applicationId, StringComparison.OrdinalIgnoreCase) &&
-				   string.Equals(_name, user._name, StringComparison.OrdinalIgnoreCase);
+			return _userId == other._userId && string.Equals(_namespace, other._namespace, StringComparison.OrdinalIgnoreCase);
 		}
 
 		public override int GetHashCode()
 		{
-			return (_applicationId + ":" + _name).ToLowerInvariant().GetHashCode();
+			return (_namespace + ":" + _userId).ToLowerInvariant().GetHashCode();
 		}
 
 		public override string ToString()
 		{
-			return string.Format("{0}[{1}]", _name, _applicationId);
+			if(string.IsNullOrWhiteSpace(_namespace))
+				return string.Format("[{0}]{1}", _userId, _name);
+			else
+				return string.Format("[{0}]{1}@{2}", _userId, _name, _namespace);
 		}
 		#endregion
 

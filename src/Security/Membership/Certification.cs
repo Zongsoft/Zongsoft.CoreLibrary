@@ -37,35 +37,32 @@ namespace Zongsoft.Security.Membership
 	{
 		#region 成员字段
 		private string _certificationId;
-		private string _applicationId;
-		private string _userName;
+		private string _namespace;
+		private int _userId;
 		private DateTime _expires;
-		private DateTime _createdTime;
+		private DateTime _issuedTime;
 		private IList<DateTime> _slidingList;
 		private IDictionary<string, object> _extendedProperties;
 		#endregion
 
 		#region 构造函数
-		public Certification(string certificationId, string applicationId, string userName, DateTime expires) : this(certificationId, applicationId, userName, expires, DateTime.Now)
+		public Certification(string certificationId, string @namespace, int userId, DateTime expires) : this(certificationId, @namespace, userId, expires, DateTime.Now)
 		{
 		}
 
-		public Certification(string certificationId, string applicationId, string userName, DateTime expires, DateTime createdTime)
+		public Certification(string certificationId, string @namespace, int userId, DateTime expires, DateTime issuedTime)
 		{
 			if(string.IsNullOrWhiteSpace(certificationId))
 				throw new ArgumentNullException("certificationId");
 
-			if(string.IsNullOrWhiteSpace(applicationId))
-				throw new ArgumentNullException("applicationId");
-
-			if(string.IsNullOrWhiteSpace(userName))
-				throw new ArgumentNullException("userName");
+			if(string.IsNullOrWhiteSpace(@namespace))
+				throw new ArgumentNullException("namespace");
 
 			_certificationId = certificationId.Trim();
-			_applicationId = applicationId.Trim();
-			_userName = userName.Trim();
+			_namespace = @namespace.Trim();
+			_userId = userId;
 			_expires = expires;
-			_createdTime = createdTime;
+			_issuedTime = issuedTime;
 			_slidingList = new List<DateTime>();
 		}
 		#endregion
@@ -83,24 +80,24 @@ namespace Zongsoft.Security.Membership
 		}
 
 		/// <summary>
-		/// 获取安全凭证的所属应用编号。
+		/// 获取安全凭证所属的命令空间。
 		/// </summary>
-		public string ApplicationId
+		public string Namespace
 		{
 			get
 			{
-				return _applicationId;
+				return _namespace;
 			}
 		}
 
 		/// <summary>
-		/// 获取安全凭证对应的用户名称。
+		/// 获取安全凭证对应的用户编号。
 		/// </summary>
-		public string UserName
+		public int UserId
 		{
 			get
 			{
-				return _userName;
+				return _userId;
 			}
 		}
 
@@ -120,13 +117,13 @@ namespace Zongsoft.Security.Membership
 		}
 
 		/// <summary>
-		/// 获取安全凭证的创建时间。
+		/// 获取安全凭证的签发时间。
 		/// </summary>
-		public DateTime CreatedTime
+		public DateTime IssuedTime
 		{
 			get
 			{
-				return _createdTime;
+				return _issuedTime;
 			}
 		}
 
@@ -165,21 +162,24 @@ namespace Zongsoft.Security.Membership
 			if(obj == null || obj.GetType() != this.GetType())
 				return false;
 
-			var state = (Certification)obj;
+			var other = (Certification)obj;
 
-			return string.Equals(_certificationId, state._certificationId, StringComparison.OrdinalIgnoreCase) &&
-				   string.Equals(_applicationId, state._applicationId, StringComparison.OrdinalIgnoreCase) &&
-				   string.Equals(_userName, state._userName, StringComparison.OrdinalIgnoreCase);
+			return string.Equals(_certificationId, other._certificationId, StringComparison.OrdinalIgnoreCase) &&
+				   string.Equals(_namespace, other._namespace, StringComparison.OrdinalIgnoreCase) &&
+				   _userId == other._userId;
 		}
 
 		public override int GetHashCode()
 		{
-			return (_applicationId + ":" + _userName + ":" + _certificationId).ToLowerInvariant().GetHashCode();
+			return (_certificationId + ":" + _userId.ToString()).ToLowerInvariant().GetHashCode();
 		}
 
 		public override string ToString()
 		{
-			return string.Format("[{0}]{1}@{2}", _certificationId, _userName, _applicationId);
+			if(string.IsNullOrWhiteSpace(_namespace))
+				return string.Format("[{0}] {1}", _certificationId, _userId);
+			else
+				return string.Format("[{0}] {1}@{2}", _certificationId, _userId, _namespace);
 		}
 		#endregion
 	}

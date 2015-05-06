@@ -37,9 +37,10 @@ namespace Zongsoft.Security.Membership
 		/// <summary>
 		/// 为指定的用户注册安全凭证。
 		/// </summary>
-		/// <param name="applicationId">指定的凭证所属的应用编号。</param>
-		/// <param name="userName">指定的用户名称。</param>
-		Certification Register(string applicationId, string userName);
+		/// <param name="userId">指定的用户编号。</param>
+		/// <param name="namespace">指定的凭证所属的命名空间。</param>
+		/// <param name="extendedProperties">扩展属性集合。</param>
+		Certification Register(int userId, string @namespace, IDictionary<string, object> extendedProperties);
 
 		/// <summary>
 		/// 从安全凭证容器中注销指定的凭证。
@@ -70,14 +71,14 @@ namespace Zongsoft.Security.Membership
 		int GetCount();
 
 		/// <summary>
-		/// 获取当前安全凭证容器内的指定应用程序的凭证数。
+		/// 获取当前安全凭证容器内的指定命名空间下的凭证数。
 		/// </summary>
-		/// <param name="applicationId">指定的应用程序编号。</param>
+		/// <param name="namespace">指定的命名空间。</param>
 		/// <returns>返回的安全凭证数量。</returns>
 		/// <remarks>
 		///		<para>返回的凭证数包括有效和过期无效的凭证。</para>
 		/// </remarks>
-		int GetCount(string applicationId);
+		int GetCount(string @namespace);
 
 		/// <summary>
 		/// 验证指定的安全凭证号是否有效。
@@ -93,7 +94,7 @@ namespace Zongsoft.Security.Membership
 		/// </summary>
 		/// <param name="certificationId">指定的安全凭证号。</param>
 		/// <returns>返回对应的应用编号，如果为空(null)则表示该凭证号无效。</returns>
-		string GetApplicationId(string certificationId);
+		string GetNamespace(string certificationId);
 
 		/// <summary>
 		/// 获取指定安全凭证编号对应的<see cref="Certification"/>安全凭证对象。
@@ -103,18 +104,17 @@ namespace Zongsoft.Security.Membership
 		Certification GetCertification(string certificationId);
 
 		/// <summary>
-		/// 获取指定应用中的所有<see cref="Certification"/>安全凭证对象集。
+		/// 获取指定命名空间中的所有<see cref="Certification"/>安全凭证对象集。
 		/// </summary>
-		/// <param name="applicationId">指定要获取的安全凭证所属的应用编号。</param>
+		/// <param name="namespace">指定要获取的安全凭证所属的命名空间。</param>
 		/// <returns>返回的对应的安全凭证对象集，如果指定的应用下无安全凭证则返回空集合。</returns>
-		IEnumerable<Certification> GetCertifications(string applicationId);
+		IEnumerable<Certification> GetCertifications(string @namespace);
 
 		/// <summary>
-		/// 获取指定应用中的指定用户对应的<see cref="Certification"/>安全凭证对象集。
+		/// 获取指定用户对应的<see cref="Certification"/>安全凭证对象集。
 		/// </summary>
-		/// <param name="applicationId">指定要获取的安全凭证所属的应用编号。</param>
-		/// <param name="userName">指定要获取的安全凭证对应的用户名。</param>
+		/// <param name="userId">指定要获取的安全凭证对应的用户编号。</param>
 		/// <returns></returns>
-		IEnumerable<Certification> GetCertifications(string applicationId, string userName);
+		IEnumerable<Certification> GetCertifications(int userId);
 	}
 }

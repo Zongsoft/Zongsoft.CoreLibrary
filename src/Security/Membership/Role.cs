@@ -41,40 +41,37 @@ namespace Zongsoft.Security.Membership
 		#endregion
 
 		#region 成员字段
-		private string _applicationId;
+		private int _roleId;
 		private string _name;
 		private string _fullName;
+		private string _namespace;
 		private string _description;
 		private DateTime _createdTime;
 		#endregion
 
 		#region 构造函数
-		public Role(string applicationId, string name) : this(applicationId, name, string.Empty, string.Empty)
+		public Role(int roleId, string name) : this(roleId, name, null)
 		{
 		}
 
-		public Role(string applicationId, string name, string fullName, string description)
+		public Role(int roleId, string name, string @namespace)
 		{
-			if(string.IsNullOrWhiteSpace(applicationId))
-				throw new ArgumentNullException("applicationId");
-
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException("name");
 
-			_applicationId = applicationId.Trim();
+			_roleId = roleId;
 			_name = name.Trim();
-			_fullName = fullName;
-			_description = description;
+			_namespace = @namespace;
 			_createdTime = DateTime.Now;
 		}
 		#endregion
 
 		#region 公共属性
-		public string ApplicationId
+		public int RoleId
 		{
 			get
 			{
-				return _applicationId;
+				return _roleId;
 			}
 		}
 
@@ -102,6 +99,18 @@ namespace Zongsoft.Security.Membership
 			set
 			{
 				_fullName = value;
+			}
+		}
+
+		public string Namespace
+		{
+			get
+			{
+				return _namespace;
+			}
+			set
+			{
+				_namespace = value;
 			}
 		}
 
@@ -136,20 +145,22 @@ namespace Zongsoft.Security.Membership
 			if(obj == null || obj.GetType() != this.GetType())
 				return false;
 
-			var role = (Role)obj;
+			var other = (Role)obj;
 
-			return string.Equals(_applicationId, role._applicationId, StringComparison.OrdinalIgnoreCase) &&
-				   string.Equals(_name, role._name, StringComparison.OrdinalIgnoreCase);
+			return _roleId == other._roleId && string.Equals(_namespace, other._namespace, StringComparison.OrdinalIgnoreCase);
 		}
 
 		public override int GetHashCode()
 		{
-			return (_applicationId + ":" + _name).ToLowerInvariant().GetHashCode();
+			return (_namespace + ":" + _roleId).ToLowerInvariant().GetHashCode();
 		}
 
 		public override string ToString()
 		{
-			return string.Format("{0}[{1}]", _name, _applicationId);
+			if(string.IsNullOrWhiteSpace(_namespace))
+				return string.Format("[{0}]{1}", _roleId, _name);
+			else
+				return string.Format("[{0}]{1}@{2}", _roleId, _name, _namespace);
 		}
 		#endregion
 

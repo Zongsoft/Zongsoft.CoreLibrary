@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2003-2014 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2003-2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -38,7 +38,8 @@ namespace Zongsoft.Security.Membership
 		#endregion
 
 		#region 成员字段
-		private Zongsoft.Runtime.Caching.ICacheProvider _cache;
+		private Zongsoft.Runtime.Caching.ICache _cache;
+		private Zongsoft.Runtime.Caching.ICacheProvider _cacheProvider;
 		#endregion
 
 		#region 构造函数
@@ -46,50 +47,75 @@ namespace Zongsoft.Security.Membership
 		{
 		}
 
-		public CertificationProvider(Zongsoft.Runtime.Caching.ICacheProvider cache)
+		public CertificationProvider(Zongsoft.Runtime.Caching.ICache cache)
 		{
 			if(cache == null)
 				throw new ArgumentNullException("cache");
 
 			_cache = cache;
 		}
+
+		public CertificationProvider(Zongsoft.Runtime.Caching.ICacheProvider cacheProvider)
+		{
+			if(cacheProvider == null)
+				throw new ArgumentNullException("cacheProvider");
+
+			_cacheProvider = cacheProvider;
+		}
 		#endregion
 
 		#region 公共属性
-		public Zongsoft.Runtime.Caching.ICacheProvider Cache
+		public Zongsoft.Runtime.Caching.ICache Cache
 		{
 			get
 			{
+				if(_cache == null)
+				{
+					var cacheProvider = _cacheProvider;
+
+					if(cacheProvider != null)
+						System.Threading.Interlocked.CompareExchange(ref _cache, cacheProvider.GetCache(DefaultCacheName), null);
+				}
+
 				return _cache;
 			}
 			set
 			{
-				if(value == null)
-					throw new ArgumentNullException();
-
 				_cache = value;
+			}
+		}
+
+		public Zongsoft.Runtime.Caching.ICacheProvider CacheProvider
+		{
+			get
+			{
+				return _cacheProvider;
+			}
+			set
+			{
+				_cacheProvider = value;
 			}
 		}
 		#endregion
 
 		#region 公共方法
-		public Certification Register(string applicationId, string userName)
+		public Certification Register(int userId, string @namespace, IDictionary<string, object> extendedProperties)
 		{
-			var certification = this.CreateCertification(applicationId, userName);
+			var certification = this.CreateCertification(userId, @namespace, extendedProperties);
 			this.Register(certification);
 			return certification;
 		}
 
 		public void Unregister(string certificationId)
 		{
-			var cache = _cache.GetDictionaryCache(DefaultCacheName);
+			var cache = this.Cache;
 
 			if(cache != null)
 			{
 				string applicationId = cache.GetValue(certificationId) as string;
 				cache.Remove(certificationId);
 
-				cache = _cache.GetDictionaryCache(applicationId);
+				cache = _cacheProvider.GetCache(applicationId);
 				if(cache != null)
 					cache.Remove(certificationId);
 			}
@@ -108,7 +134,7 @@ namespace Zongsoft.Security.Membership
 			{
 				certification.Expires += duration;
 
-				var cache = _cache.GetDictionaryCache(certification.ApplicationId);
+				var cache = _cacheProvider.GetCache(certification.Namespace);
 				if(cache != null)
 					cache.SetValue(certificationId, certification);
 			}
@@ -119,14 +145,14 @@ namespace Zongsoft.Security.Membership
 			return this.GetCount(null);
 		}
 
-		public int GetCount(string applicationId)
+		public int GetCount(string @namespace)
 		{
 			Zongsoft.Runtime.Caching.ICache cache;
 
-			if(applicationId == null)
-				cache = _cache.GetDictionaryCache(DefaultCacheName);
+			if(string.IsNullOrWhiteSpace(@namespace))
+				cache = _cacheProvider.GetCache(DefaultCacheName);
 			else
-				cache = _cache.GetDictionaryCache(applicationId);
+				cache = _cacheProvider.GetCache(@namespace);
 
 			if(cache == null)
 				return 0;
@@ -145,12 +171,12 @@ namespace Zongsoft.Security.Membership
 				throw new CertificationException(certificationId, "The certification was expired.");
 		}
 
-		public string GetApplicationId(string certificationId)
+		public string GetNamespace(string certificationId)
 		{
 			if(string.IsNullOrWhiteSpace(certificationId))
 				throw new CertificationException("Not specified certification id.");
 
-			var cache = _cache.GetDictionaryCache(DefaultCacheName);
+			var cache = _cacheProvider.GetCache(DefaultCacheName);
 
 			if(cache == null)
 				throw new InvalidOperationException("Can not obtain the certification cache provider.");
@@ -165,9 +191,9 @@ namespace Zongsoft.Security.Membership
 
 		public Certification GetCertification(string certificationId)
 		{
-			var applicationId = this.GetApplicationId(certificationId);
+			var applicationId = this.GetNamespace(certificationId);
 
-			var cache = _cache.GetDictionaryCache(applicationId);
+			var cache = _cacheProvider.GetCache(applicationId);
 
 			if(cache != null)
 				return cache.GetValue(certificationId) as Certification;
@@ -175,51 +201,46 @@ namespace Zongsoft.Security.Membership
 			return null;
 		}
 
-		public IEnumerable<Certification> GetCertifications(string applicationId)
+		public IEnumerable<Certification> GetCertifications(string @namespace)
 		{
-			return _cache.GetDictionaryCache(applicationId) as IEnumerable<Certification>;
+			return _cacheProvider.GetCache(@namespace) as IEnumerable<Certification>;
 		}
 
-		public IEnumerable<Certification> GetCertifications(string applicationId, string userName)
+		public IEnumerable<Certification> GetCertifications(int userId)
 		{
-			var certifications = this.GetCertifications(applicationId);
-
-			if(certifications == null)
-				return Enumerable.Empty<Certification>();
-
-			return certifications.Where(certification => string.Equals(certification.UserName, userName, StringComparison.OrdinalIgnoreCase));
+			return _cacheProvider.GetCache(userId.ToString()) as IEnumerable<Certification>;
 		}
 		#endregion
 
 		#region 虚拟方法
-		protected virtual Certification CreateCertification(string applicationId, string userName)
+		protected virtual Certification CreateCertification(int userId, string @namespace, IDictionary<string, object> extendedProperties)
 		{
-			return new Certification(Guid.NewGuid().ToString("D"), applicationId, userName, DateTime.Now.AddDays(1));
+			return new Certification(Guid.NewGuid().ToString("D"), @namespace, userId, DateTime.Now.AddDays(1));
 		}
 
 		protected virtual void Register(Certification certification)
 		{
-			if(_cache == null)
+			if(_cacheProvider == null)
 				throw new InvalidOperationException("The value of 'Cache' property is null.");
 
-			var masterCache = _cache.GetDictionaryCache(DefaultCacheName);
+			var masterCache = _cacheProvider.GetCache(DefaultCacheName);
 
 			if(masterCache == null)
 				throw new InvalidOperationException("Can not obtain the certification cache provider.");
 
 			//在默认缓存字典中添加一条记录
-			masterCache.SetValue(certification.CertificationId, certification.ApplicationId);
+			masterCache.SetValue(certification.CertificationId, certification.Namespace);
 
 			try
 			{
 				//获取当前安全凭证所属应用的缓存字典
-				var slaverCache = _cache.GetDictionaryCache(certification.ApplicationId);
+				var slaverCache = _cacheProvider.GetCache(certification.Namespace);
 
 				if(slaverCache == null)
 				{
 					//将默认缓存字典中刚添加的记录删除掉
 					masterCache.Remove(certification.CertificationId);
-					throw new CertificationException(string.Format("Can not obtain the certification cache for '{0}' application.", certification.ApplicationId));
+					throw new CertificationException(string.Format("Can not obtain the certification cache for '{0}' application.", certification.Namespace));
 				}
 
 				//在当前应用缓存容器中添加一条记录

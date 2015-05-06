@@ -37,12 +37,16 @@ namespace Zongsoft.Security.Membership
 		#endregion
 
 		#region 构造函数
-		public PermissionFilter(string applicationId) : base(applicationId)
+		public PermissionFilter()
 		{
 		}
 
-		public PermissionFilter(string applicationId, string schemaId, string actionId, bool granted) : base(applicationId, schemaId, actionId, granted)
+		public PermissionFilter(int memberId, MemberType memberType, string schemaId, string actionId, string filter) : base(memberId, memberType, schemaId, actionId, false)
 		{
+			if(string.IsNullOrWhiteSpace(filter))
+				throw new ArgumentNullException("filter");
+
+			_filter = filter.Trim();
 		}
 		#endregion
 

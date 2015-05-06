@@ -33,28 +33,27 @@ namespace Zongsoft.Security.Membership
 	public class Permission
 	{
 		#region 成员变量
-		private string _applicationId;
+		private int _memberId;
+		private MemberType _memberType;
 		private string _schemaId;
 		private string _actionId;
 		private bool _granted;
 		#endregion
 
 		#region 构造函数
-		public Permission(string applicationId)
+		public Permission()
 		{
-			if(string.IsNullOrWhiteSpace(applicationId))
-				throw new ArgumentNullException("applicationId");
-
-			_applicationId = applicationId.Trim();
 		}
 
-		public Permission(string applicationId, string schemaId, string actionId, bool granted) : this(applicationId)
+		public Permission(int memberId, MemberType memberType, string schemaId, string actionId, bool granted)
 		{
 			if(string.IsNullOrEmpty(schemaId))
 				throw new ArgumentNullException("schemaId");
 			if(string.IsNullOrEmpty(actionId))
 				throw new ArgumentNullException("actionId");
 
+			_memberId = memberId;
+			_memberType = memberType;
 			_schemaId = schemaId;
 			_actionId = actionId;
 			_granted = granted;
@@ -62,18 +61,27 @@ namespace Zongsoft.Security.Membership
 		#endregion
 
 		#region 公共属性
-		public string ApplicationId
+		public int MemberId
 		{
 			get
 			{
-				return _applicationId; 
+				return _memberId;
 			}
-			protected set
+			set
 			{
-				if(string.IsNullOrWhiteSpace(value))
-					throw new ArgumentNullException();
+				_memberId = value;
+			}
+		}
 
-				_applicationId = value.Trim();
+		public MemberType MemberType
+		{
+			get
+			{
+				return _memberType;
+			}
+			set
+			{
+				_memberType = value;
 			}
 		}
 
@@ -126,22 +134,21 @@ namespace Zongsoft.Security.Membership
 			if(obj == null || obj.GetType() != this.GetType())
 				return false;
 
-			var permission = (Permission)obj;
+			var other = (Permission)obj;
 
-			return _granted == permission._granted &&
-			       string.Equals(_applicationId, permission._applicationId, StringComparison.OrdinalIgnoreCase) &&
-				   string.Equals(_schemaId, permission._schemaId, StringComparison.OrdinalIgnoreCase) &&
-				   string.Equals(_actionId, permission._actionId, StringComparison.OrdinalIgnoreCase);
+			return _granted == other._granted && _memberId == other._memberId && _memberType == other._memberType &&
+				   string.Equals(_schemaId, other._schemaId, StringComparison.OrdinalIgnoreCase) &&
+				   string.Equals(_actionId, other._actionId, StringComparison.OrdinalIgnoreCase);
 		}
 
 		public override int GetHashCode()
 		{
-			return (_applicationId + ":" + _schemaId + ":" + _actionId + ":" + _granted.ToString()).ToLowerInvariant().GetHashCode();
+			return (_memberId + ":" + _memberType + ":" + _schemaId + ":" + _actionId + ":" + _granted.ToString()).ToLowerInvariant().GetHashCode();
 		}
 
 		public override string ToString()
 		{
-			return string.Format("{0}:{1}[{2}]({3})", _schemaId, _actionId, _applicationId, _granted ? "Granted" : "Denied");
+			return string.Format("{0}[{1}]{2}:{3}({4})", _memberId, _memberType, _schemaId, _actionId, (_granted ? "Granted" : "Denied"));
 		}
 		#endregion
 	}

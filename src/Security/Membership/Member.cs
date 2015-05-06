@@ -36,67 +36,42 @@ namespace Zongsoft.Security.Membership
 	public class Member
 	{
 		#region 成员字段
-		private string _applicationId;
-		private string _roleName;
-		private string _memberName;
+		private int _roleId;
+		private int _memberId;
 		private MemberType _memberType;
 		#endregion
 
 		#region 构造函数
-		public Member(string applicationId, string roleName, string memberName, MemberType memberType)
+		public Member(int roleId, int memberId, MemberType memberType)
 		{
-			if(string.IsNullOrWhiteSpace(applicationId))
-				throw new ArgumentNullException("applicationId");
-
-			if(string.IsNullOrWhiteSpace(roleName))
-				throw new ArgumentNullException("roleName");
-
-			if(string.IsNullOrWhiteSpace(memberName))
-				throw new ArgumentNullException("memberName");
-
-			_applicationId = applicationId.Trim();
-			_roleName = roleName.Trim();
-			_memberName = memberName.Trim();
+			_roleId = roleId;
+			_memberId = memberId;
 			_memberType = memberType;
 		}
 		#endregion
 
 		#region 公共属性
-		public string ApplicationId
+		public int RoleId
 		{
 			get
 			{
-				return _applicationId;
-			}
-		}
-
-		public string RoleName
-		{
-			get
-			{
-				return _roleName;
+				return _roleId;
 			}
 			set
 			{
-				if(string.IsNullOrWhiteSpace(value))
-					throw new ArgumentNullException();
-
-				_roleName = value.Trim();
+				_roleId = value;
 			}
 		}
 
-		public string MemberName
+		public int MemberId
 		{
 			get
 			{
-				return _memberName;
+				return _memberId;
 			}
 			set
 			{
-				if(string.IsNullOrWhiteSpace(value))
-					throw new ArgumentNullException();
-
-				_memberName = value.Trim();
+				_memberId = value;
 			}
 		}
 
@@ -119,22 +94,19 @@ namespace Zongsoft.Security.Membership
 			if(obj == null || obj.GetType() != this.GetType())
 				return false;
 
-			var member = (Member)obj;
+			var other = (Member)obj;
 
-			return string.Equals(_applicationId, member._applicationId, StringComparison.OrdinalIgnoreCase) &&
-				   string.Equals(_roleName, member._roleName, StringComparison.OrdinalIgnoreCase) &&
-			       string.Equals(_memberName, member._memberName, StringComparison.OrdinalIgnoreCase) &&
-				   _memberType == member._memberType;
+			return _roleId == other._roleId && _memberId == other._memberId && _memberType == other._memberType;
 		}
 
 		public override int GetHashCode()
 		{
-			return (_applicationId + ":" + _roleName + ":" + _memberName + "[" + _memberType.ToString() + "]").ToLowerInvariant().GetHashCode();
+			return (_roleId + ":" + _memberId + "[" + _memberType.ToString() + "]").ToLowerInvariant().GetHashCode();
 		}
 
 		public override string ToString()
 		{
-			return string.Format("{0}:{1}({2})[{3}]", _roleName, _memberName, _memberType, _applicationId);
+			return string.Format("{0}:{1}({2})", _roleId, _memberId, _memberType);
 		}
 		#endregion
 	}

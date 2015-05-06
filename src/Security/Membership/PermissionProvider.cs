@@ -71,36 +71,30 @@ namespace Zongsoft.Security.Membership
 		#endregion
 
 		#region 公共方法
-		public IEnumerable<Permission> GetPermissions(string certificationId, string memberName, MemberType memberType)
+		public IEnumerable<Permission> GetPermissions(string certificationId, int memberId, MemberType memberType)
 		{
 			var objectAccess = this.GetObjectAccess();
 
 			return objectAccess.Select<Permission>("Security.Permission",
 			                                       new ConditionCollection(ConditionCombine.And)
 			                                       {
-													   new Condition("ApplicationId", this.GetApplicationId(certificationId)),
-													   new Condition("MemberName", memberName),
+													   new Condition("MemberId", memberId),
 													   new Condition("MemberType", memberType),
 			                                       });
 		}
 
-		public void SetPermissions(string certificationId, string memberName, MemberType memberType, IEnumerable<Permission> permissions)
+		public void SetPermissions(string certificationId, int memberId, MemberType memberType, IEnumerable<Permission> permissions)
 		{
-			if(string.IsNullOrWhiteSpace(memberName))
-				throw new ArgumentNullException("memberName");
-
 			if(permissions == null)
 				throw new ArgumentNullException("permissions");
 
 			var objectAccess = this.GetObjectAccess();
-			var applicationId = this.GetApplicationId(certificationId);
 
 			foreach(var permission in permissions)
 			{
 				objectAccess.Execute("Security.Permission.Set", new
 				{
-					ApplicationId = applicationId,
-					MemberName = memberName,
+					MemberId = memberId,
 					MemberType = memberType,
 					SchemaId = permission.SchemaId,
 					ActionId = permission.ActionId,
@@ -109,36 +103,30 @@ namespace Zongsoft.Security.Membership
 			}
 		}
 
-		public IEnumerable<PermissionFilter> GetPermissionFilters(string certificationId, string memberName, MemberType memberType)
+		public IEnumerable<PermissionFilter> GetPermissionFilters(string certificationId, int memberId, MemberType memberType)
 		{
 			var objectAccess = this.GetObjectAccess();
 
 			return objectAccess.Select<PermissionFilter>("Security.PermissionFilter",
 												         new ConditionCollection(ConditionCombine.And)
 			                                             {
-															 new Condition("ApplicationId", this.GetApplicationId(certificationId)),
-															 new Condition("MemberName", memberName),
+															 new Condition("MemberId", memberId),
 															 new Condition("MemberType", memberType),
 			                                             });
 		}
 
-		public void SetPermissionFilters(string certificationId, string memberName, MemberType memberType, IEnumerable<PermissionFilter> permissionFilters)
+		public void SetPermissionFilters(string certificationId, int memberId, MemberType memberType, IEnumerable<PermissionFilter> permissionFilters)
 		{
-			if(string.IsNullOrWhiteSpace(memberName))
-				throw new ArgumentNullException("memberName");
-
 			if(permissionFilters == null)
 				throw new ArgumentNullException("permissionFilters");
 
 			var objectAccess = this.GetObjectAccess();
-			var applicationId = this.GetApplicationId(certificationId);
 
 			foreach(var permissionFilter in permissionFilters)
 			{
 				objectAccess.Execute("Security.PermissionFilter.Set", new
 				{
-					ApplicationId = applicationId,
-					MemberName = memberName,
+					MemberId = memberId,
 					MemberType = memberType,
 					SchemaId = permissionFilter.SchemaId,
 					ActionId = permissionFilter.ActionId,
@@ -155,16 +143,6 @@ namespace Zongsoft.Security.Membership
 				throw new InvalidOperationException("The value of 'ObjectAccess' property is null.");
 
 			return _objectAccess;
-		}
-
-		private string GetApplicationId(string certificationId)
-		{
-			var certificationProvider = _certificationProvider;
-
-			if(certificationProvider == null)
-				throw new InvalidOperationException("The value of 'CertificationProvider' property is null.");
-
-			return certificationProvider.GetApplicationId(certificationId);
 		}
 		#endregion
 	}
