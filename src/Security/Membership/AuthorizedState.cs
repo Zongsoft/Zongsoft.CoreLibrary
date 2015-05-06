@@ -31,46 +31,24 @@ namespace Zongsoft.Security.Membership
 	public struct AuthorizedState
 	{
 		#region 成员变量
-		private string _applicationId;
 		private string _schemaId;
 		private string _actionId;
 		#endregion
 
 		#region 构造函数
-		public AuthorizedState(string applicationId, string schemaId, string actionId)
+		public AuthorizedState(string schemaId, string actionId)
 		{
-			if(string.IsNullOrWhiteSpace(applicationId))
-				throw new ArgumentNullException("applicationId");
 			if(string.IsNullOrWhiteSpace(schemaId))
 				throw new ArgumentNullException("schemaId");
 			if(string.IsNullOrWhiteSpace(actionId))
 				throw new ArgumentNullException("actionId");
 
-			_applicationId = applicationId.Trim();
 			_schemaId = schemaId.Trim();
 			_actionId = actionId.Trim();
 		}
 		#endregion
 
 		#region 公共属性
-		/// <summary>
-		/// 获取或设置应用编号。
-		/// </summary>
-		public string ApplicationId
-		{
-			get
-			{
-				return _applicationId;
-			}
-			set
-			{
-				if(string.IsNullOrWhiteSpace(value))
-					throw new ArgumentNullException();
-
-				_applicationId = value.Trim();
-			}
-		}
-
 		/// <summary>
 		/// 获取或设置授权目标代号。
 		/// </summary>
@@ -114,21 +92,20 @@ namespace Zongsoft.Security.Membership
 			if(obj == null || obj.GetType() != this.GetType())
 				return false;
 
-			var state = (AuthorizedState)obj;
+			var other = (AuthorizedState)obj;
 
-			return string.Equals(_applicationId, state._applicationId, StringComparison.OrdinalIgnoreCase) &&
-			       string.Equals(_schemaId, state._schemaId, StringComparison.OrdinalIgnoreCase) &&
-				   string.Equals(_actionId, state._actionId, StringComparison.OrdinalIgnoreCase);
+			return string.Equals(_schemaId, other._schemaId, StringComparison.OrdinalIgnoreCase) &&
+				   string.Equals(_actionId, other._actionId, StringComparison.OrdinalIgnoreCase);
 		}
 
 		public override int GetHashCode()
 		{
-			return (_applicationId + ":" + _schemaId + ":" + _actionId).ToLowerInvariant().GetHashCode();
+			return (_schemaId + ":" + _actionId).ToLowerInvariant().GetHashCode();
 		}
 
 		public override string ToString()
 		{
-			return string.Format("{0}:{1}[{2}]", _schemaId, _actionId, _applicationId);
+			return string.Format("{0}:{1}", _schemaId, _actionId);
 		}
 		#endregion
 	}

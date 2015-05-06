@@ -64,6 +64,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -253,6 +254,7 @@
     <Compile Include="Security\Membership\AuthenticationAttribute.cs" />
     <Compile Include="Security\Membership\Authentication.cs" />
     <Compile Include="Security\Membership\AuthenticationException.cs" />
+    <Compile Include="Security\Membership\UserIdentityType.cs" />
     <Compile Include="Security\Membership\AuthenticationResult.cs" />
     <Compile Include="Security\Membership\Authorization.cs" />
     <Compile Include="Security\Membership\AuthorizationAttribute.cs" />

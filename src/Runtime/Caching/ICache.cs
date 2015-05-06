@@ -51,6 +51,13 @@ namespace Zongsoft.Runtime.Caching
 		}
 
 		/// <summary>
+		/// 检测指定键的缓存项是否存在。
+		/// </summary>
+		/// <param name="key">指定要检测的键。</param>
+		/// <returns>如果存在则返回真(True)，否则返回假(False)。</returns>
+		bool Exists(string key);
+
+		/// <summary>
 		/// 获取指定键的缓存项的剩下的生存时长。
 		/// </summary>
 		/// <param name="key">指定要设置的键。</param>
