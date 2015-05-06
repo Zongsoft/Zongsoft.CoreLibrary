@@ -84,7 +84,7 @@ namespace Zongsoft.Runtime.Caching
 		/// <param name="key">指定要获取的键。</param>
 		/// <param name="valueCreator">如果指定的键不存在则使用该委托进行创建它。</param>
 		/// <returns>返回指定键的值或新增并保存的缓存项的值。</returns>
-		object GetValue(string key, Func<string, object, TimeSpan> valueCreator);
+		object GetValue(string key, Func<string, Tuple<object, TimeSpan>> valueCreator);
 
 		/// <summary>
 		/// 设置指定的值保存到缓存字典中。
@@ -118,7 +118,8 @@ namespace Zongsoft.Runtime.Caching
 		/// 从缓存字典中删除指定键的缓存项。
 		/// </summary>
 		/// <param name="key">指定要删除的键。</param>
-		void Remove(string key);
+		/// <returns>如果指定的键存在则返回真(True)，否则返回假(False)。</returns>
+		bool Remove(string key);
 
 		/// <summary>
 		/// 清空缓存字典中的所有数据。
