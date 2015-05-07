@@ -280,6 +280,7 @@
     <Compile Include="Security\Membership\User.cs" />
     <Compile Include="Security\Membership\UserProvider.cs" />
     <Compile Include="Security\PasswordUtility.cs" />
+    <Compile Include="Services\CommandBase.cs" />
     <Compile Include="Services\CommandContextBase.cs" />
     <Compile Include="Services\CommandExecutorBase.cs" />
     <Compile Include="Services\CommandExecutorContext.cs" />
@@ -395,7 +396,7 @@
     <Compile Include="Services\CommandExecutingEventArgs.cs" />
     <Compile Include="Common\StringExtension.cs" />
     <Compile Include="Collections\CategoryCollection.cs" />
-    <Compile Include="Services\CommandBase.cs" />
+    <Compile Include="Services\CommandBase`1.cs" />
     <Compile Include="ComponentModel\IDispatchProvider.cs" />
     <Compile Include="ComponentModel\INotifyProgressChanged.cs" />
     <Compile Include="Common\Pager.cs" />

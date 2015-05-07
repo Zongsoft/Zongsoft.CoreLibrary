@@ -57,8 +57,21 @@ namespace Zongsoft.Services
 
 		public CommandExecutingEventArgs(object parameter, IDictionary<string, object> extendedProperties, bool cancel = false)
 		{
-			_parameter = parameter;
-			_extendedProperties = extendedProperties;
+			var context = parameter as CommandContextBase;
+
+			if(context != null)
+			{
+				_context = context;
+				_parameter = context.Parameter;
+				_extendedProperties = context.HasExtendedProperties ? context.ExtendedProperties : null;
+				_result = context.Result;
+			}
+			else
+			{
+				_parameter = parameter;
+				_extendedProperties = extendedProperties;
+			}
+
 			_cancel = cancel;
 		}
 		#endregion

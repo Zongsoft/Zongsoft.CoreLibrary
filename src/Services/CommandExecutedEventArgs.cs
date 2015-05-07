@@ -62,9 +62,21 @@ namespace Zongsoft.Services
 		/// <param name="parameter">命令执行参数对象。</param>
 		public CommandExecutedEventArgs(object parameter, object result, IDictionary<string, object> extendedProperties = null)
 		{
-			_parameter = parameter;
-			_result = result;
-			_extendedProperties = extendedProperties;
+			var context = parameter as CommandContextBase;
+
+			if(context != null)
+			{
+				_context = context;
+				_parameter = context.Parameter;
+				_result = result ?? context.Result;
+				_extendedProperties = extendedProperties ?? (context.HasExtendedProperties ? context.ExtendedProperties : null);
+			}
+			else
+			{
+				_parameter = parameter;
+				_result = result;
+				_extendedProperties = extendedProperties;
+			}
 		}
 
 		/// <summary>
@@ -74,9 +86,21 @@ namespace Zongsoft.Services
 		/// <param name="exception">命令执行失败的异常对象。</param>
 		public CommandExecutedEventArgs(object parameter, Exception exception, IDictionary<string, object> extendedProperties = null)
 		{
-			_parameter = parameter;
+			var context = parameter as CommandContextBase;
+
+			if(context != null)
+			{
+				_context = context;
+				_parameter = context.Parameter;
+				_extendedProperties = extendedProperties ?? (context.HasExtendedProperties ? context.ExtendedProperties : null);
+			}
+			else
+			{
+				_parameter = parameter;
+				_extendedProperties = extendedProperties;
+			}
+
 			_exception = exception;
-			_extendedProperties = extendedProperties;
 		}
 		#endregion
 

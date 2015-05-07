@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -30,11 +30,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Services
 {
-	/// <summary>
-	/// 提供实现<see cref="ICommand"/>接口功能的基类，建议需要完成<see cref="ICommand"/>接口功能的实现者从此类继承。
-	/// </summary>
-	/// <typeparam name="TContext">指定命令的执行上下文类型。</typeparam>
-	public abstract class CommandBase<TContext> : MarshalByRefObject, ICommand<TContext>, IPredication<TContext>, IMatchable, INotifyPropertyChanged where TContext : CommandContextBase
+	public abstract class CommandBase : MarshalByRefObject, ICommand, IPredication, IMatchable, INotifyPropertyChanged
 	{
 		#region 事件定义
 		public event EventHandler EnabledChanged;
@@ -198,24 +194,26 @@ namespace Zongsoft.Services
 		}
 		#endregion
 
-		#region 公共方法
+		#region 虚拟方法
 		/// <summary>
 		/// 判断命令是否可被执行。
 		/// </summary>
-		/// <param name="context">判断命令是否可被执行的上下文对象。</param>
+		/// <param name="parameter">判断命令是否可被执行的参数对象。</param>
 		/// <returns>如果返回真(true)则表示命令可被执行，否则表示不可执行。</returns>
 		/// <remarks>
 		///		<para>本方法为虚拟方法，可由子类更改基类的默认实现方式。</para>
 		///		<para>如果<seealso cref="Predication"/>属性为空(null)，则返回<see cref="Enabled"/>属性值；否则返回由<see cref="Predication"/>属性指定的断言对象的断言方法的值。</para>
 		/// </remarks>
-		public virtual bool CanExecute(TContext context)
+		protected virtual bool CanExecute(object parameter)
 		{
+			var predication = this.Predication;
+
 			//如果断言对象是空则返回是否可用变量的值
-			if(_predication == null)
-				return _enabled;
+			if(predication == null)
+				return this.Enabled;
 
 			//返回断言对象的断言测试的值
-			return _enabled && _predication.Predicate(context);
+			return this.Enabled && predication.Predicate(parameter);
 		}
 
 		/// <summary>
@@ -226,14 +224,14 @@ namespace Zongsoft.Services
 		/// <remarks>
 		///		<para>本方法的实现中首先调用<see cref="CanExecute"/>方法，以确保阻止非法的调用。</para>
 		/// </remarks>
-		public object Execute(TContext context)
+		protected virtual object Execute(object parameter)
 		{
 			//在执行之前首先判断是否可以执行
-			if(!this.CanExecute(context))
+			if(!this.CanExecute(parameter))
 				return null;
 
 			//创建事件参数对象
-			var executingArgs = new CommandExecutingEventArgs(context);
+			var executingArgs = new CommandExecutingEventArgs(parameter, null);
 			//激发“Executing”事件
 			this.OnExecuting(executingArgs);
 
@@ -241,14 +239,18 @@ namespace Zongsoft.Services
 			if(executingArgs.Cancel)
 				return executingArgs.Result;
 
+			object result = executingArgs.Result;
+			CommandExecutedEventArgs executedArgs;
+
 			try
 			{
 				//执行具体的工作
-				this.OnExecute(context);
+				result = this.OnExecute(parameter);
 			}
 			catch(Exception ex)
 			{
-				var executedArgs = new CommandExecutedEventArgs(context, ex);
+				//创建事件参数对象
+				executedArgs = new CommandExecutedEventArgs(parameter, ex);
 
 				//激发“Executed”事件
 				this.OnExecuted(executedArgs);
@@ -259,53 +261,30 @@ namespace Zongsoft.Services
 				return executedArgs.Result;
 			}
 
+			//创建事件参数对象
+			executedArgs = new CommandExecutedEventArgs(parameter, result);
+
 			//激发“Executed”事件
-			this.OnExecuted(new CommandExecutedEventArgs(context));
+			this.OnExecuted(executedArgs);
 
 			//返回执行成功的结果
-			return context == null ? null : context.Result;
+			return executedArgs.Result;
 		}
 		#endregion
 
 		#region 抽象方法
-		protected virtual TContext CreateContext(object parameter, IDictionary<string, object> items)
-		{
-			return parameter as TContext;
-		}
-
-		protected abstract void OnExecute(TContext context);
+		protected abstract object OnExecute(object parameter);
 		#endregion
 
 		#region 显式实现
-		/// <summary>
-		/// 判断命令是否可被执行。
-		/// </summary>
-		/// <param name="parameter">判断命令是否可被执行的参数对象。</param>
-		/// <returns>如果返回真(true)则表示命令可被执行，否则表示不可执行。</returns>
-		/// <remarks>
-		///		<para>本方法为虚拟方法，可由子类更改基类的默认实现方式。</para>
-		///		<para>如果<seealso cref="Predication"/>属性为空(null)，则返回<see cref="Enabled"/>属性值；否则返回由<see cref="Predication"/>属性指定的断言对象的断言方法的值。</para>
-		/// </remarks>
 		bool ICommand.CanExecute(object parameter)
 		{
-			if(parameter == null && default(TContext) == null)
-				return this.CanExecute(default(TContext));
-
-			if(parameter is TContext)
-				return this.CanExecute((TContext)parameter);
-
-			return this.CanExecute(this.CreateContext(parameter, null));
+			return this.CanExecute(parameter);
 		}
 
 		object ICommand.Execute(object parameter)
 		{
-			if(parameter == null && default(TContext) == null)
-				return this.Execute(default(TContext));
-
-			if(parameter is TContext)
-				return this.Execute((TContext)parameter);
-
-			return this.Execute(this.CreateContext(parameter, null));
+			return this.Execute(parameter);
 		}
 
 		/// <summary>
@@ -318,12 +297,7 @@ namespace Zongsoft.Services
 		/// </remarks>
 		bool IPredication.Predicate(object parameter)
 		{
-			return ((ICommand)this).CanExecute(parameter);
-		}
-
-		bool IPredication<TContext>.Predicate(TContext context)
-		{
-			return this.CanExecute(context);
+			return this.CanExecute(parameter);
 		}
 
 		/// <summary>
