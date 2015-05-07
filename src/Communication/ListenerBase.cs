@@ -164,8 +164,10 @@ namespace Zongsoft.Communication
 
 		protected virtual void OnFailed(ChannelFailureEventArgs args)
 		{
-			if(this.Failed != null)
-				this.Failed(this, args);
+			var handler = this.Failed;
+
+			if(handler != null)
+				handler(this, args);
 		}
 
 		protected virtual void OnReceived(ReceivedEventArgs args)
@@ -173,8 +175,10 @@ namespace Zongsoft.Communication
 			//处理接收到的数据
 			Utility.ProcessReceive(_executor, args);
 
-			if(this.Received != null)
-				this.Received(this, args);
+			var handler = this.Received;
+
+			if(handler != null)
+				handler(this, args);
 		}
 		#endregion
 

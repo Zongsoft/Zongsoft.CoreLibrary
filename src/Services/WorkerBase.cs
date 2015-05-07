@@ -334,7 +334,10 @@ namespace Zongsoft.Services
 			var isDisposed = System.Threading.Interlocked.CompareExchange(ref _isDisposed, 1, 0);
 
 			if(isDisposed == 0)
+			{
 				this.Dispose(true);
+				GC.SuppressFinalize(this);
+			}
 		}
 		#endregion
 	}
