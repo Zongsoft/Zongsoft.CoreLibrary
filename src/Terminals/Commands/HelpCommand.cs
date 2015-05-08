@@ -46,6 +46,13 @@ namespace Zongsoft.Terminals.Commands
 		}
 		#endregion
 
+		#region 静态方法
+		public static void DisplayCommandInfo(ITerminal terminal, ICommand command)
+		{
+			CommandHelper.DisplayCommandInfo(terminal, command);
+		}
+		#endregion
+
 		#region 重写方法
 		protected override void OnExecute(TerminalCommandContext context)
 		{
@@ -90,12 +97,22 @@ namespace Zongsoft.Terminals.Commands
 			if(node == null)
 				return;
 
-			var indent = depth > 0 ? new string(' ', depth * 2) : string.Empty;
+			var indent = depth > 0 ? new string(' ', depth * 4) : string.Empty;
+			var fulName = node.FullPath.Trim('/').Replace('/', '.');
 
 			if(node.Command == null)
-				context.Terminal.WriteLine("{1}[{0}]", node.FullPath, indent);
+				context.Terminal.WriteLine("{1}[{0}]", fulName, indent);
 			else
-				context.Terminal.WriteLine("{1}{0}", node.FullPath, indent);
+			{
+				var displayName = (DisplayNameAttribute)Attribute.GetCustomAttribute(node.Command.GetType(), typeof(DisplayNameAttribute), true);
+
+				context.Terminal.Write("{1}{0}", fulName, indent);
+
+				if(displayName == null)
+					context.Terminal.WriteLine();
+				else
+					context.Terminal.WriteLine(TerminalColor.DarkYellow, " " + ResourceUtility.GetString(displayName.DisplayName, node.Command.GetType().Assembly));
+			}
 
 			if(node.Children.Count > 0)
 			{
