@@ -103,8 +103,11 @@ namespace Zongsoft.Terminals
 
 				try
 				{
+					var commandText = _terminal.Input.ReadLine();
+
 					//执行单行命令
-					this.Execute(_terminal.Input.ReadLine());
+					if(!string.IsNullOrWhiteSpace(commandText))
+						this.Execute(commandText);
 				}
 				catch(ExitException ex)
 				{
