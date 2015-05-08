@@ -33,11 +33,11 @@ using System.Text;
 
 namespace Zongsoft.Runtime.Serialization
 {
-	public class Serializer : ISerializer
+	public class Serializer : ISerializer, ITextSerializer
 	{
 		#region 静态字段
-		private static ISerializer _text = new Serializer(new TextSerializationWriter());
-		private static ISerializer _json = new Serializer(new JsonSerializationWriter());
+		private static ITextSerializer _text = new Serializer(new TextSerializationWriter());
+		private static ITextSerializer _json = new Serializer(new JsonSerializationWriter());
 		#endregion
 
 		#region 事件定义
@@ -66,7 +66,7 @@ namespace Zongsoft.Runtime.Serialization
 		#endregion
 
 		#region 静态属性
-		public static ISerializer Text
+		public static ITextSerializer Text
 		{
 			get
 			{
@@ -81,7 +81,7 @@ namespace Zongsoft.Runtime.Serialization
 			}
 		}
 
-		public static ISerializer Json
+		public static ITextSerializer Json
 		{
 			get
 			{
@@ -142,6 +142,74 @@ namespace Zongsoft.Runtime.Serialization
 				throw new ArgumentNullException("type");
 
 			throw new NotImplementedException();
+		}
+
+		public object Deserialize(TextReader reader)
+		{
+			if(reader == null)
+				throw new ArgumentNullException("reader");
+
+			throw new NotImplementedException();
+		}
+
+		public object Deserialize(TextReader reader, Type type)
+		{
+			if(reader == null)
+				throw new ArgumentNullException("reader");
+
+			if(type == null)
+				throw new ArgumentNullException("type");
+
+			throw new NotImplementedException();
+		}
+
+		public T Deserialize<T>(TextReader reader)
+		{
+			return (T)this.Deserialize(reader, typeof(T));
+		}
+
+		public string Serialize(object graph)
+		{
+			if(graph == null)
+				return null;
+
+			using(var stream = new MemoryStream())
+			{
+				this.Serialize(stream, graph);
+
+				stream.Position = 0;
+
+				using(var reader = new StreamReader(stream, Encoding.UTF8))
+				{
+					return reader.ReadToEnd();
+				}
+			}
+		}
+
+		public void Serialize(TextWriter writer, object graph)
+		{
+			if(writer == null)
+				throw new ArgumentNullException("writer");
+
+			if(graph == null)
+				return;
+
+			using(var stream = new MemoryStream())
+			{
+				this.Serialize(stream, graph);
+
+				stream.Position = 0;
+
+				using(var reader = new StreamReader(stream, writer.Encoding))
+				{
+					string line = null;
+
+					while((line = reader.ReadLine()) != null)
+					{
+						writer.WriteLine(line);
+					}
+				}
+			}
 		}
 
 		public void Serialize(Stream serializationStream, object graph)
