@@ -160,15 +160,25 @@ namespace Zongsoft.Options.Profiles
 
 							break;
 						case LineType.Entry:
-							if(section == null)
-								throw new ProfileException("Invalid format of the profile.");
+							//if(section == null)
+							//	throw new ProfileException("Invalid format of the profile.");
 
 							var index = content.IndexOf('=');
 
-							if(index < 0)
-								section.Entries.Add(lineNumber, content);
+							if(section == null)
+							{
+								if(index < 0)
+									profile.Items.Add(new ProfileEntry(lineNumber, content));
+								else
+									profile.Items.Add(new ProfileEntry(lineNumber, content.Substring(0, index), content.Substring(index + 1)));
+							}
 							else
-								section.Entries.Add(lineNumber, content.Substring(0, index), content.Substring(index + 1));
+							{
+								if(index < 0)
+									section.Entries.Add(lineNumber, content);
+								else
+									section.Entries.Add(lineNumber, content.Substring(0, index), content.Substring(index + 1));
+							}
 
 							break;
 						case LineType.Comment:
