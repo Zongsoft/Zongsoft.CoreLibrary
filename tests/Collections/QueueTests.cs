@@ -112,7 +112,7 @@ namespace Zongsoft.Collections.Tests
 
 			Assert.AreEqual(6, queue.Count);
 
-			queue.Enqueue(new object[] { "xyz", new Zongsoft.Tests.Person(), 123 });
+			queue.EnqueueMany(new object[] { "xyz", new Zongsoft.Tests.Person(), 123 });
 
 			Assert.AreEqual(9, queue.Count);
 		}
