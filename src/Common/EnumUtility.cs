@@ -71,7 +71,7 @@ namespace Zongsoft.Common
 		/// </summary>
 		/// <param name="enumValue">要获取的枚举项。</param>
 		/// <returns>返回指定枚举值对应的<see cref="EnumEntry"/>对象。</returns>
-		public static EnumEntry GetEnumEntry(Enum enumValue)
+		public static EnumEntry GetEnumEntry(this Enum enumValue)
 		{
 			return GetEnumEntry(enumValue, false);
 		}
@@ -82,7 +82,7 @@ namespace Zongsoft.Common
 		/// <param name="enumValue">要获取的枚举项。</param>
 		/// <param name="underlyingType">是否将生成的 <see cref="EnumEntry"/> 元素的 <see cref="EnumEntry.Value"/> 属性值置为 enumType 参数对应的枚举项基类型值。</param>
 		/// <returns>返回指定枚举值对应的<see cref="EnumEntry"/>对象。</returns>
-		public static EnumEntry GetEnumEntry(Enum enumValue, bool underlyingType)
+		public static EnumEntry GetEnumEntry(this Enum enumValue, bool underlyingType)
 		{
 			FieldInfo field = enumValue.GetType().GetField(enumValue.ToString());
 			var alias = field.GetCustomAttributes(typeof(AliasAttribute), false).OfType<AliasAttribute>().FirstOrDefault();
