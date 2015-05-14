@@ -33,7 +33,7 @@ namespace Zongsoft.Security.Membership
 	/// 表示角色的实体类。
 	/// </summary>
 	[Serializable]
-	public class Role
+	public class Role : Zongsoft.ComponentModel.NotifyObject
 	{
 		#region 静态字段
 		public static readonly string Administrators = "Administrators";
@@ -73,6 +73,10 @@ namespace Zongsoft.Security.Membership
 			{
 				return _roleId;
 			}
+			set
+			{
+				this.SetValue(ref _roleId, value, () => this.RoleId);
+			}
 		}
 
 		public string Name
@@ -86,7 +90,7 @@ namespace Zongsoft.Security.Membership
 				if(string.IsNullOrWhiteSpace(value))
 					throw new ArgumentNullException();
 
-				_name = value.Trim();
+				this.SetValue(ref _name, value.Trim(), () => this.Name);
 			}
 		}
 
@@ -98,7 +102,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_fullName = value;
+				this.SetValue(ref _fullName, value, () => this.FullName);
 			}
 		}
 
@@ -110,7 +114,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_namespace = value;
+				this.SetValue(ref _namespace, value, () => this.Namespace);
 			}
 		}
 
@@ -122,7 +126,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_description = value;
+				this.SetValue(ref _description, value, () => this.Description);
 			}
 		}
 
@@ -134,7 +138,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_createdTime = value;
+				this.SetValue(ref _createdTime, value, () => this.CreatedTime);
 			}
 		}
 		#endregion

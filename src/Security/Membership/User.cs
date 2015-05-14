@@ -34,7 +34,7 @@ namespace Zongsoft.Security.Membership
 	/// 表示用户的实体类。
 	/// </summary>
 	[Serializable]
-	public class User
+	public class User : Zongsoft.ComponentModel.NotifyObject
 	{
 		#region 静态字段
 		public static readonly string Administrator = "Administrator";
@@ -80,13 +80,17 @@ namespace Zongsoft.Security.Membership
 
 		#region 公共属性
 		/// <summary>
-		/// 获取用户的编号。
+		/// 获取或设置用户编号。
 		/// </summary>
 		public int UserId
 		{
 			get
 			{
 				return _userId;
+			}
+			set
+			{
+				this.SetValue(ref _userId, value, () => this.UserId);
 			}
 		}
 
@@ -104,7 +108,7 @@ namespace Zongsoft.Security.Membership
 				if(string.IsNullOrWhiteSpace(value))
 					throw new ArgumentNullException();
 
-				_name = value.Trim();
+				this.SetValue(ref _name, value.Trim(), () => this.Name);
 			}
 		}
 
@@ -119,7 +123,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_fullName = value;
+				this.SetValue(ref _fullName, value, () => this.FullName);
 			}
 		}
 
@@ -134,7 +138,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_namespace = value;
+				this.SetValue(ref _namespace, value, () => this.Namespace);
 			}
 		}
 
@@ -149,7 +153,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_description = value;
+				this.SetValue(ref _description, value, () => this.Description);
 			}
 		}
 
@@ -164,7 +168,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_principal = value;
+				this.SetValue(ref _principal, value, () => this.Principal);
 			}
 		}
 
@@ -179,7 +183,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_email = value;
+				this.SetValue(ref _email, value, () => this.Email);
 			}
 		}
 
@@ -194,7 +198,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_phoneNumber = value;
+				this.SetValue(ref _phoneNumber, value, () => this.PhoneNumber);
 			}
 		}
 
@@ -209,7 +213,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_suspended = value;
+				this.SetValue(ref _suspended, value, () => this.Suspended);
 			}
 		}
 
@@ -224,7 +228,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_approved = value;
+				this.SetValue(ref _approved, value, () => this.Approved);
 			}
 		}
 
@@ -239,7 +243,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_changePasswordOnFirstTime = value;
+				this.SetValue(ref _changePasswordOnFirstTime, value, () => this.ChangePasswordOnFirstTime);
 			}
 		}
 
@@ -254,7 +258,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_maxInvalidPasswordAttempts = value;
+				this.SetValue(ref _maxInvalidPasswordAttempts, value, () => this.MaxInvalidPasswordAttempts);
 			}
 		}
 
@@ -269,7 +273,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_minRequiredPasswordLength = value;
+				this.SetValue(ref _minRequiredPasswordLength, value, () => this.MinRequiredPasswordLength);
 			}
 		}
 
@@ -284,7 +288,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_passwordAttemptWindow = value;
+				this.SetValue(ref _passwordAttemptWindow, value, () => this.PasswordAttemptWindow);
 			}
 		}
 
@@ -299,7 +303,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_passwordExpires = value;
+				this.SetValue(ref _passwordExpires, value, () => this.PasswordExpires);
 			}
 		}
 
@@ -314,7 +318,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_createdTime = value;
+				this.SetValue(ref _createdTime, value, () => this.CreatedTime);
 			}
 		}
 
@@ -329,7 +333,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_approvedTime = value;
+				this.SetValue(ref _approvedTime, value, () => this.ApprovedTime);
 			}
 		}
 
@@ -344,7 +348,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_suspendedTime = value;
+				this.SetValue(ref _suspendedTime, value, () => this.SuspendedTime);
 			}
 		}
 		#endregion
