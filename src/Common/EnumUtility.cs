@@ -58,7 +58,7 @@ namespace Zongsoft.Common
 			var alias = field.GetCustomAttributes(typeof(AliasAttribute), false).OfType<AliasAttribute>().FirstOrDefault();
 			var description = field.GetCustomAttributes(typeof(DescriptionAttribute), false).OfType<DescriptionAttribute>().FirstOrDefault();
 
-			return new EnumEntry(field.Name,
+			return new EnumEntry(enumValue.GetType(), field.Name,
 								underlyingType ? System.Convert.ChangeType(field.GetValue(null), Enum.GetUnderlyingType(enumValue.GetType())) : field.GetValue(null),
 								alias == null ? string.Empty : alias.Alias,
 								description == null ? string.Empty : Zongsoft.Resources.ResourceUtility.GetString(description.Description, enumValue.GetType().Assembly));
@@ -113,7 +113,7 @@ namespace Zongsoft.Common
 			else
 			{
 				entries = new EnumEntry[fields.Length + 1];
-				entries[0] = new EnumEntry(string.Empty, nullValue, nullText, nullText);
+				entries[0] = new EnumEntry(enumType, string.Empty, nullValue, nullText, nullText);
 			}
 
 			for(int i = 0; i < fields.Length; i++)
@@ -121,7 +121,7 @@ namespace Zongsoft.Common
 				var alias = fields[i].GetCustomAttributes(typeof(AliasAttribute), false).OfType<AliasAttribute>().FirstOrDefault();
 				var description = fields[i].GetCustomAttributes(typeof(DescriptionAttribute), false).OfType<DescriptionAttribute>().FirstOrDefault();
 
-				entries[baseIndex + i] = new EnumEntry(fields[i].Name,
+				entries[baseIndex + i] = new EnumEntry(enumType, fields[i].Name,
 													underlyingType ? System.Convert.ChangeType(fields[i].GetValue(null), Enum.GetUnderlyingType(enumType)) : fields[i].GetValue(null),
 													alias == null ? string.Empty : alias.Alias,
 													description == null ? string.Empty : Zongsoft.Resources.ResourceUtility.GetString(description.Description, enumType.Assembly));
