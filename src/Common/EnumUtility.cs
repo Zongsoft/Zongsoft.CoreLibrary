@@ -36,6 +36,36 @@ namespace Zongsoft.Common
 {
 	public static class EnumUtility
 	{
+		public static Type GetEnumType(Type type)
+		{
+			if(type == null)
+				return null;
+
+			if(type.IsEnum)
+				return type;
+
+			if(type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>) && type.GetGenericArguments()[0].IsEnum)
+				return type.GetGenericArguments()[0];
+
+			return null;
+		}
+
+		public static string Format(object value, string format)
+		{
+			if(value == null)
+				return string.Empty;
+
+			var enumType = GetEnumType(value.GetType());
+
+			if(enumType != null)
+				return GetEnumEntry((Enum)value).ToString(format);
+
+			if(string.IsNullOrWhiteSpace(format))
+				return string.Format("{0}", value);
+			else
+				return string.Format("{0:" + format + "}", value);
+		}
+
 		/// <summary>
 		/// 获取指定枚举项对应的<see cref="EnumEntry"/>描述对象。
 		/// </summary>
