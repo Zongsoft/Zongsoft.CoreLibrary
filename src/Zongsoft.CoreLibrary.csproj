@@ -316,6 +316,7 @@
     <Compile Include="Services\IMatchable`1.cs" />
     <Compile Include="Services\IMatcher.cs" />
     <Compile Include="Services\IMatcher`1.cs" />
+    <Compile Include="Services\IPredicationProvider.cs" />
     <Compile Include="Services\IPredication`1.cs" />
     <Compile Include="Services\IServiceBuilder.cs" />
     <Compile Include="Services\IServiceLifetime.cs" />
