@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2003-2014 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2003-2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -33,15 +33,27 @@ namespace Zongsoft.Security
 	/// <summary>
 	/// 表示一般用户的标识类。
 	/// </summary>
-	public class GenericIdentity : MarshalByRefObject, IIdentity
+	public class CertificationIdentity : MarshalByRefObject, IIdentity
 	{
+		#region 公共字段
+		public static readonly CertificationIdentity Empty = new CertificationIdentity();
+		#endregion
+
 		#region 成员字段
 		private string _name;
 		private string _certificationId;
+		private Certification _certification;
+		private ICertificationProvider _provider;
 		#endregion
 
 		#region 构造函数
-		public GenericIdentity(string certificationId, string name)
+		private CertificationIdentity()
+		{
+			_certificationId = string.Empty;
+			_name = string.Empty;
+		}
+
+		public CertificationIdentity(string certificationId, string name)
 		{
 			_certificationId = certificationId;
 			_name = name;
@@ -49,15 +61,7 @@ namespace Zongsoft.Security
 		#endregion
 
 		#region 公共属性
-		string IIdentity.AuthenticationType
-		{
-			get
-			{
-				return this.GetType().Name;
-			}
-		}
-
-		public virtual bool IsAuthenticated
+		public bool IsAuthenticated
 		{
 			get
 			{
@@ -65,7 +69,7 @@ namespace Zongsoft.Security
 			}
 		}
 
-		public virtual string Name
+		public string Name
 		{
 			get
 			{
@@ -73,11 +77,58 @@ namespace Zongsoft.Security
 			}
 		}
 
-		public virtual string CertificationId
+		public string CertificationId
 		{
 			get
 			{
 				return _certificationId;
+			}
+		}
+
+		public virtual Certification Certification
+		{
+			[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
+			get
+			{
+				if(string.IsNullOrWhiteSpace(_certificationId))
+					return null;
+
+				if(_certification == null)
+				{
+					var provider = this.Provider;
+
+					if(provider == null)
+						return null;
+
+					_certification = provider.GetCertification(_certificationId);
+				}
+
+				return _certification;
+			}
+		}
+
+		public ICertificationProvider Provider
+		{
+			get
+			{
+				return _provider;
+			}
+			set
+			{
+				if(value == null)
+					throw new ArgumentNullException();
+
+				_provider = value;
+			}
+		}
+		#endregion
+
+		#region 显式实现
+		string IIdentity.AuthenticationType
+		{
+			get
+			{
+				return "Zongsoft Certification Authentication System";
 			}
 		}
 		#endregion

@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2003-2014 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2003-2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -27,7 +27,7 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace Zongsoft.Security.Membership
+namespace Zongsoft.Security
 {
 	/// <summary>
 	/// 安全凭证操作相关的异常。

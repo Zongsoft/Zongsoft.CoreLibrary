@@ -35,6 +35,14 @@ namespace Zongsoft.Security.Membership
 	[Serializable]
 	public class AuthenticationException : System.ApplicationException
 	{
+		#region 常量定义
+		public static readonly int UnknownFailed = -1;
+
+		public static readonly int InvalidIdentity = 101;
+		public static readonly int InvalidPassword = 102;
+		public static readonly int AccountDisabled = 103;
+		#endregion
+
 		#region 成员变量
 		private int _failureCode;
 		#endregion

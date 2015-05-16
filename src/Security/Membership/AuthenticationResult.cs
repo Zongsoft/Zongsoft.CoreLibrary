@@ -36,42 +36,61 @@ namespace Zongsoft.Security.Membership
 	public class AuthenticationResult
 	{
 		#region 成员字段
-		public Certification _certification;
-		private string _message;
+		private User _user;
+		private IDictionary<string, object> _extendedProperties;
 		#endregion
 
 		#region 构造函数
-		public AuthenticationResult(Certification certification) : this(certification, string.Empty)
+		public AuthenticationResult(User user) : this(user, null)
 		{
 		}
 
-		public AuthenticationResult(Certification certification, string message)
+		public AuthenticationResult(User user, IDictionary<string, object> extendedProperties)
 		{
-			_certification = certification;
-			_message = message ?? string.Empty;
+			if(user == null)
+				throw new ArgumentNullException("user");
+
+			_user = user;
+
+			if(extendedProperties != null && extendedProperties.Count > 0)
+				_extendedProperties = new Dictionary<string, object>(extendedProperties, StringComparer.OrdinalIgnoreCase);
 		}
 		#endregion
 
 		#region 公共属性
 		/// <summary>
-		/// 获取验证通过后的安全凭证，如果验证失败则返回空(null)。
+		/// 获取验证通过后的用户对象，如果验证失败则返回空(null)。
 		/// </summary>
-		public Certification Certification
+		public User User
 		{
 			get
 			{
-				return _certification;
+				return _user;
 			}
 		}
 
 		/// <summary>
-		/// 获取验证通过后的消息文本。
+		/// 获取一个值，指示扩展属性集是否有内容。
 		/// </summary>
-		public string Message
+		public bool HasExtendedProperties
 		{
 			get
 			{
-				return _message;
+				return _extendedProperties != null && _extendedProperties.Count > 0;
+			}
+		}
+
+		/// <summary>
+		/// 获取验证结果的扩展属性集。
+		/// </summary>
+		public IDictionary<string, object> ExtendedProperties
+		{
+			get
+			{
+				if(_extendedProperties == null)
+					System.Threading.Interlocked.CompareExchange(ref _extendedProperties, new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase), null);
+
+				return _extendedProperties;
 			}
 		}
 		#endregion

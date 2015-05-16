@@ -91,6 +91,7 @@
     <Compile Include="Common\IObjectReference.cs" />
     <Compile Include="Common\ISequence.cs" />
     <Compile Include="Common\ObjectReference.cs" />
+    <Compile Include="Common\RandomGenerator.cs" />
     <Compile Include="Common\SequenceInfo.cs" />
     <Compile Include="Common\TypeExtension.cs" />
     <Compile Include="Common\Buffer.cs" />
@@ -250,8 +251,8 @@
     <Compile Include="Runtime\Serialization\SerializationContext.cs" />
     <Compile Include="Runtime\Serialization\SerializationEventArgs.cs" />
     <Compile Include="Runtime\Serialization\SerializerSettings.cs" />
-    <Compile Include="Security\GenericIdentity.cs" />
-    <Compile Include="Security\GenericPrincipal.cs" />
+    <Compile Include="Security\CertificationIdentity.cs" />
+    <Compile Include="Security\CertificationPrincipal.cs" />
     <Compile Include="Security\Membership\AuthenticationAttribute.cs" />
     <Compile Include="Security\Membership\Authentication.cs" />
     <Compile Include="Security\Membership\AuthenticationException.cs" />
@@ -260,12 +261,12 @@
     <Compile Include="Security\Membership\Authorization.cs" />
     <Compile Include="Security\Membership\AuthorizationAttribute.cs" />
     <Compile Include="Security\Membership\AuthorizedState.cs" />
-    <Compile Include="Security\Membership\Certification.cs" />
-    <Compile Include="Security\Membership\CertificationException.cs" />
-    <Compile Include="Security\Membership\CertificationProvider.cs" />
+    <Compile Include="Security\Certification.cs" />
+    <Compile Include="Security\CertificationException.cs" />
+    <Compile Include="Security\CertificationProvider.cs" />
     <Compile Include="Security\Membership\IAuthentication.cs" />
     <Compile Include="Security\Membership\IAuthorization.cs" />
-    <Compile Include="Security\Membership\ICertificationProvider.cs" />
+    <Compile Include="Security\ICertificationProvider.cs" />
     <Compile Include="Security\Membership\IPermissionProvider.cs" />
     <Compile Include="Security\Membership\IRoleProvider.cs" />
     <Compile Include="Security\Membership\IUserProvider.cs" />

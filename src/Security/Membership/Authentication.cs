@@ -37,7 +37,6 @@ namespace Zongsoft.Security.Membership
 		#region 成员字段
 		private string _namespace;
 		private IDataAccess _dataAccess;
-		private ICertificationProvider _certificationProvider;
 		#endregion
 
 		#region 构造函数
@@ -45,16 +44,12 @@ namespace Zongsoft.Security.Membership
 		{
 		}
 
-		public Authentication(IDataAccess objectAccess, ICertificationProvider certificationProvider)
+		public Authentication(IDataAccess objectAccess)
 		{
 			if(objectAccess == null)
 				throw new ArgumentNullException("objectAccess");
 
-			if(certificationProvider == null)
-				throw new ArgumentNullException("certificationProvider");
-
 			_dataAccess = objectAccess;
-			_certificationProvider = certificationProvider;
 		}
 		#endregion
 
@@ -91,35 +86,11 @@ namespace Zongsoft.Security.Membership
 				_dataAccess = value;
 			}
 		}
-
-		/// <summary>
-		/// 获取或设置<see cref="ICertificationProvider"/>安全凭证提供程序。
-		/// </summary>
-		public ICertificationProvider CertificationProvider
-		{
-			get
-			{
-				return _certificationProvider;
-			}
-			set
-			{
-				if(value == null)
-					throw new ArgumentNullException();
-
-				_certificationProvider = value;
-			}
-		}
 		#endregion
 
 		#region 验证方法
-		public AuthenticationResult Authenticate(string identity, string password)
+		public AuthenticationResult Authenticate(string identity, string password, string scene)
 		{
-			if(_dataAccess == null)
-				throw new InvalidOperationException("The value of 'ObjectAccess' property is null.");
-
-			if(_certificationProvider == null)
-				throw new InvalidOperationException("The value of 'CertificationProvider' property is null.");
-
 			if(string.IsNullOrWhiteSpace(identity))
 				throw new ArgumentNullException("identity");
 
@@ -131,40 +102,25 @@ namespace Zongsoft.Security.Membership
 
 			if(user != null)
 			{
+				//如果验证成功，则返回验证结果
 				if(PasswordUtility.VerifyPassword(password, storedPassword, storedPasswordSalt, "SHA1"))
-				{
-					//通过安全凭证提供程序注册凭证
-					var certification = _certificationProvider.Register(user.UserId, user.Namespace, new Dictionary<string, object>()
-					{
-						{"Name", user.Name},
-						{"FullName", user.FullName},
-						{"Email", user.Email},
-						{"PhoneNumber", user.PhoneNumber},
-						{"Principal", user.Principal},
-						{"Approved", user.Approved},
-						{"Suspended", user.Suspended}
-					});
-
-					//如果安全凭证注册失败则抛出异常
-					if(certification == null)
-						throw new AuthenticationException(string.Format("Register certification faild for '{0}'.", identity));
-
-					//验证成功，返回验证结果
-					return new AuthenticationResult(certification);
-				}
+					return new AuthenticationResult(user);
 
 				//密码校验失败则抛出验证异常
-				throw new AuthenticationException("Invalid password.");
+				throw new AuthenticationException(AuthenticationException.InvalidPassword);
 			}
 
 			//指定的用户名如果不存在则抛出验证异常
-			throw new AuthenticationException("Invalid account.");
+			throw new AuthenticationException(AuthenticationException.InvalidIdentity);
 		}
 		#endregion
 
 		#region 虚拟方法
 		protected virtual User GetPassword(string identity, out byte[] password, out byte[] passwordSalt)
 		{
+			if(string.IsNullOrWhiteSpace(identity))
+				throw new ArgumentNullException("identity");
+
 			var identityType = MembershipHelper.GetUserIdentityType(identity);
 
 			switch(identityType)

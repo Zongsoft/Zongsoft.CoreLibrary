@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2003-2014 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2003-2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -27,7 +27,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Zongsoft.Security.Membership
+namespace Zongsoft.Security
 {
 	/// <summary>
 	/// 提供安全凭证相关操作的功能。
@@ -37,10 +37,11 @@ namespace Zongsoft.Security.Membership
 		/// <summary>
 		/// 为指定的用户注册安全凭证。
 		/// </summary>
-		/// <param name="userId">指定的用户编号。</param>
 		/// <param name="namespace">指定的凭证所属的命名空间。</param>
+		/// <param name="userId">指定的用户编号。</param>
+		/// <param name="scene">指定的应用场景，通常为“Web”、“Mobile”等。</param>
 		/// <param name="extendedProperties">扩展属性集合。</param>
-		Certification Register(int userId, string @namespace, IDictionary<string, object> extendedProperties);
+		Certification Register(string @namespace, int userId, string scene, IDictionary<string, object> extendedProperties);
 
 		/// <summary>
 		/// 从安全凭证容器中注销指定的凭证。
@@ -52,14 +53,7 @@ namespace Zongsoft.Security.Membership
 		/// 续约指定的安全凭证。
 		/// </summary>
 		/// <param name="certificationId">指定要续约的安全凭证编号。</param>
-		void Renew(string certificationId);
-
-		/// <summary>
-		/// 续约指定的安全凭证。
-		/// </summary>
-		/// <param name="certificationId">指定要续约的安全凭证编号。</param>
-		/// <param name="duration">指定要续约的期限。</param>
-		void Renew(string certificationId, TimeSpan duration);
+		Certification Renew(string certificationId);
 
 		/// <summary>
 		/// 获取当前安全凭证容器内的所有凭证数。
@@ -104,17 +98,18 @@ namespace Zongsoft.Security.Membership
 		Certification GetCertification(string certificationId);
 
 		/// <summary>
+		/// 获取指定用户及应用场景对应的<see cref="Certification"/>安全凭证对象。
+		/// </summary>
+		/// <param name="userId">指定要获取的安全凭证对应的用户编号。</param>
+		/// <param name="scene">指定要获取的安全凭证对应的应用场景。</param>
+		/// <returns>返回成功的安全凭证对象，如果指定的用户及应用场景不存在对应的安全凭证则返回空(null)。</returns>
+		Certification GetCertification(int userId, string scene);
+
+		/// <summary>
 		/// 获取指定命名空间中的所有<see cref="Certification"/>安全凭证对象集。
 		/// </summary>
 		/// <param name="namespace">指定要获取的安全凭证所属的命名空间。</param>
 		/// <returns>返回的对应的安全凭证对象集，如果指定的应用下无安全凭证则返回空集合。</returns>
 		IEnumerable<Certification> GetCertifications(string @namespace);
-
-		/// <summary>
-		/// 获取指定用户对应的<see cref="Certification"/>安全凭证对象集。
-		/// </summary>
-		/// <param name="userId">指定要获取的安全凭证对应的用户编号。</param>
-		/// <returns></returns>
-		IEnumerable<Certification> GetCertifications(int userId);
 	}
 }

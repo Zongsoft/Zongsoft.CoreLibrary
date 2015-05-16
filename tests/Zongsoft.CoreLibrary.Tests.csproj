@@ -66,6 +66,8 @@
     <Compile Include="Common\StringExtensionTests.cs" />
     <Compile Include="Common\TypeExtensionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Common\RandomGeneratorTests.cs" />
+    <Compile Include="Security\CertificationTest.cs" />
     <Compile Include="Services\CommandTreeNodeCollectionTests.cs" />
   </ItemGroup>
   <ItemGroup>

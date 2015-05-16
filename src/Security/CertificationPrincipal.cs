@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2003-2014 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2003-2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -33,15 +33,15 @@ namespace Zongsoft.Security
 	/// <summary>
 	/// 表示一般用户主体的类。
 	/// </summary>
-	public class GenericPrincipal : MarshalByRefObject, IPrincipal
+	public class CertificationPrincipal : MarshalByRefObject, IPrincipal
 	{
 		#region 成员字段
-		private GenericIdentity _identity;
+		private CertificationIdentity _identity;
 		private string[] _roles;
 		#endregion
 
 		#region 构造函数
-		public GenericPrincipal(GenericIdentity identity, params string[] roles)
+		public CertificationPrincipal(CertificationIdentity identity, params string[] roles)
 		{
 			if(identity == null)
 				throw new ArgumentNullException("identity");
@@ -50,18 +50,18 @@ namespace Zongsoft.Security
 			_roles = roles;
 		}
 
-		protected GenericPrincipal(params string[] roles)
+		protected CertificationPrincipal(params string[] roles)
 		{
 			_roles = roles;
 		}
 		#endregion
 
 		#region 公共属性
-		public virtual GenericIdentity Identity
+		public virtual CertificationIdentity Identity
 		{
 			get
 			{
-				return _identity;
+				return _identity ?? CertificationIdentity.Empty;
 			}
 		}
 		#endregion
