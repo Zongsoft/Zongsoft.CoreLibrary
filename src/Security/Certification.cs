@@ -27,6 +27,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Zongsoft.Security
 {
@@ -44,29 +45,34 @@ namespace Zongsoft.Security
 		private string _certificationId;
 		private string _namespace;
 		private string _scene;
-		private int _userId;
+		private Membership.User _user;
+		private DateTime _timestamp;
 		private DateTime _issuedTime;
 		private TimeSpan _duration;
 		private IDictionary<string, object> _extendedProperties;
 		#endregion
 
 		#region 构造函数
-		public Certification(string certificationId, string @namespace, string scene, int userId, TimeSpan duration)
-			: this(certificationId, @namespace, scene, userId, duration, DateTime.Now, null)
+		public Certification(string certificationId, Membership.User user, string @namespace, string scene, TimeSpan duration)
+			: this(certificationId, user, @namespace, scene, duration, DateTime.Now, null)
 		{
 		}
 
-		public Certification(string certificationId, string @namespace, string scene, int userId, TimeSpan duration, DateTime issuedTime, IDictionary<string, object> extendedProperties = null)
+		public Certification(string certificationId, Membership.User user, string @namespace, string scene, TimeSpan duration, DateTime issuedTime, IDictionary<string, object> extendedProperties = null)
 		{
 			if(string.IsNullOrWhiteSpace(certificationId))
 				throw new ArgumentNullException("certificationId");
 
+			if(user == null)
+				throw new ArgumentNullException("user");
+
+			_user = user;
 			_certificationId = certificationId.Trim();
 			_namespace = @namespace == null ? null : @namespace.Trim();
 			_scene = scene == null ? null : scene.Trim();
-			_userId = userId;
 			_duration = duration;
 			_issuedTime = issuedTime;
+			_timestamp = issuedTime;
 
 			if(extendedProperties != null && extendedProperties.Count > 0)
 				_extendedProperties = new Dictionary<string, object>(extendedProperties, StringComparer.OrdinalIgnoreCase);
@@ -108,13 +114,28 @@ namespace Zongsoft.Security
 		}
 
 		/// <summary>
-		/// 获取安全凭证对应的用户编号。
+		/// 获取安全凭证对应的用户对象。
 		/// </summary>
-		public int UserId
+		public Membership.User User
 		{
 			get
 			{
-				return _userId;
+				return _user;
+			}
+		}
+
+		/// <summary>
+		/// 获取或设置安全凭证的最后活动时间。
+		/// </summary>
+		public DateTime Timestamp
+		{
+			get
+			{
+				return _timestamp;
+			}
+			set
+			{
+				_timestamp = value;
 			}
 		}
 
@@ -172,12 +193,19 @@ namespace Zongsoft.Security
 			var result = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase )
 			{
 				{"CertificationId", this.CertificationId},
-				{"UserId", this.UserId},
 				{"Namespace", this.Namespace},
 				{"Scene", this.Scene},
 				{"Duration", this.Duration},
 				{"IssuedTime", this.IssuedTime},
+				{"Timestamp", this.Timestamp},
 			};
+
+			var properties = TypeDescriptor.GetProperties(typeof(Membership.User));
+
+			foreach(PropertyDescriptor property in properties)
+			{
+				result.Add("User." + property.Name, property.GetValue(_user));
+			}
 
 			var extendedProperties = _extendedProperties;
 
@@ -197,12 +225,28 @@ namespace Zongsoft.Security
 			if(dictionary == null || dictionary.Count < 1)
 				return null;
 
-			var result = new Certification((string)dictionary["CertificationId"],
-				(string)dictionary["Namespace"],
-				(string)dictionary["Scene"],
-				Zongsoft.Common.Convert.ConvertValue<int>(dictionary["UserId"]),
+			var user = new Membership.User(Zongsoft.Common.Convert.ConvertValue<int>(dictionary["User.UserId"]),
+				Zongsoft.Common.Convert.ConvertValue<string>(dictionary["User.Name"]),
+				Zongsoft.Common.Convert.ConvertValue<string>(dictionary["User.Namespace"]));
+
+			var properties = TypeDescriptor.GetProperties(typeof(Membership.User));
+
+			foreach(PropertyDescriptor property in properties)
+			{
+				if(property.IsReadOnly)
+					continue;
+
+				property.SetValue(user, Zongsoft.Common.Convert.ConvertValue(dictionary["User." + property.Name], property.PropertyType));
+			}
+
+			var result = new Certification((string)dictionary["CertificationId"], user,
+				Zongsoft.Common.Convert.ConvertValue<string>(dictionary["Namespace"]),
+				Zongsoft.Common.Convert.ConvertValue<string>(dictionary["Scene"]),
 				Zongsoft.Common.Convert.ConvertValue<TimeSpan>(dictionary["Duration"], TimeSpan.Zero),
-				Zongsoft.Common.Convert.ConvertValue<DateTime>(dictionary["IssuedTime"]));
+				Zongsoft.Common.Convert.ConvertValue<DateTime>(dictionary["IssuedTime"]))
+				{
+					Timestamp = Zongsoft.Common.Convert.ConvertValue<DateTime>(dictionary["Timestamp"]),
+				};
 
 			foreach(var key in dictionary.Keys)
 			{
@@ -222,22 +266,41 @@ namespace Zongsoft.Security
 				return null;
 
 			Certification result;
-			TValue certificationId, @namespace, scene, userId, issuedTime, duration;
+			Membership.User user = null;
+			TValue certificationId, userId, userName, @namespace, scene, timestamp, issuedTime, duration;
 
-			if(dictionary.TryGetValue("CertificationId", out certificationId) &&
-			   dictionary.TryGetValue("UserId", out userId))
+			if(dictionary.TryGetValue("User.UserId", out userId) && dictionary.TryGetValue("User.Name", out userName))
+			{
+				user = new Membership.User(Zongsoft.Common.Convert.ConvertValue<int>(userId),
+				                           Zongsoft.Common.Convert.ConvertValue<string>(userName));
+
+				var properties = TypeDescriptor.GetProperties(typeof(Membership.User));
+
+				foreach(PropertyDescriptor property in properties)
+				{
+					if(property.IsReadOnly)
+						continue;
+
+					property.SetValue(user, Zongsoft.Common.Convert.ConvertValue(dictionary["User." + property.Name], property.PropertyType));
+				}
+			}
+
+			if(dictionary.TryGetValue("CertificationId", out certificationId) && user != null)
 			{
 				dictionary.TryGetValue("Namespace", out @namespace);
 				dictionary.TryGetValue("Scene", out scene);
 				dictionary.TryGetValue("IssuedTime", out issuedTime);
 				dictionary.TryGetValue("Duration", out duration);
+				dictionary.TryGetValue("Timestamp", out timestamp);
 
-				result = new Certification(Zongsoft.Common.Convert.ConvertValue<string>(certificationId),
+				result = new Certification(Zongsoft.Common.Convert.ConvertValue<string>(certificationId), user,
 											Zongsoft.Common.Convert.ConvertValue<string>(@namespace),
 											Zongsoft.Common.Convert.ConvertValue<string>(scene),
-											Zongsoft.Common.Convert.ConvertValue<int>(userId),
 											Zongsoft.Common.Convert.ConvertValue<TimeSpan>(duration),
-											Zongsoft.Common.Convert.ConvertValue<DateTime>(issuedTime));
+											Zongsoft.Common.Convert.ConvertValue<DateTime>(issuedTime))
+											{
+												Timestamp = Zongsoft.Common.Convert.ConvertValue<DateTime>(timestamp),
+											};
 			}
 			else
 				return null;
@@ -263,22 +326,22 @@ namespace Zongsoft.Security
 
 			var other = (Certification)obj;
 
-			return string.Equals(_certificationId, other._certificationId, StringComparison.OrdinalIgnoreCase) &&
-				   string.Equals(_namespace, other._namespace, StringComparison.OrdinalIgnoreCase) &&
-				   _userId == other._userId;
+			return string.Equals(_certificationId, other.CertificationId, StringComparison.OrdinalIgnoreCase) &&
+			       string.Equals(_namespace, other.Namespace, StringComparison.OrdinalIgnoreCase) &&
+			       string.Equals(_scene, other.Scene, StringComparison.OrdinalIgnoreCase);
 		}
 
 		public override int GetHashCode()
 		{
-			return (_certificationId + ":" + _userId.ToString()).ToLowerInvariant().GetHashCode();
+			return (_certificationId + ":" + _scene + "@" + _namespace).ToLowerInvariant().GetHashCode();
 		}
 
 		public override string ToString()
 		{
 			if(string.IsNullOrWhiteSpace(_namespace))
-				return string.Format("[{0}] {1}", _certificationId, _userId);
+				return string.Format("{0} ({1})", _certificationId, _scene);
 			else
-				return string.Format("[{0}] {1}@{2}", _certificationId, _userId, _namespace);
+				return string.Format("{0} ({1}@{2})", _certificationId, _scene, _namespace);
 		}
 		#endregion
 	}

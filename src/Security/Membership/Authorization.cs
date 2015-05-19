@@ -131,7 +131,7 @@ namespace Zongsoft.Security.Membership
 			if(!certification.ExtendedProperties.TryGetValue("AuthorizedStates", out states))
 			{
 				//从数据源获取最新的授权状态集
-				states = this.GetAuthorizedStates(certificationId, certification.UserId, MemberType.User);
+				states = this.GetAuthorizedStates(certificationId, certification.User.UserId, MemberType.User);
 
 				//将获取到的最新授权状态集更新到当前凭证对象的扩展包中
 				certification.ExtendedProperties["AuthorizedStates"] = states;

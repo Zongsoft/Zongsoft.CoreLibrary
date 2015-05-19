@@ -165,7 +165,7 @@ namespace Zongsoft.Security.Membership
 			byte[] storedPassword;
 			byte[] storedPasswordSalt;
 
-			var user = MembershipHelper.GetPassword(dataAccess, certification.UserId, out storedPassword, out storedPasswordSalt);
+			var user = MembershipHelper.GetPassword(dataAccess, certification.User.UserId, out storedPassword, out storedPasswordSalt);
 
 			if(user == null)
 				throw new InvalidOperationException("Invalid account.");
@@ -178,7 +178,7 @@ namespace Zongsoft.Security.Membership
 
 			dataAccess.Execute("Security.User.SetPassword", new Dictionary<string, object>
 			{
-				{"UserId", certification.UserId},
+				{"UserId", certification.User.UserId},
 				{"Password", PasswordUtility.HashPassword(newPassword, storedPasswordSalt)},
 				{"PasswordSalt", storedPasswordSalt},
 			});
@@ -193,7 +193,7 @@ namespace Zongsoft.Security.Membership
 
 			objectAccess.Execute("Security.User.GetPasswordAnswer", new Dictionary<string, object>
 			{
-				{"UserId", certification.UserId},
+				{"UserId", certification.User.UserId},
 			}, out outParameters);
 
 			object answerValue;
@@ -209,7 +209,7 @@ namespace Zongsoft.Security.Membership
 
 			objectAccess.Execute("Security.User.SetPassword", new Dictionary<string, object>
 			{
-				{"UserId", certification.UserId},
+				{"UserId", certification.User.UserId},
 				{"Password", PasswordUtility.HashPassword(password, passwordSalt)},
 				{"PasswordSalt", passwordSalt},
 			});
@@ -226,7 +226,7 @@ namespace Zongsoft.Security.Membership
 
 			objectAccess.Execute("Security.User.GetPasswordQuestion", new Dictionary<string, object>
 			{
-				{"UserId", certification.UserId},
+				{"UserId", certification.User.UserId},
 			}, out outParameters);
 
 			object questionValue;
@@ -245,7 +245,7 @@ namespace Zongsoft.Security.Membership
 			byte[] storedPassword;
 			byte[] storedPasswordSalt;
 
-			var user = MembershipHelper.GetPassword(objectAccess, certification.UserId, out storedPassword, out storedPasswordSalt);
+			var user = MembershipHelper.GetPassword(objectAccess, certification.User.UserId, out storedPassword, out storedPasswordSalt);
 
 			if(user == null)
 				throw new InvalidOperationException("Invalid account.");
@@ -256,7 +256,7 @@ namespace Zongsoft.Security.Membership
 			objectAccess.Execute("Security.User.SetPasswordQuestionAndAnswer", new Dictionary<string, object>
 			{
 				{"ApplicationId", certification.Namespace},
-				{"Name", certification.UserId},
+				{"UserId", certification.User.UserId},
 				{"PasswordQuestion", passwordQuestion},
 				{"PasswordAnswer", PasswordUtility.HashPassword(passwordAnswer)},
 			});

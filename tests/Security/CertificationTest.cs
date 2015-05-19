@@ -13,7 +13,7 @@ namespace Zongsoft.Security
 
 		public CertificationTest()
 		{
-			_certification = new Certification("10012001", "Namespace", "Web", 101, TimeSpan.FromHours(4), new DateTime(2015, 5, 15));
+			_certification = new Certification("10012001", new Membership.User(101, "Popeye"), "Namespace", "Web", TimeSpan.FromHours(4), new DateTime(2015, 5, 15));
 			_certification.ExtendedProperties.Add("User.Avatar", ":001:");
 			_certification.ExtendedProperties.Add("User.Nickname", "钟少");
 			_certification.ExtendedProperties.Add("User.Gender", Zongsoft.Tests.Gender.Male);
@@ -45,7 +45,7 @@ namespace Zongsoft.Security
 			Assert.AreEqual("10012001", certification.CertificationId);
 			Assert.AreEqual("Namespace", certification.Namespace);
 			Assert.AreEqual("Web", certification.Scene);
-			Assert.AreEqual(101, certification.UserId);
+			Assert.AreEqual(101, certification.User.UserId);
 			Assert.AreEqual(new DateTime(2015, 5, 15), certification.IssuedTime);
 			Assert.AreEqual(TimeSpan.FromHours(4), certification.Duration);
 

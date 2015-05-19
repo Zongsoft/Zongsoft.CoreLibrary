@@ -34,23 +34,23 @@ namespace Zongsoft.Security.Membership
 	public class PermissionProvider : IPermissionProvider
 	{
 		#region 成员字段
-		private IDataAccess _objectAccess;
+		private IDataAccess _dataAccess;
 		private ICertificationProvider _certificationProvider;
 		#endregion
 
 		#region 公共属性
-		public IDataAccess ObjectAccess
+		public IDataAccess DataAccess
 		{
 			get
 			{
-				return _objectAccess;
+				return _dataAccess;
 			}
 			set
 			{
 				if(value == null)
 					throw new ArgumentNullException();
 
-				_objectAccess = value;
+				_dataAccess = value;
 			}
 		}
 
@@ -139,10 +139,10 @@ namespace Zongsoft.Security.Membership
 		#region 私有方法
 		private IDataAccess GetObjectAccess()
 		{
-			if(_objectAccess == null)
+			if(_dataAccess == null)
 				throw new InvalidOperationException("The value of 'ObjectAccess' property is null.");
 
-			return _objectAccess;
+			return _dataAccess;
 		}
 		#endregion
 	}

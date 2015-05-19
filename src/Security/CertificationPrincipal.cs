@@ -35,6 +35,10 @@ namespace Zongsoft.Security
 	/// </summary>
 	public class CertificationPrincipal : MarshalByRefObject, IPrincipal
 	{
+		#region 公共字段
+		public static readonly CertificationPrincipal Empty = new CertificationPrincipal(CertificationIdentity.Empty);
+		#endregion
+
 		#region 成员字段
 		private CertificationIdentity _identity;
 		private string[] _roles;
@@ -47,11 +51,6 @@ namespace Zongsoft.Security
 				throw new ArgumentNullException("identity");
 
 			_identity = identity;
-			_roles = roles;
-		}
-
-		protected CertificationPrincipal(params string[] roles)
-		{
 			_roles = roles;
 		}
 		#endregion
