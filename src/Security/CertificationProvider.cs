@@ -88,7 +88,7 @@ namespace Zongsoft.Security
 		}
 
 		/// <summary>
-		/// 获取或设置凭证的默认续约周期。
+		/// 获取或设置凭证的默认续约周期，不能小于60秒。
 		/// </summary>
 		public TimeSpan RenewalPeriod
 		{
@@ -98,7 +98,7 @@ namespace Zongsoft.Security
 			}
 			set
 			{
-				_renewalPeriod = value;
+				_renewalPeriod = value.TotalMinutes < 1 ? TimeSpan.FromMinutes(1) : value;
 			}
 		}
 		#endregion
@@ -194,7 +194,7 @@ namespace Zongsoft.Security
 			_memoryCache.Remove(certificationId);
 
 			//将新建的凭证保存到本地内存缓存中
-			_memoryCache.SetValue(certification.CertificationId, certification);
+			_memoryCache.SetValue(certification.CertificationId, certification, TimeSpan.FromSeconds(certification.Duration.TotalSeconds / 2));
 
 			//返回续约后的新凭证对象
 			return certification;
@@ -376,7 +376,7 @@ namespace Zongsoft.Security
 			}
 
 			//将缓存对象保存到本地内存缓存中
-			_memoryCache.SetValue(certification.CertificationId, certification);
+			_memoryCache.SetValue(certification.CertificationId, certification, TimeSpan.FromSeconds(certification.Duration.TotalSeconds / 2));
 		}
 		#endregion
 
@@ -387,8 +387,9 @@ namespace Zongsoft.Security
 				return;
 
 			var certification = e.OldValue as Certification;
+			var now = DateTime.Now;
 
-			if(certification != null && (DateTime.Now > certification.IssuedTime && DateTime.Now < certification.Expires))
+			if(certification != null && (now > certification.IssuedTime && now < certification.Expires))
 				this.UpdateCertificationExpries(e.OldKey);
 		}
 		#endregion
