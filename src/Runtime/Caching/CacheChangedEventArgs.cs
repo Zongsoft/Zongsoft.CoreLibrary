@@ -25,24 +25,72 @@
  */
 
 using System;
+using System.ComponentModel;
 
 namespace Zongsoft.Runtime.Caching
 {
-	/// <summary>
-	/// 表示缓存容器的提供程序的接口。
-	/// </summary>
-	public interface ICacheProvider
+	[Serializable]
+	public class CacheChangedEventArgs : EventArgs
 	{
-		/// <summary>
-		/// 获取指定名称的缓存容器。
-		/// </summary>
-		/// <param name="name">指定要获取的缓存容器的名称，如果为空(null)或空字符串则返回默认缓存容器。</param>
-		/// <param name="createNotExists">指示如果指定名称的缓存容器不存在时是否要自动创建它。</param>
-		/// <returns>
-		///		<para>返回指定名称的缓存容。</para>
-		///		<para>如果指定名称的缓存容器不存在并且<paramref name="createNotExists"/>参数为假(False)则返回空(null)；</para>
-		///		<para>如果指定名称的缓存容器不存在并且<paramref name="createNotExists"/>参数为真(True)则创建一个指定名称的缓存容器并返回它。</para>
-		///	</returns>
-		ICache GetCache(string name, bool createNotExists = false);
+		#region 成员字段
+		private CacheChangedReason _reason;
+		private string _oldKey;
+		private string _newKey;
+		private object _oldValue;
+		private object _newValue;
+		#endregion
+
+		#region 构造函数
+		public CacheChangedEventArgs(CacheChangedReason reason, string oldKey, object oldValue, string newKey = null, object newValue = null)
+		{
+			_reason = reason;
+			_oldKey = oldKey;
+			_oldValue = oldValue;
+			_newKey = newKey;
+			_newValue = newValue;
+		}
+		#endregion
+
+		#region 公共属性
+		public CacheChangedReason Reason
+		{
+			get
+			{
+				return _reason;
+			}
+		}
+
+		public string OldKey
+		{
+			get
+			{
+				return _oldKey;
+			}
+		}
+
+		public object OldValue
+		{
+			get
+			{
+				return _oldValue;
+			}
+		}
+
+		public string NewKey
+		{
+			get
+			{
+				return _newKey;
+			}
+		}
+
+		public object NewValue
+		{
+			get
+			{
+				return _newValue;
+			}
+		}
+		#endregion
 	}
 }

@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2003-2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2013-2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -33,6 +33,11 @@ namespace Zongsoft.Runtime.Caching
 	/// </summary>
 	public interface ICache
 	{
+		/// <summary>
+		/// 表示缓存发生改变的事件。
+		/// </summary>
+		event EventHandler<CacheChangedEventArgs> Changed;
+
 		/// <summary>
 		/// 获取当前缓存容器的名字。
 		/// </summary>

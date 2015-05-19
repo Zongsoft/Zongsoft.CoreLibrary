@@ -70,6 +70,7 @@
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Data" />
+    <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -210,6 +211,8 @@
     <Compile Include="Runtime\Caching\BufferManagerBase.cs" />
     <Compile Include="Runtime\Caching\BufferManagerSelector.cs" />
     <Compile Include="Runtime\Caching\BufferUtility.cs" />
+    <Compile Include="Runtime\Caching\CacheChangedEventArgs.cs" />
+    <Compile Include="Runtime\Caching\CacheChangedReason.cs" />
     <Compile Include="Runtime\Caching\FileBufferManager.cs" />
     <Compile Include="Runtime\Caching\IBufferManager.cs" />
     <Compile Include="Runtime\Caching\IBufferManagerSelector.cs" />
@@ -235,6 +238,7 @@
     <Compile Include="Runtime\Caching\ICache.cs" />
     <Compile Include="Runtime\Caching\ICacheCreator.cs" />
     <Compile Include="Runtime\Caching\ICacheProvider.cs" />
+    <Compile Include="Runtime\Caching\MemoryCache.cs" />
     <Compile Include="Runtime\Serialization\ISerializable.cs" />
     <Compile Include="Runtime\Serialization\ISerializationWriter.cs" />
     <Compile Include="Runtime\Serialization\ISerializer.cs" />
