@@ -41,7 +41,13 @@ namespace Zongsoft.Services
 			if(matchable != null)
 				return matchable.IsMatch(parameter);
 
-			return false;
+			var attribute = (MatcherAttribute)Attribute.GetCustomAttribute(target.GetType(), typeof(MatcherAttribute), true);
+
+			if(attribute != null && attribute.Matcher != null)
+				return attribute.Matcher.Match(target, parameter);
+
+			//注意：默认返回必须是真
+			return true;
 		}
 	}
 }

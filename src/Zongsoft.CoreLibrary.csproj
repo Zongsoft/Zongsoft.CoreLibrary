@@ -322,7 +322,7 @@
     <Compile Include="Services\IServiceBuilder.cs" />
     <Compile Include="Services\IServiceLifetime.cs" />
     <Compile Include="Services\IServiceStorage.cs" />
-    <Compile Include="Services\MatchableAttribute.cs" />
+    <Compile Include="Services\MatcherAttribute.cs" />
     <Compile Include="Services\Matcher.cs" />
     <Compile Include="Services\PredicationCollection`1.cs" />
     <Compile Include="Services\ServiceProviderBase.cs" />

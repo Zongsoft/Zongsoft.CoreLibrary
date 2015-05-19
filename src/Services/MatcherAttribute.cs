@@ -30,33 +30,33 @@ using System.Collections.Generic;
 namespace Zongsoft.Services
 {
 	[AttributeUsage(AttributeTargets.Class)]
-	public class MatchableAttribute : Attribute
+	public class MatcherAttribute : Attribute
 	{
 		#region 成员字段
 		private Type _type;
 		#endregion
 
 		#region 构造函数
-		public MatchableAttribute(Type type)
+		public MatcherAttribute(Type type)
 		{
 			if(type == null)
 				throw new ArgumentNullException("type");
 
-			if(!typeof(IMatchable).IsAssignableFrom(type))
-				throw new ArgumentException("The type is not a IMatchable.");
+			if(!typeof(IMatcher).IsAssignableFrom(type))
+				throw new ArgumentException("The type is not a IMatcher.");
 
 			_type = type;
 		}
 
-		public MatchableAttribute(string typeName)
+		public MatcherAttribute(string typeName)
 		{
 			if(string.IsNullOrWhiteSpace(typeName))
 				throw new ArgumentNullException("typeName");
 
 			var type = Type.GetType(typeName, false);
 
-			if(type == null || !typeof(IMatchable).IsAssignableFrom(type))
-				throw new ArgumentException("The type is not a IMatchable.");
+			if(type == null || !typeof(IMatcher).IsAssignableFrom(type))
+				throw new ArgumentException("The type is not a IMatcher.");
 
 			_type = type;
 		}
@@ -68,6 +68,17 @@ namespace Zongsoft.Services
 			get
 			{
 				return _type;
+			}
+		}
+
+		public IMatcher Matcher
+		{
+			get
+			{
+				if(_type == null)
+					return null;
+
+				return Activator.CreateInstance<IMatcher>();
 			}
 		}
 		#endregion
