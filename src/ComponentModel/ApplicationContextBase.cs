@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2003-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2011-2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -51,7 +51,7 @@ namespace Zongsoft.ComponentModel
 		private string _applicationId;
 		private string _title;
 		private string _description;
-		private IPrincipal _user;
+		private IPrincipal _principal;
 		private ICollection<IModule> _modules;
 		private Options.ISettingProvider _settings;
 		private Options.Configuration.OptionConfiguration _configuration;
@@ -245,17 +245,17 @@ namespace Zongsoft.ComponentModel
 		/// <summary>
 		/// 获取或设置当前应用程序的安全主体。
 		/// </summary>
-		public virtual IPrincipal User
+		public virtual IPrincipal Principal
 		{
 			get
 			{
-				return _user;
+				return _principal;
 			}
 			set
 			{
-				if(_user != value)
+				if(_principal != value)
 				{
-					_user = value;
+					_principal = value;
 
 					//激发“PropertyChanged”事件
 					this.OnPropertyChanged("Principal");
@@ -291,6 +291,13 @@ namespace Zongsoft.ComponentModel
 			}
 
 			return fullPath;
+		}
+		#endregion
+
+		#region 重写方法
+		public override string ToString()
+		{
+			return string.Format("[{0}] {1}", this.ApplicationId, this.Title);
 		}
 		#endregion
 
