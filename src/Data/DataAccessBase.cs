@@ -258,8 +258,9 @@ namespace Zongsoft.Data
 				return IsScalarType(type.GetGenericArguments()[0]);
 
 			return type.IsPrimitive || type.IsEnum ||
-				   type == typeof(string) || type == typeof(DateTime) ||
-				   type == typeof(Guid) || type == typeof(TimeSpan);
+				   type == typeof(string) || type== typeof(decimal) ||
+				   type == typeof(DateTime) || type == typeof(TimeSpan) ||
+				   type == typeof(Guid);
 		}
 		#endregion
 
