@@ -184,7 +184,10 @@ namespace Zongsoft.Data
 		#region 更新方法
 		public int Update<T>(string name, T entity, ICondition condition = null)
 		{
-			return this.Update(name, entity, condition, this.ResolveScope(name, null, typeof(T)));
+			if(entity == null)
+				throw new ArgumentNullException("entity");
+
+			return this.Update(name, entity, condition, this.ResolveScope(name, null, entity.GetType()));
 		}
 
 		/// <summary>
@@ -197,7 +200,10 @@ namespace Zongsoft.Data
 		/// <returns>返回受影响的记录行数，执行成功返回大于零的整数，失败则返回负数。</returns>
 		public int Update<T>(string name, T entity, ICondition condition, string scope = null)
 		{
-			return this.Update(name, entity, condition, this.ResolveScope(name, scope, typeof(T)));
+			if(entity == null)
+				throw new ArgumentNullException("entity");
+
+			return this.Update(name, entity, condition, this.ResolveScope(name, scope, entity.GetType()));
 		}
 
 		public int Update<T>(string name, T entity, ICondition condition, Expression<Func<T, object>> includes = null, Expression<Func<T, object>> excludes = null)
