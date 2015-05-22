@@ -78,7 +78,7 @@ namespace Zongsoft.Data
 				throw new NotImplementedException();
 			}
 
-			protected override int Insert<T>(string name, T entity, string[] members)
+			protected override int Insert(string name, object entity, string[] members)
 			{
 				throw new NotImplementedException();
 			}
@@ -88,7 +88,7 @@ namespace Zongsoft.Data
 				throw new NotImplementedException();
 			}
 
-			protected override int Update<T>(string name, T entity, ICondition condition, string[] members)
+			protected override int Update(string name, object entity, ICondition condition, string[] members)
 			{
 				throw new NotImplementedException();
 			}

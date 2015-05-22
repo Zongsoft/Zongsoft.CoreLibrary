@@ -166,9 +166,9 @@ namespace Zongsoft.Data
 			return this.Insert(name, entity, this.ResolveScopeExpression(name, includes, excludes));
 		}
 
-		protected virtual int Insert<T>(string name, T entity, string[] members)
+		protected virtual int Insert(string name, object entity, string[] members)
 		{
-			return this.Insert<T>(name, new T[] { entity }, members);
+			return this.Insert(name, new object[] { entity }, members);
 		}
 
 		public int Insert<T>(string name, IEnumerable<T> entities, string scope = null)
@@ -214,9 +214,9 @@ namespace Zongsoft.Data
 			return this.Update(name, entity, condition, this.ResolveScopeExpression(name, includes, excludes));
 		}
 
-		protected virtual int Update<T>(string name, T entity, ICondition condition, string[] members)
+		protected virtual int Update(string name, object entity, ICondition condition, string[] members)
 		{
-			return this.Update<T>(name, new T[] { entity }, condition, members);
+			return this.Update(name, new object[] { entity }, condition, members);
 		}
 
 		public int Update<T>(string name, IEnumerable<T> entities, ICondition condition = null)
