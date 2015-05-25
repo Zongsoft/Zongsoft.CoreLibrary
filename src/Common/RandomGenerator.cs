@@ -55,7 +55,7 @@ namespace Zongsoft.Common
 			return BitConverter.ToInt64(bytes, 0);
 		}
 
-		public static long GenerateInt32()
+		public static int GenerateInt32()
 		{
 			var bytes = new byte[4];
 			_random.GetBytes(bytes);
