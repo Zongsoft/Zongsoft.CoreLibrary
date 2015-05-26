@@ -26,6 +26,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Text;
 
@@ -35,7 +36,7 @@ namespace Zongsoft.Services
 	{
 		#region 成员字段
 		private string _defaultName;
-		private IDictionary<string, IServiceProvider> _providers;
+		private ConcurrentDictionary<string, IServiceProvider> _providers;
 		#endregion
 
 		#region 构造函数
@@ -46,7 +47,7 @@ namespace Zongsoft.Services
 		public ServiceProviderFactory(string defaultName)
 		{
 			_defaultName = string.IsNullOrWhiteSpace(defaultName) ? string.Empty : defaultName.Trim();
-			_providers = new Dictionary<string, IServiceProvider>(StringComparer.OrdinalIgnoreCase);
+			_providers = new ConcurrentDictionary<string, IServiceProvider>(StringComparer.OrdinalIgnoreCase);
 		}
 		#endregion
 
@@ -98,16 +99,14 @@ namespace Zongsoft.Services
 
 			name = string.IsNullOrWhiteSpace(name) ? string.Empty : name.Trim();
 
-			if(_providers.ContainsKey(name))
+			//将服务提供程序描述项加入列表中
+			if(!_providers.TryAdd(name, provider))
 			{
 				if(throwExceptionOnConflict)
 					throw new ArgumentException();
 				else
 					return false;
 			}
-
-			//将服务提供程序描述项加入列表中
-			_providers.Add(name, provider);
 
 			//返回成功
 			return true;
@@ -119,7 +118,8 @@ namespace Zongsoft.Services
 		/// <param name="name">要注销服务供应程序的名称。</param>
 		public void Unregister(string name)
 		{
-			_providers.Remove(string.IsNullOrWhiteSpace(name) ? string.Empty : name.Trim());
+			IServiceProvider temp;
+			_providers.TryRemove(string.IsNullOrWhiteSpace(name) ? string.Empty : name.Trim(), out temp);
 		}
 
 		/// <summary>

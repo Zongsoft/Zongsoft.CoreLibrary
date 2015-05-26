@@ -321,13 +321,13 @@
     <Compile Include="Services\IMatchable`1.cs" />
     <Compile Include="Services\IMatcher.cs" />
     <Compile Include="Services\IMatcher`1.cs" />
-    <Compile Include="Services\IPredicationProvider.cs" />
     <Compile Include="Services\IPredication`1.cs" />
     <Compile Include="Services\IServiceBuilder.cs" />
     <Compile Include="Services\IServiceLifetime.cs" />
     <Compile Include="Services\IServiceStorage.cs" />
     <Compile Include="Services\MatcherAttribute.cs" />
     <Compile Include="Services\Matcher.cs" />
+    <Compile Include="Services\PredicationBase.cs" />
     <Compile Include="Services\PredicationCollection`1.cs" />
     <Compile Include="Services\ServiceProviderBase.cs" />
     <Compile Include="Services\ServiceEntry.cs" />
