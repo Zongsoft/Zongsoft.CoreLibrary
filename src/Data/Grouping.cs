@@ -25,49 +25,38 @@
  */
 
 using System;
+using System.ComponentModel;
 using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
-	public class Sorting
+	public class Grouping
 	{
 		#region 成员字段
-		private SortingMode _mode;
 		private string[] _members;
+		private ICondition _condition;
 		#endregion
 
 		#region 构造函数
-		public Sorting()
+		public Grouping()
 		{
 		}
 
-		public Sorting(params string[] members) : this(SortingMode.Ascending, members)
+		public Grouping(params string[] members) : this(null, members)
 		{
 		}
 
-		public Sorting(SortingMode mode, params string[] members)
+		public Grouping(ICondition condition, params string[] members)
 		{
 			if(members == null || members.Length == 0)
 				throw new ArgumentNullException("members");
 
-			this.Mode = mode;
+			this.Condition = condition;
 			this.Members = members;
 		}
 		#endregion
 
 		#region 公共属性
-		public SortingMode Mode
-		{
-			get
-			{
-				return _mode;
-			}
-			set
-			{
-				_mode = value;
-			}
-		}
-
 		public string MembersText
 		{
 			get
@@ -114,88 +103,25 @@ namespace Zongsoft.Data
 				_members = members;
 			}
 		}
-		#endregion
 
-		#region 静态方法
-		public static Sorting Ascending(params string[] members)
+		public ICondition Condition
 		{
-			if(members == null || members.Length < 1)
-				throw new ArgumentNullException("members");
-
-			return new Sorting(SortingMode.Ascending, members);
-		}
-
-		public static Sorting Descending(params string[] members)
-		{
-			if(members == null || members.Length < 1)
-				throw new ArgumentNullException("members");
-
-			return new Sorting(SortingMode.Descending, members);
+			get
+			{
+				return _condition;
+			}
+			set
+			{
+				_condition = value;
+			}
 		}
 		#endregion
 
 		#region 重写方法
 		public override string ToString()
 		{
-			return string.Format("{0} ({1})", _mode, this.MembersText);
+			return string.Format("{0} ({1})", this.MembersText, this.Condition);
 		}
 		#endregion
-
-		#region 操作符重载
-		public static Sorting[] operator +(Sorting[] values, Sorting value)
-		{
-			if((values == null || values.Length == 0) && value == null)
-				return new Sorting[0];
-
-			if(values == null || values.Length == 0)
-				return new Sorting[] { value };
-
-			if(value == null)
-				return values;
-
-			var result = new Sorting[values.Length + 1];
-			Array.Copy(values, 0, result, 0, values.Length);
-			result[result.Length - 1] = value;
-
-			return result;
-		}
-
-		public static Sorting[] operator +(Sorting a, Sorting b)
-		{
-			if(a == null && b == null)
-				return new Sorting[0];
-
-			if(a == null)
-				return new Sorting[] { b };
-
-			if(b == null)
-				return new Sorting[] { a };
-
-			if(a.Mode == b.Mode)
-			{
-				var hashset = new HashSet<string>(a.Members, StringComparer.OrdinalIgnoreCase);
-
-				foreach(var field in b.Members)
-				{
-					hashset.Add(field);
-				}
-
-				string[] fields = new string[hashset.Count];
-				hashset.CopyTo(fields);
-
-				return new Sorting[] { new Sorting(a.Mode, fields) };
-			}
-
-			return new Sorting[] { a, b };
-		}
-		#endregion
-	}
-
-	public enum SortingMode
-	{
-		/// <summary>正序</summary>
-		Ascending,
-		/// <summary>倒序</summary>
-		Descending,
 	}
 }

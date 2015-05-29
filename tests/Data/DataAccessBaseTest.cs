@@ -68,7 +68,7 @@ namespace Zongsoft.Data
 				throw new NotImplementedException();
 			}
 
-			protected override IEnumerable<T> Select<T>(string name, ICondition condition, string[] members, Paging paging, params Sorting[] sorting)
+			protected override IEnumerable<T> Select<T>(string name, ICondition condition, string[] members, Paging paging, Grouping grouping, params Sorting[] sorting)
 			{
 				throw new NotImplementedException();
 			}

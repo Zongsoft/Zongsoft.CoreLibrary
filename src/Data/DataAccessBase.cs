@@ -89,42 +89,46 @@ namespace Zongsoft.Data
 		#region 查询方法
 		public IEnumerable<T> Select<T>(string name, ICondition condition = null)
 		{
-			return this.Select<T>(name, condition, this.ResolveScope(name, null, typeof(T)), null, null);
+			return this.Select<T>(name, condition, this.ResolveScope(name, null, typeof(T)), null, null, null);
 		}
 
 		public IEnumerable Select(string name,
-						   ICondition condition = null,
-						   string scope = null,
-						   Paging paging = null,
-						   params Sorting[] sorting)
+		                          ICondition condition = null,
+		                          string scope = null,
+		                          Paging paging = null,
+		                          Grouping grouping = null,
+		                          params Sorting[] sorting)
 		{
-			return this.Select<object>(name, condition, this.ResolveScope(name, scope, null), paging, sorting);
+			return this.Select<object>(name, condition, this.ResolveScope(name, scope, null), paging, grouping, sorting);
 		}
 
 		public IEnumerable<T> Select<T>(string name,
-								 ICondition condition = null,
-								 string scope = null,
-								 Paging paging = null,
-								 params Sorting[] sorting)
+		                                ICondition condition = null,
+		                                string scope = null,
+		                                Paging paging = null,
+		                                Grouping grouping = null,
+		                                params Sorting[] sorting)
 		{
-			return this.Select<T>(name, condition, this.ResolveScope(name, scope, typeof(T)), paging, sorting);
+			return this.Select<T>(name, condition, this.ResolveScope(name, scope, typeof(T)), paging, grouping, sorting);
 		}
 
 		public IEnumerable<T> Select<T>(string name,
-								 ICondition condition = null,
-								 Expression<Func<T, object>> includes = null,
-								 Expression<Func<T, object>> excludes = null,
-								 Paging paging = null,
-								 params Sorting[] sorting)
+		                                ICondition condition = null,
+		                                Expression<Func<T, object>> includes = null,
+		                                Expression<Func<T, object>> excludes = null,
+		                                Paging paging = null,
+		                                Grouping grouping = null,
+		                                params Sorting[] sorting)
 		{
-			return this.Select<T>(name, condition, this.ResolveScopeExpression(name, includes, excludes), paging, sorting);
+			return this.Select<T>(name, condition, this.ResolveScopeExpression(name, includes, excludes), paging, grouping, sorting);
 		}
 
 		protected abstract IEnumerable<T> Select<T>(string name,
-								 ICondition condition,
-								 string[] members,
-								 Paging paging,
-								 Sorting[] sorting);
+		                                            ICondition condition,
+		                                            string[] members,
+		                                            Paging paging,
+		                                            Grouping grouping,
+		                                            Sorting[] sorting);
 		#endregion
 
 		#region 删除方法

@@ -75,6 +75,7 @@ namespace Zongsoft.Data
 		///		       },
 		///		       "Creator.HomeAddress, Corssing, -Owner.PhoneNumber",
 		///		       new Paging(1, 20),
+		///		       null,
 		///		       Sorting.Ascending("Timestamp"));
 		///		</code>
 		///		</example>
@@ -83,20 +84,23 @@ namespace Zongsoft.Data
 		                   ICondition condition,
 		                   string scope = null,
 		                   Paging paging = null,
+		                   Grouping grouping = null,
 		                   params Sorting[] sorting);
 
 		IEnumerable<T> Select<T>(string name,
 		                         ICondition condition,
 		                         string scope = null,
 		                         Paging paging = null,
+		                         Grouping grouping = null,
 		                         params Sorting[] sorting);
 
 		IEnumerable<T> Select<T>(string name,
-								 ICondition condition,
-								 Expression<Func<T, object>> includes = null,
-								 Expression<Func<T, object>> excludes = null,
-								 Paging paging = null,
-								 params Sorting[] sorting);
+		                         ICondition condition,
+		                         Expression<Func<T, object>> includes = null,
+		                         Expression<Func<T, object>> excludes = null,
+		                         Paging paging = null,
+		                         Grouping grouping = null,
+		                         params Sorting[] sorting);
 		#endregion
 
 		#region 删除方法
