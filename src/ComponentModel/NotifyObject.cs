@@ -65,7 +65,43 @@ namespace Zongsoft.ComponentModel
 		#endregion
 
 		#region 保护方法
+		[Obsolete("Please use the GetPropertyValue<T>(...) method.")]
 		protected T GetValue<T>(string propertyName, T defaultValue = default(T))
+		{
+			return this.GetPropertyValue<T>(propertyName, defaultValue);
+		}
+
+		[Obsolete("Please use the GetPropertyValue<T>(...) method.")]
+		protected T GetValue<T>(Expression<Func<T>> propertyExpression, T defaultValue = default(T))
+		{
+			return this.GetPropertyValue<T>(propertyExpression, defaultValue);
+		}
+
+		[Obsolete("Please use the SetPropertyValue<T>(...) method.")]
+		protected void SetValue(object value, string propertyName)
+		{
+			this.SetPropertyValue(propertyName, value);
+		}
+
+		[Obsolete("Please use the SetPropertyValue<T>(...) method.")]
+		protected void SetValue<T>(T value, Expression<Func<T>> propertyExpression)
+		{
+			this.SetPropertyValue<T>(propertyExpression, value);
+		}
+
+		[Obsolete("Please use the SetPropertyValue<T>(...) method.")]
+		protected void SetValue<T>(ref T target, T value, string propertyName)
+		{
+			this.SetPropertyValue<T>(propertyName, ref target, value);
+		}
+
+		[Obsolete("Please use the SetPropertyValue<T>(...) method.")]
+		protected void SetValue<T>(ref T target, T value, Expression<Func<T>> propertyExpression)
+		{
+			this.SetPropertyValue<T>(propertyExpression, ref target, value);
+		}
+
+		protected T GetPropertyValue<T>(string propertyName, T defaultValue = default(T))
 		{
 			if(string.IsNullOrWhiteSpace(propertyName))
 				throw new ArgumentNullException("propertyName");
@@ -85,7 +121,7 @@ namespace Zongsoft.ComponentModel
 			return this.GetPropertyDefaultValue(property, defaultValue);
 		}
 
-		protected T GetValue<T>(Expression<Func<T>> propertyExpression, T defaultValue = default(T))
+		protected T GetPropertyValue<T>(Expression<Func<T>> propertyExpression, T defaultValue = default(T))
 		{
 			if(propertyExpression == null)
 				throw new ArgumentNullException("propertyExpression");
@@ -105,7 +141,7 @@ namespace Zongsoft.ComponentModel
 			return this.GetPropertyDefaultValue(property, defaultValue);
 		}
 
-		protected void SetValue(object value, string propertyName)
+		protected void SetPropertyValue(string propertyName, object value)
 		{
 			if(string.IsNullOrWhiteSpace(propertyName))
 				throw new ArgumentNullException("propertyName");
@@ -117,7 +153,7 @@ namespace Zongsoft.ComponentModel
 			this.OnPropertyChanged(propertyName);
 		}
 
-		protected void SetValue<T>(T value, Expression<Func<T>> propertyExpression)
+		protected void SetPropertyValue<T>(Expression<Func<T>> propertyExpression, T value)
 		{
 			if(propertyExpression == null)
 				throw new ArgumentNullException("propertyExpression");
@@ -134,7 +170,7 @@ namespace Zongsoft.ComponentModel
 			this.OnPropertyChanged(property.Name);
 		}
 
-		protected void SetValue<T>(ref T target, T value, string propertyName)
+		protected void SetPropertyValue<T>(string propertyName, ref T target, T value)
 		{
 			if(object.ReferenceEquals(target, value))
 				return;
@@ -143,7 +179,7 @@ namespace Zongsoft.ComponentModel
 			this.OnPropertyChanged(propertyName);
 		}
 
-		protected void SetValue<T>(ref T target, T value, Expression<Func<T>> propertyExpression)
+		protected void SetPropertyValue<T>(Expression<Func<T>> propertyExpression, ref T target, T value)
 		{
 			if(object.ReferenceEquals(target, value))
 				return;
