@@ -62,6 +62,19 @@ namespace Zongsoft.Security
 		#endregion
 
 		#region 公共属性
+		public string Name
+		{
+			get
+			{
+				var certification = this.Certification;
+
+				if(certification == null || certification.User == null)
+					return string.Empty;
+
+				return certification.User.Name;
+			}
+		}
+
 		public bool IsAuthenticated
 		{
 			get
@@ -122,19 +135,6 @@ namespace Zongsoft.Security
 			get
 			{
 				return "Zongsoft Certification Authentication System";
-			}
-		}
-
-		string IIdentity.Name
-		{
-			get
-			{
-				var certification = this.Certification;
-
-				if(certification == null || certification.User == null)
-					return string.Empty;
-
-				return certification.User.Name;
 			}
 		}
 		#endregion
