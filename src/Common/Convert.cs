@@ -442,6 +442,10 @@ namespace Zongsoft.Common
 					if(!context.Handled)
 						DefaultResolve(context);
 				}
+
+				//如果解析被终止则退出后续解析
+				if(context.IsTerminated)
+					break;
 			}
 
 			return context.Value;
@@ -593,6 +597,7 @@ namespace Zongsoft.Common
 			private object _value;
 			private string _name;
 			private bool _handled;
+			private bool _isTerminated;
 			#endregion
 
 			#region 构造函数
@@ -731,6 +736,21 @@ namespace Zongsoft.Common
 				set
 				{
 					_handled = value;
+				}
+			}
+
+			/// <summary>
+			/// 获取或设置是否终止标记。
+			/// </summary>
+			public bool IsTerminated
+			{
+				get
+				{
+					return _isTerminated;
+				}
+				set
+				{
+					_isTerminated = value;
 				}
 			}
 			#endregion
