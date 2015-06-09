@@ -160,6 +160,14 @@ namespace Zongsoft.Services
 			}
 		}
 
+		public bool HasService
+		{
+			get
+			{
+				return _service != null;
+			}
+		}
+
 		public Type[] ContractTypes
 		{
 			get
