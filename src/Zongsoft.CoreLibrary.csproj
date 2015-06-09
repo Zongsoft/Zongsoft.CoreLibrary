@@ -78,6 +78,7 @@
     <Compile Include="Collections\Collection.cs" />
     <Compile Include="Collections\CollectionRemovedEventArgs.cs" />
     <Compile Include="Collections\CollectionRemovedReason.cs" />
+    <Compile Include="Collections\DictionaryExtension.cs" />
     <Compile Include="Collections\EnqueuedEventArgs.cs" />
     <Compile Include="Collections\HashSetExtension.cs" />
     <Compile Include="Collections\HierarchicalNode.cs" />
@@ -186,11 +187,17 @@
     <Compile Include="IO\FileProvider.cs" />
     <Compile Include="IO\IDirectoryService.cs" />
     <Compile Include="IO\IFileService.cs" />
+    <Compile Include="IO\IStorageBucketService.cs" />
+    <Compile Include="IO\IStorageFileService.cs" />
     <Compile Include="IO\LocalDirectoryService.cs" />
     <Compile Include="IO\LocalFileService.cs" />
     <Compile Include="IO\Path.cs" />
     <Compile Include="IO\PathException.cs" />
     <Compile Include="IO\LocalPath.cs" />
+    <Compile Include="IO\StorageBucket.cs" />
+    <Compile Include="IO\StorageBucketService.cs" />
+    <Compile Include="IO\StorageFile.cs" />
+    <Compile Include="IO\StorageFileService.cs" />
     <Compile Include="Options\Configuration\OptionConfigurationLoader.cs" />
     <Compile Include="Options\Configuration\OptionConfigurationManager.cs" />
     <Compile Include="Options\IOptionLoader.cs" />
