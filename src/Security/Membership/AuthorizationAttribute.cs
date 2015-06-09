@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2003-2008 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2003-2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,11 +25,11 @@
  */
 
 using System;
-using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Zongsoft.Security.Membership
 {
-	[AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
+	[AttributeUsage((AttributeTargets.Class | AttributeTargets.Method), AllowMultiple = false, Inherited = true)]
 	public class AuthorizationAttribute : Attribute
 	{
 		#region 成员变量
@@ -44,11 +44,11 @@ namespace Zongsoft.Security.Membership
 			_schemaId = string.Empty;
 		}
 
-		public AuthorizationAttribute(string actionId) : this(actionId, string.Empty)
+		public AuthorizationAttribute(string schemaId) : this(schemaId, string.Empty)
 		{
 		}
 
-		public AuthorizationAttribute(string actionId, string schemaId)
+		public AuthorizationAttribute(string schemaId, string actionId)
 		{
 			_actionId = actionId ?? string.Empty;
 			_schemaId = schemaId ?? string.Empty;
@@ -56,19 +56,33 @@ namespace Zongsoft.Security.Membership
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取或设置操作编号。
+		/// </summary>
 		public string ActionId
 		{
 			get
 			{
 				return _actionId;
 			}
+			set
+			{
+				_actionId = value;
+			}
 		}
 
+		/// <summary>
+		/// 获取或设置模式编号。
+		/// </summary>
 		public string SchemaId
 		{
 			get
 			{
 				return _schemaId;
+			}
+			set
+			{
+				_schemaId = value;
 			}
 		}
 		#endregion
