@@ -180,17 +180,20 @@ namespace Zongsoft.Services
 		#region 匹配方法
 		protected virtual bool OnMatch(ServiceEntry entry, object parameter)
 		{
-			var matcher = _matcher;
+			if(entry == null)
+				return false;
 
-			if(matcher != null)
-				return matcher.Match(entry.Service, parameter);
+			var matchable = typeof(IMatchable).IsAssignableFrom(entry.ServiceType);
 
-			var matchable = entry.Service as IMatchable;
+			if(typeof(IMatchable).IsAssignableFrom(entry.ServiceType))
+				return ((IMatchable)entry.Service).IsMatch(parameter);
 
-			if(matchable != null)
-				return matchable.IsMatch(parameter);
+			var attribute = (MatcherAttribute)Attribute.GetCustomAttribute(entry.ServiceType, typeof(MatcherAttribute), true);
 
-			return false;
+			if(attribute != null && attribute.Matcher != null)
+				return attribute.Matcher.Match(entry.Service, parameter);
+
+			return true;
 		}
 		#endregion
 	}
