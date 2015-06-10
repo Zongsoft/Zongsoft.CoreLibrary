@@ -222,6 +222,11 @@ namespace Zongsoft.Services
 			if(builder != null)
 				return builder.Build(this);
 
+			var type = _serviceType;
+
+			if(type != null)
+				return Activator.CreateInstance(type);
+
 			return null;
 		}
 		#endregion
