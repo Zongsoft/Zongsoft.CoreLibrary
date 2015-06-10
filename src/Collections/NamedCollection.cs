@@ -32,7 +32,7 @@ using System.Linq;
 
 namespace Zongsoft.Collections
 {
-	public class NamedCollection<T> : ICollection<T>
+	public class NamedCollection<T> : ICollection<T>, IDictionary<string, T>
 	{
 		#region 私有变量
 		private Func<T, string> _getKeyForItem;
@@ -150,7 +150,7 @@ namespace Zongsoft.Collections
 			}
 		}
 
-		bool ICollection<T>.IsReadOnly
+		public bool IsReadOnly
 		{
 			get
 			{
@@ -401,6 +401,113 @@ namespace Zongsoft.Collections
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 		{
 			return this.GetEnumerator();
+		}
+		#endregion
+
+		#region 显式实现
+		void IDictionary<string, T>.Add(string key, T value)
+		{
+			throw new NotSupportedException();
+		}
+
+		bool IDictionary<string, T>.ContainsKey(string key)
+		{
+			return this.Contains(key);
+		}
+
+		ICollection<string> IDictionary<string, T>.Keys
+		{
+			get
+			{
+				if(_innerDictionary != null)
+					return _innerDictionary.Keys;
+
+				var keys = new string[_items.Count];
+				int index = 0;
+
+				foreach(T item in _items)
+					keys[index++] = this.GetKeyForItem(item);
+
+				return keys;
+			}
+		}
+
+		bool IDictionary<string, T>.TryGetValue(string key, out T value)
+		{
+			var result = this.Contains(key);
+
+			if(result)
+				value = this[key];
+			else
+				value = default(T);
+
+			return result;
+		}
+
+		ICollection<T> IDictionary<string, T>.Values
+		{
+			get
+			{
+				if(_innerDictionary != null)
+					return _innerDictionary.Values;
+
+				var values = new T[_items.Count];
+				int index = 0;
+
+				foreach(T item in _items)
+					values[index++] = item;
+
+				return values;
+			}
+		}
+
+		T IDictionary<string, T>.this[string key]
+		{
+			get
+			{
+				return this[key];
+			}
+			set
+			{
+				throw new NotSupportedException();
+			}
+		}
+
+		void ICollection<KeyValuePair<string, T>>.Add(KeyValuePair<string, T> item)
+		{
+			this.Add(item.Value);
+		}
+
+		bool ICollection<KeyValuePair<string, T>>.Contains(KeyValuePair<string, T> item)
+		{
+			return this.Contains(item.Key);
+		}
+
+		bool ICollection<KeyValuePair<string, T>>.Remove(KeyValuePair<string, T> item)
+		{
+			return this.Remove(item.Key);
+		}
+
+		void ICollection<KeyValuePair<string, T>>.CopyTo(KeyValuePair<string, T>[] array, int arrayIndex)
+		{
+			throw new NotImplementedException();
+		}
+
+		IEnumerator<KeyValuePair<string, T>> IEnumerable<KeyValuePair<string, T>>.GetEnumerator()
+		{
+			if(_innerDictionary == null)
+			{
+				foreach(var item in _items)
+				{
+					if(this.OnItemMatch(item))
+						yield return new KeyValuePair<string, T>(this.GetKeyForItem((T)item), (T)item);
+				}
+			}
+			else
+			{
+				foreach(var item in _innerDictionary)
+					yield return item;
+			}
 		}
 		#endregion
 	}
