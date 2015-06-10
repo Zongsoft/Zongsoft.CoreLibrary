@@ -112,6 +112,23 @@ namespace Zongsoft.Common
 			return type.IsAssignableFrom(instanceType);
 		}
 
+		public static bool IsScalarType(this Type type)
+		{
+			if(type == null)
+				throw new ArgumentNullException("type");
+
+			if(type.IsArray)
+				return IsScalarType(type.GetElementType());
+
+			if(type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+				return IsScalarType(type.GetGenericArguments()[0]);
+
+			return type.IsPrimitive || type.IsEnum ||
+			       type == typeof(string) || type == typeof(decimal) ||
+			       type == typeof(DateTime) || type == typeof(TimeSpan) ||
+			       type == typeof(Guid);
+		}
+
 		public static Type GetType(string typeName, bool throwOnError = false, bool ignoreCase = true)
 		{
 			if(string.IsNullOrWhiteSpace(typeName))
