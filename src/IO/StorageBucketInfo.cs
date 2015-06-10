@@ -48,6 +48,11 @@ namespace Zongsoft.IO
 		#endregion
 
 		#region 构造函数
+		public StorageBucketInfo()
+		{
+			_createdTime = DateTime.Now;
+		}
+
 		public StorageBucketInfo(int bucketId)
 		{
 			_createdTime = DateTime.Now;
