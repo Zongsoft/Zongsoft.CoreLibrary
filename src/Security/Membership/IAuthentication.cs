@@ -34,6 +34,11 @@ namespace Zongsoft.Security.Membership
 	public interface IAuthentication
 	{
 		/// <summary>
+		/// 表示验证完成的事件。
+		/// </summary>
+		event EventHandler<AuthenticatedEventArgs> Authenticated;
+
+		/// <summary>
 		/// 验证指定名称的用户是否有效并且和指定的密码是否完全匹配。
 		/// </summary>
 		/// <param name="identity">要验证的用户名或Email或手机号码。</param>

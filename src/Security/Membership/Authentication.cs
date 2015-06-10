@@ -34,6 +34,10 @@ namespace Zongsoft.Security.Membership
 {
 	public class Authentication : IAuthentication
 	{
+		#region 事件声明
+		public event EventHandler<AuthenticatedEventArgs> Authenticated;
+		#endregion
+
 		#region 成员字段
 		private string _namespace;
 		private IDataAccess _dataAccess;
@@ -97,21 +101,35 @@ namespace Zongsoft.Security.Membership
 			byte[] storedPassword;
 			byte[] storedPasswordSalt;
 
-			//获取当前用户的密码及密码盐
+			//获取当前用户的密码及密码向量
 			var user = this.GetPassword(identity, out storedPassword, out storedPasswordSalt);
 
-			if(user != null)
+			if(user == null)
 			{
-				//如果验证成功，则返回验证结果
-				if(PasswordUtility.VerifyPassword(password, storedPassword, storedPasswordSalt, "SHA1"))
-					return new AuthenticationResult(user);
+				//激发“Authenticated”事件
+				this.OnAuthenticated(new AuthenticatedEventArgs(identity, _namespace, scene, false));
 
-				//密码校验失败则抛出验证异常
-				throw new AuthenticationException(AuthenticationException.InvalidPassword);
+				//指定的用户名如果不存在则抛出验证异常
+				throw new AuthenticationException(AuthenticationException.InvalidIdentity);
 			}
 
-			//指定的用户名如果不存在则抛出验证异常
-			throw new AuthenticationException(AuthenticationException.InvalidIdentity);
+			//如果验证成功，则返回验证结果
+			if(PasswordUtility.VerifyPassword(password, storedPassword, storedPasswordSalt, "SHA1"))
+			{
+				var eventArgs = new AuthenticatedEventArgs(identity, _namespace, scene, true, user);
+
+				//激发“Authenticated”事件
+				this.OnAuthenticated(eventArgs);
+
+				//返回成功的验证结果
+				return new AuthenticationResult(eventArgs.User ?? user);
+			}
+
+			//激发“Authenticated”事件
+			this.OnAuthenticated(new AuthenticatedEventArgs(identity, _namespace, scene, false, user));
+
+			//密码校验失败则抛出验证异常
+			throw new AuthenticationException(AuthenticationException.InvalidPassword);
 		}
 		#endregion
 
@@ -132,6 +150,16 @@ namespace Zongsoft.Security.Membership
 				default:
 					return MembershipHelper.GetPasswordByUserName(_dataAccess, _namespace, identity, out password, out passwordSalt);
 			}
+		}
+		#endregion
+
+		#region 激发事件
+		protected virtual void OnAuthenticated(AuthenticatedEventArgs args)
+		{
+			var handler = this.Authenticated;
+
+			if(handler != null)
+				handler(this, args);
 		}
 		#endregion
 	}
