@@ -49,6 +49,14 @@ namespace Zongsoft.IO
 		Stream Open(Guid fileId);
 
 		/// <summary>
+		/// 打开指定编号的文件，并获取其内容。
+		/// </summary>
+		/// <param name="fileId">指定要打开的文件编号。</param>
+		/// <param name="info">输出参数：指定编号对应的文件描述信息，如果指定的文件编号不存在则输出空(null)。</param>
+		/// <returns>返回打开的文件内容，如果指定的文件编号不存在则返回空(null)。</returns>
+		Stream Open(Guid fileId, out StorageFileInfo info);
+
+		/// <summary>
 		/// 获取指定编号的文件信息。
 		/// </summary>
 		/// <param name="fileId">指定要获取信息的文件编号。</param>

@@ -166,6 +166,39 @@ namespace Zongsoft.IO
 			return this.EnsureFileSystem().File.Open(path, FileMode.Open, FileAccess.ReadWrite, FileShare.Read);
 		}
 
+		public Stream Open(Guid fileId, out StorageFileInfo info)
+		{
+			var storage = this.Storage;
+
+			if(storage == null)
+				throw new InvalidOperationException("The Storage is null.");
+
+			info = null;
+
+			var dictionary = storage.GetValue(GetFileKey(fileId)) as IDictionary;
+
+			if(dictionary == null || dictionary.Count < 1)
+				return null;
+
+			info = StorageFileInfo.FromDictionary(dictionary);
+
+			if(dictionary is Zongsoft.Common.IAccumulator)
+				((Zongsoft.Common.IAccumulator)dictionary).Increment("TotalVisits");
+			else
+			{
+				long totalVisits = 0;
+				dictionary.TryGetValue<long>("TotalVisits", out totalVisits);
+				dictionary["TotalVisits"] = totalVisits + 1;
+			}
+
+			dictionary["VisitedTime"] = DateTime.Now;
+
+			if(string.IsNullOrWhiteSpace(info.Path))
+				return null;
+
+			return this.EnsureFileSystem().File.Open(info.Path, FileMode.Open, FileAccess.ReadWrite, FileShare.Read);
+		}
+
 		public StorageFileInfo GetInfo(Guid fileId)
 		{
 			var storage = this.Storage;
