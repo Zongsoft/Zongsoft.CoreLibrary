@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2014 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -255,16 +255,7 @@ namespace Zongsoft.Data
 
 		protected virtual bool IsScalarType(Type type)
 		{
-			if(type.IsArray)
-				return IsScalarType(type.GetElementType());
-
-			if(type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
-				return IsScalarType(type.GetGenericArguments()[0]);
-
-			return type.IsPrimitive || type.IsEnum ||
-				   type == typeof(string) || type== typeof(decimal) ||
-				   type == typeof(DateTime) || type == typeof(TimeSpan) ||
-				   type == typeof(Guid);
+			return Zongsoft.Common.TypeExtension.IsScalarType(type);
 		}
 		#endregion
 
