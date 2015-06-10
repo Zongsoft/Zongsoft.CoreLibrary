@@ -32,7 +32,7 @@ namespace Zongsoft.IO
 	/// <summary>
 	/// 公开用于创建、移动和遍历目录和子目录等功能的抽象接口，该接口将提供不同文件系统的目录支持。
 	/// </summary>
-	public interface IDirectoryService
+	public interface IDirectory
 	{
 		/// <summary>
 		/// 获取指定目录路径对应的<see cref="DirectoryInfo"/>。

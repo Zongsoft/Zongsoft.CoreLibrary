@@ -25,6 +25,7 @@
  */
 
 using System;
+using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -32,295 +33,294 @@ using Zongsoft.Collections;
 
 namespace Zongsoft.IO
 {
-	/// <summary>
-	/// 表示存储文件的信息类。
-	/// </summary>
-	[Serializable]
-	public class StorageFile : MarshalByRefObject
+	public class StorageFile : IStorageFile
 	{
 		#region 成员字段
-		private Guid _fileId;
-		private int _bucketId;
-		private string _name;
-		private string _type;
-		private long _size;
-		private string _path;
-		private string _title;
-		private DateTime _createdTime;
-		private DateTime? _modifiedTime;
-		private DateTime? _visitedTime;
-		private long _totalVisits;
+		private Zongsoft.Runtime.Caching.ICache _storage;
+		private IFileSystem _fileSystem;
 		#endregion
 
 		#region 构造函数
-		public StorageFile() : this(0)
+		public StorageFile()
 		{
 		}
 
-		public StorageFile(int bucketId) : this(bucketId, Guid.NewGuid())
+		public StorageFile(Zongsoft.Services.IServiceProvider serviceProvider)
 		{
+			if(serviceProvider != null)
+			{
+				_storage = serviceProvider.Resolve<Zongsoft.Runtime.Caching.ICache>();
+				_fileSystem = serviceProvider.Resolve<IFileSystem>(Zongsoft.IO.FileSystem.Schema);
+			}
 		}
 
-		public StorageFile(int bucketId, Guid fileId)
+		public StorageFile(Zongsoft.Runtime.Caching.ICache storage, IFileSystem fileSystem)
 		{
-			_bucketId = bucketId;
-			_fileId = fileId;
-			_createdTime = DateTime.Now;
+			if(storage == null)
+				throw new ArgumentNullException("storage");
+
+			if(fileSystem == null)
+				throw new ArgumentNullException("fileSystem");
+
+			_storage = storage;
+			_fileSystem = fileSystem;
 		}
 		#endregion
 
 		#region 公共属性
-		/// <summary>
-		/// 获取或设置文件的编号。
-		/// </summary>
-		public Guid FileId
+		public Zongsoft.Runtime.Caching.ICache Storage
 		{
 			get
 			{
-				return _fileId;
+				return _storage;
 			}
 			set
 			{
-				_fileId = value;
+				if(value == null)
+					throw new ArgumentNullException();
+
+				_storage = value;
 			}
 		}
 
-		/// <summary>
-		/// 获取或设置文件所在的容器编号。
-		/// </summary>
-		public int BucketId
+		public IFileSystem FileSystem
 		{
 			get
 			{
-				return _bucketId;
+				return _fileSystem;
 			}
 			set
 			{
-				_bucketId = value;
-			}
-		}
+				if(value == null)
+					throw new ArgumentNullException();
 
-		/// <summary>
-		/// 获取或设置文件的名称。
-		/// </summary>
-		public string Name
-		{
-			get
-			{
-				return _name;
-			}
-			set
-			{
-				_name = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置文件的MIME类型名。
-		/// </summary>
-		public string Type
-		{
-			get
-			{
-				return _type;
-			}
-			set
-			{
-				_type = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置文件的存储路径。
-		/// </summary>
-		public string Path
-		{
-			get
-			{
-				return _path;
-			}
-			set
-			{
-				_path = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置文件的标题。
-		/// </summary>
-		public string Title
-		{
-			get
-			{
-				return _title;
-			}
-			set
-			{
-				_title = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置文件的大小(单位：字节)。
-		/// </summary>
-		public long Size
-		{
-			get
-			{
-				return _size;
-			}
-			set
-			{
-				_size = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置文件的下载次数。
-		/// </summary>
-		public long TotalVisits
-		{
-			get
-			{
-				return _totalVisits;
-			}
-			set
-			{
-				_totalVisits = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置文件的创建时间。
-		/// </summary>
-		public DateTime CreatedTime
-		{
-			get
-			{
-				return _createdTime;
-			}
-			set
-			{
-				_createdTime = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置文件的最后修改时间。
-		/// </summary>
-		public DateTime? ModifiedTime
-		{
-			get
-			{
-				return _modifiedTime;
-			}
-			set
-			{
-				_modifiedTime = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置文件的最后访问时间。
-		/// </summary>
-		public DateTime? VisitedTime
-		{
-			get
-			{
-				return _visitedTime;
-			}
-			set
-			{
-				_visitedTime = value;
+				_fileSystem = value;
 			}
 		}
 		#endregion
 
 		#region 公共方法
-		public IDictionary<string, object> ToDictionary()
+		public void Create(StorageFileInfo file, Stream content)
 		{
-			return new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+			if(file == null)
+				throw new ArgumentNullException("file");
+
+			var storage = this.Storage;
+
+			if(storage == null)
+				throw new InvalidOperationException("The Storage is null.");
+
+			storage.SetValue(GetFileKey(file.FileId), file.ToDictionary());
+
+			var collection = storage.GetValue(GetFileCollectionKey(file.BucketId)) as ICollection<string>;
+
+			if(collection != null)
+				collection.Add(file.FileId.ToString("n"));
+			else
+				storage.SetValue(GetFileCollectionKey(file.BucketId), new string[] { file.FileId.ToString("n") });
+
+			if(!string.IsNullOrWhiteSpace(file.Path) && content != null)
 			{
-				{ "BucketId", _bucketId },
-				{ "FileId", _fileId },
-				{ "Name", _name },
-				{ "Type", _type },
-				{ "Size", _size },
-				{ "Path", _path },
-				{ "Title", _title },
-				{ "TotalVisits", _totalVisits },
-				{ "CreatedTime", _createdTime },
-				{ "ModifiedTime", _modifiedTime },
-				{ "VisitedTime", _visitedTime },
-			};
+				var path = Zongsoft.IO.Path.Parse(file.Path);
+				var fileSystem = this.EnsureFileSystem();
+
+				//确认文件的所在目录是存在的，如果不存在则创建相应的目录
+				fileSystem.Directory.Create(path.DirectoryName);
+
+				//创建或打开指定路径的文件流
+				var stream = fileSystem.File.Open(file.Path, FileMode.Create, FileAccess.Write);
+
+				//将文件内容写入到创建或打开的文件流中
+				StreamUtility.Copy(content, stream);
+			}
 		}
 
-		public static StorageFile FromDictionary(IDictionary dictionary)
+		public Stream Open(Guid fileId)
 		{
+			var storage = this.Storage;
+
+			if(storage == null)
+				throw new InvalidOperationException("The Storage is null.");
+
+			var dictionary = storage.GetValue(GetFileKey(fileId)) as IDictionary;
+
 			if(dictionary == null || dictionary.Count < 1)
 				return null;
 
-			object bucketId, fileId, name, type, size, title, path, totalVisits, createdTime, modifiedTime, visitedTime;
+			var path = string.Empty;
 
-			if(!dictionary.TryGetValue("BucketId", out bucketId))
+			if(dictionary.TryGetValue<string>("Path", out path) && string.IsNullOrWhiteSpace(path))
 				return null;
 
-			if(!dictionary.TryGetValue("FileId", out fileId))
-				return null;
-
-			dictionary.TryGetValue("Name", out name);
-			dictionary.TryGetValue("Type", out type);
-			dictionary.TryGetValue("Size", out size);
-			dictionary.TryGetValue("Path", out path);
-			dictionary.TryGetValue("Title", out title);
-			dictionary.TryGetValue("TotalVisits", out totalVisits);
-			dictionary.TryGetValue("CreatedTime", out createdTime);
-			dictionary.TryGetValue("ModifiedTime", out modifiedTime);
-			dictionary.TryGetValue("VisitedTime", out visitedTime);
-
-			return new StorageFile(Zongsoft.Common.Convert.ConvertValue<int>(bucketId), Zongsoft.Common.Convert.ConvertValue<Guid>(fileId))
+			if(dictionary is Zongsoft.Common.IAccumulator)
+				((Zongsoft.Common.IAccumulator)dictionary).Increment("TotalVisits");
+			else
 			{
-				Name = Zongsoft.Common.Convert.ConvertValue<string>(name),
-				Type = Zongsoft.Common.Convert.ConvertValue<string>(type),
-				Size = Zongsoft.Common.Convert.ConvertValue<long>(size),
-				Path = Zongsoft.Common.Convert.ConvertValue<string>(path),
-				Title = Zongsoft.Common.Convert.ConvertValue<string>(title),
-				TotalVisits = Zongsoft.Common.Convert.ConvertValue<int>(totalVisits),
-				CreatedTime = Zongsoft.Common.Convert.ConvertValue<DateTime>(createdTime),
-				ModifiedTime = Zongsoft.Common.Convert.ConvertValue<DateTime?>(modifiedTime),
-				VisitedTime = Zongsoft.Common.Convert.ConvertValue<DateTime?>(visitedTime),
-			};
+				long totalVisits = 0;
+				dictionary.TryGetValue<long>("TotalVisits", out totalVisits);
+				dictionary["TotalVisits"] = totalVisits + 1;
+			}
+
+			dictionary["VisitedTime"] = DateTime.Now;
+
+			return this.EnsureFileSystem().File.Open(path, FileMode.Open, FileAccess.ReadWrite, FileShare.Read);
+		}
+
+		public StorageFileInfo GetInfo(Guid fileId)
+		{
+			var storage = this.Storage;
+
+			if(storage == null)
+				throw new InvalidOperationException("The Storage is null.");
+
+			var dictionary = storage.GetValue(GetFileKey(fileId)) as IDictionary;
+
+			if(dictionary != null)
+				return StorageFileInfo.FromDictionary(dictionary);
+
+			return null;
+		}
+
+		public string GetPath(Guid fileId)
+		{
+			var storage = this.Storage;
+
+			if(storage == null)
+				throw new InvalidOperationException("The Storage is null.");
+
+			var dictionary = storage.GetValue(GetFileKey(fileId)) as IDictionary;
+
+			if(dictionary != null)
+			{
+				string path = null;
+
+				if(dictionary.TryGetValue<string>("Path", out path))
+					return path;
+			}
+
+			return null;
+		}
+
+		public bool Delete(Guid fileId)
+		{
+			var storage = this.Storage;
+
+			if(storage == null)
+				throw new InvalidOperationException("The Storage is null.");
+
+			var dictionary = storage.GetValue(GetFileKey(fileId)) as IDictionary;
+			var filePath = string.Empty;
+			var bucketId = 0;
+
+			if(dictionary == null || dictionary.Count < 1)
+				return false;
+
+			dictionary.TryGetValue<int>("BucketId", out bucketId);
+			dictionary.TryGetValue<string>("Path", out filePath);
+
+			storage.Remove(GetFileKey(fileId));
+
+			var collection = storage.GetValue(GetFileCollectionKey(bucketId)) as ICollection<string>;
+
+			if(collection != null)
+				collection.Remove(fileId.ToString("n"));
+
+			if(!string.IsNullOrWhiteSpace(filePath))
+				this.EnsureFileSystem().File.Delete(filePath);
+
+			return true;
+		}
+
+		public Guid? Copy(Guid fileId, int bucketId)
+		{
+			var storage = this.Storage;
+
+			if(storage == null)
+				throw new InvalidOperationException("The Storage is null.");
+
+			var info = this.GetInfo(fileId);
+
+			if(info == null)
+				return null;
+
+			if(info.BucketId == bucketId)
+				return fileId;
+
+			var newId = Guid.NewGuid();
+
+			this.Create(new StorageFileInfo(bucketId, newId)
+			{
+				Name = info.Name,
+				Type = info.Type,
+				Size = info.Size,
+				Path = info.Path,
+				Title = info.Title,
+			}, null);
+
+			return newId;
+		}
+
+		public bool Move(Guid fileId, int bucketId)
+		{
+			var storage = this.Storage;
+
+			if(storage == null)
+				throw new InvalidOperationException("The Storage is null.");
+
+			var dictionary = storage.GetValue(GetFileKey(fileId)) as IDictionary;
+
+			if(dictionary == null)
+				return false;
+
+			int currentBucketId;
+
+			if(dictionary.TryGetValue("BucketId", out currentBucketId))
+			{
+				//将当前文件的所在存储容器编号更改为目标容器编号
+				dictionary["BucketId"] = bucketId.ToString();
+
+				//获取当前文件容器列表集合
+				var collection = storage.GetValue(GetFileCollectionKey(currentBucketId)) as ICollection<string>;
+
+				if(collection != null)
+					collection.Remove(currentBucketId.ToString());
+
+				//获取目标文件容器列表集合
+				collection = storage.GetValue(GetFileCollectionKey(bucketId)) as ICollection<string>;
+
+				if(collection != null)
+					collection.Add(bucketId.ToString());
+				else
+					storage.SetValue(GetFileCollectionKey(bucketId), new string[] { bucketId.ToString() });
+
+				return true;
+			}
+
+			return false;
 		}
 		#endregion
 
-		#region 重写方法
-		public override int GetHashCode()
+		#region 私有方法
+		private IFileSystem EnsureFileSystem()
 		{
-			var bytes = _fileId.ToByteArray();
-			int result = bytes[0];
+			var fileSystem = this.FileSystem;
 
-			for(int i = 1; i < bytes.Length; i++)
-			{
-				result ^= bytes[i];
-			}
+			if(fileSystem == null)
+				throw new InvalidOperationException("The value of 'FileSystem' property is null.");
 
-			return result;
+			return fileSystem;
 		}
 
-		public override bool Equals(object obj)
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		internal static string GetFileCollectionKey(int bucketId)
 		{
-			if(obj == null || obj.GetType() != this.GetType())
-				return false;
-
-			return ((StorageFile)obj).FileId == this.FileId;
+			return "Zongsoft.IO.StorageFiles:" + bucketId.ToString();
 		}
 
-		public override string ToString()
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		internal static string GetFileKey(Guid fileId)
 		{
-			if(string.IsNullOrWhiteSpace(_path))
-				return string.Format("#{0} {1}", _bucketId.ToString(), _name);
-			else
-				return string.Format("#{0} {1} ({2})", _bucketId.ToString(), _name, _path);
+			return "Zongsoft.IO.StorageFile:" + fileId.ToString("n");
 		}
 		#endregion
 	}

@@ -33,7 +33,7 @@ namespace Zongsoft.IO
 	/// <summary>
 	/// 提供用于创建、复制、删除、移动和打开文件等功能的抽象接口，该接口将提供不同文件系统的文件支持。
 	/// </summary>
-	public interface IFileService
+	public interface IFile
 	{
 		/// <summary>
 		/// 获取指定文件路径对应的<see cref="FileInfo"/>。

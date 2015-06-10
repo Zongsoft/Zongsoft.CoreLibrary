@@ -32,183 +32,192 @@ using Zongsoft.Collections;
 
 namespace Zongsoft.IO
 {
-	/// <summary>
-	/// 表示存储文件的容器信息类。
-	/// </summary>
-	[Serializable]
-	public class StorageBucket : MarshalByRefObject
+	public class StorageBucket : IStorageBucket
 	{
 		#region 成员字段
-		private int _bucketId;
-		private string _name;
-		private string _path;
-		private string _title;
-		private DateTime _createdTime;
-		private DateTime? _modifiedTime;
+		private Zongsoft.Runtime.Caching.ICache _storage;
 		#endregion
 
 		#region 构造函数
-		public StorageBucket(int bucketId)
+		public StorageBucket()
 		{
-			_createdTime = DateTime.Now;
+		}
+
+		public StorageBucket(Zongsoft.Runtime.Caching.ICache storage)
+		{
+			if(storage == null)
+				throw new ArgumentNullException("storage");
+
+			_storage = storage;
 		}
 		#endregion
 
 		#region 公共属性
-		/// <summary>
-		/// 获取或设置文件存储容器的编号。
-		/// </summary>
-		public int BucketId
+		public Zongsoft.Runtime.Caching.ICache Storage
 		{
 			get
 			{
-				return _bucketId;
+				return _storage;
 			}
 			set
 			{
-				_bucketId = value;
-			}
-		}
+				if(value == null)
+					throw new ArgumentNullException();
 
-		/// <summary>
-		/// 获取或设置文件存储容器的名称。
-		/// </summary>
-		public string Name
-		{
-			get
-			{
-				return _name;
-			}
-			set
-			{
-				_name = value == null ? string.Empty : value.Trim();
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置文件容器的存储路径。
-		/// </summary>
-		public string Path
-		{
-			get
-			{
-				return _path;
-			}
-			set
-			{
-				_path = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置文件存储容器的标题。
-		/// </summary>
-		public string Title
-		{
-			get
-			{
-				return _title;
-			}
-			set
-			{
-				_title = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置文件存储容器的创建时间。
-		/// </summary>
-		public DateTime CreatedTime
-		{
-			get
-			{
-				return _createdTime;
-			}
-			set
-			{
-				_createdTime = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置文件存储容器的修改时间。
-		/// </summary>
-		public DateTime? ModifiedTime
-		{
-			get
-			{
-				return _modifiedTime;
-			}
-			set
-			{
-				_modifiedTime = value;
+				_storage = value;
 			}
 		}
 		#endregion
 
 		#region 公共方法
-		public IDictionary<string, object> ToDictionary()
+		public StorageBucketInfo Create(int bucketId, string name, string title, string path)
 		{
-			return new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+			if(string.IsNullOrWhiteSpace(name))
+				throw new ArgumentNullException("name");
+
+			var storage = this.Storage;
+
+			if(storage == null)
+				throw new InvalidOperationException("The Storage is null.");
+
+			var bucket = new StorageBucketInfo(bucketId)
 			{
-				{ "BucketId", _bucketId },
-				{ "Name", _name },
-				{ "Path", _path },
-				{ "Title", _title },
-				{ "CreatedTime", _createdTime },
-				{ "ModifiedTime", _modifiedTime },
+				Name = name,
+				Path = path,
+				Title = title,
 			};
+
+			storage.SetValue(GetBucketKey(bucketId), bucket.ToDictionary());
+
+			var collection = storage.GetValue(GetBucketCollectionKey()) as ICollection<string>;
+
+			if(collection != null)
+				collection.Add(bucketId.ToString());
+			else
+				storage.SetValue(GetBucketCollectionKey(), new string[] { bucketId.ToString() });
+
+			return bucket;
 		}
 
-		public static StorageBucket FromDictionary(IDictionary dictionary)
+		public StorageBucketInfo GetInfo(int bucketId)
 		{
-			if(dictionary == null || dictionary.Count < 1)
-				return null;
+			var storage = this.Storage;
 
-			object bucketId, name, title, path, createdTime, modifiedTime;
+			if(storage == null)
+				throw new InvalidOperationException("The Storage is null.");
 
-			if(!dictionary.TryGetValue("BucketId", out bucketId))
-				return null;
+			var dictionary = storage.GetValue(GetBucketKey(bucketId)) as IDictionary;
 
-			if(!dictionary.TryGetValue("Name", out name))
-				return null;
+			if(dictionary != null)
+				return StorageBucketInfo.FromDictionary(dictionary);
 
-			dictionary.TryGetValue("Path", out path);
-			dictionary.TryGetValue("Title", out title);
-			dictionary.TryGetValue("CreatedTime", out createdTime);
-			dictionary.TryGetValue("ModifiedTime", out modifiedTime);
+			return null;
+		}
 
-			return new StorageBucket(Zongsoft.Common.Convert.ConvertValue<int>(bucketId))
+		public string GetPath(int bucketId)
+		{
+			var storage = this.Storage;
+
+			if(storage == null)
+				throw new InvalidOperationException("The Storage is null.");
+
+			var dictionary = storage.GetValue(GetBucketKey(bucketId)) as IDictionary;
+
+			if(dictionary != null)
 			{
-				Name = Zongsoft.Common.Convert.ConvertValue<string>(name),
-				Path = Zongsoft.Common.Convert.ConvertValue<string>(path),
-				Title = Zongsoft.Common.Convert.ConvertValue<string>(title),
-				CreatedTime = Zongsoft.Common.Convert.ConvertValue<DateTime>(createdTime),
-				ModifiedTime = Zongsoft.Common.Convert.ConvertValue<DateTime?>(modifiedTime),
-			};
+				string path = null;
+
+				if(dictionary.TryGetValue<string>("Path", out path))
+					return path;
+			}
+
+			return null;
+		}
+
+		public bool Delete(int bucketId)
+		{
+			var storage = this.Storage;
+
+			if(storage == null)
+				throw new InvalidOperationException("The Storage is null.");
+
+			var result = storage.Remove(GetBucketKey(bucketId));
+
+			var collection = storage.GetValue(GetBucketCollectionKey()) as ICollection<string>;
+
+			if(collection != null)
+				collection.Remove(bucketId.ToString());
+
+			return result;
+		}
+
+		public void Modify(int bucketId, string name, string title, string path, DateTime? modifiedTime)
+		{
+			var storage = this.Storage;
+
+			if(storage == null)
+				throw new InvalidOperationException("The Storage is null.");
+
+			var dictionary = storage.GetValue(GetBucketKey(bucketId)) as IDictionary;
+
+			if(dictionary != null)
+			{
+				if(name != null)
+					dictionary["Name"] = name.Trim();
+
+				if(title != null)
+					dictionary["Title"] = title;
+
+				if(path != null)
+					dictionary["Path"] = path.Trim();
+
+				if(modifiedTime.HasValue)
+					dictionary["ModifiedTime"] = modifiedTime.Value;
+			}
+		}
+
+		public int GetBucketCount()
+		{
+			var storage = this.Storage;
+
+			if(storage == null)
+				throw new InvalidOperationException("The Storage is null.");
+
+			var collection = storage.GetValue(GetBucketCollectionKey()) as ICollection;
+
+			if(collection == null)
+				return 0;
+
+			return collection.Count;
+		}
+
+		public int GetFileCount(int bucketId)
+		{
+			var storage = this.Storage;
+
+			if(storage == null)
+				throw new InvalidOperationException("The Storage is null.");
+
+			var collection = storage.GetValue(StorageFile.GetFileCollectionKey(bucketId)) as ICollection;
+
+			if(collection == null)
+				return 0;
+
+			return collection.Count;
 		}
 		#endregion
 
-		#region 重写方法
-		public override int GetHashCode()
+		#region 私有方法
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		internal static string GetBucketCollectionKey()
 		{
-			return _bucketId;
+			return "Zongsoft.IO.StorageBuckets";
 		}
 
-		public override bool Equals(object obj)
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		internal static string GetBucketKey(int bucketId)
 		{
-			if(obj == null || obj.GetType() != this.GetType())
-				return false;
-
-			return ((StorageBucket)obj).BucketId == this.BucketId;
-		}
-
-		public override string ToString()
-		{
-			if(string.IsNullOrWhiteSpace(_path))
-				return string.Format("#{0} {1}", _bucketId.ToString(), _name);
-			else
-				return string.Format("#{0} {1} ({2})", _bucketId.ToString(), _name, _path);
+			return "Zongsoft.IO.StorageBucket:" + bucketId.ToString();
 		}
 		#endregion
 	}

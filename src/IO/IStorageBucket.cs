@@ -32,7 +32,7 @@ namespace Zongsoft.IO
 	/// <summary>
 	/// 表示<see cref="IStorageBucket">存储文件容器</see>的操作接口。
 	/// </summary>
-	public interface IStorageBucketService
+	public interface IStorageBucket
 	{
 		/// <summary>
 		/// 创建一个<see cref="IStorageBucket"/>存储文件容器。
@@ -42,14 +42,21 @@ namespace Zongsoft.IO
 		/// <param name="title">文件存储容器的标题。</param>
 		/// <param name="path">文件存储容器的路径。</param>
 		/// <returns>返回创建成功的<see cref="IStorageBucket"/>容器描述类。</returns>
-		StorageBucket Create(int bucketId, string name, string title, string path);
+		StorageBucketInfo Create(int bucketId, string name, string title, string path);
 
 		/// <summary>
 		/// 获取指定编号的文件存储容器。
 		/// </summary>
 		/// <param name="bucketId">指定要查找的文件存储容器编号。</param>
-		/// <returns>返回指定编号的存储容器，如果指定编号不存在则返回空(null)。</returns>
-		StorageBucket GetBucketInfo(int bucketId);
+		/// <returns>返回指定编号的存储容器，如果指定编号的文件存储容器不存在则返回空(null)。</returns>
+		StorageBucketInfo GetInfo(int bucketId);
+
+		/// <summary>
+		/// 获取指定编号的文件存储容器的路径。
+		/// </summary>
+		/// <param name="bucketId">指定要查找的文件容器编号</param>
+		/// <returns>返回的文件存储容器路径，如果指定编号的文件容器不存在则返回空(null)。</returns>
+		string GetPath(int bucketId);
 
 		/// <summary>
 		/// 删除指定编号的文件存储容器。
@@ -62,9 +69,9 @@ namespace Zongsoft.IO
 		/// 修改指定编号的文件存储容器的信息。
 		/// </summary>
 		/// <param name="bucketId">指定要修改的文件存储容器编号。</param>
-		/// <param name="name">要修改的文件存储容器的名称。</param>
-		/// <param name="title">要修改的文件存储容器的标题。</param>
-		/// <param name="path">要修改的文件存储容器的路径。</param>
+		/// <param name="name">要修改的文件存储容器的名称，如果为空(null)则不修改。</param>
+		/// <param name="title">要修改的文件存储容器的标题，如果为空(null)则不修改。</param>
+		/// <param name="path">要修改的文件存储容器的路径，如果为空(null)则不修改。</param>
 		/// <param name="modifiedTime">要修改的文件存储容器的最后修改时间。</param>
 		void Modify(int bucketId, string name, string title, string path, DateTime? modifiedTime);
 

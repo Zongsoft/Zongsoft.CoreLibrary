@@ -32,14 +32,14 @@ namespace Zongsoft.IO
 	/// <summary>
 	/// 表示<see cref="IStorageFile">存储文件</see>的操作接口。
 	/// </summary>
-	public interface IStorageFileService
+	public interface IStorageFile
 	{
 		/// <summary>
 		/// 根据指定的文件存储信息和内容，将其保存到文件存储容器中。
 		/// </summary>
 		/// <param name="file">指定要创建的文件存储信息。</param>
 		/// <param name="content">指定要创建的文件内容。</param>
-		void Create(StorageFile file, Stream content);
+		void Create(StorageFileInfo file, Stream content);
 
 		/// <summary>
 		/// 打开指定编号的文件，并获取其内容。
@@ -53,7 +53,14 @@ namespace Zongsoft.IO
 		/// </summary>
 		/// <param name="fileId">指定要获取信息的文件编号。</param>
 		/// <returns>返回指定编号的文件信息，如果指定的文件编号不存在则返回空(null)。</returns>
-		StorageFile GetFileInfo(Guid fileId);
+		StorageFileInfo GetInfo(Guid fileId);
+
+		/// <summary>
+		/// 获取指定编号的文件路径。
+		/// </summary>
+		/// <param name="fileId">指定要查找的文件编号</param>
+		/// <returns>返回的文件路径，如果指定编号的文件不存在则返回空(null)。</returns>
+		string GetPath(Guid fileId);
 
 		/// <summary>
 		/// 删除指定编号的文件。
@@ -67,12 +74,12 @@ namespace Zongsoft.IO
 		/// </summary>
 		/// <param name="fileId">指定要复制的文件编号。</param>
 		/// <param name="bucketId">要复制文件的目的存储容器编号。</param>
-		/// <returns>如果复制成功则返回真(True)，否则返回假(False)。</returns>
+		/// <returns>如果复制成功则返回目标文件的编号，否则返回空(null)。</returns>
 		/// <remarks>
-		///		<para>如果指定的目的存储容器即为指定文件的容器则返回假(False)；如果指定的文件编号不存在则返回假(False)。</para>
+		///		<para>如果指定的目的存储容器即为指定文件的容器则返回原文件编号；如果指定的文件编号不存在则返回空(null)。</para>
 		///		<para>注意：复制操作确保会复制一份文件信息到目的容器中，但是文件的内容是否被物理复制则取决于具体的实现者。</para>
 		/// </remarks>
-		bool Copy(Guid fileId, int bucketId);
+		Guid? Copy(Guid fileId, int bucketId);
 
 		/// <summary>
 		/// 移动指定编号的文件到指定的目标存储容器中。
