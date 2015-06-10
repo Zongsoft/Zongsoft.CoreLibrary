@@ -29,7 +29,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Runtime.Caching
 {
-	public class MemoryCache : ICache, Zongsoft.Common.IDisposableObject
+	public class MemoryCache : ICache, Zongsoft.Common.IDisposableObject, Zongsoft.Common.IAccumulator
 	{
 		#region 单例字段
 		public static readonly MemoryCache Default = new MemoryCache("Zongsoft.Runtime.Caching.MemoryCache");
@@ -263,6 +263,35 @@ namespace Zongsoft.Runtime.Caching
 
 			if(disposed != null)
 				disposed(this, new Common.DisposedEventArgs(disposing));
+		}
+		#endregion
+
+		#region 递增接口
+		public long Increment(string key, int interval = 1)
+		{
+			var value = this.GetValue(key);
+
+			if(value == null)
+			{
+				this.SetValue(key, interval);
+				return interval;
+			}
+
+			long number;
+
+			if(!Zongsoft.Common.Convert.TryConvertValue<long>(value, out number))
+				throw new InvalidOperationException();
+
+			number += interval;
+
+			this.SetValue(key, number);
+
+			return number;
+		}
+
+		public long Decrement(string key, int interval = 1)
+		{
+			return this.Increment(key, -interval);
 		}
 		#endregion
 	}
