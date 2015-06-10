@@ -279,7 +279,7 @@ namespace Zongsoft.Options.Profiles
 				if(section == null)
 					return null;
 				else
-					return section.Entries.ToArray();
+					return section.Entries;
 			}
 
 			if(isSectionPath)
@@ -289,7 +289,7 @@ namespace Zongsoft.Options.Profiles
 				if(section == null)
 					return null;
 				else
-					return section.Entries.ToArray();
+					return section.Entries;
 			}
 
 			var entry = section.Entries[name];
