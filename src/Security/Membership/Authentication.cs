@@ -139,6 +139,13 @@ namespace Zongsoft.Security.Membership
 			if(string.IsNullOrWhiteSpace(identity))
 				throw new ArgumentNullException("identity");
 
+			#region 测试代码
+			password = null;
+			passwordSalt = null;
+
+			return new User(1, identity);
+			#endregion
+
 			var identityType = MembershipHelper.GetUserIdentityType(identity);
 
 			switch(identityType)
