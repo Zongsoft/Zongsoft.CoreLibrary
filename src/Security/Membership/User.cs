@@ -159,7 +159,7 @@ namespace Zongsoft.Security.Membership
 		}
 
 		/// <summary>
-		/// 获取或设置用户对应的主体信息。
+		/// 获取或设置用户对应的主体标识。
 		/// </summary>
 		public string Principal
 		{

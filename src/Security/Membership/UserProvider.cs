@@ -117,6 +117,16 @@ namespace Zongsoft.Security.Membership
 				return dataAccess.Select<User>("Security.User", new Condition("Namespace", @namespace));
 		}
 
+		public bool SetPrincipal(string certificationId, int userId, string principal)
+		{
+			var dataAccess = this.GetDataAccess();
+
+			return dataAccess.Update("Security.User", new { Principal = principal }, new ConditionCollection(ConditionCombine.And)
+			{
+				new Condition("UserId", userId),
+			}) > 0;
+		}
+
 		public int DeleteUsers(string certificationId, params int[] userIds)
 		{
 			if(userIds == null || userIds.Length < 1)

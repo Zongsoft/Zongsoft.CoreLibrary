@@ -53,6 +53,15 @@ namespace Zongsoft.Security.Membership
 		User GetUser(string certificationId, string identity);
 
 		/// <summary>
+		/// 设置指定编号的用户主体标识。
+		/// </summary>
+		/// <param name="certificationId">调用者的安全凭证号。</param>
+		/// <param name="userId">要设置的用户编号。</param>
+		/// <param name="principal">要设置的用户主体标识。</param>
+		/// <returns>如果设置成功则返回真(True)，否则返回假(False)。</returns>
+		bool SetPrincipal(string certificationId, int userId, string principal);
+
+		/// <summary>
 		/// 获取当前命名空间中的所有用户。
 		/// </summary>
 		/// <param name="certificationId">调用者的安全凭证号。</param>
