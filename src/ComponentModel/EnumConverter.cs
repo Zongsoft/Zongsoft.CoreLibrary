@@ -1,8 +1,8 @@
-/*
+Ôªø/*
  * Authors:
- *   ÷”∑Â(Popeye Zhong) <zongsoft@gmail.com>
+ *   ÈíüÂ≥∞(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2012 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -34,25 +34,25 @@ namespace Zongsoft.ComponentModel
 {
 	public class EnumConverter : System.ComponentModel.EnumConverter
 	{
-		#region ≥…‘±±‰¡ø
+		#region ÊàêÂëòÂèòÈáè
 		private Zongsoft.Common.EnumEntry[] _entries;
 		#endregion
 
-		#region ππ‘Ï∫Ø ˝
+		#region ÊûÑÈÄ†ÂáΩÊï∞
 		public EnumConverter(Type enumType) : base(enumType)
 		{
 		}
 		#endregion
 
-		#region ÷ÿ–¥∑Ω∑®
+		#region ÈáçÂÜôÊñπÊ≥ï
 		public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
 		{
-			if(sourceType == typeof(DBNull) ||
-				sourceType == typeof(byte) || sourceType == typeof(sbyte) ||
-				sourceType == typeof(short) || sourceType == typeof(ushort) ||
-				sourceType == typeof(int) || sourceType == typeof(uint) ||
-				sourceType == typeof(long) || sourceType == typeof(ulong) ||
-				sourceType == typeof(decimal) || sourceType == typeof(double) || sourceType == typeof(float))
+			if(sourceType == typeof(string) || sourceType == typeof(DBNull) ||
+			   sourceType == typeof(byte) || sourceType == typeof(sbyte) ||
+			   sourceType == typeof(short) || sourceType == typeof(ushort) ||
+			   sourceType == typeof(int) || sourceType == typeof(uint) ||
+			   sourceType == typeof(long) || sourceType == typeof(ulong) ||
+			   sourceType == typeof(decimal) || sourceType == typeof(double) || sourceType == typeof(float))
 				return true;
 
 			return base.CanConvertFrom(context, sourceType);
@@ -67,7 +67,7 @@ namespace Zongsoft.ComponentModel
 			{
 				string valueString = (string)value;
 
-				if(valueString.IndexOf(',') > 0)
+				if(valueString.IndexOf(',') > 1)
 				{
 					long convertedValue = 0;
 					string[] parts = valueString.Split(',');
@@ -135,7 +135,7 @@ namespace Zongsoft.ComponentModel
 		}
 		#endregion
 
-		#region ÀΩ”–∑Ω∑®
+		#region ÁßÅÊúâÊñπÊ≥ï
 		private long GetEnumValue(string valueText, bool throwExceptions)
 		{
 			long result;
@@ -159,6 +159,9 @@ namespace Zongsoft.ComponentModel
 				return false;
 
 			valueText = valueText.Trim();
+
+			if(long.TryParse(valueText, out underlyingValue))
+				return true;
 
 			if(_entries == null)
 				_entries = Common.EnumUtility.GetEnumEntries(this.EnumType, true);
