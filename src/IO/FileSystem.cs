@@ -30,52 +30,29 @@ using System.Collections.Generic;
 
 namespace Zongsoft.IO
 {
-	public class FileSystem : IFileSystem
+	public class FileSystem : Zongsoft.Services.ServiceProviderBase, IFileSystem
 	{
 		#region 常量定义
 		public const string Schema = "zfs";
 		#endregion
 
 		#region 单例字段
-		//public static readonly FileSystem Default = new FileSystem(Zongsoft.Services.ServiceProvider);
+		public static readonly FileSystem Instance = new FileSystem();
 		#endregion
 
 		#region 成员字段
-		private Zongsoft.Services.IServiceProvider _serviceProvider;
 		private IFile _file;
 		private IDirectory _directory;
 		#endregion
 
 		#region 构造函数
-		public FileSystem()
+		private FileSystem() : base(new Zongsoft.Services.ServiceStorage())
 		{
-		}
-
-		public FileSystem(Zongsoft.Services.IServiceProvider serviceProvider)
-		{
-			if(serviceProvider == null)
-				throw new ArgumentNullException("serviceProvider");
-
-			_serviceProvider = serviceProvider;
+			this.Register(LocalFileSystem.Instance.Schema, LocalFileSystem.Instance, typeof(IFileSystem));
 		}
 		#endregion
 
 		#region 公共属性
-		public Zongsoft.Services.IServiceProvider ServiceProvider
-		{
-			get
-			{
-				return _serviceProvider;
-			}
-			set
-			{
-				if(value == null)
-					throw new ArgumentNullException();
-
-				_serviceProvider = value;
-			}
-		}
-
 		public IFile File
 		{
 			get
@@ -100,38 +77,65 @@ namespace Zongsoft.IO
 		#endregion
 
 		#region 内部方法
-		internal T GetService<T>(string text, out Path path) where T : class
+		internal IFile GetFileService(string text, out Path path)
 		{
 			if(string.IsNullOrWhiteSpace(text))
 				throw new ArgumentNullException("text");
 
-			var serviceProvider = this.ServiceProvider;
+			if(!Path.TryParse(text, out path))
+				throw new PathException(text);
 
-			if(serviceProvider == null)
-				throw new InvalidOperationException();
+			var fileSystem = this.Resolve<IFileSystem>(path.Schema);
+
+			if(fileSystem == null)
+				throw new InvalidOperationException(string.Format("Can not obtain the File provider by the '{0}' path.", path));
+
+			return fileSystem.File;
+		}
+
+		internal IDirectory GetDirectoryService(string text, out Path path)
+		{
+			if(string.IsNullOrWhiteSpace(text))
+				throw new ArgumentNullException("text");
 
 			if(!Path.TryParse(text, out path))
 				throw new PathException(text);
 
-			var service = serviceProvider.Resolve<T>(path.Schema) as T;
+			var fileSystem = this.Resolve<IFileSystem>(path.Schema);
 
-			if(service == null)
-				throw new InvalidOperationException(string.Format("Can not obtain the File or Directory provider by the '{0}' path.", path));
+			if(fileSystem == null)
+				throw new InvalidOperationException(string.Format("Can not obtain the File provider by the '{0}' path.", path));
 
-			return service;
+			return fileSystem.Directory;
 		}
 
-		internal T[] GetServices<T>(string[] texts, out Path[] paths) where T : class
+		internal IFile[] GetFileServices(string[] texts, out Path[] paths)
 		{
 			if(texts == null || texts.Length == 0)
 				throw new ArgumentNullException("texts");
 
 			paths = new Path[texts.Length];
-			var result = new T[texts.Length];
+			var result = new IFile[texts.Length];
 
 			for(int i = 0; i < texts.Length; i++)
 			{
-				result[i] = this.GetService<T>(texts[i], out paths[i]);
+				result[i] = this.GetFileService(texts[i], out paths[i]);
+			}
+
+			return result;
+		}
+
+		internal IDirectory[] GetDirectoryServices(string[] texts, out Path[] paths)
+		{
+			if(texts == null || texts.Length == 0)
+				throw new ArgumentNullException("texts");
+
+			paths = new Path[texts.Length];
+			var result = new IDirectory[texts.Length];
+
+			for(int i = 0; i < texts.Length; i++)
+			{
+				result[i] = this.GetDirectoryService(texts[i], out paths[i]);
 			}
 
 			return result;
@@ -158,7 +162,7 @@ namespace Zongsoft.IO
 			public void Delete(string virtualPath)
 			{
 				Path path;
-				var service = _fileSystem.GetService<IFile>(virtualPath, out path);
+				var service = _fileSystem.GetFileService(virtualPath, out path);
 
 				service.Delete(path.FullPath);
 			}
@@ -166,7 +170,7 @@ namespace Zongsoft.IO
 			public bool Exists(string virtualPath)
 			{
 				Path path;
-				var service = _fileSystem.GetService<IFile>(virtualPath, out path);
+				var service = _fileSystem.GetFileService(virtualPath, out path);
 
 				return service.Exists(path.FullPath);
 			}
@@ -179,7 +183,7 @@ namespace Zongsoft.IO
 			public void Copy(string source, string destination, bool overwrite)
 			{
 				Path[] paths;
-				var services = _fileSystem.GetServices<IFile>(new string[] { source, destination }, out paths);
+				var services = _fileSystem.GetFileServices(new string[] { source, destination }, out paths);
 
 				if(!string.Equals(paths[0].Schema, paths[1].Schema, StringComparison.OrdinalIgnoreCase))
 					throw new InvalidOperationException();
@@ -190,7 +194,7 @@ namespace Zongsoft.IO
 			public void Move(string source, string destination)
 			{
 				Path[] paths;
-				var services = _fileSystem.GetServices<IFile>(new string[] { source, destination }, out paths);
+				var services = _fileSystem.GetFileServices(new string[] { source, destination }, out paths);
 
 				if(!string.Equals(paths[0].Schema, paths[1].Schema, StringComparison.OrdinalIgnoreCase))
 					throw new InvalidOperationException();
@@ -201,7 +205,7 @@ namespace Zongsoft.IO
 			public FileInfo GetInfo(string virtualPath)
 			{
 				Path path;
-				var service = _fileSystem.GetService<IFile>(virtualPath, out path);
+				var service = _fileSystem.GetFileService(virtualPath, out path);
 
 				return service.GetInfo(path.FullPath);
 			}
@@ -209,7 +213,7 @@ namespace Zongsoft.IO
 			public System.IO.Stream Open(string virtualPath)
 			{
 				Path path;
-				var service = _fileSystem.GetService<IFile>(virtualPath, out path);
+				var service = _fileSystem.GetFileService(virtualPath, out path);
 
 				return service.Open(path.FullPath);
 			}
@@ -217,7 +221,7 @@ namespace Zongsoft.IO
 			public System.IO.Stream Open(string virtualPath, System.IO.FileMode mode)
 			{
 				Path path;
-				var service = _fileSystem.GetService<IFile>(virtualPath, out path);
+				var service = _fileSystem.GetFileService(virtualPath, out path);
 
 				return service.Open(path.FullPath, mode);
 			}
@@ -225,7 +229,7 @@ namespace Zongsoft.IO
 			public System.IO.Stream Open(string virtualPath, System.IO.FileMode mode, System.IO.FileAccess access)
 			{
 				Path path;
-				var service = _fileSystem.GetService<IFile>(virtualPath, out path);
+				var service = _fileSystem.GetFileService(virtualPath, out path);
 
 				return service.Open(path.FullPath, mode, access);
 			}
@@ -233,7 +237,7 @@ namespace Zongsoft.IO
 			public System.IO.Stream Open(string virtualPath, System.IO.FileMode mode, System.IO.FileAccess access, System.IO.FileShare share)
 			{
 				Path path;
-				var service = _fileSystem.GetService<IFile>(virtualPath, out path);
+				var service = _fileSystem.GetFileService(virtualPath, out path);
 
 				return service.Open(path.FullPath, mode, access, share);
 			}
@@ -258,7 +262,7 @@ namespace Zongsoft.IO
 			public bool Create(string virtualPath)
 			{
 				Path path;
-				var service = _fileSystem.GetService<IDirectory>(virtualPath, out path);
+				var service = _fileSystem.GetDirectoryService(virtualPath, out path);
 
 				return service.Create(path.FullPath);
 			}
@@ -271,7 +275,7 @@ namespace Zongsoft.IO
 			public void Delete(string virtualPath, bool recursive)
 			{
 				Path path;
-				var service = _fileSystem.GetService<IDirectory>(virtualPath, out path);
+				var service = _fileSystem.GetDirectoryService(virtualPath, out path);
 
 				service.Delete(path.FullPath, recursive);
 			}
@@ -279,7 +283,7 @@ namespace Zongsoft.IO
 			public void Move(string source, string destination)
 			{
 				Path[] paths;
-				var services = _fileSystem.GetServices<IDirectory>(new string[] { source, destination }, out paths);
+				var services = _fileSystem.GetDirectoryServices(new string[] { source, destination }, out paths);
 
 				if(!string.Equals(paths[0].Schema, paths[1].Schema, StringComparison.OrdinalIgnoreCase))
 					throw new InvalidOperationException();
@@ -290,7 +294,7 @@ namespace Zongsoft.IO
 			public bool Exists(string virtualPath)
 			{
 				Path path;
-				var service = _fileSystem.GetService<IDirectory>(virtualPath, out path);
+				var service = _fileSystem.GetDirectoryService(virtualPath, out path);
 
 				return service.Exists(path.FullPath);
 			}
@@ -298,7 +302,7 @@ namespace Zongsoft.IO
 			public DirectoryInfo GetInfo(string virtualPath)
 			{
 				Path path;
-				var service = _fileSystem.GetService<IDirectory>(virtualPath, out path);
+				var service = _fileSystem.GetDirectoryService(virtualPath, out path);
 
 				return service.GetInfo(path.FullPath);
 			}
@@ -311,7 +315,7 @@ namespace Zongsoft.IO
 			public IEnumerable<string> GetChildren(string virtualPath, string pattern, bool recursive)
 			{
 				Path path;
-				var service = _fileSystem.GetService<IDirectory>(virtualPath, out path);
+				var service = _fileSystem.GetDirectoryService(virtualPath, out path);
 
 				return service.GetChildren(path.FullPath, pattern, recursive);
 			}
@@ -324,7 +328,7 @@ namespace Zongsoft.IO
 			public IEnumerable<string> GetDirectories(string virtualPath, string pattern, bool recursive)
 			{
 				Path path;
-				var service = _fileSystem.GetService<IDirectory>(virtualPath, out path);
+				var service = _fileSystem.GetDirectoryService(virtualPath, out path);
 
 				return service.GetDirectories(path.FullPath, pattern, recursive);
 			}
@@ -337,7 +341,7 @@ namespace Zongsoft.IO
 			public IEnumerable<string> GetFiles(string virtualPath, string pattern, bool recursive)
 			{
 				Path path;
-				var service = _fileSystem.GetService<IDirectory>(virtualPath, out path);
+				var service = _fileSystem.GetDirectoryService(virtualPath, out path);
 
 				return service.GetFiles(path.FullPath, pattern, recursive);
 			}
