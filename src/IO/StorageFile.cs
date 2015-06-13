@@ -37,7 +37,6 @@ namespace Zongsoft.IO
 	{
 		#region 成员字段
 		private Zongsoft.Runtime.Caching.ICache _storage;
-		private IFileSystem _fileSystem;
 		#endregion
 
 		#region 构造函数
@@ -50,20 +49,15 @@ namespace Zongsoft.IO
 			if(serviceProvider != null)
 			{
 				_storage = serviceProvider.Resolve<Zongsoft.Runtime.Caching.ICache>();
-				_fileSystem = serviceProvider.Resolve<IFileSystem>(Zongsoft.IO.FileSystem.Schema);
 			}
 		}
 
-		public StorageFile(Zongsoft.Runtime.Caching.ICache storage, IFileSystem fileSystem)
+		public StorageFile(Zongsoft.Runtime.Caching.ICache storage)
 		{
 			if(storage == null)
 				throw new ArgumentNullException("storage");
 
-			if(fileSystem == null)
-				throw new ArgumentNullException("fileSystem");
-
 			_storage = storage;
-			_fileSystem = fileSystem;
 		}
 		#endregion
 
@@ -80,21 +74,6 @@ namespace Zongsoft.IO
 					throw new ArgumentNullException();
 
 				_storage = value;
-			}
-		}
-
-		public IFileSystem FileSystem
-		{
-			get
-			{
-				return _fileSystem;
-			}
-			set
-			{
-				if(value == null)
-					throw new ArgumentNullException();
-
-				_fileSystem = value;
 			}
 		}
 		#endregion
@@ -122,13 +101,12 @@ namespace Zongsoft.IO
 			if(!string.IsNullOrWhiteSpace(file.Path) && content != null)
 			{
 				var path = Zongsoft.IO.Path.Parse(file.Path);
-				var fileSystem = this.EnsureFileSystem();
 
 				//确认文件的所在目录是存在的，如果不存在则创建相应的目录
-				fileSystem.Directory.Create(path.DirectoryName);
+				FileSystem.Instance.Directory.Create(path.DirectoryName);
 
 				//创建或打开指定路径的文件流
-				var stream = fileSystem.File.Open(file.Path, FileMode.Create, FileAccess.Write);
+				var stream = FileSystem.Instance.File.Open(file.Path, FileMode.Create, FileAccess.Write);
 
 				//将文件内容写入到创建或打开的文件流中
 				StreamUtility.Copy(content, stream);
@@ -163,7 +141,7 @@ namespace Zongsoft.IO
 
 			dictionary["VisitedTime"] = DateTime.Now;
 
-			return this.EnsureFileSystem().File.Open(path, FileMode.Open, FileAccess.ReadWrite, FileShare.Read);
+			return FileSystem.Instance.File.Open(path, FileMode.Open, FileAccess.ReadWrite, FileShare.Read);
 		}
 
 		public Stream Open(Guid fileId, out StorageFileInfo info)
@@ -196,7 +174,7 @@ namespace Zongsoft.IO
 			if(string.IsNullOrWhiteSpace(info.Path))
 				return null;
 
-			return this.EnsureFileSystem().File.Open(info.Path, FileMode.Open, FileAccess.ReadWrite, FileShare.Read);
+			return FileSystem.Instance.File.Open(info.Path, FileMode.Open, FileAccess.ReadWrite, FileShare.Read);
 		}
 
 		public StorageFileInfo GetInfo(Guid fileId)
@@ -259,7 +237,7 @@ namespace Zongsoft.IO
 				collection.Remove(fileId.ToString("n"));
 
 			if(!string.IsNullOrWhiteSpace(filePath))
-				this.EnsureFileSystem().File.Delete(filePath);
+				FileSystem.Instance.File.Delete(filePath);
 
 			return true;
 		}
@@ -334,16 +312,6 @@ namespace Zongsoft.IO
 		#endregion
 
 		#region 私有方法
-		private IFileSystem EnsureFileSystem()
-		{
-			var fileSystem = this.FileSystem;
-
-			if(fileSystem == null)
-				throw new InvalidOperationException("The value of 'FileSystem' property is null.");
-
-			return fileSystem;
-		}
-
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 		internal static string GetFileCollectionKey(int bucketId)
 		{
