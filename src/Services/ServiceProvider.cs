@@ -35,11 +35,11 @@ namespace Zongsoft.Services
 	public class ServiceProvider : ServiceProviderBase
 	{
 		#region 构造函数
-		public ServiceProvider() : this(ServiceStorage.Default, null)
+		public ServiceProvider() : this(new ServiceStorage(), null)
 		{
 		}
 
-		public ServiceProvider(IServiceBuilder builder) : this(ServiceStorage.Default, builder)
+		public ServiceProvider(IServiceBuilder builder) : this(new ServiceStorage(), builder)
 		{
 		}
 

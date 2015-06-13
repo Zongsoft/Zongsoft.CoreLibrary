@@ -33,10 +33,6 @@ namespace Zongsoft.Services
 {
 	public class ServiceStorage : MarshalByRefObject, IServiceStorage
 	{
-		#region 单例字段
-		public static readonly ServiceStorage Default = new ServiceStorage();
-		#endregion
-
 		#region 成员字段
 		private IMatcher _matcher;
 		private List<ServiceEntry> _list;
@@ -44,7 +40,7 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 构造函数
-		public ServiceStorage() : this(new Matcher())
+		public ServiceStorage() : this(Zongsoft.Services.Matcher.Default)
 		{
 		}
 
