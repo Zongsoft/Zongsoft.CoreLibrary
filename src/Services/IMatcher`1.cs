@@ -31,6 +31,6 @@ namespace Zongsoft.Services
 {
 	public interface IMatcher<T> : IMatcher
 	{
-		bool Match(T target, object parameter);
+		bool Match(object target, T parameter);
 	}
 }
