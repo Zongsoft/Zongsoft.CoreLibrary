@@ -25,6 +25,7 @@
  */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Zongsoft.Services
@@ -37,6 +38,7 @@ namespace Zongsoft.Services
 			set;
 		}
 
+		void Clear();
 		void Add(ServiceEntry entry);
 		ServiceEntry Remove(string name);
 

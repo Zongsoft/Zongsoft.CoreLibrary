@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2014 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,13 +25,14 @@
  */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Linq;
 
 namespace Zongsoft.Services
 {
-	public class ServiceStorage : MarshalByRefObject, IServiceStorage
+	public class ServiceStorage : MarshalByRefObject, IServiceStorage, ICollection, ICollection<ServiceEntry>
 	{
 		#region 成员字段
 		private IMatcher _matcher;
@@ -53,6 +54,14 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 公共属性
+		public virtual int Count
+		{
+			get
+			{
+				return _list.Count;
+			}
+		}
+
 		public IMatcher Matcher
 		{
 			get
@@ -67,6 +76,54 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 公共方法
+		public ServiceEntry Add(object service)
+		{
+			return this.Add(service, null);
+		}
+
+		public ServiceEntry Add(object service, Type[] contractTypes)
+		{
+			var entry = new ServiceEntry(service, contractTypes);
+			this.Add(entry);
+			return entry;
+		}
+
+		public ServiceEntry Add(Type serviceType)
+		{
+			return this.Add(serviceType, null);
+		}
+
+		public ServiceEntry Add(Type serviceType, Type[] contractTypes)
+		{
+			var entry = new ServiceEntry(serviceType, contractTypes);
+			this.Add(entry);
+			return entry;
+		}
+
+		public ServiceEntry Add(string name, object service)
+		{
+			return this.Add(name, service, null);
+		}
+
+		public ServiceEntry Add(string name, object service, Type[] contractTypes)
+		{
+			var entry = new ServiceEntry(name, service, contractTypes);
+			this.Add(entry);
+			return entry;
+		}
+
+		public ServiceEntry Add(string name, Type serviceType)
+		{
+			return this.Add(name, serviceType, null);
+		}
+
+		public ServiceEntry Add(string name, Type serviceType, Type[] contractTypes)
+		{
+			var entry = new ServiceEntry(name, serviceType, contractTypes);
+			this.Add(entry);
+			return entry;
+		}
+
 		public virtual void Add(ServiceEntry entry)
 		{
 			if(entry == null)
@@ -76,6 +133,12 @@ namespace Zongsoft.Services
 				_namedDictionary[entry.Name] = entry;
 
 			_list.Add(entry);
+		}
+
+		public virtual void Clear()
+		{
+			_namedDictionary.Clear();
+			_list.Clear();
 		}
 
 		public virtual ServiceEntry Remove(string name)
@@ -190,6 +253,73 @@ namespace Zongsoft.Services
 				return attribute.Matcher.Match(entry.Service, parameter);
 
 			return true;
+		}
+		#endregion
+
+		#region 显式实现
+		void ICollection.CopyTo(Array array, int index)
+		{
+			for(int i = index; i < array.Length; index++)
+			{
+				array.SetValue(_list[i - index], i);
+			}
+		}
+
+		bool ICollection.IsSynchronized
+		{
+			get
+			{
+				return true;
+			}
+		}
+
+		private object _syncRoot;
+
+		object ICollection.SyncRoot
+		{
+			get
+			{
+				if(_syncRoot == null)
+					System.Threading.Interlocked.CompareExchange(ref _syncRoot, new object(), null);
+
+				return _syncRoot;
+			}
+		}
+
+		bool ICollection<ServiceEntry>.Contains(ServiceEntry item)
+		{
+			return _list.Contains(item);
+		}
+
+		void ICollection<ServiceEntry>.CopyTo(ServiceEntry[] array, int arrayIndex)
+		{
+			_list.CopyTo(array, arrayIndex);
+		}
+
+
+		bool ICollection<ServiceEntry>.IsReadOnly
+		{
+			get
+			{
+				return false;
+			}
+		}
+
+		bool ICollection<ServiceEntry>.Remove(ServiceEntry item)
+		{
+			throw new NotSupportedException();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			foreach(var entry in _list)
+				yield return entry;
+		}
+
+		IEnumerator<ServiceEntry> IEnumerable<ServiceEntry>.GetEnumerator()
+		{
+			foreach(var entry in _list)
+				yield return entry;
 		}
 		#endregion
 	}
