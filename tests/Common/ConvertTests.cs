@@ -60,6 +60,24 @@ namespace Zongsoft.Common.Tests
 		}
 
 		[TestMethod]
+		public void PopulateTest()
+		{
+			var dictionary = new Dictionary<string, object>()
+			{
+				{ "Name", "Popeye Zhong" },
+				{ "Gender", Gender.Male },
+				{ "HomeAddress", new Address(){ City = "Wuhan", CountryId = 123 } },
+			};
+
+			var person = Zongsoft.Common.Convert.Populate<Person>((System.Collections.IDictionary)dictionary);
+
+			Assert.AreEqual("Popeye Zhong", person.Name);
+			Assert.AreEqual(Gender.Male, person.Gender);
+			Assert.AreEqual(123, person.HomeAddress.CountryId);
+			Assert.AreEqual("Wuhan", person.HomeAddress.City);
+		}
+
+		[TestMethod]
 		public void ToHexStringTest()
 		{
 			var source = new byte[16];

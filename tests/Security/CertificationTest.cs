@@ -20,14 +20,15 @@ namespace Zongsoft.Security
 		}
 
 		[TestMethod]
-		public void TestToDictionary()
+		public void ToDictionaryTest()
 		{
 			var dictionary = _certification.ToDictionary();
 
 			Assert.AreEqual("10012001", dictionary["CertificationId"]);
 			Assert.AreEqual("Namespace", dictionary["Namespace"]);
 			Assert.AreEqual("Web", dictionary["Scene"]);
-			Assert.AreEqual(101, dictionary["UserId"]);
+			Assert.AreEqual(101, dictionary["User.UserId"]);
+			Assert.AreEqual("Popeye", dictionary["User.Name"]);
 			Assert.AreEqual(new DateTime(2015, 5, 15), dictionary["IssuedTime"]);
 			Assert.AreEqual(TimeSpan.FromHours(4), dictionary["Duration"]);
 
@@ -37,7 +38,7 @@ namespace Zongsoft.Security
 		}
 
 		[TestMethod]
-		public void TestFromDictionary()
+		public void FromDictionaryTest()
 		{
 			var dictionary = _certification.ToDictionary();
 			var certification = Certification.FromDictionary(dictionary);

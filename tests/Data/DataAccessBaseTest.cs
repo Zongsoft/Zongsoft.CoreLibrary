@@ -45,7 +45,6 @@ namespace Zongsoft.Data
 			Assert.IsTrue(_dataAccess.IsScalarType(typeof(TimeSpan[])));
 
 			Assert.IsFalse(_dataAccess.IsScalarType(typeof(Zongsoft.Tests.Address)));
-			Assert.IsFalse(_dataAccess.IsScalarType(typeof(Zongsoft.Tests.Address?)));
 			Assert.IsFalse(_dataAccess.IsScalarType(typeof(Zongsoft.Tests.Address[])));
 
 			Assert.IsTrue(_dataAccess.IsScalarType(typeof(Zongsoft.Tests.Gender)));

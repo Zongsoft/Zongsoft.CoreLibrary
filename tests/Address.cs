@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Zongsoft.Tests
 {
-	public struct Address
+	public class Address
 	{
 		public string City
 		{
