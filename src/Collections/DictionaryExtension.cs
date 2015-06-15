@@ -26,6 +26,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Zongsoft.Collections
 {
@@ -59,6 +60,24 @@ namespace Zongsoft.Collections
 
 			if(result)
 				value = Zongsoft.Common.Convert.ConvertValue<TValue>(dictionary[key]);
+
+			return result;
+		}
+
+		public static IDictionary<TKey, TValue> ToDictionary<TKey, TValue>(IDictionary dictionary, Func<object, TKey> keyConvert = null, Func<object, TValue> valueConvert = null)
+		{
+			if(dictionary == null)
+				return null;
+
+			keyConvert = key => Zongsoft.Common.Convert.ConvertValue<TKey>(key);
+			valueConvert = value => Zongsoft.Common.Convert.ConvertValue<TValue>(value);
+
+			var result = new Dictionary<TKey, TValue>(dictionary.Count);
+
+			foreach(DictionaryEntry entry in dictionary)
+			{
+				result.Add(keyConvert(entry.Key), valueConvert(entry.Value));
+			}
 
 			return result;
 		}
