@@ -91,6 +91,8 @@
     <Compile Include="Common\BitVector32.cs" />
     <Compile Include="Common\IDisposableObject.cs" />
     <Compile Include="Common\IAccumulator.cs" />
+    <Compile Include="Common\IEventHandler.cs" />
+    <Compile Include="Common\IEventHandler`1.cs" />
     <Compile Include="Common\IObjectReference.cs" />
     <Compile Include="Common\ISequence.cs" />
     <Compile Include="Common\ObjectReference.cs" />
