@@ -30,7 +30,8 @@ using System.Collections.Generic;
 
 namespace Zongsoft.IO
 {
-	public class LocalFileSystem : IFileSystem, Zongsoft.Services.IMatchable<string>
+	[Zongsoft.Services.Matcher(typeof(FileSystem.Matcher))]
+	public class LocalFileSystem : IFileSystem
 	{
 		#region 单例字段
 		public static readonly LocalFileSystem Instance = new LocalFileSystem();
@@ -47,7 +48,7 @@ namespace Zongsoft.IO
 		{
 			get
 			{
-				return FileSystem.Schema + ".local";
+				return "zfs.local";
 			}
 		}
 
@@ -65,18 +66,6 @@ namespace Zongsoft.IO
 			{
 				return LocalDirectoryService.Instance;
 			}
-		}
-		#endregion
-
-		#region 匹配实现
-		bool Services.IMatchable<string>.IsMatch(string parameter)
-		{
-			return string.Equals(this.Schema, parameter, StringComparison.OrdinalIgnoreCase);
-		}
-
-		bool Services.IMatchable.IsMatch(object parameter)
-		{
-			return string.Equals(this.Schema, (parameter as string), StringComparison.OrdinalIgnoreCase);
 		}
 		#endregion
 

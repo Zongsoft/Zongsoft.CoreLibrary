@@ -103,10 +103,10 @@ namespace Zongsoft.IO
 				var path = Zongsoft.IO.Path.Parse(file.Path);
 
 				//确认文件的所在目录是存在的，如果不存在则创建相应的目录
-				FileSystem.Instance.Directory.Create(path.DirectoryName);
+				FileSystem.Directory.Create(path.DirectoryName);
 
 				//创建或打开指定路径的文件流
-				var stream = FileSystem.Instance.File.Open(file.Path, FileMode.Create, FileAccess.Write);
+				var stream = FileSystem.File.Open(file.Path, FileMode.Create, FileAccess.Write);
 
 				//将文件内容写入到创建或打开的文件流中
 				StreamUtility.Copy(content, stream);
@@ -141,7 +141,7 @@ namespace Zongsoft.IO
 
 			dictionary["VisitedTime"] = DateTime.Now;
 
-			return FileSystem.Instance.File.Open(path, FileMode.Open, FileAccess.ReadWrite, FileShare.Read);
+			return FileSystem.File.Open(path, FileMode.Open, FileAccess.ReadWrite, FileShare.Read);
 		}
 
 		public Stream Open(Guid fileId, out StorageFileInfo info)
@@ -174,7 +174,7 @@ namespace Zongsoft.IO
 			if(string.IsNullOrWhiteSpace(info.Path))
 				return null;
 
-			return FileSystem.Instance.File.Open(info.Path, FileMode.Open, FileAccess.ReadWrite, FileShare.Read);
+			return FileSystem.File.Open(info.Path, FileMode.Open, FileAccess.ReadWrite, FileShare.Read);
 		}
 
 		public StorageFileInfo GetInfo(Guid fileId)
@@ -237,7 +237,7 @@ namespace Zongsoft.IO
 				collection.Remove(fileId.ToString("n"));
 
 			if(!string.IsNullOrWhiteSpace(filePath))
-				FileSystem.Instance.File.Delete(filePath);
+				FileSystem.File.Delete(filePath);
 
 			return true;
 		}
