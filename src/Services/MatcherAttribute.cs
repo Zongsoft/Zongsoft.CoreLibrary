@@ -78,7 +78,7 @@ namespace Zongsoft.Services
 				if(_type == null)
 					return null;
 
-				return Activator.CreateInstance<IMatcher>();
+				return Activator.CreateInstance(_type) as IMatcher;
 			}
 		}
 		#endregion
