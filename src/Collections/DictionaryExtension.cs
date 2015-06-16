@@ -64,7 +64,7 @@ namespace Zongsoft.Collections
 			return result;
 		}
 
-		public static IDictionary<TKey, TValue> ToDictionary<TKey, TValue>(IDictionary dictionary, Func<object, TKey> keyConvert = null, Func<object, TValue> valueConvert = null)
+		public static IDictionary<TKey, TValue> ToDictionary<TKey, TValue>(this IDictionary dictionary, Func<object, TKey> keyConvert = null, Func<object, TValue> valueConvert = null)
 		{
 			if(dictionary == null)
 				return null;
