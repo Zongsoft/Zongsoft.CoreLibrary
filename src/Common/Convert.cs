@@ -776,8 +776,8 @@ namespace Zongsoft.Common
 			/// 获取或设置一个操作的值，该属性在不同场景中所表示的含义和可设置性均不同。详情请参考备注。
 			/// </summary>
 			/// <remarks>
-			///		<para>当<see cref="Direction"/>属性值等于<seealso cref="ObjectResolvingDirection.Get"/>时，该属性可设置，表示处理程序所解析出来的成员值。</para>
-			///		<para>当<see cref="Direction"/>属性值等于<seealso cref="ObjectResolvingDirection.Set"/>时，该属性不可设置，表示是由用户指定要设置的目标值。</para>
+			///		<para>当<see cref="Direction"/>属性值等于<seealso cref="ObjectResolvingDirection.Get"/>时，表示处理程序所解析出来的成员值。</para>
+			///		<para>当<see cref="Direction"/>属性值等于<seealso cref="ObjectResolvingDirection.Set"/>时，表示是由用户指定要设置的目标值。</para>
 			/// </remarks>
 			/// <exception cref="System.InvalidOperationException">当<see cref="Direction"/>属性值不等于<seealso cref="ObjectResolvingDirection.Get"/>时激发。</exception>
 			public object Value
@@ -788,9 +788,6 @@ namespace Zongsoft.Common
 				}
 				set
 				{
-					if(_direction != ObjectResolvingDirection.Get)
-						throw new InvalidOperationException();
-
 					_value = value;
 				}
 			}
