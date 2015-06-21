@@ -35,6 +35,14 @@ namespace Zongsoft.Runtime.Serialization
 	public interface ISerializer
 	{
 		/// <summary>
+		/// 获取当前序列化器的选项设置。
+		/// </summary>
+		SerializerSettings Settings
+		{
+			get;
+		}
+
+		/// <summary>
 		/// 反序列化指定<paramref name="serializationStream"/>包含的对象。
 		/// </summary>
 		/// <param name="serializationStream">待反序列化的流。</param>
