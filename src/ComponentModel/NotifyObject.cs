@@ -203,6 +203,19 @@ namespace Zongsoft.ComponentModel
 			this.OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
 		}
 
+		protected void OnPropertyChanged<T>(Expression<Func<T>> propertyExpression)
+		{
+			if(propertyExpression == null)
+				throw new ArgumentNullException("propertyExpression");
+
+			var property = this.GetPropertyInfo<T>(propertyExpression);
+
+			if(property == null)
+				throw new ArgumentException("Invalid expression of the argument", "propertyExpression");
+
+			this.OnPropertyChanged(property.Name);
+		}
+
 		protected virtual void OnPropertyChanged(PropertyChangedEventArgs args)
 		{
 			var handler = this.PropertyChanged;
