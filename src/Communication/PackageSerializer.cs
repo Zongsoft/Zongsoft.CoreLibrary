@@ -278,5 +278,15 @@ namespace Zongsoft.Communication
 			}
 		}
 		#endregion
+
+		#region 显式实现
+		SerializerSettings Zongsoft.Runtime.Serialization.ISerializer.Settings
+		{
+			get
+			{
+				return null;
+			}
+		}
+		#endregion
 	}
 }
