@@ -25,10 +25,11 @@
  */
 
 using System;
+using System.Collections.Generic;
 
 namespace Zongsoft.Runtime.Serialization
 {
-	public class SerializerSettings
+	public class SerializerSettings : Zongsoft.ComponentModel.NotifyObject
 	{
 		#region 成员变量
 		private int _maximumDepth;
@@ -58,7 +59,13 @@ namespace Zongsoft.Runtime.Serialization
 			}
 			set
 			{
-				_maximumDepth = Math.Max(-1, value);
+				var newValue = Math.Max(-1, value);
+				var changed = _maximumDepth != newValue;
+
+				_maximumDepth = newValue;
+
+				if(changed)
+					this.OnPropertyChanged(() => this.MaximumDepth);
 			}
 		}
 
@@ -70,7 +77,11 @@ namespace Zongsoft.Runtime.Serialization
 			}
 			set
 			{
-				_serializationMembers = value;
+				if(_serializationMembers != value)
+				{
+					_serializationMembers = value;
+					this.OnPropertyChanged(() => this.SerializationMembers);
+				}
 			}
 		}
 		#endregion
