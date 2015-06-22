@@ -61,18 +61,39 @@ namespace Zongsoft.IO
 			if(driveName.Length > 1)
 			{
 				var drives = System.IO.DriveInfo.GetDrives();
+				var matched = false;
 
 				foreach(var drive in drives)
 				{
-					if(string.Equals(drive.VolumeLabel, driveName, StringComparison.OrdinalIgnoreCase))
+					matched = IsMatch(drive, driveName);
+
+					if(matched)
 					{
 						driveName = drive.Name;
 						break;
 					}
 				}
+
+				if(!matched)
+					throw new PathException(string.Format("Not matched drive for '{0}' path.", path));
 			}
 
 			return driveName[0] + ":" + match.Groups["path"].Value.Replace('/', '\\');
+		}
+
+		private static bool IsMatch(System.IO.DriveInfo drive, string driveName)
+		{
+			if(drive == null)
+				return false;
+
+			try
+			{
+				return string.Equals(drive.VolumeLabel, driveName, StringComparison.OrdinalIgnoreCase);
+			}
+			catch
+			{
+				return false;
+			}
 		}
 	}
 }
