@@ -108,7 +108,7 @@ namespace Zongsoft.IO
 				var path = Zongsoft.IO.Path.Parse(file.Path);
 
 				//确认文件的所在目录是存在的，如果不存在则创建相应的目录
-				FileSystem.Directory.Create(path.DirectoryName);
+				FileSystem.Directory.Create(path.Schema + ":" + path.DirectoryName);
 
 				//创建或打开指定路径的文件流
 				var stream = FileSystem.File.Open(file.Path, FileMode.Create, FileAccess.Write);
