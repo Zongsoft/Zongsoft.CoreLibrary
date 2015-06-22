@@ -28,6 +28,7 @@ using System;
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 using Zongsoft.Collections;
 
@@ -98,8 +99,12 @@ namespace Zongsoft.IO
 			else
 				storage.SetValue(GetFileCollectionKey(file.BucketId), new string[] { file.FileId.ToString("n") });
 
-			if(!string.IsNullOrWhiteSpace(file.Path) && content != null)
+			if(content != null)
 			{
+				//如果文件路径为空则为它设置一个有效的文件路径
+				if(string.IsNullOrWhiteSpace(file.Path))
+					file.Path = this.GetFilePath(file);
+
 				var path = Zongsoft.IO.Path.Parse(file.Path);
 
 				//确认文件的所在目录是存在的，如果不存在则创建相应的目录
@@ -322,6 +327,64 @@ namespace Zongsoft.IO
 		internal static string GetFileKey(Guid fileId)
 		{
 			return "Zongsoft.IO.StorageFile:" + fileId.ToString("n");
+		}
+
+		private string GetBucketPath(int bucketId)
+		{
+			var storage = this.Storage;
+
+			if(storage == null)
+				throw new InvalidOperationException("The Storage is null.");
+
+			var dictionary = storage.GetValue(StorageBucket.GetBucketKey(bucketId)) as IDictionary;
+
+			if(dictionary != null)
+			{
+				string path = null;
+
+				if(dictionary.TryGetValue<string>("Path", out path))
+					return path;
+			}
+
+			return null;
+		}
+
+		private string GetFilePath(StorageFileInfo fileInfo)
+		{
+			var timestamp = fileInfo.CreatedTime;
+			var parameters = Zongsoft.Collections.DictionaryExtension.ToDictionary<string, string>(Environment.GetEnvironmentVariables());
+
+			parameters.Add("date", timestamp.ToString("yyyyMMdd"));
+			parameters.Add("time", timestamp.ToString("HHmmss"));
+			parameters.Add("year", timestamp.Year.ToString("0000"));
+			parameters.Add("month", timestamp.Month.ToString("00"));
+			parameters.Add("day", timestamp.Day.ToString("00"));
+
+			var resolvedPath = this.ResolveTextWithParameters(this.GetBucketPath(fileInfo.BucketId), parameters);
+
+			//返回当前文件的完整虚拟路径
+			return Zongsoft.IO.Path.Combine(resolvedPath, string.Format("[{0}]{1:n}{2}", fileInfo.BucketId, fileInfo.FileId, System.IO.Path.GetExtension(fileInfo.Name).ToLowerInvariant()));
+		}
+
+		private string ResolveTextWithParameters(string text, IDictionary<string, string> parameters)
+		{
+			if(string.IsNullOrWhiteSpace(text))
+				return string.Empty;
+
+			if(parameters == null || parameters.Count < 1)
+				return text;
+
+			var result = text;
+
+			foreach(var parameter in parameters)
+			{
+				if(string.IsNullOrWhiteSpace(parameter.Key))
+					continue;
+
+				result = Regex.Replace(result, @"\$\(" + parameter.Key + @"\)", parameter.Value, RegexOptions.IgnorePatternWhitespace | RegexOptions.IgnoreCase);
+			}
+
+			return result;
 		}
 		#endregion
 	}
