@@ -62,6 +62,8 @@
     <Compile Include="Data\SortingTest.cs" />
     <Compile Include="Gender.cs" />
     <Compile Include="Common\ObjectReferenceTests.cs" />
+    <Compile Include="IO\FileSystemTest.cs" />
+    <Compile Include="IO\PathTest.cs" />
     <Compile Include="Person.cs" />
     <Compile Include="Common\StringExtensionTests.cs" />
     <Compile Include="Common\TypeExtensionTests.cs" />
@@ -80,6 +82,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx" />
   </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>
