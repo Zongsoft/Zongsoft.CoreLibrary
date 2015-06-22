@@ -90,7 +90,7 @@ namespace Zongsoft.IO
 			else
 			{
 				_fileName = parts[parts.Length - 1].Trim();
-				_directoryName = string.Join("/", parts);
+				_directoryName = string.Join("/", parts, 0, parts.Length - 1) + "/";
 			}
 		}
 		#endregion
@@ -191,19 +191,6 @@ namespace Zongsoft.IO
 			return match.Success;
 		}
 
-		public static string GetSchema(string path)
-		{
-			if(string.IsNullOrWhiteSpace(path))
-				return string.Empty;
-
-			var match = _regex.Match(path);
-
-			if(match.Success)
-				return match.Groups["schema"].Value;
-
-			return string.Empty;
-		}
-
 		public static bool TryParse(string text, out string schema, out string path)
 		{
 			schema = string.Empty;
@@ -221,6 +208,19 @@ namespace Zongsoft.IO
 			}
 
 			return match.Success;
+		}
+
+		public static string GetSchema(string path)
+		{
+			if(string.IsNullOrWhiteSpace(path))
+				return string.Empty;
+
+			var match = _regex.Match(path);
+
+			if(match.Success)
+				return match.Groups["schema"].Value;
+
+			return string.Empty;
 		}
 
 		public static string Combine(params string[] parts)
