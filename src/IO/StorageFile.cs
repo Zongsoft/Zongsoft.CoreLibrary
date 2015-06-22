@@ -90,6 +90,10 @@ namespace Zongsoft.IO
 			if(storage == null)
 				throw new InvalidOperationException("The Storage is null.");
 
+			//如果文件路径为空则为它设置一个有效的文件路径
+			if(string.IsNullOrWhiteSpace(file.Path))
+				file.Path = this.GetFilePath(file);
+
 			storage.SetValue(GetFileKey(file.FileId), file.ToDictionary());
 
 			var collection = storage.GetValue(GetFileCollectionKey(file.BucketId)) as ICollection<string>;
@@ -101,20 +105,17 @@ namespace Zongsoft.IO
 
 			if(content != null)
 			{
-				//如果文件路径为空则为它设置一个有效的文件路径
-				if(string.IsNullOrWhiteSpace(file.Path))
-					file.Path = this.GetFilePath(file);
-
 				var path = Zongsoft.IO.Path.Parse(file.Path);
 
 				//确认文件的所在目录是存在的，如果不存在则创建相应的目录
 				FileSystem.Directory.Create(path.Schema + ":" + path.DirectoryName);
 
 				//创建或打开指定路径的文件流
-				var stream = FileSystem.File.Open(file.Path, FileMode.Create, FileAccess.Write);
-
-				//将文件内容写入到创建或打开的文件流中
-				StreamUtility.Copy(content, stream);
+				using(var stream = FileSystem.File.Open(file.Path, FileMode.Create, FileAccess.Write))
+				{
+					//将文件内容写入到创建或打开的文件流中
+					StreamUtility.Copy(content, stream);
+				}
 			}
 		}
 
