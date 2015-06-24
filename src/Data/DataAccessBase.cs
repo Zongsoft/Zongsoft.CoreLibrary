@@ -305,14 +305,28 @@ namespace Zongsoft.Data
 								return new string[] { p.PropertyName };
 
 							var list = new List<string>();
-							this.GetComplexPropertyMembers(entity.EntityName, p.PropertyName, p.PropertyType, list);
+							this.GetComplexPropertyMembers(entity.EntityName, p.PropertyName, p.PropertyType, list, true);
 							return list.ToArray();
 						}));
 
 						break;
 					default:
 						if((part[0] >= 'A' && part[0] <= 'Z') || (part[0] >= 'a' && part[0] <= 'z') || part[0] == '_')
-							result.Add(part);
+						{
+							var property = entity.Properties.FirstOrDefault(p => string.Equals(p.PropertyName, part, StringComparison.OrdinalIgnoreCase));
+
+							if(property == null)
+								throw new ArgumentException(string.Format("The '{0}' property is not exists in the '{1}' entity.", part, entity.EntityName));
+
+							if(property.IsScalarType)
+								result.Add(part);
+							else
+							{
+								var list = new List<string>();
+								this.GetComplexPropertyMembers(entity.EntityName, property.PropertyName, property.PropertyType, list, false);
+								result.UnionWith(list);
+							}
+						}
 						else
 							throw new ArgumentException("scope");
 
@@ -323,7 +337,7 @@ namespace Zongsoft.Data
 			return result;
 		}
 
-		private void GetComplexPropertyMembers(string entityName, string memberPrefix, Type memberType, ICollection<string> collection)
+		private void GetComplexPropertyMembers(string entityName, string memberPrefix, Type memberType, ICollection<string> collection, bool recursive)
 		{
 			var entityDescriptor = _entityCache.GetOrAdd(memberType, type => new EntityDesciptior(this, entityName + "!" + memberPrefix, type));
 
@@ -331,8 +345,8 @@ namespace Zongsoft.Data
 			{
 				if(this.IsScalarType(property.PropertyType))
 					collection.Add(memberPrefix + "." + property.PropertyName);
-				else
-					GetComplexPropertyMembers(entityName, memberPrefix + "." + property.PropertyName, property.PropertyType, collection);
+				else if(recursive)
+					GetComplexPropertyMembers(entityName, memberPrefix + "." + property.PropertyName, property.PropertyType, collection, recursive);
 			}
 		}
 
