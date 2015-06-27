@@ -15,6 +15,11 @@ namespace Zongsoft.Common.Tests
 		[TestMethod]
 		public void ConvertValueTest()
 		{
+			Assert.AreEqual("100", Zongsoft.Common.Convert.ConvertValue<string>(100));
+			Assert.AreEqual("100", Zongsoft.Common.Convert.ConvertValue<string>(100L));
+			Assert.AreEqual("100.5", Zongsoft.Common.Convert.ConvertValue<string>(100.50));
+			Assert.AreEqual("100.50", Zongsoft.Common.Convert.ConvertValue<string>(100.50m));
+
 			Assert.AreEqual(Gender.Male, Zongsoft.Common.Convert.ConvertValue("male", typeof(Gender)));
 			Assert.AreEqual(Gender.Male, Zongsoft.Common.Convert.ConvertValue("Male", typeof(Gender)));
 			Assert.AreEqual(Gender.Female, Zongsoft.Common.Convert.ConvertValue("female", typeof(Gender)));
