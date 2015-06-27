@@ -50,6 +50,7 @@ namespace Zongsoft.IO
 		private DateTime? _modifiedTime;
 		private DateTime? _visitedTime;
 		private long _totalVisits;
+		private IDictionary<string, object> _extendedProperties;
 		#endregion
 
 		#region 构造函数
@@ -232,6 +233,31 @@ namespace Zongsoft.IO
 			set
 			{
 				_visitedTime = value;
+			}
+		}
+
+		/// <summary>
+		/// 获取一个值，指示扩展属性集是否存在并且有值。
+		/// </summary>
+		public bool HasExtendedProperties
+		{
+			get
+			{
+				return _extendedProperties != null && _extendedProperties.Count > 0;
+			}
+		}
+
+		/// <summary>
+		/// 获取扩展属性集。
+		/// </summary>
+		public IDictionary<string, object> ExtendedProperties
+		{
+			get
+			{
+				if(_extendedProperties == null)
+					System.Threading.Interlocked.CompareExchange(ref _extendedProperties, new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase), null);
+
+				return _extendedProperties;
 			}
 		}
 		#endregion
