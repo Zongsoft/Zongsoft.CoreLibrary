@@ -340,7 +340,7 @@ namespace Zongsoft.IO
 
 			foreach(var extendedProperty in extendedProperties)
 			{
-				dictionary[extendedProperty.Key] = extendedProperty.Value;
+				dictionary[StorageFileInfo.EXTENDEDPROPERTIESPREFIX + extendedProperty.Key] = extendedProperty.Value;
 			}
 
 			return true;

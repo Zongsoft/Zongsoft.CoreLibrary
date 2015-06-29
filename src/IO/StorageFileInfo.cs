@@ -40,7 +40,7 @@ namespace Zongsoft.IO
 	public class StorageFileInfo : MarshalByRefObject
 	{
 		#region 常量定义
-		private const string EXTENDEDPROPERTIESPREFIX = "ExtendedProperties.";
+		internal const string EXTENDEDPROPERTIESPREFIX = "ExtendedProperties.";
 		#endregion
 
 		#region 成员字段
