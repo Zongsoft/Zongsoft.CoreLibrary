@@ -322,6 +322,29 @@ namespace Zongsoft.IO
 
 			return false;
 		}
+
+		public bool SetExtendedProperties(Guid fileId, IDictionary<string, object> extendedProperties)
+		{
+			if(extendedProperties == null)
+				throw new ArgumentNullException("extendedProperties");
+
+			var storage = this.Storage;
+
+			if(storage == null)
+				throw new InvalidOperationException("The Storage is null.");
+
+			var dictionary = storage.GetValue(GetFileKey(fileId)) as IDictionary;
+
+			if(dictionary == null)
+				return false;
+
+			foreach(var extendedProperty in extendedProperties)
+			{
+				dictionary[extendedProperty.Key] = extendedProperty.Value;
+			}
+
+			return true;
+		}
 		#endregion
 
 		#region 私有方法

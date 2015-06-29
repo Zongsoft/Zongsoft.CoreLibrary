@@ -26,6 +26,7 @@
 
 using System;
 using System.IO;
+using System.Collections.Generic;
 
 namespace Zongsoft.IO
 {
@@ -99,5 +100,7 @@ namespace Zongsoft.IO
 		///		<para>如果指定的目的存储容器即为指定文件的容器则返回假(False)；如果指定的文件编号不存在则返回假(False)。</para>
 		/// </remarks>
 		bool Move(Guid fileId, int bucketId);
+
+		bool SetExtendedProperties(Guid fileId, IDictionary<string, object> extendedProperties);
 	}
 }
