@@ -263,18 +263,25 @@ namespace Zongsoft.IO
 			if(info.BucketId == bucketId)
 				return fileId;
 
-			var newId = Guid.NewGuid();
-
-			this.Create(new StorageFileInfo(bucketId, newId)
+			var newInfo = new StorageFileInfo(bucketId, Guid.NewGuid())
 			{
 				Name = info.Name,
 				Type = info.Type,
 				Size = info.Size,
 				Path = info.Path,
-				Title = info.Title,
-			}, null);
+			};
 
-			return newId;
+			if(info.HasExtendedProperties)
+			{
+				foreach(var entry in info.ExtendedProperties)
+				{
+					newInfo.ExtendedProperties.Add(entry.Key, entry.Value);
+				}
+			}
+
+			this.Create(newInfo, null);
+
+			return newInfo.FileId;
 		}
 
 		public bool Move(Guid fileId, int bucketId)

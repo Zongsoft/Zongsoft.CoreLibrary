@@ -50,7 +50,6 @@ namespace Zongsoft.IO
 		private string _type;
 		private long _size;
 		private string _path;
-		private string _title;
 		private DateTime _createdTime;
 		private DateTime? _modifiedTime;
 		private DateTime? _visitedTime;
@@ -148,21 +147,6 @@ namespace Zongsoft.IO
 			set
 			{
 				_path = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置文件的标题。
-		/// </summary>
-		public string Title
-		{
-			get
-			{
-				return _title;
-			}
-			set
-			{
-				_title = value;
 			}
 		}
 
@@ -278,7 +262,6 @@ namespace Zongsoft.IO
 				{ "Type", _type },
 				{ "Size", _size },
 				{ "Path", _path },
-				{ "Title", _title },
 				{ "TotalVisits", _totalVisits },
 				{ "CreatedTime", _createdTime },
 				{ "ModifiedTime", _modifiedTime },
@@ -303,7 +286,7 @@ namespace Zongsoft.IO
 			if(dictionary == null || dictionary.Count < 1)
 				return null;
 
-			object bucketId, fileId, name, type, size, title, path, totalVisits, createdTime, modifiedTime, visitedTime;
+			object bucketId, fileId, name, type, size, path, totalVisits, createdTime, modifiedTime, visitedTime;
 
 			if(!dictionary.TryGetValue("BucketId", out bucketId))
 				return null;
@@ -315,7 +298,6 @@ namespace Zongsoft.IO
 			dictionary.TryGetValue("Type", out type);
 			dictionary.TryGetValue("Size", out size);
 			dictionary.TryGetValue("Path", out path);
-			dictionary.TryGetValue("Title", out title);
 			dictionary.TryGetValue("TotalVisits", out totalVisits);
 			dictionary.TryGetValue("CreatedTime", out createdTime);
 			dictionary.TryGetValue("ModifiedTime", out modifiedTime);
@@ -327,7 +309,6 @@ namespace Zongsoft.IO
 				Type = Zongsoft.Common.Convert.ConvertValue<string>(type),
 				Size = Zongsoft.Common.Convert.ConvertValue<long>(size),
 				Path = Zongsoft.Common.Convert.ConvertValue<string>(path),
-				Title = Zongsoft.Common.Convert.ConvertValue<string>(title),
 				TotalVisits = Zongsoft.Common.Convert.ConvertValue<int>(totalVisits),
 				CreatedTime = Zongsoft.Common.Convert.ConvertValue<DateTime>(createdTime),
 				ModifiedTime = Zongsoft.Common.Convert.ConvertValue<DateTime?>(modifiedTime),
