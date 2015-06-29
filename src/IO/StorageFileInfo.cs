@@ -27,6 +27,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 using Zongsoft.Collections;
 
@@ -38,6 +39,10 @@ namespace Zongsoft.IO
 	[Serializable]
 	public class StorageFileInfo : MarshalByRefObject
 	{
+		#region 常量定义
+		private const string EXTENDEDPROPERTIESPREFIX = "ExtendedProperties.";
+		#endregion
+
 		#region 成员字段
 		private Guid _fileId;
 		private int _bucketId;
@@ -265,7 +270,7 @@ namespace Zongsoft.IO
 		#region 公共方法
 		public IDictionary<string, object> ToDictionary()
 		{
-			return new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+			var result = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
 			{
 				{ "BucketId", _bucketId },
 				{ "FileId", _fileId },
@@ -279,6 +284,18 @@ namespace Zongsoft.IO
 				{ "ModifiedTime", _modifiedTime },
 				{ "VisitedTime", _visitedTime },
 			};
+
+			var extendedProperties = _extendedProperties;
+
+			if(extendedProperties != null && extendedProperties.Count > 0)
+			{
+				foreach(var extendedProperty in extendedProperties)
+				{
+					result.Add(EXTENDEDPROPERTIESPREFIX + extendedProperty.Key, extendedProperty.Value);
+				}
+			}
+
+			return result;
 		}
 
 		public static StorageFileInfo FromDictionary(IDictionary dictionary)
@@ -304,7 +321,7 @@ namespace Zongsoft.IO
 			dictionary.TryGetValue("ModifiedTime", out modifiedTime);
 			dictionary.TryGetValue("VisitedTime", out visitedTime);
 
-			return new StorageFileInfo(Zongsoft.Common.Convert.ConvertValue<int>(bucketId), Zongsoft.Common.Convert.ConvertValue<Guid>(fileId))
+			var result = new StorageFileInfo(Zongsoft.Common.Convert.ConvertValue<int>(bucketId), Zongsoft.Common.Convert.ConvertValue<Guid>(fileId))
 			{
 				Name = Zongsoft.Common.Convert.ConvertValue<string>(name),
 				Type = Zongsoft.Common.Convert.ConvertValue<string>(type),
@@ -316,6 +333,17 @@ namespace Zongsoft.IO
 				ModifiedTime = Zongsoft.Common.Convert.ConvertValue<DateTime?>(modifiedTime),
 				VisitedTime = Zongsoft.Common.Convert.ConvertValue<DateTime?>(visitedTime),
 			};
+
+			foreach(var key in dictionary.Keys)
+			{
+				if(key == null)
+					continue;
+
+				if(key.ToString().StartsWith(EXTENDEDPROPERTIESPREFIX))
+					result.ExtendedProperties[key.ToString().Substring(EXTENDEDPROPERTIESPREFIX.Length)] = dictionary[key];
+			}
+
+			return result;
 		}
 		#endregion
 
