@@ -93,16 +93,34 @@ namespace Zongsoft.IO
 				return System.IO.Directory.CreateDirectory(fullPath) != null;
 			}
 
-			public void Delete(string path)
+			public bool Delete(string path)
 			{
 				var fullPath = LocalPath.ToLocalPath(path);
-				System.IO.Directory.Delete(fullPath);
+
+				try
+				{
+					System.IO.Directory.Delete(fullPath);
+					return true;
+				}
+				catch(DirectoryNotFoundException)
+				{
+					return false;
+				}
 			}
 
-			public void Delete(string path, bool recursive)
+			public bool Delete(string path, bool recursive)
 			{
 				var fullPath = LocalPath.ToLocalPath(path);
-				System.IO.Directory.Delete(fullPath, recursive);
+
+				try
+				{
+					System.IO.Directory.Delete(fullPath, recursive);
+					return true;
+				}
+				catch(DirectoryNotFoundException)
+				{
+					return false;
+				}
 			}
 
 			public void Move(string source, string destination)
@@ -178,10 +196,19 @@ namespace Zongsoft.IO
 			#endregion
 
 			#region 公共方法
-			public void Delete(string path)
+			public bool Delete(string path)
 			{
 				var fullPath = LocalPath.ToLocalPath(path);
-				System.IO.File.Delete(fullPath);
+
+				try
+				{
+					System.IO.File.Delete(fullPath);
+					return true;
+				}
+				catch(FileNotFoundException)
+				{
+					return false;
+				}
 			}
 
 			public bool Exists(string path)

@@ -51,7 +51,7 @@ namespace Zongsoft.IO
 		/// </remarks>
 		bool Create(string path);
 
-		void Delete(string path, bool recursive = false);
+		bool Delete(string path, bool recursive = false);
 
 		void Move(string source, string destination);
 		bool Exists(string path);

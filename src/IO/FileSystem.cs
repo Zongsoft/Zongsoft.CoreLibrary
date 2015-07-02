@@ -162,12 +162,12 @@ namespace Zongsoft.IO
 		#region 嵌套子类
 		private class FileService : IFile
 		{
-			public void Delete(string virtualPath)
+			public bool Delete(string virtualPath)
 			{
 				Path path;
 				var service = FileSystem.GetFileService(virtualPath, out path);
 
-				service.Delete(path.FullPath);
+				return service.Delete(path.FullPath);
 			}
 
 			public bool Exists(string virtualPath)
@@ -256,17 +256,17 @@ namespace Zongsoft.IO
 				return service.Create(path.FullPath);
 			}
 
-			public void Delete(string virtualPath)
+			public bool Delete(string virtualPath)
 			{
-				this.Delete(virtualPath, false);
+				return this.Delete(virtualPath, false);
 			}
 
-			public void Delete(string virtualPath, bool recursive)
+			public bool Delete(string virtualPath, bool recursive)
 			{
 				Path path;
 				var service = FileSystem.GetDirectoryService(virtualPath, out path);
 
-				service.Delete(path.FullPath, recursive);
+				return service.Delete(path.FullPath, recursive);
 			}
 
 			public void Move(string source, string destination)
