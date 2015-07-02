@@ -32,6 +32,7 @@ using Zongsoft.Collections;
 
 namespace Zongsoft.IO
 {
+	[Obsolete("Please use Aliyun-OSS providr of filesystem.")]
 	public class StorageBucket : IStorageBucket
 	{
 		#region 成员字段

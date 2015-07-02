@@ -37,6 +37,7 @@ namespace Zongsoft.IO
 	/// 表示存储文件的信息类。
 	/// </summary>
 	[Serializable]
+	[Obsolete("Please use Aliyun-OSS providr of filesystem.")]
 	public class StorageFileInfo : MarshalByRefObject
 	{
 		#region 常量定义

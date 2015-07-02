@@ -33,6 +33,7 @@ namespace Zongsoft.IO
 	/// <summary>
 	/// 表示<see cref="IStorageFile">存储文件</see>的操作接口。
 	/// </summary>
+	[Obsolete("Please use Aliyun-OSS providr of filesystem.")]
 	public interface IStorageFile
 	{
 		/// <summary>

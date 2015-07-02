@@ -36,6 +36,7 @@ namespace Zongsoft.IO
 	/// 表示存储文件的容器信息类。
 	/// </summary>
 	[Serializable]
+	[Obsolete("Please use Aliyun-OSS providr of filesystem.")]
 	public class StorageBucketInfo : MarshalByRefObject
 	{
 		#region 成员字段
