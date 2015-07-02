@@ -77,7 +77,7 @@ namespace Zongsoft.IO
 				throw new ArgumentNullException("fullPath");
 
 			_originalString = originalString.Trim();
-			_schema = schema.Trim();
+			_schema = schema.Trim().ToLowerInvariant();
 			_fullPath = fullPath.Trim();
 
 			var parts = fullPath.Split('/');
@@ -132,12 +132,22 @@ namespace Zongsoft.IO
 		#region 重写方法
 		public override string ToString()
 		{
-			return _originalString;
+			if(string.IsNullOrWhiteSpace(_schema))
+				return _fullPath;
+			else
+				return _schema + ":" + _originalString;
 		}
 
 		public override int GetHashCode()
 		{
-			return _originalString.GetHashCode();
+			switch(Environment.OSVersion.Platform)
+			{
+				case PlatformID.MacOSX:
+				case PlatformID.Unix:
+					return (_schema + _fullPath).GetHashCode();
+				default:
+					return (_schema + _fullPath.ToLowerInvariant()).GetHashCode();
+			}
 		}
 
 		public override bool Equals(object obj)
@@ -145,7 +155,19 @@ namespace Zongsoft.IO
 			if(obj == null || obj.GetType() != this.GetType())
 				return false;
 
-			return _originalString == ((Path)obj)._originalString;
+			var other = (Path)obj;
+
+			if(!string.Equals(_schema, other._schema))
+				return false;
+
+			switch(Environment.OSVersion.Platform)
+			{
+				case PlatformID.MacOSX:
+				case PlatformID.Unix:
+					return string.Equals(_fullPath, other._fullPath, StringComparison.Ordinal);
+				default:
+					return string.Equals(_fullPath, other._fullPath, StringComparison.OrdinalIgnoreCase);
+			}
 		}
 		#endregion
 
