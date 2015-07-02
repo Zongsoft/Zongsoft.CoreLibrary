@@ -135,7 +135,7 @@ namespace Zongsoft.IO
 			if(string.IsNullOrWhiteSpace(_schema))
 				return _fullPath;
 			else
-				return _schema + ":" + _originalString;
+				return _schema + ":" + _fullPath;
 		}
 
 		public override int GetHashCode()
