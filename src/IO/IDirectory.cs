@@ -45,11 +45,12 @@ namespace Zongsoft.IO
 		/// 创建一个指定路径的目录。
 		/// </summary>
 		/// <param name="path">指定要创建的目录路径。</param>
+		/// <param name="properties">目录的扩展属性集，默认为空(null)。</param>
 		/// <returns>如果创建成功则返回真(True)，否则返回假(False)。</returns>
 		/// <remarks>
 		///		<para>如果<paramref name="path"/>参数指定的路径不存在并且创建成功则返回真；如果指定的路径已存在则返回假。</para>
 		/// </remarks>
-		bool Create(string path);
+		bool Create(string path, IDictionary<string, string> properties = null);
 
 		bool Delete(string path, bool recursive = false);
 
