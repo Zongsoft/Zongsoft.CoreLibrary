@@ -201,7 +201,6 @@
     <Compile Include="IO\StorageBucket.cs" />
     <Compile Include="IO\StorageFileInfo.cs" />
     <Compile Include="IO\StorageFile.cs" />
-    <Compile Include="IO\StreamUtility.cs" />
     <Compile Include="Options\Configuration\OptionConfigurationLoader.cs" />
     <Compile Include="Options\Configuration\OptionConfigurationManager.cs" />
     <Compile Include="Options\IOptionLoader.cs" />

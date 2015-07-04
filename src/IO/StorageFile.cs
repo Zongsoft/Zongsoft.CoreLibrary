@@ -115,7 +115,7 @@ namespace Zongsoft.IO
 				using(var stream = FileSystem.File.Open(file.Path, FileMode.Create, FileAccess.Write))
 				{
 					//将文件内容写入到创建或打开的文件流中
-					StreamUtility.Copy(content, stream);
+					content.CopyTo(stream);
 				}
 			}
 		}
