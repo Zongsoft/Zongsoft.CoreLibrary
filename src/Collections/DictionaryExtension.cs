@@ -69,8 +69,11 @@ namespace Zongsoft.Collections
 			if(dictionary == null)
 				return null;
 
-			keyConvert = key => Zongsoft.Common.Convert.ConvertValue<TKey>(key);
-			valueConvert = value => Zongsoft.Common.Convert.ConvertValue<TValue>(value);
+			if(keyConvert == null)
+				keyConvert = key => Zongsoft.Common.Convert.ConvertValue<TKey>(key);
+
+			if(valueConvert == null)
+				valueConvert = value => Zongsoft.Common.Convert.ConvertValue<TValue>(value);
 
 			var result = new Dictionary<TKey, TValue>(dictionary.Count);
 
