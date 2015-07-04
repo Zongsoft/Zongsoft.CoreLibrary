@@ -44,6 +44,9 @@ namespace Zongsoft.IO
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取本地文件目录系统的模式，始终返回“zfs.local”。
+		/// </summary>
 		public string Schema
 		{
 			get
@@ -83,7 +86,7 @@ namespace Zongsoft.IO
 			#endregion
 
 			#region 公共方法
-			public bool Create(string path)
+			public bool Create(string path, IDictionary<string, string> properties = null)
 			{
 				var fullPath = LocalPath.ToLocalPath(path);
 
@@ -145,7 +148,7 @@ namespace Zongsoft.IO
 				if(info == null || !info.Exists)
 					return null;
 
-				return new DirectoryInfo(info.FullName, name: info.Name, createdTime: info.CreationTime);
+				return new DirectoryInfo(info.FullName, name: info.Name, createdTime: info.CreationTime, modifiedTime: info.LastWriteTime);
 			}
 
 			public IEnumerable<string> GetChildren(string path)
@@ -249,25 +252,25 @@ namespace Zongsoft.IO
 				return new FileInfo(info.FullName, name: info.Name, size: info.Length, createdTime: info.CreationTime, modifiedTime: info.LastWriteTime);
 			}
 
-			public Stream Open(string path)
+			public Stream Open(string path, IDictionary<string, string> properties = null)
 			{
 				var fullPath = LocalPath.ToLocalPath(path);
 				return System.IO.File.Open(fullPath, FileMode.Open);
 			}
 
-			public Stream Open(string path, FileMode mode)
+			public Stream Open(string path, FileMode mode, IDictionary<string, string> properties = null)
 			{
 				var fullPath = LocalPath.ToLocalPath(path);
 				return System.IO.File.Open(fullPath, mode);
 			}
 
-			public Stream Open(string path, FileMode mode, FileAccess access)
+			public Stream Open(string path, FileMode mode, FileAccess access, IDictionary<string, string> properties = null)
 			{
 				var fullPath = LocalPath.ToLocalPath(path);
 				return System.IO.File.Open(fullPath, mode, access);
 			}
 
-			public Stream Open(string path, FileMode mode, FileAccess access, FileShare share)
+			public Stream Open(string path, FileMode mode, FileAccess access, FileShare share, IDictionary<string, string> properties = null)
 			{
 				var fullPath = LocalPath.ToLocalPath(path);
 				return System.IO.File.Open(fullPath, mode, access, share);

@@ -160,100 +160,14 @@ namespace Zongsoft.IO
 		#endregion
 
 		#region 嵌套子类
-		private class FileService : IFile
-		{
-			public bool Delete(string virtualPath)
-			{
-				Path path;
-				var service = FileSystem.GetFileService(virtualPath, out path);
-
-				return service.Delete(path.FullPath);
-			}
-
-			public bool Exists(string virtualPath)
-			{
-				Path path;
-				var service = FileSystem.GetFileService(virtualPath, out path);
-
-				return service.Exists(path.FullPath);
-			}
-
-			public void Copy(string source, string destination)
-			{
-				this.Copy(source, destination, true);
-			}
-
-			public void Copy(string source, string destination, bool overwrite)
-			{
-				Path[] paths;
-				var services = FileSystem.GetFileServices(new string[] { source, destination }, out paths);
-
-				if(!string.Equals(paths[0].Schema, paths[1].Schema, StringComparison.OrdinalIgnoreCase))
-					throw new InvalidOperationException();
-
-				services[0].Copy(paths[0].FullPath, paths[1].FullPath, overwrite);
-			}
-
-			public void Move(string source, string destination)
-			{
-				Path[] paths;
-				var services = FileSystem.GetFileServices(new string[] { source, destination }, out paths);
-
-				if(!string.Equals(paths[0].Schema, paths[1].Schema, StringComparison.OrdinalIgnoreCase))
-					throw new InvalidOperationException();
-
-				services[0].Move(paths[0].FullPath, paths[1].FullPath);
-			}
-
-			public FileInfo GetInfo(string virtualPath)
-			{
-				Path path;
-				var service = FileSystem.GetFileService(virtualPath, out path);
-
-				return service.GetInfo(path.FullPath);
-			}
-
-			public Stream Open(string virtualPath)
-			{
-				Path path;
-				var service = FileSystem.GetFileService(virtualPath, out path);
-
-				return service.Open(path.FullPath);
-			}
-
-			public Stream Open(string virtualPath, FileMode mode)
-			{
-				Path path;
-				var service = FileSystem.GetFileService(virtualPath, out path);
-
-				return service.Open(path.FullPath, mode);
-			}
-
-			public Stream Open(string virtualPath, FileMode mode, FileAccess access)
-			{
-				Path path;
-				var service = FileSystem.GetFileService(virtualPath, out path);
-
-				return service.Open(path.FullPath, mode, access);
-			}
-
-			public Stream Open(string virtualPath, FileMode mode, FileAccess access, System.IO.FileShare share)
-			{
-				Path path;
-				var service = FileSystem.GetFileService(virtualPath, out path);
-
-				return service.Open(path.FullPath, mode, access, share);
-			}
-		}
-
 		private class DirectoryService : IDirectory
 		{
-			public bool Create(string virtualPath)
+			public bool Create(string virtualPath, IDictionary<string, string> properties = null)
 			{
 				Path path;
 				var service = FileSystem.GetDirectoryService(virtualPath, out path);
 
-				return service.Create(path.FullPath);
+				return service.Create(path.FullPath, properties);
 			}
 
 			public bool Delete(string virtualPath)
@@ -333,6 +247,92 @@ namespace Zongsoft.IO
 				var service = FileSystem.GetDirectoryService(virtualPath, out path);
 
 				return service.GetFiles(path.FullPath, pattern, recursive);
+			}
+		}
+
+		private class FileService : IFile
+		{
+			public bool Delete(string virtualPath)
+			{
+				Path path;
+				var service = FileSystem.GetFileService(virtualPath, out path);
+
+				return service.Delete(path.FullPath);
+			}
+
+			public bool Exists(string virtualPath)
+			{
+				Path path;
+				var service = FileSystem.GetFileService(virtualPath, out path);
+
+				return service.Exists(path.FullPath);
+			}
+
+			public void Copy(string source, string destination)
+			{
+				this.Copy(source, destination, true);
+			}
+
+			public void Copy(string source, string destination, bool overwrite)
+			{
+				Path[] paths;
+				var services = FileSystem.GetFileServices(new string[] { source, destination }, out paths);
+
+				if(!string.Equals(paths[0].Schema, paths[1].Schema, StringComparison.OrdinalIgnoreCase))
+					throw new InvalidOperationException();
+
+				services[0].Copy(paths[0].FullPath, paths[1].FullPath, overwrite);
+			}
+
+			public void Move(string source, string destination)
+			{
+				Path[] paths;
+				var services = FileSystem.GetFileServices(new string[] { source, destination }, out paths);
+
+				if(!string.Equals(paths[0].Schema, paths[1].Schema, StringComparison.OrdinalIgnoreCase))
+					throw new InvalidOperationException();
+
+				services[0].Move(paths[0].FullPath, paths[1].FullPath);
+			}
+
+			public FileInfo GetInfo(string virtualPath)
+			{
+				Path path;
+				var service = FileSystem.GetFileService(virtualPath, out path);
+
+				return service.GetInfo(path.FullPath);
+			}
+
+			public Stream Open(string virtualPath, IDictionary<string, string> properties = null)
+			{
+				Path path;
+				var service = FileSystem.GetFileService(virtualPath, out path);
+
+				return service.Open(path.FullPath, properties);
+			}
+
+			public Stream Open(string virtualPath, FileMode mode, IDictionary<string, string> properties = null)
+			{
+				Path path;
+				var service = FileSystem.GetFileService(virtualPath, out path);
+
+				return service.Open(path.FullPath, mode, properties);
+			}
+
+			public Stream Open(string virtualPath, FileMode mode, FileAccess access, IDictionary<string, string> properties = null)
+			{
+				Path path;
+				var service = FileSystem.GetFileService(virtualPath, out path);
+
+				return service.Open(path.FullPath, mode, access, properties);
+			}
+
+			public Stream Open(string virtualPath, FileMode mode, FileAccess access, System.IO.FileShare share, IDictionary<string, string> properties = null)
+			{
+				Path path;
+				var service = FileSystem.GetFileService(virtualPath, out path);
+
+				return service.Open(path.FullPath, mode, access, share, properties);
 			}
 		}
 		#endregion
