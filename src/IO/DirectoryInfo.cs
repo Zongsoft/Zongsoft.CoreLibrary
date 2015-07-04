@@ -35,15 +35,16 @@ namespace Zongsoft.IO
 		private string _fullPath;
 		private string _name;
 		private DateTime _createdTime;
-		private Dictionary<string, object> _properties;
+		private DateTime _modifiedTime;
+		private Dictionary<string, string> _properties;
 		#endregion
 
 		#region 构造函数
-		public DirectoryInfo()
+		protected DirectoryInfo()
 		{
 		}
 
-		public DirectoryInfo(string fullPath, string name, DateTime? createdTime = null)
+		public DirectoryInfo(string fullPath, string name, DateTime? createdTime = null, DateTime? modifiedTime = null)
 		{
 			if(string.IsNullOrWhiteSpace(fullPath))
 				throw new ArgumentNullException("fullPath");
@@ -53,6 +54,11 @@ namespace Zongsoft.IO
 
 			if(createdTime.HasValue)
 				_createdTime = createdTime.Value;
+
+			if(modifiedTime.HasValue)
+				_modifiedTime = modifiedTime.Value;
+			else
+				_modifiedTime = _createdTime;
 		}
 		#endregion
 
@@ -93,12 +99,32 @@ namespace Zongsoft.IO
 			}
 		}
 
-		public IDictionary<string, object> Properties
+		public DateTime ModifiedTime
+		{
+			get
+			{
+				return _modifiedTime;
+			}
+			protected set
+			{
+				_modifiedTime = value;
+			}
+		}
+
+		public bool HasProperties
+		{
+			get
+			{
+				return _properties != null && _properties.Count > 0;
+			}
+		}
+
+		public IDictionary<string, string> Properties
 		{
 			get
 			{
 				if(_properties == null)
-					System.Threading.Interlocked.CompareExchange(ref _properties, new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase), null);
+					System.Threading.Interlocked.CompareExchange(ref _properties, new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase), null);
 
 				return _properties;
 			}

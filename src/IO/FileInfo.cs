@@ -37,12 +37,12 @@ namespace Zongsoft.IO
 		private string _directoryName;
 		private long _size;
 		private DateTime _createdTime;
-		private DateTime? _modifiedTime;
-		private Dictionary<string, object> _properties;
+		private DateTime _modifiedTime;
+		private Dictionary<string, string> _properties;
 		#endregion
 
 		#region 构造函数
-		public FileInfo()
+		protected FileInfo()
 		{
 		}
 
@@ -54,10 +54,14 @@ namespace Zongsoft.IO
 			_fullPath = fullPath;
 			_name = name;
 			_size = size;
-			_modifiedTime = modifiedTime;
 
 			if(createdTime.HasValue)
 				_createdTime = createdTime.Value;
+
+			if(modifiedTime.HasValue)
+				_modifiedTime = modifiedTime.Value;
+			else
+				_modifiedTime = _createdTime;
 		}
 		#endregion
 
@@ -122,7 +126,7 @@ namespace Zongsoft.IO
 			}
 		}
 
-		public DateTime? ModifiedTime
+		public DateTime ModifiedTime
 		{
 			get
 			{
@@ -134,12 +138,20 @@ namespace Zongsoft.IO
 			}
 		}
 
-		public IDictionary<string, object> Properties
+		public bool HasProperties
+		{
+			get
+			{
+				return _properties != null && _properties.Count > 0;
+			}
+		}
+
+		public IDictionary<string, string> Properties
 		{
 			get
 			{
 				if(_properties == null)
-					System.Threading.Interlocked.CompareExchange(ref _properties, new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase), null);
+					System.Threading.Interlocked.CompareExchange(ref _properties, new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase), null);
 
 				return _properties;
 			}
