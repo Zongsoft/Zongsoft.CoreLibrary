@@ -50,9 +50,9 @@ namespace Zongsoft.IO
 
 		void Move(string source, string destination);
 
-		Stream Open(string path);
-		Stream Open(string path, FileMode mode);
-		Stream Open(string path, FileMode mode, FileAccess access);
-		Stream Open(string path, FileMode mode, FileAccess access, FileShare share);
+		Stream Open(string path, IDictionary<string, string> properties = null);
+		Stream Open(string path, FileMode mode, IDictionary<string, string> properties = null);
+		Stream Open(string path, FileMode mode, FileAccess access, IDictionary<string, string> properties = null);
+		Stream Open(string path, FileMode mode, FileAccess access, FileShare share, IDictionary<string, string> properties = null);
 	}
 }
