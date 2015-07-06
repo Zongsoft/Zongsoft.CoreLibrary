@@ -79,7 +79,16 @@ namespace Zongsoft.IO
 		}
 		#endregion
 
-		#region 内部方法
+		#region 公共方法
+		public static string GetUrl(string virtualPath)
+		{
+			Path path;
+			var fs = GetFileSystem(virtualPath, out path);
+			return fs.GetUrl(path.FullPath);
+		}
+		#endregion
+
+		#region 私有方法
 		private static IFileSystem GetFileSystem(string text, out Path path)
 		{
 			if(string.IsNullOrWhiteSpace(text))
@@ -99,17 +108,17 @@ namespace Zongsoft.IO
 			return fileSystem;
 		}
 
-		internal static IFile GetFileService(string text, out Path path)
+		private static IFile GetFileService(string text, out Path path)
 		{
 			return GetFileSystem(text, out path).File;
 		}
 
-		internal static IDirectory GetDirectoryService(string text, out Path path)
+		private static IDirectory GetDirectoryService(string text, out Path path)
 		{
 			return GetFileSystem(text, out path).Directory;
 		}
 
-		internal static IFile[] GetFileServices(string[] texts, out Path[] paths)
+		private static IFile[] GetFileServices(string[] texts, out Path[] paths)
 		{
 			if(texts == null || texts.Length == 0)
 				throw new ArgumentNullException("texts");
@@ -125,7 +134,7 @@ namespace Zongsoft.IO
 			return result;
 		}
 
-		internal static IDirectory[] GetDirectoryServices(string[] texts, out Path[] paths)
+		private static IDirectory[] GetDirectoryServices(string[] texts, out Path[] paths)
 		{
 			if(texts == null || texts.Length == 0)
 				throw new ArgumentNullException("texts");

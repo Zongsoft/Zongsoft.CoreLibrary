@@ -72,6 +72,14 @@ namespace Zongsoft.IO
 		}
 		#endregion
 
+		#region 公共方法
+		public string GetUrl(string path)
+		{
+			var fullPath = LocalPath.ToLocalPath(path);
+			return @"file:///" + fullPath.Replace('\\', '/').Trim();
+		}
+		#endregion
+
 		#region 嵌套子类
 		private sealed class LocalDirectoryService : IDirectory
 		{

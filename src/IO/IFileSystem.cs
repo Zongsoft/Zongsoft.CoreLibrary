@@ -57,5 +57,12 @@ namespace Zongsoft.IO
 		{
 			get;
 		}
+
+		/// <summary>
+		/// 获取指定路径对应的Url地址。
+		/// </summary>
+		/// <param name="path">要获取的路径。</param>
+		/// <returns>返回对应的Url地址。</returns>
+		string GetUrl(string path);
 	}
 }
