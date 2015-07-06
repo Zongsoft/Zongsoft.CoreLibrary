@@ -25,7 +25,9 @@ namespace Zongsoft.IO
 			var directoryPath = path.Schema + ":" + path.DirectoryName;
 
 			FileSystem.Directory.Create(directoryPath);
+
 			Assert.IsTrue(FileSystem.Directory.Exists(directoryPath));
+			Assert.IsTrue(FileSystem.Directory.Delete(directoryPath));
 		}
 	}
 }
