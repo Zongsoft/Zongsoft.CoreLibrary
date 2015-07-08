@@ -35,7 +35,7 @@ namespace Zongsoft.IO
 		#region 成员字段
 		private static readonly IFile _file;
 		private static readonly IDirectory _directory;
-		private static Zongsoft.Services.IServiceProvider _services;
+		private static Zongsoft.Services.IServiceProvider _providers;
 		#endregion
 
 		#region 构造函数
@@ -63,18 +63,21 @@ namespace Zongsoft.IO
 			}
 		}
 
-		public static Zongsoft.Services.IServiceProvider Services
+		public static Zongsoft.Services.IServiceProvider Providers
 		{
 			get
 			{
-				return _services;
+				if(_providers == null)
+					System.Threading.Interlocked.CompareExchange(ref _providers, new Zongsoft.Services.ServiceProvider(), null);
+
+				return _providers;
 			}
 			set
 			{
 				if(value == null)
 					throw new ArgumentNullException();
 
-				_services = value;
+				_providers = value;
 			}
 		}
 		#endregion
@@ -97,10 +100,10 @@ namespace Zongsoft.IO
 			if(!Path.TryParse(text, out path))
 				throw new PathException(text);
 
-			if(_services == null)
+			if(_providers == null)
 				throw new InvalidOperationException("The value of 'Services' property is null.");
 
-			var fileSystem = _services.Resolve<IFileSystem>(path.Schema);
+			var fileSystem = _providers.Resolve<IFileSystem>(path.Schema);
 
 			if(fileSystem == null)
 				throw new InvalidOperationException(string.Format("Can not obtain the File or Directory provider by the '{0}' path.", path));
