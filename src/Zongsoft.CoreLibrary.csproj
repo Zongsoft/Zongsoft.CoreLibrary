@@ -188,6 +188,7 @@
     <Compile Include="IO\DirectoryInfo.cs" />
     <Compile Include="IO\FileInfo.cs" />
     <Compile Include="IO\FileSystem.cs" />
+    <Compile Include="IO\PathInfo.cs" />
     <Compile Include="IO\IDirectory.cs" />
     <Compile Include="IO\IFile.cs" />
     <Compile Include="IO\IFileSystem.cs" />
@@ -196,7 +197,6 @@
     <Compile Include="IO\LocalFileSystem.cs" />
     <Compile Include="IO\Path.cs" />
     <Compile Include="IO\PathException.cs" />
-    <Compile Include="IO\LocalPath.cs" />
     <Compile Include="IO\StorageBucketInfo.cs" />
     <Compile Include="IO\StorageBucket.cs" />
     <Compile Include="IO\StorageFileInfo.cs" />

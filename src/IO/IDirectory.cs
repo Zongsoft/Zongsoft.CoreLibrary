@@ -26,6 +26,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Zongsoft.IO
 {
@@ -40,6 +41,7 @@ namespace Zongsoft.IO
 		/// <param name="path">指定的目录路径。</param>
 		/// <returns>如果指定的路径是存在的则返回对应的<see cref="DirectoryInfo"/>，否则返回空(null)。</returns>
 		DirectoryInfo GetInfo(string path);
+		Task<DirectoryInfo> GetInfoAsync(string path);
 
 		/// <summary>
 		/// 创建一个指定路径的目录。
@@ -51,19 +53,33 @@ namespace Zongsoft.IO
 		///		<para>如果<paramref name="path"/>参数指定的路径不存在并且创建成功则返回真；如果指定的路径已存在则返回假。</para>
 		/// </remarks>
 		bool Create(string path, IDictionary<string, string> properties = null);
+		Task<bool> CreateAsync(string path, IDictionary<string, string> properties = null);
 
 		bool Delete(string path, bool recursive = false);
+		Task<bool> DeleteAsync(string path, bool recursive = false);
 
 		void Move(string source, string destination);
+		Task MoveAsync(string source, string destination);
+
 		bool Exists(string path);
+		Task<bool> ExistsAsync(string path);
 
-		IEnumerable<string> GetChildren(string path);
-		IEnumerable<string> GetChildren(string path, string pattern, bool recursive = false);
+		IEnumerable<PathInfo> GetChildren(string path);
+		IEnumerable<PathInfo> GetChildren(string path, string pattern, bool recursive = false);
 
-		IEnumerable<string> GetDirectories(string path);
-		IEnumerable<string> GetDirectories(string path, string pattern, bool recursive = false);
+		Task<IEnumerable<PathInfo>> GetChildrenAsync(string path);
+		Task<IEnumerable<PathInfo>> GetChildrenAsync(string path, string pattern, bool recursive = false);
 
-		IEnumerable<string> GetFiles(string path);
-		IEnumerable<string> GetFiles(string path, string pattern, bool recursive = false);
+		IEnumerable<DirectoryInfo> GetDirectories(string path);
+		IEnumerable<DirectoryInfo> GetDirectories(string path, string pattern, bool recursive = false);
+
+		Task<IEnumerable<DirectoryInfo>> GetDirectoriesAsync(string path);
+		Task<IEnumerable<DirectoryInfo>> GetDirectoriesAsync(string path, string pattern, bool recursive = false);
+
+		IEnumerable<FileInfo> GetFiles(string path);
+		IEnumerable<FileInfo> GetFiles(string path, string pattern, bool recursive = false);
+
+		Task<IEnumerable<FileInfo>> GetFilesAsync(string path);
+		Task<IEnumerable<FileInfo>> GetFilesAsync(string path, string pattern, bool recursive = false);
 	}
 }

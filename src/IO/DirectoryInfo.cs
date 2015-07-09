@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2014 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -29,105 +29,21 @@ using System.Collections.Generic;
 
 namespace Zongsoft.IO
 {
-	public class DirectoryInfo : MarshalByRefObject
+	public class DirectoryInfo : PathInfo
 	{
-		#region 成员字段
-		private string _fullPath;
-		private string _name;
-		private DateTime _createdTime;
-		private DateTime _modifiedTime;
-		private Dictionary<string, string> _properties;
-		#endregion
-
 		#region 构造函数
 		protected DirectoryInfo()
 		{
 		}
 
-		public DirectoryInfo(string fullPath, string name, DateTime? createdTime = null, DateTime? modifiedTime = null)
+		public DirectoryInfo(string fullPath, DateTime? createdTime = null, DateTime? modifiedTime = null)
+			: base(fullPath, createdTime, modifiedTime)
 		{
-			if(string.IsNullOrWhiteSpace(fullPath))
-				throw new ArgumentNullException("fullPath");
-
-			_fullPath = fullPath;
-			_name = name;
-
-			if(createdTime.HasValue)
-				_createdTime = createdTime.Value;
-
-			if(modifiedTime.HasValue)
-				_modifiedTime = modifiedTime.Value;
-			else
-				_modifiedTime = _createdTime;
-		}
-		#endregion
-
-		#region 公共属性
-		public virtual string Name
-		{
-			get
-			{
-				return _name;
-			}
-			protected set
-			{
-				_name = value;
-			}
 		}
 
-		public string FullPath
+		public DirectoryInfo(Path path, DateTime? createdTime = null, DateTime? modifiedTime = null)
+			: base(path, createdTime, modifiedTime)
 		{
-			get
-			{
-				return _fullPath;
-			}
-			protected set
-			{
-				_fullPath = value;
-			}
-		}
-
-		public DateTime CreatedTime
-		{
-			get
-			{
-				return _createdTime;
-			}
-			protected set
-			{
-				_createdTime = value;
-			}
-		}
-
-		public DateTime ModifiedTime
-		{
-			get
-			{
-				return _modifiedTime;
-			}
-			protected set
-			{
-				_modifiedTime = value;
-			}
-		}
-
-		public bool HasProperties
-		{
-			get
-			{
-				return _properties != null && _properties.Count > 0;
-			}
-		}
-
-		public IDictionary<string, string> Properties
-		{
-			get
-			{
-				if(_properties == null)
-					System.Threading.Interlocked.CompareExchange(ref _properties, new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase), null);
-
-				return _properties;
-			}
 		}
 		#endregion
 	}

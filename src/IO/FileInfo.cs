@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2014 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -29,16 +29,11 @@ using System.Collections.Generic;
 
 namespace Zongsoft.IO
 {
-	public class FileInfo : MarshalByRefObject
+	public class FileInfo : PathInfo
 	{
 		#region 成员字段
-		private string _fullPath;
-		private string _name;
-		private string _directoryName;
 		private long _size;
-		private DateTime _createdTime;
-		private DateTime _modifiedTime;
-		private Dictionary<string, string> _properties;
+		private byte[] _checksum;
 		#endregion
 
 		#region 构造函数
@@ -46,59 +41,31 @@ namespace Zongsoft.IO
 		{
 		}
 
-		public FileInfo(string fullPath, string name, long size = 0, DateTime? createdTime = null, DateTime? modifiedTime = null)
+		public FileInfo(string fullPath, long size = 0, DateTime? createdTime = null, DateTime? modifiedTime = null, byte[] checksum = null)
+			: base(fullPath, createdTime, modifiedTime)
 		{
-			if(string.IsNullOrWhiteSpace(fullPath))
-				throw new ArgumentNullException("fullPath");
-
-			_fullPath = fullPath;
-			_name = name;
 			_size = size;
+			_checksum = checksum;
+		}
 
-			if(createdTime.HasValue)
-				_createdTime = createdTime.Value;
-
-			if(modifiedTime.HasValue)
-				_modifiedTime = modifiedTime.Value;
-			else
-				_modifiedTime = _createdTime;
+		public FileInfo(Path path, long size = 0, DateTime? createdTime = null, DateTime? modifiedTime = null, byte[] checksum = null)
+			: base(path, createdTime, modifiedTime)
+		{
+			_size = size;
+			_checksum = checksum;
 		}
 		#endregion
 
 		#region 公共属性
-		public virtual string Name
+		public byte[] Checksum
 		{
 			get
 			{
-				return _name;
+				return _checksum;
 			}
 			protected set
 			{
-				_name = value;
-			}
-		}
-
-		public virtual string DirectoryName
-		{
-			get
-			{
-				return _directoryName;
-			}
-			protected set
-			{
-				_directoryName = value;
-			}
-		}
-
-		public string FullPath
-		{
-			get
-			{
-				return _fullPath;
-			}
-			protected set
-			{
-				_fullPath = value;
+				_checksum = value;
 			}
 		}
 
@@ -113,48 +80,26 @@ namespace Zongsoft.IO
 				_size = value;
 			}
 		}
+		#endregion
 
-		public DateTime CreatedTime
+		#region 重写方法
+		public override int GetHashCode()
 		{
-			get
-			{
-				return _createdTime;
-			}
-			protected set
-			{
-				_createdTime = value;
-			}
+			return (this.FullPath + _size.ToString() + Zongsoft.Common.Convert.ToHexString(_checksum)).GetHashCode();
 		}
 
-		public DateTime ModifiedTime
+		public override bool Equals(object obj)
 		{
-			get
-			{
-				return _modifiedTime;
-			}
-			protected set
-			{
-				_modifiedTime = value;
-			}
-		}
+			if(obj == null || obj.GetType() != this.GetType())
+				return false;
 
-		public bool HasProperties
-		{
-			get
-			{
-				return _properties != null && _properties.Count > 0;
-			}
-		}
+			var other = (FileInfo)obj;
 
-		public IDictionary<string, string> Properties
-		{
-			get
-			{
-				if(_properties == null)
-					System.Threading.Interlocked.CompareExchange(ref _properties, new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase), null);
+			if(_size != other._size || !Zongsoft.Collections.BinaryComparer.Default.Equals(_checksum, other._checksum))
+				return false;
 
-				return _properties;
-			}
+			var path = this.Path;
+			return path == null ? true : path.Equals(other.Path);
 		}
 		#endregion
 	}

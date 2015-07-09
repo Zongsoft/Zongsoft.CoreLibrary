@@ -27,6 +27,7 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Zongsoft.IO
 {
@@ -94,14 +95,13 @@ namespace Zongsoft.IO
 		#region 私有方法
 		private static IFileSystem GetFileSystem(string text, out Path path)
 		{
+			if(_providers == null)
+				throw new InvalidOperationException("The value of 'Services' property is null.");
+
 			if(string.IsNullOrWhiteSpace(text))
 				throw new ArgumentNullException("text");
 
-			if(!Path.TryParse(text, out path))
-				throw new PathException(text);
-
-			if(_providers == null)
-				throw new InvalidOperationException("The value of 'Services' property is null.");
+			path = Path.Parse(text);
 
 			var fileSystem = _providers.Resolve<IFileSystem>(path.Schema);
 
@@ -182,17 +182,28 @@ namespace Zongsoft.IO
 				return service.Create(path.FullPath, properties);
 			}
 
-			public bool Delete(string virtualPath)
+			public Task<bool> CreateAsync(string virtualPath, IDictionary<string, string> properties = null)
 			{
-				return this.Delete(virtualPath, false);
+				Path path;
+				var service = FileSystem.GetDirectoryService(virtualPath, out path);
+
+				return service.CreateAsync(path.FullPath, properties);
 			}
 
-			public bool Delete(string virtualPath, bool recursive)
+			public bool Delete(string virtualPath, bool recursive = false)
 			{
 				Path path;
 				var service = FileSystem.GetDirectoryService(virtualPath, out path);
 
 				return service.Delete(path.FullPath, recursive);
+			}
+
+			public Task<bool> DeleteAsync(string virtualPath, bool recursive)
+			{
+				Path path;
+				var service = FileSystem.GetDirectoryService(virtualPath, out path);
+
+				return service.DeleteAsync(path.FullPath, recursive);
 			}
 
 			public void Move(string source, string destination)
@@ -206,12 +217,31 @@ namespace Zongsoft.IO
 				services[0].Move(paths[0].FullPath, paths[1].FullPath);
 			}
 
+			public Task MoveAsync(string source, string destination)
+			{
+				Path[] paths;
+				var services = FileSystem.GetDirectoryServices(new string[] { source, destination }, out paths);
+
+				if(!string.Equals(paths[0].Schema, paths[1].Schema, StringComparison.OrdinalIgnoreCase))
+					throw new InvalidOperationException();
+
+				return services[0].MoveAsync(paths[0].FullPath, paths[1].FullPath);
+			}
+
 			public bool Exists(string virtualPath)
 			{
 				Path path;
 				var service = FileSystem.GetDirectoryService(virtualPath, out path);
 
 				return service.Exists(path.FullPath);
+			}
+
+			public Task<bool> ExistsAsync(string virtualPath)
+			{
+				Path path;
+				var service = FileSystem.GetDirectoryService(virtualPath, out path);
+
+				return service.ExistsAsync(path.FullPath);
 			}
 
 			public DirectoryInfo GetInfo(string virtualPath)
@@ -222,12 +252,20 @@ namespace Zongsoft.IO
 				return service.GetInfo(path.FullPath);
 			}
 
-			public IEnumerable<string> GetChildren(string virtualPath)
+			public Task<DirectoryInfo> GetInfoAsync(string virtualPath)
+			{
+				Path path;
+				var service = FileSystem.GetDirectoryService(virtualPath, out path);
+
+				return service.GetInfoAsync(path.FullPath);
+			}
+
+			public IEnumerable<PathInfo> GetChildren(string virtualPath)
 			{
 				return this.GetChildren(virtualPath, null, false);
 			}
 
-			public IEnumerable<string> GetChildren(string virtualPath, string pattern, bool recursive)
+			public IEnumerable<PathInfo> GetChildren(string virtualPath, string pattern, bool recursive = false)
 			{
 				Path path;
 				var service = FileSystem.GetDirectoryService(virtualPath, out path);
@@ -235,12 +273,25 @@ namespace Zongsoft.IO
 				return service.GetChildren(path.FullPath, pattern, recursive);
 			}
 
-			public IEnumerable<string> GetDirectories(string virtualPath)
+			public Task<IEnumerable<PathInfo>> GetChildrenAsync(string virtualPath)
+			{
+				return this.GetChildrenAsync(virtualPath, null, false);
+			}
+
+			public Task<IEnumerable<PathInfo>> GetChildrenAsync(string virtualPath, string pattern, bool recursive = false)
+			{
+				Path path;
+				var service = FileSystem.GetDirectoryService(virtualPath, out path);
+
+				return service.GetChildrenAsync(path.FullPath, pattern, recursive);
+			}
+
+			public IEnumerable<DirectoryInfo> GetDirectories(string virtualPath)
 			{
 				return this.GetDirectories(virtualPath, null, false);
 			}
 
-			public IEnumerable<string> GetDirectories(string virtualPath, string pattern, bool recursive)
+			public IEnumerable<DirectoryInfo> GetDirectories(string virtualPath, string pattern, bool recursive = false)
 			{
 				Path path;
 				var service = FileSystem.GetDirectoryService(virtualPath, out path);
@@ -248,17 +299,43 @@ namespace Zongsoft.IO
 				return service.GetDirectories(path.FullPath, pattern, recursive);
 			}
 
-			public IEnumerable<string> GetFiles(string virtualPath)
+			public Task<IEnumerable<DirectoryInfo>> GetDirectoriesAsync(string virtualPath)
+			{
+				return this.GetDirectoriesAsync(virtualPath, null, false);
+			}
+
+			public Task<IEnumerable<DirectoryInfo>> GetDirectoriesAsync(string virtualPath, string pattern, bool recursive = false)
+			{
+				Path path;
+				var service = FileSystem.GetDirectoryService(virtualPath, out path);
+
+				return service.GetDirectoriesAsync(path.FullPath, pattern, recursive);
+			}
+
+			public IEnumerable<FileInfo> GetFiles(string virtualPath)
 			{
 				return this.GetFiles(virtualPath, null, false);
 			}
 
-			public IEnumerable<string> GetFiles(string virtualPath, string pattern, bool recursive)
+			public IEnumerable<FileInfo> GetFiles(string virtualPath, string pattern, bool recursive = false)
 			{
 				Path path;
 				var service = FileSystem.GetDirectoryService(virtualPath, out path);
 
 				return service.GetFiles(path.FullPath, pattern, recursive);
+			}
+
+			public Task<IEnumerable<FileInfo>> GetFilesAsync(string virtualPath)
+			{
+				return this.GetFilesAsync(virtualPath, null, false);
+			}
+
+			public Task<IEnumerable<FileInfo>> GetFilesAsync(string virtualPath, string pattern, bool recursive = false)
+			{
+				Path path;
+				var service = FileSystem.GetDirectoryService(virtualPath, out path);
+
+				return service.GetFilesAsync(path.FullPath, pattern, recursive);
 			}
 		}
 
@@ -272,12 +349,28 @@ namespace Zongsoft.IO
 				return service.Delete(path.FullPath);
 			}
 
+			public Task<bool> DeleteAsync(string virtualPath)
+			{
+				Path path;
+				var service = FileSystem.GetFileService(virtualPath, out path);
+
+				return service.DeleteAsync(path.FullPath);
+			}
+
 			public bool Exists(string virtualPath)
 			{
 				Path path;
 				var service = FileSystem.GetFileService(virtualPath, out path);
 
 				return service.Exists(path.FullPath);
+			}
+
+			public Task<bool> ExistsAsync(string virtualPath)
+			{
+				Path path;
+				var service = FileSystem.GetFileService(virtualPath, out path);
+
+				return service.ExistsAsync(path.FullPath);
 			}
 
 			public void Copy(string source, string destination)
@@ -296,6 +389,22 @@ namespace Zongsoft.IO
 				services[0].Copy(paths[0].FullPath, paths[1].FullPath, overwrite);
 			}
 
+			public Task CopyAsync(string source, string destination)
+			{
+				return this.CopyAsync(source, destination, true);
+			}
+
+			public Task CopyAsync(string source, string destination, bool overwrite)
+			{
+				Path[] paths;
+				var services = FileSystem.GetFileServices(new string[] { source, destination }, out paths);
+
+				if(!string.Equals(paths[0].Schema, paths[1].Schema, StringComparison.OrdinalIgnoreCase))
+					throw new InvalidOperationException();
+
+				return services[0].CopyAsync(paths[0].FullPath, paths[1].FullPath, overwrite);
+			}
+
 			public void Move(string source, string destination)
 			{
 				Path[] paths;
@@ -307,12 +416,31 @@ namespace Zongsoft.IO
 				services[0].Move(paths[0].FullPath, paths[1].FullPath);
 			}
 
+			public Task MoveAsync(string source, string destination)
+			{
+				Path[] paths;
+				var services = FileSystem.GetFileServices(new string[] { source, destination }, out paths);
+
+				if(!string.Equals(paths[0].Schema, paths[1].Schema, StringComparison.OrdinalIgnoreCase))
+					throw new InvalidOperationException();
+
+				return services[0].MoveAsync(paths[0].FullPath, paths[1].FullPath);
+			}
+
 			public FileInfo GetInfo(string virtualPath)
 			{
 				Path path;
 				var service = FileSystem.GetFileService(virtualPath, out path);
 
 				return service.GetInfo(path.FullPath);
+			}
+
+			public Task<FileInfo> GetInfoAsync(string virtualPath)
+			{
+				Path path;
+				var service = FileSystem.GetFileService(virtualPath, out path);
+
+				return service.GetInfoAsync(path.FullPath);
 			}
 
 			public Stream Open(string virtualPath, IDictionary<string, string> properties = null)
