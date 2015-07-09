@@ -10,9 +10,6 @@ namespace Zongsoft.IO
 	{
 		public FileSystemTest()
 		{
-			if(FileSystem.Providers == null)
-				FileSystem.Providers = new Zongsoft.Services.ServiceProvider();
-
 			FileSystem.Providers.Register(LocalFileSystem.Instance, typeof(IFileSystem));
 		}
 
