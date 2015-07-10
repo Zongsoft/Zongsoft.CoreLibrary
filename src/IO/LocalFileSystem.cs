@@ -268,6 +268,16 @@ namespace Zongsoft.IO
 				return new DirectoryInfo(info.FullName, info.CreationTime, info.LastWriteTime);
 			}
 
+			public bool SetInfo(string path, IDictionary<string, string> properties)
+			{
+				throw new NotSupportedException();
+			}
+
+			public Task<bool> SetInfoAsync(string path, IDictionary<string, string> properties)
+			{
+				throw new NotSupportedException();
+			}
+
 			public IEnumerable<PathInfo> GetChildren(string path)
 			{
 				return this.GetChildren(path, null, false);
@@ -531,6 +541,16 @@ namespace Zongsoft.IO
 					return null;
 
 				return new FileInfo(info.FullName, info.Length, info.CreationTime, info.LastWriteTime);
+			}
+
+			public bool SetInfo(string path, IDictionary<string, string> properties)
+			{
+				throw new NotSupportedException();
+			}
+
+			public Task<bool> SetInfoAsync(string path, IDictionary<string, string> properties)
+			{
+				throw new NotSupportedException();
 			}
 
 			public Stream Open(string path, IDictionary<string, string> properties = null)

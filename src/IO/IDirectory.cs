@@ -36,12 +36,15 @@ namespace Zongsoft.IO
 	public interface IDirectory
 	{
 		/// <summary>
-		/// 获取指定目录路径对应的<see cref="DirectoryInfo"/>。
+		/// 获取指定目录路径对应的<see cref="DirectoryInfo"/>描述信息。
 		/// </summary>
 		/// <param name="path">指定的目录路径。</param>
 		/// <returns>如果指定的路径是存在的则返回对应的<see cref="DirectoryInfo"/>，否则返回空(null)。</returns>
 		DirectoryInfo GetInfo(string path);
 		Task<DirectoryInfo> GetInfoAsync(string path);
+
+		bool SetInfo(string path, IDictionary<string, string> properties);
+		Task<bool> SetInfoAsync(string path, IDictionary<string, string> properties);
 
 		/// <summary>
 		/// 创建一个指定路径的目录。
