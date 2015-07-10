@@ -85,6 +85,7 @@
     <Compile Include="Collections\HierarchicalNodeCollection.cs" />
     <Compile Include="Collections\BinaryComparer.cs" />
     <Compile Include="Collections\IQueueProvider.cs" />
+    <Compile Include="Collections\IQueue`1.cs" />
     <Compile Include="Collections\NamedCollectionBase.cs" />
     <Compile Include="Collections\NamedCollection.cs" />
     <Compile Include="Collections\ObjectCache.cs" />
@@ -201,6 +202,8 @@
     <Compile Include="IO\StorageBucket.cs" />
     <Compile Include="IO\StorageFileInfo.cs" />
     <Compile Include="IO\StorageFile.cs" />
+    <Compile Include="Messaging\MessageBase.cs" />
+    <Compile Include="Messaging\MessageQueueBase.cs" />
     <Compile Include="Options\Configuration\OptionConfigurationLoader.cs" />
     <Compile Include="Options\Configuration\OptionConfigurationManager.cs" />
     <Compile Include="Options\IOptionLoader.cs" />
