@@ -100,14 +100,14 @@ namespace Zongsoft.Collections
 		object Dequeue();
 
 		/// <summary>
-		/// 移除并返回从开始处的由<paramref name="length"/>参数指定的连续多个对象。
+		/// 移除并返回从开始处的由<paramref name="count"/>参数指定的连续多个对象。
 		/// </summary>
-		/// <param name="length">指定要连续移除的元素数。</param>
+		/// <param name="count">指定要连续移除的元素数。</param>
 		/// <returns>从队列的开头处指定的连续对象集。</returns>
 		/// <exception cref="System.InvalidOperationException">当队列为空，即<see cref="Count"/>属性等于零。</exception>
-		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="length"/>参数小于壹(1)。</exception>
-		/// <remarks>如果<paramref name="length"/>参数指定的数值超出队列中可用的元素数，则忽略该参数值，而应用可用的元素数。</remarks>
-		IEnumerable Dequeue(int length);
+		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="count"/>参数小于壹(1)。</exception>
+		/// <remarks>如果<paramref name="count"/>参数指定的数值超出队列中可用的元素数，则忽略该参数值，而应用可用的元素数。</remarks>
+		IEnumerable Dequeue(int count);
 		#endregion
 
 		#region 获取方法
@@ -122,14 +122,14 @@ namespace Zongsoft.Collections
 		object Peek();
 
 		/// <summary>
-		/// 返回从开始处的由<paramref name="length"/>参数指定的连续多个对象。
+		/// 返回从开始处的由<paramref name="count"/>参数指定的连续多个对象。
 		/// </summary>
-		/// <param name="length">指定要连续查看的元素数。</param>
+		/// <param name="count">指定要连续查看的元素数。</param>
 		/// <returns>从队列的开头处指定的连续对象集。</returns>
 		/// <exception cref="System.InvalidOperationException">当队列为空，即<see cref="Count"/>属性等于零。</exception>
-		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="length"/>参数小于壹(1)。</exception>
-		/// <remarks>如果<paramref name="length"/>参数指定的数值超出队列中可用的元素数，则忽略该参数值，而应用可用的元素数。</remarks>
-		IEnumerable Peek(int length);
+		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="count"/>参数小于壹(1)。</exception>
+		/// <remarks>如果<paramref name="count"/>参数指定的数值超出队列中可用的元素数，则忽略该参数值，而应用可用的元素数。</remarks>
+		IEnumerable Peek(int count);
 
 		/// <summary>
 		/// 返回从队列开头处往后偏移由<paramref name="startOffset"/>参数指定长度后开始的元素值。
@@ -139,17 +139,17 @@ namespace Zongsoft.Collections
 		object Take(int startOffset);
 
 		/// <summary>
-		/// 返回从队列开头处往后偏移由<paramref name="startOffset"/>参数指定长度后开始的由<paramref name="length"/>参数指定的连续多个对象。
+		/// 返回从队列开头处往后偏移由<paramref name="startOffset"/>参数指定长度后开始的由<paramref name="count"/>参数指定的连续多个对象。
 		/// </summary>
 		/// <param name="startOffset">从队列开头处往后偏移的长度。</param>
-		/// <param name="length">要连续获取的元素数。</param>
+		/// <param name="count">要连续获取的元素数。</param>
 		/// <returns>从队列的开头处指定偏移后的连续特定长度的对象集。</returns>
 		/// <exception cref="System.InvalidOperationException">当队列为空，即<see cref="Count"/>属性等于零。</exception>
-		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="length"/>参数小于壹(1)。</exception>
+		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="count"/>参数小于壹(1)。</exception>
 		/// <remarks>
-		///		<para>如果<paramref name="length"/>参数指定的数值超出队列中可用的元素数，则忽略该参数值，而应用可用的元素数。</para>
+		///		<para>如果<paramref name="count"/>参数指定的数值超出队列中可用的元素数，则忽略该参数值，而应用可用的元素数。</para>
 		/// </remarks>
-		IEnumerable Take(int startOffset, int length);
+		IEnumerable Take(int startOffset, int count);
 		#endregion
 	}
 }
