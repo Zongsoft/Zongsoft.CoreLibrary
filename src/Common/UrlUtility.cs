@@ -31,6 +31,7 @@ using System.Text;
 
 namespace Zongsoft.Common
 {
+	[Obsolete("Please use the 'System.Uri' class.")]
 	public static class UrlUtility
 	{
 		#region 编码方法
