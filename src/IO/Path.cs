@@ -34,23 +34,23 @@ namespace Zongsoft.IO
 	/// 表示不依赖操作系统的路径。
 	/// </summary>
 	/// <remarks>
-	///		<para>路径格式分为<seealso cref="Path.Schema"/>和<seealso cref="Path.FullPath"/>这两个部分，其中 Schema 与 Path 中间使用冒号(:)分隔，路径分层使用正斜杠(/)分隔。如果是目录的话则应该以正斜杠结尾。</para>
+	///		<para>路径格式分为<seealso cref="Path.Schema"/>和<seealso cref="Path.FullPath"/>这两个部分，中间使用冒号(:)分隔，路径各层级间使用正斜杠(/)进行分隔。如果是目录路径则以正斜杠(/)结尾。</para>
 	///		<para>其中<seealso cref="Path.Schema"/>可以省略，如果为目录路径，则<see cref="Path.FileName"/>属性为空或空字符串("")。常用路径示例如下：</para>
 	///		<list type="bullet">
 	///			<item>
-	///				<term>某个文件：zfs:/data/attachments/2014/07/file-name.ext</term>
+	///				<term>某个文件的<see cref="Url"/>：zfs:/data/attachments/2014/07/file-name.ext</term>
 	///			</item>
 	///			<item>
-	///				<term>某个本地文件：zfs.local:/data/attachments/2014/07/file-name.ext</term>
+	///				<term>某个本地文件的<see cref="Url"/>：zfs.local:/data/attachments/2014/07/file-name.ext</term>
 	///			</item>
 	///			<item>
-	///				<term>某个分布式文件：zfs.distributed:/data/attachments/file-name.ext</term>
+	///				<term>某个分布式文件的<see cref="Url"/>：zfs.distributed:/data/attachments/file-name.ext</term>
 	///			</item>
 	///			<item>
-	///				<term>某个目录：zfs:/data/attachments/2014/07/</term>
+	///				<term>某个目录的<see cref="Url"/>：zfs:/data/attachments/2014/07/</term>
 	///			</item>
 	///			<item>
-	///				<term>未指定模式(Schema)的目录路径：/data/attachements/images/</term>
+	///				<term>未指定模式(Schema)的<see cref="Url"/>：/data/attachements/images/</term>
 	///			</item>
 	///		</list>
 	/// </remarks>
@@ -129,6 +129,14 @@ namespace Zongsoft.IO
 			get
 			{
 				return _fullPath;
+			}
+		}
+
+		public string Url
+		{
+			get
+			{
+				return string.IsNullOrEmpty(_schema) ? _fullPath : (_schema + ":" + _fullPath);
 			}
 		}
 
@@ -289,7 +297,7 @@ namespace Zongsoft.IO
 				if(string.IsNullOrWhiteSpace(parts[i]))
 					continue;
 
-				var part = parts[i].Replace('\\', '/');
+				var part = parts[i].Replace('\\', '/').Trim();
 
 				if(result.Length == 0)
 					result = part;

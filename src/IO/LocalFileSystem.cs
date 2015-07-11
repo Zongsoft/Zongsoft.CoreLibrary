@@ -254,7 +254,7 @@ namespace Zongsoft.IO
 				if(info == null || !info.Exists)
 					return null;
 
-				return new DirectoryInfo(info.FullName, info.CreationTime, info.LastWriteTime);
+				return new DirectoryInfo(info.FullName, info.CreationTime, info.LastWriteTime, LocalFileSystem.Instance.GetUrl(path));
 			}
 
 			public async Task<DirectoryInfo> GetInfoAsync(string path)
@@ -265,7 +265,7 @@ namespace Zongsoft.IO
 				if(info == null || !info.Exists)
 					return null;
 
-				return new DirectoryInfo(info.FullName, info.CreationTime, info.LastWriteTime);
+				return new DirectoryInfo(info.FullName, info.CreationTime, info.LastWriteTime, LocalFileSystem.Instance.GetUrl(path));
 			}
 
 			public bool SetInfo(string path, IDictionary<string, string> properties)
@@ -529,7 +529,7 @@ namespace Zongsoft.IO
 				if(info == null || !info.Exists)
 					return null;
 
-				return new FileInfo(info.FullName, info.Length, info.CreationTime, info.LastWriteTime);
+				return new FileInfo(info.FullName, info.Length, info.CreationTime, info.LastWriteTime, LocalFileSystem.Instance.GetUrl(path));
 			}
 
 			public async Task<FileInfo> GetInfoAsync(string path)
@@ -540,7 +540,7 @@ namespace Zongsoft.IO
 				if(info == null || !info.Exists)
 					return null;
 
-				return new FileInfo(info.FullName, info.Length, info.CreationTime, info.LastWriteTime);
+				return new FileInfo(info.FullName, info.Length, info.CreationTime, info.LastWriteTime, LocalFileSystem.Instance.GetUrl(path));
 			}
 
 			public bool SetInfo(string path, IDictionary<string, string> properties)

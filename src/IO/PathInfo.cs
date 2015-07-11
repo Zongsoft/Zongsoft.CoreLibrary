@@ -29,10 +29,12 @@ using System.Collections.Generic;
 
 namespace Zongsoft.IO
 {
+	[Serializable]
 	public class PathInfo
 	{
 		#region 成员字段
 		private Path _path;
+		private string _url;
 		private DateTime _createdTime;
 		private DateTime _modifiedTime;
 		private Dictionary<string, string> _properties;
@@ -43,12 +45,13 @@ namespace Zongsoft.IO
 		{
 		}
 
-		public PathInfo(string fullPath, DateTime? createdTime = null, DateTime? modifiedTime = null)
+		public PathInfo(string path, DateTime? createdTime = null, DateTime? modifiedTime = null, string url = null)
 		{
-			if(string.IsNullOrWhiteSpace(fullPath))
-				throw new ArgumentNullException("fullPath");
+			if(string.IsNullOrWhiteSpace(path))
+				throw new ArgumentNullException("path");
 
-			_path = Zongsoft.IO.Path.Parse(fullPath);
+			_path = Zongsoft.IO.Path.Parse(path);
+			_url = url;
 
 			if(createdTime.HasValue)
 				_createdTime = createdTime.Value;
@@ -59,12 +62,13 @@ namespace Zongsoft.IO
 				_modifiedTime = _createdTime;
 		}
 
-		public PathInfo(Path path, DateTime? createdTime = null, DateTime? modifiedTime = null)
+		public PathInfo(Path path, DateTime? createdTime = null, DateTime? modifiedTime = null, string url = null)
 		{
 			if(path == null)
 				throw new ArgumentNullException("path");
 
 			_path = path;
+			_url = url;
 
 			if(createdTime.HasValue)
 				_createdTime = createdTime.Value;
@@ -77,58 +81,68 @@ namespace Zongsoft.IO
 		#endregion
 
 		#region 公共属性
-		public string FileName
-		{
-			get
-			{
-				return _path == null ? string.Empty : _path.FileName;
-			}
-		}
-
-		public string DirectoryName
-		{
-			get
-			{
-				return _path == null ? string.Empty : _path.DirectoryName;
-			}
-		}
-
-		public string FullPath
-		{
-			get
-			{
-				return _path == null ? string.Empty : _path.FullPath;
-			}
-			protected set
-			{
-				if(string.IsNullOrWhiteSpace(value))
-					throw new ArgumentNullException();
-
-				_path = Zongsoft.IO.Path.Parse(value);
-			}
-		}
-
 		public Zongsoft.IO.Path Path
 		{
 			get
 			{
 				return _path;
 			}
-		}
-
-		public bool IsFile
-		{
-			get
+			protected set
 			{
-				return _path == null ? false : _path.IsFile;
+				if(value == null)
+					throw new ArgumentNullException();
+
+				_path = value;
 			}
 		}
 
-		public bool IsDirectory
+		/// <summary>
+		/// 获取或设置外部访问的URL地址。
+		/// </summary>
+		/// <remarks>有关外部访问的URL请参考：<seealso cref="IFileSystem.GetUrl"/>方法。</remarks>
+		public virtual string Url
 		{
 			get
 			{
-				return _path == null ? false : _path.IsDirectory;
+				if(_url != null)
+					return _url;
+
+				var path = _path;
+
+				if(path == null)
+					return string.Empty;
+
+				return path.Url;
+			}
+			set
+			{
+				_url = value;
+			}
+		}
+
+		public virtual bool IsFile
+		{
+			get
+			{
+				var path = this.Path;
+
+				if(path == null)
+					return false;
+
+				return path.IsFile;
+			}
+		}
+
+		public virtual bool IsDirectory
+		{
+			get
+			{
+				var path = this.Path;
+
+				if(path == null)
+					return false;
+
+				return path.IsDirectory;
 			}
 		}
 
