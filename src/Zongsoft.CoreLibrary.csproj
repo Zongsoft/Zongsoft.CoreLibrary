@@ -262,6 +262,7 @@
     <Compile Include="Runtime\Serialization\JsonSerializationWriter.cs" />
     <Compile Include="Runtime\Serialization\SerializationDirection.cs" />
     <Compile Include="Runtime\Serialization\SerializationMembers.cs" />
+    <Compile Include="Runtime\Serialization\SerializerAttribute.cs" />
     <Compile Include="Runtime\Serialization\TextSerializationWriter.cs" />
     <Compile Include="Runtime\Serialization\SerializationWriterContext.cs" />
     <Compile Include="Runtime\Serialization\SerializationWroteEventArgs.cs" />
@@ -352,6 +353,7 @@
     <Compile Include="Services\ServiceStorage.cs" />
     <Compile Include="Services\ServiceUnregisteredEventArgs.cs" />
     <Compile Include="Services\WorkerStateChangedEventArgs.cs" />
+    <Compile Include="TaskUtility.cs" />
     <Compile Include="Terminals\CommandHelper.cs" />
     <Compile Include="Services\CommandNotFoundException.cs" />
     <Compile Include="Services\CommandTreeNodeCollection.cs" />
