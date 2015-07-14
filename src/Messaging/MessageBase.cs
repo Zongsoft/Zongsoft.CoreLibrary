@@ -174,6 +174,13 @@ namespace Zongsoft.Messaging
 		#endregion
 
 		#region 公共方法
+		public virtual DateTime Delay(TimeSpan duration)
+		{
+			return TaskUtility.ExecuteTask(() => this.DelayAsync(duration));
+		}
+
+		public abstract Task<DateTime> DelayAsync(TimeSpan duration);
+
 		public virtual object Acknowledge(object parameter = null)
 		{
 			return TaskUtility.ExecuteTask(() => this.AcknowledgeAsync(parameter));
