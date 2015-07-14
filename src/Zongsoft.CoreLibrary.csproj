@@ -202,7 +202,10 @@
     <Compile Include="IO\StorageBucket.cs" />
     <Compile Include="IO\StorageFileInfo.cs" />
     <Compile Include="IO\StorageFile.cs" />
+    <Compile Include="Messaging\IMessageQueue.cs" />
     <Compile Include="Messaging\MessageBase.cs" />
+    <Compile Include="Messaging\MessageDequeueSettings.cs" />
+    <Compile Include="Messaging\MessageEnqueueSettings.cs" />
     <Compile Include="Messaging\MessageQueueBase.cs" />
     <Compile Include="Options\Configuration\OptionConfigurationLoader.cs" />
     <Compile Include="Options\Configuration\OptionConfigurationManager.cs" />

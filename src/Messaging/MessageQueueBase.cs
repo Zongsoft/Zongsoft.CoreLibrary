@@ -32,7 +32,7 @@ using System.Linq;
 
 namespace Zongsoft.Messaging
 {
-	public abstract class MessageQueueBase : Zongsoft.Collections.IQueue<MessageBase>
+	public abstract class MessageQueueBase : IMessageQueue
 	{
 		#region 事件定义
 		public event EventHandler<Zongsoft.Collections.DequeuedEventArgs> Dequeued;
@@ -81,29 +81,29 @@ namespace Zongsoft.Messaging
 		}
 		#endregion
 
-		#region 队列方法
+		#region 公共方法
 		public abstract Task<long> GetCountAsync();
 
-		public virtual void Enqueue(object item, object settings = null)
+		public virtual void Enqueue(object item, MessageEnqueueSettings settings = null)
 		{
 			this.EnqueueMany(new object[] { item }, settings);
 		}
 
-		public virtual Task EnqueueAsync(object item, object settings = null)
-		{
-			return this.EnqueueManyAsync(new object[] { item }, settings);
-		}
-
-		public virtual int EnqueueMany<T>(IEnumerable<T> items, object settings = null)
+		public virtual int EnqueueMany<T>(IEnumerable<T> items, MessageEnqueueSettings settings = null)
 		{
 			return TaskUtility.ExecuteTask(() => this.EnqueueManyAsync(items, settings));
 		}
 
-		public abstract Task<int> EnqueueManyAsync<TItem>(IEnumerable<TItem> items, object settings = null);
-
-		public virtual MessageBase Dequeue()
+		public virtual Task EnqueueAsync(object item, MessageEnqueueSettings settings = null)
 		{
-			var result = this.Dequeue(1);
+			return this.EnqueueManyAsync(new object[] { item }, settings);
+		}
+
+		public abstract Task<int> EnqueueManyAsync<TItem>(IEnumerable<TItem> items, MessageEnqueueSettings settings = null);
+
+		public virtual MessageBase Dequeue(MessageDequeueSettings settings = null)
+		{
+			var result = this.Dequeue(1, settings);
 
 			if(result == null)
 				return null;
@@ -111,14 +111,14 @@ namespace Zongsoft.Messaging
 			return result.FirstOrDefault();
 		}
 
-		public virtual IEnumerable<MessageBase> Dequeue(int count)
+		public virtual IEnumerable<MessageBase> Dequeue(int count, MessageDequeueSettings settings = null)
 		{
 			return TaskUtility.ExecuteTask(() => this.DequeueAsync(count));
 		}
 
-		public virtual async Task<MessageBase> DequeueAsync()
+		public virtual async Task<MessageBase> DequeueAsync(MessageDequeueSettings settings = null)
 		{
-			var result = await this.DequeueAsync(1);
+			var result = await this.DequeueAsync(1, settings);
 
 			if(result == null)
 				return null;
@@ -126,7 +126,7 @@ namespace Zongsoft.Messaging
 			return result.FirstOrDefault();
 		}
 
-		public abstract Task<IEnumerable<MessageBase>> DequeueAsync(int count);
+		public abstract Task<IEnumerable<MessageBase>> DequeueAsync(int count, MessageDequeueSettings settings = null);
 
 		public virtual MessageBase Peek()
 		{
@@ -154,47 +154,62 @@ namespace Zongsoft.Messaging
 		}
 
 		public abstract Task<IEnumerable<MessageBase>> PeekAsync(int count);
+		#endregion
 
-		public virtual MessageBase Take(int startOffset)
-		{
-			var result = this.Take(startOffset, 1);
-
-			if(result == null)
-				return null;
-			else
-				return result.FirstOrDefault();
-		}
-
-		public virtual IEnumerable<MessageBase> Take(int startOffset, int count)
-		{
-			return TaskUtility.ExecuteTask(() => this.TakeAsync(startOffset, count));
-		}
-
-		public virtual async Task<MessageBase> TakeAsync(int startOffset)
-		{
-			var result = await this.TakeAsync(startOffset, 1);
-
-			if(result == null)
-				return null;
-
-			return result.FirstOrDefault();
-		}
-
-		public abstract Task<IEnumerable<MessageBase>> TakeAsync(int startOffset, int count);
-
+		#region 队列实现
 		void Zongsoft.Collections.IQueue.Clear()
 		{
 			this.ClearQueue();
 		}
 
+		void Zongsoft.Collections.IQueue.Enqueue(object item, object settings)
+		{
+			this.Enqueue(item, settings as MessageEnqueueSettings);
+		}
+
+		int Zongsoft.Collections.IQueue.EnqueueMany<T>(IEnumerable<T> items, object settings)
+		{
+			return this.EnqueueMany(items, settings as MessageEnqueueSettings);
+		}
+
+		Task Zongsoft.Collections.IQueue<MessageBase>.EnqueueAsync(object item, object settings)
+		{
+			return this.EnqueueAsync(item, settings as MessageEnqueueSettings);
+		}
+
+		Task<int> Zongsoft.Collections.IQueue<MessageBase>.EnqueueManyAsync<TItem>(IEnumerable<TItem> items, object settings)
+		{
+			return this.EnqueueManyAsync(items, settings as MessageEnqueueSettings);
+		}
+
 		object Zongsoft.Collections.IQueue.Dequeue()
 		{
-			return this.Dequeue();
+			return this.Dequeue(null);
 		}
 
 		IEnumerable Zongsoft.Collections.IQueue.Dequeue(int count)
 		{
-			return this.Dequeue(count);
+			return this.Dequeue(count, null);
+		}
+
+		MessageBase Zongsoft.Collections.IQueue<MessageBase>.Dequeue(object settings)
+		{
+			return this.Dequeue(settings as MessageDequeueSettings);
+		}
+
+		IEnumerable<MessageBase> Zongsoft.Collections.IQueue<MessageBase>.Dequeue(int count, object settings)
+		{
+			return this.Dequeue(count, settings as MessageDequeueSettings);
+		}
+
+		Task<MessageBase> Zongsoft.Collections.IQueue<MessageBase>.DequeueAsync(object settings)
+		{
+			return this.DequeueAsync(settings as MessageDequeueSettings);
+		}
+
+		Task<IEnumerable<MessageBase>> Zongsoft.Collections.IQueue<MessageBase>.DequeueAsync(int count, object settings)
+		{
+			return this.DequeueAsync(count, settings as MessageDequeueSettings);
 		}
 
 		object Zongsoft.Collections.IQueue.Peek()
@@ -216,6 +231,26 @@ namespace Zongsoft.Messaging
 		{
 			return this.TakeQueue(startOffset, count);
 		}
+
+		MessageBase Zongsoft.Collections.IQueue<MessageBase>.Take(int startOffset)
+		{
+			return this.TakeQueue(startOffset);
+		}
+
+		IEnumerable<MessageBase> Zongsoft.Collections.IQueue<MessageBase>.Take(int startOffset, int count)
+		{
+			return this.TakeQueue(startOffset, count);
+		}
+
+		Task<MessageBase> Zongsoft.Collections.IQueue<MessageBase>.TakeAsync(int startOffset)
+		{
+			return this.TakeQueueAsync(startOffset);
+		}
+
+		Task<IEnumerable<MessageBase>> Zongsoft.Collections.IQueue<MessageBase>.TakeAsync(int startOffset, int count)
+		{
+			return this.TakeQueueAsync(startOffset, count);
+		}
 		#endregion
 
 		#region 保护方法
@@ -224,7 +259,12 @@ namespace Zongsoft.Messaging
 			throw new NotSupportedException("The message queue does not support the operation.");
 		}
 
-		protected virtual object TakeQueue(int startOffset)
+		protected virtual void CopyQueueTo(Array array, int index)
+		{
+			throw new NotSupportedException("The message queue does not support the operation.");
+		}
+
+		protected virtual MessageBase TakeQueue(int startOffset)
 		{
 			var result = this.TakeQueue(startOffset, 1);
 
@@ -234,12 +274,22 @@ namespace Zongsoft.Messaging
 			return result.GetEnumerator().Current;
 		}
 
-		protected virtual IEnumerable TakeQueue(int startOffset, int count)
+		protected virtual IEnumerable<MessageBase> TakeQueue(int startOffset, int count)
 		{
 			throw new NotSupportedException("The message queue does not support the operation.");
 		}
 
-		protected virtual void CopyQueueTo(Array array, int index)
+		protected virtual async Task<MessageBase> TakeQueueAsync(int startOffset)
+		{
+			var result = await this.TakeQueueAsync(startOffset, 1);
+
+			if(result == null)
+				return null;
+
+			return result.GetEnumerator().Current;
+		}
+
+		protected virtual Task<IEnumerable<MessageBase>> TakeQueueAsync(int startOffset, int count)
 		{
 			throw new NotSupportedException("The message queue does not support the operation.");
 		}
