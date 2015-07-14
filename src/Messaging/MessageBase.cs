@@ -49,7 +49,7 @@ namespace Zongsoft.Messaging
 		#endregion
 
 		#region 构造函数
-		protected MessageBase(string id, byte[] data, byte[] checksum = null, DateTime? expires = null, DateTime? enqueuedTime = null, DateTime? dequeuedTime = null)
+		protected MessageBase(string id, byte[] data, byte[] checksum = null, DateTime? expires = null, DateTime? enqueuedTime = null, DateTime? dequeuedTime = null, int dequeuedCount = 0)
 		{
 			if(string.IsNullOrWhiteSpace(id))
 				throw new ArgumentNullException("id");
@@ -60,6 +60,7 @@ namespace Zongsoft.Messaging
 			_expires = (expires.HasValue ? expires.Value : DateTime.Today.AddYears(50));
 			_enqueuedTime = (enqueuedTime.HasValue ? enqueuedTime.Value : MINIMUM_DATETIME);
 			_dequeuedTime = (dequeuedTime.HasValue ? dequeuedTime.Value : MINIMUM_DATETIME);
+			_dequeuedCount = dequeuedCount;
 		}
 		#endregion
 
@@ -83,7 +84,7 @@ namespace Zongsoft.Messaging
 			}
 			protected set
 			{
-				_acknowledgementId = value;
+				_acknowledgementId = value == null ? null : value.Trim();
 			}
 		}
 
@@ -173,7 +174,10 @@ namespace Zongsoft.Messaging
 		#endregion
 
 		#region 公共方法
-		public abstract object Acknowledge(object parameter = null);
+		public virtual object Acknowledge(object parameter = null)
+		{
+			return TaskUtility.ExecuteTask(() => this.AcknowledgeAsync(parameter));
+		}
 
 		public abstract Task<object> AcknowledgeAsync(object parameter = null);
 		#endregion
