@@ -62,9 +62,12 @@ namespace Zongsoft.Messaging
 			}
 		}
 
-		public abstract long Count
+		public virtual long Count
 		{
-			get;
+			get
+			{
+				return TaskUtility.ExecuteTask(() => this.GetCountAsync());
+			}
 		}
 		#endregion
 
@@ -79,12 +82,24 @@ namespace Zongsoft.Messaging
 		#endregion
 
 		#region 队列方法
+		public abstract Task<long> GetCountAsync();
+
 		public virtual void Enqueue(object item)
 		{
-			this.Enqueue(new object[] { item });
+			this.EnqueueMany(new object[] { item });
 		}
 
-		public abstract void EnqueueMany<T>(IEnumerable<T> items);
+		public virtual Task EnqueueAsync(object item)
+		{
+			return this.EnqueueManyAsync(new object[] { item });
+		}
+
+		public virtual int EnqueueMany<T>(IEnumerable<T> items)
+		{
+			return TaskUtility.ExecuteTask(() => this.EnqueueManyAsync(items));
+		}
+
+		public abstract Task<int> EnqueueManyAsync<TItem>(IEnumerable<TItem> items);
 
 		public virtual MessageBase Dequeue()
 		{
@@ -96,7 +111,22 @@ namespace Zongsoft.Messaging
 			return result.FirstOrDefault();
 		}
 
-		public abstract IEnumerable<MessageBase> Dequeue(int count);
+		public virtual IEnumerable<MessageBase> Dequeue(int count)
+		{
+			return TaskUtility.ExecuteTask(() => this.DequeueAsync(count));
+		}
+
+		public virtual async Task<MessageBase> DequeueAsync()
+		{
+			var result = await this.DequeueAsync(1);
+
+			if(result == null)
+				return null;
+
+			return result.FirstOrDefault();
+		}
+
+		public abstract Task<IEnumerable<MessageBase>> DequeueAsync(int count);
 
 		public virtual MessageBase Peek()
 		{
@@ -108,7 +138,22 @@ namespace Zongsoft.Messaging
 				return result.FirstOrDefault();
 		}
 
-		public abstract IEnumerable<MessageBase> Peek(int count);
+		public virtual IEnumerable<MessageBase> Peek(int count)
+		{
+			return TaskUtility.ExecuteTask(() => this.PeekAsync(count));
+		}
+
+		public virtual async Task<MessageBase> PeekAsync()
+		{
+			var result = await this.PeekAsync(1);
+
+			if(result == null)
+				return null;
+
+			return result.FirstOrDefault();
+		}
+
+		public abstract Task<IEnumerable<MessageBase>> PeekAsync(int count);
 
 		public virtual MessageBase Take(int startOffset)
 		{
@@ -120,7 +165,22 @@ namespace Zongsoft.Messaging
 				return result.FirstOrDefault();
 		}
 
-		public abstract IEnumerable<MessageBase> Take(int startOffset, int count);
+		public virtual IEnumerable<MessageBase> Take(int startOffset, int count)
+		{
+			return TaskUtility.ExecuteTask(() => this.TakeAsync(startOffset, count));
+		}
+
+		public virtual async Task<MessageBase> TakeAsync(int startOffset)
+		{
+			var result = await this.TakeAsync(startOffset, 1);
+
+			if(result == null)
+				return null;
+
+			return result.FirstOrDefault();
+		}
+
+		public abstract Task<IEnumerable<MessageBase>> TakeAsync(int startOffset, int count);
 
 		void Zongsoft.Collections.IQueue.Clear()
 		{
