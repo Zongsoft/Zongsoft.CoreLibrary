@@ -333,13 +333,20 @@ namespace Zongsoft.Collections
 		/// 将指定集合中的所有元素依次添加到<seealso cref="Zongsoft.Collections.Queue"/>的结尾处。
 		/// </summary>
 		/// <param name="items">要入队的集合。</param>
-		public void EnqueueMany<T>(IEnumerable<T> items)
+		public int EnqueueMany<T>(IEnumerable<T> items)
 		{
 			if(items == null)
 				throw new ArgumentNullException("items");
 
+			int count = 0;
+
 			foreach(var item in items)
+			{
 				this.Enqueue(item);
+				count++;
+			}
+
+			return count;
 		}
 
 		/// <summary>

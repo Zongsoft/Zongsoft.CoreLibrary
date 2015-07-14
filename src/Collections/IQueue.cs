@@ -88,7 +88,7 @@ namespace Zongsoft.Collections
 		/// 将指定集合中的所有元素依次添加到队列的结尾处。
 		/// </summary>
 		/// <param name="items">要入队的集合。</param>
-		void EnqueueMany<T>(IEnumerable<T> items);
+		int EnqueueMany<T>(IEnumerable<T> items);
 		#endregion
 
 		#region 出队方法
