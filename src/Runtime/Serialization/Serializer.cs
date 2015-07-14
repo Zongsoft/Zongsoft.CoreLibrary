@@ -398,6 +398,51 @@ namespace Zongsoft.Runtime.Serialization
 		}
 		#endregion
 
+		#region 静态方法
+		public static bool CanSerialize(object graph)
+		{
+			if(graph == null)
+				return false;
+
+			if(typeof(ISerializable).IsAssignableFrom(graph.GetType()))
+				return true;
+
+			var attribute = (SerializerAttribute)Attribute.GetCustomAttribute(graph.GetType(), typeof(SerializerAttribute));
+
+			return (attribute != null && attribute.Type != null);
+		}
+
+		public static bool TrySerialize(Stream serializationStream, object graph)
+		{
+			if(serializationStream == null)
+				throw new ArgumentNullException("serializationStream");
+
+			if(graph == null)
+				return false;
+
+			if(typeof(ISerializable).IsAssignableFrom(graph.GetType()))
+			{
+				((ISerializable)graph).Serialize(serializationStream);
+				return true;
+			}
+
+			var attribute = (SerializerAttribute)Attribute.GetCustomAttribute(graph.GetType(), typeof(SerializerAttribute));
+
+			if(attribute != null && attribute.Type != null)
+			{
+				var serializer = Activator.CreateInstance(attribute.Type) as ISerializer;
+
+				if(serializer != null)
+				{
+					serializer.Serialize(serializationStream, graph);
+					return true;
+				}
+			}
+
+			return false;
+		}
+		#endregion
+
 		#region 嵌套子类
 		private class ObjectReferenceComparer : System.Collections.IEqualityComparer, IEqualityComparer<object>
 		{
