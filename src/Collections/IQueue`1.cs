@@ -36,11 +36,11 @@ namespace Zongsoft.Collections
 
 		Task<int> EnqueueManyAsync<TItem>(IEnumerable<TItem> items, object settings = null);
 
-		T Dequeue();
-		IEnumerable<T> Dequeue(int count);
+		T Dequeue(object settings = null);
+		IEnumerable<T> Dequeue(int count, object settings = null);
 
-		Task<T> DequeueAsync();
-		Task<IEnumerable<T>> DequeueAsync(int count);
+		Task<T> DequeueAsync(object settings = null);
+		Task<IEnumerable<T>> DequeueAsync(int count, object settings = null);
 
 		T Peek();
 		IEnumerable<T> Peek(int count);
