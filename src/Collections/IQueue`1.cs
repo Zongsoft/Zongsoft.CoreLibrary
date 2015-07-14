@@ -26,18 +26,32 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Zongsoft.Collections
 {
-	public interface IQueue<out T> : IQueue
+	public interface IQueue<T> : IQueue
 	{
+		Task EnqueueAsync(object item);
+
+		Task<int> EnqueueManyAsync<TItem>(IEnumerable<TItem> items);
+
 		T Dequeue();
 		IEnumerable<T> Dequeue(int count);
+
+		Task<T> DequeueAsync();
+		Task<IEnumerable<T>> DequeueAsync(int count);
 
 		T Peek();
 		IEnumerable<T> Peek(int count);
 
+		Task<T> PeekAsync();
+		Task<IEnumerable<T>> PeekAsync(int count);
+
 		T Take(int startOffset);
 		IEnumerable<T> Take(int startOffset, int count);
+
+		Task<T> TakeAsync(int startOffset);
+		Task<IEnumerable<T>> TakeAsync(int startOffset, int count);
 	}
 }
