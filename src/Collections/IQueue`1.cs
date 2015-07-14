@@ -32,9 +32,9 @@ namespace Zongsoft.Collections
 {
 	public interface IQueue<T> : IQueue
 	{
-		Task EnqueueAsync(object item);
+		Task EnqueueAsync(object item, object settings = null);
 
-		Task<int> EnqueueManyAsync<TItem>(IEnumerable<TItem> items);
+		Task<int> EnqueueManyAsync<TItem>(IEnumerable<TItem> items, object settings = null);
 
 		T Dequeue();
 		IEnumerable<T> Dequeue(int count);

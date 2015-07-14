@@ -333,7 +333,8 @@ namespace Zongsoft.Collections
 		/// 将指定集合中的所有元素依次添加到<seealso cref="Zongsoft.Collections.Queue"/>的结尾处。
 		/// </summary>
 		/// <param name="items">要入队的集合。</param>
-		public int EnqueueMany<T>(IEnumerable<T> items)
+		/// <param name="settings">不支持入队的选项参数设置，始终忽略该参数。</param>
+		public int EnqueueMany<T>(IEnumerable<T> items, object settings = null)
 		{
 			if(items == null)
 				throw new ArgumentNullException("items");
@@ -342,7 +343,7 @@ namespace Zongsoft.Collections
 
 			foreach(var item in items)
 			{
-				this.Enqueue(item);
+				this.Enqueue(item, settings);
 				count++;
 			}
 
@@ -353,23 +354,25 @@ namespace Zongsoft.Collections
 		/// 将字符串文本添加到<seealso cref="Zongsoft.Collections.Queue"/>的结尾处。
 		/// </summary>
 		/// <param name="text">要入队的字符串文本，该值可以为空(null)。</param>
+		/// <param name="settings">不支持入队的选项参数设置，始终忽略该参数。</param>
 		/// <remarks>
 		///		<para>该重载可以优先<see cref="Enqueue"/>重载的匹配。</para>
 		/// </remarks>
-		public void Enqueue(string text)
+		public void Enqueue(string text, object settings = null)
 		{
-			this.Enqueue((object)text);
+			this.Enqueue((object)text, settings);
 		}
 
 		/// <summary>
 		/// 将对象添加到<seealso cref="Zongsoft.Collections.Queue"/>的结尾处。
 		/// </summary>
 		/// <param name="item">要入队的对象，该值可以为空(null)。</param>
+		/// <param name="settings">不支持入队的选项参数设置，始终忽略该参数。</param>
 		/// <remarks>
 		///		<para>容量<seealso cref="Capacity"/>是指队列可以保存的元素数。随着入队操作（即向队列中添加元素），容量通过重新分配按需自动增加。但是增加到最大限制值(<seealso cref="MaximumLimit"/>)就不再扩容，而是首先导致出队以腾出空间再入队。</para>
 		///		<para>成长因子是当需要更大容量时当前容量要乘以的数字。在构造<seealso cref="Zongsoft.Collections.Queue"/>时确定增长因子。无论增长因子是多少，队列的容量将始终增加一个最小值（即<see cref="MinimumGrow"/>属性值），即使1.0f的增长因子也不会阻止队列的扩容。</para>
 		/// </remarks>
-		public void Enqueue(object item)
+		public void Enqueue(object item, object settings = null)
 		{
 			if(_size == _buffer.Length)
 			{

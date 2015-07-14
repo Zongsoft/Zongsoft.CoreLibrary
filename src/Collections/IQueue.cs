@@ -82,13 +82,21 @@ namespace Zongsoft.Collections
 		/// 将对象添加到队列的结尾处。
 		/// </summary>
 		/// <param name="item">要入队的对象，该值可以为空(null)。</param>
-		void Enqueue(object item);
+		/// <param name="settings">指定入队的一些选项参数，具体内容请参考特定实现者的规范。</param>
+		/// <remarks>
+		///		<para>有些队列实现者可能忽略当<paramref name="item"/>参数为空的入队操作。</para>
+		/// </remarks>
+		void Enqueue(object item, object settings = null);
 
 		/// <summary>
 		/// 将指定集合中的所有元素依次添加到队列的结尾处。
 		/// </summary>
 		/// <param name="items">要入队的集合。</param>
-		int EnqueueMany<T>(IEnumerable<T> items);
+		/// <param name="settings">指定入队的一些选项参数，具体内容请参考特定实现者的规范。</param>
+		/// <remarks>
+		///		<para>有些队列实现者可能忽略当<paramref name="items"/>参数集合中那些为空的元素的入队操作。</para>
+		/// </remarks>
+		int EnqueueMany<T>(IEnumerable<T> items, object settings = null);
 		#endregion
 
 		#region 出队方法

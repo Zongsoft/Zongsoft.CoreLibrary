@@ -84,22 +84,22 @@ namespace Zongsoft.Messaging
 		#region 队列方法
 		public abstract Task<long> GetCountAsync();
 
-		public virtual void Enqueue(object item)
+		public virtual void Enqueue(object item, object settings = null)
 		{
-			this.EnqueueMany(new object[] { item });
+			this.EnqueueMany(new object[] { item }, settings);
 		}
 
-		public virtual Task EnqueueAsync(object item)
+		public virtual Task EnqueueAsync(object item, object settings = null)
 		{
-			return this.EnqueueManyAsync(new object[] { item });
+			return this.EnqueueManyAsync(new object[] { item }, settings);
 		}
 
-		public virtual int EnqueueMany<T>(IEnumerable<T> items)
+		public virtual int EnqueueMany<T>(IEnumerable<T> items, object settings = null)
 		{
-			return TaskUtility.ExecuteTask(() => this.EnqueueManyAsync(items));
+			return TaskUtility.ExecuteTask(() => this.EnqueueManyAsync(items, settings));
 		}
 
-		public abstract Task<int> EnqueueManyAsync<TItem>(IEnumerable<TItem> items);
+		public abstract Task<int> EnqueueManyAsync<TItem>(IEnumerable<TItem> items, object settings = null);
 
 		public virtual MessageBase Dequeue()
 		{
