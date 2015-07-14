@@ -81,6 +81,38 @@ namespace Zongsoft.IO
 		#endregion
 
 		#region 公共属性
+		public string Name
+		{
+			get
+			{
+				var path = _path;
+
+				if(path == null)
+					return null;
+
+				if(path.IsFile)
+					return path.FileName;
+
+				if(path.IsDirectory)
+				{
+					var directoryName = path.DirectoryName;
+
+					if(directoryName != null && directoryName.Length > 1)
+					{
+						int offset = directoryName.EndsWith("/") ? directoryName.Length - 2 : directoryName.Length - 1;
+						int index = directoryName.LastIndexOf('/', offset);
+
+						if(index >= 0)
+							return directoryName.Substring(index + 1, offset - index) + "/";
+					}
+
+					return directoryName;
+				}
+
+				return string.Empty;
+			}
+		}
+
 		public Zongsoft.IO.Path Path
 		{
 			get
