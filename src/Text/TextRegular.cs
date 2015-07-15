@@ -30,14 +30,14 @@ using System.Text.RegularExpressions;
 
 namespace Zongsoft.Text
 {
-	public class Regular : IRegular
+	public class TextRegular : ITextRegular
 	{
 		#region 成员字段
 		private readonly Regex _regex;
 		#endregion
 
 		#region 构造函数
-		public Regular(string pattern)
+		public TextRegular(string pattern)
 		{
 			if(string.IsNullOrWhiteSpace(pattern))
 				throw new ArgumentNullException("pattern");
@@ -115,7 +115,7 @@ namespace Zongsoft.Text
 		public static class Web
 		{
 			/// <summary>获取电子邮箱(Email)地址的文本验证器。</summary>
-			public static Regular Email = new Regular(@"^\s*(?<value>[A-Za-z]([-_\.][A-Za-z0-9]+)*@([A-Za-z0-9]+([-_][A-Za-z0-9]+)*)(\.([A-Za-z0-9]+([-_][A-Za-z0-9]+)*))+?\.[A-Za-z]+)\s*$");
+			public static TextRegular Email = new TextRegular(@"^\s*(?<value>[A-Za-z]([-_\.][A-Za-z0-9]+)*@([A-Za-z0-9]+([-_][A-Za-z0-9]+)*)(\.([A-Za-z0-9]+([-_][A-Za-z0-9]+)*))+?\.[A-Za-z]+)\s*$");
 		}
 
 		public static class Uri
@@ -155,25 +155,25 @@ namespace Zongsoft.Text
 			#endregion
 
 			/// <summary>获取Http协议的URL文本验证器。</summary>
-			public static Regular Http = new Regular(URI_PATTERN.Replace("${schema}", "http[s]?"));
+			public static TextRegular Http = new TextRegular(URI_PATTERN.Replace("${schema}", "http[s]?"));
 
 			/// <summary>获取Ftp协议的URL文本验证器。</summary>
-			public static Regular Ftp = new Regular(URI_PATTERN.Replace("${schema}", "ftp"));
+			public static TextRegular Ftp = new TextRegular(URI_PATTERN.Replace("${schema}", "ftp"));
 		}
 
 		public static class Chinese
 		{
 			/// <summary>获取中国手机号码的文本验证器。</summary>
-			public static Regular Cellphone = new Regular(@"^\s*(?<value>1\d{2})(?<separator>(\s*)|(-?))(?<value>\d{4})(?<separator>(\s*)|(-?))(?<value>\d{4})\s*$");
+			public static TextRegular Cellphone = new TextRegular(@"^\s*(?<value>1\d{2})(?<separator>(\s*)|(-?))(?<value>\d{4})(?<separator>(\s*)|(-?))(?<value>\d{4})\s*$");
 
 			/// <summary>获取中国固定电话号码的文本验证器。</summary>
-			public static Regular Telephone = new Regular(@"^\s*(?<value>0\d{2,4})?(?<separator>(\s*)|(-?))(?<value>\d{4})(?<separator>(\s*)|(-?))(?<value>\d{3,4})\s*$");
+			public static TextRegular Telephone = new TextRegular(@"^\s*(?<value>0\d{2,4})?(?<separator>(\s*)|(-?))(?<value>\d{4})(?<separator>(\s*)|(-?))(?<value>\d{3,4})\s*$");
 
 			/// <summary>获取中国身份证号码的文本验证器。</summary>
-			public static Regular IdentityNo = new Regular(@"^\s*(?<value>\d{6})?(?<separator>(\s*)|(-?))(?<value>\d{8})(?<separator>(\s*)|(-?))(?<value>(\d{4})|(\d{3}[A-Za-z]))\s*$");
+			public static TextRegular IdentityNo = new TextRegular(@"^\s*(?<value>\d{6})?(?<separator>(\s*)|(-?))(?<value>\d{8})(?<separator>(\s*)|(-?))(?<value>(\d{4})|(\d{3}[A-Za-z]))\s*$");
 
 			/// <summary>获取中国邮政编码的文本验证器。</summary>
-			public static Regular PostalCode = new Regular(@"^\s*(?<value>\d{6})\s*$");
+			public static TextRegular PostalCode = new TextRegular(@"^\s*(?<value>\d{6})\s*$");
 		}
 		#endregion
 	}

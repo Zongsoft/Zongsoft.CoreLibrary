@@ -505,8 +505,8 @@
     <Compile Include="Terminals\TerminalCommandContext.cs" />
     <Compile Include="Terminals\TerminalCommandExecutor.cs" />
     <Compile Include="Terminals\TerminalStyles.cs" />
-    <Compile Include="Text\IRegular.cs" />
-    <Compile Include="Text\Regular.cs" />
+    <Compile Include="Text\ITextRegular.cs" />
+    <Compile Include="Text\TextRegular.cs" />
     <Compile Include="Text\TextExpression.cs" />
     <Compile Include="Text\TextExpressionArgument.cs" />
     <Compile Include="Text\TextExpressionNode.cs" />
