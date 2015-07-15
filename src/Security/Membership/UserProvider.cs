@@ -167,7 +167,7 @@ namespace Zongsoft.Security.Membership
 		#endregion
 
 		#region 密码管理
-		public void ChangePassword(string certificationId, string oldPassword, string newPassword)
+		public bool ChangePassword(string certificationId, string oldPassword, string newPassword)
 		{
 			var dataAccess = this.GetDataAccess();
 			var certification = this.GetCertification(certificationId);
@@ -192,84 +192,105 @@ namespace Zongsoft.Security.Membership
 				{"Password", PasswordUtility.HashPassword(newPassword, storedPasswordSalt)},
 				{"PasswordSalt", storedPasswordSalt},
 			});
+
+			return true;
 		}
 
-		public string ResetPassword(string certificationId, string passwordAnswer)
+		public bool ForgetPassword(string identity, out int userId, out string secret, out string token)
 		{
-			var objectAccess = this.GetDataAccess();
-			var certification = this.GetCertification(certificationId);
+			userId = 0;
+			secret = null;
+			token = null;
 
-			IDictionary<string, object> outParameters;
-
-			objectAccess.Execute("Security.User.GetPasswordAnswer", new Dictionary<string, object>
-			{
-				{"UserId", certification.User.UserId},
-			}, out outParameters);
-
-			object answerValue;
-
-			if(!outParameters.TryGetValue("PasswordAnswer", out answerValue))
-				throw new InvalidOperationException("Can not obtain the Password-Answer.");
-
-			if(!Zongsoft.Collections.BinaryComparer.Default.Equals(PasswordUtility.HashPassword(passwordAnswer), (byte[])answerValue))
-				throw new AuthenticationException("Invalid value of the Password-Answer.");
-
-			var password = PasswordUtility.GeneratePassword();
-			var passwordSalt = PasswordUtility.GeneratePasswordSalt(4);
-
-			objectAccess.Execute("Security.User.SetPassword", new Dictionary<string, object>
-			{
-				{"UserId", certification.User.UserId},
-				{"Password", PasswordUtility.HashPassword(password, passwordSalt)},
-				{"PasswordSalt", passwordSalt},
-			});
-
-			return password;
+			return false;
 		}
 
-		public string GetPasswordQuestion(string certificationId)
+		public bool ResetPassword(int userId, string token, string newPassword = null)
 		{
-			var objectAccess = this.GetDataAccess();
-			var certification = this.GetCertification(certificationId);
+			return false;
+		}
 
-			IDictionary<string, object> outParameters;
+		public bool ResetPassword(string identity, string secret, string newPassword = null)
+		{
+			return false;
+		}
 
-			objectAccess.Execute("Security.User.GetPasswordQuestion", new Dictionary<string, object>
-			{
-				{"UserId", certification.User.UserId},
-			}, out outParameters);
+		public bool ResetPassword(string identity, string[] passwordAnswers, string newPassword = null)
+		{
+			//var objectAccess = this.GetDataAccess();
+			//var certification = this.GetCertification(certificationId);
 
-			object questionValue;
+			//IDictionary<string, object> outParameters;
 
-			if(outParameters.TryGetValue("PasswordQuestion", out questionValue))
-				return questionValue as string;
+			//objectAccess.Execute("Security.User.GetPasswordAnswer", new Dictionary<string, object>
+			//{
+			//	{"UserId", certification.User.UserId},
+			//}, out outParameters);
+
+			//object answerValue;
+
+			//if(!outParameters.TryGetValue("PasswordAnswer", out answerValue))
+			//	throw new InvalidOperationException("Can not obtain the Password-Answer.");
+
+			//if(!Zongsoft.Collections.BinaryComparer.Default.Equals(PasswordUtility.HashPassword(passwordAnswer), (byte[])answerValue))
+			//	throw new AuthenticationException("Invalid value of the Password-Answer.");
+
+			//var password = PasswordUtility.GeneratePassword();
+			//var passwordSalt = PasswordUtility.GeneratePasswordSalt(4);
+
+			//objectAccess.Execute("Security.User.SetPassword", new Dictionary<string, object>
+			//{
+			//	{"UserId", certification.User.UserId},
+			//	{"Password", PasswordUtility.HashPassword(password, passwordSalt)},
+			//	{"PasswordSalt", passwordSalt},
+			//});
+
+			return true;
+		}
+
+		public string[] GetPasswordQuestions(string identity)
+		{
+			//var objectAccess = this.GetDataAccess();
+			//var certification = this.GetCertification(certificationId);
+
+			//IDictionary<string, object> outParameters;
+
+			//objectAccess.Execute("Security.User.GetPasswordQuestion", new Dictionary<string, object>
+			//{
+			//	{"UserId", certification.User.UserId},
+			//}, out outParameters);
+
+			//object questionValue;
+
+			//if(outParameters.TryGetValue("PasswordQuestion", out questionValue))
+			//	return questionValue as string;
 
 			return null;
 		}
 
-		public void SetPasswordQuestionAndAnswer(string certificationId, string password, string passwordQuestion, string passwordAnswer)
+		public void SetPasswordQuestionsAndAnswers(string certificationId, string password, string[] passwordQuestions, string[] passwordAnswers)
 		{
-			var objectAccess = this.GetDataAccess();
-			var certification = this.GetCertification(certificationId);
+			//var objectAccess = this.GetDataAccess();
+			//var certification = this.GetCertification(certificationId);
 
-			byte[] storedPassword;
-			byte[] storedPasswordSalt;
+			//byte[] storedPassword;
+			//byte[] storedPasswordSalt;
 
-			var user = MembershipHelper.GetPassword(objectAccess, certification.User.UserId, out storedPassword, out storedPasswordSalt);
+			//var user = MembershipHelper.GetPassword(objectAccess, certification.User.UserId, out storedPassword, out storedPasswordSalt);
 
-			if(user == null)
-				throw new InvalidOperationException("Invalid account.");
+			//if(user == null)
+			//	throw new InvalidOperationException("Invalid account.");
 
-			if(!PasswordUtility.VerifyPassword(password, storedPassword, storedPasswordSalt))
-				throw new AuthenticationException("Invalid password.");
+			//if(!PasswordUtility.VerifyPassword(password, storedPassword, storedPasswordSalt))
+			//	throw new AuthenticationException("Invalid password.");
 
-			objectAccess.Execute("Security.User.SetPasswordQuestionAndAnswer", new Dictionary<string, object>
-			{
-				{"ApplicationId", certification.Namespace},
-				{"UserId", certification.User.UserId},
-				{"PasswordQuestion", passwordQuestion},
-				{"PasswordAnswer", PasswordUtility.HashPassword(passwordAnswer)},
-			});
+			//objectAccess.Execute("Security.User.SetPasswordQuestionAndAnswer", new Dictionary<string, object>
+			//{
+			//	{"ApplicationId", certification.Namespace},
+			//	{"UserId", certification.User.UserId},
+			//	{"PasswordQuestion", passwordQuestion},
+			//	{"PasswordAnswer", PasswordUtility.HashPassword(passwordAnswer)},
+			//});
 		}
 		#endregion
 
