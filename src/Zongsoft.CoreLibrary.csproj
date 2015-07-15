@@ -281,6 +281,7 @@
     <Compile Include="Security\Membership\AuthenticationAttribute.cs" />
     <Compile Include="Security\Membership\Authentication.cs" />
     <Compile Include="Security\Membership\AuthenticationException.cs" />
+    <Compile Include="Security\Membership\IMemberProvider.cs" />
     <Compile Include="Security\Membership\UserIdentityType.cs" />
     <Compile Include="Security\Membership\AuthenticationResult.cs" />
     <Compile Include="Security\Membership\Authorization.cs" />
@@ -331,6 +332,7 @@
     <Compile Include="Services\Composition\ExecutionPipelineContext.cs" />
     <Compile Include="Services\Composition\ExecutionPipelineExecutedEventArgs.cs" />
     <Compile Include="Services\Composition\ExecutionPipelineExecutingEventArgs.cs" />
+    <Compile Include="Services\Composition\ExecutionResult.cs" />
     <Compile Include="Services\Composition\IExecutionCombiner.cs" />
     <Compile Include="Services\Composition\IExecutionContext.cs" />
     <Compile Include="Services\Composition\IExecutionPipelineContext.cs" />
