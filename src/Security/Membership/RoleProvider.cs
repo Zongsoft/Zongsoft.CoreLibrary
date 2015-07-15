@@ -33,7 +33,7 @@ using Zongsoft.Data;
 
 namespace Zongsoft.Security.Membership
 {
-	public class RoleProvider : IRoleProvider
+	public class RoleProvider : IRoleProvider, IMemberProvider
 	{
 		#region 成员字段
 		private IDataAccess _dataAccess;

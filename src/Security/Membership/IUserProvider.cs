@@ -102,6 +102,10 @@ namespace Zongsoft.Security.Membership
 		/// <param name="newPassword">指定的用户的新密码。</param>
 		void ChangePassword(string certificationId, string oldPassword, string newPassword);
 
+		//bool ForgetPassword(string identity, out string sequence, out string secret);
+
+		//bool ForgetPassword(string sequence, string secret, string newPassword);
+
 		/// <summary>
 		/// 将用户密码重置为一个自动生成的新密码。
 		/// </summary>
