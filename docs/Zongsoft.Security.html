@@ -26,12 +26,12 @@
 </head>
 
 <body style="font-family:仿宋, 仿宋_gb2312; font-size:12pt">
-	<h1 style="font-family:黑体,楷体_gb2312; font-size:20pt; text-align:center; font-weight:bold">
+	<h1 style="font-family:黑体, 楷体, 楷体_gb2312; font-size:20pt; text-align:center; font-weight:bold">
 		<font face="Arial"><em>Zongsoft</em> <font face="Monotype Corsiva">i</font><font size="1"> </font>Security<sup>&reg;</sup></font> 用户角色安全数据库表结构定义</strong>
 	</h1>
 
 	<h2 style="font-family:Arial, 仿宋, 仿宋_gb2312; font-size:14pt; text-align:center">
-		版权所有 2001-2014 &nbsp;&nbsp;<a href="http://www.zongsoft.com">Zongsoft Corporation</a><br/>2014年11月05日　　版本4.0
+		版权所有 2001-2015 &nbsp;&nbsp;<a href="http://www.zongsoft.com">Zongsoft Corporation</a><br/>2015年06月15日　　版本4.1
 	</h2>
 
 	<a name="Security.User"><p widht="0" height="15px"></p></a>
@@ -53,8 +53,8 @@
 
 		<tr>
 			<td align="center"><font face="Arial"><strong>(PK)</strong> UserId</font></td>
-			<td align="center"><font face="Arial">long</font></td>
-			<td align="center"><font face="Arial">8</font></td>
+			<td align="center"><font face="Arial">int</font></td>
+			<td align="center"><font face="Arial">4</font></td>
 			<td align="center"><input type="checkbox" disabled="1" /></td>
 			<td align="center"></td>
 			<td>用户编号，主键。</td>
@@ -73,7 +73,7 @@
 			<td align="center"><font face="Arial">50</font></td>
 			<td align="center"><input type="checkbox" disabled="1" /></td>
 			<td align="center"></td>
-			<td>用户的名称，该名称必须保持全局唯一性。</td>
+			<td>用户的名称，该名称在所属命名空间内具有唯一性。</td>
 		</tr>
 		<tr>
 			<td align="center"><font face="Arial">Password</font></td>
@@ -94,14 +94,14 @@
 		<tr>
 			<td align="center"><font face="Arial">FullName</font></td>
 			<td align="center"><font face="Arial">nvarchar</font></td>
-			<td align="center"><font face="Arial">100</font></td>
+			<td align="center"><font face="Arial">50</font></td>
 			<td align="center"><input type="checkbox" disabled="1" checked="checked" /></td>
 			<td align="center"></td>
 			<td>用户的全称</td>
 		</tr>
 		<tr>
 			<td align="center"><font face="Arial">Principal</font></td>
-			<td align="center"><font face="Arial">nvarchar</font></td>
+			<td align="center"><font face="Arial">varchar</font></td>
 			<td align="center"><font face="Arial">100</font></td>
 			<td align="center"><input type="checkbox" disabled="1" checked="checked" /></td>
 			<td align="center"></td>
@@ -110,7 +110,7 @@
 		<tr>
 			<td align="center"><font face="Arial">Email</font></td>
 			<td align="center"><font face="Arial">varchar</font></td>
-			<td align="center"><font face="Arial">100</font></td>
+			<td align="center"><font face="Arial">50</font></td>
 			<td align="center"><input type="checkbox" disabled="1" checked="checked" /></td>
 			<td align="center"></td>
 			<td>用户的电子邮箱，唯一约束。系统可通过该字段来联系用户（如发送新密码等）。</td>
@@ -180,25 +180,57 @@
 			<td>密码的过期时间。</td>
 		</tr>
 		<tr>
-			<td align="center"><font face="Arial">PasswordQuestion</font></td>
+			<td align="center"><font face="Arial">PasswordQuestion1</font></td>
 			<td align="center"><font face="Arial">nvarchar</font></td>
-			<td align="center"><font face="Arial">100</font></td>
+			<td align="center"><font face="Arial">50</font></td>
 			<td align="center"><input type="checkbox" disabled="1" checked="checked" /></td>
 			<td align="center"></td>
-			<td>用户的密码提示问题。</td>
+			<td>用户的密码问答的题面[1]。</td>
 		</tr>
 		<tr>
-			<td align="center"><font face="Arial">PasswordAnswer</font></td>
+			<td align="center"><font face="Arial">PasswordAnswer1</font></td>
 			<td align="center"><font face="Arial">varbinary</font></td>
 			<td align="center"><font face="Arial">64</font></td>
 			<td align="center"><input type="checkbox" disabled="1" checked="checked" /></td>
 			<td align="center"></td>
-			<td>用户的密码提示问题的答案。</td>
+			<td>用户的密码问答的答案[1] <i>(哈希值)</i>。</td>
+		</tr>
+		<tr>
+			<td align="center"><font face="Arial">PasswordQuestion2</font></td>
+			<td align="center"><font face="Arial">nvarchar</font></td>
+			<td align="center"><font face="Arial">50</font></td>
+			<td align="center"><input type="checkbox" disabled="1" checked="checked" /></td>
+			<td align="center"></td>
+			<td>用户的密码问答的题面[2]。</td>
+		</tr>
+		<tr>
+			<td align="center"><font face="Arial">PasswordAnswer2</font></td>
+			<td align="center"><font face="Arial">varbinary</font></td>
+			<td align="center"><font face="Arial">64</font></td>
+			<td align="center"><input type="checkbox" disabled="1" checked="checked" /></td>
+			<td align="center"></td>
+			<td>用户的密码问答的答案[2] <i>(哈希值)</i>。</td>
+		</tr>
+		<tr>
+			<td align="center"><font face="Arial">PasswordQuestion3</font></td>
+			<td align="center"><font face="Arial">nvarchar</font></td>
+			<td align="center"><font face="Arial">50</font></td>
+			<td align="center"><input type="checkbox" disabled="1" checked="checked" /></td>
+			<td align="center"></td>
+			<td>用户的密码问答的题面[3]。</td>
+		</tr>
+		<tr>
+			<td align="center"><font face="Arial">PasswordAnswer3</font></td>
+			<td align="center"><font face="Arial">varbinary</font></td>
+			<td align="center"><font face="Arial">64</font></td>
+			<td align="center"><input type="checkbox" disabled="1" checked="checked" /></td>
+			<td align="center"></td>
+			<td>用户的密码问答的答案[3] <i>(哈希值)</i>。</td>
 		</tr>
 		<tr>
 			<td align="center"><font face="Arial">CreatorId</font></td>
-			<td align="center"><font face="Arial">long</font></td>
-			<td align="center"><font face="Arial">8</font></td>
+			<td align="center"><font face="Arial">int</font></td>
+			<td align="center"><font face="Arial">4</font></td>
 			<td align="center"><input type="checkbox" disabled="1" checked="checked" /></td>
 			<td align="center"></td>
 			<td>创建者</td>
@@ -213,8 +245,8 @@
 		</tr>
 		<tr>
 			<td align="center"><font face="Arial">ModifierId</font></td>
-			<td align="center"><font face="Arial">long</font></td>
-			<td align="center"><font face="Arial">8</font></td>
+			<td align="center"><font face="Arial">int</font></td>
+			<td align="center"><font face="Arial">4</font></td>
 			<td align="center"><input type="checkbox" disabled="1" checked="checked" /></td>
 			<td align="center"></td>
 			<td>最后的修改者</td>
@@ -272,8 +304,8 @@
 
 		<tr>
 			<td align="center"><font face="Arial"><strong>(PK)</strong> RoleId</font></td>
-			<td align="center"><font face="Arial">long</font></td>
-			<td align="center"><font face="Arial">8</font></td>
+			<td align="center"><font face="Arial">int</font></td>
+			<td align="center"><font face="Arial">4</font></td>
 			<td align="center"><input type="checkbox" disabled="1" /></td>
 			<td align="center"></td>
 			<td>角色编号，主键。</td>
@@ -304,8 +336,8 @@
 		</tr>
 		<tr>
 			<td align="center"><font face="Arial">CreatorId</font></td>
-			<td align="center"><font face="Arial">long</font></td>
-			<td align="center"><font face="Arial">8</font></td>
+			<td align="center"><font face="Arial">int</font></td>
+			<td align="center"><font face="Arial">4</font></td>
 			<td align="center"><input type="checkbox" disabled="1" checked="checked" /></td>
 			<td align="center"></td>
 			<td>创建者</td>
@@ -320,8 +352,8 @@
 		</tr>
 		<tr>
 			<td align="center"><font face="Arial">ModifierId</font></td>
-			<td align="center"><font face="Arial">long</font></td>
-			<td align="center"><font face="Arial">8</font></td>
+			<td align="center"><font face="Arial">int</font></td>
+			<td align="center"><font face="Arial">4</font></td>
 			<td align="center"><input type="checkbox" disabled="1" checked="checked" /></td>
 			<td align="center"></td>
 			<td>最后的修改者ID</td>
@@ -364,16 +396,16 @@
 
 		<tr>
 			<td align="center"><font face="Arial"><strong>(PK)</strong> RoleId</font></td>
-			<td align="center"><font face="Arial">long</font></td>
-			<td align="center"><font face="Arial">8</font></td>
+			<td align="center"><font face="Arial">int</font></td>
+			<td align="center"><font face="Arial">4</font></td>
 			<td align="center"><input type="checkbox" disabled="1" /></td>
 			<td align="center"></td>
 			<td>角色的编号</td>
 		</tr>
 		<tr>
 			<td align="center"><font face="Arial"><strong>(PK)</strong> MemberId</font></td>
-			<td align="center"><font face="Arial">long</font></td>
-			<td align="center"><font face="Arial">8</font></td>
+			<td align="center"><font face="Arial">int</font></td>
+			<td align="center"><font face="Arial">4</font></td>
 			<td align="center"><input type="checkbox" disabled="1" /></td>
 			<td align="center"></td>
 			<td>用户或角色的编号</td>
@@ -408,8 +440,8 @@
 
 		<tr>
 			<td align="center"><font face="Arial"><strong>(PK)</strong> MemberId</font></td>
-			<td align="center"><font face="Arial">long</font></td>
-			<td align="center"><font face="Arial">8</font></td>
+			<td align="center"><font face="Arial">int</font></td>
+			<td align="center"><font face="Arial">4</font></td>
 			<td align="center"><input type="checkbox" disabled="1" /></td>
 			<td align="center"></td>
 			<td>用户或角色编号</td>
@@ -470,8 +502,8 @@
 
 		<tr>
 			<td align="center"><font face="Arial"><strong>(PK)</strong> MemberId</font></td>
-			<td align="center"><font face="Arial">long</font></td>
-			<td align="center"><font face="Arial">8</font></td>
+			<td align="center"><font face="Arial">int</font></td>
+			<td align="center"><font face="Arial">4</font></td>
 			<td align="center"><input type="checkbox" disabled="1" /></td>
 			<td align="center"></td>
 			<td>用户或角色编号</td>
@@ -502,7 +534,7 @@
 		</tr>
 		<tr>
 			<td align="center"><font face="Arial"><font face="Arial">Filter</font></td>
-			<td align="center"><font face="Arial">nvarchar</font></td>
+			<td align="center"><font face="Arial">varchar</font></td>
 			<td align="center"><font face="Arial">4000</font></td>
 			<td align="center"><input type="checkbox" disabled="1" /></td>
 			<td align="center"></td>
