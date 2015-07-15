@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2014-2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -29,58 +29,46 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Services.Composition
 {
-	public interface IExecutionContext
+	public class ExecutionResult
 	{
-		/// <summary>
-		/// 获取处理本次执行请求的执行器。
-		/// </summary>
-		IExecutor Executor
+		#region 成员字段
+		private IExecutionContext _context;
+		#endregion
+
+		#region 构造函数
+		public ExecutionResult(IExecutionContext context)
 		{
-			get;
+			if(context == null)
+				throw new ArgumentNullException("context");
+
+			_context = context;
+		}
+		#endregion
+
+		#region 公共属性
+		public object Result
+		{
+			get
+			{
+				return _context.Result;
+			}
 		}
 
-		/// <summary>
-		/// 获取处理本次执行请求的输入参数。
-		/// </summary>
-		object Parameter
+		public Exception Exception
 		{
-			get;
+			get
+			{
+				return _context.Exception;
+			}
 		}
 
-		/// <summary>
-		/// 获取本次执行中发生的异常。
-		/// </summary>
-		Exception Exception
+		public IExecutionContext Context
 		{
-			get;
+			get
+			{
+				return _context;
+			}
 		}
-
-		/// <summary>
-		/// 获取扩展属性集是否有内容。
-		/// </summary>
-		/// <remarks>
-		///		<para>在不确定扩展属性集是否含有内容之前，建议先使用该属性来检测。</para>
-		/// </remarks>
-		bool HasExtendedProperties
-		{
-			get;
-		}
-
-		/// <summary>
-		/// 获取可用于在本次执行过程中在各处理模块之间组织和共享数据的键/值集合。
-		/// </summary>
-		IDictionary<string, object> ExtendedProperties
-		{
-			get;
-		}
-
-		/// <summary>
-		/// 获取或设置本次执行的返回结果。
-		/// </summary>
-		object Result
-		{
-			get;
-			set;
-		}
+		#endregion
 	}
 }

@@ -144,12 +144,12 @@ namespace Zongsoft.Services.Composition
 		#endregion
 
 		#region 执行方法
-		public object Execute(object parameter = null)
+		public ExecutionResult Execute(object parameter = null)
 		{
 			return this.Execute(this.CreateContext(parameter));
 		}
 
-		protected object Execute(IExecutionContext context)
+		protected ExecutionResult Execute(ExecutionContext context)
 		{
 			if(context == null)
 				throw new ArgumentNullException("context");
@@ -161,7 +161,7 @@ namespace Zongsoft.Services.Composition
 			this.OnExecuting(executingArgs);
 
 			if(executingArgs.Cancel)
-				return context.Result;
+				return new ExecutionResult(context);
 
 			//通过选择器获取当前请求对应的管道集
 			var pipelines = this.SelectPipelines(context, _pipelines);
@@ -182,17 +182,17 @@ namespace Zongsoft.Services.Composition
 			//激发“Executed”事件
 			this.OnExecuted(new ExecutedEventArgs(context));
 
-			return context.Result;
+			return new ExecutionResult(context);
 		}
 		#endregion
 
 		#region 虚拟方法
-		protected virtual IExecutionContext CreateContext(object parameter)
+		protected virtual ExecutionContext CreateContext(object parameter)
 		{
 			return new ExecutionContext(this, parameter);
 		}
 
-		protected virtual object InvokePipelines(IEnumerable<ExecutionPipeline> pipelines, Func<ExecutionPipeline, IExecutionPipelineContext> createContext)
+		protected virtual object InvokePipelines(IEnumerable<ExecutionPipeline> pipelines, Func<ExecutionPipeline, ExecutionPipelineContext> createContext)
 		{
 			if(pipelines == null)
 				return null;
@@ -209,8 +209,20 @@ namespace Zongsoft.Services.Composition
 				//创建管道上下文对象
 				var pipelineContext = createContext(pipeline);
 
-				//执行当前管道
-				if(this.InvokePipeline(pipelineContext))
+				//定义管道是否处理完成的标志
+				var isHandled = false;
+
+				try
+				{
+					//执行当前管道
+					isHandled = this.InvokePipeline(pipelineContext);
+				}
+				catch(Exception ex)
+				{
+					pipelineContext.Exception = ex;
+				}
+
+				if(isHandled)
 					pipelineContexts.Add(pipelineContext);
 			});
 
@@ -225,7 +237,7 @@ namespace Zongsoft.Services.Composition
 			return result;
 		}
 
-		protected virtual bool InvokePipeline(IExecutionPipelineContext context)
+		protected virtual bool InvokePipeline(ExecutionPipelineContext context)
 		{
 			var pipeline = context.Pipeline;
 
@@ -284,9 +296,9 @@ namespace Zongsoft.Services.Composition
 			return canHandle;
 		}
 
-		protected virtual IExecutionPipelineContext CreatePipelineContext(IExecutionContext context, ExecutionPipeline pipeline, object parameter)
+		protected virtual ExecutionPipelineContext CreatePipelineContext(ExecutionContext context, ExecutionPipeline pipeline, object parameter)
 		{
-			return new ExecutionPipelineContext(this, pipeline, parameter);
+			return new ExecutionPipelineContext(context, pipeline, parameter);
 		}
 
 		protected virtual object CombineResult(IEnumerable<IExecutionPipelineContext> contexts)

@@ -92,8 +92,8 @@ namespace Zongsoft.Services.Composition
 		/// 执行方法。
 		/// </summary>
 		/// <param name="parameter">指定的执行参数对象。</param>
-		/// <returns>返回一个执行的结果。</returns>
-		object Execute(object parameter = null);
+		/// <returns>返回执行的结果器。</returns>
+		ExecutionResult Execute(object parameter = null);
 		#endregion
 	}
 }

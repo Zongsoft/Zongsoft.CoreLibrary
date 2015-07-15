@@ -35,6 +35,7 @@ namespace Zongsoft.Services.Composition
 		private IExecutor _executor;
 		private object _parameter;
 		private object _result;
+		private Exception _exception;
 		private IDictionary<string, object> _extendedProperties;
 		#endregion
 
@@ -72,6 +73,21 @@ namespace Zongsoft.Services.Composition
 			get
 			{
 				return _parameter;
+			}
+		}
+
+		/// <summary>
+		/// 获取本次执行中发生的异常。
+		/// </summary>
+		public virtual Exception Exception
+		{
+			get
+			{
+				return _exception;
+			}
+			internal protected set
+			{
+				_exception = value;
 			}
 		}
 
