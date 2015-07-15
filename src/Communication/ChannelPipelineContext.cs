@@ -39,7 +39,7 @@ namespace Zongsoft.Communication
 		#endregion
 
 		#region 构造函数
-		public ChannelPipelineContext(IExecutor executor, ExecutionPipeline pipeline, object data, IChannel channel) : base(executor, pipeline, data)
+		public ChannelPipelineContext(ExecutionContext context, ExecutionPipeline pipeline, object data, IChannel channel) : base(context, pipeline, data)
 		{
 			_channel = channel;
 		}
