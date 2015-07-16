@@ -15,6 +15,13 @@ namespace Zongsoft.Common.Tests
 		[TestMethod]
 		public void ConvertValueTest()
 		{
+			Assert.IsNull(Zongsoft.Common.Convert.ConvertValue<int?>("", () => null));
+			Assert.IsNull(Zongsoft.Common.Convert.ConvertValue<int?>("x", () => null));
+			Assert.IsNotNull(Zongsoft.Common.Convert.ConvertValue<int?>("123", () => null));
+			Assert.AreEqual(123, Zongsoft.Common.Convert.ConvertValue<int?>("123", () => null));
+
+			Assert.AreEqual(123, Zongsoft.Common.Convert.ConvertValue<int>("123"));
+
 			Assert.AreEqual("100", Zongsoft.Common.Convert.ConvertValue<string>(100));
 			Assert.AreEqual("100", Zongsoft.Common.Convert.ConvertValue<string>(100L));
 			Assert.AreEqual("100.5", Zongsoft.Common.Convert.ConvertValue<string>(100.50));
