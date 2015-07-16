@@ -115,7 +115,7 @@ namespace Zongsoft.Text
 		public static class Web
 		{
 			/// <summary>获取电子邮箱(Email)地址的文本验证器。</summary>
-			public static TextRegular Email = new TextRegular(@"^\s*(?<value>[A-Za-z]([-_\.][A-Za-z0-9]+)*@([A-Za-z0-9]+([-_][A-Za-z0-9]+)*)(\.([A-Za-z0-9]+([-_][A-Za-z0-9]+)*))+?\.[A-Za-z]+)\s*$");
+			public static TextRegular Email = new TextRegular(@"^\s*(?<value>[A-Za-z0-9]([-_\.]?[A-Za-z0-9]+)*@([A-Za-z0-9]+([-_]?[A-Za-z0-9]+)*)(\.[A-Za-z0-9]+([-_]?[A-Za-z0-9]+)*)*\.[A-Za-z]+)\s*$");
 		}
 
 		public static class Uri
@@ -164,7 +164,7 @@ namespace Zongsoft.Text
 		public static class Chinese
 		{
 			/// <summary>获取中国手机号码的文本验证器。</summary>
-			public static TextRegular Cellphone = new TextRegular(@"^\s*(?<value>1\d{2})(?<separator>(\s*)|(-?))(?<value>\d{4})(?<separator>(\s*)|(-?))(?<value>\d{4})\s*$");
+			public static TextRegular Cellphone = new TextRegular(@"^\s*((\+|00)86\s*[-\.]?)?\s*(?<value>1\d{2})(?<separator>(\s*)|(-?))(?<value>\d{4})(?<separator>(\s*)|(-?))(?<value>\d{4})\s*$");
 
 			/// <summary>获取中国固定电话号码的文本验证器。</summary>
 			public static TextRegular Telephone = new TextRegular(@"^\s*(?<value>0\d{2,4})?(?<separator>(\s*)|(-?))(?<value>\d{4})(?<separator>(\s*)|(-?))(?<value>\d{3,4})\s*$");
