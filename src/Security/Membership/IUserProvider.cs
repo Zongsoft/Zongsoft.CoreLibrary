@@ -36,71 +36,63 @@ namespace Zongsoft.Security.Membership
 	{
 		#region 用户管理
 		/// <summary>
-		/// 获取指定名称对应的用户对象。
+		/// 获取指定编号对应的用户对象。
 		/// </summary>
-		/// <param name="certificationId">调用者的安全凭证号。</param>
 		/// <param name="userId">要查找的用户编号。</param>
-		/// <returns>返回由<paramref name="userId"/>参数指定的用户对象，如果没有找到指定名称的用户则返回空。</returns>
-		User GetUser(string certificationId, int userId);
+		/// <returns>返回由<paramref name="userId"/>参数指定的用户对象，如果没有找到指定编号的用户则返回空。</returns>
+		User GetUser(int userId);
 
 		/// <summary>
 		/// 获取指定标识对应的用户对象。
 		/// </summary>
-		/// <param name="certificationId">调用者的安全凭证号。</param>
-		/// <param name="identity">要查找的用户标识(用户名或邮箱或手机号码)。</param>
-		/// <returns>返回由<paramref name="identity"/>参数指定的用户对象，如果没有找到指定名称的用户则返回空。</returns>
+		/// <param name="identity">要查找的用户标识，可以是“用户名”或“邮箱地址”或“手机号码”。</param>
+		/// <returns>返回由<paramref name="identity"/>参数指定的用户对象，如果没有找到指定标识的用户则返回空。</returns>
 		/// <exception cref="System.ArgumentNullException">当<paramref name="identity"/>参数为空(null)或者全空格字符。</exception>
-		User GetUser(string certificationId, string identity);
+		User GetUser(string identity);
 
 		/// <summary>
 		/// 设置指定编号的用户主体标识。
 		/// </summary>
-		/// <param name="certificationId">调用者的安全凭证号。</param>
 		/// <param name="userId">要设置的用户编号。</param>
 		/// <param name="principal">要设置的用户主体标识。</param>
 		/// <returns>如果设置成功则返回真(True)，否则返回假(False)。</returns>
-		bool SetPrincipal(string certificationId, int userId, string principal);
+		bool SetPrincipal(int userId, string principal);
 
 		/// <summary>
 		/// 获取当前命名空间中的所有用户。
 		/// </summary>
-		/// <param name="certificationId">调用者的安全凭证号。</param>
-		/// <returns>返回当前系统中的所有用户对象集。</returns>
-		IEnumerable<User> GetAllUsers(string certificationId);
+		/// <returns>返回当前命名空间中的所有用户对象集。</returns>
+		IEnumerable<User> GetAllUsers();
 
 		/// <summary>
-		/// 删除指定名称集的多个用户。
+		/// 删除指定编号集的多个用户。
 		/// </summary>
-		/// <param name="certificationId">调用者的安全凭证号。</param>
 		/// <param name="userIds">要删除的用户编号数组。</param>
 		/// <returns>如果删除成功则返回删除的数量，否则返回零。</returns>
-		int DeleteUsers(string certificationId, params int[] userIds);
+		int DeleteUsers(params int[] userIds);
 
 		/// <summary>
 		/// 创建单个或者多个用户。
 		/// </summary>
-		/// <param name="certificationId">调用者的安全凭证号。</param>
 		/// <param name="users">要创建的用户对象集。</param>
 		/// <remarks>如果创建失败则抛出异常，并且整个事务会被回滚。</remarks>
-		void CreateUsers(string certificationId, IEnumerable<User> users);
+		void CreateUsers(IEnumerable<User> users);
 
 		/// <summary>
 		/// 更新单个或多个用户信息。
 		/// </summary>
-		/// <param name="certificationId">调用者的安全凭证号。</param>
 		/// <param name="users">要更新的用户对象集。</param>
-		/// <remarks>如果在批量更新中，如果待更新的用户对象在数据源中不存在则该项操作将被忽略，而不影响本次操作中的其他对象的更新。</remarks>
-		void UpdateUsers(string certificationId, IEnumerable<User> users);
+		void UpdateUsers(IEnumerable<User> users);
 		#endregion
 
 		#region 密码管理
 		/// <summary>
-		/// 修改当前用户的密码。
+		/// 修改指定用户的密码。
 		/// </summary>
-		/// <param name="certificationId">调用者的安全凭证号。</param>
+		/// <param name="userId">要修改密码的用户编号。</param>
 		/// <param name="oldPassword">指定的用户的当前密码。</param>
 		/// <param name="newPassword">指定的用户的新密码。</param>
-		bool ChangePassword(string certificationId, string oldPassword, string newPassword);
+		bool ChangePassword(int userId, string oldPassword, string newPassword);
 
 		/// <summary>
 		/// 准备重置指定用户的密码。
@@ -153,13 +145,13 @@ namespace Zongsoft.Security.Membership
 		string[] GetPasswordQuestions(string identity);
 
 		/// <summary>
-		/// 设置当前用户的密码问答。
+		/// 设置指定用户的密码问答集。
 		/// </summary>
-		/// <param name="certificationId">调用者的安全凭证号。</param>
-		/// <param name="password">指定的用户的密码。</param>
-		/// <param name="passwordQuestions">指定用户的密码问答的题面集。</param>
-		/// <param name="passwordAnswers">指定用户的密码问答的答案集。</param>
-		void SetPasswordQuestionsAndAnswers(string certificationId, string password, string[] passwordQuestions, string[] passwordAnswers);
+		/// <param name="userId">要设置密码问答集的用户编号。</param>
+		/// <param name="password">当前用户的密码，如果密码错误则无法更新密码问答。</param>
+		/// <param name="passwordQuestions">当前用户的密码问答的题面集。</param>
+		/// <param name="passwordAnswers">当前用户的密码问答的答案集。</param>
+		void SetPasswordQuestionsAndAnswers(int userId, string password, string[] passwordQuestions, string[] passwordAnswers);
 		#endregion
 	}
 }

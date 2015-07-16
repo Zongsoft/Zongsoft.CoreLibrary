@@ -30,60 +30,26 @@ using System.Linq;
 using System.Text;
 
 using Zongsoft.Data;
+using Zongsoft.Options;
 
 namespace Zongsoft.Security.Membership
 {
-	public class UserProvider : IUserProvider
+	public class UserProvider : ProviderBase, IUserProvider
 	{
-		#region 成员字段
-		private IDataAccess _dataAccess;
-		private ICertificationProvider _certificationProvider;
-		#endregion
-
-		#region 公共属性
-		public IDataAccess DataAccess
+		#region 构造函数
+		public UserProvider(ISettingsProvider settings) : base(settings)
 		{
-			get
-			{
-				return _dataAccess;
-			}
-			set
-			{
-				if(value == null)
-					throw new ArgumentNullException();
-
-				_dataAccess = value;
-			}
-		}
-
-		public ICertificationProvider CertificationProvider
-		{
-			get
-			{
-				return _certificationProvider;
-			}
-			set
-			{
-				if(value == null)
-					throw new ArgumentNullException();
-
-				_certificationProvider = value;
-			}
 		}
 		#endregion
 
 		#region 用户管理
-		public User GetUser(string certificationId, int userId)
+		public User GetUser(int userId)
 		{
-			var objectAccess = this.GetDataAccess();
-
-			return objectAccess.Select<User>("Security.User", new ConditionCollection(ConditionCombine.And)
-			{
-				new Condition("UserId", userId),
-			}).FirstOrDefault();
+			var dataAccess = this.EnsureDataAccess();
+			return MembershipHelper.GetUser(dataAccess, userId);
 		}
 
-		public User GetUser(string certificationId, string identity)
+		public User GetUser(string identity)
 		{
 			ICondition condition = null;
 			var identityType = MembershipHelper.GetUserIdentityType(identity);
@@ -101,25 +67,24 @@ namespace Zongsoft.Security.Membership
 					break;
 			}
 
-			var objectAccess = this.GetDataAccess();
+			var objectAccess = this.EnsureDataAccess();
 
 			return objectAccess.Select<User>("Security.User", condition).FirstOrDefault();
 		}
 
-		public IEnumerable<User> GetAllUsers(string certificationId)
+		public IEnumerable<User> GetAllUsers()
 		{
-			var dataAccess = this.GetDataAccess();
-			var @namespace = this.GetNamespace(certificationId);
+			var dataAccess = this.EnsureDataAccess();
 
-			if(string.IsNullOrWhiteSpace(@namespace))
+			if(string.IsNullOrWhiteSpace(this.Namespace))
 				return dataAccess.Select<User>("Security.User");
 			else
-				return dataAccess.Select<User>("Security.User", new Condition("Namespace", @namespace));
+				return dataAccess.Select<User>("Security.User", new Condition("Namespace", this.Namespace));
 		}
 
-		public bool SetPrincipal(string certificationId, int userId, string principal)
+		public bool SetPrincipal(int userId, string principal)
 		{
-			var dataAccess = this.GetDataAccess();
+			var dataAccess = this.EnsureDataAccess();
 
 			return dataAccess.Update("Security.User", new { Principal = principal }, new ConditionCollection(ConditionCombine.And)
 			{
@@ -127,58 +92,45 @@ namespace Zongsoft.Security.Membership
 			}) > 0;
 		}
 
-		public int DeleteUsers(string certificationId, params int[] userIds)
+		public int DeleteUsers(params int[] userIds)
 		{
 			if(userIds == null || userIds.Length < 1)
 				return 0;
 
-			var dataAccess = this.GetDataAccess();
+			var dataAccess = this.EnsureDataAccess();
 
 			return dataAccess.Delete("Security.User", new Condition("UserId", userIds, ConditionOperator.In));
 		}
 
-		public void CreateUsers(string certificationId, IEnumerable<User> users)
+		public void CreateUsers(IEnumerable<User> users)
 		{
 			if(users == null)
 				return;
 
-			var objectAccess = this.GetDataAccess();
+			var objectAccess = this.EnsureDataAccess();
 			objectAccess.Insert("Security.User", users);
 		}
 
-		public void UpdateUsers(string certificationId, IEnumerable<User> users)
+		public void UpdateUsers(IEnumerable<User> users)
 		{
 			if(users == null)
 				return;
 
-			var objectAccess = this.GetDataAccess();
-
-			foreach(var user in users)
-			{
-				if(user == null)
-					continue;
-
-				objectAccess.Update("Security.User", user, new ConditionCollection(ConditionCombine.And)
-				{
-					new Condition("UserId", user.UserId),
-				});
-			}
+			var objectAccess = this.EnsureDataAccess();
+			objectAccess.Update("Security.User", users);
 		}
 		#endregion
 
 		#region 密码管理
-		public bool ChangePassword(string certificationId, string oldPassword, string newPassword)
+		public bool ChangePassword(int userId, string oldPassword, string newPassword)
 		{
-			var dataAccess = this.GetDataAccess();
-			var certification = this.GetCertification(certificationId);
+			var dataAccess = this.EnsureDataAccess();
 
 			byte[] storedPassword;
 			byte[] storedPasswordSalt;
 
-			var user = MembershipHelper.GetPassword(dataAccess, certification.User.UserId, out storedPassword, out storedPasswordSalt);
-
-			if(user == null)
-				throw new InvalidOperationException("Invalid account.");
+			if(!MembershipHelper.GetPassword(dataAccess, userId, out storedPassword, out storedPasswordSalt))
+				return false;
 
 			if(!PasswordUtility.VerifyPassword(oldPassword, storedPassword, storedPasswordSalt))
 				throw new AuthenticationException("Invalid password.");
@@ -188,7 +140,7 @@ namespace Zongsoft.Security.Membership
 
 			dataAccess.Execute("Security.User.SetPassword", new Dictionary<string, object>
 			{
-				{"UserId", certification.User.UserId},
+				{"UserId", userId},
 				{"Password", PasswordUtility.HashPassword(newPassword, storedPasswordSalt)},
 				{"PasswordSalt", storedPasswordSalt},
 			});
@@ -217,7 +169,7 @@ namespace Zongsoft.Security.Membership
 
 		public bool ResetPassword(string identity, string[] passwordAnswers, string newPassword = null)
 		{
-			//var objectAccess = this.GetDataAccess();
+			//var objectAccess = this.EnsureDataAccess();
 			//var certification = this.GetCertification(certificationId);
 
 			//IDictionary<string, object> outParameters;
@@ -250,7 +202,7 @@ namespace Zongsoft.Security.Membership
 
 		public string[] GetPasswordQuestions(string identity)
 		{
-			//var objectAccess = this.GetDataAccess();
+			//var objectAccess = this.EnsureDataAccess();
 			//var certification = this.GetCertification(certificationId);
 
 			//IDictionary<string, object> outParameters;
@@ -268,9 +220,9 @@ namespace Zongsoft.Security.Membership
 			return null;
 		}
 
-		public void SetPasswordQuestionsAndAnswers(string certificationId, string password, string[] passwordQuestions, string[] passwordAnswers)
+		public void SetPasswordQuestionsAndAnswers(int userId, string password, string[] passwordQuestions, string[] passwordAnswers)
 		{
-			//var objectAccess = this.GetDataAccess();
+			//var objectAccess = this.EnsureDataAccess();
 			//var certification = this.GetCertification(certificationId);
 
 			//byte[] storedPassword;
@@ -291,36 +243,6 @@ namespace Zongsoft.Security.Membership
 			//	{"PasswordQuestion", passwordQuestion},
 			//	{"PasswordAnswer", PasswordUtility.HashPassword(passwordAnswer)},
 			//});
-		}
-		#endregion
-
-		#region 私有方法
-		private IDataAccess GetDataAccess()
-		{
-			if(_dataAccess == null)
-				throw new InvalidOperationException("The value of 'DataAccess' property is null.");
-
-			return _dataAccess;
-		}
-
-		private Certification GetCertification(string certificationId)
-		{
-			var certificationProvider = _certificationProvider;
-
-			if(certificationProvider == null)
-				throw new InvalidOperationException("The value of 'CertificationProvider' property is null.");
-
-			return certificationProvider.GetCertification(certificationId);
-		}
-
-		private string GetNamespace(string certificationId)
-		{
-			var certificationProvider = _certificationProvider;
-
-			if(certificationProvider == null)
-				throw new InvalidOperationException("The value of 'CertificationProvider' property is null.");
-
-			return certificationProvider.GetNamespace(certificationId);
 		}
 		#endregion
 	}

@@ -29,66 +29,19 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 
 using Zongsoft.Data;
+using Zongsoft.Options;
 
 namespace Zongsoft.Security.Membership
 {
-	public class Authentication : IAuthentication
+	public class Authentication : ProviderBase, IAuthentication
 	{
 		#region 事件声明
 		public event EventHandler<AuthenticatedEventArgs> Authenticated;
 		#endregion
 
-		#region 成员字段
-		private string _namespace;
-		private IDataAccess _dataAccess;
-		#endregion
-
 		#region 构造函数
-		public Authentication()
+		public Authentication(ISettingsProvider settings) : base(settings)
 		{
-		}
-
-		public Authentication(IDataAccess objectAccess)
-		{
-			if(objectAccess == null)
-				throw new ArgumentNullException("objectAccess");
-
-			_dataAccess = objectAccess;
-		}
-		#endregion
-
-		#region 公共属性
-		/// <summary>
-		/// 获取或设置所属的命名空间。
-		/// </summary>
-		public string Namespace
-		{
-			get
-			{
-				return _namespace;
-			}
-			set
-			{
-				_namespace = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置<see cref="Zongsoft.Data.IDataAccess"/>数据访问对象。
-		/// </summary>
-		public IDataAccess DataAccess
-		{
-			get
-			{
-				return _dataAccess;
-			}
-			set
-			{
-				if(value == null)
-					throw new ArgumentNullException();
-
-				_dataAccess = value;
-			}
 		}
 		#endregion
 
@@ -102,12 +55,12 @@ namespace Zongsoft.Security.Membership
 			byte[] storedPasswordSalt;
 
 			//获取当前用户的密码及密码向量
-			var user = this.GetPassword(identity, out storedPassword, out storedPasswordSalt);
+			var userId = this.GetPassword(identity, out storedPassword, out storedPasswordSalt);
 
-			if(user == null)
+			if(userId == null)
 			{
 				//激发“Authenticated”事件
-				this.OnAuthenticated(new AuthenticatedEventArgs(identity, _namespace, scene, false));
+				this.OnAuthenticated(new AuthenticatedEventArgs(identity, this.Namespace, scene, false));
 
 				//指定的用户名如果不存在则抛出验证异常
 				throw new AuthenticationException(AuthenticationException.InvalidIdentity);
@@ -116,7 +69,11 @@ namespace Zongsoft.Security.Membership
 			//如果验证成功，则返回验证结果
 			if(PasswordUtility.VerifyPassword(password, storedPassword, storedPasswordSalt, "SHA1"))
 			{
-				var eventArgs = new AuthenticatedEventArgs(identity, _namespace, scene, true, user);
+				//获取指定用户编号对应的用户对象
+				var user = MembershipHelper.GetUser(this.EnsureDataAccess(), userId.Value);
+
+				//创建“Authenticated”事件参数
+				var eventArgs = new AuthenticatedEventArgs(identity, this.Namespace, scene, true, user);
 
 				//激发“Authenticated”事件
 				this.OnAuthenticated(eventArgs);
@@ -126,7 +83,7 @@ namespace Zongsoft.Security.Membership
 			}
 
 			//激发“Authenticated”事件
-			this.OnAuthenticated(new AuthenticatedEventArgs(identity, _namespace, scene, false, user));
+			this.OnAuthenticated(new AuthenticatedEventArgs(identity, this.Namespace, scene, false));
 
 			//密码校验失败则抛出验证异常
 			throw new AuthenticationException(AuthenticationException.InvalidPassword);
@@ -134,28 +91,27 @@ namespace Zongsoft.Security.Membership
 		#endregion
 
 		#region 虚拟方法
-		protected virtual User GetPassword(string identity, out byte[] password, out byte[] passwordSalt)
+		protected virtual int? GetPassword(string identity, out byte[] password, out byte[] passwordSalt)
 		{
-			if(string.IsNullOrWhiteSpace(identity))
-				throw new ArgumentNullException("identity");
-
 			#region 测试代码
 			password = null;
 			passwordSalt = null;
-
-			return new User(1, identity);
+			return 1;
 			#endregion
+
+			if(string.IsNullOrWhiteSpace(identity))
+				throw new ArgumentNullException("identity");
 
 			var identityType = MembershipHelper.GetUserIdentityType(identity);
 
 			switch(identityType)
 			{
 				case UserIdentityType.Email:
-					return MembershipHelper.GetPasswordByEmail(_dataAccess, _namespace, identity, out password, out passwordSalt);
+					return MembershipHelper.GetPasswordByEmail(this.EnsureDataAccess(), this.Namespace, identity, out password, out passwordSalt);
 				case UserIdentityType.PhoneNumber:
-					return MembershipHelper.GetPasswordByPhoneNumber(_dataAccess, _namespace, identity, out password, out passwordSalt);
+					return MembershipHelper.GetPasswordByPhone(this.EnsureDataAccess(), this.Namespace, identity, out password, out passwordSalt);
 				default:
-					return MembershipHelper.GetPasswordByUserName(_dataAccess, _namespace, identity, out password, out passwordSalt);
+					return MembershipHelper.GetPasswordByName(this.EnsureDataAccess(), this.Namespace, identity, out password, out passwordSalt);
 			}
 		}
 		#endregion

@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2003-2014 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2003-2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -28,54 +28,24 @@ using System;
 using System.Collections.Generic;
 
 using Zongsoft.Data;
+using Zongsoft.Options;
 
 namespace Zongsoft.Security.Membership
 {
-	public class PermissionProvider : IPermissionProvider
+	public class PermissionProvider : ProviderBase, IPermissionProvider
 	{
-		#region 成员字段
-		private IDataAccess _dataAccess;
-		private ICertificationProvider _certificationProvider;
-		#endregion
-
-		#region 公共属性
-		public IDataAccess DataAccess
+		#region 构造函数
+		public PermissionProvider(ISettingsProvider settings) : base(settings)
 		{
-			get
-			{
-				return _dataAccess;
-			}
-			set
-			{
-				if(value == null)
-					throw new ArgumentNullException();
-
-				_dataAccess = value;
-			}
-		}
-
-		public ICertificationProvider CertificationProvider
-		{
-			get
-			{
-				return _certificationProvider;
-			}
-			set
-			{
-				if(value == null)
-					throw new ArgumentNullException();
-
-				_certificationProvider = value;
-			}
 		}
 		#endregion
 
 		#region 公共方法
-		public IEnumerable<Permission> GetPermissions(string certificationId, int memberId, MemberType memberType)
+		public IEnumerable<Permission> GetPermissions(int memberId, MemberType memberType)
 		{
-			var objectAccess = this.GetObjectAccess();
+			var objectAccess = this.EnsureDataAccess();
 
-			return objectAccess.Select<Permission>("Security.Permission",
+			return objectAccess.Select<Permission>(MembershipHelper.DATA_ENTITY_PERMISSION,
 			                                       new ConditionCollection(ConditionCombine.And)
 			                                       {
 													   new Condition("MemberId", memberId),
@@ -83,12 +53,12 @@ namespace Zongsoft.Security.Membership
 			                                       });
 		}
 
-		public void SetPermissions(string certificationId, int memberId, MemberType memberType, IEnumerable<Permission> permissions)
+		public void SetPermissions(int memberId, MemberType memberType, IEnumerable<Permission> permissions)
 		{
 			if(permissions == null)
 				throw new ArgumentNullException("permissions");
 
-			var objectAccess = this.GetObjectAccess();
+			var objectAccess = this.EnsureDataAccess();
 
 			foreach(var permission in permissions)
 			{
@@ -103,9 +73,9 @@ namespace Zongsoft.Security.Membership
 			}
 		}
 
-		public IEnumerable<PermissionFilter> GetPermissionFilters(string certificationId, int memberId, MemberType memberType)
+		public IEnumerable<PermissionFilter> GetPermissionFilters(int memberId, MemberType memberType)
 		{
-			var objectAccess = this.GetObjectAccess();
+			var objectAccess = this.EnsureDataAccess();
 
 			return objectAccess.Select<PermissionFilter>("Security.PermissionFilter",
 												         new ConditionCollection(ConditionCombine.And)
@@ -115,12 +85,12 @@ namespace Zongsoft.Security.Membership
 			                                             });
 		}
 
-		public void SetPermissionFilters(string certificationId, int memberId, MemberType memberType, IEnumerable<PermissionFilter> permissionFilters)
+		public void SetPermissionFilters(int memberId, MemberType memberType, IEnumerable<PermissionFilter> permissionFilters)
 		{
 			if(permissionFilters == null)
 				throw new ArgumentNullException("permissionFilters");
 
-			var objectAccess = this.GetObjectAccess();
+			var objectAccess = this.EnsureDataAccess();
 
 			foreach(var permissionFilter in permissionFilters)
 			{
@@ -133,16 +103,6 @@ namespace Zongsoft.Security.Membership
 					Filter = permissionFilter.Filter,
 				});
 			}
-		}
-		#endregion
-
-		#region 私有方法
-		private IDataAccess GetObjectAccess()
-		{
-			if(_dataAccess == null)
-				throw new InvalidOperationException("The value of 'ObjectAccess' property is null.");
-
-			return _dataAccess;
 		}
 		#endregion
 	}

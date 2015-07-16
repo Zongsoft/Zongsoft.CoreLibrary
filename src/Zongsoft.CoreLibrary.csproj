@@ -265,6 +265,7 @@
     <Compile Include="Runtime\Serialization\JsonSerializationWriter.cs" />
     <Compile Include="Runtime\Serialization\SerializationDirection.cs" />
     <Compile Include="Runtime\Serialization\SerializationMembers.cs" />
+    <Compile Include="Runtime\Serialization\SerializationNamingConvention.cs" />
     <Compile Include="Runtime\Serialization\SerializerAttribute.cs" />
     <Compile Include="Runtime\Serialization\TextSerializationWriter.cs" />
     <Compile Include="Runtime\Serialization\SerializationWriterContext.cs" />
@@ -274,7 +275,8 @@
     <Compile Include="Runtime\Serialization\Serializer.cs" />
     <Compile Include="Runtime\Serialization\SerializationContext.cs" />
     <Compile Include="Runtime\Serialization\SerializationEventArgs.cs" />
-    <Compile Include="Runtime\Serialization\SerializerSettings.cs" />
+    <Compile Include="Runtime\Serialization\SerializationSettings.cs" />
+    <Compile Include="Runtime\Serialization\TextSerializationSettings.cs" />
     <Compile Include="Security\CertificationIdentity.cs" />
     <Compile Include="Security\CertificationPrincipal.cs" />
     <Compile Include="Security\Membership\AuthenticatedEventArgs.cs" />
@@ -282,6 +284,7 @@
     <Compile Include="Security\Membership\Authentication.cs" />
     <Compile Include="Security\Membership\AuthenticationException.cs" />
     <Compile Include="Security\Membership\IMemberProvider.cs" />
+    <Compile Include="Security\Membership\ProviderBase.cs" />
     <Compile Include="Security\Membership\UserIdentityType.cs" />
     <Compile Include="Security\Membership\AuthenticationResult.cs" />
     <Compile Include="Security\Membership\Authorization.cs" />
@@ -369,7 +372,7 @@
     <Compile Include="Services\PredicationCollection.cs" />
     <Compile Include="Services\PredicationCombine.cs" />
     <Compile Include="Services\Predicator.cs" />
-    <Compile Include="Options\ISettingProvider.cs" />
+    <Compile Include="Options\ISettingsProvider.cs" />
     <Compile Include="Services\Composition\ExecutionFilterCompositeCollection.cs" />
     <Compile Include="Services\Composition\ExecutionPipeline.cs" />
     <Compile Include="Services\Composition\ExecutionHandler.cs" />

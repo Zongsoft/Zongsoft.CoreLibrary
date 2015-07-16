@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2003-2014 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2003-2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -37,43 +37,39 @@ namespace Zongsoft.Security.Membership
 		/// <summary>
 		/// 获取指定用户或角色的权限集。
 		/// </summary>
-		/// <param name="certificationId">调用者的安全凭证号。</param>
 		/// <param name="memberId">指定要获取的权限集的成员编号(用户或角色)。</param>
 		/// <param name="memberType">指定要获取的权限集的成员类型。</param>
 		/// <returns>返回指定用户或角色的权限集。注意：该结果集不包含指定成员所属的上级角色的权限设置。</returns>
-		IEnumerable<Permission> GetPermissions(string certificationId, int memberId, MemberType memberType);
+		IEnumerable<Permission> GetPermissions(int memberId, MemberType memberType);
 
 		/// <summary>
 		/// 设置指定用户或角色的权限集。
 		/// </summary>
-		/// <param name="certificationId">调用者的安全凭证号。</param>
 		/// <param name="memberId">指定的要设置的权限集的成员编号(用户或角色)。</param>
 		/// <param name="memberType">指定的要设置的权限集的成员类型。</param>
 		/// <param name="permissions">要设置更新的权限集。</param>
 		/// <remarks>
 		///		<para>该方法默认以覆盖方式进行更新。即先清空指定成员的所有权限设置项，然后再将<paramref name="permissions"/>参数指定的权限项插入其中。</para>
 		/// </remarks>
-		void SetPermissions(string certificationId, int memberId, MemberType memberType, IEnumerable<Permission> permissions);
+		void SetPermissions(int memberId, MemberType memberType, IEnumerable<Permission> permissions);
 
 		/// <summary>
 		/// 获取指定用户或角色的权限过滤集。
 		/// </summary>
-		/// <param name="certificationId">调用者的安全凭证号。</param>
 		/// <param name="memberId">指定要获取的权限过滤集的成员编号(用户或角色)。</param>
 		/// <param name="memberType">指定要获取的权限过滤集的成员类型。</param>
 		/// <returns>返回指定用户或角色的权限过滤集。注意：该结果集不包含指定成员所属的上级角色的权限设置。</returns>
-		IEnumerable<PermissionFilter> GetPermissionFilters(string certificationId, int memberId, MemberType memberType);
+		IEnumerable<PermissionFilter> GetPermissionFilters(int memberId, MemberType memberType);
 
 		/// <summary>
 		/// 设置指定用户或角色的权限过滤集。
 		/// </summary>
-		/// <param name="certificationId">调用者的安全凭证号。</param>
 		/// <param name="memberId">指定的要设置的权限过滤集的成员编号(用户或角色)。</param>
 		/// <param name="memberType">指定的要设置的权限过滤集的成员类型。</param>
 		/// <param name="permissionFilters">要设置更新的权限过滤集。</param>
 		/// <remarks>
 		///		<para>该方法默认以覆盖方式进行更新。即先清空指定成员的所有权限过滤设置项，然后再将<paramref name="permissionFilters"/>参数指定的权限过滤项插入其中。</para>
 		/// </remarks>
-		void SetPermissionFilters(string certificationId, int memberId, MemberType memberType, IEnumerable<PermissionFilter> permissionFilters);
+		void SetPermissionFilters(int memberId, MemberType memberType, IEnumerable<PermissionFilter> permissionFilters);
 	}
 }
