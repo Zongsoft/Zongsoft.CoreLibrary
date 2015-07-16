@@ -113,7 +113,7 @@
 			<td align="center"><font face="Arial">50</font></td>
 			<td align="center"><input type="checkbox" disabled="1" checked="checked" /></td>
 			<td align="center"></td>
-			<td>用户的电子邮箱，唯一约束。系统可通过该字段来联系用户（如发送新密码等）。</td>
+			<td>用户的电子邮箱，该邮箱地址在所属命名空间内具有唯一性。</td>
 		</tr>
 		<tr>
 			<td align="center"><font face="Arial">PhoneNumber</font></td>
@@ -121,7 +121,7 @@
 			<td align="center"><font face="Arial">50</font></td>
 			<td align="center"><input type="checkbox" disabled="1" checked="checked" /></td>
 			<td align="center"></td>
-			<td>用户的手机号码，唯一约束。系统可通过该字段来联系用户（如发送验证码等）。</td>
+			<td>用户的手机号码，该手机号码在所属命名空间内具有唯一性。</td>
 		</tr>
 		<tr>
 			<td align="center"><font face="Arial">Approved</font></td>
@@ -169,7 +169,7 @@
 			<td align="center"><font face="Arial">4</font></td>
 			<td align="center"><input type="checkbox" disabled="1" checked="checked" /></td>
 			<td align="center"><font face="Arial">30</td>
-			<td>在锁定成员资格用户之前允许的最大无效密码或无效密码提示问题答案尝试次数的分钟数。</td>
+			<td>无效密码被锁定后到下次解锁的间隔分钟数。</td>
 		</tr>
 		<tr>
 			<td align="center"><font face="Arial">PasswordExpires</font></td>
@@ -316,7 +316,7 @@
 			<td align="center"><font face="Arial">50</font></td>
 			<td align="center"><input type="checkbox" disabled="1" /></td>
 			<td align="center"></td>
-			<td>用户所属的命名空间，该字段表示应用或组织机构的标识。</td>
+			<td>角色所属的命名空间，该字段表示应用或组织机构的标识。</td>
 		</tr>
 		<tr>
 			<td align="center"><font face="Arial"><span style="color:maroon">(Unique#1)</span> Name</font></td>
@@ -324,15 +324,15 @@
 			<td align="center"><font face="Arial">50</font></td>
 			<td align="center"><input type="checkbox" disabled="1" /></td>
 			<td align="center"></td>
-			<td>角色的名称，该名称必须保持全局唯一性。</td>
+			<td>角色的名称，该名称在所属命名空间内具有唯一性。</td>
 		</tr>
 		<tr>
 			<td align="center"><font face="Arial">FullName</font></td>
 			<td align="center"><font face="Arial">nvarchar</font></td>
-			<td align="center"><font face="Arial">100</font></td>
+			<td align="center"><font face="Arial">50</font></td>
 			<td align="center"><input type="checkbox" disabled="1" checked="checked" /></td>
 			<td align="center"></td>
-			<td>用户或角色的全称</td>
+			<td>角色的全称</td>
 		</tr>
 		<tr>
 			<td align="center"><font face="Arial">CreatorId</font></td>
@@ -460,7 +460,7 @@
 			<td align="center"><font face="Arial">50</font></td>
 			<td align="center"><input type="checkbox" disabled="1" /></td>
 			<td align="center"></td>
-			<td>应用编号</td>
+			<td>授权目标的标识</td>
 		</tr>
 		<tr>
 			<td align="center"><font face="Arial"><strong>(PK)</strong> ActionId</font></td>
@@ -468,7 +468,7 @@
 			<td align="center"><font face="Arial">50</font></td>
 			<td align="center"><input type="checkbox" disabled="1" /></td>
 			<td align="center"></td>
-			<td>权限编号</td>
+			<td>授权行为的标识</td>
 		</tr>
 		<tr>
 			<td align="center"><font face="Arial">Granted</font></td>
@@ -477,7 +477,10 @@
 			<td align="center"><input type="checkbox" disabled="1" /></td>
 			<td align="center"></td>
 			<td>是否授权
-				<p style="margin-top:5px">　　表示该用户对指定的系统对象对应的权限字的保护类型，其取值范围定义如下：<br/>1)显示指定用户和角色对指定的系统对象拥有该权限；<br/>0)显示指定用户和角色对指定的系统对象拒绝该权限。</p>
+				<p style="margin-top:5px">
+表示该用户对指定的系统对象对应的权限字的保护类型，其取值范围定义如下：<br/>
+1)表示用户或角色对指定的系统对象拥有该权限；<br/>
+0)表示用户或角色对指定的系统对象拒绝该权限。</p>
 			</td>
 		</tr>
 	</table>
@@ -522,7 +525,7 @@
 			<td align="center"><font face="Arial">50</font></td>
 			<td align="center"><input type="checkbox" disabled="1" /></td>
 			<td align="center"></td>
-			<td>应用编号</td>
+			<td>授权目标的标识</td>
 		</tr>
 		<tr>
 			<td align="center"><font face="Arial"><strong>(PK)</strong> ActionId</font></td>
@@ -530,7 +533,7 @@
 			<td align="center"><font face="Arial">50</font></td>
 			<td align="center"><input type="checkbox" disabled="1" /></td>
 			<td align="center"></td>
-			<td>权限编号</td>
+			<td>授权行为的标识</td>
 		</tr>
 		<tr>
 			<td align="center"><font face="Arial"><font face="Arial">Filter</font></td>
