@@ -29,7 +29,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Options.Configuration
 {
-	public class SettingElementCollection : OptionConfigurationElementCollection, ISettingProvider
+	public class SettingElementCollection : OptionConfigurationElementCollection, ISettingsProvider
 	{
 		#region 构造函数
 		public SettingElementCollection() : base("setting")
@@ -100,12 +100,12 @@ namespace Zongsoft.Options.Configuration
 		#endregion
 
 		#region 显式实现
-		object ISettingProvider.GetValue(string name)
+		object ISettingsProvider.GetValue(string name)
 		{
 			return this[name];
 		}
 
-		void ISettingProvider.SetValue(string name, object value)
+		void ISettingsProvider.SetValue(string name, object value)
 		{
 			if(value == null)
 				this[name] = null;

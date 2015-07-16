@@ -79,9 +79,9 @@ namespace Zongsoft.Options
 		}
 
 		/// <summary>
-		/// 获取全局的<seealso cref="ISettingProvider"/>选项设置，全局设置集的配置路径为“/Settings”。
+		/// 获取全局的<seealso cref="ISettingsProvider"/>选项设置，全局设置集的配置路径为“/Settings”。
 		/// </summary>
-		public ISettingProvider Settings
+		public ISettingsProvider Settings
 		{
 			get
 			{
@@ -90,7 +90,7 @@ namespace Zongsoft.Options
 				if(node == null || node.Option == null)
 					return null;
 
-				return node.Option.OptionObject as ISettingProvider;
+				return node.Option.OptionObject as ISettingsProvider;
 			}
 		}
 

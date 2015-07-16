@@ -53,7 +53,7 @@ namespace Zongsoft.ComponentModel
 		private string _description;
 		private IPrincipal _principal;
 		private ICollection<IModule> _modules;
-		private Options.ISettingProvider _settings;
+		private Options.ISettingsProvider _settings;
 		private Options.Configuration.OptionConfiguration _configuration;
 		#endregion
 
@@ -162,7 +162,7 @@ namespace Zongsoft.ComponentModel
 		/// <summary>
 		/// 获取当前应用程序的自定义设置提供程序。
 		/// </summary>
-		public Options.ISettingProvider Settings
+		public Options.ISettingsProvider Settings
 		{
 			get
 			{

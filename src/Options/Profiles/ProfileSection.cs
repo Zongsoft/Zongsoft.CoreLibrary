@@ -29,7 +29,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Options.Profiles
 {
-	public class ProfileSection : ProfileItem, ISettingProvider
+	public class ProfileSection : ProfileItem, ISettingsProvider
 	{
 		#region 成员字段
 		private string _name;
@@ -171,12 +171,12 @@ namespace Zongsoft.Options.Profiles
 		#endregion
 
 		#region 接口实现
-		object ISettingProvider.GetValue(string name)
+		object ISettingsProvider.GetValue(string name)
 		{
 			return this.GetEntryValue(name);
 		}
 
-		void ISettingProvider.SetValue(string name, object value)
+		void ISettingsProvider.SetValue(string name, object value)
 		{
 			this.SetEntryValue(name, Zongsoft.Common.Convert.ConvertValue<string>(value));
 		}
