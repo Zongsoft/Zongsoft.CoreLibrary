@@ -43,9 +43,9 @@ namespace Zongsoft.Security.Membership
 		#region 公共方法
 		public IEnumerable<Permission> GetPermissions(int memberId, MemberType memberType)
 		{
-			var objectAccess = this.EnsureDataAccess();
+			var dataAccess = this.EnsureDataAccess();
 
-			return objectAccess.Select<Permission>(MembershipHelper.DATA_ENTITY_PERMISSION,
+			return dataAccess.Select<Permission>(MembershipHelper.DATA_ENTITY_PERMISSION,
 			                                       new ConditionCollection(ConditionCombine.And)
 			                                       {
 													   new Condition("MemberId", memberId),
@@ -58,11 +58,11 @@ namespace Zongsoft.Security.Membership
 			if(permissions == null)
 				throw new ArgumentNullException("permissions");
 
-			var objectAccess = this.EnsureDataAccess();
+			var dataAccess = this.EnsureDataAccess();
 
 			foreach(var permission in permissions)
 			{
-				objectAccess.Execute("Security.Permission.Set", new
+				dataAccess.Execute(MembershipHelper.DATA_COMMAND_SETPREMISSION, new
 				{
 					MemberId = memberId,
 					MemberType = memberType,
@@ -75,9 +75,9 @@ namespace Zongsoft.Security.Membership
 
 		public IEnumerable<PermissionFilter> GetPermissionFilters(int memberId, MemberType memberType)
 		{
-			var objectAccess = this.EnsureDataAccess();
+			var dataAccess = this.EnsureDataAccess();
 
-			return objectAccess.Select<PermissionFilter>("Security.PermissionFilter",
+			return dataAccess.Select<PermissionFilter>(MembershipHelper.DATA_ENTITY_PERMISSION_FILTER,
 												         new ConditionCollection(ConditionCombine.And)
 			                                             {
 															 new Condition("MemberId", memberId),
@@ -90,11 +90,11 @@ namespace Zongsoft.Security.Membership
 			if(permissionFilters == null)
 				throw new ArgumentNullException("permissionFilters");
 
-			var objectAccess = this.EnsureDataAccess();
+			var dataAccess = this.EnsureDataAccess();
 
 			foreach(var permissionFilter in permissionFilters)
 			{
-				objectAccess.Execute("Security.PermissionFilter.Set", new
+				dataAccess.Execute(MembershipHelper.DATA_COMMAND_SETPREMISSIONFILTER, new
 				{
 					MemberId = memberId,
 					MemberType = memberType,

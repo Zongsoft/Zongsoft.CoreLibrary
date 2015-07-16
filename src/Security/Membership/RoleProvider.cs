@@ -45,19 +45,15 @@ namespace Zongsoft.Security.Membership
 		#region 角色管理
 		public Role GetRole(int roleId)
 		{
-			var objectAccess = this.EnsureDataAccess();
-
-			return objectAccess.Select<Role>("Security.Role", new ConditionCollection(ConditionCombine.And)
-			{
-				new Condition("RoleId", roleId),
-			}).FirstOrDefault();
+			var dataAccess = this.EnsureDataAccess();
+			return dataAccess.Select<Role>(MembershipHelper.DATA_ENTITY_ROLE, new Condition("RoleId", roleId)).FirstOrDefault();
 		}
 
 		public IEnumerable<Role> GetAllRoles()
 		{
-			var objectAccess = this.EnsureDataAccess();
+			var dataAccess = this.EnsureDataAccess();
 
-			return objectAccess.Select<Role>("Security.Role", new ConditionCollection(ConditionCombine.And)
+			return dataAccess.Select<Role>(MembershipHelper.DATA_ENTITY_ROLE, new ConditionCollection(ConditionCombine.And)
 			{
 				new Condition("Namespace", this.Namespace),
 			});
@@ -65,9 +61,9 @@ namespace Zongsoft.Security.Membership
 
 		public IEnumerable<Role> GetRoles(int memberId, MemberType memberType)
 		{
-			var objectAccess = this.EnsureDataAccess();
+			var dataAccess = this.EnsureDataAccess();
 
-			var roles = objectAccess.Execute("Security.GetRoles", new Dictionary<string, object>
+			var roles = dataAccess.Execute(MembershipHelper.DATA_ENTITY_ROLE, new Dictionary<string, object>
 			{
 				{"Namespace", this.Namespace},
 				{"MemberId", memberId},
@@ -87,9 +83,8 @@ namespace Zongsoft.Security.Membership
 			if(roleIds == null || roleIds.Length < 1)
 				return 0;
 
-			var objectAccess = this.EnsureDataAccess();
-
-			return objectAccess.Delete("Security.Role", new Condition("RoleId", roleIds, ConditionOperator.In));
+			var dataAccess = this.EnsureDataAccess();
+			return dataAccess.Delete(MembershipHelper.DATA_ENTITY_ROLE, new Condition("RoleId", roleIds, ConditionOperator.In));
 		}
 
 		public void CreateRoles(IEnumerable<Role> roles)
@@ -97,8 +92,8 @@ namespace Zongsoft.Security.Membership
 			if(roles == null)
 				return;
 
-			var objectAccess = this.EnsureDataAccess();
-			objectAccess.Insert("Security.Role", roles);
+			var dataAccess = this.EnsureDataAccess();
+			dataAccess.Insert(MembershipHelper.DATA_ENTITY_ROLE, roles);
 		}
 
 		public void UpdateRoles(IEnumerable<Role> roles)
@@ -106,9 +101,8 @@ namespace Zongsoft.Security.Membership
 			if(roles == null)
 				return;
 
-			var objectAccess = this.EnsureDataAccess();
-
-			objectAccess.Update("Security.Role", roles);
+			var dataAccess = this.EnsureDataAccess();
+			dataAccess.Update(MembershipHelper.DATA_ENTITY_ROLE, roles);
 		}
 		#endregion
 
@@ -120,9 +114,9 @@ namespace Zongsoft.Security.Membership
 
 		public IEnumerable<Member> GetMembers(int roleId)
 		{
-			var objectAccess = this.EnsureDataAccess();
+			var dataAccess = this.EnsureDataAccess();
 
-			var members = objectAccess.Execute("Security.GetMembers", new Dictionary<string, object>
+			var members = dataAccess.Execute("Security.GetMembers", new Dictionary<string, object>
 			{
 				{"RoleId", roleId},
 			}) as IEnumerable<Member>;
@@ -137,9 +131,9 @@ namespace Zongsoft.Security.Membership
 
 		public void DeleteMember(int roleId, int memberId, MemberType memberType)
 		{
-			var objectAccess = this.EnsureDataAccess();
+			var dataAccess = this.EnsureDataAccess();
 
-			objectAccess.Delete("Security.Member", new ConditionCollection(ConditionCombine.And)
+			dataAccess.Delete(MembershipHelper.DATA_ENTITY_MEMBER, new ConditionCollection(ConditionCombine.And)
 			{
 				new Condition("RoleId", roleId),
 				new Condition("MemberId", memberId),
@@ -149,9 +143,9 @@ namespace Zongsoft.Security.Membership
 
 		public void CreateMember(int roleId, int memberId, MemberType memberType)
 		{
-			var objectAccess = this.EnsureDataAccess();
+			var dataAccess = this.EnsureDataAccess();
 
-			objectAccess.Insert("Security.Member", new Member(roleId, memberId, memberType));
+			dataAccess.Insert(MembershipHelper.DATA_ENTITY_MEMBER, new Member(roleId, memberId, memberType));
 		}
 
 		public void SetMembers(IEnumerable<Member> members)

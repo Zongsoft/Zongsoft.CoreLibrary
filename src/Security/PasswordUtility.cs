@@ -40,32 +40,6 @@ namespace Zongsoft.Security
 		#endregion
 
 		/// <summary>
-		/// 生成随机的Salt值。
-		/// </summary>
-		/// <returns>返回生成的整型数类型的Salt值。</returns>
-		public static int GeneratePasswordSalt()
-		{
-			return BitConverter.ToInt32(GeneratePasswordSalt(4), 0);
-		}
-
-		/// <summary>
-		/// 生成随机的Salt值。
-		/// </summary>
-		/// <param name="length">指定要生成的Salt字节数组的长度，如果长度小于4则为4。</param>
-		/// <returns>返回生成字节数组的Salt值。</returns>
-		public static byte[] GeneratePasswordSalt(int length)
-		{
-			byte[] salt = new byte[Math.Max(length, 4)];
-
-			using(RandomNumberGenerator random = RandomNumberGenerator.Create())
-			{
-				random.GetNonZeroBytes(salt);
-			}
-
-			return salt;
-		}
-
-		/// <summary>
 		/// 生成随机口令字符串。
 		/// </summary>
 		/// <returns>返回生成的随机口令字符串。</returns>
@@ -81,13 +55,8 @@ namespace Zongsoft.Security
 		/// <returns>返回生成的随机口令字符串。</returns>
 		public static string GeneratePassword(int length)
 		{
-			byte[] buffer = new byte[Math.Max(length, 8)];
+			byte[] buffer = Zongsoft.Common.RandomGenerator.Generate(Math.Max(length, 8));
 			char[] password = new char[buffer.Length];
-
-			using(RandomNumberGenerator random = RandomNumberGenerator.Create())
-			{
-				random.GetBytes(buffer);
-			}
 
 			for(int i = 0; i < buffer.Length; i++)
 			{
@@ -165,6 +134,7 @@ namespace Zongsoft.Security
 		/// <param name="password">待验证的口令明文。</param>
 		/// <param name="storedPassword">存储在数据库中的已Salt后的口令散列值。</param>
 		/// <param name="storedPasswordSalt">存储在数据库中的与之匹对的整型随机Salt数。</param>
+		/// <param name="hashAlgorithm">进行散列算法的名称，默认为SHA1。</param>
 		/// <returns>验证成功则返回真，否则返回假。</returns>
 		public static bool VerifyPassword(string password, byte[] storedPassword, int storedPasswordSalt, string hashAlgorithm = "SHA1")
 		{
@@ -177,6 +147,7 @@ namespace Zongsoft.Security
 		/// <param name="password">待验证的口令明文。</param>
 		/// <param name="storedPassword">存储在数据库中的已Salt后的口令散列值。</param>
 		/// <param name="storedPasswordSalt">存储在数据库中的与之匹对的随机Salt值。</param>
+		/// <param name="hashAlgorithm">进行散列算法的名称，默认为SHA1。</param>
 		/// <returns>验证成功则返回真，否则返回假。</returns>
 		public static bool VerifyPassword(string password, byte[] storedPassword, byte[] storedPasswordSalt, string hashAlgorithm = "SHA1")
 		{

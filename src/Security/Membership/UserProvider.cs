@@ -51,25 +51,27 @@ namespace Zongsoft.Security.Membership
 
 		public User GetUser(string identity)
 		{
-			ICondition condition = null;
 			var identityType = MembershipHelper.GetUserIdentityType(identity);
+
+			var conditions = new ConditionCollection(ConditionCombine.And);
+			conditions.Add(new Condition("Namespace", this.Namespace));
 
 			switch(identityType)
 			{
 				case UserIdentityType.Email:
-					condition = new Condition("Email", identity);
+					conditions.Add(new Condition("Email", identity));
 					break;
 				case UserIdentityType.PhoneNumber:
-					condition = new Condition("PhoneNumber", identity);
+					conditions.Add(new Condition("PhoneNumber", identity));
 					break;
 				default:
-					condition = new Condition("Name", identity);
+					conditions.Add(new Condition("Name", identity));
 					break;
 			}
 
-			var objectAccess = this.EnsureDataAccess();
+			var dataAccess = this.EnsureDataAccess();
 
-			return objectAccess.Select<User>("Security.User", condition).FirstOrDefault();
+			return dataAccess.Select<User>(MembershipHelper.DATA_ENTITY_USER, conditions).FirstOrDefault();
 		}
 
 		public IEnumerable<User> GetAllUsers()
@@ -77,19 +79,20 @@ namespace Zongsoft.Security.Membership
 			var dataAccess = this.EnsureDataAccess();
 
 			if(string.IsNullOrWhiteSpace(this.Namespace))
-				return dataAccess.Select<User>("Security.User");
+				return dataAccess.Select<User>(MembershipHelper.DATA_ENTITY_USER);
 			else
-				return dataAccess.Select<User>("Security.User", new Condition("Namespace", this.Namespace));
+				return dataAccess.Select<User>(MembershipHelper.DATA_ENTITY_USER, new Condition("Namespace", this.Namespace));
 		}
 
 		public bool SetPrincipal(int userId, string principal)
 		{
 			var dataAccess = this.EnsureDataAccess();
 
-			return dataAccess.Update("Security.User", new { Principal = principal }, new ConditionCollection(ConditionCombine.And)
-			{
-				new Condition("UserId", userId),
-			}) > 0;
+			return dataAccess.Update(MembershipHelper.DATA_ENTITY_USER, new { Principal = principal },
+				new ConditionCollection(ConditionCombine.And)
+				{
+					new Condition("UserId", userId),
+				}) > 0;
 		}
 
 		public int DeleteUsers(params int[] userIds)
@@ -99,7 +102,7 @@ namespace Zongsoft.Security.Membership
 
 			var dataAccess = this.EnsureDataAccess();
 
-			return dataAccess.Delete("Security.User", new Condition("UserId", userIds, ConditionOperator.In));
+			return dataAccess.Delete(MembershipHelper.DATA_ENTITY_USER, new Condition("UserId", userIds, ConditionOperator.In));
 		}
 
 		public void CreateUsers(IEnumerable<User> users)
@@ -107,8 +110,8 @@ namespace Zongsoft.Security.Membership
 			if(users == null)
 				return;
 
-			var objectAccess = this.EnsureDataAccess();
-			objectAccess.Insert("Security.User", users);
+			var dataAccess = this.EnsureDataAccess();
+			dataAccess.Insert(MembershipHelper.DATA_ENTITY_USER, users);
 		}
 
 		public void UpdateUsers(IEnumerable<User> users)
@@ -116,8 +119,8 @@ namespace Zongsoft.Security.Membership
 			if(users == null)
 				return;
 
-			var objectAccess = this.EnsureDataAccess();
-			objectAccess.Update("Security.User", users);
+			var dataAccess = this.EnsureDataAccess();
+			dataAccess.Update(MembershipHelper.DATA_ENTITY_USER, users);
 		}
 		#endregion
 
@@ -136,9 +139,9 @@ namespace Zongsoft.Security.Membership
 				throw new AuthenticationException("Invalid password.");
 
 			//重新生成密码随机数
-			storedPasswordSalt = PasswordUtility.GeneratePasswordSalt(4);
+			storedPasswordSalt = Zongsoft.Common.RandomGenerator.Generate(8);
 
-			dataAccess.Execute("Security.User.SetPassword", new Dictionary<string, object>
+			dataAccess.Execute(MembershipHelper.DATA_COMMAND_SETPASSWORD, new Dictionary<string, object>
 			{
 				{"UserId", userId},
 				{"Password", PasswordUtility.HashPassword(newPassword, storedPasswordSalt)},
@@ -202,12 +205,12 @@ namespace Zongsoft.Security.Membership
 
 		public string[] GetPasswordQuestions(string identity)
 		{
-			//var objectAccess = this.EnsureDataAccess();
+			//var dataAccess = this.EnsureDataAccess();
 			//var certification = this.GetCertification(certificationId);
 
 			//IDictionary<string, object> outParameters;
 
-			//objectAccess.Execute("Security.User.GetPasswordQuestion", new Dictionary<string, object>
+			//dataAccess.Execute("Security.User.GetPasswordQuestion", new Dictionary<string, object>
 			//{
 			//	{"UserId", certification.User.UserId},
 			//}, out outParameters);
@@ -222,7 +225,7 @@ namespace Zongsoft.Security.Membership
 
 		public void SetPasswordQuestionsAndAnswers(int userId, string password, string[] passwordQuestions, string[] passwordAnswers)
 		{
-			//var objectAccess = this.EnsureDataAccess();
+			//var dataAccess = this.EnsureDataAccess();
 			//var certification = this.GetCertification(certificationId);
 
 			//byte[] storedPassword;
@@ -236,7 +239,7 @@ namespace Zongsoft.Security.Membership
 			//if(!PasswordUtility.VerifyPassword(password, storedPassword, storedPasswordSalt))
 			//	throw new AuthenticationException("Invalid password.");
 
-			//objectAccess.Execute("Security.User.SetPasswordQuestionAndAnswer", new Dictionary<string, object>
+			//dataAccess.Execute("Security.User.SetPasswordQuestionAndAnswer", new Dictionary<string, object>
 			//{
 			//	{"ApplicationId", certification.Namespace},
 			//	{"UserId", certification.User.UserId},

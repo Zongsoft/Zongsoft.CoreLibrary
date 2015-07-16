@@ -39,10 +39,14 @@ namespace Zongsoft.Security.Membership
 		#region 常量定义
 		internal const string DATA_CONTAINER_NAME = "Security";
 
+		internal const string DATA_COMMAND_SETPASSWORD = DATA_CONTAINER_NAME + ".SetPassword";
 		internal const string DATA_COMMAND_GETPASSWORD = DATA_CONTAINER_NAME + ".GetPassword";
 		internal const string DATA_COMMAND_GETPASSWORDBYNAME = DATA_CONTAINER_NAME + ".GetPasswordByName";
 		internal const string DATA_COMMAND_GETPASSWORDBYEMAIL = DATA_CONTAINER_NAME + ".GetPasswordByEmail";
 		internal const string DATA_COMMAND_GETPASSWORDBYPHONE = DATA_CONTAINER_NAME + ".GetPasswordByPhone";
+
+		internal const string DATA_COMMAND_SETPREMISSION = DATA_CONTAINER_NAME + ".SetPermission";
+		internal const string DATA_COMMAND_SETPREMISSIONFILTER = DATA_CONTAINER_NAME + ".SetPermissionFilter";
 
 		internal const string DATA_ENTITY_USER = DATA_CONTAINER_NAME + ".User";
 		internal const string DATA_ENTITY_ROLE = DATA_CONTAINER_NAME + ".Role";
