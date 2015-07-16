@@ -113,7 +113,7 @@ namespace Zongsoft.Communication
 			if(serializationStream.Read(temp, 0, temp.Length) != temp.Length)
 				return null;
 
-			var package = new Package(Zongsoft.Common.UrlUtility.UrlDecode(Encoding.ASCII.GetString(temp)));
+			var package = new Package(Uri.UnescapeDataString(Encoding.ASCII.GetString(temp)));
 
 			int headerCount = serializationStream.ReadByte();
 			int contentCount = serializationStream.ReadByte();
@@ -179,7 +179,7 @@ namespace Zongsoft.Communication
 		#endregion
 
 		#region 序列方法
-		public void Serialize(Stream serializationStream, object graph)
+		public void Serialize(Stream serializationStream, object graph, SerializationSettings settings = null)
 		{
 			if(graph == null)
 				return;
@@ -192,7 +192,7 @@ namespace Zongsoft.Communication
 			if(package == null)
 				throw new NotSupportedException();
 
-			byte[] value = Encoding.ASCII.GetBytes(Zongsoft.Common.UrlUtility.UrlEncode(package.Url));
+			byte[] value = Encoding.ASCII.GetBytes(Uri.EscapeUriString(package.Url));
 
 			if(value.Length > ushort.MaxValue)
 				throw new InvalidOperationException("The url length of the Package too large.");
@@ -280,7 +280,7 @@ namespace Zongsoft.Communication
 		#endregion
 
 		#region 显式实现
-		SerializerSettings Zongsoft.Runtime.Serialization.ISerializer.Settings
+		SerializationSettings Zongsoft.Runtime.Serialization.ISerializer.Settings
 		{
 			get
 			{

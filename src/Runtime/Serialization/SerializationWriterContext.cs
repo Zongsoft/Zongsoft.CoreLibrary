@@ -78,6 +78,14 @@ namespace Zongsoft.Runtime.Serialization
 			}
 		}
 
+		public SerializationSettings Settings
+		{
+			get
+			{
+				return _serializationContext.Settings;
+			}
+		}
+
 		public ISerializationWriter Writer
 		{
 			get

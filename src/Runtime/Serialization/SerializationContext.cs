@@ -39,11 +39,12 @@ namespace Zongsoft.Runtime.Serialization
 		private ISerializer _serializer;
 		private Stream _serializationStream;
 		private object _serializationObject;
+		private SerializationSettings _settings;
 		private IDictionary<string, object> _properties;
 		#endregion
 
 		#region 构造函数
-		public SerializationContext(ISerializer serializer, Stream serializationStream, object serializationObject)
+		public SerializationContext(ISerializer serializer, Stream serializationStream, object serializationObject, SerializationSettings settings)
 		{
 			if(serializer == null)
 				throw new ArgumentNullException("serializer");
@@ -54,6 +55,7 @@ namespace Zongsoft.Runtime.Serialization
 			if(serializationStream == null)
 				throw new ArgumentNullException("serializationStream");
 
+			_settings = settings;
 			_serializer = serializer;
 			_serializationStream = serializationStream;
 			_serializationObject = serializationObject;
@@ -82,6 +84,22 @@ namespace Zongsoft.Runtime.Serialization
 			get
 			{
 				return _serializationObject;
+			}
+		}
+
+		public SerializationSettings Settings
+		{
+			get
+			{
+				return _settings;
+			}
+		}
+
+		public bool HasProperties
+		{
+			get
+			{
+				return _properties != null && _properties.Count > 0;
 			}
 		}
 

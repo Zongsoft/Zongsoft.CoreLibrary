@@ -36,8 +36,8 @@ namespace Zongsoft.Runtime.Serialization
 	public class Serializer : ISerializer, ITextSerializer
 	{
 		#region 静态字段
-		private static ITextSerializer _text = new Serializer(new TextSerializationWriter());
-		private static ITextSerializer _json = new Serializer(new JsonSerializationWriter());
+		private static ITextSerializer _text = new Serializer(new TextSerializationWriter(), new TextSerializationSettings());
+		private static ITextSerializer _json = new Serializer(new JsonSerializationWriter(), new TextSerializationSettings());
 		#endregion
 
 		#region 事件定义
@@ -46,7 +46,7 @@ namespace Zongsoft.Runtime.Serialization
 		#endregion
 
 		#region 成员字段
-		private SerializerSettings _settings;
+		private SerializationSettings _settings;
 		private ISerializationWriter _writer;
 		#endregion
 
@@ -55,13 +55,13 @@ namespace Zongsoft.Runtime.Serialization
 		{
 		}
 
-		public Serializer(ISerializationWriter writer, SerializerSettings settings)
+		public Serializer(ISerializationWriter writer, SerializationSettings settings)
 		{
 			if(writer == null)
 				throw new ArgumentNullException("writer");
 
 			_writer = writer;
-			_settings = settings ?? new SerializerSettings();
+			_settings = settings ?? new SerializationSettings();
 		}
 		#endregion
 
@@ -98,7 +98,7 @@ namespace Zongsoft.Runtime.Serialization
 		#endregion
 
 		#region 公共属性
-		public SerializerSettings Settings
+		public SerializationSettings Settings
 		{
 			get
 			{
@@ -192,25 +192,20 @@ namespace Zongsoft.Runtime.Serialization
 			}
 		}
 
-		public string Serialize(object graph)
+		public string Serialize(object graph, TextSerializationSettings settings = null)
 		{
 			if(graph == null)
 				return null;
 
-			using(var stream = new MemoryStream())
+			using(var writer = new StringWriter())
 			{
-				this.Serialize(stream, graph);
+				this.Serialize(writer, graph, settings);
 
-				stream.Position = 0;
-
-				using(var reader = new StreamReader(stream, Encoding.UTF8))
-				{
-					return reader.ReadToEnd();
-				}
+				return writer.ToString();
 			}
 		}
 
-		public void Serialize(TextWriter writer, object graph)
+		public void Serialize(TextWriter writer, object graph, TextSerializationSettings settings = null)
 		{
 			if(writer == null)
 				throw new ArgumentNullException("writer");
@@ -236,7 +231,7 @@ namespace Zongsoft.Runtime.Serialization
 			}
 		}
 
-		public void Serialize(Stream serializationStream, object graph)
+		public void Serialize(Stream serializationStream, object graph, SerializationSettings settings = null)
 		{
 			if(_writer == null)
 				throw new InvalidOperationException("The value of property 'Writer' is null.");
@@ -248,7 +243,7 @@ namespace Zongsoft.Runtime.Serialization
 			this.OnSerializing(new SerializationEventArgs(SerializationDirection.Output, serializationStream, graph));
 
 			//创建序列化上下文对象
-			var context = new SerializationContext(this, serializationStream, graph);
+			var context = new SerializationContext(this, serializationStream, graph, (settings ?? _settings));
 
 			try
 			{
@@ -282,7 +277,7 @@ namespace Zongsoft.Runtime.Serialization
 					return;
 
 				//判断该是否已经达到允许的序列化的层次
-				if(_settings.MaximumDepth > -1 && context.Depth >= _settings.MaximumDepth)
+				if(context.Settings.MaximumDepth > -1 && context.Depth >= context.Settings.MaximumDepth)
 					return;
 
 				//判断该是否需要继续序列化当前对象

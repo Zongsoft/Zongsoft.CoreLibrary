@@ -35,9 +35,9 @@ namespace Zongsoft.Runtime.Serialization
 	public interface ISerializer
 	{
 		/// <summary>
-		/// 获取当前序列化器的选项设置。
+		/// 获取当前序列化的默认选项设置。
 		/// </summary>
-		SerializerSettings Settings
+		SerializationSettings Settings
 		{
 			get;
 		}
@@ -71,6 +71,7 @@ namespace Zongsoft.Runtime.Serialization
 		/// </summary>
 		/// <param name="serializationStream">要将对象序列化到的流。</param>
 		/// <param name="graph">待序列化的目标对象。</param>
-		void Serialize(Stream serializationStream, object graph);
+		/// <param name="settings">序列化的选项设置。</param>
+		void Serialize(Stream serializationStream, object graph, SerializationSettings settings = null);
 	}
 }

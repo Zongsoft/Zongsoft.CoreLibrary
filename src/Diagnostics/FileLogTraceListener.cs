@@ -97,7 +97,7 @@ namespace Zongsoft.Diagnostics
 				{
 					_serializer = new Zongsoft.Runtime.Serialization.Serializer(
 						new Runtime.Serialization.JsonSerializationWriter(),
-						new Runtime.Serialization.SerializerSettings(3, Runtime.Serialization.SerializationMembers.Properties));
+						new Runtime.Serialization.SerializationSettings(3, Runtime.Serialization.SerializationMembers.Properties));
 				}
 
 				return _serializer;
