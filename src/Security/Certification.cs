@@ -125,6 +125,18 @@ namespace Zongsoft.Security
 		}
 
 		/// <summary>
+		/// 获取安全凭证对应的用户编号。
+		/// </summary>
+		public int UserId
+		{
+			get
+			{
+				var user = _user;
+				return user == null ? 0 : user.UserId;
+			}
+		}
+
+		/// <summary>
 		/// 获取或设置安全凭证的最后活动时间。
 		/// </summary>
 		public DateTime Timestamp
