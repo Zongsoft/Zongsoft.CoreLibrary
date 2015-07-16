@@ -26,6 +26,7 @@
 
 using System;
 using System.IO;
+using System.Text;
 
 namespace Zongsoft.Runtime.Serialization
 {
@@ -33,6 +34,10 @@ namespace Zongsoft.Runtime.Serialization
 	{
 		string Serialize(object graph);
 		void Serialize(TextWriter writer, object graph);
+
+		object Deserialize(string text);
+		object Deserialize(string text, Type type);
+		T Deserialize<T>(string text);
 
 		object Deserialize(TextReader reader);
 		object Deserialize(TextReader reader, Type type);

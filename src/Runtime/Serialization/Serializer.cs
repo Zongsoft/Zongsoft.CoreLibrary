@@ -168,6 +168,30 @@ namespace Zongsoft.Runtime.Serialization
 			return (T)this.Deserialize(reader, typeof(T));
 		}
 
+		public object Deserialize(string text)
+		{
+			using(var reader = new StringReader(text))
+			{
+				return this.Deserialize(reader);
+			}
+		}
+
+		public object Deserialize(string text, Type type)
+		{
+			using(var reader = new StringReader(text))
+			{
+				return this.Deserialize(reader, type);
+			}
+		}
+
+		public T Deserialize<T>(string text)
+		{
+			using(var reader = new StringReader(text))
+			{
+				return this.Deserialize<T>(reader);
+			}
+		}
+
 		public string Serialize(object graph)
 		{
 			if(graph == null)
