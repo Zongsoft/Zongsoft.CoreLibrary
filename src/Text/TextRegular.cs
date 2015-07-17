@@ -154,6 +154,9 @@ namespace Zongsoft.Text
 			private const string URI_PATTERN = @"^\s*(?<value>((?<schema>${schema})://)?(?<host>(?<domain>[A-Za-z0-9]+([-_][A-Za-z0-9]+)*)(\.(?<domain>[A-Za-z0-9]+([-_][A-Za-z0-9]+)*))+)(:(?<port>\d{1,5}))?(?<path>(?<segment>/[^\s/:\*\?\&]*)*)?(?<query>\?((?<parameter>(?<parameter_name>[A-Za-z0-9]+([-_][A-Za-z0-9]+)*)(=(?<parameter_value>[^\?\&\s]*))?)\&?)*)?(?<fragment>\#[^\#\s]*)?)\s*$";
 			#endregion
 
+			/// <summary>获取任意协议的URL文本验证器。</summary>
+			public static TextRegular Url = new TextRegular(URI_PATTERN.Replace("${schema}", "[A-Za-z]+"));
+
 			/// <summary>获取Http协议的URL文本验证器。</summary>
 			public static TextRegular Http = new TextRegular(URI_PATTERN.Replace("${schema}", "http[s]?"));
 
