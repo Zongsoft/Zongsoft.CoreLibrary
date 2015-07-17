@@ -376,6 +376,7 @@ namespace Zongsoft.Common
 		#region 对象解析
 
 		#region 对象组装
+		[Obsolete("Please use Zongsoft.Runtime.Serialization.DictionarySerializer class.")]
 		public static T Populate<T>(IEnumerable<KeyValuePair<string, object>> dictionary, Func<T> creator = null, Action<ObjectResolvingContext> resolve = null)
 		{
 			if(dictionary == null)
@@ -420,6 +421,7 @@ namespace Zongsoft.Common
 			return result;
 		}
 
+		[Obsolete("Please use Zongsoft.Runtime.Serialization.DictionarySerializer class.")]
 		public static T Populate<T>(IDictionary dictionary, Func<T> creator = null, Action<ObjectResolvingContext> resolve = null)
 		{
 			if(dictionary == null || dictionary.Count < 1)
@@ -428,6 +430,7 @@ namespace Zongsoft.Common
 			return Populate<T>(Zongsoft.Collections.DictionaryExtension.ToDictionary<string, object>(dictionary), creator, resolve);
 		}
 
+		[Obsolete("Please use Zongsoft.Runtime.Serialization.DictionarySerializer class.")]
 		public static object Populate(IEnumerable<KeyValuePair<string, object>> dictionary, Type type, Func<object> creator = null, Action<ObjectResolvingContext> resolve = null)
 		{
 			if(dictionary == null)
@@ -472,6 +475,7 @@ namespace Zongsoft.Common
 			return result;
 		}
 
+		[Obsolete("Please use Zongsoft.Runtime.Serialization.DictionarySerializer class.")]
 		public static object Populate(IDictionary dictionary, Type type, Func<object> creator = null, Action<ObjectResolvingContext> resolve = null)
 		{
 			if(dictionary == null || dictionary.Count < 1)
