@@ -42,20 +42,27 @@ namespace Zongsoft.Transactions
 		#endregion
 
 		#region 成员字段
+		private IsolationLevel _isolationLevel;
 		private TransactionInformation _information;
 		#endregion
 
 		#region 构造函数
-		public Transaction()
+		public Transaction() : this(IsolationLevel.ReadCommitted)
 		{
+		}
+
+		public Transaction(IsolationLevel isolationLevel)
+		{
+			_isolationLevel = isolationLevel;
+
 			//首先设置当前事务的父事务
 			_information = new TransactionInformation(Transaction.Current);
 
-			//将当前事务对象加入到事务栈中
-			_locals.Value.Push(this);
-
 			//创建本事务的登记集合
 			_enlistments = new Queue<IEnlistment>();
+
+			//将当前事务对象加入到事务栈中
+			_locals.Value.Push(this);
 		}
 		#endregion
 
@@ -79,6 +86,17 @@ namespace Zongsoft.Transactions
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取当前事务的隔离级别。
+		/// </summary>
+		public IsolationLevel IsolationLevel
+		{
+			get
+			{
+				return _isolationLevel;
+			}
+		}
+
 		/// <summary>
 		/// 获取当前事务的附加信息。
 		/// </summary>
@@ -109,7 +127,7 @@ namespace Zongsoft.Transactions
 			_enlistments.Enqueue(enlistment);
 
 			//通知事务处理程序进入事务准备阶段
-			enlistment.OnEnlist(new EnlistmentContext(this, EnlistmentPhase.Prepare));
+			//enlistment.OnEnlist(new EnlistmentContext(this, EnlistmentPhase.Prepare));
 		}
 
 		/// <summary>
