@@ -281,13 +281,10 @@
     <Compile Include="Security\CertificationPrincipal.cs" />
     <Compile Include="Security\Membership\AuthenticatedEventArgs.cs" />
     <Compile Include="Security\Membership\AuthenticationAttribute.cs" />
-    <Compile Include="Security\Membership\Authentication.cs" />
     <Compile Include="Security\Membership\AuthenticationException.cs" />
     <Compile Include="Security\Membership\IMemberProvider.cs" />
-    <Compile Include="Security\Membership\ProviderBase.cs" />
     <Compile Include="Security\Membership\UserIdentityType.cs" />
     <Compile Include="Security\Membership\AuthenticationResult.cs" />
-    <Compile Include="Security\Membership\Authorization.cs" />
     <Compile Include="Security\Membership\AuthorizationAttribute.cs" />
     <Compile Include="Security\Membership\AuthorizedState.cs" />
     <Compile Include="Security\Certification.cs" />
@@ -300,15 +297,11 @@
     <Compile Include="Security\Membership\IRoleProvider.cs" />
     <Compile Include="Security\Membership\IUserProvider.cs" />
     <Compile Include="Security\Membership\Member.cs" />
-    <Compile Include="Security\Membership\MembershipHelper.cs" />
     <Compile Include="Security\Membership\MemberType.cs" />
     <Compile Include="Security\Membership\Permission.cs" />
     <Compile Include="Security\Membership\PermissionFilter.cs" />
-    <Compile Include="Security\Membership\PermissionProvider.cs" />
     <Compile Include="Security\Membership\Role.cs" />
-    <Compile Include="Security\Membership\RoleProvider.cs" />
     <Compile Include="Security\Membership\User.cs" />
-    <Compile Include="Security\Membership\UserProvider.cs" />
     <Compile Include="Security\PasswordUtility.cs" />
     <Compile Include="Services\CommandBase.cs" />
     <Compile Include="Services\CommandContextBase.cs" />
@@ -517,6 +510,7 @@
     <Compile Include="Text\TextExpressionParser.cs" />
     <Compile Include="Transactions\EnlistmentContext.cs" />
     <Compile Include="Transactions\IEnlistment.cs" />
+    <Compile Include="Transactions\IsolationLevel.cs" />
     <Compile Include="Transactions\Transaction.cs" />
     <Compile Include="Transactions\EnlistmentPhase.cs" />
     <Compile Include="Transactions\TransactionInformation.cs" />

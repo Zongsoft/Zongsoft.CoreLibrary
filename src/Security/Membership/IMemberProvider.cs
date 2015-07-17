@@ -76,10 +76,11 @@ namespace Zongsoft.Security.Membership
 		/// <summary>
 		/// 设置更新指定角色下的所有成员。
 		/// </summary>
+		/// <param name="roleId">指定要更新的角色编号。</param>
 		/// <param name="members">要更新的角色成员集。</param>
 		/// <remarks>
 		///		<para>该方法默认以覆盖方式进行更新。即先清空指定角色下的所有成员记录，然后再将<paramref name="members"/>参数指定的成员插入其中。</para>
 		/// </remarks>
-		void SetMembers(IEnumerable<Member> members);
+		void SetMembers(int roleId, IEnumerable<Member> members);
 	}
 }
