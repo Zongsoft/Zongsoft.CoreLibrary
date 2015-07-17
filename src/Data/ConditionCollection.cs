@@ -46,6 +46,11 @@ namespace Zongsoft.Data
 		{
 			_conditionCombine = conditionCombine;
 		}
+
+		public ConditionCollection(ConditionCombine conditionCombine, params ICondition[] items) : base(items)
+		{
+			_conditionCombine = conditionCombine;
+		}
 		#endregion
 
 		#region 公共属性
