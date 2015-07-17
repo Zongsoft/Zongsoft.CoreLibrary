@@ -75,3 +75,19 @@ CREATE TABLE IF NOT EXISTS `Security_PermissionFilter` (
   `Filter` VARCHAR(4000) NOT NULL COMMENT '拒绝授权的过滤表达式',
   PRIMARY KEY (`MemberId`, `MemberType`, `SchemaId`, `ActionId`))
 ENGINE = InnoDB DEFAULT CHARSET=utf8 COMMENT='权限表';
+
+# COMMENT '角色名在命名空间范围内的唯一索引'
+ALTER TABLE `Automao`.`Security_Role` 
+ADD UNIQUE INDEX `IX_Unique_Name` (`Namespace` ASC, `Name` ASC);
+
+# COMMENT '用户名在命名空间范围内的唯一索引'
+ALTER TABLE `Automao`.`Security_User` 
+ADD UNIQUE INDEX `IX_Unique_Name` (`Namespace` ASC, `Name` ASC);
+
+# COMMENT '邮箱地址在命名空间范围内的唯一索引'
+ALTER TABLE `Automao`.`Security_User` 
+ADD UNIQUE INDEX `IX_Unique_Email` (`Namespace` ASC, `Email` ASC);
+
+# COMMENT '手机号码在命名空间范围内的唯一索引'
+ALTER TABLE `Automao`.`Security_User` 
+ADD UNIQUE INDEX `IX_Unique_PhoneNumber` (`Namespace` ASC, `PhoneNumber` ASC);
