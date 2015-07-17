@@ -107,6 +107,10 @@ namespace Zongsoft.Security.Membership
 
 		public static User GetUser(IDataAccess dataAccess, int userId)
 		{
+			#region 测试代码
+			return new User(1, "Administrator");
+			#endregion
+
 			if(dataAccess == null)
 				throw new ArgumentNullException("dataAccess");
 

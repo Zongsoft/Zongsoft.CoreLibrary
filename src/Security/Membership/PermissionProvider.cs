@@ -58,19 +58,7 @@ namespace Zongsoft.Security.Membership
 			if(permissions == null)
 				throw new ArgumentNullException("permissions");
 
-			var dataAccess = this.EnsureDataAccess();
-
-			foreach(var permission in permissions)
-			{
-				dataAccess.Execute(MembershipHelper.DATA_COMMAND_SETPREMISSION, new
-				{
-					MemberId = memberId,
-					MemberType = memberType,
-					SchemaId = permission.SchemaId,
-					ActionId = permission.ActionId,
-					Granted = permission.Granted,
-				});
-			}
+			this.SetPermissions(MembershipHelper.DATA_ENTITY_PERMISSION, memberId, memberType, permissions);
 		}
 
 		public IEnumerable<PermissionFilter> GetPermissionFilters(int memberId, MemberType memberType)
@@ -90,18 +78,40 @@ namespace Zongsoft.Security.Membership
 			if(permissionFilters == null)
 				throw new ArgumentNullException("permissionFilters");
 
+			this.SetPermissions(MembershipHelper.DATA_ENTITY_PERMISSION, memberId, memberType, permissionFilters);
+		}
+		#endregion
+
+		#region 私有方法
+		private void SetPermissions(string name, int memberId, MemberType memberType, IEnumerable<Permission> permissions)
+		{
+			if(permissions == null)
+				throw new ArgumentNullException("permissions");
+
 			var dataAccess = this.EnsureDataAccess();
 
-			foreach(var permissionFilter in permissionFilters)
+			foreach(var permission in permissions)
 			{
-				dataAccess.Execute(MembershipHelper.DATA_COMMAND_SETPREMISSIONFILTER, new
+				permission.MemberId = memberId;
+				permission.MemberType = memberType;
+			}
+
+			using(var transaction = new Zongsoft.Transactions.Transaction())
+			{
+				dataAccess.Delete(name, new ConditionCollection(ConditionCombine.And,
+					new Condition[]{
+					new Condition("MemberId", memberId),
+					new Condition("MemberType", memberType)
+				}));
+
+				using(var t2 = new Zongsoft.Transactions.Transaction())
 				{
-					MemberId = memberId,
-					MemberType = memberType,
-					SchemaId = permissionFilter.SchemaId,
-					ActionId = permissionFilter.ActionId,
-					Filter = permissionFilter.Filter,
-				});
+					dataAccess.Insert(name, permissions);
+				}
+
+				dataAccess.Insert(name, permissions);
+
+				transaction.Commit();
 			}
 		}
 		#endregion
