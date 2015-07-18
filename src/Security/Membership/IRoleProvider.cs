@@ -49,23 +49,6 @@ namespace Zongsoft.Security.Membership
 		IEnumerable<Role> GetAllRoles(string @namespace);
 
 		/// <summary>
-		/// 获取指定成员的父级角色集。
-		/// </summary>
-		/// <param name="memberId">要搜索的成员编号(用户或角色)。</param>
-		/// <param name="memberType">要搜索的成员类型。</param>
-		/// <returns>返回指定成员的父级角色集。</returns>
-		IEnumerable<Role> GetRoles(int memberId, MemberType memberType);
-
-		/// <summary>
-		/// 获取指定角色成员的上级角色集。
-		/// </summary>
-		/// <param name="memberId">要搜索的角色成员编号。</param>
-		/// <param name="memberType">要搜索的角色成员类型。</param>
-		/// <param name="depth">对搜索角色成员隶属关系的遍历深度，如果不限深度则为负数。</param>
-		/// <returns>返回指定成员的上级角色集。</returns>
-		IEnumerable<Role> GetRoles(int memberId, MemberType memberType, int depth);
-
-		/// <summary>
 		/// 删除指定编号集的多个角色。
 		/// </summary>
 		/// <param name="roleIds">要删除的角色编号集合。</param>
@@ -75,14 +58,29 @@ namespace Zongsoft.Security.Membership
 		/// <summary>
 		/// 创建单个或者多个角色。
 		/// </summary>
+		/// <param name="roles">要创建的角色对象数组。</param>
+		/// <returns>返回创建成功的角色数量。</returns>
+		int CreateRoles(params Role[] roles);
+
+		/// <summary>
+		/// 创建单个或者多个角色。
+		/// </summary>
 		/// <param name="roles">要创建的角色对象集。</param>
-		/// <remarks>如果创建失败则抛出异常，并且整个事务会被回滚。</remarks>
-		void CreateRoles(IEnumerable<Role> roles);
+		/// <returns>返回创建成功的角色数量。</returns>
+		int CreateRoles(IEnumerable<Role> roles);
+
+		/// <summary>
+		/// 更新单个或多个角色信息。
+		/// </summary>
+		/// <param name="roles">要更新的角色对象数组。</param>
+		/// <returns>返回更新成功的角色数量。</returns>
+		int UpdateRoles(params Role[] roles);
 
 		/// <summary>
 		/// 更新单个或多个角色信息。
 		/// </summary>
 		/// <param name="roles">要更新的角色对象集。</param>
-		void UpdateRoles(IEnumerable<Role> roles);
+		/// <returns>返回更新成功的角色数量。</returns>
+		int UpdateRoles(IEnumerable<Role> roles);
 	}
 }

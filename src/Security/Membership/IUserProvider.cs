@@ -76,15 +76,30 @@ namespace Zongsoft.Security.Membership
 		/// <summary>
 		/// 创建单个或者多个用户。
 		/// </summary>
+		/// <param name="users">要创建的用户对象数组。</param>
+		/// <returns>返回创建成功的用户数量。</returns>
+		int CreateUsers(params User[] users);
+
+		/// <summary>
+		/// 创建单个或者多个用户。
+		/// </summary>
 		/// <param name="users">要创建的用户对象集。</param>
-		/// <remarks>如果创建失败则抛出异常，并且整个事务会被回滚。</remarks>
-		void CreateUsers(IEnumerable<User> users);
+		/// <returns>返回创建成功的用户数量。</returns>
+		int CreateUsers(IEnumerable<User> users);
+
+		/// <summary>
+		/// 更新单个或多个用户信息。
+		/// </summary>
+		/// <param name="users">要更新的用户对象数组。</param>
+		/// <returns>返回更新成功的用户数量。</returns>
+		int UpdateUsers(params User[] users);
 
 		/// <summary>
 		/// 更新单个或多个用户信息。
 		/// </summary>
 		/// <param name="users">要更新的用户对象集。</param>
-		void UpdateUsers(IEnumerable<User> users);
+		/// <returns>返回更新成功的用户数量。</returns>
+		int UpdateUsers(IEnumerable<User> users);
 		#endregion
 
 		#region 密码管理

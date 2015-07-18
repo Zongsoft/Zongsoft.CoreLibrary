@@ -1,6 +1,6 @@
-/*
+ï»¿/*
  * Authors:
- *   ÖÓ·å(Popeye Zhong) <zongsoft@gmail.com>
+ *   é’Ÿå³°(Popeye Zhong) <zongsoft@gmail.com>
  *
  * Copyright (C) 2003-2014 Zongsoft Corporation <http://www.zongsoft.com>
  *
@@ -30,18 +30,19 @@ using System.Collections.Generic;
 namespace Zongsoft.Security.Membership
 {
 	/// <summary>
-	/// ±íÊ¾½ÇÉ«³ÉÔ±µÄÊµÌåÀà¡£
+	/// è¡¨ç¤ºè§’è‰²æˆå‘˜çš„å®ä½“ç±»ã€‚
 	/// </summary>
 	[Serializable]
 	public class Member
 	{
-		#region ³ÉÔ±×Ö¶Î
+		#region æˆå‘˜å­—æ®µ
 		private int _roleId;
 		private int _memberId;
 		private MemberType _memberType;
+		private Role _role;
 		#endregion
 
-		#region ¹¹Ôìº¯Êı
+		#region æ„é€ å‡½æ•°
 		public Member(int roleId, int memberId, MemberType memberType)
 		{
 			_roleId = roleId;
@@ -50,7 +51,7 @@ namespace Zongsoft.Security.Membership
 		}
 		#endregion
 
-		#region ¹«¹²ÊôĞÔ
+		#region å…¬å…±å±æ€§
 		public int RoleId
 		{
 			get
@@ -60,6 +61,18 @@ namespace Zongsoft.Security.Membership
 			set
 			{
 				_roleId = value;
+			}
+		}
+
+		public Role Role
+		{
+			get
+			{
+				return _role;
+			}
+			set
+			{
+				_role = value;
 			}
 		}
 
@@ -88,7 +101,7 @@ namespace Zongsoft.Security.Membership
 		}
 		#endregion
 
-		#region ÖØĞ´·½·¨
+		#region é‡å†™æ–¹æ³•
 		public override bool Equals(object obj)
 		{
 			if(obj == null || obj.GetType() != this.GetType())
