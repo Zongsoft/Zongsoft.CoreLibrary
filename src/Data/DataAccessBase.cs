@@ -265,38 +265,43 @@ namespace Zongsoft.Data
 			if(string.IsNullOrWhiteSpace(entityName))
 				throw new ArgumentNullException("entityName");
 
-			var entityDescriptor = _entityCache.GetOrAdd(entityType ?? this.GetEntityType(entityName), type => new EntityDesciptior(this, entityName, type));
-			return this.ResolveScope(entityDescriptor, scope).ToArray();
+			var isWeakType = entityType != null && (typeof(IDictionary).IsAssignableFrom(entityType) || Zongsoft.Common.TypeExtension.IsAssignableFrom(typeof(IDictionary<,>), entityType));
+
+			if(entityType == null || isWeakType)
+				entityType = this.GetEntityType(entityName);
+
+			var entityDescriptor = _entityCache.GetOrAdd(entityType, type => new EntityDesciptior(this, entityName, type));
+			return this.ResolveScope(entityDescriptor, scope, isWeakType).ToArray();
 		}
 
-		private HashSet<string> ResolveScope(EntityDesciptior entity, string scope)
+		private HashSet<string> ResolveScope(EntityDesciptior entity, string scope, bool isWeakType)
 		{
 			var result = new HashSet<string>(entity.Properties.Where(p => p.IsScalarType).Select(p => p.PropertyName), StringComparer.OrdinalIgnoreCase);
 
 			if(string.IsNullOrWhiteSpace(scope))
 				return result;
 
-			var parts = scope.Split(',', ';');
+			var members = scope.Split(new char[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries);
 
-			for(int i = 0; i < parts.Length; i++)
+			for(int i = 0; i < members.Length; i++)
 			{
-				var part = parts[i].Trim();
+				var member = members[i].Trim();
 
-				if(part.Length == 0)
+				if(member.Length == 0)
 					continue;
 
-				switch(part[0])
+				switch(member[0])
 				{
 					case '-':
 					case '!':
-						if(part.Length > 1)
-							result.Remove(part.Substring(1));
+						if(member.Length > 1)
+							result.Remove(member.Substring(1));
 						else
 							result.Clear();
 
 						break;
 					case '*':
-						if(part.Length != 1)
+						if(member.Length != 1)
 							throw new ArgumentException("scope");
 
 						result.UnionWith(entity.Properties.SelectMany(p =>
@@ -311,15 +316,23 @@ namespace Zongsoft.Data
 
 						break;
 					default:
-						if((part[0] >= 'A' && part[0] <= 'Z') || (part[0] >= 'a' && part[0] <= 'z') || part[0] == '_')
+						if((member[0] >= 'A' && member[0] <= 'Z') || (member[0] >= 'a' && member[0] <= 'z') || member[0] == '_')
 						{
-							var property = entity.Properties.FirstOrDefault(p => string.Equals(p.PropertyName, part, StringComparison.OrdinalIgnoreCase));
+							var property = entity.Properties.FirstOrDefault(p => string.Equals(p.PropertyName, member, StringComparison.OrdinalIgnoreCase));
 
 							if(property == null)
-								throw new ArgumentException(string.Format("The '{0}' property is not exists in the '{1}' entity.", part, entity.EntityName));
+							{
+								if(isWeakType)
+								{
+									result.Add(member);
+									continue;
+								}
+
+								throw new ArgumentException(string.Format("The '{0}' property is not exists in the '{1}' entity.", member, entity.EntityName));
+							}
 
 							if(property.IsScalarType)
-								result.Add(part);
+								result.Add(member);
 							else
 							{
 								var list = new List<string>();
@@ -328,7 +341,9 @@ namespace Zongsoft.Data
 							}
 						}
 						else
-							throw new ArgumentException("scope");
+						{
+							throw new ArgumentException(string.Format("Invalid '{0}' member in the '{1}' scope.", member, scope));
+						}
 
 						break;
 				}
