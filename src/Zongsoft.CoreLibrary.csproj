@@ -289,7 +289,6 @@
     <Compile Include="Security\Membership\AuthorizedState.cs" />
     <Compile Include="Security\Certification.cs" />
     <Compile Include="Security\CertificationException.cs" />
-    <Compile Include="Security\CertificationProvider.cs" />
     <Compile Include="Security\Membership\IAuthentication.cs" />
     <Compile Include="Security\Membership\IAuthorization.cs" />
     <Compile Include="Security\ICertificationProvider.cs" />
