@@ -44,8 +44,9 @@ namespace Zongsoft.Security.Membership
 		/// <summary>
 		/// 获取当前命名空间中的所有角色。
 		/// </summary>
+		/// <param name="namespace">要获取的用户集所属的命名空间。</param>
 		/// <returns>返回当前命名空间中的所有角色对象集。</returns>
-		IEnumerable<Role> GetAllRoles();
+		IEnumerable<Role> GetAllRoles(string @namespace);
 
 		/// <summary>
 		/// 获取指定成员的父级角色集。
