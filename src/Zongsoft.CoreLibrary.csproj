@@ -279,6 +279,7 @@
     <Compile Include="Runtime\Serialization\TextSerializationSettings.cs" />
     <Compile Include="Security\CertificationIdentity.cs" />
     <Compile Include="Security\CertificationPrincipal.cs" />
+    <Compile Include="Security\ICensorship.cs" />
     <Compile Include="Security\Membership\AuthenticatedEventArgs.cs" />
     <Compile Include="Security\Membership\AuthenticationAttribute.cs" />
     <Compile Include="Security\Membership\AuthenticationException.cs" />
