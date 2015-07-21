@@ -43,8 +43,9 @@ namespace Zongsoft.Common
 		/// </summary>
 		/// <param name="name">指定要获取的序列号名称。</param>
 		/// <param name="interval">指定的序列号递增的步长数，如果为零则表示获取当前值，而不会引发递增。</param>
+		/// <param name="seed">初始化的种子数，如果指定名称的序列号不存在，则创建指定名称的序列号，并使用该种子数作为该序列号的初始值。</param>
 		/// <returns>返回的序列号数值。</returns>
-		long GetSequenceNumber(string name, int interval);
+		long GetSequenceNumber(string name, int interval, int seed = 0);
 
 		/// <summary>
 		/// 获取指定序列号的下一个格式化文本值，递增步长以指定名称的序列号设置为准。
@@ -61,8 +62,10 @@ namespace Zongsoft.Common
 		/// </summary>
 		/// <param name="name">指定要获取的序列号名称。</param>
 		/// <param name="interval">指定的序列号递增的步长数，如果为零则表示获取当前值，而不会引发递增。</param>
+		/// <param name="seed">初始化的种子数，如果指定名称的序列号不存在，则创建指定名称的序列号，并使用该种子数作为该序列号的初始值。</param>
+		/// <param name="formatString">初始化的格式化文本，如果指定名称的序列号不存在，则创建指定名称的序列号，并使用该格式化文本作为该序列号的格式化文本。</param>
 		/// <returns>返回的序列号文本值。</returns>
-		string GetSequenceString(string name, int interval);
+		string GetSequenceString(string name, int interval, int seed = 0, string formatString = null);
 
 		/// <summary>
 		/// 获取指定名称的序列号信息。
