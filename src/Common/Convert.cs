@@ -486,6 +486,73 @@ namespace Zongsoft.Common
 		#endregion
 
 		#region 获取方法
+		public static Type GetMemberType(object target, string text)
+		{
+			if(target == null)
+				return null;
+
+			if(string.IsNullOrWhiteSpace(text))
+				return target.GetType();
+
+			var type = target.GetType();
+			var parts = text.Split(new char[]{ '.' }, StringSplitOptions.RemoveEmptyEntries);
+
+			foreach(var part in parts)
+			{
+				var member = GetMember(type, part, (BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static), true);
+
+				if(member == null)
+					throw new ArgumentException(string.Format("The '{0}' member is not existed in the '{1}' type, the original text is '{2}'.", part, type.FullName, text));
+
+				switch(member.MemberType)
+				{
+					case MemberTypes.Field:
+						type = ((FieldInfo)member).FieldType;
+						break;
+					case MemberTypes.Property:
+						type = ((PropertyInfo)member).PropertyType;
+						break;
+				}
+			}
+
+			return type;
+		}
+
+		public static bool TryGetMemberType(object target, string text, out Type memberType)
+		{
+			memberType = null;
+
+			if(target == null)
+				return false;
+
+			memberType = target.GetType();
+
+			if(string.IsNullOrWhiteSpace(text))
+				return true;
+
+			var parts = text.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+
+			foreach(var part in parts)
+			{
+				var member = GetMember(memberType, part, (BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static), true);
+
+				if(member == null)
+					return false;
+
+				switch(member.MemberType)
+				{
+					case MemberTypes.Field:
+						memberType = ((FieldInfo)member).FieldType;
+						break;
+					case MemberTypes.Property:
+						memberType = ((PropertyInfo)member).PropertyType;
+						break;
+				}
+			}
+
+			return true;
+		}
+
 		public static object GetValue(object target, string text)
 		{
 			if(target == null || text == null || text.Length < 1)
