@@ -36,6 +36,10 @@ namespace Zongsoft.Communication.Net.Ftp
 		public FtpException(string message) : base(message)
 		{
 		}
+
+		public FtpException(string message, Exception innerException) : base(message, innerException)
+		{
+		}
 	}
 
 	internal class CommandNotImplementedException : FtpException

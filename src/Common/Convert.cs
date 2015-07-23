@@ -245,7 +245,7 @@ namespace Zongsoft.Common
 		/// <param name="separator">要过滤掉的分隔符字符。</param>
 		/// <param name="throwExceptionOnFormat">指定当输入文本中含有非法字符时是否抛出<seealso cref="System.FormatException"/>异常。</param>
 		/// <returns>与<paramref name="text"/>等效的字节数组。</returns>
-		/// <exception cref="System.FormatException">当<param name="throwExceptionOnFormat"参数为真，并且<paramref name="text"/>参数中含有非空白字符或非指定的分隔符。</exception>
+		/// <exception cref="System.FormatException">当<paramref name="throwExceptionOnFormat"/>参数为真，并且<paramref name="text"/>参数中含有非空白字符或非指定的分隔符。</exception>
 		/// <remarks>该方法的实现始终忽略<paramref name="text"/>参数中的空白字符。</remarks>
 		public static byte[] FromHexString(string text, char separator, bool throwExceptionOnFormat)
 		{

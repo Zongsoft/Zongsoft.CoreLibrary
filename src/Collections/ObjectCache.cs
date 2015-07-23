@@ -66,7 +66,7 @@ namespace Zongsoft.Collections
 		/// <summary>
 		/// 创建一个对象缓存容器。
 		/// </summary>
-		/// <param name="comparer">对键进行比较时要使用的<see cref="System.Collections.Generic.IEqualityComparer<System.String>"/>比较器。</param>
+		/// <param name="comparer">对键进行比较时要使用的字符串比较器。</param>
 		/// <param name="limit">指定的最大缓存数，如果为零则表示不做限制。</param>
 		public ObjectCache(IEqualityComparer<string> comparer, int limit = 32)
 		{

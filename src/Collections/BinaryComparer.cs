@@ -69,7 +69,7 @@ namespace Zongsoft.Collections
 			return result;
 		}
 
-		public bool Equals(object x, object y)
+		public new bool Equals(object x, object y)
 		{
 			if(x == null && y == null)
 				return true;

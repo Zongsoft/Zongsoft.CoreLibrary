@@ -44,6 +44,7 @@ namespace Zongsoft.Services.Composition
 			if(pipeline == null)
 				throw new ArgumentNullException("pipeline");
 
+			_context = context;
 			_pipeline = pipeline;
 		}
 		#endregion

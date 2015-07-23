@@ -32,10 +32,6 @@ namespace Zongsoft.IO
 	[Serializable]
 	public class PathException : ApplicationException
 	{
-		#region 成员字段
-		private string _path;
-		#endregion
-
 		#region 构造函数
 		public PathException(string message) : base(message)
 		{

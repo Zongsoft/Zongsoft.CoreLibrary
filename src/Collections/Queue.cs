@@ -37,7 +37,7 @@ namespace Zongsoft.Collections
 	/// <remarks>
 	///		<para>本队列的默认实现不同步。</para>
 	///		<para>本队列中的各种方法本质上不是一个线程安全的过程。若要确保各种操作过程中的线程安全性，可以在操作过程中锁定队列。若要允许多个线程访问集合以进行读写操作，则必须实现自己的同步。</para>
-	///		<para>通过锁定实现于<seealso cref="System.Collections.ICollection"/>接口中的<seealso cref="SyncRoot"/>属性值，达成同步访问的效果。</para>
+	///		<para>通过锁定实现于<seealso cref="System.Collections.ICollection"/>接口中的<seealso cref="System.Collections.ICollection.SyncRoot"/>属性值，达成同步访问的效果。</para>
 	/// </remarks>
 	public class Queue : Zongsoft.Collections.IQueue
 	{
@@ -355,9 +355,6 @@ namespace Zongsoft.Collections
 		/// </summary>
 		/// <param name="text">要入队的字符串文本，该值可以为空(null)。</param>
 		/// <param name="settings">不支持入队的选项参数设置，始终忽略该参数。</param>
-		/// <remarks>
-		///		<para>该重载可以优先<see cref="Enqueue"/>重载的匹配。</para>
-		/// </remarks>
 		public void Enqueue(string text, object settings = null)
 		{
 			this.Enqueue((object)text, settings);
@@ -423,7 +420,7 @@ namespace Zongsoft.Collections
 		/// <returns>位于队列开头处的对象。</returns>
 		/// <exception cref="System.InvalidOperationException">当队列为空，即<see cref="Count"/>属性等于零。</exception>
 		/// <remarks>
-		///		<para>此方法类似于<seealso cref="Dequeue"/>出队方法，但本方法不修改<seealso cref="Zongsoft.Collections.Queue"/>队列。</para>
+		///		<para>此方法类似于<seealso cref="Dequeue()"/>出队方法，但本方法不修改<seealso cref="Zongsoft.Collections.Queue"/>队列。</para>
 		/// </remarks>
 		public object Peek()
 		{

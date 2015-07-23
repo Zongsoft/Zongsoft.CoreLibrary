@@ -57,6 +57,7 @@ namespace Zongsoft.Data
 		/// <param name="condition">指定的查询条件。</param>
 		/// <param name="scope">指定的要获取的和排除获取的属性名列表，如果指定的是多个属性则属性名之间使用逗号(,)分隔；要排除的属性以减号(-)打头，星号(*)表示所有属性，感叹号(!)表示排除所有属性；如果未指定该参数则默认只会获取所有单值属性而不会获取导航属性。</param>
 		/// <param name="paging">指定的分页设置。</param>
+		/// <param name="grouping">指定的分组设置。</param>
 		/// <param name="sorting">指定的排序设置(包括排序的方式和字段)。</param>
 		/// <returns>返回的结果集。</returns>
 		/// <remarks>

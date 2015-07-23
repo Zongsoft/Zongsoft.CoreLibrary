@@ -30,7 +30,7 @@ using System.ComponentModel;
 namespace Zongsoft.Services
 {
 	/// <summary>
-	/// 关于<see cref="Worker"/>的状态信息。
+	/// 关于<seealso cref="IWorker"/>的状态信息。
 	/// </summary>
 	public enum WorkerState
 	{

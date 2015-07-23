@@ -43,7 +43,7 @@ namespace Zongsoft.Resources
 	/// </summary>
 	/// <remarks>
 	///		<para>
-	///		该类的<see cref="GetString(string text)"/>、<see cref="GetObject(string text)"/>和<see cref="GetStream(string text)"/>方法均支持如下表达式：
+	///		该类的<see cref="GetString(string)"/>、<see cref="GetObject(string)"/>和<see cref="GetStream(string)"/>方法均支持如下表达式：
 	///		${ResourceEntryName}或者${ResourceEntryName@BaseName, AssemblyName}， 其中BaseName和AssemblyName均可省略。
 	///		</para>
 	///		<para>GetString(string text, ...)方法的text参数如果不匹配上面的表达式语法则返回text参数值。</para>

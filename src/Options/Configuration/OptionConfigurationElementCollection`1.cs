@@ -50,7 +50,7 @@ namespace Zongsoft.Options.Configuration
 			}
 		}
 
-		public T this[string key]
+		public new T this[string key]
 		{
 			get
 			{

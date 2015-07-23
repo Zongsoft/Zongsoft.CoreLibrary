@@ -373,10 +373,10 @@ namespace Zongsoft.Communication.Net
 
 				Send(reply);
 			}
-			catch(Exception e)
+			catch(Exception ex)
 			{
-				CloseDataChannel();
-				throw new FtpException("502 Open the listener failure");
+				this.CloseDataChannel();
+				throw new FtpException("502 Open the listener failure", ex);
 			}
 		}
 

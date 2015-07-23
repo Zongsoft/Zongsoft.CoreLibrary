@@ -110,9 +110,6 @@ namespace Zongsoft.Services.Composition
 		/// <summary>
 		/// 获取或设置当前处理程序是否可用。
 		/// </summary>
-		/// <remarks>
-		///		该属性作为当前命令是否可被执行的备选方案，命令是否可被执行由<see cref="CanExecute"/>方法决定，该方法的不同实现方式可能导致不同的判断逻辑。有关默认的判断逻辑请参考<seealso cref="CanExecute"/>方法的帮助。
-		/// </remarks>
 		public bool Enabled
 		{
 			get

@@ -54,9 +54,6 @@ namespace Zongsoft.Diagnostics
 		/// </summary>
 		/// <param name="exception">要处理的异常对象。</param>
 		/// <returns>如果当前处理器已经对参数<paramref name="exception"/>指定的异常对象，处理完毕则返回为空，如果当前异常处理器还需要后续的其他处理器对返回的新异常对象继续处理的话，则返回一个新异常。</returns>
-		/// <remarks>
-		///		<para>当 <paramref name="exception"/> 参数为 <see cref="System.Web.Services.Protocols.SoapException"/> 类型，通常需要反序列化其 <see cref="System.Web.Services.Protocols.SoapException.Detail"/> 属性对应的实际异常对象，以供后续异常处理器处理。</para>
-		/// </remarks>
 		Exception Handle(Exception exception);
 	}
 }

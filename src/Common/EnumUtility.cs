@@ -70,7 +70,7 @@ namespace Zongsoft.Common
 		/// 获取指定枚举项对应的<see cref="EnumEntry"/>描述对象。
 		/// </summary>
 		/// <param name="enumValue">要获取的枚举项。</param>
-		/// <returns>返回指定枚举值对应的<see cref="EnumEntry"/>对象。</returns>
+		/// <returns>返回指定枚举值对应的<seealso cref="EnumEntry"/>对象。</returns>
 		public static EnumEntry GetEnumEntry(this Enum enumValue)
 		{
 			return GetEnumEntry(enumValue, false);
@@ -80,8 +80,8 @@ namespace Zongsoft.Common
 		/// 获取指定枚举项对应的<see cref="EnumEntry"/>描述对象。
 		/// </summary>
 		/// <param name="enumValue">要获取的枚举项。</param>
-		/// <param name="underlyingType">是否将生成的 <see cref="EnumEntry"/> 元素的 <see cref="EnumEntry.Value"/> 属性值置为 enumType 参数对应的枚举项基类型值。</param>
-		/// <returns>返回指定枚举值对应的<see cref="EnumEntry"/>对象。</returns>
+		/// <param name="underlyingType">是否将生成的 <seealso cref="EnumEntry"/> 元素的 <seealso cref="EnumEntry.Value"/> 属性值置为 enumType 参数对应的枚举项基类型值。</param>
+		/// <returns>返回指定枚举值对应的<seealso cref="EnumEntry"/>对象。</returns>
 		public static EnumEntry GetEnumEntry(this Enum enumValue, bool underlyingType)
 		{
 			FieldInfo field = enumValue.GetType().GetField(enumValue.ToString());
@@ -98,7 +98,7 @@ namespace Zongsoft.Common
 		/// 获取指定枚举的描述对象数组。
 		/// </summary>
 		/// <param name="enumType">要获取的枚举类型。</param>
-		/// <param name="underlyingType">是否将生成的 <see cref="EnumEntry"/> 元素的 <see cref="EnumEntry.Value"/> 属性值置为 enumType 参数对应的枚举项基类型值。</param>
+		/// <param name="underlyingType">是否将生成的 <seealso cref="EnumEntry"/> 元素的 <seealso cref="EnumEntry.Value"/> 属性值置为 enumType 参数对应的枚举项基类型值。</param>
 		/// <returns>返回的枚举描述对象数组。</returns>
 		public static EnumEntry[] GetEnumEntries(Type enumType, bool underlyingType)
 		{
@@ -108,9 +108,9 @@ namespace Zongsoft.Common
 		/// <summary>
 		/// 获取指定枚举的描述对象数组。
 		/// </summary>
-		/// <param name="enumType">要获取的枚举类型，可为<seealso cref="System.Nullable<>"/>类型。</param>
-		/// <param name="underlyingType">是否将生成的 <see cref="EnumEntry"/> 元素的 <see cref="EnumDescription.Value"/> 属性值置为 enumType 参数对应的枚举项基类型值。</param>
-		/// <param name="nullValue">如果参数<paramref name="enumType"/>为可空类型时，该空值对应的<see cref="EnumDescription.Value"/>属性的值。</param>
+		/// <param name="enumType">要获取的枚举类型，可为<seealso cref="System.Nullable"/>类型。</param>
+		/// <param name="underlyingType">是否将生成的 <seealso cref="EnumEntry"/> 元素的 <seealso cref="EnumEntry.Value"/> 属性值置为 enumType 参数对应的枚举项基类型值。</param>
+		/// <param name="nullValue">如果参数<paramref name="enumType"/>为可空类型时，该空值对应的<seealso cref="EnumEntry.Value"/>属性的值。</param>
 		/// <returns>返回的枚举描述对象数组。</returns>
 		public static EnumEntry[] GetEnumEntries(Type enumType, bool underlyingType, object nullValue)
 		{
@@ -120,10 +120,10 @@ namespace Zongsoft.Common
 		/// <summary>
 		/// 获取指定枚举的描述对象数组。
 		/// </summary>
-		/// <param name="enumType">要获取的枚举类型，可为<seealso cref="System.Nullable<>"/>类型。</param>
-		/// <param name="underlyingType">是否将生成的 <see cref="EnumEntry"/> 元素的 <see cref="EnumEntry.Value"/> 属性值置为 enumType 参数对应的枚举项基类型值。</param>
-		/// <param name="nullValue">如果参数<paramref name="enumType"/>为可空类型时，该空值对应的<see cref="EnumEntry.Value"/>属性的值。</param>
-		/// <param name="nullText">如果参数<paramref name="enumType"/>为可空类型时，该空值对应的<see cref="EnumEntry.Description"/>属性的值。</param>
+		/// <param name="enumType">要获取的枚举类型，可为<seealso cref="System.Nullable"/>类型。</param>
+		/// <param name="underlyingType">是否将生成的 <seealso cref="EnumEntry"/> 元素的 <seealso cref="EnumEntry.Value"/> 属性值置为 enumType 参数对应的枚举项基类型值。</param>
+		/// <param name="nullValue">如果参数<paramref name="enumType"/>为可空类型时，该空值对应的<seealso cref="EnumEntry.Value"/>属性的值。</param>
+		/// <param name="nullText">如果参数<paramref name="enumType"/>为可空类型时，该空值对应的<seealso cref="EnumEntry.Description"/>属性的值。</param>
 		/// <returns>返回的枚举描述对象数组。</returns>
 		public static EnumEntry[] GetEnumEntries(Type enumType, bool underlyingType, object nullValue, string nullText)
 		{

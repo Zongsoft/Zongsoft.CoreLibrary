@@ -152,26 +152,6 @@ namespace Zongsoft.Terminals
 			terminal.WriteLine();
 		}
 
-		private static int GetMaxStringLength(IEnumerable<string> values)
-		{
-			if(values == null)
-				return 0;
-
-			int max = 0;
-
-			foreach(var value in values)
-			{
-				if(value == null)
-					continue;
-
-				max = Math.Max(max, value.Length);
-			}
-
-			string[] sa;
-
-			return max;
-		}
-
 		private static int GetMaxOptionLength(IEnumerable<CommandOptionAttribute> attributes)
 		{
 			if(attributes == null)

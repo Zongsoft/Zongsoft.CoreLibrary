@@ -58,7 +58,7 @@ namespace Zongsoft.Services
 		/// <returns>如果返回真(true)则表示命令可被执行，否则表示不可执行。</returns>
 		/// <remarks>
 		///		<para>本方法为虚拟方法，可由子类更改基类的默认实现方式。</para>
-		///		<para>如果<seealso cref="Predication"/>属性为空(null)，则返回<see cref="Enabled"/>属性值；否则返回由<see cref="Predication"/>属性指定的断言对象的断言方法的值。</para>
+		///		<para>如果<seealso cref="CommandBase.Predication"/>属性为空(null)，则返回<seealso cref="CommandBase.Enabled"/>属性值；否则返回由<seealso cref="CommandBase.Predication"/>属性指定的断言对象的断言方法的值。</para>
 		/// </remarks>
 		public virtual bool CanExecute(TContext context)
 		{
@@ -71,7 +71,7 @@ namespace Zongsoft.Services
 		/// <param name="context">执行命令的上下文对象。</param>
 		/// <returns>返回执行的返回结果。</returns>
 		/// <remarks>
-		///		<para>本方法的实现中首先调用<see cref="CanExecute"/>方法，以确保阻止非法的调用。</para>
+		///		<para>本方法的实现中首先调用<seealso cref="CommandBase.CanExecute"/>方法，以确保阻止非法的调用。</para>
 		/// </remarks>
 		public object Execute(TContext context)
 		{

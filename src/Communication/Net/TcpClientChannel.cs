@@ -143,7 +143,7 @@ namespace Zongsoft.Communication.Net
 		/// </summary>
 		/// <returns>返回是否连接成功，返回真(true)表示连接成功否则连接失败。</returns>
 		/// <remarks>
-		///		<para>注意：该方法不会激发<see cref="Connected"/>连接完成事件，也不会因为连接失败而激发<see cref="Failed"/>事件。判断该方法是否连接成功请使用方法的返回值。</para>
+		///		<para>注意：该方法不会激发<see cref="Connected"/>连接完成事件，也不会因为连接失败而激发<seealso cref="ChannelBase.Failed"/>事件。判断该方法是否连接成功请使用方法的返回值。</para>
 		/// </remarks>
 		public bool Connect()
 		{

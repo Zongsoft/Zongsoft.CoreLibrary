@@ -41,12 +41,14 @@ namespace Zongsoft.Runtime.Serialization
 		void OnSerialized(SerializationContext context);
 		void OnWrote(SerializationWriterContext context);
 
+		/*
 		/// <summary>
 		/// 当序列化处于特定阶段时，该方法被回调。
 		/// </summary>
 		/// <param name="context">当前序列化操作的上下文。</param>
 		/// <param name="step">指定当前所处的序列化阶段。</param>
-		//void OnStep(SerializationWriterContext context, SerializationWriterStep step);
+		void OnStep(SerializationWriterContext context, SerializationWriterStep step);
+		*/
 
 		/// <summary>
 		/// 根据序列化的<seealso cref="SerializationWriterContext"/>上下文对象执行具体的写入操作。

@@ -33,9 +33,6 @@ namespace Zongsoft.Services.Composition
 	{
 		#region 成员字段
 		private bool _cancel;
-		private Executor _executor;
-		private object _parameter;
-		private object _result;
 		#endregion
 
 		#region 构造函数

@@ -46,7 +46,6 @@ namespace Zongsoft.Runtime.Serialization
 		/// 反序列化指定<paramref name="serializationStream"/>包含的对象。
 		/// </summary>
 		/// <param name="serializationStream">待反序列化的流。</param>
-		/// <param name="type">反序列化的结果类型。</param>
 		/// <returns>反序列化的结果。</returns>
 		object Deserialize(Stream serializationStream);
 

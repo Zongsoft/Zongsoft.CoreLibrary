@@ -44,7 +44,7 @@ namespace Zongsoft.Communication.Net
 		#endregion
 
 		#region 公共属性
-		public FtpServer Server
+		public new FtpServer Server
 		{
 			get
 			{

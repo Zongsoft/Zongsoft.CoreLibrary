@@ -75,7 +75,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				this.SetValue(ref _roleId, value, () => this.RoleId);
+				this.SetPropertyValue(() => this.RoleId, ref _roleId, value);
 			}
 		}
 
@@ -90,7 +90,7 @@ namespace Zongsoft.Security.Membership
 				if(string.IsNullOrWhiteSpace(value))
 					throw new ArgumentNullException();
 
-				this.SetValue(ref _name, value.Trim(), () => this.Name);
+				this.SetPropertyValue(() => this.Name, ref _name, value.Trim());
 			}
 		}
 
@@ -102,7 +102,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				this.SetValue(ref _fullName, value, () => this.FullName);
+				this.SetPropertyValue(() => this.FullName, ref _fullName, value);
 			}
 		}
 
@@ -114,7 +114,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				this.SetValue(ref _namespace, value, () => this.Namespace);
+				this.SetPropertyValue(() => this.Namespace, ref _namespace, value);
 			}
 		}
 
@@ -126,7 +126,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				this.SetValue(ref _description, value, () => this.Description);
+				this.SetPropertyValue(() => this.Description, ref _description, value);
 			}
 		}
 
@@ -138,7 +138,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				this.SetValue(ref _createdTime, value, () => this.CreatedTime);
+				this.SetPropertyValue(() => this.CreatedTime, ref _createdTime, value);
 			}
 		}
 		#endregion
@@ -169,15 +169,15 @@ namespace Zongsoft.Security.Membership
 		#endregion
 
 		#region ¾²Ì¬·½·¨
-		public static bool IsFixedRole(Role role)
+		public static bool IsBuiltin(Role role)
 		{
 			if(role == null)
 				return false;
 
-			return IsFixedRole(role.Name);
+			return IsBuiltin(role.Name);
 		}
 
-		public static bool IsFixedRole(string roleName)
+		public static bool IsBuiltin(string roleName)
 		{
 			return string.Equals(roleName, Role.Administrators, StringComparison.OrdinalIgnoreCase) ||
 			       string.Equals(roleName, Role.Security, StringComparison.OrdinalIgnoreCase);

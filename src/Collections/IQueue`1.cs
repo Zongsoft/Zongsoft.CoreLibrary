@@ -42,14 +42,14 @@ namespace Zongsoft.Collections
 		Task<T> DequeueAsync(object settings = null);
 		Task<IEnumerable<T>> DequeueAsync(int count, object settings = null);
 
-		T Peek();
-		IEnumerable<T> Peek(int count);
+		new T Peek();
+		new IEnumerable<T> Peek(int count);
 
 		Task<T> PeekAsync();
 		Task<IEnumerable<T>> PeekAsync(int count);
 
-		T Take(int startOffset);
-		IEnumerable<T> Take(int startOffset, int count);
+		new T Take(int startOffset);
+		new IEnumerable<T> Take(int startOffset, int count);
 
 		Task<T> TakeAsync(int startOffset);
 		Task<IEnumerable<T>> TakeAsync(int startOffset, int count);

@@ -60,6 +60,8 @@ namespace Zongsoft.Services
 		/// 构造一个命令执行成功的事件参数对象。
 		/// </summary>
 		/// <param name="parameter">命令执行参数对象。</param>
+		/// <param name="result">命令执行的结果。</param>
+		/// <param name="extendedProperties">指定的扩展属性集。</param>
 		public CommandExecutedEventArgs(object parameter, object result, IDictionary<string, object> extendedProperties = null)
 		{
 			var context = parameter as CommandContextBase;
@@ -84,6 +86,7 @@ namespace Zongsoft.Services
 		/// </summary>
 		/// <param name="parameter">命令执行参数对象。</param>
 		/// <param name="exception">命令执行失败的异常对象。</param>
+		/// <param name="extendedProperties">指定的扩展属性集。</param>
 		public CommandExecutedEventArgs(object parameter, Exception exception, IDictionary<string, object> extendedProperties = null)
 		{
 			var context = parameter as CommandContextBase;

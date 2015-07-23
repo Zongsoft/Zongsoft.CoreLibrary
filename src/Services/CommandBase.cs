@@ -219,7 +219,7 @@ namespace Zongsoft.Services
 		/// <summary>
 		/// 执行命令。
 		/// </summary>
-		/// <param name="context">执行命令的上下文对象。</param>
+		/// <param name="parameter">执行命令的参数。</param>
 		/// <returns>返回执行的返回结果。</returns>
 		/// <remarks>
 		///		<para>本方法的实现中首先调用<see cref="CanExecute"/>方法，以确保阻止非法的调用。</para>

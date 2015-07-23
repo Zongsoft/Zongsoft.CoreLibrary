@@ -56,7 +56,7 @@ namespace Zongsoft.Options.Configuration
 		/// </summary>
 		/// <param name="name">指定要获取或设置的项目名称。</param>
 		/// <returns>返回指定名称对应的文本值，如果指定的名称不存在则返回空(null)，如果属性设置器中(setter)中<paramref name="value"/>参数为空(null)，则表示将其指定名称的设置项删除。</returns>
-		public string this[string name]
+		public new string this[string name]
 		{
 			get
 			{

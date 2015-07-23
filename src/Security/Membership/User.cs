@@ -91,7 +91,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				this.SetValue(ref _userId, value, () => this.UserId);
+				this.SetPropertyValue(() => this.UserId, ref _userId, value);
 			}
 		}
 
@@ -109,7 +109,7 @@ namespace Zongsoft.Security.Membership
 				if(string.IsNullOrWhiteSpace(value))
 					throw new ArgumentNullException();
 
-				this.SetValue(ref _name, value.Trim(), () => this.Name);
+				this.SetPropertyValue(() => this.Name, ref _name, value.Trim());
 			}
 		}
 
@@ -124,7 +124,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				this.SetValue(ref _fullName, value, () => this.FullName);
+				this.SetPropertyValue(() => this.FullName, ref _fullName, value);
 			}
 		}
 
@@ -139,7 +139,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				this.SetValue(ref _namespace, value, () => this.Namespace);
+				this.SetPropertyValue(() => this.Namespace, ref _namespace, value);
 			}
 		}
 
@@ -154,7 +154,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				this.SetValue(ref _description, value, () => this.Description);
+				this.SetPropertyValue(() => this.Description, ref _description, value);
 			}
 		}
 
@@ -169,7 +169,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				this.SetValue(ref _principal, value, () => this.Principal);
+				this.SetPropertyValue(() => this.Principal, ref _principal, value);
 			}
 		}
 
@@ -184,7 +184,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				this.SetValue(ref _email, value, () => this.Email);
+				this.SetPropertyValue(() => this.Email, ref _email, value);
 			}
 		}
 
@@ -199,7 +199,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				this.SetValue(ref _phoneNumber, value, () => this.PhoneNumber);
+				this.SetPropertyValue(() => this.PhoneNumber, ref _phoneNumber, value);
 			}
 		}
 
@@ -214,7 +214,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				this.SetValue(ref _suspended, value, () => this.Suspended);
+				this.SetPropertyValue(() => this.Suspended, ref _suspended, value);
 			}
 		}
 
@@ -229,7 +229,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				this.SetValue(ref _approved, value, () => this.Approved);
+				this.SetPropertyValue(() => this.Approved, ref _approved, value);
 			}
 		}
 
@@ -244,7 +244,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				this.SetValue(ref _changePasswordOnFirstTime, value, () => this.ChangePasswordOnFirstTime);
+				this.SetPropertyValue(() => this.ChangePasswordOnFirstTime, ref _changePasswordOnFirstTime, value);
 			}
 		}
 
@@ -259,7 +259,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				this.SetValue(ref _maxInvalidPasswordAttempts, value, () => this.MaxInvalidPasswordAttempts);
+				this.SetPropertyValue(() => this.MaxInvalidPasswordAttempts, ref _maxInvalidPasswordAttempts, value);
 			}
 		}
 
@@ -274,7 +274,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				this.SetValue(ref _minRequiredPasswordLength, value, () => this.MinRequiredPasswordLength);
+				this.SetPropertyValue(() => this.MinRequiredPasswordLength, ref _minRequiredPasswordLength, value);
 			}
 		}
 
@@ -289,7 +289,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				this.SetValue(ref _passwordAttemptWindow, value, () => this.PasswordAttemptWindow);
+				this.SetPropertyValue(() => this.PasswordAttemptWindow, ref _passwordAttemptWindow, value);
 			}
 		}
 
@@ -304,7 +304,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				this.SetValue(ref _passwordExpires, value, () => this.PasswordExpires);
+				this.SetPropertyValue(() => this.PasswordExpires, ref _passwordExpires, value);
 			}
 		}
 
@@ -319,7 +319,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				this.SetValue(ref _createdTime, value, () => this.CreatedTime);
+				this.SetPropertyValue(() => this.CreatedTime, ref _createdTime, value);
 			}
 		}
 
@@ -334,7 +334,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				this.SetValue(ref _approvedTime, value, () => this.ApprovedTime);
+				this.SetPropertyValue(() => this.ApprovedTime, ref _approvedTime, value);
 			}
 		}
 
@@ -349,7 +349,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				this.SetValue(ref _suspendedTime, value, () => this.SuspendedTime);
+				this.SetPropertyValue(() => this.SuspendedTime, ref _suspendedTime, value);
 			}
 		}
 		#endregion
@@ -380,15 +380,15 @@ namespace Zongsoft.Security.Membership
 		#endregion
 
 		#region 静态方法
-		public static bool IsFixedUser(User user)
+		public static bool IsBuiltin(User user)
 		{
 			if(user == null)
 				return false;
 
-			return IsFixedUser(user.Name);
+			return IsBuiltin(user.Name);
 		}
 
-		public static bool IsFixedUser(string userName)
+		public static bool IsBuiltin(string userName)
 		{
 			return string.Equals(userName, User.Administrator, StringComparison.OrdinalIgnoreCase) ||
 			       string.Equals(userName, User.Guest, StringComparison.OrdinalIgnoreCase);

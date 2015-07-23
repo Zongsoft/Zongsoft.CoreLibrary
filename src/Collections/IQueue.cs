@@ -72,7 +72,7 @@ namespace Zongsoft.Collections
 		/// 移除队列中的所有元素。
 		/// </summary>
 		/// <remarks>
-		///		<para><see cref="Count"/>被设置为零，并且对来自该集合元素的其他对象的引用也被释放。</para>
+		///		<para><seealso cref="ICollection.Count"/>被设置为零，并且对来自该集合元素的其他对象的引用也被释放。</para>
 		/// </remarks>
 		void Clear();
 		#endregion
@@ -104,7 +104,7 @@ namespace Zongsoft.Collections
 		/// 移除并返回位于队列开始处的对象。
 		/// </summary>
 		/// <returns>从队列的开头处移除的对象。</returns>
-		/// <exception cref="System.InvalidOperationException">当队列为空，即<see cref="Count"/>属性为零。</exception>
+		/// <exception cref="System.InvalidOperationException">当队列为空，即<seealso cref="ICollection.Count"/>属性为零。</exception>
 		object Dequeue();
 
 		/// <summary>
@@ -112,7 +112,7 @@ namespace Zongsoft.Collections
 		/// </summary>
 		/// <param name="count">指定要连续移除的元素数。</param>
 		/// <returns>从队列的开头处指定的连续对象集。</returns>
-		/// <exception cref="System.InvalidOperationException">当队列为空，即<see cref="Count"/>属性等于零。</exception>
+		/// <exception cref="System.InvalidOperationException">当队列为空，即<seealso cref="ICollection.Count"/>属性等于零。</exception>
 		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="count"/>参数小于壹(1)。</exception>
 		/// <remarks>如果<paramref name="count"/>参数指定的数值超出队列中可用的元素数，则忽略该参数值，而应用可用的元素数。</remarks>
 		IEnumerable Dequeue(int count);
@@ -123,9 +123,9 @@ namespace Zongsoft.Collections
 		/// 返回位于队列开始处的对象但不将其移除。
 		/// </summary>
 		/// <returns>位于队列开头处的对象。</returns>
-		/// <exception cref="System.InvalidOperationException">当队列为空，即<see cref="Count"/>属性等于零。</exception>
+		/// <exception cref="System.InvalidOperationException">当队列为空，即<seealso cref="ICollection.Count"/>属性等于零。</exception>
 		/// <remarks>
-		///		<para>此方法类似于<seealso cref="Dequeue"/>出队方法，但本方法不修改<seealso cref="Zongsoft.Collections.Queue"/>队列。</para>
+		///		<para>此方法类似于<seealso cref="Dequeue()"/>出队方法，但本方法不修改<seealso cref="Zongsoft.Collections.Queue"/>队列。</para>
 		/// </remarks>
 		object Peek();
 
@@ -134,7 +134,7 @@ namespace Zongsoft.Collections
 		/// </summary>
 		/// <param name="count">指定要连续查看的元素数。</param>
 		/// <returns>从队列的开头处指定的连续对象集。</returns>
-		/// <exception cref="System.InvalidOperationException">当队列为空，即<see cref="Count"/>属性等于零。</exception>
+		/// <exception cref="System.InvalidOperationException">当队列为空，即<seealso cref="ICollection.Count"/>属性等于零。</exception>
 		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="count"/>参数小于壹(1)。</exception>
 		/// <remarks>如果<paramref name="count"/>参数指定的数值超出队列中可用的元素数，则忽略该参数值，而应用可用的元素数。</remarks>
 		IEnumerable Peek(int count);
@@ -152,7 +152,7 @@ namespace Zongsoft.Collections
 		/// <param name="startOffset">从队列开头处往后偏移的长度。</param>
 		/// <param name="count">要连续获取的元素数。</param>
 		/// <returns>从队列的开头处指定偏移后的连续特定长度的对象集。</returns>
-		/// <exception cref="System.InvalidOperationException">当队列为空，即<see cref="Count"/>属性等于零。</exception>
+		/// <exception cref="System.InvalidOperationException">当队列为空，即<seealso cref="ICollection.Count"/>属性等于零。</exception>
 		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="count"/>参数小于壹(1)。</exception>
 		/// <remarks>
 		///		<para>如果<paramref name="count"/>参数指定的数值超出队列中可用的元素数，则忽略该参数值，而应用可用的元素数。</para>

@@ -75,14 +75,6 @@ namespace Zongsoft.Options.Profiles
 			}
 		}
 
-		public Profile Profile
-		{
-			get
-			{
-				return base.Owner as Profile;
-			}
-		}
-
 		public ProfileSection Parent
 		{
 			get

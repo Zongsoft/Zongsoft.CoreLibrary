@@ -134,7 +134,7 @@ namespace Zongsoft.Security.Membership
 		/// <param name="newPassword">重置后的新密码，如果为空(null)或空字符串("")则不进行密码设置，只进行验证码摘要的校验（即判断验证码摘要是否正确）。</param>
 		/// <returns>如果重置或者验证码摘要校验成功则返回真(True)，否则返回假(False)。</returns>
 		/// <remarks>
-		///		<para>本重置方法通常由Web请求的方式进行，请求的URL大致如下：http://zongsoft.com/security/user/resetpassword?userId=xxx&token=xxxxxx </para>
+		///		<para>本重置方法通常由Web请求的方式进行，请求的URL大致如下：<c><![CDATA[http://zongsoft.com/security/user/resetpassword?userId=xxx&token=xxxxxx]]></c></para>
 		/// </remarks>
 		bool ResetPassword(int userId, string token, string newPassword = null);
 
