@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2003-2008 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2003-2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,37 +25,22 @@
  */
 
 using System;
-using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Zongsoft.Security.Membership
 {
-	[AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-	public class AuthenticationAttribute : Attribute
+	/// <summary>
+	/// 表示在授权验证模块中对当前用户的操作行为进行授权处理的方式。
+	/// </summary>
+	public enum AuthorizationMode
 	{
-		#region 成员变量
-		private bool _ignoreAuthenticate;
-		#endregion
+		/// <summary>忽略授权验证，即对当前处理不做授权验证。</summary>
+		Ignore,
 
-		#region 构造函数
-		public AuthenticationAttribute()
-		{
-			_ignoreAuthenticate = false;
-		}
+		/// <summary>仅限身份验证，即当前调用为非匿名调用即通过。</summary>
+		Licensee,
 
-		public AuthenticationAttribute(bool ignoreAuthenticate)
-		{
-			_ignoreAuthenticate = ignoreAuthenticate;
-		}
-		#endregion
-
-		#region 公共属性
-		public bool IgnoreAuthenticate
-		{
-			get
-			{
-				return _ignoreAuthenticate;
-			}
-		}
-		#endregion
+		/// <summary>必须授权验证通过。</summary>
+		Required,
 	}
 }

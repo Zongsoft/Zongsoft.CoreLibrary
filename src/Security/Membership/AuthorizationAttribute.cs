@@ -35,6 +35,7 @@ namespace Zongsoft.Security.Membership
 		#region 成员变量
 		private string _schemaId;
 		private string _actionId;
+		private AuthorizationMode _mode;
 		#endregion
 
 		#region 构造函数
@@ -42,6 +43,13 @@ namespace Zongsoft.Security.Membership
 		{
 			_actionId = string.Empty;
 			_schemaId = string.Empty;
+
+			_mode = AuthorizationMode.Required;
+		}
+
+		public AuthorizationAttribute(AuthorizationMode mode)
+		{
+			_mode = mode;
 		}
 
 		public AuthorizationAttribute(string schemaId) : this(schemaId, string.Empty)
@@ -52,10 +60,27 @@ namespace Zongsoft.Security.Membership
 		{
 			_actionId = actionId ?? string.Empty;
 			_schemaId = schemaId ?? string.Empty;
+
+			_mode = AuthorizationMode.Required;
 		}
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取或设置授权验证的方式。
+		/// </summary>
+		public AuthorizationMode Mode
+		{
+			get
+			{
+				return _mode;
+			}
+			set
+			{
+				_mode = value;
+			}
+		}
+
 		/// <summary>
 		/// 获取或设置操作编号。
 		/// </summary>
