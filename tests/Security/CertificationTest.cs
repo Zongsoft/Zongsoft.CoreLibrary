@@ -13,7 +13,7 @@ namespace Zongsoft.Security
 
 		public CertificationTest()
 		{
-			_certification = new Certification("10012001", new Membership.User(101, "Popeye"), "Namespace", "Web", TimeSpan.FromHours(4), new DateTime(2015, 5, 15));
+			_certification = new Certification("10012001", new Membership.User(101, "Popeye"), "Web", TimeSpan.FromHours(4), new DateTime(2015, 5, 15));
 			_certification.ExtendedProperties.Add("User.Avatar", ":001:");
 			_certification.ExtendedProperties.Add("User.Nickname", "钟少");
 			_certification.ExtendedProperties.Add("User.Gender", Zongsoft.Tests.Gender.Male);
