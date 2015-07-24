@@ -43,22 +43,21 @@ namespace Zongsoft.Security
 
 		#region 成员字段
 		private string _certificationId;
-		private string _namespace;
 		private string _scene;
-		private Membership.User _user;
 		private DateTime _timestamp;
 		private DateTime _issuedTime;
 		private TimeSpan _duration;
+		private Membership.User _user;
 		private IDictionary<string, object> _extendedProperties;
 		#endregion
 
 		#region 构造函数
-		public Certification(string certificationId, Membership.User user, string @namespace, string scene, TimeSpan duration)
-			: this(certificationId, user, @namespace, scene, duration, DateTime.Now, null)
+		public Certification(string certificationId, Membership.User user, string scene, TimeSpan duration)
+			: this(certificationId, user, scene, duration, DateTime.Now, null)
 		{
 		}
 
-		public Certification(string certificationId, Membership.User user, string @namespace, string scene, TimeSpan duration, DateTime issuedTime, IDictionary<string, object> extendedProperties = null)
+		public Certification(string certificationId, Membership.User user, string scene, TimeSpan duration, DateTime issuedTime, IDictionary<string, object> extendedProperties = null)
 		{
 			if(string.IsNullOrWhiteSpace(certificationId))
 				throw new ArgumentNullException("certificationId");
@@ -68,7 +67,6 @@ namespace Zongsoft.Security
 
 			_user = user;
 			_certificationId = certificationId.Trim();
-			_namespace = @namespace == null ? null : @namespace.Trim();
 			_scene = scene == null ? null : scene.Trim();
 			_duration = duration;
 			_issuedTime = issuedTime;
@@ -98,7 +96,7 @@ namespace Zongsoft.Security
 		{
 			get
 			{
-				return _namespace;
+				return _user == null ? null : _user.Namespace;
 			}
 		}
 
@@ -219,7 +217,6 @@ namespace Zongsoft.Security
 			var result = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase )
 			{
 				{"CertificationId", this.CertificationId},
-				{"Namespace", this.Namespace},
 				{"Scene", this.Scene},
 				{"Duration", this.Duration},
 				{"IssuedTime", this.IssuedTime},
@@ -266,7 +263,6 @@ namespace Zongsoft.Security
 			}
 
 			var result = new Certification((string)dictionary["CertificationId"], user,
-				Zongsoft.Common.Convert.ConvertValue<string>(dictionary["Namespace"]),
 				Zongsoft.Common.Convert.ConvertValue<string>(dictionary["Scene"]),
 				Zongsoft.Common.Convert.ConvertValue<TimeSpan>(dictionary["Duration"], TimeSpan.Zero),
 				Zongsoft.Common.Convert.ConvertValue<DateTime>(dictionary["IssuedTime"]))
@@ -293,7 +289,7 @@ namespace Zongsoft.Security
 
 			Certification result;
 			Membership.User user = null;
-			TValue certificationId, userId, userName, @namespace, scene, timestamp, issuedTime, duration;
+			TValue certificationId, userId, userName, scene, timestamp, issuedTime, duration;
 
 			if(dictionary.TryGetValue("User.UserId", out userId) && dictionary.TryGetValue("User.Name", out userName))
 			{
@@ -313,14 +309,12 @@ namespace Zongsoft.Security
 
 			if(dictionary.TryGetValue("CertificationId", out certificationId) && user != null)
 			{
-				dictionary.TryGetValue("Namespace", out @namespace);
 				dictionary.TryGetValue("Scene", out scene);
 				dictionary.TryGetValue("IssuedTime", out issuedTime);
 				dictionary.TryGetValue("Duration", out duration);
 				dictionary.TryGetValue("Timestamp", out timestamp);
 
 				result = new Certification(Zongsoft.Common.Convert.ConvertValue<string>(certificationId), user,
-											Zongsoft.Common.Convert.ConvertValue<string>(@namespace),
 											Zongsoft.Common.Convert.ConvertValue<string>(scene),
 											Zongsoft.Common.Convert.ConvertValue<TimeSpan>(duration),
 											Zongsoft.Common.Convert.ConvertValue<DateTime>(issuedTime))
@@ -353,21 +347,17 @@ namespace Zongsoft.Security
 			var other = (Certification)obj;
 
 			return string.Equals(_certificationId, other.CertificationId, StringComparison.OrdinalIgnoreCase) &&
-			       string.Equals(_namespace, other.Namespace, StringComparison.OrdinalIgnoreCase) &&
 			       string.Equals(_scene, other.Scene, StringComparison.OrdinalIgnoreCase);
 		}
 
 		public override int GetHashCode()
 		{
-			return (_certificationId + ":" + _scene + "@" + _namespace).ToLowerInvariant().GetHashCode();
+			return (_certificationId + ":" + _scene).ToLowerInvariant().GetHashCode();
 		}
 
 		public override string ToString()
 		{
-			if(string.IsNullOrWhiteSpace(_namespace))
-				return string.Format("{0} ({1})", _certificationId, _scene);
-			else
-				return string.Format("{0} ({1}@{2})", _certificationId, _scene, _namespace);
+			return string.Format("{0}:{1} {2}", _certificationId, _scene, _user);
 		}
 		#endregion
 	}
