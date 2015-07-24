@@ -79,7 +79,14 @@ namespace Zongsoft.Security
 		{
 			get
 			{
-				return !string.IsNullOrWhiteSpace(_certificationId);
+				if(string.IsNullOrWhiteSpace(_certificationId))
+					return false;
+
+				//获取当前凭证对象
+				var certification = this.Certification;
+
+				//只有当凭证对象不为空并且对应的用户对象也不为空才算验证通过
+				return certification != null && certification.User != null;
 			}
 		}
 
