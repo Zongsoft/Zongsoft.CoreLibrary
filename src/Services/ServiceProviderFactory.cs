@@ -34,20 +34,41 @@ namespace Zongsoft.Services
 {
 	public class ServiceProviderFactory : MarshalByRefObject, IServiceProviderFactory, IEnumerable<KeyValuePair<string, IServiceProvider>>
 	{
+		#region 单例字段
+		private static ServiceProviderFactory _instance;
+		#endregion
+
 		#region 成员字段
 		private string _defaultName;
 		private ConcurrentDictionary<string, IServiceProvider> _providers;
 		#endregion
 
 		#region 构造函数
-		public ServiceProviderFactory() : this(string.Empty)
+		protected ServiceProviderFactory() : this(string.Empty)
 		{
 		}
 
-		public ServiceProviderFactory(string defaultName)
+		protected ServiceProviderFactory(string defaultName)
 		{
 			_defaultName = string.IsNullOrWhiteSpace(defaultName) ? string.Empty : defaultName.Trim();
 			_providers = new ConcurrentDictionary<string, IServiceProvider>(StringComparer.OrdinalIgnoreCase);
+		}
+		#endregion
+
+		#region 单例属性
+		public static ServiceProviderFactory Instance
+		{
+			get
+			{
+				if(_instance == null)
+					System.Threading.Interlocked.CompareExchange(ref _instance, new ServiceProviderFactory(), null);
+
+				return _instance;
+			}
+			set
+			{
+				_instance = value;
+			}
 		}
 		#endregion
 
@@ -92,21 +113,17 @@ namespace Zongsoft.Services
 			this.Register(name, provider, true);
 		}
 
-		public bool Register(string name, IServiceProvider provider, bool throwExceptionOnConflict)
+		public bool Register(string name, IServiceProvider provider, bool replaceOnExists)
 		{
 			if(provider == null)
 				throw new ArgumentNullException("provider");
 
 			name = string.IsNullOrWhiteSpace(name) ? string.Empty : name.Trim();
 
-			//将服务提供程序描述项加入列表中
-			if(!_providers.TryAdd(name, provider))
-			{
-				if(throwExceptionOnConflict)
-					throw new ArgumentException();
-				else
-					return false;
-			}
+			if(replaceOnExists)
+				_providers.AddOrUpdate(name, provider, (_, __) => provider);
+			else
+				return _providers.TryAdd(name, provider);
 
 			//返回成功
 			return true;
