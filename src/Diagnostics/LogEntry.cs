@@ -88,6 +88,14 @@ namespace Zongsoft.Diagnostics
 			}
 		}
 
+		public Exception Exception
+		{
+			get
+			{
+				return _exception;
+			}
+		}
+
 		public string Message
 		{
 			get

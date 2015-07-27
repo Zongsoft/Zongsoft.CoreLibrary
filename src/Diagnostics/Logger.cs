@@ -30,175 +30,170 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Diagnostics
 {
-	public class Logger
+	public static class Logger
 	{
 		#region 成员字段
-		private object _parameter;
-		private ILoggerSelector _selector;
+		private static readonly LoggerHandlerCollection _handlers = new LoggerHandlerCollection();
 		#endregion
 
-		#region 静态方法
-		public static Logger GetLogger()
+		#region 公共属性
+		public static LoggerHandlerCollection Handlers
 		{
-			return GetLogger(null);
-		}
-
-		public static Logger GetLogger(object parameter)
-		{
-			throw new NotImplementedException();
+			get
+			{
+				return _handlers;
+			}
 		}
 		#endregion
 
 		#region 日志方法
-		public void Trace(Exception exception, object data = null)
+		public static void Trace(Exception exception, object data = null)
 		{
-			this.Log(new LogEntry(LogLevel.Trace, this.GetSource(), exception, data));
+			Log(new LogEntry(LogLevel.Trace, GetSource(), exception, data));
 		}
 
-		public void Trace(string message, object data = null)
+		public static void Trace(string message, object data = null)
 		{
-			this.Log(new LogEntry(LogLevel.Trace, this.GetSource(), message, data));
+			Log(new LogEntry(LogLevel.Trace, GetSource(), message, data));
 		}
 
-		public void Trace(string source, Exception exception, object data = null)
+		public static void Trace(string source, Exception exception, object data = null)
 		{
-			source = string.IsNullOrWhiteSpace(source) ? this.GetSource() : source.Trim();
-			this.Log(new LogEntry(LogLevel.Trace, source, exception, data));
+			source = string.IsNullOrWhiteSpace(source) ? GetSource() : source.Trim();
+			Log(new LogEntry(LogLevel.Trace, source, exception, data));
 		}
 
-		public void Trace(string source, string message, object data = null)
+		public static void Trace(string source, string message, object data = null)
 		{
-			source = string.IsNullOrWhiteSpace(source) ? this.GetSource() : source.Trim();
-			this.Log(new LogEntry(LogLevel.Trace, source, message, data));
+			source = string.IsNullOrWhiteSpace(source) ? GetSource() : source.Trim();
+			Log(new LogEntry(LogLevel.Trace, source, message, data));
 		}
 
-		public void Debug(Exception exception, object data = null)
+		public static void Debug(Exception exception, object data = null)
 		{
-			this.Log(new LogEntry(LogLevel.Debug, this.GetSource(), exception, data));
+			Log(new LogEntry(LogLevel.Debug, GetSource(), exception, data));
 		}
 
-		public void Debug(string message, object data = null)
+		public static void Debug(string message, object data = null)
 		{
-			this.Log(new LogEntry(LogLevel.Debug, this.GetSource(), message, data));
+			Log(new LogEntry(LogLevel.Debug, GetSource(), message, data));
 		}
 
-		public void Debug(string source, Exception exception, object data = null)
+		public static void Debug(string source, Exception exception, object data = null)
 		{
-			source = string.IsNullOrWhiteSpace(source) ? this.GetSource() : source.Trim();
-			this.Log(new LogEntry(LogLevel.Debug, source, exception, data));
+			source = string.IsNullOrWhiteSpace(source) ? GetSource() : source.Trim();
+			Log(new LogEntry(LogLevel.Debug, source, exception, data));
 		}
 
-		public void Debug(string source, string message, object data = null)
+		public static void Debug(string source, string message, object data = null)
 		{
-			source = string.IsNullOrWhiteSpace(source) ? this.GetSource() : source.Trim();
-			this.Log(new LogEntry(LogLevel.Debug, source, message, data));
+			source = string.IsNullOrWhiteSpace(source) ? GetSource() : source.Trim();
+			Log(new LogEntry(LogLevel.Debug, source, message, data));
 		}
 
-		public void Info(Exception exception, object data = null)
+		public static void Info(Exception exception, object data = null)
 		{
-			this.Log(new LogEntry(LogLevel.Info, this.GetSource(), exception, data));
+			Log(new LogEntry(LogLevel.Info, GetSource(), exception, data));
 		}
 
-		public void Info(string message, object data = null)
+		public static void Info(string message, object data = null)
 		{
-			this.Log(new LogEntry(LogLevel.Info, this.GetSource(), message, data));
+			Log(new LogEntry(LogLevel.Info, GetSource(), message, data));
 		}
 
-		public void Info(string source, Exception exception, object data = null)
+		public static void Info(string source, Exception exception, object data = null)
 		{
-			source = string.IsNullOrWhiteSpace(source) ? this.GetSource() : source.Trim();
-			this.Log(new LogEntry(LogLevel.Info, source, exception, data));
+			source = string.IsNullOrWhiteSpace(source) ? GetSource() : source.Trim();
+			Log(new LogEntry(LogLevel.Info, source, exception, data));
 		}
 
-		public void Info(string source, string message, object data = null)
+		public static void Info(string source, string message, object data = null)
 		{
-			source = string.IsNullOrWhiteSpace(source) ? this.GetSource() : source.Trim();
-			this.Log(new LogEntry(LogLevel.Info, source, message, data));
+			source = string.IsNullOrWhiteSpace(source) ? GetSource() : source.Trim();
+			Log(new LogEntry(LogLevel.Info, source, message, data));
 		}
 
-		public void Warn(Exception exception, object data = null)
+		public static void Warn(Exception exception, object data = null)
 		{
-			this.Log(new LogEntry(LogLevel.Warn, this.GetSource(), exception, data));
+			Log(new LogEntry(LogLevel.Warn, GetSource(), exception, data));
 		}
 
-		public void Warn(string message, object data = null)
+		public static void Warn(string message, object data = null)
 		{
-			this.Log(new LogEntry(LogLevel.Warn, this.GetSource(), message, data));
+			Log(new LogEntry(LogLevel.Warn, GetSource(), message, data));
 		}
 
-		public void Warn(string source, Exception exception, object data = null)
+		public static void Warn(string source, Exception exception, object data = null)
 		{
-			source = string.IsNullOrWhiteSpace(source) ? this.GetSource() : source.Trim();
-			this.Log(new LogEntry(LogLevel.Warn, source, exception, data));
+			source = string.IsNullOrWhiteSpace(source) ? GetSource() : source.Trim();
+			Log(new LogEntry(LogLevel.Warn, source, exception, data));
 		}
 
-		public void Warn(string source, string message, object data = null)
+		public static void Warn(string source, string message, object data = null)
 		{
-			source = string.IsNullOrWhiteSpace(source) ? this.GetSource() : source.Trim();
-			this.Log(new LogEntry(LogLevel.Warn, source, message, data));
+			source = string.IsNullOrWhiteSpace(source) ? GetSource() : source.Trim();
+			Log(new LogEntry(LogLevel.Warn, source, message, data));
 		}
 
-		public void Error(Exception exception, object data = null)
+		public static void Error(Exception exception, object data = null)
 		{
-			this.Log(new LogEntry(LogLevel.Error, this.GetSource(), exception, data));
+			Log(new LogEntry(LogLevel.Error, GetSource(), exception, data));
 		}
 
-		public void Error(string message, object data = null)
+		public static void Error(string message, object data = null)
 		{
-			this.Log(new LogEntry(LogLevel.Error, this.GetSource(), message, data));
+			Log(new LogEntry(LogLevel.Error, GetSource(), message, data));
 		}
 
-		public void Error(string source, Exception exception, object data = null)
+		public static void Error(string source, Exception exception, object data = null)
 		{
-			source = string.IsNullOrWhiteSpace(source) ? this.GetSource() : source.Trim();
-			this.Log(new LogEntry(LogLevel.Error, source, exception, data));
+			source = string.IsNullOrWhiteSpace(source) ? GetSource() : source.Trim();
+			Log(new LogEntry(LogLevel.Error, source, exception, data));
 		}
 
-		public void Error(string source, string message, object data = null)
+		public static void Error(string source, string message, object data = null)
 		{
-			source = string.IsNullOrWhiteSpace(source) ? this.GetSource() : source.Trim();
-			this.Log(new LogEntry(LogLevel.Error, source, message, data));
+			source = string.IsNullOrWhiteSpace(source) ? GetSource() : source.Trim();
+			Log(new LogEntry(LogLevel.Error, source, message, data));
 		}
 
-		public void Fatal(Exception exception, object data = null)
+		public static void Fatal(Exception exception, object data = null)
 		{
-			this.Log(new LogEntry(LogLevel.Fatal, this.GetSource(), exception, data));
+			Log(new LogEntry(LogLevel.Fatal, GetSource(), exception, data));
 		}
 
-		public void Fatal(string message, object data = null)
+		public static void Fatal(string message, object data = null)
 		{
-			this.Log(new LogEntry(LogLevel.Fatal, this.GetSource(), message, data));
+			Log(new LogEntry(LogLevel.Fatal, GetSource(), message, data));
 		}
 
-		public void Fatal(string source, Exception exception, object data = null)
+		public static void Fatal(string source, Exception exception, object data = null)
 		{
-			source = string.IsNullOrWhiteSpace(source) ? this.GetSource() : source.Trim();
-			this.Log(new LogEntry(LogLevel.Fatal, source, exception, data));
+			source = string.IsNullOrWhiteSpace(source) ? GetSource() : source.Trim();
+			Log(new LogEntry(LogLevel.Fatal, source, exception, data));
 		}
 
-		public void Fatal(string source, string message, object data = null)
+		public static void Fatal(string source, string message, object data = null)
 		{
-			source = string.IsNullOrWhiteSpace(source) ? this.GetSource() : source.Trim();
-			this.Log(new LogEntry(LogLevel.Fatal, source, message, data));
+			source = string.IsNullOrWhiteSpace(source) ? GetSource() : source.Trim();
+			Log(new LogEntry(LogLevel.Fatal, source, message, data));
 		}
 
-		protected virtual void Log(LogEntry entry)
+		private static void Log(LogEntry entry)
 		{
-			if(entry == null)
+			if(entry == null || _handlers == null)
 				return;
 
-			var loggers = _selector.Select(_parameter);
-
-			System.Threading.Tasks.Parallel.ForEach(loggers, logger =>
+			System.Threading.Tasks.Parallel.ForEach(_handlers, handler =>
 			{
-				if(logger != null)
-					logger.Log(entry);
+				if(handler != null)
+					handler.Handle(entry);
 			});
 		}
 		#endregion
 
 		#region 私有方法
-		private string GetSource()
+		private static string GetSource()
 		{
 			var frame = new StackFrame(2, true);
 

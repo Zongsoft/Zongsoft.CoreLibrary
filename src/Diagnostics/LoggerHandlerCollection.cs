@@ -29,8 +29,19 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Diagnostics
 {
-	public interface ILoggerSelector
+	public class LoggerHandlerCollection : Zongsoft.Collections.NamedCollectionBase<LoggerHandler>
 	{
-		IEnumerable<ILogger> Select(object parameter);
+		#region 构造函数
+		public LoggerHandlerCollection() : base(StringComparer.OrdinalIgnoreCase)
+		{
+		}
+		#endregion
+
+		#region 重写方法
+		protected override string GetKeyForItem(LoggerHandler item)
+		{
+			return item.Name;
+		}
+		#endregion
 	}
 }
