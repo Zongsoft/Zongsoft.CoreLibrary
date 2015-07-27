@@ -73,7 +73,7 @@ namespace Zongsoft.Diagnostics
 			var filePath = this.GetFilePath(entry);
 
 			if(string.IsNullOrWhiteSpace(filePath))
-				return;
+				throw new InvalidOperationException("Unspecified path of the log file.");
 
 			using(var stream = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.Read))
 			{
@@ -89,10 +89,22 @@ namespace Zongsoft.Diagnostics
 		#region 虚拟方法
 		protected virtual string GetFilePath(LogEntry entry)
 		{
-			if(string.IsNullOrWhiteSpace(_filePath))
-				return string.IsNullOrWhiteSpace(entry.Source) ? string.Empty : entry.Source + ".log";
+			var filePath = string.Empty;
 
-			return _filePath.Trim();
+			if(string.IsNullOrWhiteSpace(_filePath))
+				filePath = string.IsNullOrWhiteSpace(entry.Source) ? string.Empty : entry.Source + ".log";
+			else
+				filePath = _filePath.Trim();
+
+			if(!string.IsNullOrWhiteSpace(filePath))
+			{
+				var applicationContext = Zongsoft.ComponentModel.ApplicationContextBase.GetApplicationContext();
+
+				if(applicationContext != null)
+					filePath = applicationContext.EnsureDirectory(System.IO.Path.GetDirectoryName(filePath));
+			}
+
+			return filePath;
 		}
 		#endregion
 	}
