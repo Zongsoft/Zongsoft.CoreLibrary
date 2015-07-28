@@ -32,21 +32,28 @@ namespace Zongsoft.Diagnostics
 {
 	public abstract class FileLogger : ILogger
 	{
+		#region 常量定义
+		private const int FILE_SIZE = 1024;
+		#endregion
+
 		#region 成员字段
 		private string _filePath;
+		private int _fileSize;
 		#endregion
 
 		#region 构造函数
 		protected FileLogger()
 		{
+			_fileSize = FILE_SIZE;
 		}
 
-		protected FileLogger(string filePath)
+		protected FileLogger(string filePath, int fileSize = FILE_SIZE)
 		{
 			if(string.IsNullOrWhiteSpace(filePath))
 				throw new ArgumentNullException("filePath");
 
 			_filePath = filePath.Trim();
+			_fileSize = Math.Max(fileSize, 0);
 		}
 		#endregion
 
@@ -60,6 +67,21 @@ namespace Zongsoft.Diagnostics
 			set
 			{
 				_filePath = value;
+			}
+		}
+
+		/// <summary>
+		/// 获取或设置日志文件的大小，单位为KB，默认为1MB。
+		/// </summary>
+		public int FileSize
+		{
+			get
+			{
+				return _fileSize;
+			}
+			set
+			{
+				_fileSize = value;
 			}
 		}
 		#endregion
@@ -101,7 +123,10 @@ namespace Zongsoft.Diagnostics
 				var applicationContext = Zongsoft.ComponentModel.ApplicationContextBase.GetApplicationContext();
 
 				if(applicationContext != null)
-					filePath = applicationContext.EnsureDirectory(System.IO.Path.GetDirectoryName(filePath));
+				{
+					var directoryPath = applicationContext.EnsureDirectory(System.IO.Path.GetDirectoryName(filePath));
+					filePath = System.IO.Path.Combine(directoryPath, System.IO.Path.GetFileName(filePath));
+				}
 			}
 
 			return filePath;

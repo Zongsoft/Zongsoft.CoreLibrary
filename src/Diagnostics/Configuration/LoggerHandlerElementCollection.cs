@@ -27,60 +27,28 @@
 using System;
 using System.Collections.Generic;
 
-namespace Zongsoft.Diagnostics
+using Zongsoft.Options;
+using Zongsoft.Options.Configuration;
+
+namespace Zongsoft.Diagnostics.Configuration
 {
-	public class LoggerHandler : Zongsoft.Services.CommandBase
+	public class LoggerHandlerElementCollection : OptionConfigurationElementCollection<LoggerHandlerElement>
 	{
-		#region 成员字段
-		private ILogger _logger;
-		#endregion
-
 		#region 构造函数
-		public LoggerHandler(string name, ILogger logger = null, LoggerHandlerPredication predication = null) : base(name)
+		public LoggerHandlerElementCollection() : base("handler")
 		{
-			_logger = logger;
-			this.Predication = predication ?? new LoggerHandlerPredication();
 		}
 		#endregion
 
-		#region 公共属性
-		public ILogger Logger
+		#region 重写函数
+		protected override OptionConfigurationElement CreateNewElement()
 		{
-			get
-			{
-				return _logger;
-			}
-			set
-			{
-				if(value == null)
-					throw new ArgumentNullException();
-
-				_logger = value;
-			}
-		}
-		#endregion
-
-		#region 重写方法
-		protected override bool CanExecute(object parameter)
-		{
-			return parameter is LogEntry && this.Logger != null && base.CanExecute(parameter);
+			return new LoggerHandlerElement();
 		}
 
-		protected override object OnExecute(object parameter)
+		protected override string GetElementKey(OptionConfigurationElement element)
 		{
-			var logger = this.Logger;
-
-			if(logger != null)
-				logger.Log(parameter as LogEntry);
-
-			return null;
-		}
-		#endregion
-
-		#region 公共方法
-		public void Handle(LogEntry entry)
-		{
-			this.Execute(entry);
+			return ((LoggerHandlerElement)element).Name;
 		}
 		#endregion
 	}

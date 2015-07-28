@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2013 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -29,58 +29,55 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Diagnostics
 {
-	public class LoggerHandler : Zongsoft.Services.CommandBase
+	public class TracerModule : Zongsoft.ComponentModel.IModule, IDisposable
 	{
-		#region 成员字段
-		private ILogger _logger;
-		#endregion
-
-		#region 构造函数
-		public LoggerHandler(string name, ILogger logger = null, LoggerHandlerPredication predication = null) : base(name)
-		{
-			_logger = logger;
-			this.Predication = predication ?? new LoggerHandlerPredication();
-		}
-		#endregion
-
 		#region 公共属性
-		public ILogger Logger
+		public string Name
 		{
 			get
 			{
-				return _logger;
+				return this.GetType().Name;
 			}
-			set
+		}
+		#endregion
+
+		#region 初始化器
+		public virtual void Initialize(Zongsoft.ComponentModel.ApplicationContextBase context)
+		{
+			//判断当前应用上下文中是否有主配置对象
+			if(context.Configuration == null)
+				return;
+
+			//获取住配置中的跟踪配置节
+			var element = context.Configuration.GetOptionObject("diagnostics/tracer") as Configuration.TracerElement;
+
+			if(element != null && element.Enabled)
 			{
-				if(value == null)
-					throw new ArgumentNullException();
+				foreach(Configuration.TraceListenerElement listenerElement in element.Listeners)
+				{
+					var listener = listenerElement.Listener;
 
-				_logger = value;
+					if(listener != null)
+						context.Tracer.Listeners.Add(listener);
+				}
 			}
 		}
-		#endregion
 
-		#region 重写方法
-		protected override bool CanExecute(object parameter)
+		void Zongsoft.ComponentModel.IModule.Initialize(object context)
 		{
-			return parameter is LogEntry && this.Logger != null && base.CanExecute(parameter);
-		}
-
-		protected override object OnExecute(object parameter)
-		{
-			var logger = this.Logger;
-
-			if(logger != null)
-				logger.Log(parameter as LogEntry);
-
-			return null;
+			this.Initialize(context as Zongsoft.ComponentModel.ApplicationContextBase);
 		}
 		#endregion
 
-		#region 公共方法
-		public void Handle(LogEntry entry)
+		#region 释放资源
+		void IDisposable.Dispose()
 		{
-			this.Execute(entry);
+			this.Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
+		protected virtual void Dispose(bool disposing)
+		{
 		}
 		#endregion
 	}
