@@ -54,7 +54,6 @@ namespace Zongsoft.ComponentModel
 		private IPrincipal _principal;
 		private ICollection<IModule> _modules;
 		private Options.ISettingsProvider _settings;
-		private Options.Configuration.OptionConfiguration _configuration;
 		#endregion
 
 		#region 构造函数
@@ -189,20 +188,13 @@ namespace Zongsoft.ComponentModel
 		}
 
 		/// <summary>
-		/// 获取或设置当前应用程序的默认选项配置。
+		/// 获取当前应用程序的默认选项配置。
 		/// </summary>
-		public Options.Configuration.OptionConfiguration Configuration
+		public virtual Options.Configuration.OptionConfiguration Configuration
 		{
 			get
 			{
-				return _configuration;
-			}
-			protected set
-			{
-				if(value == null)
-					throw new ArgumentNullException();
-
-				_configuration = value;
+				return null;
 			}
 		}
 
