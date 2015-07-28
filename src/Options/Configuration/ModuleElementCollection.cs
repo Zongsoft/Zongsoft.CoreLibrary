@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -26,31 +26,48 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 
 namespace Zongsoft.Options.Configuration
 {
-	public class OptionConfigurationDeclarationCollection : Zongsoft.Collections.NamedCollectionBase<OptionConfigurationDeclaration>
+	public class ModuleElementCollection : OptionConfigurationElementCollection
 	{
 		#region 构造函数
-		public OptionConfigurationDeclarationCollection() : base(StringComparer.OrdinalIgnoreCase)
+		public ModuleElementCollection() : base("module")
+		{
+		}
+
+		protected ModuleElementCollection(string elementName) : base(elementName)
 		{
 		}
 		#endregion
 
-		#region 公共方法
-		public OptionConfigurationDeclaration Add(string name, Type type)
+		#region 公共属性
+		public ModuleElement this[int index]
 		{
-			var item = new OptionConfigurationDeclaration(name, type);
-			this.Add(item);
-			return item;
+			get
+			{
+				return (ModuleElement)this.Items[index];
+			}
+		}
+
+		public new ModuleElement this[string name]
+		{
+			get
+			{
+				return base.Find(name) as ModuleElement;
+			}
 		}
 		#endregion
 
 		#region 重写方法
-		protected override string GetKeyForItem(OptionConfigurationDeclaration item)
+		protected override OptionConfigurationElement CreateNewElement()
 		{
-			return item.Name;
+			return new ModuleElement();
+		}
+
+		protected override string GetElementKey(OptionConfigurationElement element)
+		{
+			return ((ModuleElement)element).Name;
 		}
 		#endregion
 	}

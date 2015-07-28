@@ -203,7 +203,7 @@ namespace Zongsoft.Options.Configuration
 				{
 					//如果当前配置项集合不是默认集合(即集合有对应的XML节点)，则将当前读取器移动到其下的子元素的XML节点上
 					if(!property.IsDefaultCollection)
-						reader.ReadToDescendant(collection.ElementName);
+						reader.ReadToDescendant(string.IsNullOrWhiteSpace(property.ElementName) ? collection.ElementName : property.ElementName);
 				}
 
 				//调用当前配置元素对象的反序列化方法

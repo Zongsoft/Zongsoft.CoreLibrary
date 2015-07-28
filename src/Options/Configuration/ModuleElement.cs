@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -29,25 +29,28 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Options.Configuration
 {
-	public class SettingElement : OptionConfigurationElement
+	public class ModuleElement : OptionConfigurationElement
 	{
 		#region 常量定义
 		private const string XML_NAME_ATTRIBUTE = "name";
-		private const string XML_VALUE_ATTRIBUTE = "value";
+		private const string XML_TYPE_ATTRIBUTE = "type";
 		#endregion
 
 		#region 构造函数
-		internal SettingElement()
+		internal ModuleElement()
 		{
 		}
 
-		internal SettingElement(string name, string value)
+		internal ModuleElement(string name, string type)
 		{
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException("name");
 
+			if(string.IsNullOrWhiteSpace(type))
+				throw new ArgumentNullException("type");
+
 			this.Name = name;
-			this.Value = value;
+			this.Type = type;
 		}
 		#endregion
 
@@ -68,17 +71,37 @@ namespace Zongsoft.Options.Configuration
 			}
 		}
 
-		[OptionConfigurationProperty(XML_VALUE_ATTRIBUTE)]
-		public string Value
+		[OptionConfigurationProperty(XML_TYPE_ATTRIBUTE)]
+		public string Type
 		{
 			get
 			{
-				return (string)this[XML_VALUE_ATTRIBUTE];
+				return (string)this[XML_TYPE_ATTRIBUTE];
 			}
 			set
 			{
-				this[XML_VALUE_ATTRIBUTE] = value;
+				this[XML_TYPE_ATTRIBUTE] = value;
 			}
+		}
+		#endregion
+
+		#region 公共方法
+		public Zongsoft.ComponentModel.IModule CreateModule()
+		{
+			var typeName = this.Type;
+
+			if(string.IsNullOrWhiteSpace(typeName))
+				throw new OptionConfigurationException("The module type is empty or unspecified.");
+
+			var type = System.Type.GetType(typeName, false);
+
+			if(type == null)
+				throw new OptionConfigurationException(string.Format("Invalid '{0}' type of module, becase cann't load it.", typeName));
+
+			if(!typeof(Zongsoft.ComponentModel.IModule).IsAssignableFrom(type))
+				throw new OptionConfigurationException(string.Format("Invalid '{0}' type of module, it doesn't implemented IModule interface.", typeName));
+
+			return Activator.CreateInstance(type) as Zongsoft.ComponentModel.IModule;
 		}
 		#endregion
 	}

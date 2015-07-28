@@ -187,6 +187,9 @@
     <Compile Include="Data\ICondition.cs" />
     <Compile Include="Data\Paging.cs" />
     <Compile Include="Data\Sorting.cs" />
+    <Compile Include="Diagnostics\Configuration\LoggerHandlerElement.cs" />
+    <Compile Include="Diagnostics\Configuration\LoggerElement.cs" />
+    <Compile Include="Diagnostics\Configuration\LoggerHandlerElementCollection.cs" />
     <Compile Include="Diagnostics\Configuration\TracerElement.cs" />
     <Compile Include="Diagnostics\ConsoleLogger.cs" />
     <Compile Include="Diagnostics\DataLogger.cs" />
@@ -198,8 +201,10 @@
     <Compile Include="Diagnostics\LoggerHandler.cs" />
     <Compile Include="Diagnostics\LoggerHandlerCollection.cs" />
     <Compile Include="Diagnostics\LoggerHandlerPredication.cs" />
+    <Compile Include="Diagnostics\LoggerModule.cs" />
     <Compile Include="Diagnostics\LogLevel.cs" />
     <Compile Include="Diagnostics\TextFileLogger.cs" />
+    <Compile Include="Diagnostics\TracerModule.cs" />
     <Compile Include="IO\DirectoryInfo.cs" />
     <Compile Include="IO\FileInfo.cs" />
     <Compile Include="IO\FileSystem.cs" />
@@ -221,6 +226,8 @@
     <Compile Include="Messaging\MessageDequeueSettings.cs" />
     <Compile Include="Messaging\MessageEnqueueSettings.cs" />
     <Compile Include="Messaging\MessageQueueBase.cs" />
+    <Compile Include="Options\Configuration\ModuleElement.cs" />
+    <Compile Include="Options\Configuration\ModuleElementCollection.cs" />
     <Compile Include="Options\Configuration\OptionConfigurationLoader.cs" />
     <Compile Include="Options\Configuration\OptionConfigurationManager.cs" />
     <Compile Include="Options\IOptionLoader.cs" />

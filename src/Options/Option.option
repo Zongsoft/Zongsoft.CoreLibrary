@@ -1,8 +1,34 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 
 <options>
+	<declarations>
+		<declaration name="logger" type="Zongsoft.Diagnostics.Configuration.LoggerElement, Zongsoft.CoreLibrary" />
+		<declaration name="tracer" type="Zongsoft.Diagnostics.Configuration.TracerElement, Zongsoft.CoreLibrary" />
+	</declarations>
+
+	<option path="/">
+		<modules>
+			<module name="LoggerModule" type="Zongsoft.Diagnostics.LoggerModule, Zongsoft.CoreLibrary" />
+			<module name="TracerModule" type="Zongsoft.Diagnostics.TracerModule, Zongsoft.CoreLibrary" />
+		</modules>
+	</option>
+
 	<option path="/Diagnostics">
-		<tracer tracer.type="Zongsoft.Diagnostics.Configuration.TracerElement, Zongsoft.CoreLibrary" enabled="true">
+		<logger>
+			<handler name="Console" type="Zongsoft.Diagnostics.ConsoleLogger, Zongsoft.CoreLibrary">
+				<predication maxLevel="Info" />
+			</handler>
+
+			<handler name="File" type="Zongsoft.Diagnostics.TextFileLogger, Zongsoft.CoreLibrary">
+				<predication minLevel="Warn" />
+
+				<properties>
+					<property name="FilePath" value="logs/${source}.log" />
+				</properties>
+			</handler>
+		</logger>
+
+		<tracer enabled="true">
 			<listeners>
 				<listener name="ConsoleTraceListener" type="Zongsoft.Diagnostics.ConsoleTraceListener, Zongsoft.CoreLibrary" />
 				<listener name="FileLogTraceListener" type="Zongsoft.Diagnostics.FileLogTraceListener, Zongsoft.CoreLibrary" />

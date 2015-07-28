@@ -33,9 +33,12 @@ namespace Zongsoft.Options.Configuration
 {
 	public class OptionConfigurationDeclaration
 	{
+		#region 成员字段
 		private string _name;
 		private Type _type;
+		#endregion
 
+		#region 构造函数
 		public OptionConfigurationDeclaration(string name, Type type)
 		{
 			if(string.IsNullOrWhiteSpace(name))
@@ -50,7 +53,9 @@ namespace Zongsoft.Options.Configuration
 			_name = name.Trim();
 			_type = type;
 		}
+		#endregion
 
+		#region 公共属性
 		public string Name
 		{
 			get
@@ -66,5 +71,6 @@ namespace Zongsoft.Options.Configuration
 				return _type;
 			}
 		}
+		#endregion
 	}
 }

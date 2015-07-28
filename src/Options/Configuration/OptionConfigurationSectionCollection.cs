@@ -30,22 +30,28 @@ using System.Collections.ObjectModel;
 
 namespace Zongsoft.Options.Configuration
 {
-	public class OptionConfigurationSectionCollection : KeyedCollection<string, OptionConfigurationSection>
+	public class OptionConfigurationSectionCollection : Zongsoft.Collections.NamedCollectionBase<OptionConfigurationSection>
 	{
+		#region 构造函数
 		public OptionConfigurationSectionCollection() : base(StringComparer.OrdinalIgnoreCase)
 		{
 		}
+		#endregion
 
+		#region 重写方法
 		protected override string GetKeyForItem(OptionConfigurationSection item)
 		{
 			return item.Path;
 		}
+		#endregion
 
+		#region 公共方法
 		public OptionConfigurationSection Add(string path)
 		{
 			var section = new OptionConfigurationSection(path);
 			this.Add(section);
 			return section;
 		}
+		#endregion
 	}
 }

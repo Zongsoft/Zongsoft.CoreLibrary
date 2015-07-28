@@ -35,6 +35,10 @@ namespace Zongsoft.Options.Configuration
 		public SettingElementCollection() : base("setting")
 		{
 		}
+
+		protected SettingElementCollection(string elementName) : base(elementName)
+		{
+		}
 		#endregion
 
 		#region 公共属性

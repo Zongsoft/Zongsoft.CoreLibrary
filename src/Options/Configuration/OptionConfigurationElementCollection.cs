@@ -202,7 +202,7 @@ namespace Zongsoft.Options.Configuration
 
 		#region 重写方法
 		/// <summary>
-		/// 重写了基类默认读取选项配置XML文件内容的逻辑，重写逻辑请参考备注说明。
+		/// 重写了基类默认读取选项配置XML文件内容的逻辑。
 		/// </summary>
 		/// <param name="reader">在选项配置文件中进行读取操作的<seealso cref="System.Xml.XmlReader"/>读取器。</param>
 		/// <remarks>
@@ -218,8 +218,13 @@ namespace Zongsoft.Options.Configuration
 
 			if(reader.NodeType == XmlNodeType.Element)
 			{
+				var elementName = this.ElementName;
+
+				if(this.ElementProperty != null && !string.IsNullOrWhiteSpace(this.ElementProperty.ElementName))
+					elementName = this.ElementProperty.ElementName;
+
 				//如果当前配置属性定义项是默认集合(即其没有对应的XML集合元素)，则必须检查当前XML元素的名称是否与默认集合的元素名相同，如果不同则配置文件内容非法而抛出异常
-				if(!string.Equals(reader.Name, this.ElementName, StringComparison.OrdinalIgnoreCase))
+				if(!string.Equals(reader.Name, elementName, StringComparison.OrdinalIgnoreCase))
 					throw new OptionConfigurationException();
 
 				//创建集合元素对象
