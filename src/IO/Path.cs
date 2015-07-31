@@ -253,7 +253,7 @@ namespace Zongsoft.IO
 			if(match.Success)
 			{
 				schema = match.Groups["schema"].Value;
-				path = match.Groups["path"].Value;
+				path = match.Groups["path"].Value.Replace('\\', '/');
 			}
 
 			return match.Success;
@@ -280,7 +280,7 @@ namespace Zongsoft.IO
 			var match = _regex.Match(text);
 
 			if(match.Success)
-				return match.Groups["path"].Value;
+				return match.Groups["path"].Value.Replace('\\', '/');
 
 			return string.Empty;
 		}
