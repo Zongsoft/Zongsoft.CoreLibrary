@@ -81,6 +81,14 @@ namespace Zongsoft.IO
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取路径信息的名称。
+		/// </summary>
+		/// <remarks>
+		///		<para>该属性不同于<see cref="Path"/>属性指向的<seealso cref="Zongsoft.IO.Path"/>路径对象中的<seealso cref="Zongsoft.IO.Path.FileName"/>或<seealso cref="Zongsoft.IO.Path.DirectoryName"/>属性值。</para>
+		///		<para>如果<see cref="IsFile"/>属性为真(True)，则返回<see cref="Path"/>属性指向的<seealso cref="Zongsoft.IO.Path.FileName"/>属性值。</para>
+		///		<para>如果<see cref="IsDirectory"/>属性为真(True)，则返回<see cref="Path"/>属性指向的<seealso cref="Zongsoft.IO.Path.DirectoryName"/>属性值表示的目录路径中的最后一个子目录的名称。</para>
+		/// </remarks>
 		public string Name
 		{
 			get

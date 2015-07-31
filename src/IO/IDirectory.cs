@@ -67,19 +67,77 @@ namespace Zongsoft.IO
 		bool Exists(string path);
 		Task<bool> ExistsAsync(string path);
 
+		/// <summary>
+		/// 获取指定路径中的所有文件和目录信息的可枚举集合。
+		/// </summary>
+		/// <param name="path">要搜索的目录。</param>
+		/// <returns>指定路径中的所有文件和目录的<seealso cref="PathInfo"/>集合。</returns>
+		/// <remarks>更多功能搜索功能请参考<see cref="GetChildren(string, string, bool)"/>方法。</remarks>
 		IEnumerable<PathInfo> GetChildren(string path);
+
+		/// <summary>
+		/// 获取指定路径中与搜索模式匹配的所有文件和目录信息的可枚举集合，还可以搜索子目录。
+		/// </summary>
+		/// <param name="path">要搜索的目录。</param>
+		/// <param name="pattern">搜索模式文本，即用于搜索匹配的所有文件或子目录名称的字符串。
+		///		<para>注意：不同文件目录系统可能支持的搜索模式能力是不一样的。</para>
+		///		<para>搜索模式文本为空(null)或空字符串(“”)或“*”，表示返回指定范围内的所有文件和目录。文件系统的标准搜索模式包括：多字匹配模式(“*”)和单字匹配模式(“?”)，大部分文件目录系统均支持标准搜索模式。</para>
+		///		<para>如果搜索模式文本中包含以反斜杠(“\”)或正斜杠(“/”)或竖线符(“|”)字符对括的文本，则表示搜索模式为正则匹配搜索模式；否则为文件系统的标准搜索模式。</para>
+		/// </param>
+		/// <param name="recursive">指定搜索操作的范围是应仅包含当前目录还是应包含所有子目录，默认是仅包含当前目录。</param>
+		/// <returns>匹配指定搜索条件的<seealso cref="PathInfo"/>集合。</returns>
+		/// <remarks>
+		///		<list type="bullet">
+		///			<item>
+		///				<term><c>prefix-/\d+/.log</c></term>
+		///				<description>正则匹配搜索模式：两个正斜杠(“/”)字符括起来的部分为正则表达式(“\d+”)，表示查找指定目录范围内的以“prefix-”打头并接一个或多个数字，扩展名为“.log”的所有文件或目录。</description>
+		///			</item>
+		///			<item>
+		///				<term><c>prefix-*.log</c></term>
+		///				<description>标准搜索模式：字符“*”表示匹配零个或多个字符，表示查找指定目录范围内的以“prefix-”打头并接零个或多个字符，扩展名为“.log”的所有文件或目录。</description>
+		///			</item>
+		///		</list>
+		/// </remarks>
 		IEnumerable<PathInfo> GetChildren(string path, string pattern, bool recursive = false);
 
 		Task<IEnumerable<PathInfo>> GetChildrenAsync(string path);
 		Task<IEnumerable<PathInfo>> GetChildrenAsync(string path, string pattern, bool recursive = false);
 
+		/// <summary>
+		/// 获取指定路径中的所有目录信息的可枚举集合。
+		/// </summary>
+		/// <param name="path">要搜索的目录。</param>
+		/// <returns>指定路径中的所有目录的<seealso cref="DirectoryInfo"/>集合。</returns>
+		/// <remarks>更多功能搜索功能请参考<see cref="GetDirectories(string, string, bool)"/>方法。</remarks>
 		IEnumerable<DirectoryInfo> GetDirectories(string path);
+
+		/// <summary>
+		/// 获取指定路径中与搜索模式匹配的所有目录信息的可枚举集合，还可以搜索子目录。
+		/// </summary>
+		/// <param name="path">要搜索的目录。</param>
+		/// <param name="pattern">搜索模式文本，即用于搜索匹配的所有子目录名称的字符串。更多详细功能请参考：<see cref="GetChildren(string, string, bool)"/>方法。</param>
+		/// <param name="recursive">指定搜索操作的范围是应仅包含当前目录还是应包含所有子目录，默认是仅包含当前目录。</param>
+		/// <returns>匹配指定搜索条件的<seealso cref="DirectoryInfo"/>集合。</returns>
 		IEnumerable<DirectoryInfo> GetDirectories(string path, string pattern, bool recursive = false);
 
 		Task<IEnumerable<DirectoryInfo>> GetDirectoriesAsync(string path);
 		Task<IEnumerable<DirectoryInfo>> GetDirectoriesAsync(string path, string pattern, bool recursive = false);
 
+		/// <summary>
+		/// 获取指定路径中的所有文件信息的可枚举集合。
+		/// </summary>
+		/// <param name="path">要搜索的目录。</param>
+		/// <returns>指定路径中的所有目录的<seealso cref="FileInfo"/>集合。</returns>
+		/// <remarks>更多功能搜索功能请参考<see cref="GetFiles(string, string, bool)"/>方法。</remarks>
 		IEnumerable<FileInfo> GetFiles(string path);
+
+		/// <summary>
+		/// 获取指定路径中与搜索模式匹配的所有文件信息的可枚举集合，还可以搜索子目录。
+		/// </summary>
+		/// <param name="path">要搜索的目录。</param>
+		/// <param name="pattern">搜索模式文本，即用于搜索匹配的所有文件名的字符串。更多详细功能请参考：<see cref="GetChildren(string, string, bool)"/>方法。</param>
+		/// <param name="recursive">指定搜索操作的范围是应仅包含当前目录还是应包含所有子目录，默认是仅包含当前目录。</param>
+		/// <returns>匹配指定搜索条件的<seealso cref="FileInfo"/>集合。</returns>
 		IEnumerable<FileInfo> GetFiles(string path, string pattern, bool recursive = false);
 
 		Task<IEnumerable<FileInfo>> GetFilesAsync(string path);
