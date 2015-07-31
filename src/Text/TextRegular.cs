@@ -26,6 +26,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 
 namespace Zongsoft.Text
@@ -115,7 +116,7 @@ namespace Zongsoft.Text
 		public static class Web
 		{
 			/// <summary>获取电子邮箱(Email)地址的文本验证器。</summary>
-			public static TextRegular Email = new TextRegular(@"^\s*(?<value>[A-Za-z0-9]([-_\.]?[A-Za-z0-9]+)*@([A-Za-z0-9]+([-_]?[A-Za-z0-9]+)*)(\.[A-Za-z0-9]+([-_]?[A-Za-z0-9]+)*)*\.[A-Za-z]+)\s*$");
+			public static readonly TextRegular Email = new TextRegular(@"^\s*(?<value>[A-Za-z0-9]([-_\.]?[A-Za-z0-9]+)*@([A-Za-z0-9]+([-_]?[A-Za-z0-9]+)*)(\.[A-Za-z0-9]+([-_]?[A-Za-z0-9]+)*)*\.[A-Za-z]+)\s*$");
 		}
 
 		public static class Uri
@@ -154,29 +155,45 @@ namespace Zongsoft.Text
 			private const string URI_PATTERN = @"^\s*(?<value>((?<schema>${schema})://)?(?<host>(?<domain>[A-Za-z0-9]+([-_][A-Za-z0-9]+)*)(\.(?<domain>[A-Za-z0-9]+([-_][A-Za-z0-9]+)*))+)(:(?<port>\d{1,5}))?(?<path>(?<segment>/[^\s/:\*\?\&]*)*)?(?<query>\?((?<parameter>(?<parameter_name>[A-Za-z0-9]+([-_][A-Za-z0-9]+)*)(=(?<parameter_value>[^\?\&\s]*))?)\&?)*)?(?<fragment>\#[^\#\s]*)?)\s*$";
 			#endregion
 
+			#region 静态变量
+			private static readonly ConcurrentDictionary<string, TextRegular> _instances = new ConcurrentDictionary<string,TextRegular>(StringComparer.OrdinalIgnoreCase);
+			#endregion
+
+			#region 单例字段
 			/// <summary>获取任意协议的URL文本验证器。</summary>
-			public static TextRegular Url = new TextRegular(URI_PATTERN.Replace("${schema}", "[A-Za-z]+"));
+			public static readonly TextRegular Url = new TextRegular(URI_PATTERN.Replace("${schema}", "[A-Za-z]+"));
 
 			/// <summary>获取Http协议的URL文本验证器。</summary>
-			public static TextRegular Http = new TextRegular(URI_PATTERN.Replace("${schema}", "http[s]?"));
+			public static readonly TextRegular Http = new TextRegular(URI_PATTERN.Replace("${schema}", "http[s]?"));
 
 			/// <summary>获取Ftp协议的URL文本验证器。</summary>
-			public static TextRegular Ftp = new TextRegular(URI_PATTERN.Replace("${schema}", "ftp"));
+			public static readonly TextRegular Ftp = new TextRegular(URI_PATTERN.Replace("${schema}", "ftp"));
+			#endregion
+
+			#region 静态方法
+			public static TextRegular GetRegular(string schema)
+			{
+				if(string.IsNullOrWhiteSpace(schema))
+					throw new ArgumentNullException("schema");
+
+				return _instances.GetOrAdd(schema.Trim().ToLowerInvariant(), key => new TextRegular(URI_PATTERN.Replace("${schema}", key)));
+			}
+			#endregion
 		}
 
 		public static class Chinese
 		{
 			/// <summary>获取中国手机号码的文本验证器。</summary>
-			public static TextRegular Cellphone = new TextRegular(@"^\s*((\+|00)86\s*[-\.]?)?\s*(?<value>1\d{2})(?<separator>(\s*)|(-?))(?<value>\d{4})(?<separator>(\s*)|(-?))(?<value>\d{4})\s*$");
+			public static readonly TextRegular Cellphone = new TextRegular(@"^\s*((\+|00)86\s*[-\.]?)?\s*(?<value>1\d{2})(?<separator>(\s*)|(-?))(?<value>\d{4})(?<separator>(\s*)|(-?))(?<value>\d{4})\s*$");
 
 			/// <summary>获取中国固定电话号码的文本验证器。</summary>
-			public static TextRegular Telephone = new TextRegular(@"^\s*(?<value>0\d{2,4})?(?<separator>(\s*)|(-?))(?<value>\d{4})(?<separator>(\s*)|(-?))(?<value>\d{3,4})\s*$");
+			public static readonly TextRegular Telephone = new TextRegular(@"^\s*(?<value>0\d{2,4})?(?<separator>(\s*)|(-?))(?<value>\d{4})(?<separator>(\s*)|(-?))(?<value>\d{3,4})\s*$");
 
 			/// <summary>获取中国身份证号码的文本验证器。</summary>
-			public static TextRegular IdentityNo = new TextRegular(@"^\s*(?<value>\d{6})?(?<separator>(\s*)|(-?))(?<value>\d{8})(?<separator>(\s*)|(-?))(?<value>(\d{4})|(\d{3}[A-Za-z]))\s*$");
+			public static readonly TextRegular IdentityNo = new TextRegular(@"^\s*(?<value>\d{6})?(?<separator>(\s*)|(-?))(?<value>\d{8})(?<separator>(\s*)|(-?))(?<value>(\d{4})|(\d{3}[A-Za-z]))\s*$");
 
 			/// <summary>获取中国邮政编码的文本验证器。</summary>
-			public static TextRegular PostalCode = new TextRegular(@"^\s*(?<value>\d{6})\s*$");
+			public static readonly TextRegular PostalCode = new TextRegular(@"^\s*(?<value>\d{6})\s*$");
 		}
 		#endregion
 	}
