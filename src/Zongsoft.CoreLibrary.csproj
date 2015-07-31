@@ -406,7 +406,6 @@
     <Compile Include="Services\CommandException.cs" />
     <Compile Include="ComponentModel\GuidConverter.cs" />
     <Compile Include="Diagnostics\EventLogTraceListener.cs" />
-    <Compile Include="Diagnostics\Utility.cs" />
     <Compile Include="Services\IPredication.cs" />
     <Compile Include="Resources\ResourceUtility.cs" />
     <Compile Include="ComponentModel\ActionCollection.cs" />
@@ -522,7 +521,13 @@
     <Compile Include="Terminals\TerminalCommandContext.cs" />
     <Compile Include="Terminals\TerminalCommandExecutor.cs" />
     <Compile Include="Terminals\TerminalStyles.cs" />
+    <Compile Include="Text\ITemplateEvaluator.cs" />
     <Compile Include="Text\ITextRegular.cs" />
+    <Compile Include="Text\TemplateEvaluatorBase.cs" />
+    <Compile Include="Text\TemplateEvaluatorContext.cs" />
+    <Compile Include="Text\TemplateEvaluatorManager.cs" />
+    <Compile Include="Text\BindingEvaluator.cs" />
+    <Compile Include="Text\DateTimeEvaluator.cs" />
     <Compile Include="Text\TextRegular.cs" />
     <Compile Include="Text\TextExpression.cs" />
     <Compile Include="Text\TextExpressionArgument.cs" />
