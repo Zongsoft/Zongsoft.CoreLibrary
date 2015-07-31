@@ -199,18 +199,6 @@ namespace Zongsoft.ComponentModel
 		}
 
 		/// <summary>
-		/// 获取当前应用程序上下文的跟踪器对象。
-		/// </summary>
-		[Obsolete("Please use the Zongsoft.Diagnostics.Logger class.")]
-		public virtual Zongsoft.Diagnostics.Tracer Tracer
-		{
-			get
-			{
-				return Zongsoft.Diagnostics.Tracer.Default;
-			}
-		}
-
-		/// <summary>
 		/// 获取当前应用程序的服务管理对象。
 		/// </summary>
 		public virtual Zongsoft.Services.IServiceProviderFactory ServiceFactory
