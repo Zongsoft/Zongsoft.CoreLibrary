@@ -28,6 +28,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace Zongsoft.IO
 {
@@ -100,13 +101,13 @@ namespace Zongsoft.IO
 
 			if(string.IsNullOrEmpty(driveName))
 			{
-				var index = fullPath.IndexOf('/', (fullPath[0] == '/' ? 1 : 0));
-				var parts = fullPath.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+				var parts = fullPath.Split('/');
 
 				if(parts != null && parts.Length > 0)
 				{
-					driveName = parts[0];
-					fullPath = "/" + string.Join("/", parts, 1, parts.Length - 1);
+					var index = (string.IsNullOrEmpty(parts[0]) && parts.Length > 1) ? 1 : 0;
+					driveName = parts[index];
+					fullPath = "/" + string.Join("/", parts, index + 1, parts.Length - (index + 1));
 				}
 
 				if(string.IsNullOrWhiteSpace(driveName))
@@ -153,7 +154,7 @@ namespace Zongsoft.IO
 		#endregion
 
 		#region 嵌套子类
-		private sealed class LocalDirectoryProvider : IDirectory
+		internal sealed class LocalDirectoryProvider : IDirectory
 		{
 			#region 单例字段
 			public static readonly LocalDirectoryProvider Instance = new LocalDirectoryProvider();
@@ -283,10 +284,22 @@ namespace Zongsoft.IO
 				return this.GetChildren(path, null, false);
 			}
 
+			/// <summary>
+			/// 获取指定路径中与搜索模式匹配的所有文件名称和目录信息的可枚举集合，还可以搜索子目录。
+			/// </summary>
+			/// <param name="path">要搜索的目录。</param>
+			/// <param name="pattern">用于搜索匹配的所有文件或子目录的字符串。
+			///		<para>默认模式为空(null)，如果为空(null)或空字符串(“”)或“*”，即表示返回指定范围内的所有文件和目录。</para>
+			///		<para>如果<paramref name="pattern"/>参数以反斜杠(“\”)或正斜杠(“/”)或竖线符(“|”)字符起始和结尾，则表示搜索模式为正则表达式，即进行正则匹配搜索；否则即为本地文件系统的匹配模式。</para>
+			/// </param>
+			/// <param name="recursive">指定搜索操作的范围是应仅包含当前目录还是应包含所有子目录，默认是仅包含当前目录。</param>
+			/// <returns>指定搜索条件匹配的<seealso cref="PathInfo"/>集合。</returns>
 			public IEnumerable<PathInfo> GetChildren(string path, string pattern, bool recursive = false)
 			{
 				var fullPath = GetLocalPath(path);
-				return new InfoEnumerator<PathInfo>(System.IO.Directory.GetFileSystemEntries(fullPath, pattern, recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly));
+				var entries = this.Search(pattern, p => System.IO.Directory.EnumerateFileSystemEntries(fullPath, p, recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly));
+
+				return new InfoEnumerator<PathInfo>(entries);
 			}
 
 			public Task<IEnumerable<PathInfo>> GetChildrenAsync(string path)
@@ -297,7 +310,12 @@ namespace Zongsoft.IO
 			public async Task<IEnumerable<PathInfo>> GetChildrenAsync(string path, string pattern, bool recursive = false)
 			{
 				var fullPath = GetLocalPath(path);
-				return await Task.Run(() => new InfoEnumerator<PathInfo>(System.IO.Directory.GetFileSystemEntries(fullPath, pattern, recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly)));
+
+				return await Task.Run(() =>
+				{
+					var entries = this.Search(pattern, p => System.IO.Directory.EnumerateFileSystemEntries(fullPath, p, recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly));
+					return new InfoEnumerator<PathInfo>(entries);
+				});
 			}
 
 			public IEnumerable<DirectoryInfo> GetDirectories(string path)
@@ -305,10 +323,22 @@ namespace Zongsoft.IO
 				return this.GetDirectories(path, null, false);
 			}
 
+			/// <summary>
+			/// 返回指定路径中与搜索模式匹配的目录信息的可枚举集合，还可以搜索子目录。
+			/// </summary>
+			/// <param name="path">要搜索的目录。</param>
+			/// <param name="pattern">用于搜索匹配的所有子目录的字符串。
+			///		<para>默认模式为空(null)，如果为空(null)或空字符串(“”)或“*”，即表示返回指定范围内的所有目录。</para>
+			///		<para>如果<paramref name="pattern"/>参数以反斜杠(“\”)或正斜杠(“/”)或竖线符(“|”)字符起始和结尾，则表示搜索模式为正则表达式，即进行正则匹配搜索；否则即为本地文件系统的匹配模式。</para>
+			/// </param>
+			/// <param name="recursive">指定搜索操作的范围是应仅包含当前目录还是应包含所有子目录，默认是仅包含当前目录。</param>
+			/// <returns>指定搜索条件匹配的<seealso cref="DirectoryInfo"/>集合。</returns>
 			public IEnumerable<DirectoryInfo> GetDirectories(string path, string pattern, bool recursive = false)
 			{
 				var fullPath = GetLocalPath(path);
-				return new InfoEnumerator<DirectoryInfo>(System.IO.Directory.GetDirectories(fullPath, pattern, recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly));
+				var entries = this.Search(pattern, p => System.IO.Directory.EnumerateDirectories(fullPath, p, recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly));
+
+				return new InfoEnumerator<DirectoryInfo>(entries);
 			}
 
 			public Task<IEnumerable<DirectoryInfo>> GetDirectoriesAsync(string path)
@@ -319,7 +349,12 @@ namespace Zongsoft.IO
 			public async Task<IEnumerable<DirectoryInfo>> GetDirectoriesAsync(string path, string pattern, bool recursive = false)
 			{
 				var fullPath = GetLocalPath(path);
-				return await Task.Run(() => new InfoEnumerator<DirectoryInfo>(System.IO.Directory.GetDirectories(fullPath, pattern, recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly)));
+
+				return await Task.Run(() =>
+				{
+					var entries = this.Search(pattern, p => System.IO.Directory.EnumerateDirectories(fullPath, p, recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly));
+					return new InfoEnumerator<DirectoryInfo>(entries);
+				});
 			}
 
 			public IEnumerable<FileInfo> GetFiles(string path)
@@ -327,10 +362,22 @@ namespace Zongsoft.IO
 				return this.GetFiles(path, null, false);
 			}
 
+			/// <summary>
+			/// 返回指定路径中与搜索模式匹配的文件信息的可枚举集合，还可以搜索子目录。
+			/// </summary>
+			/// <param name="path">要搜索的目录。</param>
+			/// <param name="pattern">用于搜索匹配的所有文件的字符串。
+			///		<para>默认模式为空(null)，如果为空(null)或空字符串(“”)或“*”，即表示返回指定范围内的所有文件。</para>
+			///		<para>如果<paramref name="pattern"/>参数以反斜杠(“\”)或正斜杠(“/”)或竖线符(“|”)字符起始和结尾，则表示搜索模式为正则表达式，即进行正则匹配搜索；否则即为本地文件系统的匹配模式。</para>
+			/// </param>
+			/// <param name="recursive">指定搜索操作的范围是应仅包含当前目录还是应包含所有子目录，默认是仅包含当前目录。</param>
+			/// <returns>指定搜索条件匹配的<seealso cref="FileInfo"/>集合。</returns>
 			public IEnumerable<FileInfo> GetFiles(string path, string pattern, bool recursive = false)
 			{
 				var fullPath = GetLocalPath(path);
-				return new InfoEnumerator<FileInfo>(System.IO.Directory.GetFiles(fullPath, pattern, recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly));
+				var entries = this.Search(pattern, p => System.IO.Directory.EnumerateFiles(fullPath, p, recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly));
+
+				return new InfoEnumerator<FileInfo>(entries);
 			}
 
 			public Task<IEnumerable<FileInfo>> GetFilesAsync(string path)
@@ -341,7 +388,113 @@ namespace Zongsoft.IO
 			public async Task<IEnumerable<FileInfo>> GetFilesAsync(string path, string pattern, bool recursive = false)
 			{
 				var fullPath = GetLocalPath(path);
-				return await Task.Run(() => new InfoEnumerator<FileInfo>(System.IO.Directory.GetFiles(fullPath, pattern, recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly)));
+
+				return await Task.Run(() =>
+				{
+					var entries = this.Search(pattern, p => System.IO.Directory.EnumerateFiles(fullPath, p, recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly));
+					return new InfoEnumerator<FileInfo>(entries);
+				});
+			}
+			#endregion
+
+			#region 私有方法
+			private static readonly Regex _regex = new Regex(@"(?<delimiter>[/\|\\]).+\k<delimiter>", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
+
+			private IEnumerable<string> Search(string pattern, Func<string, IEnumerable<string>> searcher, Predicate<string> filter = null)
+			{
+				var regularPattern = string.Empty;
+				IEnumerable<string> result = null;
+
+				if(string.IsNullOrEmpty(pattern))
+				{
+					result = searcher("*");
+				}
+				else
+				{
+					var matches = _regex.Matches(pattern);
+
+					if(matches == null || matches.Count <= 0)
+					{
+						result = searcher(pattern);
+					}
+					else
+					{
+						var position = 0;
+
+						foreach(Match match in matches)
+						{
+							if(match.Index > 0)
+								regularPattern += EscapePattern(pattern.Substring(position, match.Index - position));
+
+							regularPattern += match.Value.Substring(1, match.Value.Length - 2);
+
+							//移动当前指针位置
+							position = match.Index + match.Length;
+						}
+
+						if(position < pattern.Length)
+							regularPattern += EscapePattern(pattern.Substring(position));
+
+						result = searcher("*");
+					}
+				}
+
+				if(result == null)
+					yield break;
+
+				foreach(var item in result)
+				{
+					if(string.IsNullOrEmpty(regularPattern))
+					{
+						if(filter == null || filter(item))
+							yield return item;
+					}
+					else
+					{
+						var fileName = System.IO.Path.GetFileName(item);
+
+						if(Regex.IsMatch(fileName, regularPattern, RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture) && (filter == null || filter(item)))
+							yield return item;
+					}
+				}
+			}
+
+			internal static string EscapePattern(string pattern)
+			{
+				if(string.IsNullOrWhiteSpace(pattern))
+					return pattern;
+
+				string result = string.Empty;
+
+				foreach(var chr in pattern)
+				{
+					switch(chr)
+					{
+						case '.':
+						case '^':
+						case '*':
+						case '?':
+						case '+':
+						case '-':
+						case '|':
+						case '\\':
+						case '(':
+						case ')':
+						case '[':
+						case ']':
+						case '{':
+						case '}':
+						case '<':
+						case '>':
+							result += ("\\" + chr);
+							break;
+						default:
+							result += chr;
+							break;
+					}
+				}
+
+				return result;
 			}
 			#endregion
 
@@ -349,12 +502,93 @@ namespace Zongsoft.IO
 			private class InfoEnumerator<T> : IEnumerable<T>, IEnumerator<T> where T : PathInfo
 			{
 				#region 私有字段
+				private IEnumerator<string> _source;
+				#endregion
+
+				#region 构造函数
+				public InfoEnumerator(IEnumerable<string> source)
+				{
+					_source = source == null ? null : source.GetEnumerator();
+				}
+				#endregion
+
+				#region 公共成员
+				public T Current
+				{
+					get
+					{
+						if(_source == null)
+							return null;
+
+						var item = _source.Current;
+
+						if(string.IsNullOrEmpty(item))
+							return null;
+
+						if(typeof(T) == typeof(FileInfo))
+							return LocalFileSystem.Instance.File.GetInfo(item) as T;
+						else if(typeof(T) == typeof(DirectoryInfo))
+							return LocalFileSystem.Instance.Directory.GetInfo(item) as T;
+						else if(typeof(T) == typeof(PathInfo))
+							return (T)new PathInfo(item);
+
+						throw new InvalidOperationException();
+					}
+				}
+
+				public bool MoveNext()
+				{
+					if(_source != null)
+						return _source.MoveNext();
+
+					return false;
+				}
+
+				public void Reset()
+				{
+					if(_source != null)
+						_source.Reset();
+				}
+				#endregion
+
+				#region 显式实现
+				object System.Collections.IEnumerator.Current
+				{
+					get
+					{
+						return this.Current;
+					}
+				}
+
+				void IDisposable.Dispose()
+				{
+					_source = null;
+				}
+				#endregion
+
+				#region 枚举遍历
+				public IEnumerator<T> GetEnumerator()
+				{
+					return this;
+				}
+
+				System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+				{
+					return this;
+				}
+				#endregion
+			}
+
+			[Obsolete]
+			private class InfoEnumeratorObsoleted<T> : IEnumerable<T>, IEnumerator<T> where T : PathInfo
+			{
+				#region 私有字段
 				private int _index;
 				private string[] _items;
 				#endregion
 
 				#region 构造函数
-				public InfoEnumerator(string[] items)
+				public InfoEnumeratorObsoleted(string[] items)
 				{
 					_items = items;
 				}
