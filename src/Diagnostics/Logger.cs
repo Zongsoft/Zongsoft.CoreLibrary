@@ -33,7 +33,8 @@ namespace Zongsoft.Diagnostics
 	public static class Logger
 	{
 		#region 成员字段
-		private static readonly LoggerHandlerCollection _handlers = new LoggerHandlerCollection();
+		private static LoggerHandlerCollection _handlers;
+		private static Text.TemplateEvaluatorManager _templateManager;
 		#endregion
 
 		#region 公共属性
@@ -41,7 +42,29 @@ namespace Zongsoft.Diagnostics
 		{
 			get
 			{
+				if(_handlers == null)
+					System.Threading.Interlocked.CompareExchange(ref _handlers, new LoggerHandlerCollection(), null);
+
 				return _handlers;
+			}
+		}
+
+		public static Zongsoft.Text.TemplateEvaluatorManager TemplateManager
+		{
+			get
+			{
+				if(_templateManager == null)
+				{
+					var templateManager = System.Threading.Interlocked.CompareExchange(ref _templateManager, new Text.TemplateEvaluatorManager(), null);
+
+					if(templateManager == null)
+					{
+						_templateManager.Register(new Text.BindingEvaluator());
+						_templateManager.Register(new Text.DateTimeEvaluator());
+					}
+				}
+
+				return _templateManager;
 			}
 		}
 		#endregion

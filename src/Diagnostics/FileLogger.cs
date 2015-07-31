@@ -33,6 +33,7 @@ namespace Zongsoft.Diagnostics
 	public abstract class FileLogger : ILogger
 	{
 		#region 常量定义
+		private const int KB = 1024;
 		private const int FILE_SIZE = 1024;
 		#endregion
 
@@ -92,7 +93,7 @@ namespace Zongsoft.Diagnostics
 			if(entry == null)
 				return;
 
-			var filePath = this.GetFilePath(entry);
+			var filePath = this.ResolveFilePath(entry);
 
 			if(string.IsNullOrWhiteSpace(filePath))
 				throw new InvalidOperationException("Unspecified path of the log file.");
@@ -116,7 +117,7 @@ namespace Zongsoft.Diagnostics
 			if(string.IsNullOrWhiteSpace(_filePath))
 				filePath = string.IsNullOrWhiteSpace(entry.Source) ? string.Empty : entry.Source + ".log";
 			else
-				filePath = _filePath.Trim();
+				filePath = Logger.TemplateManager.Evaluate<string>(_filePath.Trim(), entry);
 
 			if(!string.IsNullOrWhiteSpace(filePath))
 			{
@@ -130,6 +131,65 @@ namespace Zongsoft.Diagnostics
 			}
 
 			return filePath;
+		}
+		#endregion
+
+		#region 私有方法
+		private string ResolveFilePath(LogEntry entry)
+		{
+			const string PATTERN = @"(?<no>\d+)";
+			const string SEQUENCE = "{sequence}";
+
+			var maximum = 0;
+			var result = string.Empty;
+			var filePath = this.GetFilePath(entry);
+
+			if(string.IsNullOrEmpty(filePath) || this.FileSize < 1)
+				return filePath;
+
+			if(!filePath.Contains(SEQUENCE))
+				return filePath;
+
+			var fileName = System.IO.Path.GetFileName(filePath);
+			var infos = Zongsoft.IO.LocalFileSystem.Instance.Directory.GetFiles(System.IO.Path.GetDirectoryName(filePath), fileName.Replace(SEQUENCE, "|" + PATTERN + "|"), false);
+			var pattern = string.Empty;
+			int index = 0, position = 0;
+
+			while((index = fileName.IndexOf(SEQUENCE, index)) >= 0)
+			{
+				if(index > 0)
+					pattern += Zongsoft.IO.LocalFileSystem.LocalDirectoryProvider.EscapePattern(fileName.Substring(position, index - position));
+
+				pattern += PATTERN;
+				index += SEQUENCE.Length;
+				position = index;
+			}
+
+			if(position < fileName.Length)
+				pattern += Zongsoft.IO.LocalFileSystem.LocalDirectoryProvider.EscapePattern(fileName.Substring(position));
+
+			foreach(var info in infos)
+			{
+				var match = System.Text.RegularExpressions.Regex.Match(info.Name, pattern);
+
+				if(match.Success)
+				{
+					var number = int.Parse(match.Groups["no"].Value);
+
+					if(number > maximum)
+					{
+						maximum = number;
+
+						if(info.Size < this.FileSize * KB)
+							result = info.Path.FullPath;
+					}
+				}
+			}
+
+			if(string.IsNullOrEmpty(result))
+				return filePath.Replace(SEQUENCE, (maximum + 1).ToString());
+
+			return result;
 		}
 		#endregion
 	}
