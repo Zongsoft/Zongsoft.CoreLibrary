@@ -58,7 +58,7 @@ namespace Zongsoft.Diagnostics
 					var listener = listenerElement.Listener;
 
 					if(listener != null)
-						context.Tracer.Listeners.Add(listener);
+						Zongsoft.Diagnostics.Tracer.Default.Listeners.Add(listener);
 				}
 			}
 		}
