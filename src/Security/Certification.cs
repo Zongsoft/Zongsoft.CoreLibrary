@@ -92,6 +92,7 @@ namespace Zongsoft.Security
 		/// <summary>
 		/// 获取安全凭证所属的命令空间。
 		/// </summary>
+		[Zongsoft.Runtime.Serialization.SerializationMember(Runtime.Serialization.SerializationMemberBehavior.Ignored)]
 		public string Namespace
 		{
 			get
@@ -125,6 +126,7 @@ namespace Zongsoft.Security
 		/// <summary>
 		/// 获取安全凭证对应的用户编号。
 		/// </summary>
+		[Zongsoft.Runtime.Serialization.SerializationMember(Runtime.Serialization.SerializationMemberBehavior.Ignored)]
 		public int UserId
 		{
 			get
@@ -177,6 +179,7 @@ namespace Zongsoft.Security
 		/// <remarks>
 		///		<para>该属性始终返回<see cref="Timestamp"/>属性加上<see cref="Duration"/>属性的值。</para>
 		/// </remarks>
+		[Zongsoft.Runtime.Serialization.SerializationMember(Runtime.Serialization.SerializationMemberBehavior.Ignored)]
 		public DateTime Expires
 		{
 			get
@@ -188,6 +191,7 @@ namespace Zongsoft.Security
 		/// <summary>
 		/// 获取一个值，指示扩展属性集是否存在并且有值。
 		/// </summary>
+		[Zongsoft.Runtime.Serialization.SerializationMember(Runtime.Serialization.SerializationMemberBehavior.Ignored)]
 		public bool HasExtendedProperties
 		{
 			get
