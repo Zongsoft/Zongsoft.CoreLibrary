@@ -7,28 +7,28 @@ namespace Zongsoft.Runtime.Serialization
 	public class TextSerializationSettings : SerializationSettings
 	{
 		#region 成员字段
-		private bool _isIndented;
+		private bool _indented;
 		private SerializationNamingConvention _namingConvention;
 		#endregion
 
 		#region 构造函数
 		public TextSerializationSettings()
 		{
-			_isIndented = false;
+			_indented = false;
 			_namingConvention = SerializationNamingConvention.None;
 		}
 		#endregion
 
 		#region 公共属性
-		public bool IsIndented
+		public bool Indented
 		{
 			get
 			{
-				return _isIndented;
+				return _indented;
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.IsIndented, ref _isIndented, value);
+				this.SetPropertyValue(() => this.Indented, ref _indented, value);
 			}
 		}
 
