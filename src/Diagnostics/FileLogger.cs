@@ -181,7 +181,7 @@ namespace Zongsoft.Diagnostics
 						maximum = number;
 
 						if(info.Size < this.FileSize * KB)
-							result = info.Path.FullPath;
+							result = info.Path.Url;
 					}
 				}
 			}

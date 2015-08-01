@@ -92,6 +92,12 @@ namespace Zongsoft.Diagnostics
 			Log(new LogEntry(LogLevel.Trace, source, message, data));
 		}
 
+		public static void Trace(string source, string message, Exception exception, object data = null)
+		{
+			source = string.IsNullOrWhiteSpace(source) ? GetSource() : source.Trim();
+			Log(new LogEntry(LogLevel.Trace, source, message, exception, data));
+		}
+
 		public static void Debug(Exception exception, object data = null)
 		{
 			Log(new LogEntry(LogLevel.Debug, GetSource(), exception, data));
@@ -112,6 +118,12 @@ namespace Zongsoft.Diagnostics
 		{
 			source = string.IsNullOrWhiteSpace(source) ? GetSource() : source.Trim();
 			Log(new LogEntry(LogLevel.Debug, source, message, data));
+		}
+
+		public static void Debug(string source, string message, Exception exception, object data = null)
+		{
+			source = string.IsNullOrWhiteSpace(source) ? GetSource() : source.Trim();
+			Log(new LogEntry(LogLevel.Debug, source, message, exception, data));
 		}
 
 		public static void Info(Exception exception, object data = null)
@@ -136,6 +148,12 @@ namespace Zongsoft.Diagnostics
 			Log(new LogEntry(LogLevel.Info, source, message, data));
 		}
 
+		public static void Info(string source, string message, Exception exception, object data = null)
+		{
+			source = string.IsNullOrWhiteSpace(source) ? GetSource() : source.Trim();
+			Log(new LogEntry(LogLevel.Info, source, message, exception, data));
+		}
+
 		public static void Warn(Exception exception, object data = null)
 		{
 			Log(new LogEntry(LogLevel.Warn, GetSource(), exception, data));
@@ -156,6 +174,12 @@ namespace Zongsoft.Diagnostics
 		{
 			source = string.IsNullOrWhiteSpace(source) ? GetSource() : source.Trim();
 			Log(new LogEntry(LogLevel.Warn, source, message, data));
+		}
+
+		public static void Warn(string source, string message, Exception exception, object data = null)
+		{
+			source = string.IsNullOrWhiteSpace(source) ? GetSource() : source.Trim();
+			Log(new LogEntry(LogLevel.Warn, source, message, exception, data));
 		}
 
 		public static void Error(Exception exception, object data = null)
@@ -180,6 +204,12 @@ namespace Zongsoft.Diagnostics
 			Log(new LogEntry(LogLevel.Error, source, message, data));
 		}
 
+		public static void Error(string source, string message, Exception exception, object data = null)
+		{
+			source = string.IsNullOrWhiteSpace(source) ? GetSource() : source.Trim();
+			Log(new LogEntry(LogLevel.Error, source, message, exception, data));
+		}
+
 		public static void Fatal(Exception exception, object data = null)
 		{
 			Log(new LogEntry(LogLevel.Fatal, GetSource(), exception, data));
@@ -200,6 +230,12 @@ namespace Zongsoft.Diagnostics
 		{
 			source = string.IsNullOrWhiteSpace(source) ? GetSource() : source.Trim();
 			Log(new LogEntry(LogLevel.Fatal, source, message, data));
+		}
+
+		public static void Fatal(string source, string message, Exception exception, object data = null)
+		{
+			source = string.IsNullOrWhiteSpace(source) ? GetSource() : source.Trim();
+			Log(new LogEntry(LogLevel.Fatal, source, message, exception, data));
 		}
 
 		private static void Log(LogEntry entry)

@@ -47,24 +47,21 @@ namespace Zongsoft.Diagnostics
 		#endregion
 
 		#region 构造函数
-		public LogEntry(LogLevel level, string source, string message, object data = null)
+		public LogEntry(LogLevel level, string source, string message, object data = null) : this(level, source, message, null, data)
 		{
-			_toString = null;
-			_stackTrace = string.Empty;
-			_source = source == null ? string.Empty : source.Trim();
-			_message = message ?? string.Empty;
-			_data = data;
-			_level = level;
-			_timestamp = DateTime.Now;
 		}
 
-		public LogEntry(LogLevel level, string source, Exception exception, object data = null)
+		public LogEntry(LogLevel level, string source, Exception exception, object data = null) : this(level, source, null, exception, data)
+		{
+		}
+
+		public LogEntry(LogLevel level, string source, string message, Exception exception, object data = null)
 		{
 			_toString = null;
 			_stackTrace = string.Empty;
-			_source = string.IsNullOrEmpty(source)? (exception == null ? string.Empty : exception.Source) : source.Trim();
+			_source = string.IsNullOrEmpty(source) ? (exception == null ? string.Empty : exception.Source) : source.Trim();
 			_exception = exception;
-			_message = exception == null ? string.Empty : exception.Message;
+			_message = message ?? (exception == null ? string.Empty : exception.Message);
 			_data = data ?? (exception != null && exception.Data != null && exception.Data.Count > 0 ? exception.Data : null);
 			_level = level;
 			_timestamp = DateTime.Now;
@@ -147,10 +144,17 @@ namespace Zongsoft.Diagnostics
 
 				var aggregateException = _exception as AggregateException;
 
-				if(aggregateException != null && aggregateException.InnerExceptions != null)
+				if(aggregateException != null)
 				{
-					foreach(var exception in aggregateException.InnerExceptions)
-						this.WriteException(builder, exception);
+					if(aggregateException.InnerExceptions != null && aggregateException.InnerExceptions.Count > 0)
+					{
+						foreach(var exception in aggregateException.InnerExceptions)
+							this.WriteException(builder, exception);
+					}
+					else
+					{
+						this.WriteException(builder, _exception);
+					}
 				}
 				else
 				{
@@ -200,23 +204,23 @@ namespace Zongsoft.Diagnostics
 			builder.AppendLine();
 			builder.AppendFormat("\t<exception type=\"{0}, {1}\">" + Environment.NewLine, _exception.GetType().FullName, _exception.GetType().Assembly.GetName().Name);
 
-			if(!string.Equals(_message, _exception.Message))
+			if(!string.Equals(_message, exception.Message))
 			{
-				builder.AppendLine("\t\t<message><![CDATA[" + _exception.Message + "]]></message>");
+				builder.AppendLine("\t\t<message><![CDATA[" + exception.Message + "]]></message>");
 			}
 
-			if(_exception.StackTrace != null && _exception.StackTrace.Length > 0)
+			if(exception.StackTrace != null && exception.StackTrace.Length > 0)
 			{
 				builder.AppendLine("\t\t<stackTrace>");
 				builder.AppendLine("\t\t<![CDATA[");
-				builder.AppendLine(_exception.StackTrace);
+				builder.AppendLine(exception.StackTrace);
 				builder.AppendLine("\t\t]]>");
 				builder.AppendLine("\t\t</stackTrace>");
 			}
 
 			builder.AppendLine("\t</exception>");
 
-			if(exception.InnerException != null)
+			if(exception.InnerException != null && exception.InnerException != exception)
 				WriteException(builder, exception.InnerException);
 		}
 		#endregion
