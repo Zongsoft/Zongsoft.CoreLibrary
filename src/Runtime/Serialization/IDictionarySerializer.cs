@@ -35,7 +35,7 @@ namespace Zongsoft.Runtime.Serialization
 		IDictionary Serialize(object graph);
 		void Serialize(object graph, IDictionary dictionary);
 
+		object Deserialize(IDictionary dictionary);
 		object Deserialize(IDictionary dictionary, Type type);
-		T Deserialize<T>(IDictionary dictionary, Func<T> creator = null);
 	}
 }

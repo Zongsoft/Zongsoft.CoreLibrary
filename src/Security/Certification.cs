@@ -212,130 +212,136 @@ namespace Zongsoft.Security
 		#endregion
 
 		#region 公共方法
-		public IDictionary<string, object> ToDictionary()
-		{
-			var result = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase )
-			{
-				{"CertificationId", this.CertificationId},
-				{"Scene", this.Scene},
-				{"Duration", this.Duration},
-				{"IssuedTime", this.IssuedTime},
-				{"Timestamp", this.Timestamp},
-			};
+		//public IDictionary<string, object> ToDictionary()
+		//{
+		//	var result = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+		//	{
+		//		{"CertificationId", this.CertificationId},
+		//		{"Scene", this.Scene},
+		//		{"Duration", this.Duration},
+		//		{"IssuedTime", this.IssuedTime},
+		//		{"Timestamp", this.Timestamp},
+		//	};
 
-			var properties = TypeDescriptor.GetProperties(typeof(Membership.User));
+		//	if(_user != null)
+		//	{
+		//		result.Add(".User.Type", _user.GetType().AssemblyQualifiedName);
 
-			foreach(PropertyDescriptor property in properties)
-			{
-				result.Add("User." + property.Name, property.GetValue(_user));
-			}
+		//		var properties = TypeDescriptor.GetProperties(_user.GetType());
 
-			var extendedProperties = _extendedProperties;
+		//		foreach(PropertyDescriptor property in properties)
+		//		{
+		//			result.Add("User." + property.Name, property.GetValue(_user));
+		//		}
+		//	}
 
-			if(extendedProperties != null && extendedProperties.Count > 0)
-			{
-				foreach(var extendedProperty in extendedProperties)
-				{
-					result.Add(EXTENDEDPROPERTIESPREFIX + extendedProperty.Key, extendedProperty.Value);
-				}
-			}
+		//	var extendedProperties = _extendedProperties;
 
-			return result;
-		}
+		//	if(extendedProperties != null && extendedProperties.Count > 0)
+		//	{
+		//		foreach(var extendedProperty in extendedProperties)
+		//		{
+		//			result.Add(EXTENDEDPROPERTIESPREFIX + extendedProperty.Key, extendedProperty.Value);
+		//		}
+		//	}
 
-		public static Certification FromDictionary(IDictionary dictionary)
-		{
-			if(dictionary == null || dictionary.Count < 1)
-				return null;
+		//	return result;
+		//}
 
-			var user = new Membership.User(Zongsoft.Common.Convert.ConvertValue<int>(dictionary["User.UserId"]),
-				Zongsoft.Common.Convert.ConvertValue<string>(dictionary["User.Name"]),
-				Zongsoft.Common.Convert.ConvertValue<string>(dictionary["User.Namespace"]));
+		//public static Certification FromDictionary(IDictionary dictionary)
+		//{
+		//	if(dictionary == null || dictionary.Count < 1)
+		//		return null;
 
-			var properties = TypeDescriptor.GetProperties(typeof(Membership.User));
+		//	var user = new Membership.User(Zongsoft.Common.Convert.ConvertValue<int>(dictionary["User.UserId"]),
+		//		Zongsoft.Common.Convert.ConvertValue<string>(dictionary["User.Name"]),
+		//		Zongsoft.Common.Convert.ConvertValue<string>(dictionary["User.Namespace"]));
 
-			foreach(PropertyDescriptor property in properties)
-			{
-				if(property.IsReadOnly)
-					continue;
+		//	var properties = TypeDescriptor.GetProperties(typeof(Membership.User));
 
-				property.SetValue(user, Zongsoft.Common.Convert.ConvertValue(dictionary["User." + property.Name], property.PropertyType));
-			}
+		//	foreach(PropertyDescriptor property in properties)
+		//	{
+		//		if(property.IsReadOnly)
+		//			continue;
 
-			var result = new Certification((string)dictionary["CertificationId"], user,
-				Zongsoft.Common.Convert.ConvertValue<string>(dictionary["Scene"]),
-				Zongsoft.Common.Convert.ConvertValue<TimeSpan>(dictionary["Duration"], TimeSpan.Zero),
-				Zongsoft.Common.Convert.ConvertValue<DateTime>(dictionary["IssuedTime"]))
-				{
-					Timestamp = Zongsoft.Common.Convert.ConvertValue<DateTime>(dictionary["Timestamp"]),
-				};
+		//		property.SetValue(user, Zongsoft.Common.Convert.ConvertValue(dictionary["User." + property.Name], property.PropertyType));
+		//	}
 
-			foreach(var key in dictionary.Keys)
-			{
-				if(key == null)
-					continue;
+		//	var result = new Certification((string)dictionary["CertificationId"], user,
+		//		Zongsoft.Common.Convert.ConvertValue<string>(dictionary["Scene"]),
+		//		Zongsoft.Common.Convert.ConvertValue<TimeSpan>(dictionary["Duration"], TimeSpan.Zero),
+		//		Zongsoft.Common.Convert.ConvertValue<DateTime>(dictionary["IssuedTime"]))
+		//		{
+		//			Timestamp = Zongsoft.Common.Convert.ConvertValue<DateTime>(dictionary["Timestamp"]),
+		//		};
 
-				if(key.ToString().StartsWith(EXTENDEDPROPERTIESPREFIX))
-					result.ExtendedProperties[key.ToString().Substring(EXTENDEDPROPERTIESPREFIX.Length)] = dictionary[key];
-			}
+		//	foreach(var key in dictionary.Keys)
+		//	{
+		//		if(key == null)
+		//			continue;
 
-			return result;
-		}
+		//		if(key.ToString().StartsWith(EXTENDEDPROPERTIESPREFIX))
+		//			result.ExtendedProperties[key.ToString().Substring(EXTENDEDPROPERTIESPREFIX.Length)] = dictionary[key];
+		//	}
 
-		public static Certification FromDictionary<TValue>(IDictionary<string, TValue> dictionary)
-		{
-			if(dictionary == null || dictionary.Count < 1)
-				return null;
+		//	return result;
+		//}
 
-			Certification result;
-			Membership.User user = null;
-			TValue certificationId, userId, userName, scene, timestamp, issuedTime, duration;
+		//public static Certification FromDictionary<TValue>(IDictionary<string, TValue> dictionary)
+		//{
+		//	if(dictionary == null || dictionary.Count < 1)
+		//		return null;
 
-			if(dictionary.TryGetValue("User.UserId", out userId) && dictionary.TryGetValue("User.Name", out userName))
-			{
-				user = new Membership.User(Zongsoft.Common.Convert.ConvertValue<int>(userId),
-				                           Zongsoft.Common.Convert.ConvertValue<string>(userName));
+		//	Certification result;
+		//	Membership.User user = null;
+		//	TValue certificationId, userId, userName, scene, timestamp, issuedTime, duration, @namespace;
 
-				var properties = TypeDescriptor.GetProperties(typeof(Membership.User));
+		//	if(dictionary.TryGetValue("User.UserId", out userId) && dictionary.TryGetValue("User.Name", out userName) && dictionary.TryGetValue("User.Namespace", out @namespace))
+		//	{
+		//		user = new Membership.User(Zongsoft.Common.Convert.ConvertValue<int>(userId),
+		//								   Zongsoft.Common.Convert.ConvertValue<string>(userName),
+		//								   Zongsoft.Common.Convert.ConvertValue<string>(@namespace));
 
-				foreach(PropertyDescriptor property in properties)
-				{
-					if(property.IsReadOnly)
-						continue;
+		//		var properties = TypeDescriptor.GetProperties(typeof(Membership.User));
 
-					property.SetValue(user, Zongsoft.Common.Convert.ConvertValue(dictionary["User." + property.Name], property.PropertyType));
-				}
-			}
+		//		foreach(PropertyDescriptor property in properties)
+		//		{
+		//			if(property.IsReadOnly)
+		//				continue;
 
-			if(dictionary.TryGetValue("CertificationId", out certificationId) && user != null)
-			{
-				dictionary.TryGetValue("Scene", out scene);
-				dictionary.TryGetValue("IssuedTime", out issuedTime);
-				dictionary.TryGetValue("Duration", out duration);
-				dictionary.TryGetValue("Timestamp", out timestamp);
+		//			property.SetValue(user, Zongsoft.Common.Convert.ConvertValue(dictionary["User." + property.Name], property.PropertyType));
+		//		}
+		//	}
 
-				result = new Certification(Zongsoft.Common.Convert.ConvertValue<string>(certificationId), user,
-											Zongsoft.Common.Convert.ConvertValue<string>(scene),
-											Zongsoft.Common.Convert.ConvertValue<TimeSpan>(duration),
-											Zongsoft.Common.Convert.ConvertValue<DateTime>(issuedTime))
-											{
-												Timestamp = Zongsoft.Common.Convert.ConvertValue<DateTime>(timestamp),
-											};
-			}
-			else
-				return null;
+		//	if(dictionary.TryGetValue("CertificationId", out certificationId) && user != null)
+		//	{
+		//		dictionary.TryGetValue("Scene", out scene);
+		//		dictionary.TryGetValue("IssuedTime", out issuedTime);
+		//		dictionary.TryGetValue("Duration", out duration);
+		//		dictionary.TryGetValue("Timestamp", out timestamp);
 
-			foreach(var key in dictionary.Keys)
-			{
-				if(key == null)
-					continue;
+		//		result = new Certification(Zongsoft.Common.Convert.ConvertValue<string>(certificationId), user,
+		//									Zongsoft.Common.Convert.ConvertValue<string>(scene),
+		//									Zongsoft.Common.Convert.ConvertValue<TimeSpan>(duration),
+		//									Zongsoft.Common.Convert.ConvertValue<DateTime>(issuedTime))
+		//									{
+		//										Timestamp = Zongsoft.Common.Convert.ConvertValue<DateTime>(timestamp),
+		//									};
+		//	}
+		//	else
+		//		return null;
 
-				if(key.ToString().StartsWith(EXTENDEDPROPERTIESPREFIX))
-					result.ExtendedProperties[key.ToString().Substring(EXTENDEDPROPERTIESPREFIX.Length)] = dictionary[key];
-			}
+		//	foreach(var key in dictionary.Keys)
+		//	{
+		//		if(key == null)
+		//			continue;
 
-			return result;
-		}
+		//		if(key.ToString().StartsWith(EXTENDEDPROPERTIESPREFIX))
+		//			result.ExtendedProperties[key.ToString().Substring(EXTENDEDPROPERTIESPREFIX.Length)] = dictionary[key];
+		//	}
+
+		//	return result;
+		//}
 		#endregion
 
 		#region 重写方法

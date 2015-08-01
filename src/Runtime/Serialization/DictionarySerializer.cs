@@ -27,7 +27,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
 using Zongsoft.Common;
@@ -55,10 +54,26 @@ namespace Zongsoft.Runtime.Serialization
 			if(dictionary == null)
 				throw new ArgumentNullException("dictionary");
 
-			throw new NotImplementedException();
+			dictionary.Add("@type", graph.GetType().AssemblyQualifiedName);
+
+			var properties = graph.GetType().GetProperties();
+
+			foreach(var property in properties)
+			{
+				if(!property.CanRead)
+					continue;
+
+				if(TypeExtension.IsScalarType(property.PropertyType))
+					dictionary.Add(property.Name.ToLowerInvariant(), property.GetValue(graph));
+			}
 		}
 
-		public object Deserialize(IDictionary dictionary, Type type = null)
+		public object Deserialize(IDictionary dictionary)
+		{
+			return this.Deserialize(dictionary, null);
+		}
+
+		public object Deserialize(IDictionary dictionary, Type type)
 		{
 			return this.Deserialize(dictionary, type, null);
 		}
@@ -71,9 +86,9 @@ namespace Zongsoft.Runtime.Serialization
 			return this.Deserialize<object>(dictionary, () => Activator.CreateInstance(type), resolve);
 		}
 
-		public T Deserialize<T>(IDictionary dictionary, Func<T> creator = null)
+		public T Deserialize<T>(IDictionary dictionary)
 		{
-			return this.Deserialize<T>(dictionary, creator, null);
+			return (T)this.Deserialize(dictionary, typeof(T));
 		}
 
 		public T Deserialize<T>(IDictionary dictionary, Func<T> creator, Action<Zongsoft.Common.Convert.ObjectResolvingContext> resolve)
