@@ -31,7 +31,7 @@ namespace Zongsoft.Runtime.Serialization
 {
 	public enum SerializationMemberBehavior
 	{
-		Ignore,
+		Ignored,
 		Required,
 	}
 }
