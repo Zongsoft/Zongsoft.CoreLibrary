@@ -33,7 +33,8 @@ namespace Zongsoft.Diagnostics
 	{
 		#region 成员字段
 		private Zongsoft.Data.IDataAccess _dataAccess;
-		private DataLoggerSettings _settings;
+		private Zongsoft.Runtime.Caching.ICache _storage;
+		private Configuration.LoggerHandlerElement _configuration;
 		#endregion
 
 		#region 公共属性
@@ -52,21 +53,33 @@ namespace Zongsoft.Diagnostics
 			}
 		}
 
-		public DataLoggerSettings Settings
+		public Zongsoft.Runtime.Caching.ICache Storage
 		{
 			get
 			{
-				if(_settings == null)
-					System.Threading.Interlocked.CompareExchange(ref _settings, new DataLoggerSettings(), null);
-
-				return _settings;
+				return _storage;
 			}
 			set
 			{
 				if(value == null)
 					throw new ArgumentNullException();
 
-				_settings = value;
+				_storage = value;
+			}
+		}
+
+		public Configuration.LoggerHandlerElement Configuration
+		{
+			get
+			{
+				return _configuration;
+			}
+			set
+			{
+				if(value == null)
+					throw new ArgumentNullException();
+
+				_configuration = value;
 			}
 		}
 		#endregion
@@ -78,6 +91,14 @@ namespace Zongsoft.Diagnostics
 
 			if(dataAccess == null)
 				return;
+
+			var storage = this.Storage;
+			Zongsoft.Collections.IQueue queue = null;
+
+			foreach(Zongsoft.Options.Configuration.SettingElement parameter in _configuration.Parameters)
+			{
+				Logger.TemplateManager.Evaluate<string>(parameter.Value, entry);
+			}
 
 			throw new NotImplementedException();
 		}
