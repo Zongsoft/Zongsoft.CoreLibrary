@@ -38,7 +38,7 @@ namespace Zongsoft.Diagnostics.Configuration
 		private const string XML_NAME_ATTRIBUTE = "name";
 		private const string XML_TYPE_ATTRIBUTE = "type";
 		private const string XML_PREDICATION_ELEMENT = "predication";
-		private const string XML_PROPERTIES_COLLECTION = "properties";
+		private const string XML_PARAMETERS_COLLECTION = "parameters";
 		#endregion
 
 		#region 公共属性
@@ -83,13 +83,29 @@ namespace Zongsoft.Diagnostics.Configuration
 			}
 		}
 
-		[OptionConfigurationProperty(XML_PROPERTIES_COLLECTION, ElementName = "property")]
-		public new SettingElementCollection Properties
+		[OptionConfigurationProperty(XML_PARAMETERS_COLLECTION, ElementName = "parameter")]
+		public SettingElementCollection Parameters
 		{
 			get
 			{
-				return (SettingElementCollection)this[XML_PROPERTIES_COLLECTION];
+				return (SettingElementCollection)this[XML_PARAMETERS_COLLECTION];
 			}
+		}
+
+		public new IDictionary<string, string> Properties
+		{
+			get
+			{
+				return base.UnrecognizedProperties;
+			}
+		}
+		#endregion
+
+		#region 重写方法
+		protected override bool OnDeserializeUnrecognizedAttribute(string name, string value)
+		{
+			this.UnrecognizedProperties.Add(name, value);
+			return true;
 		}
 		#endregion
 

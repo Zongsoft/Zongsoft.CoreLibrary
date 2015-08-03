@@ -32,28 +32,6 @@ namespace Zongsoft.Diagnostics
 {
 	public class TextFileLogger : FileLogger
 	{
-		#region 常量定义
-		private const string FORMATSTRING = @"[{log.level}] {log.source} ({log.timestamp}@{environment.machineName}){newline}{log.message}{newline}{log.stackTrace}";
-		#endregion
-
-		#region 成员字段
-		private string _formatString;
-		#endregion
-
-		#region 公共属性
-		public string FormatString
-		{
-			get
-			{
-				return _formatString;
-			}
-			set
-			{
-				_formatString = value;
-			}
-		}
-		#endregion
-
 		#region 重写方法
 		protected override void WriteLog(LogEntry entry, Stream stream)
 		{
@@ -61,23 +39,6 @@ namespace Zongsoft.Diagnostics
 			{
 				writer.WriteLine(entry.ToString());
 			}
-		}
-		#endregion
-
-		#region 虚拟方法
-		protected virtual string GetFormattedContent(LogEntry entry)
-		{
-			var formatString = this.FormatString;
-
-			if(string.IsNullOrWhiteSpace(formatString))
-				formatString = FORMATSTRING;
-
-			throw new NotImplementedException();
-		}
-
-		protected virtual string Format(LogEntry entry, string formatString)
-		{
-			throw new NotImplementedException();
 		}
 		#endregion
 	}

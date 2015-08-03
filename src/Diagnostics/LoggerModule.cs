@@ -65,9 +65,9 @@ namespace Zongsoft.Diagnostics
 
 					if(handlerElement.Properties != null && handlerElement.Properties.Count > 0)
 					{
-						foreach(Zongsoft.Options.Configuration.SettingElement property in handlerElement.Properties)
+						foreach(var property in handlerElement.Properties)
 						{
-							Zongsoft.Common.Convert.SetValue(instance, property.Name, property.Value);
+							Zongsoft.Common.Convert.SetValue(instance, property.Key, property.Value);
 						}
 					}
 

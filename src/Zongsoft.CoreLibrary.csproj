@@ -193,7 +193,6 @@
     <Compile Include="Diagnostics\Configuration\TracerElement.cs" />
     <Compile Include="Diagnostics\ConsoleLogger.cs" />
     <Compile Include="Diagnostics\DataLogger.cs" />
-    <Compile Include="Diagnostics\DataLoggerSettings.cs" />
     <Compile Include="Diagnostics\FileLogger.cs" />
     <Compile Include="Diagnostics\ILogger.cs" />
     <Compile Include="Diagnostics\LogEntry.cs" />
