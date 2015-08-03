@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2013-2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -46,6 +46,7 @@ namespace Zongsoft.Options.Configuration
 		#region 实例字段
 		private OptionConfigurationProperty _elementProperty;
 		private Dictionary<OptionConfigurationProperty, object> _values;
+		private UnrecognizedPropertyCollection _unrecognizedProperties;
 		#endregion
 
 		#region 构造函数
@@ -124,9 +125,31 @@ namespace Zongsoft.Options.Configuration
 				return GetOptionPropertiesFromType(this.GetType());
 			}
 		}
+
+		protected IDictionary<string, string> UnrecognizedProperties
+		{
+			get
+			{
+				if(_unrecognizedProperties == null)
+					System.Threading.Interlocked.CompareExchange(ref _unrecognizedProperties, new UnrecognizedPropertyCollection(this), null);
+
+				return _unrecognizedProperties;
+			}
+		}
 		#endregion
 
 		#region 虚拟方法
+		protected virtual bool OnDeserializeUnrecognizedAttribute(string name, string value)
+		{
+			/*
+			 * 在子类中重写该方法，可使用以下被注释代码用来处理允许未知的属性
+			this.UnrecognizedProperties.Add(name, value);
+			return true;
+			*/
+
+			return false;
+		}
+
 		/// <summary>
 		/// 读取选项配置文件中的XML内容。
 		/// </summary>
@@ -143,17 +166,25 @@ namespace Zongsoft.Options.Configuration
 
 			if(reader.NodeType == XmlNodeType.Element)
 			{
+				var elementName = reader.Name;
+
 				for(int i = 0; i < reader.AttributeCount; i++)
 				{
 					reader.MoveToAttribute(i);
 
-					//XML特性名中间含点的，表示是系统内置特性因而无需解析处理
-					if(reader.Name.Contains("."))
+					//XML特性名中间含点的，并且是以表示是以元素名打头的，则表示为系统内置特性因而无需解析处理
+					if(reader.Name.StartsWith(elementName + "."))
 						continue;
 
 					//获取当前XML元素特性对应的配置属性定义项
 					if(this.Properties.TryGetValue(reader.Name, out property))
 						this.SetPropertyValue(property, reader.Value);
+					else
+					{
+						//执行处理未知的属性反序列化
+						if(!this.OnDeserializeUnrecognizedAttribute(reader.Name, reader.Value))
+							throw new OptionConfigurationException(string.Format("The '{0}' option configuration attribute is unrecognized.", reader.Name));
+					}
 				}
 
 				//将当前读取器移到元素上
@@ -192,7 +223,7 @@ namespace Zongsoft.Options.Configuration
 
 				//如果对应的配置属性定义项均获取失败则抛出异常
 				if(property == null)
-					throw new OptionConfigurationException();
+					throw new OptionConfigurationException(string.Format("The '{0}' option configuration element is unrecognized.", reader.Name));
 
 				//获取或创建当前配置属性定义项对应的目标元素对象
 				element = element.EnsureElementPropertyValue(property);
@@ -368,6 +399,206 @@ namespace Zongsoft.Options.Configuration
 				result = new OptionConfigurationProperty(propertyInfo);
 
 			return result;
+		}
+		#endregion
+
+		#region 嵌套子类
+		private class UnrecognizedPropertyCollection : IDictionary<string, string>
+		{
+			#region 成员字段
+			private OptionConfigurationElement _element;
+			private HashSet<string> _unrecognizedProperties;
+			#endregion
+
+			#region 构造函数
+			internal UnrecognizedPropertyCollection(OptionConfigurationElement element)
+			{
+				if(element == null)
+					throw new ArgumentNullException("element");
+
+				_element = element;
+				_unrecognizedProperties = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+			}
+			#endregion
+
+			#region 公共属性
+			public int Count
+			{
+				get
+				{
+					return _unrecognizedProperties.Count;
+				}
+			}
+
+			public bool IsReadOnly
+			{
+				get
+				{
+					return false;
+				}
+			}
+
+			public ICollection<string> Keys
+			{
+				get
+				{
+					return _unrecognizedProperties;
+				}
+			}
+
+			public ICollection<string> Values
+			{
+				get
+				{
+					var result = new string[_unrecognizedProperties.Count];
+					var index = 0;
+
+					foreach(var name in _unrecognizedProperties)
+					{
+						result[index++] = (string)_element[name];
+					}
+
+					return result;
+				}
+			}
+
+			public string this[string name]
+			{
+				get
+				{
+					if(string.IsNullOrWhiteSpace(name))
+						throw new ArgumentNullException("name");
+
+					if(_unrecognizedProperties.Contains(name))
+						return (string)_element[name];
+
+					return null;
+				}
+				set
+				{
+					if(string.IsNullOrWhiteSpace(name))
+						throw new ArgumentNullException("name");
+
+					if(_unrecognizedProperties.Contains(name))
+						_element[name] = value;
+					else
+						this.Add(name, value);
+				}
+			}
+			#endregion
+
+			#region 公共方法
+			public void Add(string name, string value)
+			{
+				if(string.IsNullOrWhiteSpace(name))
+					throw new ArgumentNullException("name");
+
+				if(_unrecognizedProperties.Contains(name))
+					throw new OptionConfigurationException(string.Format("The '{0}' attribute is existed.", name));
+
+				var property = new OptionConfigurationProperty(name, typeof(string));
+				_element.Properties.Add(property);
+				_element.SetPropertyValue(property, value);
+
+				_unrecognizedProperties.Add(name);
+			}
+
+			public bool ContainsKey(string name)
+			{
+				return _unrecognizedProperties.Contains(name);
+			}
+
+			public bool Remove(string name)
+			{
+				if(string.IsNullOrWhiteSpace(name))
+					throw new ArgumentNullException("name");
+
+				if(_unrecognizedProperties.Remove(name))
+				{
+					var property = _element.Properties[name];
+
+					if(property != null)
+					{
+						_element.SetPropertyValue(property, null);
+						_element.Properties.Remove(property);
+					}
+
+					return true;
+				}
+
+				return false;
+			}
+
+			public bool TryGetValue(string name, out string value)
+			{
+				if(string.IsNullOrWhiteSpace(name))
+					throw new ArgumentNullException("name");
+
+				value = null;
+
+				if(_unrecognizedProperties.Contains(name))
+				{
+					value = (string)_element[name];
+					return true;
+				}
+
+				return false;
+			}
+
+			public void Clear()
+			{
+				if(_unrecognizedProperties.Count < 1)
+					return;
+
+				foreach(var name in _unrecognizedProperties)
+				{
+					var property = _element.Properties[name];
+
+					if(property != null)
+					{
+						_element.SetPropertyValue(property, null);
+						_element.Properties.Remove(property);
+					}
+				}
+
+				_unrecognizedProperties.Clear();
+			}
+			#endregion
+
+			#region 显式实现
+			void ICollection<KeyValuePair<string, string>>.Add(KeyValuePair<string, string> item)
+			{
+				this.Add(item.Key, item.Value);
+			}
+
+			bool ICollection<KeyValuePair<string, string>>.Contains(KeyValuePair<string, string> item)
+			{
+				return this.ContainsKey(item.Key);
+			}
+
+			void ICollection<KeyValuePair<string, string>>.CopyTo(KeyValuePair<string, string>[] array, int arrayIndex)
+			{
+				throw new NotImplementedException();
+			}
+
+			bool ICollection<KeyValuePair<string, string>>.Remove(KeyValuePair<string, string> item)
+			{
+				return this.Remove(item.Key);
+			}
+
+			public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
+			{
+				foreach(var name in _unrecognizedProperties)
+				{
+					yield return new KeyValuePair<string, string>(name, (string)_element[name]);
+				}
+			}
+
+			System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+			{
+				return this.GetEnumerator();
+			}
+			#endregion
 		}
 		#endregion
 	}

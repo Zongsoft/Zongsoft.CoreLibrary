@@ -29,7 +29,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Options.Configuration
 {
-	public class SettingElementCollection : OptionConfigurationElementCollection, ISettingsProvider
+	public class SettingElementCollection : OptionConfigurationElementCollection<SettingElement>, ISettingsProvider
 	{
 		#region 构造函数
 		public SettingElementCollection() : base("setting")
@@ -42,19 +42,6 @@ namespace Zongsoft.Options.Configuration
 		#endregion
 
 		#region 公共属性
-		/// <summary>
-		/// 获取指定位置的<see cref="SettingElement"/>设置项元素。
-		/// </summary>
-		/// <param name="index">指定获取的设置项位置号。</param>
-		/// <returns>返回指定位置的<see cref="SettingElement"/>设置项元素。</returns>
-		public SettingElement this[int index]
-		{
-			get
-			{
-				return (SettingElement)this.Items[index];
-			}
-		}
-
 		/// <summary>
 		/// 获取或设置指定设置项的文本值。
 		/// </summary>
