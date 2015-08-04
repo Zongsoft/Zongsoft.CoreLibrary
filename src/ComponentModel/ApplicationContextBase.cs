@@ -34,6 +34,10 @@ namespace Zongsoft.ComponentModel
 {
 	public class ApplicationContextBase : MarshalByRefObject, INotifyPropertyChanged
 	{
+		#region 单例字段
+		private volatile static ApplicationContextBase _current;
+		#endregion
+
 		#region 事件声明
 		public event CancelEventHandler Exiting;
 		public event EventHandler<ApplicationEventArgs> Starting;
@@ -68,6 +72,26 @@ namespace Zongsoft.ComponentModel
 
 			//初始化属性变量
 			_applicationId = applicationId;
+		}
+		#endregion
+
+		#region 单例属性
+		/// <summary>
+		/// 获取当前应用程序的<see cref="ApplicationContextBase"/>上下文。
+		/// </summary>
+		public static ApplicationContextBase Current
+		{
+			get
+			{
+				return _current;
+			}
+			protected set
+			{
+				if(value == null)
+					throw new ArgumentNullException();
+
+				_current = value;
+			}
 		}
 		#endregion
 
@@ -265,32 +289,13 @@ namespace Zongsoft.ComponentModel
 				if(string.IsNullOrWhiteSpace(part))
 					continue;
 
-				if(!Directory.Exists(Path.Combine(fullPath, part)))
-					Directory.CreateDirectory(Path.Combine(fullPath, part));
-
 				fullPath = Path.Combine(fullPath, part);
+
+				if(!Directory.Exists(fullPath))
+					Directory.CreateDirectory(fullPath);
 			}
 
 			return fullPath;
-		}
-		#endregion
-
-		#region 静态方法
-		/// <summary>
-		/// 获取当前应用程序的<see cref="ApplicationContextBase"/>上下文。
-		/// </summary>
-		/// <returns>返回当前应用程序的上下文对象。</returns>
-		/// <remarks>
-		///		<para>该方法的实现机制是通过<seealso cref="Zongsoft.Services.ServiceProviderFactory"/>类中的默认服务容器来解析获取<see cref="ApplicationContextBase"/>的，所以必须确保应用程序上下文在应用启动时被注册到默认服务容器中了。</para>
-		/// </remarks>
-		public static ApplicationContextBase GetApplicationContext()
-		{
-			var provider = Zongsoft.Services.ServiceProviderFactory.Instance.Default;
-
-			if(provider != null)
-				return provider.Resolve<ApplicationContextBase>();
-
-			return null;
 		}
 		#endregion
 
