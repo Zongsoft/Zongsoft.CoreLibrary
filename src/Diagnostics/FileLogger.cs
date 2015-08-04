@@ -119,18 +119,29 @@ namespace Zongsoft.Diagnostics
 			else
 				filePath = Logger.TemplateManager.Evaluate<string>(_filePath.Trim(), entry);
 
-			if(!string.IsNullOrWhiteSpace(filePath))
-			{
-				var applicationContext = Zongsoft.ComponentModel.ApplicationContextBase.GetApplicationContext();
+			if(string.IsNullOrWhiteSpace(filePath))
+				return null;
 
-				if(applicationContext != null)
-				{
-					var directoryPath = applicationContext.EnsureDirectory(System.IO.Path.GetDirectoryName(filePath));
-					filePath = System.IO.Path.Combine(directoryPath, System.IO.Path.GetFileName(filePath));
-				}
+			filePath = filePath.Replace((Path.DirectorySeparatorChar == '/' ? '\\' : '/'), Path.DirectorySeparatorChar).Trim();
+
+			if(filePath[0] == '/' || filePath[0] == '\\')
+			{
+				filePath = Path.Combine(Path.GetPathRoot(Zongsoft.ComponentModel.ApplicationContextBase.Current.ApplicationDirectory), filePath.Substring(1));
+
+				if(!Directory.Exists(Path.GetDirectoryName(filePath)))
+					Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+
+				return filePath;
 			}
 
-			return filePath;
+			string directoryPath;
+
+			if(filePath.StartsWith("~/") || filePath.StartsWith("~\\"))
+				directoryPath = Zongsoft.ComponentModel.ApplicationContextBase.Current.EnsureDirectory(Path.GetDirectoryName(filePath.Substring(2)));
+			else
+				directoryPath = Zongsoft.ComponentModel.ApplicationContextBase.Current.EnsureDirectory(Path.GetDirectoryName(filePath));
+
+			return Path.Combine(directoryPath, Path.GetFileName(filePath));
 		}
 		#endregion
 
