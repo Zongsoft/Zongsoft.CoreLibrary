@@ -93,7 +93,7 @@ namespace Zongsoft.Diagnostics
 			if(entry == null)
 				return;
 
-			var filePath = this.ResolveFilePath(entry);
+			var filePath = this.ResolveSequence(entry);
 
 			if(string.IsNullOrWhiteSpace(filePath))
 				throw new InvalidOperationException("Unspecified path of the log file.");
@@ -146,7 +146,7 @@ namespace Zongsoft.Diagnostics
 		#endregion
 
 		#region 私有方法
-		private string ResolveFilePath(LogEntry entry)
+		private string ResolveSequence(LogEntry entry)
 		{
 			const string PATTERN = @"(?<no>\d+)";
 			const string SEQUENCE = "{sequence}";
@@ -155,11 +155,11 @@ namespace Zongsoft.Diagnostics
 			var result = string.Empty;
 			var filePath = this.GetFilePath(entry);
 
-			if(string.IsNullOrEmpty(filePath) || this.FileSize < 1)
+			if(string.IsNullOrEmpty(filePath) || (!filePath.Contains(SEQUENCE)))
 				return filePath;
 
-			if(!filePath.Contains(SEQUENCE))
-				return filePath;
+			if(this.FileSize < 1)
+				return filePath.Replace(SEQUENCE, string.Empty);
 
 			var fileName = System.IO.Path.GetFileName(filePath);
 			var infos = Zongsoft.IO.LocalFileSystem.Instance.Directory.GetFiles(System.IO.Path.GetDirectoryName(filePath), fileName.Replace(SEQUENCE, "|" + PATTERN + "|"), false);

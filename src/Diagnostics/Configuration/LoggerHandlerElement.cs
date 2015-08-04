@@ -59,7 +59,7 @@ namespace Zongsoft.Diagnostics.Configuration
 		}
 
 		[OptionConfigurationProperty(XML_TYPE_ATTRIBUTE, Behavior = OptionConfigurationPropertyBehavior.IsRequired)]
-		public string Type
+		public string TypeName
 		{
 			get
 			{

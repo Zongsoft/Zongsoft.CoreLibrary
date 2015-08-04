@@ -53,21 +53,30 @@ namespace Zongsoft.Diagnostics
 			{
 				foreach(Configuration.LoggerHandlerElement handlerElement in loggerElement.Handlers)
 				{
-					var type = Type.GetType(handlerElement.Type, true, true);
+					var type = Type.GetType(handlerElement.TypeName, true, true);
 
 					if(!typeof(ILogger).IsAssignableFrom(type))
-						throw new Options.Configuration.OptionConfigurationException();
+						throw new Options.Configuration.OptionConfigurationException(string.Format("The '{0}' type isn't a Logger.", type.FullName));
 
-					var instance = (ILogger)Activator.CreateInstance(type);
+					var constructor = type.GetConstructor(new Type[] { typeof(Configuration.LoggerHandlerElement) });
+					ILogger instance;
+
+					if(constructor == null)
+						instance = (ILogger)Activator.CreateInstance(type);
+					else
+						instance = (ILogger)Activator.CreateInstance(type, handlerElement);
 
 					if(instance == null)
-						throw new Options.Configuration.OptionConfigurationException();
+						throw new Options.Configuration.OptionConfigurationException(string.Format("Can not create instance of '{0}' type.", type));
 
-					if(handlerElement.Properties != null && handlerElement.Properties.Count > 0)
+					if(constructor == null)
 					{
-						foreach(var property in handlerElement.Properties)
+						if(handlerElement.Properties != null && handlerElement.Properties.Count > 0)
 						{
-							Zongsoft.Common.Convert.SetValue(instance, property.Key, property.Value);
+							foreach(var property in handlerElement.Properties)
+							{
+								Zongsoft.Common.Convert.SetValue(instance, property.Key, property.Value);
+							}
 						}
 					}
 
