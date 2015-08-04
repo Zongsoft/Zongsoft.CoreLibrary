@@ -255,7 +255,7 @@ namespace Zongsoft.Data
 
 		protected virtual bool IsScalarType(Type type)
 		{
-			return Zongsoft.Common.TypeExtension.IsScalarType(type);
+			return Zongsoft.Common.TypeExtension.IsScalarType(type) || typeof(Expression).IsAssignableFrom(type);
 		}
 		#endregion
 
