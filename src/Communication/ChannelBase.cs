@@ -55,7 +55,6 @@ namespace Zongsoft.Communication
 		private int _channelId;
 		private DateTime _lastSendTime;
 		private DateTime _lastReceivedTime;
-		private IPacketizer _packetizer;
 		#endregion
 
 		#region 构造函数
@@ -76,21 +75,6 @@ namespace Zongsoft.Communication
 			get
 			{
 				return _channelId;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置当前通道的通讯协议解析器。
-		/// </summary>
-		public IPacketizer Packetizer
-		{
-			get
-			{
-				return _packetizer;
-			}
-			set
-			{
-				_packetizer = value;
 			}
 		}
 
@@ -261,9 +245,10 @@ namespace Zongsoft.Communication
 			this.Close();
 		}
 
-		void IDisposable.Dispose()
+		public void Dispose()
 		{
 			this.Dispose(true);
+			GC.SuppressFinalize(this);
 		}
 		#endregion
 	}

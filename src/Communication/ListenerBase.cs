@@ -50,24 +50,14 @@ namespace Zongsoft.Communication
 		#endregion
 
 		#region 成员变量
-		private IPEndPoint _address;
 		private IReceiver _receiver;
 		private IExecutor _executor;
 		#endregion
 
 		#region 构造函数
-		protected ListenerBase(string name) : this(name, new IPEndPoint(IPAddress.Any, 7969))
+		protected ListenerBase(string name)
 		{
-		}
-
-		protected ListenerBase(string name, [TypeConverter(typeof(IPEndPointConverter))]IPEndPoint address) : base(name)
-		{
-			if(address == null)
-				throw new ArgumentNullException("address");
-
 			_syncRoot = new object();
-			_address = address;
-			_receiver = null;
 		}
 		#endregion
 
@@ -77,25 +67,6 @@ namespace Zongsoft.Communication
 			get
 			{
 				return this.State == WorkerState.Running;
-			}
-		}
-
-		[TypeConverter(typeof(IPEndPointConverter))]
-		public IPEndPoint Address
-		{
-			get
-			{
-				return _address;
-			}
-			set
-			{
-				if(value == null)
-					throw new ArgumentNullException();
-
-				if(this.IsListening)
-					throw new InvalidOperationException("The service state is listening.");
-
-				_address = value;
 			}
 		}
 

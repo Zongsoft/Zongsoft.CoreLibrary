@@ -49,6 +49,7 @@ namespace Zongsoft.Communication.Net
 
 		#region 成员变量
 		private Socket _socket;
+		private IPEndPoint _address;
 		private TcpServerChannelManager _channelManager;
 		private Zongsoft.Runtime.Caching.IBufferManagerSelector _bufferSelector;
 		#endregion
@@ -62,8 +63,13 @@ namespace Zongsoft.Communication.Net
 		{
 		}
 
-		public TcpServer([TypeConverter(typeof(IPEndPointConverter))]IPEndPoint localEP) : base("TcpServer", localEP)
+		public TcpServer([TypeConverter(typeof(IPEndPointConverter))]IPEndPoint address) : base("TcpServer")
 		{
+			if(address == null)
+				throw new ArgumentNullException("address");
+
+			_address = address;
+
 			//创建接受异步事件参数
 			_acceptAsyncArgs = new SocketAsyncEventArgs();
 
@@ -82,6 +88,25 @@ namespace Zongsoft.Communication.Net
 		#endregion
 
 		#region 公共属性
+		[TypeConverter(typeof(IPEndPointConverter))]
+		public IPEndPoint Address
+		{
+			get
+			{
+				return _address;
+			}
+			set
+			{
+				if(value == null)
+					throw new ArgumentNullException();
+
+				if(this.IsListening)
+					throw new InvalidOperationException("The service state is listening.");
+
+				_address = value;
+			}
+		}
+
 		public TcpServerChannelManager ChannelManager
 		{
 			get

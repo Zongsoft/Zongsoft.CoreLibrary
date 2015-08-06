@@ -51,14 +51,6 @@ namespace Zongsoft.Communication
 		}
 
 		/// <summary>
-		/// 获取通讯侦听的地址。
-		/// </summary>
-		IPEndPoint Address
-		{
-			get;
-		}
-
-		/// <summary>
 		/// 开启侦听。
 		/// </summary>
 		void Start(params string[] args);

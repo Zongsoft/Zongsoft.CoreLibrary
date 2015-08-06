@@ -50,6 +50,7 @@ namespace Zongsoft.Communication.Net
 
 		#region 成员变量
 		private Socket _socket;
+		private IPacketizer _packetizer;
 		#endregion
 
 		#region 构造函数
@@ -106,6 +107,21 @@ namespace Zongsoft.Communication.Net
 					return socket.RemoteEndPoint;
 
 				return null;
+			}
+		}
+
+		/// <summary>
+		/// 获取或设置当前通道的通讯协议解析器。
+		/// </summary>
+		public IPacketizer Packetizer
+		{
+			get
+			{
+				return _packetizer;
+			}
+			set
+			{
+				_packetizer = value;
 			}
 		}
 		#endregion
