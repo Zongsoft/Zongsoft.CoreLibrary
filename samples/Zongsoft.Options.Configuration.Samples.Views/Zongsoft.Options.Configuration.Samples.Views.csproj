@@ -38,7 +38,7 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Zongsoft.CoreLibrary">
-      <HintPath>..\..\src\bin\Debug\Zongsoft.CoreLibrary.dll</HintPath>
+      <HintPath>..\..\src\bin\$(Configuration)\Zongsoft.CoreLibrary.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
