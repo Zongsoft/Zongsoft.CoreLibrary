@@ -36,16 +36,14 @@ namespace Zongsoft.Security.Membership
 		private bool _isAuthenticated;
 		private string _namespace;
 		private string _identity;
-		private string _scene;
 		private User _user;
 		#endregion
 
 		#region 构造函数
-		public AuthenticatedEventArgs(string identity, string @namespace, string scene, bool isAuthenticated, User user = null)
+		public AuthenticatedEventArgs(string identity, string @namespace, bool isAuthenticated, User user = null)
 		{
 			_identity = identity;
 			_namespace = @namespace;
-			_scene = scene;
 			_isAuthenticated = isAuthenticated;
 			_user = user;
 		}
@@ -71,17 +69,6 @@ namespace Zongsoft.Security.Membership
 			get
 			{
 				return _identity;
-			}
-		}
-
-		/// <summary>
-		/// 获取身份验证的场景。
-		/// </summary>
-		public string Scene
-		{
-			get
-			{
-				return _scene;
 			}
 		}
 

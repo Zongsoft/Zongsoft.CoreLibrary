@@ -34,11 +34,11 @@ namespace Zongsoft.Security.Membership
 	/// </summary>
 	public enum AuthorizationMode
 	{
-		/// <summary>忽略授权验证，即对当前处理不做授权验证。</summary>
-		Ignore,
+		/// <summary>禁止授权验证，即对当前处理不做授权验证。</summary>
+		Disabled,
 
 		/// <summary>仅限身份验证，即当前调用为非匿名调用即通过。</summary>
-		Licensee,
+		Identity,
 
 		/// <summary>必须授权验证通过。</summary>
 		Required,

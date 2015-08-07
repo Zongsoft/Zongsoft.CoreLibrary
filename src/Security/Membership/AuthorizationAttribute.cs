@@ -44,15 +44,18 @@ namespace Zongsoft.Security.Membership
 			_actionId = string.Empty;
 			_schemaId = string.Empty;
 
-			_mode = AuthorizationMode.Required;
+			_mode = AuthorizationMode.Identity;
 		}
 
-		public AuthorizationAttribute(AuthorizationMode mode)
+		public AuthorizationAttribute(bool disabled)
 		{
-			_mode = mode;
+			_actionId = string.Empty;
+			_schemaId = string.Empty;
+
+			_mode = disabled ? AuthorizationMode.Disabled : AuthorizationMode.Identity;
 		}
 
-		public AuthorizationAttribute(string schemaId) : this(schemaId, string.Empty)
+		public AuthorizationAttribute(string schemaId) : this(schemaId, null)
 		{
 		}
 
