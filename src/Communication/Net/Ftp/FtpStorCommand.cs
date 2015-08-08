@@ -89,9 +89,9 @@ namespace Zongsoft.Communication.Net.Ftp
 
                 context.Channel.Send("150 Opening data connection for file transfer.");
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Tracer.Default.Trace(typeof(FtpStorCommand).FullName, e.ToString());
+				Logger.Error(ex);
 
                 if (context.Channel.UpFileStream != null)
                 {
@@ -100,8 +100,8 @@ namespace Zongsoft.Communication.Net.Ftp
                 }
                 context.Channel.CloseDataChannel();
 
-                if (e is FtpException)
-                    throw e;
+                if (ex is FtpException)
+                    throw ex;
 
                 throw new InternalException("store file");
             }

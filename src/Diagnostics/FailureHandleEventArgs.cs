@@ -31,6 +31,7 @@ using System.Text;
 namespace Zongsoft.Diagnostics
 {
 	[Serializable]
+	[Obsolete]
 	public class FailureHandleEventArgs : FailureEventArgs
 	{
 		#region 成员字段
