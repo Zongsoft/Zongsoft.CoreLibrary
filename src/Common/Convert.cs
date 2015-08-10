@@ -705,25 +705,111 @@ namespace Zongsoft.Common
 
 		private static MemberInfo GetMember(Type type, string name, BindingFlags? binding = null, bool ignoreCase = true)
 		{
+			object[] index;
+			return GetMember(type, name, binding, ignoreCase, out index);
+		}
+
+		private static MemberInfo GetMember(Type type, string name, BindingFlags? binding, bool ignoreCase, out object[] index)
+		{
+			index = null;
+
 			if(type == null || string.IsNullOrWhiteSpace(name))
 				return null;
 
 			if(!binding.HasValue)
 				binding = (BindingFlags.Public | BindingFlags.Instance);
 
-			var members = type.FindMembers((MemberTypes.Field | MemberTypes.Property),
-								binding.Value,
-								(member, criteria) =>
-								{
-									return string.Equals((string)criteria, member.Name,
-														 (ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal));
-								},
-								name);
+			//var members = type.FindMembers((MemberTypes.Field | MemberTypes.Property),
+			//					binding.Value,
+			//					(member, criteria) =>
+			//					{
+			//						string indexer;
 
-			if(members != null && members.Length > 0)
-				return members[0];
+			//						if(IsIndexer(member.Name, out indexer) && member.MemberType == MemberTypes.Property)
+			//						{
+			//							var parameters = ((PropertyInfo)member).GetIndexParameters();
+			//							object value;
+
+			//							if(parameters.Length == 1 && Convert.TryConvertValue(indexer, parameters[0].ParameterType, out value))
+			//							{
+			//								index[0] = value;
+			//							}
+			//						}
+
+			//						return string.Equals((string)criteria, member.Name,
+			//											 (ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal));
+			//					},
+			//					name);
+
+			//if(members != null && members.Length > 0)
+			//	return members[0];
+
+			var members = type.GetMembers(binding.Value);
+
+			foreach(var member in members)
+			{
+				if(member.MemberType != MemberTypes.Field && member.MemberType != MemberTypes.Property)
+					continue;
+
+				string indexer;
+				bool isString;
+
+				if(member.MemberType == MemberTypes.Property && IsIndexer(name, out indexer, out isString))
+				{
+					var parameters = ((PropertyInfo)member).GetIndexParameters();
+					object value;
+
+					if(parameters.Length == 1)
+					{
+						if(isString && parameters[0].ParameterType == typeof(string))
+						{
+							index = new object[] { indexer };
+							return member;
+						}
+						else if(parameters[0].ParameterType != typeof(string) && Convert.TryConvertValue(indexer, parameters[0].ParameterType, out value))
+						{
+							index = new object[] { value };
+							return member;
+						}
+					}
+				}
+				else
+				{
+					if(string.Equals(name, member.Name, (ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal)))
+						return member;
+				}
+			}
 
 			return null;
+		}
+
+		private static bool IsIndexer(string name, out string indexer, out bool isString)
+		{
+			isString = false;
+
+			if(name.Length >= 4)
+			{
+				int endPosition = name.Length - 1;
+
+				if((name[0] == '[' && name[1] == '"' && name[endPosition - 1] == '"' && name[endPosition] == ']') ||
+				   (name[0] == '[' && name[1] == '\'' && name[endPosition - 1] == '\'' && name[endPosition] == ']'))
+				{
+					isString = true;
+					indexer = name.Substring(2, name.Length - 4);
+					return true;
+				}
+			}
+			else if(name.Length >= 2)
+			{
+				if(name[0] == '[' && name[name.Length - 1] == ']')
+				{
+					indexer = name.Substring(1, name.Length - 2);
+					return true;
+				}
+			}
+
+			indexer = name;
+			return false;
 		}
 		#endregion
 
@@ -751,6 +837,7 @@ namespace Zongsoft.Common
 			private MemberInfo _member;
 			private string _text;
 			private string _memberName;
+			private object[] _memberParameters;
 			private object _value;
 			private bool _handled;
 			private bool _isTerminated;
@@ -893,7 +980,7 @@ namespace Zongsoft.Common
 						if(_container == null || string.IsNullOrWhiteSpace(_memberName))
 							return null;
 
-						_member = GetMember(_container.GetType(), _memberName);
+						_member = GetMember(_container.GetType(), _memberName, null, true, out _memberParameters);
 					}
 
 					return _member;
@@ -984,9 +1071,9 @@ namespace Zongsoft.Common
 					case MemberTypes.Field:
 						return ((FieldInfo)member).GetValue(container);
 					case MemberTypes.Property:
-						return ((PropertyInfo)member).GetValue(container, null);
+						return ((PropertyInfo)member).GetValue(container, _memberParameters);
 					case MemberTypes.Method:
-						return ((MethodInfo)member).Invoke(container, null);
+						return ((MethodInfo)member).Invoke(container, _memberParameters);
 				}
 
 				throw new InvalidOperationException(string.Format("Invalid '{0}' member for '{1}' text.", this.MemberName, this.Text));

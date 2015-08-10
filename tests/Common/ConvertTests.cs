@@ -49,10 +49,11 @@ namespace Zongsoft.Common.Tests
 		[TestMethod]
 		public void GetValueTest()
 		{
-			var person = new Person()
+			var emp1 = new Employee()
 			{
 				Name = "Popeye Zhong",
 				Gender = Gender.Male,
+				Salary = 10000.01m,
 				HomeAddress = new Address
 				{
 					CountryId = 123,
@@ -61,14 +62,28 @@ namespace Zongsoft.Common.Tests
 				},
 			};
 
-			Assert.AreEqual("Popeye Zhong", Zongsoft.Common.Convert.GetValue(person, "Name"));
-			Assert.AreEqual("Wuhan", Zongsoft.Common.Convert.GetValue(person, "HomeAddress.City"));
+			Assert.AreEqual("Popeye Zhong", Zongsoft.Common.Convert.GetValue(emp1, "Name"));
+			Assert.AreEqual("Wuhan", Zongsoft.Common.Convert.GetValue(emp1, "HomeAddress.City"));
 
-			Zongsoft.Common.Convert.SetValue(person, "Name", "Popeye");
-			Assert.AreEqual("Popeye", Zongsoft.Common.Convert.GetValue(person, "Name"));
+			Zongsoft.Common.Convert.SetValue(emp1, "Name", "Popeye");
+			Assert.AreEqual("Popeye", Zongsoft.Common.Convert.GetValue(emp1, "Name"));
 
-			Zongsoft.Common.Convert.SetValue(person, "HomeAddress.City", "Shenzhen");
-			Assert.AreEqual("Shenzhen", Zongsoft.Common.Convert.GetValue(person, "HomeAddress.City"));
+			Zongsoft.Common.Convert.SetValue(emp1, "HomeAddress.City", "Shenzhen");
+			Assert.AreEqual("Shenzhen", Zongsoft.Common.Convert.GetValue(emp1, "HomeAddress.City"));
+
+			var department = new Department("Develop");
+			department.AddEmployee(emp1);
+
+			var empX = department[0];
+			Assert.IsNotNull(empX);
+			var empY = department["Popeye"];
+			Assert.IsNotNull(empY);
+
+			empX = (Employee)Zongsoft.Common.Convert.GetValue(department, "[0]");
+			Assert.IsNotNull(empX);
+
+			empY = (Employee)Zongsoft.Common.Convert.GetValue(department, "['Popeye']");
+			Assert.IsNotNull(empX);
 		}
 
 		[TestMethod]
