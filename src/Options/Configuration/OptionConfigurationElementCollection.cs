@@ -225,7 +225,7 @@ namespace Zongsoft.Options.Configuration
 
 				//如果当前配置属性定义项是默认集合(即其没有对应的XML集合元素)，则必须检查当前XML元素的名称是否与默认集合的元素名相同，如果不同则配置文件内容非法而抛出异常
 				if(!string.Equals(reader.Name, elementName, StringComparison.OrdinalIgnoreCase))
-					throw new OptionConfigurationException();
+					throw new OptionConfigurationException(string.Format("The '{0}' option configuration collection is unrecognized.", reader.Name));
 
 				//创建集合元素对象
 				var element = this.CreateNewElement();
