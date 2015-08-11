@@ -328,7 +328,7 @@ namespace Zongsoft.Services.Composition
 			if(selector != null)
 				return selector.SelectPipelines(context, pipelines);
 
-			return this.Pipelines;
+			return pipelines;
 		}
 		#endregion
 
