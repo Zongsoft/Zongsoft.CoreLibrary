@@ -90,6 +90,15 @@ namespace Zongsoft.Communication
 		{
 			PackageSerializer.Default.Serialize(serializationStream, this);
 		}
+
+		public byte[] ToArray()
+		{
+			using(var ms = new MemoryStream())
+			{
+				this.Serialize(ms);
+				return ms.ToArray();
+			}
+		}
 		#endregion
 
 		#region 处置方法
