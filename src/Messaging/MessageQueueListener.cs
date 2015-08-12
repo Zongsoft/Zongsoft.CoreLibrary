@@ -26,12 +26,15 @@
 
 using System;
 using System.IO;
+using System.ComponentModel;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Zongsoft.Messaging
 {
+	[DisplayName("${Text.MessageQueueListener.Title}")]
+	[Description("${Text.MessageQueueListener.Description}")]
 	public class MessageQueueListener : Zongsoft.Communication.ListenerBase
 	{
 		#region 成员字段

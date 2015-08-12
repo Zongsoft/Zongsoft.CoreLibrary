@@ -192,6 +192,12 @@
   <data name="Text.HelpCommand.Title" xml:space="preserve">
     <value>帮助命令</value>
   </data>
+  <data name="Text.MessageQueueListener.Description" xml:space="preserve">
+    <value>侦听器基于消息队列的出队堵塞机制去获取出队消息，只要队列中有消息可用则激发出队事件，将出队的消息递交给执行器去执行。</value>
+  </data>
+  <data name="Text.MessageQueueListener.Title" xml:space="preserve">
+    <value>消息队列侦听器</value>
+  </data>
   <data name="Text.ShellCommand.Description" xml:space="preserve">
     <value>通过系统Shell来执行外部命令。</value>
   </data>
