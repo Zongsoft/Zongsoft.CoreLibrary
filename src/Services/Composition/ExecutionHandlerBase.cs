@@ -50,14 +50,16 @@ namespace Zongsoft.Services.Composition
 		protected ExecutionHandlerBase()
 		{
 			_name = this.GetType().Name;
+			_enabled = true;
 		}
 
 		protected ExecutionHandlerBase(string name)
 		{
-			if(string.IsNullOrEmpty(name))
+			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException("name");
 
 			_name = name.Trim();
+			_enabled = true;
 		}
 		#endregion
 

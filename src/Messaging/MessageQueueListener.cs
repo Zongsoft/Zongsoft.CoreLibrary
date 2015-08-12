@@ -85,12 +85,14 @@ namespace Zongsoft.Messaging
 				throw new MissingMemberException(this.GetType().FullName, "Queue");
 
 			_channel = new MessageQueueChannel(1, queue);
+			this.Receiver = _channel;
 			_channel.ReceiveAsync();
 		}
 
 		protected override void OnStop(string[] args)
 		{
 			var channel = System.Threading.Interlocked.Exchange(ref _channel, null);
+			this.Receiver = null;
 
 			if(channel != null)
 				channel.Dispose();
