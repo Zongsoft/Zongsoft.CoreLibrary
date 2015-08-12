@@ -8,6 +8,7 @@ namespace Zongsoft.Runtime.Serialization
 	{
 		#region 成员字段
 		private bool _indented;
+		private bool _typed;
 		private SerializationNamingConvention _namingConvention;
 		#endregion
 
@@ -20,6 +21,9 @@ namespace Zongsoft.Runtime.Serialization
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取或设置一个值，指示序列化后的文本是否保持缩进风格。
+		/// </summary>
 		public bool Indented
 		{
 			get
@@ -32,6 +36,24 @@ namespace Zongsoft.Runtime.Serialization
 			}
 		}
 
+		/// <summary>
+		/// 获取或设置一个值，指示序列化的文本是否保持强类型信息。
+		/// </summary>
+		public bool Typed
+		{
+			get
+			{
+				return _typed;
+			}
+			set
+			{
+				this.SetPropertyValue(() => this.Typed, ref _typed, value);
+			}
+		}
+
+		/// <summary>
+		/// 获取或设置一个值，指示序列化成员的命名转换方式。
+		/// </summary>
 		public SerializationNamingConvention NamingConvention
 		{
 			get
