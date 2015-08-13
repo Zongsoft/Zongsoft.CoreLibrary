@@ -33,6 +33,7 @@ namespace Zongsoft.Runtime.Serialization
 	{
 		#region 成员变量
 		private int _maximumDepth;
+		private SerializationBehavior _serializationBehavior;
 		private SerializationMembers _serializationMembers;
 		#endregion
 
@@ -69,6 +70,18 @@ namespace Zongsoft.Runtime.Serialization
 			}
 		}
 
+		public SerializationBehavior SerializationBehavior
+		{
+			get
+			{
+				return _serializationBehavior;
+			}
+			set
+			{
+				this.SetPropertyValue(() => this.SerializationBehavior, ref _serializationBehavior, value);
+			}
+		}
+
 		public SerializationMembers SerializationMembers
 		{
 			get
@@ -77,11 +90,7 @@ namespace Zongsoft.Runtime.Serialization
 			}
 			set
 			{
-				if(_serializationMembers != value)
-				{
-					_serializationMembers = value;
-					this.OnPropertyChanged(() => this.SerializationMembers);
-				}
+				this.SetPropertyValue(() => this.SerializationMembers, ref _serializationMembers, value);
 			}
 		}
 		#endregion
