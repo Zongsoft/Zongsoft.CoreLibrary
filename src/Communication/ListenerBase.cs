@@ -92,9 +92,6 @@ namespace Zongsoft.Communication
 			}
 			protected set
 			{
-				if(value == null)
-					throw new ArgumentNullException();
-
 				//绑定接收器事件(先取消原有接收器的事件，再挂载新接收器事件)
 				this.BindReceiver(value, _receiver);
 
