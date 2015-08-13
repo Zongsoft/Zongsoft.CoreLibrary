@@ -110,10 +110,8 @@ namespace Zongsoft.Security
 				{
 					var provider = this.Provider;
 
-					if(provider == null)
-						return null;
-
-					_certification = provider.GetCertification(_certificationId);
+					if(provider != null)
+						_certification = provider.GetCertification(_certificationId);
 				}
 
 				return _certification;
