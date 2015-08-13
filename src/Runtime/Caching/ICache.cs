@@ -97,6 +97,14 @@ namespace Zongsoft.Runtime.Caching
 		/// <param name="key">指定要获取的键。</param>
 		/// <param name="valueCreator">如果指定的键不存在则使用该委托进行创建它，如果该参数为空则当指定的键不存在时返回空(null)。</param>
 		/// <returns>返回指定键的值或新增并保存的缓存项的值。</returns>
+		object GetValue(string key, Func<string, Tuple<object, DateTime>> valueCreator);
+
+		/// <summary>
+		/// 从缓存字典中获取指定键的缓存值。
+		/// </summary>
+		/// <param name="key">指定要获取的键。</param>
+		/// <param name="valueCreator">如果指定的键不存在则使用该委托进行创建它，如果该参数为空则当指定的键不存在时返回空(null)。</param>
+		/// <returns>返回指定键的值或新增并保存的缓存项的值。</returns>
 		object GetValue(string key, Func<string, Tuple<object, TimeSpan>> valueCreator);
 
 		/// <summary>
@@ -112,10 +120,20 @@ namespace Zongsoft.Runtime.Caching
 		/// </summary>
 		/// <param name="key">指定要保存的键。</param>
 		/// <param name="value">指定要保存的值。</param>
-		/// <param name="duration">指定缓存项的生存时长，如果为零则不限制。</param>
+		/// <param name="duration">指定缓存项的生存时长，如果为零则表示永不过期。</param>
 		/// <param name="requiredNotExists">设置一个值，当指定的<paramref name="key"/>是不存在的则设置该缓存项，否则不执行任何动作。</param>
 		/// <returns>如果设置成功则返回真(true)，否则返回假(false)。</returns>
 		bool SetValue(string key, object value, TimeSpan duration, bool requiredNotExists = false);
+
+		/// <summary>
+		/// 设置指定的值保存到缓存字典中。
+		/// </summary>
+		/// <param name="key">指定要保存的键。</param>
+		/// <param name="value">指定要保存的值。</param>
+		/// <param name="expires">指定缓存项的过期时间，如果小于当前时间则表示永不过期。</param>
+		/// <param name="requiredNotExists">设置一个值，当指定的<paramref name="key"/>是不存在的则设置该缓存项，否则不执行任何动作。</param>
+		/// <returns>如果设置成功则返回真(true)，否则返回假(false)。</returns>
+		bool SetValue(string key, object value, DateTime expires, bool requiredNotExists = false);
 
 		/// <summary>
 		/// 修改指定键的缓存项的键名。

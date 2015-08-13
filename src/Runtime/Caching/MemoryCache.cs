@@ -144,6 +144,21 @@ namespace Zongsoft.Runtime.Caching
 			});
 		}
 
+		public object GetValue(string key, Func<string, Tuple<object, DateTime>> valueCreator)
+		{
+			if(valueCreator == null)
+				return _innerCache.Get(key);
+
+			var result = valueCreator(key);
+
+			return _innerCache.AddOrGetExisting(key, result.Item1, new System.Runtime.Caching.CacheItemPolicy()
+			{
+				AbsoluteExpiration = result.Item2 > DateTime.Now ? result.Item2 : System.Runtime.Caching.ObjectCache.InfiniteAbsoluteExpiration,
+				//UpdateCallback = this.OnUpdateCallback,
+				RemovedCallback = this.OnRemovedCallback,
+			});
+		}
+
 		public bool SetValue(string key, object value)
 		{
 			return this.SetValue(key, value, TimeSpan.Zero);
@@ -170,6 +185,34 @@ namespace Zongsoft.Runtime.Caching
 				_innerCache.Set(key, value, new System.Runtime.Caching.CacheItemPolicy()
 				{
 					SlidingExpiration = duration,
+					//UpdateCallback = this.OnUpdateCallback,
+					RemovedCallback = this.OnRemovedCallback,
+				});
+
+			return true;
+		}
+
+		public bool SetValue(string key, object value, DateTime expires, bool requiredNotExists = false)
+		{
+			if(requiredNotExists)
+			{
+				var exists = _innerCache.Contains(key);
+
+				if(exists)
+					return false;
+			}
+
+			if(expires < DateTime.Now)
+				_innerCache.Set(key, value, new System.Runtime.Caching.CacheItemPolicy()
+				{
+					AbsoluteExpiration = System.Runtime.Caching.ObjectCache.InfiniteAbsoluteExpiration,
+					//UpdateCallback = this.OnUpdateCallback,
+					RemovedCallback = this.OnRemovedCallback,
+				});
+			else
+				_innerCache.Set(key, value, new System.Runtime.Caching.CacheItemPolicy()
+				{
+					AbsoluteExpiration = expires.ToUniversalTime(),
 					//UpdateCallback = this.OnUpdateCallback,
 					RemovedCallback = this.OnRemovedCallback,
 				});
