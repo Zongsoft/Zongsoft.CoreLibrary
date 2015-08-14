@@ -173,7 +173,8 @@ namespace Zongsoft.Security.Membership
 		/// <param name="password">当前用户的密码，如果密码错误则无法更新密码问答。</param>
 		/// <param name="passwordQuestions">当前用户的密码问答的题面集。</param>
 		/// <param name="passwordAnswers">当前用户的密码问答的答案集。</param>
-		void SetPasswordQuestionsAndAnswers(int userId, string password, string[] passwordQuestions, string[] passwordAnswers);
+		/// <returns>如果设置成则返回真(True)，否则返回假(False)。</returns>
+		bool SetPasswordQuestionsAndAnswers(int userId, string password, string[] passwordQuestions, string[] passwordAnswers);
 		#endregion
 	}
 }
