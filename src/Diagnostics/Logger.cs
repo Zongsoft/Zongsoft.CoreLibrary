@@ -238,6 +238,34 @@ namespace Zongsoft.Diagnostics
 			Log(new LogEntry(LogLevel.Fatal, source, message, exception, data));
 		}
 
+		public static void Log(LogLevel level, Exception exception, object data = null)
+		{
+			Log(new LogEntry(level, GetSource(), exception, data));
+		}
+
+		public static void Log(LogLevel level, string message, object data = null)
+		{
+			Log(new LogEntry(level, GetSource(), message, data));
+		}
+
+		public static void Log(LogLevel level, string source, Exception exception, object data = null)
+		{
+			source = string.IsNullOrWhiteSpace(source) ? GetSource() : source.Trim();
+			Log(new LogEntry(level, source, exception, data));
+		}
+
+		public static void Log(LogLevel level, string source, string message, object data = null)
+		{
+			source = string.IsNullOrWhiteSpace(source) ? GetSource() : source.Trim();
+			Log(new LogEntry(level, source, message, data));
+		}
+
+		public static void Log(LogLevel level, string source, string message, Exception exception, object data = null)
+		{
+			source = string.IsNullOrWhiteSpace(source) ? GetSource() : source.Trim();
+			Log(new LogEntry(level, source, message, exception, data));
+		}
+
 		private static void Log(LogEntry entry)
 		{
 			if(entry == null || _handlers == null)
