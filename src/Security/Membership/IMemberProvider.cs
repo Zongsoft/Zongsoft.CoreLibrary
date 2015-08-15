@@ -39,8 +39,16 @@ namespace Zongsoft.Security.Membership
 		/// </summary>
 		/// <param name="userId">要检查的用户编号。</param>
 		/// <param name="roleId">要确认的角色编号。</param>
-		/// <returns>如果指定的用户是指定角色的成员，则为真(true)；否则为假(false)。</returns>
+		/// <returns>如果指定的用户是指定角色的成员则返回真(true)；否则返回假(false)。</returns>
 		bool InRole(int userId, int roleId);
+
+		/// <summary>
+		/// 确定指定的用户是否属于指定的角色。
+		/// </summary>
+		/// <param name="userId">要检查的用户编号。</param>
+		/// <param name="roleNames">要确认的角色名称数组。</param>
+		/// <returns>如果指定的用户是指定角色名称中的任一成员则返回真(true)；否则返回假(false)。</returns>
+		bool InRoles(int userId, params string[] roleNames);
 
 		/// <summary>
 		/// 获取指定成员的父级角色集。
