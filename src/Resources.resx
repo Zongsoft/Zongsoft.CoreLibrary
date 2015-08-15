@@ -231,4 +231,22 @@
   <data name="ValueRange" xml:space="preserve">
     <value>取值范围：</value>
   </data>
+  <data name="Text.AuthenticationReason.InvalidPassword.Description" xml:space="preserve">
+    <value>无效的密码。</value>
+  </data>
+  <data name="Text.AuthenticationReason.AccountSuspended.Description" xml:space="preserve">
+    <value>帐户已被禁用。</value>
+  </data>
+  <data name="Text.AuthenticationReason.AccountUnapproved.Description" xml:space="preserve">
+    <value>帐户尚未通过审核批准。</value>
+  </data>
+  <data name="Text.AuthenticationReason.InvalidIdentity.Description" xml:space="preserve">
+    <value>无效的身份标识。</value>
+  </data>
+  <data name="Text.AuthenticationReason.Succeed.Description" xml:space="preserve">
+    <value>验证成功</value>
+  </data>
+  <data name="Text.AuthenticationReason.Unknown.Description" xml:space="preserve">
+    <value>验证失败</value>
+  </data>
 </root>

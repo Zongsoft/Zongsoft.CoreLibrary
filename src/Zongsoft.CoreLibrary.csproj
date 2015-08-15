@@ -304,6 +304,7 @@
     <Compile Include="Security\ICensorship.cs" />
     <Compile Include="Security\Membership\AuthenticatedEventArgs.cs" />
     <Compile Include="Security\Membership\AuthenticationException.cs" />
+    <Compile Include="Security\Membership\AuthenticationReason.cs" />
     <Compile Include="Security\Membership\AuthorizationMode.cs" />
     <Compile Include="Security\Membership\IMemberProvider.cs" />
     <Compile Include="Security\Membership\UserIdentityType.cs" />

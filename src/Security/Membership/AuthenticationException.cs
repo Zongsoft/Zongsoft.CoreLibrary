@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2003-2014 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2003-2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -35,16 +35,8 @@ namespace Zongsoft.Security.Membership
 	[Serializable]
 	public class AuthenticationException : System.ApplicationException
 	{
-		#region 常量定义
-		public static readonly int UnknownFailed = -1;
-
-		public static readonly int InvalidIdentity = 101;
-		public static readonly int InvalidPassword = 102;
-		public static readonly int AccountDisabled = 103;
-		#endregion
-
 		#region 成员变量
-		private int _failureCode;
+		private AuthenticationReason _reason;
 		#endregion
 
 		#region 构造函数
@@ -60,18 +52,22 @@ namespace Zongsoft.Security.Membership
 		{
 		}
 
-		public AuthenticationException(int failureCode) : this(failureCode, string.Empty, null)
+		public AuthenticationException(AuthenticationReason reason) : this(reason, string.Empty, null)
 		{
 		}
 
-		public AuthenticationException(int failureCode, string message, Exception innerException) : base(message, innerException)
+		public AuthenticationException(AuthenticationReason reason, string message) : this(reason, message, null)
 		{
-			_failureCode = failureCode;
+		}
+
+		public AuthenticationException(AuthenticationReason reason, string message, Exception innerException) : base(message, innerException)
+		{
+			_reason = reason;
 		}
 
 		protected AuthenticationException(SerializationInfo info, StreamingContext context) : base(info, context)
 		{
-			_failureCode = info.GetInt32("FailureCode");
+			_reason = (AuthenticationReason)info.GetInt32("Reason");
 		}
 		#endregion
 
@@ -79,19 +75,37 @@ namespace Zongsoft.Security.Membership
 		public override void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
 		{
 			base.GetObjectData(info, context);
-			info.AddValue("FailureCode", _failureCode);
+			info.AddValue("Reason", _reason);
 		}
 		#endregion
 
 		#region 公共属性
 		/// <summary>
-		/// 验证返回失败代码。
+		/// 获取验证失败的原因。
 		/// </summary>
-		public int FailureCode
+		public AuthenticationReason Reason
 		{
 			get
 			{
-				return _failureCode;
+				return _reason;
+			}
+		}
+
+		public override string Message
+		{
+			get
+			{
+				var message = base.Message;
+
+				if(string.IsNullOrWhiteSpace(message))
+				{
+					var entry = Zongsoft.Common.EnumUtility.GetEnumEntry(_reason);
+
+					if(entry != null)
+						message = entry.Description;
+				}
+
+				return message;
 			}
 		}
 		#endregion
