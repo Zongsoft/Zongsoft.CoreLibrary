@@ -76,6 +76,8 @@ namespace Zongsoft.Security.Membership
 			_name = name.Trim();
 			_namespace = @namespace;
 			_createdTime = DateTime.Now;
+			_approved = true;
+			_approvedTime = _createdTime;
 		}
 		#endregion
 
