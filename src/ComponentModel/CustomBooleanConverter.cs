@@ -106,15 +106,19 @@ namespace Zongsoft.ComponentModel
 				if(bool.TryParse((string)value, out result))
 					return result;
 
+				if(string.Equals((string)value, "yes", StringComparison.OrdinalIgnoreCase) ||
+				   string.Equals((string)value, "on", StringComparison.OrdinalIgnoreCase))
+					return true;
+
 				if(string.Equals(_trueString, (string)value, StringComparison.OrdinalIgnoreCase))
 					return true;
 				if(string.Equals(_falseString, (string)value, StringComparison.OrdinalIgnoreCase))
 					return false;
 
-				if(string.IsNullOrEmpty((string)value) && this.IsNullable(context.PropertyDescriptor.PropertyType))
+				if(string.IsNullOrWhiteSpace((string)value) && this.IsNullable(context.PropertyDescriptor.PropertyType))
 					return null;
 				else
-					throw new FormatException();
+					return false;
 			}
 
 			return base.ConvertFrom(context, culture, value);
