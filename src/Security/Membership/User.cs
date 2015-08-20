@@ -47,6 +47,7 @@ namespace Zongsoft.Security.Membership
 		private string _fullName;
 		private string _description;
 		private string _namespace;
+		private string _avatar;
 		private object _principal;
 		private string _principalId;
 		private string _email;
@@ -162,6 +163,21 @@ namespace Zongsoft.Security.Membership
 			set
 			{
 				this.SetPropertyValue(() => this.Description, ref _description, value);
+			}
+		}
+
+		/// <summary>
+		/// 获取或设置用户的头像标志(头像代码或头像图片的URL)。
+		/// </summary>
+		public string Avatar
+		{
+			get
+			{
+				return _avatar;
+			}
+			set
+			{
+				this.SetPropertyValue(() => this.Avatar, ref _avatar, value);
 			}
 		}
 
