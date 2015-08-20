@@ -390,7 +390,8 @@ namespace Zongsoft.Data
 			if(expression == parameter)
 				return GetMembers(expression.Type);
 
-			if(expression.GetType().FullName == "System.Linq.Expressions.PropertyExpression")
+			//if(expression.GetType().FullName == "System.Linq.Expressions.PropertyExpression")
+			if(expression.NodeType == ExpressionType.MemberAccess)
 			{
 				if(IsScalarType(expression.Type))
 					return new string[] { ExpressionToString(expression, parameter) };
