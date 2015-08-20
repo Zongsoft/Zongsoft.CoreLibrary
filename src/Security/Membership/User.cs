@@ -47,7 +47,8 @@ namespace Zongsoft.Security.Membership
 		private string _fullName;
 		private string _description;
 		private string _namespace;
-		private string _principal;
+		private object _principal;
+		private string _principalId;
 		private string _email;
 		private string _phoneNumber;
 		private bool _approved;
@@ -63,6 +64,10 @@ namespace Zongsoft.Security.Membership
 		#endregion
 
 		#region 构造函数
+		protected User()
+		{
+		}
+
 		public User(int userId, string name) : this(userId, name, null)
 		{
 		}
@@ -161,9 +166,9 @@ namespace Zongsoft.Security.Membership
 		}
 
 		/// <summary>
-		/// 获取或设置用户对应的主体标识。
+		/// 获取或设置用户对应的主体对象。
 		/// </summary>
-		public string Principal
+		public object Principal
 		{
 			get
 			{
@@ -172,6 +177,21 @@ namespace Zongsoft.Security.Membership
 			set
 			{
 				this.SetPropertyValue(() => this.Principal, ref _principal, value);
+			}
+		}
+
+		/// <summary>
+		/// 获取或设置用户对应的主体标识。
+		/// </summary>
+		public string PrincipalId
+		{
+			get
+			{
+				return _principalId;
+			}
+			set
+			{
+				this.SetPropertyValue(() => this.PrincipalId, ref _principalId, value);
 			}
 		}
 

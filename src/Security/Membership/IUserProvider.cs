@@ -60,12 +60,12 @@ namespace Zongsoft.Security.Membership
 		bool Exists(string identity, string @namespace);
 
 		/// <summary>
-		/// 设置指定编号的用户主体标识。
+		/// 设置指定编号的用户所对应的主体标识。
 		/// </summary>
 		/// <param name="userId">要设置的用户编号。</param>
-		/// <param name="principal">要设置的用户主体标识。</param>
+		/// <param name="principalId">要设置的用户主体标识。</param>
 		/// <returns>如果设置成功则返回真(True)，否则返回假(False)。</returns>
-		bool SetPrincipal(int userId, string principal);
+		bool SetPrincipalId(int userId, string principalId);
 
 		/// <summary>
 		/// 获取当前命名空间中的所有用户。
