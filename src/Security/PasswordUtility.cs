@@ -160,7 +160,8 @@ namespace Zongsoft.Security
 			//计算密码与对应的随机值的哈希值
 			byte[] hashedPassword = HashPassword(password, storedPasswordSalt, hashAlgorithm);
 
-			if(storedPassword == null || storedPassword.Length != hashedPassword.Length)
+			//由于存储的密码长度受不同数据库的影响，其返回的长度可能是字段申明的最大长度，所以不能按长度完全相等进行判断
+			if(storedPassword == null || storedPassword.Length < hashedPassword.Length)
 				return false;
 
 			//逐字节检测口令的散列值，如果有任一差异则整个匹对失败并退出。
