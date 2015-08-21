@@ -257,8 +257,10 @@ namespace Zongsoft.Data
 		{
 			return Zongsoft.Common.TypeExtension.IsScalarType(type) || typeof(Expression).IsAssignableFrom(type);
 		}
+		#endregion
 
-		protected virtual string[] ResolveScope(string entityName, string scope, Type entityType = null)
+		#region 私有方法
+		private string[] ResolveScope(string entityName, string scope, Type entityType = null)
 		{
 			if(string.IsNullOrWhiteSpace(entityName))
 				throw new ArgumentNullException("entityName");
@@ -271,9 +273,7 @@ namespace Zongsoft.Data
 			var entityDescriptor = _entityCache.GetOrAdd(entityType, type => new EntityDesciptior(this, entityName, type));
 			return this.ResolveScope(entityDescriptor, scope, isWeakType).ToArray();
 		}
-		#endregion
 
-		#region 私有方法
 		private HashSet<string> ResolveScope(EntityDesciptior entity, string scope, bool isWeakType)
 		{
 			var result = new HashSet<string>(entity.Properties.Where(p => p.IsScalarType).Select(p => p.PropertyName), StringComparer.OrdinalIgnoreCase);
