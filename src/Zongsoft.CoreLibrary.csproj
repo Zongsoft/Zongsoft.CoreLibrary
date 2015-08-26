@@ -521,7 +521,9 @@
     <Compile Include="Transactions\IsolationLevel.cs" />
     <Compile Include="Transactions\Transaction.cs" />
     <Compile Include="Transactions\EnlistmentPhase.cs" />
+    <Compile Include="Transactions\TransactionBehavior.cs" />
     <Compile Include="Transactions\TransactionInformation.cs" />
+    <Compile Include="Transactions\TransactionStatus.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Options\Option.option">

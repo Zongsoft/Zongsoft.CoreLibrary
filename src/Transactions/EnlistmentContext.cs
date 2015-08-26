@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2014 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2014-2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -39,6 +39,9 @@ namespace Zongsoft.Transactions
 		#region 构造函数
 		internal EnlistmentContext(Transaction transaction, EnlistmentPhase phase)
 		{
+			if(transaction == null)
+				throw new ArgumentNullException("transaction");
+
 			_transaction = transaction;
 			_phase = phase;
 		}
@@ -65,6 +68,32 @@ namespace Zongsoft.Transactions
 			{
 				return _transaction;
 			}
+		}
+		#endregion
+
+		#region 公共方法
+		/// <summary>
+		/// 将当前事务更改为跟随父事务。
+		/// </summary>
+		/// <returns></returns>
+		public bool Follow()
+		{
+			var parent = _transaction.Parent;
+
+			if(parent == null)
+				return false;
+
+			switch(this.Phase)
+			{
+				case EnlistmentPhase.Abort:
+					parent.Operation = Transaction.OPERATION_ABORT;
+					break;
+				case EnlistmentPhase.Rollback:
+					parent.Operation = Transaction.OPERATION_ROLLBACK;
+					break;
+			}
+
+			return true;
 		}
 		#endregion
 	}

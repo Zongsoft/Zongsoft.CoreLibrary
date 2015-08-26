@@ -33,15 +33,18 @@ namespace Zongsoft.Transactions
 	{
 		#region 成员字段
 		private Guid _transactionId;
-		private IDictionary<string, object> _arguments;
-		private Transaction _parent;
+		private Transaction _transaction;
+		private IDictionary<string, object> _parameters;
 		#endregion
 
 		#region 构造函数
-		public TransactionInformation(Transaction parent)
+		public TransactionInformation(Transaction transaction)
 		{
+			if(transaction == null)
+				throw new ArgumentNullException("transaction");
+
+			_transaction = transaction;
 			_transactionId = Guid.NewGuid();
-			_parent = parent;
 		}
 		#endregion
 
@@ -58,16 +61,13 @@ namespace Zongsoft.Transactions
 		}
 
 		/// <summary>
-		/// 获取当前事务的环境参数。
+		/// 获取当前的事务对象。
 		/// </summary>
-		public IDictionary<string, object> Arguments
+		public Transaction Transaction
 		{
 			get
 			{
-				if(_arguments == null)
-					System.Threading.Interlocked.CompareExchange(ref _arguments, new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase), null);
-
-				return _arguments;
+				return _transaction;
 			}
 		}
 
@@ -78,7 +78,43 @@ namespace Zongsoft.Transactions
 		{
 			get
 			{
-				return _parent;
+				return _transaction.Parent;
+			}
+		}
+
+		/// <summary>
+		/// 获取当前事务的行为特性。
+		/// </summary>
+		public TransactionBehavior Behavior
+		{
+			get
+			{
+				return _transaction.Behavior;
+			}
+		}
+
+		/// <summary>
+		/// 获取当前事务的状态。
+		/// </summary>
+		public TransactionStatus Status
+		{
+			get
+			{
+				return _transaction.Status;
+			}
+		}
+
+		/// <summary>
+		/// 获取当前事务的环境参数。
+		/// </summary>
+		public IDictionary<string, object> Parameters
+		{
+			get
+			{
+				if(_parameters == null)
+					System.Threading.Interlocked.CompareExchange(ref _parameters, new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase), null);
+
+				return _parameters;
 			}
 		}
 		#endregion

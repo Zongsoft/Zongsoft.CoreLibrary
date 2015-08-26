@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2014 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2014-2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -33,54 +33,83 @@ namespace Zongsoft.Transactions
 {
 	public class Transaction : IDisposable, IEquatable<Transaction>
 	{
+		#region 常量定义
+		internal const int OPERATION_NONE = 0;
+		internal const int OPERATION_ROLLBACK = 1;
+		internal const int OPERATION_ABORT = 2;
+		#endregion
+
 		#region 静态字段
-		private static readonly ThreadLocal<Stack<Transaction>> _locals = new ThreadLocal<Stack<Transaction>>(() => new Stack<Transaction>());
+		[ThreadStatic]
+		private static Transaction _current;
 		#endregion
 
 		#region 私有变量
+		private int _operation;
 		private Queue<IEnlistment> _enlistments;
 		#endregion
 
 		#region 成员字段
+		private int _isCompleted;
+		private Transaction _parent;
+		private TransactionBehavior _behavior;
 		private IsolationLevel _isolationLevel;
+		private TransactionStatus _status;
 		private TransactionInformation _information;
 		#endregion
 
 		#region 构造函数
-		public Transaction() : this(IsolationLevel.ReadCommitted)
+		public Transaction() : this(TransactionBehavior.Required, IsolationLevel.ReadCommitted)
 		{
 		}
 
-		public Transaction(IsolationLevel isolationLevel)
+		public Transaction(IsolationLevel isolationLevel) : this(TransactionBehavior.Required, isolationLevel)
 		{
+		}
+
+		public Transaction(TransactionBehavior behavior, IsolationLevel isolationLevel)
+		{
+			_status = TransactionStatus.Active;
+			_behavior = behavior;
 			_isolationLevel = isolationLevel;
 
+			switch(behavior)
+			{
+				case TransactionBehavior.Followed:
+				case TransactionBehavior.Required:
+					//如果当前环境事务为空，则将当前事务置为环境事务
+					if(_current == null)
+						_current = this;
+					else
+						_parent = _current;
+
+					break;
+				case TransactionBehavior.RequiresNew:
+					//始终将当前事务置为环境事务
+					_current = this;
+
+					break;
+				case TransactionBehavior.Suppress:
+					throw new NotSupportedException();
+			}
+
 			//首先设置当前事务的父事务
-			_information = new TransactionInformation(Transaction.Current);
+			_information = new TransactionInformation(this);
 
 			//创建本事务的登记集合
 			_enlistments = new Queue<IEnlistment>();
-
-			//将当前事务对象加入到事务栈中
-			_locals.Value.Push(this);
 		}
 		#endregion
 
 		#region 静态属性
+		/// <summary>
+		/// 获取当前环境事务。
+		/// </summary>
 		public static Transaction Current
 		{
 			get
 			{
-				if(_locals.IsValueCreated)
-				{
-					var stack = _locals.Value;
-
-					if(stack.Count > 0)
-						return stack.Peek();
-				}
-
-				return null;
-				//return TransactionManager.Instance.Current;
+				return _current;
 			}
 		}
 		#endregion
@@ -98,6 +127,17 @@ namespace Zongsoft.Transactions
 		}
 
 		/// <summary>
+		/// 获取当前事务是否已终结。
+		/// </summary>
+		public bool IsCompleted
+		{
+			get
+			{
+				return _isCompleted != 0;
+			}
+		}
+
+		/// <summary>
 		/// 获取当前事务的附加信息。
 		/// </summary>
 		public TransactionInformation Information
@@ -105,6 +145,44 @@ namespace Zongsoft.Transactions
 			get
 			{
 				return _information;
+			}
+		}
+		#endregion
+
+		#region 内部属性
+		internal int Operation
+		{
+			get
+			{
+				return _operation;
+			}
+			set
+			{
+				_operation = value;
+			}
+		}
+
+		internal Transaction Parent
+		{
+			get
+			{
+				return _parent;
+			}
+		}
+
+		internal TransactionBehavior Behavior
+		{
+			get
+			{
+				return _behavior;
+			}
+		}
+
+		internal TransactionStatus Status
+		{
+			get
+			{
+				return _status;
 			}
 		}
 		#endregion
@@ -150,6 +228,41 @@ namespace Zongsoft.Transactions
 		#region 私有方法
 		private void DoEnlistment(EnlistmentPhase phase)
 		{
+			var isCompleted = System.Threading.Interlocked.Exchange(ref _isCompleted, 1);
+
+			if(isCompleted != 0)
+				return;
+
+			//如果当前事务是跟随模式，并且具有父事务则当前事务不用通知投票者(订阅者)，而是交由父事务处理
+			if(_behavior == TransactionBehavior.Followed && _parent != null)
+			{
+				switch(phase)
+				{
+					case EnlistmentPhase.Abort:
+						_parent._operation = OPERATION_ABORT;
+						break;
+					case EnlistmentPhase.Rollback:
+						_parent._operation = OPERATION_ROLLBACK;
+						break;
+				}
+
+				//更新当前事务的状态
+				this.UpdateStatus(phase);
+
+				//退出当前子事务
+				return;
+			}
+
+			switch(_operation)
+			{
+				case OPERATION_ABORT:
+					phase = EnlistmentPhase.Abort;
+					break;
+				case OPERATION_ROLLBACK:
+					phase = EnlistmentPhase.Rollback;
+					break;
+			}
+
 			while(_enlistments.Count > 0)
 			{
 				var enlistment = _enlistments.Dequeue();
@@ -157,14 +270,24 @@ namespace Zongsoft.Transactions
 				enlistment.OnEnlist(new EnlistmentContext(this, phase));
 			}
 
-			while(_locals.Value.Count > 0)
+			//更新当前事务的状态
+			this.UpdateStatus(phase);
+		}
+
+		private void UpdateStatus(EnlistmentPhase phase)
+		{
+			switch(phase)
 			{
-				var current = _locals.Value.Pop();
-
-				if(object.ReferenceEquals(current, this))
-					return;
-
-				current.Rollback();
+				case EnlistmentPhase.Abort:
+				case EnlistmentPhase.Rollback:
+					_status = TransactionStatus.Aborted;
+					break;
+				case EnlistmentPhase.Commit:
+					_status = TransactionStatus.Committed;
+					break;
+				default:
+					_status = TransactionStatus.Undetermined;
+					break;
 			}
 		}
 		#endregion
@@ -173,11 +296,16 @@ namespace Zongsoft.Transactions
 		protected virtual void Dispose(bool disposing)
 		{
 			this.Rollback();
+
+			//如果结束的是环境事务则置空环境事务的指针
+			if(object.ReferenceEquals(_current, this))
+				_current = null;
 		}
 
 		public void Dispose()
 		{
 			this.Dispose(true);
+			GC.SuppressFinalize(this);
 		}
 		#endregion
 
@@ -188,6 +316,11 @@ namespace Zongsoft.Transactions
 				return false;
 
 			return object.ReferenceEquals(this, obj);
+		}
+
+		public override int GetHashCode()
+		{
+			return _information.TransactionId.GetHashCode();
 		}
 		#endregion
 
