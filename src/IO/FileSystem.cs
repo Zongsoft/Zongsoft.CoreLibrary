@@ -86,6 +86,13 @@ namespace Zongsoft.IO
 		#region 公共方法
 		public static string GetUrl(string virtualPath)
 		{
+			if(string.IsNullOrEmpty(virtualPath))
+				return virtualPath;
+
+			//如果传入的虚拟路径参数是一个URI格式，则直接返回它作为结果
+			if(Zongsoft.Text.TextRegular.Uri.Url.IsMatch(virtualPath))
+				return virtualPath;
+
 			Path path;
 			var fs = GetFileSystem(virtualPath, out path);
 			return fs.GetUrl(path.FullPath);
