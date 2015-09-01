@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2003-2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -30,100 +30,97 @@ using System.Collections.Generic;
 namespace Zongsoft.Security.Membership
 {
 	[Serializable]
-	public class AuthenticatedEventArgs : EventArgs
+	public class AuthorizationEventArgs : EventArgs
 	{
 		#region 成员字段
-		private bool _isAuthenticated;
-		private string _namespace;
-		private string _identity;
-		private User _user;
-		private IDictionary<string, object> _extendedProperties;
+		private CertificationPrincipal _principal;
+		private int _userId;
+		private string _schemaId;
+		private string _actionId;
+		private bool _isAuthorized;
 		#endregion
 
 		#region 构造函数
-		public AuthenticatedEventArgs(string identity, string @namespace, bool isAuthenticated, User user = null)
+		public AuthorizationEventArgs(int userId, string schemaId, string actionId, bool isAuthorized)
 		{
-			_identity = identity;
-			_namespace = @namespace;
-			_isAuthenticated = isAuthenticated;
-			_user = user;
+			_userId = userId;
+			_schemaId = schemaId;
+			_actionId = actionId;
+			_isAuthorized = isAuthorized;
+		}
+
+		public AuthorizationEventArgs(CertificationPrincipal principal, string schemaId, string actionId, bool isAuthorized)
+		{
+			if(principal == null)
+				throw new ArgumentNullException("principal");
+
+			_principal = principal;
+			_schemaId = schemaId;
+			_actionId = actionId;
+			_isAuthorized = isAuthorized;
 		}
 		#endregion
 
 		#region 公共属性
 		/// <summary>
-		/// 获取身份验证是否通过。
+		/// 获取待授权的<seealso cref="CertificationPrincipal"/>凭证主体。
 		/// </summary>
-		public bool IsAuthenticated
+		public CertificationPrincipal Principal
 		{
 			get
 			{
-				return _isAuthenticated;
+				return _principal;
 			}
 		}
 
 		/// <summary>
-		/// 获取身份验证使用的身份标识。
+		/// 获取待授权的用户编号。
 		/// </summary>
-		public string Identity
+		public int UserId
 		{
 			get
 			{
-				return _identity;
+				if(_principal != null && _principal.Identity != null && _principal.Identity.Certification != null)
+					return _principal.Identity.Certification.UserId;
+
+				return _userId;
 			}
 		}
 
 		/// <summary>
-		/// 获取身份验证的命名空间。
+		/// 获取待授权的资源标识。
 		/// </summary>
-		public string Namespace
+		public string SchemaId
 		{
 			get
 			{
-				return _namespace;
+				return _schemaId;
 			}
 		}
 
 		/// <summary>
-		/// 获取或设置身份验证对应的用户对象。
+		/// 获取待授权的行为标识。
 		/// </summary>
-		public User User
+		public string ActionId
 		{
 			get
 			{
-				return _user;
+				return _actionId;
+			}
+		}
+
+		/// <summary>
+		/// 获取或设置是否授权通过。
+		/// </summary>
+		public bool IsAuthorized
+		{
+			get
+			{
+				return _isAuthorized;
 			}
 			set
 			{
-				if(value == null)
-					throw new ArgumentNullException();
-
-				_user = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取一个值，指示扩展属性集是否有内容。
-		/// </summary>
-		public bool HasExtendedProperties
-		{
-			get
-			{
-				return _extendedProperties != null && _extendedProperties.Count > 0;
-			}
-		}
-
-		/// <summary>
-		/// 获取验证结果的扩展属性集。
-		/// </summary>
-		public IDictionary<string, object> ExtendedProperties
-		{
-			get
-			{
-				if(_extendedProperties == null)
-					System.Threading.Interlocked.CompareExchange(ref _extendedProperties, new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase), null);
-
-				return _extendedProperties;
+				_isAuthorized = value;
 			}
 		}
 		#endregion

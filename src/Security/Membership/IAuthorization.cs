@@ -34,6 +34,11 @@ namespace Zongsoft.Security.Membership
 	/// </summary>
 	public interface IAuthorization
 	{
+		/// <summary>表示授权验证开始事件。</summary>
+		event EventHandler<AuthorizationEventArgs> Authorizing;
+		/// <summary>表示授权验证完成事件。</summary>
+		event EventHandler<AuthorizationEventArgs> Authorized;
+
 		/// <summary>
 		/// 判断指定的用户对特定目标对象的特定行为是否具有授权。
 		/// </summary>
@@ -44,7 +49,7 @@ namespace Zongsoft.Security.Membership
 		/// <remarks>
 		///		<para>该验证会对指定的用户所属角色进行逐级向上展开做授权判断，因此只需对本方法一次调用即可得知当前用户对指定目标的特定行为的最终授权计算结果。</para>
 		/// </remarks>
-		bool IsAuthorized(int userId, string schemaId, string actionId);
+		bool Authorize(int userId, string schemaId, string actionId);
 
 		/// <summary>
 		/// 获取指定用户或角色的最终授权状态集。
@@ -56,6 +61,6 @@ namespace Zongsoft.Security.Membership
 		///		<para>注意：该集合仅包含了最终的已授权状态信息。</para>
 		///		<para>该方法对指定用户及其所属角色进行逐级向上展开做授权计算，因此只需对本方法一次调用即可得知指定成员的最终授权计算结果。</para>
 		/// </remarks>
-		IEnumerable<AuthorizedState> GetAuthorizedStates(int memberId, MemberType memberType);
+		IEnumerable<AuthorizationState> GetAuthorizedStates(int memberId, MemberType memberType);
 	}
 }

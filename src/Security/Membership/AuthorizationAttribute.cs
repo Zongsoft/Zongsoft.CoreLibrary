@@ -36,6 +36,8 @@ namespace Zongsoft.Security.Membership
 		private string _schemaId;
 		private string _actionId;
 		private AuthorizationMode _mode;
+		private Type _validatorType;
+		private ICertificationValidator _validator;
 		#endregion
 
 		#region 构造函数
@@ -111,6 +113,53 @@ namespace Zongsoft.Security.Membership
 			set
 			{
 				_schemaId = value;
+			}
+		}
+
+		/// <summary>
+		/// 获取凭证验证器实例。
+		/// </summary>
+		public ICertificationValidator Validator
+		{
+			get
+			{
+				if(_validator == null)
+				{
+					var type = this.ValidatorType;
+
+					if(type == null)
+						return null;
+
+					lock(type)
+					{
+						if(_validator == null)
+							_validator = Activator.CreateInstance(type) as ICertificationValidator;
+					}
+				}
+
+				return _validator;
+			}
+		}
+
+		/// <summary>
+		/// 获取或设置凭证验证器的类型。
+		/// </summary>
+		public Type ValidatorType
+		{
+			get
+			{
+				return _validatorType;
+			}
+			set
+			{
+				if(_validatorType == value)
+					return;
+
+				if(value != null && !typeof(ICertificationValidator).IsAssignableFrom(value))
+					throw new ArgumentException();
+
+				_validatorType = value;
+				_validator = null;
 			}
 		}
 		#endregion

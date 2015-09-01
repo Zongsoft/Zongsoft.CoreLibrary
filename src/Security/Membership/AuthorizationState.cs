@@ -28,7 +28,7 @@ using System;
 
 namespace Zongsoft.Security.Membership
 {
-	public struct AuthorizedState
+	public class AuthorizationState
 	{
 		#region 成员变量
 		private string _schemaId;
@@ -36,7 +36,7 @@ namespace Zongsoft.Security.Membership
 		#endregion
 
 		#region 构造函数
-		public AuthorizedState(string schemaId, string actionId)
+		public AuthorizationState(string schemaId, string actionId)
 		{
 			if(string.IsNullOrWhiteSpace(schemaId))
 				throw new ArgumentNullException("schemaId");
@@ -92,7 +92,7 @@ namespace Zongsoft.Security.Membership
 			if(obj == null || obj.GetType() != this.GetType())
 				return false;
 
-			var other = (AuthorizedState)obj;
+			var other = (AuthorizationState)obj;
 
 			return string.Equals(_schemaId, other._schemaId, StringComparison.OrdinalIgnoreCase) &&
 				   string.Equals(_actionId, other._actionId, StringComparison.OrdinalIgnoreCase);

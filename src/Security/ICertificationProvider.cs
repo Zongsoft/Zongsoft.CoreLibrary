@@ -77,10 +77,8 @@ namespace Zongsoft.Security
 		/// 验证指定的安全凭证号是否有效。
 		/// </summary>
 		/// <param name="certificationId">指定的要验证的安全凭证号。</param>
-		/// <remarks>
-		///		<para>如果验证失败则抛出相应的异常。</para>
-		/// </remarks>
-		void Validate(string certificationId);
+		/// <returns>如果验证成功则返回真(True)，否则返回假(False)。</returns>
+		bool Validate(string certificationId);
 
 		/// <summary>
 		/// 获取指定安全凭证号对应的应用编号。
