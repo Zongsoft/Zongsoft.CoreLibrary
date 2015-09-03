@@ -299,6 +299,7 @@
     <Compile Include="Runtime\Serialization\SerializationEventArgs.cs" />
     <Compile Include="Runtime\Serialization\SerializationSettings.cs" />
     <Compile Include="Runtime\Serialization\TextSerializationSettings.cs" />
+    <Compile Include="Security\CensorshipException.cs" />
     <Compile Include="Security\CertificationIdentity.cs" />
     <Compile Include="Security\CertificationPrincipal.cs" />
     <Compile Include="Security\ICensorship.cs" />
