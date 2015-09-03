@@ -59,11 +59,15 @@ namespace Zongsoft.Transactions
 		#endregion
 
 		#region 构造函数
-		public Transaction() : this(TransactionBehavior.Required, IsolationLevel.ReadCommitted)
+		public Transaction() : this(TransactionBehavior.Followed, IsolationLevel.ReadCommitted)
 		{
 		}
 
-		public Transaction(IsolationLevel isolationLevel) : this(TransactionBehavior.Required, isolationLevel)
+		public Transaction(IsolationLevel isolationLevel) : this(TransactionBehavior.Followed, isolationLevel)
+		{
+		}
+
+		public Transaction(TransactionBehavior behavior) : this(behavior, IsolationLevel.ReadCommitted)
 		{
 		}
 
