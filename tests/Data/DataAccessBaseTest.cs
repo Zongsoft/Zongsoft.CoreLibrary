@@ -62,6 +62,11 @@ namespace Zongsoft.Data
 				throw new NotImplementedException();
 			}
 
+			public override bool Exists(string name, ICondition condition)
+			{
+				throw new NotImplementedException();
+			}
+
 			protected override int Count(string name, ICondition condition, string[] includes)
 			{
 				throw new NotImplementedException();

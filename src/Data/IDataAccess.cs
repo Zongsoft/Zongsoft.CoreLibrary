@@ -41,6 +41,10 @@ namespace Zongsoft.Data
 		object Execute(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters);
 		#endregion
 
+		#region 存在方法
+		bool Exists(string name, ICondition condition);
+		#endregion
+
 		#region 计数方法
 		int Count(string name, ICondition condition);
 		int Count(string name, ICondition condition, string includes);

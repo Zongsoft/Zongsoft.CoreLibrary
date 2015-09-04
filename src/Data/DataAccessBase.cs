@@ -61,6 +61,10 @@ namespace Zongsoft.Data
 		public abstract object Execute(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters);
 		#endregion
 
+		#region 存在方法
+		public abstract bool Exists(string name, ICondition condition);
+		#endregion
+
 		#region 计数方法
 		public int Count(string name, ICondition condition)
 		{
