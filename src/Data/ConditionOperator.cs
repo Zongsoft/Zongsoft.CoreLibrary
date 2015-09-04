@@ -55,6 +55,7 @@ namespace Zongsoft.Data
 		[Zongsoft.ComponentModel.Alias("<=")]
 		LessThanEqual,
 
+		/// <summary>模糊匹配</summary>
 		Like,
 
 		/// <summary>介于</summary>
