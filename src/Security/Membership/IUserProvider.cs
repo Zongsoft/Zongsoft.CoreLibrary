@@ -68,6 +68,14 @@ namespace Zongsoft.Security.Membership
 		User GetUser(string identity, string @namespace);
 
 		/// <summary>
+		/// 获取当前命名空间中的所有用户。
+		/// </summary>
+		/// <param name="namespace">要获取的用户集所属的命名空间。</param>
+		/// <param name="paging">查询的分页设置，默认为第一页。</param>
+		/// <returns>返回当前命名空间中的所有用户对象集。</returns>
+		IEnumerable<User> GetAllUsers(string @namespace, Zongsoft.Data.Paging paging = null);
+
+		/// <summary>
 		/// 确定指定编号的用户是否存在。
 		/// </summary>
 		/// <param name="userId">指定要查找的用户编号。</param>
@@ -83,20 +91,28 @@ namespace Zongsoft.Security.Membership
 		bool Exists(string identity, string @namespace);
 
 		/// <summary>
-		/// 获取当前命名空间中的所有用户。
-		/// </summary>
-		/// <param name="namespace">要获取的用户集所属的命名空间。</param>
-		/// <param name="paging">查询的分页设置，默认为第一页。</param>
-		/// <returns>返回当前命名空间中的所有用户对象集。</returns>
-		IEnumerable<User> GetAllUsers(string @namespace, Zongsoft.Data.Paging paging = null);
-
-		/// <summary>
 		/// 设置指定编号的用户头像标识。
 		/// </summary>
 		/// <param name="userId">要设置的用户编号。</param>
 		/// <param name="avatar">要设置的用户头像标识(头像代码或头像图片的URL)。</param>
 		/// <returns>如果设置成功则返回真(True)，否则返回假(False)。</returns>
 		bool SetAvatar(int userId, string avatar);
+
+		/// <summary>
+		/// 设置指定编号的用户邮箱地址。
+		/// </summary>
+		/// <param name="userId">要设置的用户编号。</param>
+		/// <param name="email">要设置的邮箱地址。</param>
+		/// <returns>如果设置成功则返回真(True)，否则返回假(False)。</returns>
+		bool SetEmail(int userId, string email);
+
+		/// <summary>
+		/// 设置指定编号的用户手机号码。
+		/// </summary>
+		/// <param name="userId">要设置的用户编号。</param>
+		/// <param name="email">要设置的手机号码。</param>
+		/// <returns>如果设置成功则返回真(True)，否则返回假(False)。</returns>
+		bool SetPhoneNumber(int userId, string phoneNumber);
 
 		/// <summary>
 		/// 设置指定编号的用户全称(昵称)。
@@ -213,6 +229,13 @@ namespace Zongsoft.Security.Membership
 		/// <param name="newPassword">重置后的新密码，如果为空(null)或空字符串("")则不进行密码设置，只进行密码问答的校验（即判断密码问答的答案集是否全部正确）。</param>
 		/// <returns>如果重置或者密码问答校验成功则返回真(True)，否则返回假(False)。</returns>
 		bool ResetPassword(string identity, string @namespace, string[] passwordAnswers, string newPassword = null);
+
+		/// <summary>
+		/// 获取指定用户的密码问答的题面集。
+		/// </summary>
+		/// <param name="userId">指定的用户编号。</param>
+		/// <returns>返回指定用户的密码问答的题面，即密码问答的提示部分。</returns>
+		string[] GetPasswordQuestions(int userId);
 
 		/// <summary>
 		/// 获取指定用户的密码问答的题面集。
