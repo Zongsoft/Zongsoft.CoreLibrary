@@ -36,6 +36,22 @@ namespace Zongsoft.Security.Membership
 	{
 		#region 用户管理
 		/// <summary>
+		/// 审核指定编号的用户帐户。
+		/// </summary>
+		/// <param name="userId">要审核的用户编号。</param>
+		/// <param name="approved">是否审核通过。</param>
+		/// <returns>返回执行结果是否成功，如果为真(True)则表示操作成功；否则返回假(False)。</returns>
+		bool Approve(int userId, bool approved = true);
+
+		/// <summary>
+		/// 禁用指定编号的用户帐户。
+		/// </summary>
+		/// <param name="userId">要禁用的用户编号。</param>
+		/// <param name="suspended">是否禁用的标志。</param>
+		/// <returns>返回执行结果是否成功，如果为真(True)则表示操作成功；否则返回假(False)。</returns>
+		bool Suspend(int userId, bool suspended = true);
+
+		/// <summary>
 		/// 获取指定编号对应的用户对象。
 		/// </summary>
 		/// <param name="userId">要查找的用户编号。</param>
@@ -52,20 +68,19 @@ namespace Zongsoft.Security.Membership
 		User GetUser(string identity, string @namespace);
 
 		/// <summary>
+		/// 确定指定编号的用户是否存在。
+		/// </summary>
+		/// <param name="userId">指定要查找的用户编号。</param>
+		/// <returns>如果指定编号的用户是存在的则返回真(True)，否则返回假(False)。</returns>
+		bool Exists(int userId);
+
+		/// <summary>
 		/// 确定指定的用户标识在指定的命名空间内是否已经存在。
 		/// </summary>
 		/// <param name="identity">要确定的用户标识，可以是“用户名”或“邮箱地址”或“手机号码”。</param>
 		/// <param name="namespace">要确定的用户标识所属的命名空间。</param>
-		/// <returns>如果指定的用户标识在命名空间内已经存在则返回真(true)，否则返回假(false)。</returns>
+		/// <returns>如果指定的用户标识在命名空间内已经存在则返回真(True)，否则返回假(False)。</returns>
 		bool Exists(string identity, string @namespace);
-
-		/// <summary>
-		/// 设置指定编号的用户所对应的主体标识。
-		/// </summary>
-		/// <param name="userId">要设置的用户编号。</param>
-		/// <param name="principalId">要设置的用户主体标识。</param>
-		/// <returns>如果设置成功则返回真(True)，否则返回假(False)。</returns>
-		bool SetPrincipalId(int userId, string principalId);
 
 		/// <summary>
 		/// 获取当前命名空间中的所有用户。
@@ -74,6 +89,38 @@ namespace Zongsoft.Security.Membership
 		/// <param name="paging">查询的分页设置，默认为第一页。</param>
 		/// <returns>返回当前命名空间中的所有用户对象集。</returns>
 		IEnumerable<User> GetAllUsers(string @namespace, Zongsoft.Data.Paging paging = null);
+
+		/// <summary>
+		/// 设置指定编号的用户头像标识。
+		/// </summary>
+		/// <param name="userId">要设置的用户编号。</param>
+		/// <param name="avatar">要设置的用户头像标识(头像代码或头像图片的URL)。</param>
+		/// <returns>如果设置成功则返回真(True)，否则返回假(False)。</returns>
+		bool SetAvatar(int userId, string avatar);
+
+		/// <summary>
+		/// 设置指定编号的用户全称(昵称)。
+		/// </summary>
+		/// <param name="userId">要设置的用户编号。</param>
+		/// <param name="fullName">要设置的用户全称(昵称)。</param>
+		/// <returns>如果设置成功则返回真(True)，否则返回假(False)。</returns>
+		bool SetFullName(int userId, string fullName);
+
+		/// <summary>
+		/// 设置指定编号的用户描述信息。
+		/// </summary>
+		/// <param name="userId">要设置的用户编号。</param>
+		/// <param name="description">要设置的用户描述信息。</param>
+		/// <returns>如果设置成功则返回真(True)，否则返回假(False)。</returns>
+		bool SetDescription(int userId, string description);
+
+		/// <summary>
+		/// 设置指定编号的用户所对应的主体标识。
+		/// </summary>
+		/// <param name="userId">要设置的用户编号。</param>
+		/// <param name="principalId">要设置的用户主体标识。</param>
+		/// <returns>如果设置成功则返回真(True)，否则返回假(False)。</returns>
+		bool SetPrincipalId(int userId, string principalId);
 
 		/// <summary>
 		/// 删除指定编号集的多个用户。
@@ -184,6 +231,18 @@ namespace Zongsoft.Security.Membership
 		/// <param name="passwordAnswers">当前用户的密码问答的答案集。</param>
 		/// <returns>如果设置成则返回真(True)，否则返回假(False)。</returns>
 		bool SetPasswordQuestionsAndAnswers(int userId, string password, string[] passwordQuestions, string[] passwordAnswers);
+
+		/// <summary>
+		/// 设置指定用户的密码参数选项。
+		/// </summary>
+		/// <param name="userId">要设置的用户编号。</param>
+		/// <param name="changePasswordOnFirstTime">用户第一次登入是否必须变更密码的参数选项。</param>
+		/// <param name="maxInvalidPasswordAttempts">锁定用户前允许的无效密码或无效密码提示问题答案尝试次数。</param>
+		/// <param name="minRequiredPasswordLength">密码所要求的最小长度。</param>
+		/// <param name="passwordAttemptWindow">无效密码被锁定后到下次解锁的间隔分钟数。</param>
+		/// <param name="passwordExpires">密码的过期时间。</param>
+		/// <returns>如果设置成功则返回真(True)，否则返回假(False)。</returns>
+		bool SetPasswordOptions(int userId, bool changePasswordOnFirstTime = false, byte maxInvalidPasswordAttempts = 3, byte minRequiredPasswordLength = 6, TimeSpan? passwordAttemptWindow = null, DateTime? passwordExpires = null);
 		#endregion
 	}
 }

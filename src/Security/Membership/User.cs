@@ -167,7 +167,7 @@ namespace Zongsoft.Security.Membership
 		}
 
 		/// <summary>
-		/// 获取或设置用户的头像标志(头像代码或头像图片的URL)。
+		/// 获取或设置用户的头像标识(头像代码或头像图片的URL)。
 		/// </summary>
 		public string Avatar
 		{
