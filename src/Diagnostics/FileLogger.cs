@@ -26,7 +26,9 @@
 
 using System;
 using System.IO;
+using System.Threading;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 
 namespace Zongsoft.Diagnostics
 {
@@ -40,12 +42,16 @@ namespace Zongsoft.Diagnostics
 		#region 成员字段
 		private string _filePath;
 		private int _fileSize;
+
+		private int _flag;
+		private ConcurrentQueue<LogEntry> _queue;
 		#endregion
 
 		#region 构造函数
 		protected FileLogger()
 		{
 			_fileSize = FILE_SIZE;
+			_queue = new ConcurrentQueue<LogEntry>();
 		}
 
 		protected FileLogger(string filePath, int fileSize = FILE_SIZE)
@@ -55,6 +61,7 @@ namespace Zongsoft.Diagnostics
 
 			_filePath = filePath.Trim();
 			_fileSize = Math.Max(fileSize, 0);
+			_queue = new ConcurrentQueue<LogEntry>();
 		}
 		#endregion
 
@@ -98,9 +105,40 @@ namespace Zongsoft.Diagnostics
 			if(string.IsNullOrWhiteSpace(filePath))
 				throw new InvalidOperationException("Unspecified path of the log file.");
 
-			using(var stream = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.Read))
+			//将日志实体加入内存队列中
+			_queue.Enqueue(entry);
+
+			//从线程池拉出一个后台线程进行具体的日志记录操作
+			ThreadPool.QueueUserWorkItem(this.LogCore, filePath);
+		}
+
+		private void LogCore(object filePath)
+		{
+			var original = Interlocked.CompareExchange(ref _flag, 1, 0);
+
+			if(original != 0)
+				return;
+
+			Stream stream = null;
+
+			try
 			{
-				this.WriteLog(entry, stream);
+				Monitor.Enter(this);
+
+				LogEntry entry;
+				stream = new FileStream((string)filePath, FileMode.Append, FileAccess.Write, FileShare.Read);
+
+				while((_flag = _queue.Count) > 0 && _queue.TryDequeue(out entry))
+				{
+					this.WriteLog(entry, stream);
+				}
+			}
+			finally
+			{
+				if(stream != null)
+					stream.Dispose();
+
+				Monitor.Exit(this);
 			}
 		}
 		#endregion
