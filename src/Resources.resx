@@ -196,7 +196,7 @@
     <value>这是一个侦听消息队列的后台服务程序，它以堵塞方式不断轮询消息队列(即循环以堵塞式调用消息队列的出队方法)，一旦队列中有消息可用则立即将消息出队，然后交给侦听器中的执行器去执行。</value>
   </data>
   <data name="Text.MessageQueueListener.Title" xml:space="preserve">
-    <value>消息队列侦听器</value>
+    <value>Zongsoft 消息队列侦听器</value>
   </data>
   <data name="Text.ShellCommand.Description" xml:space="preserve">
     <value>通过系统Shell来执行外部命令。</value>
