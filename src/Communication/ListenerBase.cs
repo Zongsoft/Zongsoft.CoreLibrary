@@ -55,7 +55,7 @@ namespace Zongsoft.Communication
 		#endregion
 
 		#region 构造函数
-		protected ListenerBase(string name)
+		protected ListenerBase(string name) : base(name)
 		{
 			_syncRoot = new object();
 		}
