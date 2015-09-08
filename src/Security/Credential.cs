@@ -35,14 +35,14 @@ namespace Zongsoft.Security
 	/// 表示安全凭证的实体类。
 	/// </summary>
 	[Serializable]
-	public class Certification
+	public class Credential
 	{
 		#region 常量定义
 		private const string EXTENDEDPROPERTIESPREFIX = "ExtendedProperties.";
 		#endregion
 
 		#region 成员字段
-		private string _certificationId;
+		private string _credentialId;
 		private string _scene;
 		private DateTime _timestamp;
 		private DateTime _issuedTime;
@@ -52,21 +52,21 @@ namespace Zongsoft.Security
 		#endregion
 
 		#region 构造函数
-		public Certification(string certificationId, Membership.User user, string scene, TimeSpan duration)
-			: this(certificationId, user, scene, duration, DateTime.Now, null)
+		public Credential(string credentialId, Membership.User user, string scene, TimeSpan duration)
+			: this(credentialId, user, scene, duration, DateTime.Now, null)
 		{
 		}
 
-		public Certification(string certificationId, Membership.User user, string scene, TimeSpan duration, DateTime issuedTime, IDictionary<string, object> extendedProperties = null)
+		public Credential(string credentialId, Membership.User user, string scene, TimeSpan duration, DateTime issuedTime, IDictionary<string, object> extendedProperties = null)
 		{
-			if(string.IsNullOrWhiteSpace(certificationId))
-				throw new ArgumentNullException("certificationId");
+			if(string.IsNullOrWhiteSpace(credentialId))
+				throw new ArgumentNullException("credentialId");
 
 			if(user == null)
 				throw new ArgumentNullException("user");
 
 			_user = user;
-			_certificationId = certificationId.Trim();
+			_credentialId = credentialId.Trim();
 			_scene = scene == null ? null : scene.Trim();
 			_duration = duration;
 			_issuedTime = issuedTime;
@@ -81,11 +81,11 @@ namespace Zongsoft.Security
 		/// <summary>
 		/// 获取安全凭证编号。
 		/// </summary>
-		public string CertificationId
+		public string CredentialId
 		{
 			get
 			{
-				return _certificationId;
+				return _credentialId;
 			}
 		}
 
@@ -354,20 +354,20 @@ namespace Zongsoft.Security
 			if(obj == null || obj.GetType() != this.GetType())
 				return false;
 
-			var other = (Certification)obj;
+			var other = (Credential)obj;
 
-			return string.Equals(_certificationId, other.CertificationId, StringComparison.OrdinalIgnoreCase) &&
+			return string.Equals(_credentialId, other.CredentialId, StringComparison.OrdinalIgnoreCase) &&
 			       string.Equals(_scene, other.Scene, StringComparison.OrdinalIgnoreCase);
 		}
 
 		public override int GetHashCode()
 		{
-			return (_certificationId + ":" + _scene).ToLowerInvariant().GetHashCode();
+			return (_credentialId + ":" + _scene).ToLowerInvariant().GetHashCode();
 		}
 
 		public override string ToString()
 		{
-			return string.Format("{0}:{1} {2}", _certificationId, _scene, _user);
+			return string.Format("{0}:{1} {2}", _credentialId, _scene, _user);
 		}
 		#endregion
 	}

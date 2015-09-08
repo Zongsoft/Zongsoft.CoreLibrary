@@ -37,7 +37,7 @@ namespace Zongsoft.Security.Membership
 		private string _actionId;
 		private AuthorizationMode _mode;
 		private Type _validatorType;
-		private ICertificationValidator _validator;
+		private ICredentialValidator _validator;
 		#endregion
 
 		#region 构造函数
@@ -119,7 +119,7 @@ namespace Zongsoft.Security.Membership
 		/// <summary>
 		/// 获取凭证验证器实例。
 		/// </summary>
-		public ICertificationValidator Validator
+		public ICredentialValidator Validator
 		{
 			get
 			{
@@ -133,7 +133,7 @@ namespace Zongsoft.Security.Membership
 					lock(type)
 					{
 						if(_validator == null)
-							_validator = Activator.CreateInstance(type) as ICertificationValidator;
+							_validator = Activator.CreateInstance(type) as ICredentialValidator;
 					}
 				}
 
@@ -155,7 +155,7 @@ namespace Zongsoft.Security.Membership
 				if(_validatorType == value)
 					return;
 
-				if(value != null && !typeof(ICertificationValidator).IsAssignableFrom(value))
+				if(value != null && !typeof(ICredentialValidator).IsAssignableFrom(value))
 					throw new ArgumentException();
 
 				_validatorType = value;

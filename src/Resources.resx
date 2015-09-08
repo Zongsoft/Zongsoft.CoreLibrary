@@ -249,4 +249,10 @@
   <data name="Text.AuthenticationReason.Unknown.Description" xml:space="preserve">
     <value>验证失败</value>
   </data>
+  <data name="Text.AuthorizationException.Message" xml:space="preserve">
+    <value>授权验证异常，您没有访问这项资源的授权。</value>
+  </data>
+  <data name="Text.CredentialException.Message" xml:space="preserve">
+    <value>凭证错误：指定的凭证是无效的或已经过期。</value>
+  </data>
 </root>

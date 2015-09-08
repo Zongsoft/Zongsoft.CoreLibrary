@@ -33,30 +33,30 @@ namespace Zongsoft.Security
 	/// <summary>
 	/// 表示一般用户的标识类。
 	/// </summary>
-	public class CertificationIdentity : MarshalByRefObject, IIdentity
+	public class CredentialIdentity : MarshalByRefObject, IIdentity
 	{
 		#region 公共字段
-		public static readonly CertificationIdentity Empty = new CertificationIdentity();
+		public static readonly CredentialIdentity Empty = new CredentialIdentity();
 		#endregion
 
 		#region 成员字段
-		private string _certificationId;
-		private Certification _certification;
-		private ICertificationProvider _provider;
+		private string _credentialId;
+		private Credential _credential;
+		private ICredentialProvider _provider;
 		#endregion
 
 		#region 构造函数
-		private CertificationIdentity()
+		private CredentialIdentity()
 		{
-			_certificationId = string.Empty;
+			_credentialId = string.Empty;
 		}
 
-		public CertificationIdentity(string certificationId, ICertificationProvider provider = null)
+		public CredentialIdentity(string credentialId, ICredentialProvider provider = null)
 		{
-			if(string.IsNullOrWhiteSpace(certificationId))
-				throw new ArgumentNullException("certificationId");
+			if(string.IsNullOrWhiteSpace(credentialId))
+				throw new ArgumentNullException("credentialId");
 
-			_certificationId = certificationId;
+			_credentialId = credentialId;
 			_provider = provider;
 		}
 		#endregion
@@ -66,7 +66,7 @@ namespace Zongsoft.Security
 		{
 			get
 			{
-				var certification = this.Certification;
+				var certification = this.Credential;
 
 				if(certification == null || certification.User == null)
 					return string.Empty;
@@ -79,46 +79,46 @@ namespace Zongsoft.Security
 		{
 			get
 			{
-				if(string.IsNullOrWhiteSpace(_certificationId))
+				if(string.IsNullOrWhiteSpace(_credentialId))
 					return false;
 
 				//获取当前凭证对象
-				var certification = this.Certification;
+				var certification = this.Credential;
 
 				//只有当凭证对象不为空并且对应的用户对象也不为空才算验证通过
 				return certification != null && certification.User != null;
 			}
 		}
 
-		public string CertificationId
+		public string CredentialId
 		{
 			get
 			{
-				return _certificationId;
+				return _credentialId;
 			}
 		}
 
-		public virtual Certification Certification
+		public virtual Credential Credential
 		{
 			[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
 			get
 			{
-				if(string.IsNullOrWhiteSpace(_certificationId))
+				if(string.IsNullOrWhiteSpace(_credentialId))
 					return null;
 
-				if(_certification == null)
+				if(_credential == null)
 				{
 					var provider = this.Provider;
 
 					if(provider != null)
-						_certification = provider.GetCertification(_certificationId);
+						_credential = provider.GetCredential(_credentialId);
 				}
 
-				return _certification;
+				return _credential;
 			}
 		}
 
-		public ICertificationProvider Provider
+		public ICredentialProvider Provider
 		{
 			get
 			{
@@ -139,7 +139,7 @@ namespace Zongsoft.Security
 		{
 			get
 			{
-				return "Zongsoft Certification Authentication System";
+				return "Zongsoft Credentials System";
 			}
 		}
 		#endregion

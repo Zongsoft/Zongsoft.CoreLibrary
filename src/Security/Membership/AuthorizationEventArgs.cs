@@ -33,7 +33,7 @@ namespace Zongsoft.Security.Membership
 	public class AuthorizationEventArgs : EventArgs
 	{
 		#region 成员字段
-		private CertificationPrincipal _principal;
+		private CredentialPrincipal _principal;
 		private int _userId;
 		private string _schemaId;
 		private string _actionId;
@@ -49,7 +49,7 @@ namespace Zongsoft.Security.Membership
 			_isAuthorized = isAuthorized;
 		}
 
-		public AuthorizationEventArgs(CertificationPrincipal principal, string schemaId, string actionId, bool isAuthorized)
+		public AuthorizationEventArgs(CredentialPrincipal principal, string schemaId, string actionId, bool isAuthorized)
 		{
 			if(principal == null)
 				throw new ArgumentNullException("principal");
@@ -63,9 +63,9 @@ namespace Zongsoft.Security.Membership
 
 		#region 公共属性
 		/// <summary>
-		/// 获取待授权的<seealso cref="CertificationPrincipal"/>凭证主体。
+		/// 获取待授权的<seealso cref="CredentialPrincipal"/>凭证主体。
 		/// </summary>
-		public CertificationPrincipal Principal
+		public CredentialPrincipal Principal
 		{
 			get
 			{
@@ -80,8 +80,8 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				if(_principal != null && _principal.Identity != null && _principal.Identity.Certification != null)
-					return _principal.Identity.Certification.UserId;
+				if(_principal != null && _principal.Identity != null && _principal.Identity.Credential != null)
+					return _principal.Identity.Credential.UserId;
 
 				return _userId;
 			}

@@ -27,64 +27,60 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace Zongsoft.Security.Membership
+namespace Zongsoft.Security
 {
 	/// <summary>
-	/// 身份验证失败时引发的异常。
+	/// 安全凭证操作相关的异常。
 	/// </summary>
 	[Serializable]
-	public class AuthenticationException : System.ApplicationException
+	public class CredentialException : System.ApplicationException
 	{
-		#region 成员变量
-		private AuthenticationReason _reason;
+		#region 成员字段
+		private string _credentialId;
 		private string _message;
 		#endregion
 
 		#region 构造函数
-		public AuthenticationException()
+		public CredentialException()
 		{
-			_message = this.GetMessage(null);
+			_message = Resources.ResourceUtility.GetString("Text.CredentialException.Message");
 		}
 
-		public AuthenticationException(string message) : base(message, null)
+		public CredentialException(string message) : base(message, null)
 		{
-			_message = this.GetMessage(message);
+			_message = string.IsNullOrEmpty(message) ? Resources.ResourceUtility.GetString("Text.CredentialException.Message") : message;
 		}
 
-		public AuthenticationException(string message, Exception innerException) : base(message, innerException)
+		public CredentialException(string message, Exception innerException) : base(message, innerException)
 		{
-			_message = this.GetMessage(message);
+			_message = string.IsNullOrEmpty(message) ? Resources.ResourceUtility.GetString("Text.CredentialException.Message") : message;
 		}
 
-		public AuthenticationException(AuthenticationReason reason) : this(reason, string.Empty, null)
-		{
-		}
-
-		public AuthenticationException(AuthenticationReason reason, string message) : this(reason, message, null)
+		public CredentialException(string certificationId, string message) : this(certificationId, message, null)
 		{
 		}
 
-		public AuthenticationException(AuthenticationReason reason, string message, Exception innerException) : base(message, innerException)
+		public CredentialException(string certificationId, string message, Exception innerException) : base(message, innerException)
 		{
-			_reason = reason;
-			_message = this.GetMessage(message);
+			_credentialId = certificationId;
+			_message = string.IsNullOrEmpty(message) ? Resources.ResourceUtility.GetString("Text.CredentialException.Message") : message;
 		}
 
-		protected AuthenticationException(SerializationInfo info, StreamingContext context) : base(info, context)
+		protected CredentialException(SerializationInfo info, StreamingContext context) : base(info, context)
 		{
-			_reason = (AuthenticationReason)info.GetInt32("Reason");
+			_credentialId = info.GetString("CredentialId");
 		}
 		#endregion
 
 		#region 公共属性
 		/// <summary>
-		/// 获取验证失败的原因。
+		/// 获取安全凭证号。
 		/// </summary>
-		public AuthenticationReason Reason
+		public string CredentialId
 		{
 			get
 			{
-				return _reason;
+				return _credentialId;
 			}
 		}
 
@@ -101,22 +97,7 @@ namespace Zongsoft.Security.Membership
 		public override void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
 		{
 			base.GetObjectData(info, context);
-			info.AddValue("Reason", _reason);
-		}
-		#endregion
-
-		#region 私有方法
-		private string GetMessage(string message)
-		{
-			if(string.IsNullOrWhiteSpace(message))
-			{
-				var entry = Zongsoft.Common.EnumUtility.GetEnumEntry(_reason);
-
-				if(entry != null)
-					return entry.Description;
-			}
-
-			return message;
+			info.AddValue("CredentialId", _credentialId);
 		}
 		#endregion
 	}

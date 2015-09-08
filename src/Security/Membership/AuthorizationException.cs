@@ -25,70 +25,55 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Security.Principal;
+using System.Runtime.Serialization;
 
-namespace Zongsoft.Security
+namespace Zongsoft.Security.Membership
 {
 	/// <summary>
-	/// 表示一般用户主体的类。
+	/// 授权验证失败时引发的异常。
 	/// </summary>
-	public class CertificationPrincipal : MarshalByRefObject, IPrincipal
+	[Serializable]
+	public class AuthorizationException : ApplicationException
 	{
-		#region 公共字段
-		public static readonly CertificationPrincipal Empty = new CertificationPrincipal(CertificationIdentity.Empty);
-		#endregion
-
 		#region 成员字段
-		private CertificationIdentity _identity;
-		private string[] _roles;
+		private string _message;
 		#endregion
 
 		#region 构造函数
-		public CertificationPrincipal(CertificationIdentity identity, params string[] roles)
+		public AuthorizationException()
 		{
-			if(identity == null)
-				throw new ArgumentNullException("identity");
+			_message = Resources.ResourceUtility.GetString("Text.AuthorizationException.Message");
+		}
 
-			_identity = identity;
-			_roles = roles;
+		public AuthorizationException(string message) : base(message, null)
+		{
+			_message = string.IsNullOrEmpty(message) ? Resources.ResourceUtility.GetString("Text.AuthorizationException.Message") : message;
+		}
+
+		public AuthorizationException(string message, Exception innerException) : base(message, innerException)
+		{
+			_message = string.IsNullOrEmpty(message) ? Resources.ResourceUtility.GetString("Text.AuthorizationException.Message") : message;
+		}
+
+		protected AuthorizationException(SerializationInfo info, StreamingContext context) : base(info, context)
+		{
 		}
 		#endregion
 
-		#region 公共属性
-		public virtual CertificationIdentity Identity
+		#region 重写属性
+		public override string Message
 		{
 			get
 			{
-				return _identity ?? CertificationIdentity.Empty;
+				return _message;
 			}
 		}
 		#endregion
 
-		#region 显式实现
-		IIdentity IPrincipal.Identity
+		#region 重写方法
+		public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
-			get
-			{
-				return this.Identity;
-			}
-		}
-
-		bool IPrincipal.IsInRole(string roleName)
-		{
-			if(string.IsNullOrWhiteSpace(roleName))
-				throw new ArgumentNullException("roleName");
-
-			if(_roles == null || _roles.Length < 1)
-				return false;
-
-			foreach(var role in _roles)
-			{
-				if(string.Equals(role, roleName, StringComparison.OrdinalIgnoreCase))
-					return true;
-			}
-
-			return false;
+			base.GetObjectData(info, context);
 		}
 		#endregion
 	}
