@@ -17,6 +17,8 @@ namespace Zongsoft.IO
 			Assert.AreEqual("/data/images/1/year/month-day/[1]123.jpg", path.FullPath);
 			Assert.AreEqual("/data/images/1/year/month-day/", path.DirectoryName);
 			Assert.AreEqual("[1]123.jpg", path.FileName);
+
+			Assert.IsTrue(Zongsoft.IO.Path.TryParse("/images/avatar/large/steve.jpg", out path));
 		}
 	}
 }

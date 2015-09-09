@@ -113,6 +113,10 @@ namespace Zongsoft.IO
 			if(!Path.TryParse(text, out path))
 				return null;
 
+			//如果路径模式为空则返回本地文件系统
+			if(string.IsNullOrEmpty(path.Schema))
+				return LocalFileSystem.Instance;
+
 			var fileSystem = _providers.Resolve<IFileSystem>(path.Schema);
 
 			if(fileSystem == null)
