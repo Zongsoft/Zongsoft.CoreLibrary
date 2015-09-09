@@ -31,7 +31,7 @@ using System.Security.Principal;
 namespace Zongsoft.Security
 {
 	/// <summary>
-	/// 表示一般用户的标识类。
+	/// 表示带凭证的用户标识类。
 	/// </summary>
 	public class CredentialIdentity : MarshalByRefObject, IIdentity
 	{
@@ -66,12 +66,12 @@ namespace Zongsoft.Security
 		{
 			get
 			{
-				var certification = this.Credential;
+				var credential = this.Credential;
 
-				if(certification == null || certification.User == null)
+				if(credential == null || credential.User == null)
 					return string.Empty;
 
-				return certification.User.Name;
+				return credential.User.Name;
 			}
 		}
 
@@ -83,10 +83,10 @@ namespace Zongsoft.Security
 					return false;
 
 				//获取当前凭证对象
-				var certification = this.Credential;
+				var credential = this.Credential;
 
 				//只有当凭证对象不为空并且对应的用户对象也不为空才算验证通过
-				return certification != null && certification.User != null;
+				return credential != null && credential.User != null;
 			}
 		}
 
@@ -139,7 +139,7 @@ namespace Zongsoft.Security
 		{
 			get
 			{
-				return "Zongsoft Credentials System";
+				return "Zongsoft Credentials Authentication";
 			}
 		}
 		#endregion

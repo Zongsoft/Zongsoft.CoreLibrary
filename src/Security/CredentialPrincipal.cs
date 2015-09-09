@@ -31,7 +31,7 @@ using System.Security.Principal;
 namespace Zongsoft.Security
 {
 	/// <summary>
-	/// 表示一般用户主体的类。
+	/// 表示带凭证的用户主体类。
 	/// </summary>
 	public class CredentialPrincipal : MarshalByRefObject, IPrincipal
 	{
