@@ -51,11 +51,11 @@ namespace Zongsoft.Security
 		/// <summary>
 		/// 生成随机口令字符串。
 		/// </summary>
-		/// <param name="length">指定要生成的口令字符串的长度，如果长度小于8则为8。</param>
+		/// <param name="length">指定要生成的口令字符串的长度，长度至少为6。</param>
 		/// <returns>返回生成的随机口令字符串。</returns>
 		public static string GeneratePassword(int length)
 		{
-			byte[] buffer = Zongsoft.Common.RandomGenerator.Generate(Math.Max(length, 8));
+			byte[] buffer = Zongsoft.Common.RandomGenerator.Generate(Math.Max(length, 6));
 			char[] password = new char[buffer.Length];
 
 			for(int i = 0; i < buffer.Length; i++)
@@ -76,14 +76,27 @@ namespace Zongsoft.Security
 		}
 
 		/// <summary>
-		/// 使用系统默认的散列算法对口令明文进行散列。
+		/// 使用系统默认的散列算法(SHA1)对口令明文进行散列。
 		/// </summary>
 		/// <param name="password">待散列(哈希)的口令明文。</param>
+		/// <param name="passwordSalt">输出参数，返回随机生成的整型数。</param>
 		/// <returns>散列后的口令值。</returns>
-		/// <remarks>注意：该方法未对<paramref name="password"/>进行Salting干扰处理，建议使用带口令Salting功能的同名方法。</remarks>
-		public static byte[] HashPassword(string password)
+		public static byte[] HashPassword(string password, out int passwordSalt)
 		{
-			return HashPassword(password, null);
+			passwordSalt = Zongsoft.Common.RandomGenerator.GenerateInt32();
+			return HashPassword(password, BitConverter.GetBytes(passwordSalt));
+		}
+
+		/// <summary>
+		/// 使用系统默认的散列算法(SHA1)对口令明文进行散列。
+		/// </summary>
+		/// <param name="password">待散列(哈希)的口令明文。</param>
+		/// <param name="passwordSalt">输出参数，返回随机生成的字节数组(8个字节)。</param>
+		/// <returns>散列后的口令值。</returns>
+		public static byte[] HashPassword(string password, out byte[] passwordSalt)
+		{
+			passwordSalt = Zongsoft.Common.RandomGenerator.Generate(8);
+			return HashPassword(password, passwordSalt);
 		}
 
 		/// <summary>
