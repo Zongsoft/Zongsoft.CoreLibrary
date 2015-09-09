@@ -86,7 +86,7 @@ namespace Zongsoft.IO
 		#region 公共方法
 		public static string GetUrl(string virtualPath)
 		{
-			if(string.IsNullOrEmpty(virtualPath))
+			if(string.IsNullOrWhiteSpace(virtualPath))
 				return virtualPath;
 
 			//如果传入的虚拟路径参数是一个URI格式，则直接返回它作为结果
@@ -95,7 +95,8 @@ namespace Zongsoft.IO
 
 			Path path;
 			var fs = GetFileSystem(virtualPath, out path);
-			return fs.GetUrl(path.FullPath);
+
+			return fs == null ? virtualPath : fs.GetUrl(path.FullPath);
 		}
 		#endregion
 
@@ -108,7 +109,9 @@ namespace Zongsoft.IO
 			if(string.IsNullOrWhiteSpace(text))
 				throw new ArgumentNullException("text");
 
-			path = Path.Parse(text);
+			//如果路径解析失败则返回空
+			if(!Path.TryParse(text, out path))
+				return null;
 
 			var fileSystem = _providers.Resolve<IFileSystem>(path.Schema);
 
