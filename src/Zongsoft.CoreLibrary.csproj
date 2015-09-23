@@ -507,6 +507,7 @@
     <Compile Include="Terminals\TerminalCommandContext.cs" />
     <Compile Include="Terminals\TerminalCommandExecutor.cs" />
     <Compile Include="Terminals\TerminalStyles.cs" />
+    <Compile Include="Text\Evaluation\RandomEvaluator.cs" />
     <Compile Include="Text\ITemplateEvaluator.cs" />
     <Compile Include="Text\ITextRegular.cs" />
     <Compile Include="Text\TemplateEvaluatorBase.cs" />

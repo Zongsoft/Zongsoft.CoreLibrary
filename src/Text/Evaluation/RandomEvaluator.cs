@@ -27,36 +27,57 @@
 using System;
 using System.Collections.Generic;
 
-namespace Zongsoft.Text
+namespace Zongsoft.Text.Evaluation
 {
-	public abstract class TemplateEvaluatorBase : ITemplateEvaluator
+	public class RandomEvaluator : TemplateEvaluatorBase
 	{
-		#region 成员字段
-		private string _schema;
-		#endregion
-
 		#region 构造函数
-		protected TemplateEvaluatorBase(string schema)
+		public RandomEvaluator() : base("datetime")
 		{
-			if(string.IsNullOrWhiteSpace(schema))
-				throw new ArgumentNullException("schema");
+		}
 
-			_schema = schema.Trim();
+		public RandomEvaluator(string schema) : base(schema)
+		{
 		}
 		#endregion
 
-		#region 公共属性
-		public string Schema
+		#region 重写方法
+		public override object Evaluate(TemplateEvaluatorContext context)
 		{
-			get
+			if(string.IsNullOrWhiteSpace(context.Text))
+				return this.GetDefaultRandom();
+
+			switch(context.Text.ToLowerInvariant())
 			{
-				return _schema;
+				case "byte":
+					return Zongsoft.Common.RandomGenerator.Generate(1)[0].ToString();
+				case "short":
+				case "int16":
+					return ((short)Zongsoft.Common.RandomGenerator.GenerateInt32()).ToString();
+				case "int":
+				case "int32":
+					return this.GetDefaultRandom();
+				case "long":
+				case "int64":
+					return "";
+				case "guid":
+					return Guid.NewGuid().ToString("n");
 			}
+
+			int length;
+
+			if(Zongsoft.Common.Convert.TryConvertValue<int>(context.Text, out length))
+				return Zongsoft.Common.RandomGenerator.GenerateString(length);
+
+			return this.GetDefaultRandom();
 		}
 		#endregion
 
-		#region 抽象方法
-		public abstract object Evaluate(TemplateEvaluatorContext context);
+		#region 私有方法
+		private string GetDefaultRandom()
+		{
+			return ((uint)Zongsoft.Common.RandomGenerator.GenerateInt32()).ToString();
+		}
 		#endregion
 	}
 }
