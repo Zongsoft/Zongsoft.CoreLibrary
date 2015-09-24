@@ -34,7 +34,6 @@ namespace Zongsoft.Diagnostics
 	{
 		#region 成员字段
 		private static LoggerHandlerCollection _handlers;
-		private static Text.TemplateEvaluatorManager _templateManager;
 		#endregion
 
 		#region 公共属性
@@ -53,18 +52,7 @@ namespace Zongsoft.Diagnostics
 		{
 			get
 			{
-				if(_templateManager == null)
-				{
-					var templateManager = System.Threading.Interlocked.CompareExchange(ref _templateManager, new Text.TemplateEvaluatorManager(), null);
-
-					if(templateManager == null)
-					{
-						_templateManager.Register(new Text.BindingEvaluator());
-						_templateManager.Register(new Text.DateTimeEvaluator());
-					}
-				}
-
-				return _templateManager;
+				return Text.TemplateEvaluatorManager.Default;
 			}
 		}
 		#endregion

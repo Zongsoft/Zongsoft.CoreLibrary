@@ -513,8 +513,8 @@
     <Compile Include="Text\TemplateEvaluatorBase.cs" />
     <Compile Include="Text\TemplateEvaluatorContext.cs" />
     <Compile Include="Text\TemplateEvaluatorManager.cs" />
-    <Compile Include="Text\BindingEvaluator.cs" />
-    <Compile Include="Text\DateTimeEvaluator.cs" />
+    <Compile Include="Text\Evaluation\BindingEvaluator.cs" />
+    <Compile Include="Text\Evaluation\DateTimeEvaluator.cs" />
     <Compile Include="Text\TextRegular.cs" />
     <Compile Include="Text\TextExpression.cs" />
     <Compile Include="Text\TextExpressionArgument.cs" />

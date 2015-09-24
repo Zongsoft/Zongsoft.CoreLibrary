@@ -27,36 +27,27 @@
 using System;
 using System.Collections.Generic;
 
-namespace Zongsoft.Text
+namespace Zongsoft.Text.Evaluation
 {
-	public class BindingEvaluator : TemplateEvaluatorBase
+	public class DateTimeEvaluator : TemplateEvaluatorBase
 	{
 		#region 构造函数
-		public BindingEvaluator() : base("binding")
+		public DateTimeEvaluator() : base("datetime")
 		{
 		}
 
-		public BindingEvaluator(string schema) : base(schema)
+		public DateTimeEvaluator(string schema) : base(schema)
 		{
 		}
 		#endregion
 
-		#region 评估方法
+		#region 重写方法
 		public override object Evaluate(TemplateEvaluatorContext context)
 		{
-			if(context.Data == null)
-				return null;
-
 			if(string.IsNullOrWhiteSpace(context.Text))
-				return context.Data;
+				return DateTime.Now.ToString();
 
-			var index = context.Text.IndexOf('#');
-			var result = Zongsoft.Common.Convert.GetValue(context.Data, (index > 0 ? context.Text.Substring(0, index) : context.Text));
-
-			if(index > 0 && index < context.Text.Length - 1)
-				return string.Format("{0:" + context.Text.Substring(index + 1) + "}", result);
-
-			return result;
+			return DateTime.Now.ToString(context.Text);
 		}
 		#endregion
 	}

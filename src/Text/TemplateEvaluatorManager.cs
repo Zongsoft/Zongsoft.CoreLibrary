@@ -28,6 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace Zongsoft.Text
 {
@@ -45,6 +46,37 @@ namespace Zongsoft.Text
 		public TemplateEvaluatorManager()
 		{
 			_evaluators = new ConcurrentDictionary<string, ITemplateEvaluator>(StringComparer.OrdinalIgnoreCase);
+		}
+		#endregion
+
+		#region 单例属性
+		private static TemplateEvaluatorManager _default;
+		private static int _initializationFlag;
+
+		public static TemplateEvaluatorManager Default
+		{
+			get
+			{
+				if(_initializationFlag == 0)
+				{
+					var original = Interlocked.CompareExchange(ref _initializationFlag, 1, 0);
+
+					if(original == 0)
+					{
+						_default = new TemplateEvaluatorManager();
+						_default.Register(new Evaluation.DateTimeEvaluator());
+						_default.Register(new Evaluation.BindingEvaluator());
+						_default.Register(new Evaluation.RandomEvaluator());
+
+						_initializationFlag = 2;
+					}
+				}
+
+				if(_initializationFlag == 1)
+					SpinWait.SpinUntil(() => _initializationFlag > 1);
+
+				return _default;
+			}
 		}
 		#endregion
 

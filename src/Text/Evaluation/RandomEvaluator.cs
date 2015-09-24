@@ -32,7 +32,7 @@ namespace Zongsoft.Text.Evaluation
 	public class RandomEvaluator : TemplateEvaluatorBase
 	{
 		#region 构造函数
-		public RandomEvaluator() : base("datetime")
+		public RandomEvaluator() : base("random")
 		{
 		}
 
@@ -53,13 +53,13 @@ namespace Zongsoft.Text.Evaluation
 					return Zongsoft.Common.RandomGenerator.Generate(1)[0].ToString();
 				case "short":
 				case "int16":
-					return ((short)Zongsoft.Common.RandomGenerator.GenerateInt32()).ToString();
+					return ((ushort)Zongsoft.Common.RandomGenerator.GenerateInt32()).ToString();
 				case "int":
 				case "int32":
-					return this.GetDefaultRandom();
+					return ((uint)Zongsoft.Common.RandomGenerator.GenerateInt32()).ToString();
 				case "long":
 				case "int64":
-					return "";
+					return ((ulong)Zongsoft.Common.RandomGenerator.GenerateInt64()).ToString();
 				case "guid":
 					return Guid.NewGuid().ToString("n");
 			}
@@ -67,7 +67,7 @@ namespace Zongsoft.Text.Evaluation
 			int length;
 
 			if(Zongsoft.Common.Convert.TryConvertValue<int>(context.Text, out length))
-				return Zongsoft.Common.RandomGenerator.GenerateString(length);
+				return Zongsoft.Common.RandomGenerator.GenerateString(Math.Max(length, 1));
 
 			return this.GetDefaultRandom();
 		}
@@ -76,7 +76,7 @@ namespace Zongsoft.Text.Evaluation
 		#region 私有方法
 		private string GetDefaultRandom()
 		{
-			return ((uint)Zongsoft.Common.RandomGenerator.GenerateInt32()).ToString();
+			return Zongsoft.Common.RandomGenerator.GenerateStringEx(6);
 		}
 		#endregion
 	}
