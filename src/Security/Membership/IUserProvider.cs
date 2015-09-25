@@ -189,26 +189,23 @@ namespace Zongsoft.Security.Membership
 		/// </summary>
 		/// <param name="identity">要重置密码的用户标识，仅限用户的“邮箱地址”或“手机号码”。</param>
 		/// <param name="namespace">指定的用户标识所属的命名空间。</param>
-		/// <param name="userId">输出参数，对应的用户编号。</param>
-		/// <param name="secret">输出参数，生成的验证码。</param>
-		/// <param name="token">输出参数，生成的验证码摘要。</param>
-		/// <returns>如果成功则返回真(True)，否则返回假(False)这通常表示指定的用户标识不存在。</returns>
-		/// <remarks>
-		///		<para><paramref name="token"/>的计算公式：HEX(MD5(<paramref name="userId"/>+<paramref name="secret"/>))</para>
-		/// </remarks>
-		bool ForgetPassword(string identity, string @namespace, out int userId, out string secret, out string token);
+		/// <param name="secret">指定的验证码。</param>
+		/// <param name="timeout">指定验证码的有效期。</param>
+		/// <exception cref="System.ArgumentNullException"><paramref name="secret"/>参数为空(null)或全空白字符串。</exception>
+		/// <returns>返回<paramref name="identity"/>参数对应的用户编号，如果指定用户标识不存在则返回负数(-1)。</returns>
+		int ForgetPassword(string identity, string @namespace, string secret, TimeSpan? timeout = null);
 
 		/// <summary>
 		/// 重置指定用户的密码，以验证码摘要的方式进行密码重置。
 		/// </summary>
 		/// <param name="userId">要重置的用户编号。</param>
-		/// <param name="token">重置密码的验证码摘要。</param>
+		/// <param name="secret">重置密码的验证码。</param>
 		/// <param name="newPassword">重置后的新密码，如果为空(null)或空字符串("")则不进行密码设置，只进行验证码摘要的校验（即判断验证码摘要是否正确）。</param>
 		/// <returns>如果重置或者验证码摘要校验成功则返回真(True)，否则返回假(False)。</returns>
 		/// <remarks>
-		///		<para>本重置方法通常由Web请求的方式进行，请求的URL大致如下：<c><![CDATA[http://zongsoft.com/security/user/resetpassword?userId=xxx&token=xxxxxx]]></c></para>
+		///		<para>本重置方法通常由Web请求的方式进行，请求的URL大致如下：<c><![CDATA[http://zongsoft.com/security/user/resetpassword?userId=xxx&secret=xxxxxx]]></c></para>
 		/// </remarks>
-		bool ResetPassword(int userId, string token, string newPassword = null);
+		bool ResetPassword(int userId, string secret, string newPassword = null);
 
 		/// <summary>
 		/// 重置指定用户的密码，以验证码的方式进行密码重置。
