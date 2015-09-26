@@ -190,7 +190,7 @@ namespace Zongsoft.Security.Membership
 		/// <param name="identity">要重置密码的用户标识，仅限用户的“邮箱地址”或“手机号码”。</param>
 		/// <param name="namespace">指定的用户标识所属的命名空间。</param>
 		/// <param name="secret">指定的验证码。</param>
-		/// <param name="timeout">指定验证码的有效期。</param>
+		/// <param name="timeout">指定验证码的有效期，默认为60分钟。</param>
 		/// <exception cref="System.ArgumentNullException"><paramref name="secret"/>参数为空(null)或全空白字符串。</exception>
 		/// <returns>返回<paramref name="identity"/>参数对应的用户编号，如果指定用户标识不存在则返回负数(-1)。</returns>
 		int ForgetPassword(string identity, string @namespace, string secret, TimeSpan? timeout = null);
