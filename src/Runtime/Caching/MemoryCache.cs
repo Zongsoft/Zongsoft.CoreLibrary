@@ -114,6 +114,11 @@ namespace Zongsoft.Runtime.Caching
 			throw new NotSupportedException();
 		}
 
+		public T GetValue<T>(string key)
+		{
+			return Zongsoft.Common.Convert.ConvertValue<T>(this.GetValue(key));
+		}
+
 		public object GetValue(string key)
 		{
 			var creator = this.Creator;
