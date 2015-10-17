@@ -148,7 +148,8 @@ namespace Zongsoft.IO
 			if(string.IsNullOrWhiteSpace(schema))
 				return LocalFileSystem.Instance;
 
-			var fileSystem = _providers.Resolve<IFileSystem>(path.Schema);
+			//根据文件系统模式从服务容器中获得对应的文件系统提供程序
+			var fileSystem = _providers.Resolve<IFileSystem>(schema);
 
 			if(fileSystem == null)
 				throw new InvalidOperationException(string.Format("Can not obtain the File or Directory provider by the '{0}' path.", path));
