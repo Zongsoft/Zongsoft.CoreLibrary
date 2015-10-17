@@ -37,6 +37,7 @@ namespace Zongsoft.IO
 		private static readonly IFile _file;
 		private static readonly IDirectory _directory;
 		private static Zongsoft.Services.IServiceProvider _providers;
+		private static string _schema;
 		#endregion
 
 		#region 构造函数
@@ -48,6 +49,9 @@ namespace Zongsoft.IO
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取文件服务。
+		/// </summary>
 		public static IFile File
 		{
 			get
@@ -56,6 +60,9 @@ namespace Zongsoft.IO
 			}
 		}
 
+		/// <summary>
+		/// 获取目录服务。
+		/// </summary>
 		public static IDirectory Directory
 		{
 			get
@@ -64,6 +71,9 @@ namespace Zongsoft.IO
 			}
 		}
 
+		/// <summary>
+		/// 获取或设置一个服务容器，该容器包含文件系统提供程序。
+		/// </summary>
 		public static Zongsoft.Services.IServiceProvider Providers
 		{
 			get
@@ -79,6 +89,21 @@ namespace Zongsoft.IO
 					throw new ArgumentNullException();
 
 				_providers = value;
+			}
+		}
+
+		/// <summary>
+		/// 获取文件系统的默认模式。
+		/// </summary>
+		public static string Schema
+		{
+			get
+			{
+				return _schema;
+			}
+			set
+			{
+				_schema = value;
 			}
 		}
 		#endregion
@@ -113,8 +138,14 @@ namespace Zongsoft.IO
 			if(!Path.TryParse(text, out path))
 				return null;
 
-			//如果路径模式为空则返回本地文件系统
-			if(string.IsNullOrEmpty(path.Schema))
+			var schema = path.Schema;
+
+			//如果路径模式为空则使用默认文件系统模式
+			if(string.IsNullOrWhiteSpace(schema))
+				schema = FileSystem.Schema;
+
+			//如果文件系统模式为空则返回本地文件系统
+			if(string.IsNullOrWhiteSpace(schema))
 				return LocalFileSystem.Instance;
 
 			var fileSystem = _providers.Resolve<IFileSystem>(path.Schema);
