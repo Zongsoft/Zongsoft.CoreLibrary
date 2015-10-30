@@ -115,6 +115,14 @@ namespace Zongsoft.Security.Membership
 		bool SetPhoneNumber(int userId, string phoneNumber);
 
 		/// <summary>
+		/// 设置指定编号的用户名称。
+		/// </summary>
+		/// <param name="userId">要设置的用户编号。</param>
+		/// <param name="name">要设置的用户名称。</param>
+		/// <returns>如果设置成功则返回真(True)，否则返回假(False)。</returns>
+		bool SetName(int userId, string name);
+
+		/// <summary>
 		/// 设置指定编号的用户全称(昵称)。
 		/// </summary>
 		/// <param name="userId">要设置的用户编号。</param>
