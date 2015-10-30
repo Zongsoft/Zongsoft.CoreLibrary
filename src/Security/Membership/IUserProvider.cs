@@ -177,6 +177,21 @@ namespace Zongsoft.Security.Membership
 
 		#region 密码管理
 		/// <summary>
+		/// 判断指定编号的用户是否设置了密码。
+		/// </summary>
+		/// <param name="userId">指定的用户编号。</param>
+		/// <returns>如果返回真(True)表示指定编号的用户已经设置了密码，否则未设置密码。</returns>
+		bool HasPassword(int userId);
+
+		/// <summary>
+		/// 判断指定标识的用户是否设置了密码。
+		/// </summary>
+		/// <param name="identity">指定的用户标识。</param>
+		/// <param name="namespace">指定的用户标识所属的命名空间。</param>
+		/// <returns>如果返回真(True)表示指定标识的用户已经设置了密码，否则未设置密码。</returns>
+		bool HasPassword(string identity, string @namespace);
+
+		/// <summary>
 		/// 修改指定用户的密码。
 		/// </summary>
 		/// <param name="userId">要修改密码的用户编号。</param>
