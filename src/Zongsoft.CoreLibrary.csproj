@@ -373,10 +373,12 @@
     <Compile Include="Services\IServiceStorage.cs" />
     <Compile Include="Services\MatcherAttribute.cs" />
     <Compile Include="Services\Matcher.cs" />
+    <Compile Include="Services\ServiceNotFoundException.cs" />
     <Compile Include="Services\PredicationBase.cs" />
     <Compile Include="Services\PredicationCollection`1.cs" />
     <Compile Include="Services\ServiceProviderBase.cs" />
     <Compile Include="Services\ServiceEntry.cs" />
+    <Compile Include="Services\ServiceProviderExtension.cs" />
     <Compile Include="Services\ServiceRegisteredEventArgs.cs" />
     <Compile Include="Services\ServiceStorage.cs" />
     <Compile Include="Services\ServiceUnregisteredEventArgs.cs" />
