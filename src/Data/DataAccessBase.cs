@@ -314,7 +314,7 @@ namespace Zongsoft.Data
 								return new string[] { p.PropertyName };
 
 							var list = new List<string>();
-							this.GetComplexPropertyMembers(entity.EntityName, p.PropertyName, p.PropertyType, list, true);
+							this.GetComplexPropertyMembers(entity.EntityName, p.PropertyName, p.PropertyType, list, new HashSet<Type>(new Type[] { p.PropertyType }));
 							return list.ToArray();
 						}));
 
@@ -322,7 +322,19 @@ namespace Zongsoft.Data
 					default:
 						if((member[0] >= 'A' && member[0] <= 'Z') || (member[0] >= 'a' && member[0] <= 'z') || member[0] == '_')
 						{
-							var property = entity.Properties.FirstOrDefault(p => string.Equals(p.PropertyName, member, StringComparison.OrdinalIgnoreCase));
+							EntityPropertyDescriptor property = null;
+
+							if(member.Contains("."))
+							{
+								var navigationProperty = GetNavigationProperty(member, entity.EntityType, isWeakType);
+
+								if(navigationProperty != null)
+									property = new EntityPropertyDescriptor(member, navigationProperty.PropertyType, this.IsScalarType(navigationProperty.PropertyType));
+							}
+							else
+							{
+								property = entity.Properties.FirstOrDefault(p => string.Equals(p.PropertyName, member, StringComparison.OrdinalIgnoreCase));
+							}
 
 							if(property == null)
 							{
@@ -340,7 +352,7 @@ namespace Zongsoft.Data
 							else
 							{
 								var list = new List<string>();
-								this.GetComplexPropertyMembers(entity.EntityName, property.PropertyName, property.PropertyType, list, false);
+								this.GetComplexPropertyMembers(entity.EntityName, property.PropertyName, property.PropertyType, list, null);
 								result.UnionWith(list);
 							}
 						}
@@ -356,16 +368,38 @@ namespace Zongsoft.Data
 			return result;
 		}
 
-		private void GetComplexPropertyMembers(string entityName, string memberPrefix, Type memberType, ICollection<string> collection, bool recursive)
+		private PropertyDescriptor GetNavigationProperty(string path, Type type, bool isWeakType)
 		{
-			var entityDescriptor = _entityCache.GetOrAdd(memberType, type => new EntityDesciptior(this, entityName + "!" + memberPrefix, type));
+			if(string.IsNullOrWhiteSpace(path))
+				return null;
 
-			foreach(var property in entityDescriptor.Properties)
+			var parts = path.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+			PropertyDescriptor property = null;
+
+			foreach(var part in parts)
+			{
+				property = TypeDescriptor.GetProperties(type).Find(part, true);
+
+				if(property == null)
+					throw new ArgumentException(string.Format("The '{0}' member is not existed in the '{1}' type, the original text is '{2}'.", part, type.FullName, path));
+
+				type = property.PropertyType;
+			}
+
+			return property;
+		}
+
+		private void GetComplexPropertyMembers(string entityName, string memberPrefix, Type memberType, ICollection<string> collection, HashSet<Type> recursiveStack)
+		{
+			foreach(PropertyDescriptor property in TypeDescriptor.GetProperties(memberType))
 			{
 				if(this.IsScalarType(property.PropertyType))
-					collection.Add(memberPrefix + "." + property.PropertyName);
-				else if(recursive)
-					GetComplexPropertyMembers(entityName, memberPrefix + "." + property.PropertyName, property.PropertyType, collection, recursive);
+					collection.Add(memberPrefix + "." + property.Name);
+				else if(recursiveStack != null && !recursiveStack.Contains(property.PropertyType))
+				{
+					recursiveStack.Add(property.PropertyType);
+					GetComplexPropertyMembers(entityName, memberPrefix + "." + property.Name, property.PropertyType, collection, recursiveStack);
+				}
 			}
 		}
 
