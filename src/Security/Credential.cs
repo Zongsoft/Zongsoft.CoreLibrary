@@ -49,6 +49,7 @@ namespace Zongsoft.Security
 		private TimeSpan _duration;
 		private Membership.User _user;
 		private IDictionary<string, object> _extendedProperties;
+		private Credential _innerCredential;
 		#endregion
 
 		#region 构造函数
@@ -75,6 +76,14 @@ namespace Zongsoft.Security
 			if(extendedProperties != null && extendedProperties.Count > 0)
 				_extendedProperties = new Dictionary<string, object>(extendedProperties, StringComparer.OrdinalIgnoreCase);
 		}
+
+		protected Credential(Credential innerCredential)
+		{
+			if(innerCredential == null)
+				throw new ArgumentNullException("innerCredential");
+
+			_innerCredential = innerCredential;
+		}
 		#endregion
 
 		#region 公共属性
@@ -85,6 +94,9 @@ namespace Zongsoft.Security
 		{
 			get
 			{
+				if(_innerCredential != null)
+					return _innerCredential.CredentialId;
+
 				return _credentialId;
 			}
 		}
@@ -97,6 +109,9 @@ namespace Zongsoft.Security
 		{
 			get
 			{
+				if(_innerCredential != null)
+					return _innerCredential.Namespace;
+
 				return _user == null ? null : _user.Namespace;
 			}
 		}
@@ -108,6 +123,9 @@ namespace Zongsoft.Security
 		{
 			get
 			{
+				if(_innerCredential != null)
+					return _innerCredential.Scene;
+
 				return _scene;
 			}
 		}
@@ -119,6 +137,9 @@ namespace Zongsoft.Security
 		{
 			get
 			{
+				if(_innerCredential != null)
+					return _innerCredential.User;
+
 				return _user;
 			}
 		}
@@ -131,6 +152,9 @@ namespace Zongsoft.Security
 		{
 			get
 			{
+				if(_innerCredential != null)
+					return _innerCredential.UserId;
+
 				var user = _user;
 				return user == null ? 0 : user.UserId;
 			}
@@ -143,11 +167,17 @@ namespace Zongsoft.Security
 		{
 			get
 			{
+				if(_innerCredential != null)
+					return _innerCredential.Timestamp;
+
 				return _timestamp;
 			}
 			set
 			{
-				_timestamp = value;
+				if(_innerCredential != null)
+					_innerCredential.Timestamp = value;
+				else
+					_timestamp = value;
 			}
 		}
 
@@ -158,6 +188,9 @@ namespace Zongsoft.Security
 		{
 			get
 			{
+				if(_innerCredential != null)
+					return _innerCredential.IssuedTime;
+
 				return _issuedTime;
 			}
 		}
@@ -169,6 +202,9 @@ namespace Zongsoft.Security
 		{
 			get
 			{
+				if(_innerCredential != null)
+					return _innerCredential.Duration;
+
 				return _duration;
 			}
 		}
@@ -184,6 +220,9 @@ namespace Zongsoft.Security
 		{
 			get
 			{
+				if(_innerCredential != null)
+					return _innerCredential.Expires;
+
 				return _timestamp + _duration;
 			}
 		}
@@ -196,6 +235,9 @@ namespace Zongsoft.Security
 		{
 			get
 			{
+				if(_innerCredential != null)
+					return _innerCredential.HasExtendedProperties;
+
 				return _extendedProperties != null && _extendedProperties.Count > 0;
 			}
 		}
@@ -207,6 +249,9 @@ namespace Zongsoft.Security
 		{
 			get
 			{
+				if(_innerCredential != null)
+					return _innerCredential.ExtendedProperties;
+
 				if(_extendedProperties == null)
 					System.Threading.Interlocked.CompareExchange(ref _extendedProperties, new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase), null);
 
@@ -356,18 +401,18 @@ namespace Zongsoft.Security
 
 			var other = (Credential)obj;
 
-			return string.Equals(_credentialId, other.CredentialId, StringComparison.OrdinalIgnoreCase) &&
-			       string.Equals(_scene, other.Scene, StringComparison.OrdinalIgnoreCase);
+			return string.Equals(this.CredentialId, other.CredentialId, StringComparison.OrdinalIgnoreCase) &&
+				   string.Equals(this.Scene, other.Scene, StringComparison.OrdinalIgnoreCase);
 		}
 
 		public override int GetHashCode()
 		{
-			return (_credentialId + ":" + _scene).ToLowerInvariant().GetHashCode();
+			return (this.CredentialId + ":" + this.Scene).ToLowerInvariant().GetHashCode();
 		}
 
 		public override string ToString()
 		{
-			return string.Format("{0}:{1} {2}", _credentialId, _scene, _user);
+			return string.Format("{0}:{1} {2}", this.CredentialId, this.Scene, this.User);
 		}
 		#endregion
 	}
