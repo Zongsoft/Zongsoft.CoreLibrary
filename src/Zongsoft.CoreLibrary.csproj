@@ -373,6 +373,8 @@
     <Compile Include="Services\IServiceStorage.cs" />
     <Compile Include="Services\MatcherAttribute.cs" />
     <Compile Include="Services\Matcher.cs" />
+    <Compile Include="Services\ServiceAttribute.cs" />
+    <Compile Include="Services\ServiceBase.cs" />
     <Compile Include="Services\ServiceNotFoundException.cs" />
     <Compile Include="Services\PredicationBase.cs" />
     <Compile Include="Services\PredicationCollection`1.cs" />
