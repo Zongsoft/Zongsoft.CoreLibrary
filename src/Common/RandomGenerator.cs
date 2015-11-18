@@ -48,13 +48,6 @@ namespace Zongsoft.Common
 			return bytes;
 		}
 
-		public static long GenerateInt64()
-		{
-			var bytes = new byte[8];
-			_random.GetBytes(bytes);
-			return BitConverter.ToInt64(bytes, 0);
-		}
-
 		public static int GenerateInt32()
 		{
 			var bytes = new byte[4];
@@ -62,7 +55,19 @@ namespace Zongsoft.Common
 			return BitConverter.ToInt32(bytes, 0);
 		}
 
-		public static string GenerateString(int length = 8)
+		public static long GenerateInt64()
+		{
+			var bytes = new byte[8];
+			_random.GetBytes(bytes);
+			return BitConverter.ToInt64(bytes, 0);
+		}
+
+		public static string GenerateString()
+		{
+			return GenerateString(8);
+		}
+
+		public static string GenerateString(int length, bool digitOnly = false)
 		{
 			if(length < 1 || length > 128)
 				throw new ArgumentOutOfRangeException("length");
@@ -73,11 +78,11 @@ namespace Zongsoft.Common
 			_random.GetBytes(data);
 
 			//确保首位字符始终为数字字符
-			result[0] = Digits[data[0] %10];
+			result[0] = Digits[data[0] % 10];
 
 			for(int i = 1; i < length; i++)
 			{
-				result[i] = Digits[data[i] % 32];
+				result[i] = Digits[data[i] % (digitOnly ? 10 : 32)];
 			}
 
 			return new string(result);
