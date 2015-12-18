@@ -65,7 +65,7 @@ namespace Zongsoft.Security.Membership
 		#endregion
 
 		#region 构造函数
-		protected User()
+		public User()
 		{
 		}
 

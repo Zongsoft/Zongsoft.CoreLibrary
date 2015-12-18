@@ -50,6 +50,10 @@ namespace Zongsoft.Security.Membership
 		#endregion
 
 		#region 构造函数
+		public Role()
+		{
+		}
+
 		public Role(int roleId, string name) : this(roleId, name, null)
 		{
 		}
