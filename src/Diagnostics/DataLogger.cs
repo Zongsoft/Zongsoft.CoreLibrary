@@ -93,7 +93,6 @@ namespace Zongsoft.Diagnostics
 				return;
 
 			var storage = this.Storage;
-			Zongsoft.Collections.IQueue queue = null;
 
 			foreach(Zongsoft.Options.Configuration.SettingElement parameter in _configuration.Parameters)
 			{
