@@ -76,7 +76,7 @@ namespace Zongsoft.Text.Evaluation
 		#region 私有方法
 		private string GetDefaultRandom()
 		{
-			return Zongsoft.Common.RandomGenerator.GenerateStringEx(6);
+			return Zongsoft.Common.RandomGenerator.GenerateString(6);
 		}
 		#endregion
 	}

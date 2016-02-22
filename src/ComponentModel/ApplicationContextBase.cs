@@ -56,7 +56,7 @@ namespace Zongsoft.ComponentModel
 		private string _title;
 		private string _description;
 		private IPrincipal _principal;
-		private ICollection<IModule> _modules;
+		private ICollection<IApplicationModule> _modules;
 		private Options.ISettingsProvider _settings;
 		#endregion
 
@@ -236,12 +236,12 @@ namespace Zongsoft.ComponentModel
 		/// <summary>
 		/// 获取当前应用程序的模块集合。
 		/// </summary>
-		public virtual ICollection<IModule> Modules
+		public virtual ICollection<IApplicationModule> Modules
 		{
 			get
 			{
 				if(_modules == null)
-					System.Threading.Interlocked.CompareExchange(ref _modules, new Zongsoft.Collections.Collection<IModule>(), null);
+					System.Threading.Interlocked.CompareExchange(ref _modules, new Zongsoft.Collections.Collection<IApplicationModule>(), null);
 
 				return _modules;
 			}

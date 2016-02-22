@@ -32,6 +32,7 @@ using System.Text;
 
 namespace Zongsoft.ComponentModel
 {
+	[Obsolete]
 	public class ActionCollection : Zongsoft.Collections.NamedCollectionBase<Action>
 	{
 		#region 构造函数

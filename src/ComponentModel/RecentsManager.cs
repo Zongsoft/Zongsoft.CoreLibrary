@@ -36,11 +36,11 @@ namespace Zongsoft.ComponentModel
 	public class RecentsManager
 	{
 		#region 私有常量
-		private const string DefaultRootPath = @"Software\Zongsoft\Common\Recents";
+		private const string DEFAULT_ROOT_PATH = @"Software\Zongsoft\Common\Recents";
 		#endregion
 
 		#region 静态字段
-		public static readonly RecentsManager Default = new RecentsManager(DefaultRootPath);
+		public static readonly RecentsManager Default = new RecentsManager(DEFAULT_ROOT_PATH);
 		#endregion
 
 		#region 成员变量
@@ -49,7 +49,7 @@ namespace Zongsoft.ComponentModel
 		#endregion
 
 		#region 构造函数
-		public RecentsManager() : this(DefaultRootPath)
+		public RecentsManager() : this(DEFAULT_ROOT_PATH)
 		{
 		}
 

@@ -3,14 +3,14 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("Zongsoft.CoreLibrary")]
-[assembly: AssemblyDescription("Zongsoft.CoreLibrary")]
+[assembly: AssemblyDescription("This is a kernel library about Zongsoft development framework.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Zongsoft Corporation")]
 [assembly: AssemblyProduct("Zongsoft Core Library")]
-[assembly: AssemblyCopyright("Copyright(C) Zongsoft Corporation 2010-2015. All rights reserved.")]
+[assembly: AssemblyCopyright("Copyright(C) Zongsoft Corporation 2010-2016. All rights reserved.")]
 [assembly: AssemblyTrademark("Zongsoft is registered trademarks of Zongsoft Corporation in the P.R.C. and/or other countries.")]
 [assembly: AssemblyCulture("")]
 [assembly: ComVisible(false)]
 
-[assembly: AssemblyVersion("3.2.1501.*")]
-[assembly: AssemblyFileVersion("3.2.1501.0")]
+[assembly: AssemblyVersion("4.1.1602.0")]
+[assembly: AssemblyFileVersion("4.1.1602.0")]

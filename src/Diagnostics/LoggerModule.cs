@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2016 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -29,7 +29,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Diagnostics
 {
-	public class LoggerModule : Zongsoft.ComponentModel.IModule, IDisposable
+	public class LoggerModule : Zongsoft.ComponentModel.IApplicationModule, IDisposable
 	{
 		#region 公共属性
 		public virtual string Name
@@ -96,13 +96,6 @@ namespace Zongsoft.Diagnostics
 					Logger.Handlers.Add(new LoggerHandler(handlerElement.Name, instance, predication));
 				}
 			}
-		}
-		#endregion
-
-		#region 显式实现
-		void Zongsoft.ComponentModel.IModule.Initialize(object context)
-		{
-			this.Initialize(context as Zongsoft.ComponentModel.ApplicationContextBase);
 		}
 		#endregion
 

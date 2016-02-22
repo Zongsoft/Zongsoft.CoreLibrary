@@ -29,6 +29,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.ComponentModel
 {
+	[Obsolete]
 	public class SchemaCollection : Zongsoft.Collections.NamedCollectionBase<Schema>
 	{
 		#region 构造函数

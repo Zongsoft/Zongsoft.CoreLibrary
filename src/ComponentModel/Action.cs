@@ -29,6 +29,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.ComponentModel
 {
+	[Obsolete]
 	[Serializable]
 	public class Action
 	{

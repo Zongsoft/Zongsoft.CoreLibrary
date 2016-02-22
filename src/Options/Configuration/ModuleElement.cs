@@ -86,7 +86,7 @@ namespace Zongsoft.Options.Configuration
 		#endregion
 
 		#region 公共方法
-		public Zongsoft.ComponentModel.IModule CreateModule()
+		public Zongsoft.ComponentModel.IApplicationModule CreateModule()
 		{
 			var typeName = this.Type;
 
@@ -98,10 +98,10 @@ namespace Zongsoft.Options.Configuration
 			if(type == null)
 				throw new OptionConfigurationException(string.Format("Invalid '{0}' type of module, becase cann't load it.", typeName));
 
-			if(!typeof(Zongsoft.ComponentModel.IModule).IsAssignableFrom(type))
+			if(!typeof(Zongsoft.ComponentModel.IApplicationModule).IsAssignableFrom(type))
 				throw new OptionConfigurationException(string.Format("Invalid '{0}' type of module, it doesn't implemented IModule interface.", typeName));
 
-			return Activator.CreateInstance(type) as Zongsoft.ComponentModel.IModule;
+			return Activator.CreateInstance(type) as Zongsoft.ComponentModel.IApplicationModule;
 		}
 		#endregion
 	}

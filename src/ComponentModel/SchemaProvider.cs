@@ -29,6 +29,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.ComponentModel
 {
+	[Obsolete]
 	public class SchemaProvider : ISchemaProvider
 	{
 		#region 成员变量

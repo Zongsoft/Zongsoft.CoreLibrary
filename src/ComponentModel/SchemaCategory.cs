@@ -30,6 +30,7 @@ using System.Threading;
 
 namespace Zongsoft.ComponentModel
 {
+	[Obsolete]
 	public class SchemaCategory : Zongsoft.Collections.CategoryBase
 	{
 		#region 成员字段

@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2016 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -26,46 +26,27 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Zongsoft.ComponentModel
 {
-	[Serializable]
-	public class DispatcherRepliedEventArgs : EventArgs
+	/// <summary>
+	/// 向实现类提供应用扩展模块初始化和处置事件。
+	/// </summary>
+	public interface IApplicationModule : IDisposable
 	{
-		#region 成员变量
-		private object _data;
-		private DispatcherRepliedReason _reason;
-		#endregion
-
-		#region 构造函数
-		public DispatcherRepliedEventArgs(object data, DispatcherRepliedReason reason)
+		/// <summary>
+		/// 获取应用扩展模块名称。
+		/// </summary>
+		string Name
 		{
-			if(data == null)
-				throw new ArgumentNullException("data");
-
-			_data = data;
-			_reason = reason;
-		}
-		#endregion
-
-		#region 公共属性
-		public object Data
-		{
-			get
-			{
-				return _data;
-			}
+			get;
 		}
 
-		public DispatcherRepliedReason Reason
-		{
-			get
-			{
-				return _reason;
-			}
-		}
-		#endregion
+		/// <summary>
+		/// 初始化应用扩展模块，并使其为处理请求做好准备。
+		/// </summary>
+		/// <param name="context">一个上下文对象，它提供对模块处理应用程序内所有应用程序对象的公用的方法、属性和事件的访问。</param>
+		/// <remarks>使用 <c>Initialize</c> 将事件处理方法向具体事件进行注册等初始化操作。</remarks>
+		void Initialize(ApplicationContextBase context);
 	}
 }

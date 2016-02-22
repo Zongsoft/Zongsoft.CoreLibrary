@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package>
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <licenseUrl>http://www.gnu.org/licenses/lgpl-2.1.html</licenseUrl>
+    <projectUrl>https://github.com/Zongsoft/Zongsoft.CoreLibrary</projectUrl>
+    <iconUrl>https://avatars.githubusercontent.com/u/4804332</iconUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>$description$</description>
+    <summary>Zongsoft.CoreLibrary 类库提供了.NET开发的常用功能集以及一些相对于.NET BCL中进行了功能强化的实现。采用C#语言开发，支持跨平台。</summary>
+    <releaseNotes>Zongsoft.CoreLibrary 类库提供了.NET开发的常用功能集以及一些相对于.NET BCL中进行了功能强化的实现。采用C#语言开发，支持跨平台。</releaseNotes>
+    <copyright>$copyright$</copyright>
+    <tags>Zongsoft CoreLibrary</tags>
+  </metadata>
+</package>

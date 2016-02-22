@@ -32,6 +32,7 @@ namespace Zongsoft.ComponentModel
 	/// <summary>
 	/// 提供<seealso cref="Schema"/>相关功能的接口。
 	/// </summary>
+	[Obsolete]
 	public interface ISchemaProvider
 	{
 		/// <summary>
