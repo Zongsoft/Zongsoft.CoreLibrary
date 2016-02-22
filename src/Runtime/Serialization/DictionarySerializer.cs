@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2016 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -124,12 +124,12 @@ namespace Zongsoft.Runtime.Serialization
 				};
 			}
 
-			foreach(KeyValuePair<string, object> entry in dictionary)
+			foreach(DictionaryEntry entry in dictionary)
 			{
-				if(string.IsNullOrWhiteSpace(entry.Key))
+				if(entry.Key == null)
 					continue;
 
-				Zongsoft.Common.Convert.SetValue(result, entry.Key, entry.Value, resolve);
+				Zongsoft.Common.Convert.SetValue(result, entry.Key.ToString(), entry.Value, resolve);
 			}
 
 			return result;
