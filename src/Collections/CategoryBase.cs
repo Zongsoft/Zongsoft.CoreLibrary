@@ -36,6 +36,7 @@ namespace Zongsoft.Collections
 		#region 成员字段
 		private string _title;
 		private string _description;
+		private string _tags;
 		private bool _visible;
 		#endregion
 
@@ -85,6 +86,18 @@ namespace Zongsoft.Collections
 			set
 			{
 				_description = value;
+			}
+		}
+
+		public string Tags
+		{
+			get
+			{
+				return _tags;
+			}
+			set
+			{
+				_tags = value;
 			}
 		}
 
