@@ -118,7 +118,7 @@ namespace Zongsoft.Common
 		{
 			result = ConvertValue(value, conversionType, () => typeof(Convert));
 
-			if(result == typeof(Convert))
+			if(object.ReferenceEquals(result, typeof(Convert)))
 			{
 				result = null;
 				return false;
@@ -374,116 +374,6 @@ namespace Zongsoft.Common
 		#endregion
 
 		#region 对象解析
-
-		#region 对象组装
-		[Obsolete("Please use Zongsoft.Runtime.Serialization.DictionarySerializer class.")]
-		public static T Populate<T>(IEnumerable<KeyValuePair<string, object>> dictionary, Func<T> creator = null, Action<ObjectResolvingContext> resolve = null)
-		{
-			if(dictionary == null)
-				return default(T);
-
-			var result = creator != null ? creator() : Activator.CreateInstance<T>();
-
-			if(resolve == null)
-			{
-				resolve = ctx =>
-				{
-					if(ctx.Direction == ObjectResolvingDirection.Get)
-					{
-						ctx.Value = ctx.GetMemberValue();
-
-						if(ctx.Value == null)
-						{
-							ctx.Value = Activator.CreateInstance(ctx.MemberType);
-
-							switch(ctx.Member.MemberType)
-							{
-								case MemberTypes.Field:
-									((FieldInfo)ctx.Member).SetValue(ctx.Container, ctx.Value);
-									break;
-								case MemberTypes.Property:
-									((PropertyInfo)ctx.Member).SetValue(ctx.Container, ctx.Value);
-									break;
-							}
-						}
-					}
-				};
-			}
-
-			foreach(KeyValuePair<string, object> entry in dictionary)
-			{
-				if(string.IsNullOrWhiteSpace(entry.Key))
-					continue;
-
-				SetValue(result, entry.Key, entry.Value, resolve);
-			}
-
-			return result;
-		}
-
-		[Obsolete("Please use Zongsoft.Runtime.Serialization.DictionarySerializer class.")]
-		public static T Populate<T>(IDictionary dictionary, Func<T> creator = null, Action<ObjectResolvingContext> resolve = null)
-		{
-			if(dictionary == null || dictionary.Count < 1)
-				return default(T);
-
-			return Populate<T>(Zongsoft.Collections.DictionaryExtension.ToDictionary<string, object>(dictionary), creator, resolve);
-		}
-
-		[Obsolete("Please use Zongsoft.Runtime.Serialization.DictionarySerializer class.")]
-		public static object Populate(IEnumerable<KeyValuePair<string, object>> dictionary, Type type, Func<object> creator = null, Action<ObjectResolvingContext> resolve = null)
-		{
-			if(dictionary == null)
-				return null;
-
-			var result = creator != null ? creator() : Activator.CreateInstance(type);
-
-			if(resolve == null)
-			{
-				resolve = ctx =>
-				{
-					if(ctx.Direction == ObjectResolvingDirection.Get)
-					{
-						ctx.Value = ctx.GetMemberValue();
-
-						if(ctx.Value == null)
-						{
-							ctx.Value = Activator.CreateInstance(ctx.MemberType);
-
-							switch(ctx.Member.MemberType)
-							{
-								case MemberTypes.Field:
-									((FieldInfo)ctx.Member).SetValue(ctx.Container, ctx.Value);
-									break;
-								case MemberTypes.Property:
-									((PropertyInfo)ctx.Member).SetValue(ctx.Container, ctx.Value);
-									break;
-							}
-						}
-					}
-				};
-			}
-
-			foreach(KeyValuePair<string, object> entry in dictionary)
-			{
-				if(string.IsNullOrWhiteSpace(entry.Key))
-					continue;
-
-				SetValue(result, entry.Key, entry.Value, resolve);
-			}
-
-			return result;
-		}
-
-		[Obsolete("Please use Zongsoft.Runtime.Serialization.DictionarySerializer class.")]
-		public static object Populate(IDictionary dictionary, Type type, Func<object> creator = null, Action<ObjectResolvingContext> resolve = null)
-		{
-			if(dictionary == null || dictionary.Count < 1)
-				return null;
-
-			return Populate(Zongsoft.Collections.DictionaryExtension.ToDictionary<string, object>(dictionary), creator, resolve);
-		}
-		#endregion
 
 		#region 获取方法
 		public static Type GetMemberType(object target, string text)
