@@ -110,7 +110,7 @@ namespace Zongsoft.Security.Membership
 		/// 设置指定编号的用户手机号码。
 		/// </summary>
 		/// <param name="userId">要设置的用户编号。</param>
-		/// <param name="email">要设置的手机号码。</param>
+		/// <param name="phoneNumber">要设置的手机号码。</param>
 		/// <returns>如果设置成功则返回真(True)，否则返回假(False)。</returns>
 		bool SetPhoneNumber(int userId, string phoneNumber);
 
