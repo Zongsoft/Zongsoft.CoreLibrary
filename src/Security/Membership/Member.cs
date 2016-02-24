@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2003-2014 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2003-2016 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -37,9 +37,10 @@ namespace Zongsoft.Security.Membership
 	{
 		#region 成员字段
 		private int _roleId;
+		private Role _role;
 		private int _memberId;
 		private MemberType _memberType;
-		private Role _role;
+		private object _memberObject;
 		#endregion
 
 		#region 构造函数
@@ -52,6 +53,9 @@ namespace Zongsoft.Security.Membership
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取或设置成员的父角色编号。
+		/// </summary>
 		public int RoleId
 		{
 			get
@@ -64,6 +68,9 @@ namespace Zongsoft.Security.Membership
 			}
 		}
 
+		/// <summary>
+		/// 获取或设置成员的父角色对象。
+		/// </summary>
 		public Role Role
 		{
 			get
@@ -76,6 +83,9 @@ namespace Zongsoft.Security.Membership
 			}
 		}
 
+		/// <summary>
+		/// 获取或设置成员编号。
+		/// </summary>
 		public int MemberId
 		{
 			get
@@ -88,6 +98,9 @@ namespace Zongsoft.Security.Membership
 			}
 		}
 
+		/// <summary>
+		/// 获取或设置成员类型。
+		/// </summary>
 		public MemberType MemberType
 		{
 			get
@@ -97,6 +110,25 @@ namespace Zongsoft.Security.Membership
 			set
 			{
 				_memberType = value;
+			}
+		}
+
+		/// <summary>
+		/// 获取或设置成员自身对象，具体类型由<see cref="MemberType"/>属性标示。
+		/// </summary>
+		/// <exception cref="ArgumentException">当设置的值不为空，并且不是<seealso cref="User"/>用户或<seealso cref="Role"/>角色类型。</exception>
+		public object MemberObject
+		{
+			get
+			{
+				return _memberObject;
+			}
+			set
+			{
+				if(value == null || value is User || value is Role)
+					_memberObject = value;
+				else
+					throw new ArgumentException("The type of value must be 'User' or 'Role'.");
 			}
 		}
 		#endregion

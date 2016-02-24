@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2003-2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2003-2016 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -59,28 +59,11 @@ namespace Zongsoft.Security.Membership
 		IEnumerable<Role> GetRoles(int memberId, MemberType memberType);
 
 		/// <summary>
-		/// 获取指定角色成员的上级角色集。
-		/// </summary>
-		/// <param name="memberId">要搜索的角色成员编号。</param>
-		/// <param name="memberType">要搜索的角色成员类型。</param>
-		/// <param name="depth">对搜索角色成员隶属关系的遍历深度，如果不限深度则为负数。</param>
-		/// <returns>返回指定成员的上级角色集。</returns>
-		IEnumerable<Role> GetRoles(int memberId, MemberType memberType, int depth);
-
-		/// <summary>
 		/// 获取指定角色的直属成员集。
 		/// </summary>
 		/// <param name="roleId">要搜索的角色编号。</param>
 		/// <returns>返回隶属于指定角色的直属子级成员集。</returns>
 		IEnumerable<Member> GetMembers(int roleId);
-
-		/// <summary>
-		/// 获取指定角色的成员集。
-		/// </summary>
-		/// <param name="roleId">要搜索的角色编号。</param>
-		/// <param name="depth">对搜索角色成员隶属关系的遍历深度，如果不限深度则为负数。</param>
-		/// <returns>返回隶属于指定角色下特定深度的所有成员集。</returns>
-		IEnumerable<Member> GetMembers(int roleId, int depth);
 
 		/// <summary>
 		/// 设置更新指定角色下的所有成员。
