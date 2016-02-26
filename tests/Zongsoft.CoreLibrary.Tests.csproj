@@ -58,6 +58,8 @@
     <Compile Include="Common\BufferTests.cs" />
     <Compile Include="Common\ConvertTests.cs" />
     <Compile Include="Common\EnumUtilityTests.cs" />
+    <Compile Include="Data\ConditionCollectionTest.cs" />
+    <Compile Include="Data\ConditionTest.cs" />
     <Compile Include="Data\DataAccessBaseTest.cs" />
     <Compile Include="Data\SortingTest.cs" />
     <Compile Include="Department.cs" />
