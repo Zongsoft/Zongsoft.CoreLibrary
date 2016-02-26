@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2016 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -29,8 +29,19 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
+	/// <summary>
+	/// 表示数据分页查询的设置类。
+	/// </summary>
 	public class Paging
 	{
+		#region 常量定义
+		private const int PAGE_SIZE = 20;
+		#endregion
+
+		#region 静态字段
+		public static readonly Paging Disable = new Paging(1, 0);
+		#endregion
+
 		#region 成员字段
 		private int _pageIndex;
 		private int _pageSize;
@@ -38,14 +49,26 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public Paging() : this(1, 20)
+		/// <summary>
+		/// 创建默认的分页设置。<see cref="PageIndex"/>默认值为1（即首页），<see cref="PageSize"/>默认值为20。
+		/// </summary>
+		public Paging() : this(1, PAGE_SIZE)
 		{
 		}
 
-		public Paging(int pageIndex) : this(pageIndex, 20)
+		/// <summary>
+		/// 创建指定页号的分页设置。<see cref="PageSize"/>默认值为20。
+		/// </summary>
+		/// <param name="pageIndex"></param>
+		public Paging(int pageIndex) : this(pageIndex, PAGE_SIZE)
 		{
 		}
 
+		/// <summary>
+		/// 创建指定页号和页大小的分页设置。
+		/// </summary>
+		/// <param name="pageIndex"></param>
+		/// <param name="pageSize"></param>
 		public Paging(int pageIndex, int pageSize)
 		{
 			this.PageIndex = pageIndex;
@@ -63,17 +86,14 @@ namespace Zongsoft.Data
 			{
 				return _pageSize;
 			}
-			set
+			protected set
 			{
-				if(value < 0)
-					throw new ArgumentOutOfRangeException();
-
-				_pageSize = value;
+				_pageSize = Math.Max(value, 0);
 			}
 		}
 
 		/// <summary>
-		/// 获取或设置当前查询的页号，页号从1开始。
+		/// 获取或设置当前查询的页号，页号从1开始，如果设置小于1的数值均被重置为1。
 		/// </summary>
 		public int PageIndex
 		{
@@ -97,6 +117,9 @@ namespace Zongsoft.Data
 				if(_totalCount < 1)
 					return 0;
 
+				if(_pageSize < 1)
+					return 1;
+
 				return (int)Math.Ceiling((double)_totalCount / _pageSize);
 			}
 		}
@@ -114,6 +137,19 @@ namespace Zongsoft.Data
 			{
 				_totalCount = Math.Max(value, -1);
 			}
+		}
+		#endregion
+
+		#region 静态方法
+		/// <summary>
+		/// 以指定的页号创建一个分页设置对象。
+		/// </summary>
+		/// <param name="value">指定的页号。</param>
+		/// <param name="size">每页的大小，默认为20。</param>
+		/// <returns>返回新创建的分页设置对象。</returns>
+		public static Paging Index(int value, int size = PAGE_SIZE)
+		{
+			return new Paging(value, size);
 		}
 		#endregion
 	}

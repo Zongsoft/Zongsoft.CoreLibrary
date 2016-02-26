@@ -56,15 +56,19 @@ namespace Zongsoft.Data
 		LessThanEqual,
 
 		/// <summary>模糊匹配</summary>
+		[Zongsoft.ComponentModel.Alias("*=")]
 		Like,
 
 		/// <summary>介于</summary>
+		[Zongsoft.ComponentModel.Alias("~")]
 		Between,
 
 		/// <summary>范围</summary>
+		[Zongsoft.ComponentModel.Alias("^")]
 		In,
 
 		/// <summary>排除范围</summary>
+		[Zongsoft.ComponentModel.Alias("!^")]
 		NotIn,
 	}
 }
