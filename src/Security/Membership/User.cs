@@ -79,7 +79,7 @@ namespace Zongsoft.Security.Membership
 				throw new ArgumentNullException("name");
 
 			_userId = userId;
-			_name = name.Trim();
+			_name = _fullName = name.Trim();
 			_namespace = @namespace;
 			_createdTime = DateTime.Now;
 			_approved = true;
