@@ -142,14 +142,14 @@ namespace Zongsoft.Data
 
 		#region 静态方法
 		/// <summary>
-		/// 以指定的页号创建一个分页设置对象。
+		/// 以指定的页号及大小创建一个分页设置对象。
 		/// </summary>
-		/// <param name="value">指定的页号。</param>
+		/// <param name="index">指定的页号，默认为1。</param>
 		/// <param name="size">每页的大小，默认为20。</param>
 		/// <returns>返回新创建的分页设置对象。</returns>
-		public static Paging Index(int value, int size = PAGE_SIZE)
+		public static Paging Page(int index = 1, int size = PAGE_SIZE)
 		{
-			return new Paging(value, size);
+			return new Paging(index, size);
 		}
 		#endregion
 	}
