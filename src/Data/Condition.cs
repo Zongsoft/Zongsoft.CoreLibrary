@@ -139,6 +139,83 @@ namespace Zongsoft.Data
 		}
 		#endregion
 
+		#region 静态方法
+		public static Condition Equal(string name, object value)
+		{
+			return new Condition(name, value, ConditionOperator.Equal);
+		}
+
+		public static Condition NotEqual(string name, object value)
+		{
+			return new Condition(name, value, ConditionOperator.NotEqual);
+		}
+
+		public static Condition GreaterThan(string name, object value)
+		{
+			return new Condition(name, value, ConditionOperator.GreaterThan);
+		}
+
+		public static Condition GreaterThanEqual(string name, object value)
+		{
+			return new Condition(name, value, ConditionOperator.GreaterThanEqual);
+		}
+
+		public static Condition LessThan(string name, object value)
+		{
+			return new Condition(name, value, ConditionOperator.LessThan);
+		}
+
+		public static Condition LessThanEqual(string name, object value)
+		{
+			return new Condition(name, value, ConditionOperator.LessThanEqual);
+		}
+
+		public static Condition Like(string name, string value)
+		{
+			if(string.IsNullOrEmpty(value))
+				return new Condition(name, value, ConditionOperator.Equal);
+			else
+				return new Condition(name, value, ConditionOperator.Like);
+		}
+
+		public static Condition Between<T>(string name, T begin, T end) where T : IComparable<T>
+		{
+			return new Condition(name, new T[] { begin, end }, ConditionOperator.Between);
+		}
+
+		public static Condition In<T>(string name, IEnumerable<T> values) where T : IEquatable<T>
+		{
+			if(values == null)
+				throw new ArgumentNullException("values");
+
+			return new Condition(name, values, ConditionOperator.In);
+		}
+
+		public static Condition In<T>(string name, params T[] values) where T : IEquatable<T>
+		{
+			if(values == null)
+				throw new ArgumentNullException("values");
+
+			return new Condition(name, values, ConditionOperator.In);
+		}
+
+		public static Condition NotIn<T>(string name, IEnumerable<T> values) where T : IEquatable<T>
+		{
+			if(values == null)
+				throw new ArgumentNullException("values");
+
+			return new Condition(name, values, ConditionOperator.NotIn);
+		}
+
+		public static Condition NotIn<T>(string name, params T[] values) where T : IEquatable<T>
+		{
+			if(values == null)
+				throw new ArgumentNullException("values");
+
+			return new Condition(name, values, ConditionOperator.NotIn);
+		}
+		#endregion
+
 		#region 符号重写
 		public static ConditionCollection operator &(Condition a, Condition b)
 		{
