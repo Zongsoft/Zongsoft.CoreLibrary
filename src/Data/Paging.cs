@@ -86,7 +86,7 @@ namespace Zongsoft.Data
 			{
 				return _pageSize;
 			}
-			protected set
+			set
 			{
 				_pageSize = Math.Max(value, 0);
 			}
