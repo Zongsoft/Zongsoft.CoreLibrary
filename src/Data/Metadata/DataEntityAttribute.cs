@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2016 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -27,21 +27,21 @@
 using System;
 using System.ComponentModel;
 
-namespace Zongsoft.Data
+namespace Zongsoft.Data.Metadata
 {
 	[AttributeUsage(AttributeTargets.Class)]
-	public class DataAccessAttribute : Attribute
+	public class DataEntityAttribute : Attribute
 	{
 		#region 成员字段
 		private string _name;
 		#endregion
 
 		#region 构造函数
-		public DataAccessAttribute()
+		public DataEntityAttribute()
 		{
 		}
 
-		public DataAccessAttribute(string name)
+		public DataEntityAttribute(string name)
 		{
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException("name");

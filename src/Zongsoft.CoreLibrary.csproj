@@ -178,10 +178,13 @@
     <Compile Include="Data\ConditionCollection.cs" />
     <Compile Include="Data\ConditionCombine.cs" />
     <Compile Include="Data\ConditionOperator.cs" />
-    <Compile Include="Data\DataAccessAttribute.cs" />
+    <Compile Include="Data\Metadata\DataEntityAttribute.cs" />
     <Compile Include="Data\DataAccessBase.cs" />
+    <Compile Include="Data\DataService.cs" />
     <Compile Include="Data\Grouping.cs" />
     <Compile Include="Data\ICondition.cs" />
+    <Compile Include="Data\IDataService.cs" />
+    <Compile Include="Data\Metadata\DataEntityKeyAttribute.cs" />
     <Compile Include="Data\Paging.cs" />
     <Compile Include="Data\Sorting.cs" />
     <Compile Include="Diagnostics\Configuration\LoggerHandlerElement.cs" />

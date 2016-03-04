@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2016 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -91,11 +91,47 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 查询方法
-		public IEnumerable<T> Select<T>(string name, ICondition condition = null)
+		public IEnumerable<T> Select<T>(string name, ICondition condition = null, params Sorting[] sorting)
 		{
 			return this.Select<T>(name, condition, this.ResolveScope(name, null, typeof(T)), null, null, null);
 		}
 
+		public IEnumerable<T> Select<T>(string name, ICondition condition, string scope, params Sorting[] sorting)
+		{
+			return this.Select<T>(name, condition, this.ResolveScope(name, scope, typeof(T)), null, null, sorting);
+		}
+
+		public IEnumerable<T> Select<T>(string name, ICondition condition, string scope, Paging paging, params Sorting[] sorting)
+		{
+			return this.Select<T>(name, condition, this.ResolveScope(name, scope, typeof(T)), paging, null, sorting);
+		}
+
+		public IEnumerable<T> Select<T>(string name, ICondition condition, string scope, Grouping grouping, params Sorting[] sorting)
+		{
+			return this.Select<T>(name, condition, this.ResolveScope(name, scope, typeof(T)), null, grouping, sorting);
+		}
+
+		public IEnumerable<T> Select<T>(string name, ICondition condition, Paging paging, params Sorting[] sorting)
+		{
+			return this.Select<T>(name, condition, this.ResolveScope(name, null, typeof(T)), paging, null, sorting);
+		}
+
+		public IEnumerable<T> Select<T>(string name, ICondition condition, Paging paging, string scope, params Sorting[] sorting)
+		{
+			return this.Select<T>(name, condition, this.ResolveScope(name, scope, typeof(T)), paging, null, sorting);
+		}
+
+		public IEnumerable<T> Select<T>(string name, ICondition condition, Grouping grouping, params Sorting[] sorting)
+		{
+			return this.Select<T>(name, condition, this.ResolveScope(name, null, typeof(T)), null, grouping, sorting);
+		}
+
+		public IEnumerable<T> Select<T>(string name, ICondition condition, Grouping grouping, string scope, params Sorting[] sorting)
+		{
+			return this.Select<T>(name, condition, this.ResolveScope(name, scope, typeof(T)), null, grouping, sorting);
+		}
+
+		[Obsolete]
 		public IEnumerable Select(string name,
 		                          ICondition condition = null,
 		                          string scope = null,
@@ -106,6 +142,7 @@ namespace Zongsoft.Data
 			return this.Select<object>(name, condition, this.ResolveScope(name, scope, null), paging, grouping, sorting);
 		}
 
+		[Obsolete]
 		public IEnumerable<T> Select<T>(string name,
 		                                ICondition condition = null,
 		                                string scope = null,
@@ -116,6 +153,7 @@ namespace Zongsoft.Data
 			return this.Select<T>(name, condition, this.ResolveScope(name, scope, typeof(T)), paging, grouping, sorting);
 		}
 
+		[Obsolete]
 		public IEnumerable<T> Select<T>(string name,
 		                                ICondition condition = null,
 		                                Expression<Func<T, object>> includes = null,
@@ -161,12 +199,18 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 插入方法
+		[Obsolete]
 		public int Insert(string name, object entity, string scope = null)
 		{
 			if(entity == null)
 				throw new ArgumentNullException("entity");
 
 			return this.Insert(name, entity, this.ResolveScope(name, scope, entity.GetType()));
+		}
+
+		public int Insert<T>(string name, T entity, string scope = null)
+		{
+			return this.Insert(name, entity, this.ResolveScope(name, scope, typeof(T)));
 		}
 
 		public int Insert<T>(string name, T entity, Expression<Func<T, object>> includes, Expression<Func<T, object>> excludes = null)
@@ -193,14 +237,6 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 更新方法
-		public int Update(string name, object entity, ICondition condition = null)
-		{
-			if(entity == null)
-				throw new ArgumentNullException("entity");
-
-			return this.Update(name, entity, condition, this.ResolveScope(name, null, entity.GetType()));
-		}
-
 		/// <summary>
 		/// 根据指定的条件将指定的实体更新到数据源。
 		/// </summary>
@@ -209,7 +245,8 @@ namespace Zongsoft.Data
 		/// <param name="condition">要更新的条件子句，如果为空(null)则根据实体的主键进行更新。</param>
 		/// <param name="scope">指定的要更新的和排除更新的属性名列表，如果指定的是多个属性则属性名之间使用逗号(,)分隔；要排除的属性以减号(-)打头，星号(*)表示所有属性，感叹号(!)表示排除所有属性；如果未指定该参数则默认只会更新所有单值属性而不会更新导航属性。</param>
 		/// <returns>返回受影响的记录行数，执行成功返回大于零的整数，失败则返回负数。</returns>
-		public int Update(string name, object entity, ICondition condition, string scope = null)
+		[Obsolete]
+		public int Update(string name, object entity, ICondition condition = null, string scope = null)
 		{
 			if(entity == null)
 				throw new ArgumentNullException("entity");
@@ -217,7 +254,12 @@ namespace Zongsoft.Data
 			return this.Update(name, entity, condition, this.ResolveScope(name, scope, entity.GetType()));
 		}
 
-		public int Update<T>(string name, T entity, ICondition condition, Expression<Func<T, object>> includes = null, Expression<Func<T, object>> excludes = null)
+		public int Update<T>(string name, T entity, ICondition condition = null, string scope = null)
+		{
+			return this.Update(name, entity, condition, this.ResolveScope(name, scope, typeof(T)));
+		}
+
+		public int Update<T>(string name, T entity, ICondition condition, Expression<Func<T, object>> includes, Expression<Func<T, object>> excludes = null)
 		{
 			return this.Update(name, entity, condition, this.ResolveScopeExpression(name, includes, excludes));
 		}
@@ -225,11 +267,6 @@ namespace Zongsoft.Data
 		protected virtual int Update(string name, object entity, ICondition condition, string[] members)
 		{
 			return this.Update(name, new object[] { entity }, condition, members);
-		}
-
-		public int Update<T>(string name, IEnumerable<T> entities, ICondition condition = null)
-		{
-			return this.Update(name, entities, condition, this.ResolveScope(name, null, typeof(T)));
 		}
 
 		/// <summary>
@@ -241,12 +278,12 @@ namespace Zongsoft.Data
 		/// <param name="condition">要更新的条件子句，如果为空(null)则根据实体的主键进行更新。</param>
 		/// <param name="scope">指定的要更新的和排除更新的属性名列表，如果指定的是多个属性则属性名之间使用逗号(,)分隔；要排除的属性以减号(-)打头，星号(*)表示所有属性，感叹号(!)表示排除所有属性；如果未指定该参数则默认只会更新所有单值属性而不会更新导航属性。</param>
 		/// <returns>返回受影响的记录行数，执行成功返回大于零的整数，失败则返回负数。</returns>
-		public int Update<T>(string name, IEnumerable<T> entities, ICondition condition, string scope = null)
+		public int Update<T>(string name, IEnumerable<T> entities, ICondition condition = null, string scope = null)
 		{
-			return this.Update(name, entities, condition, this.ResolveScope(name, scope, typeof(T)).ToArray());
+			return this.Update(name, entities, condition, this.ResolveScope(name, scope, typeof(T)));
 		}
 
-		public int Update<T>(string name, IEnumerable<T> entities, ICondition condition, Expression<Func<T, object>> includes = null, Expression<Func<T, object>> excludes = null)
+		public int Update<T>(string name, IEnumerable<T> entities, ICondition condition, Expression<Func<T, object>> includes, Expression<Func<T, object>> excludes = null)
 		{
 			return this.Update(name, entities, condition, this.ResolveScopeExpression(name, includes, excludes));
 		}
