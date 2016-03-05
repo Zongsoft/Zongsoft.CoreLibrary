@@ -31,6 +31,9 @@ using System.Text;
 
 namespace Zongsoft.Data
 {
+	/// <summary>
+	/// 表示数据过滤条件的设置项。
+	/// </summary>
 	public class Condition : ICondition
 	{
 		#region 成员字段

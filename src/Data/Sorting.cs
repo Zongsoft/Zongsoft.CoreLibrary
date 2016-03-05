@@ -29,6 +29,9 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
+	/// <summary>
+	/// 表示数据排序的设置项。
+	/// </summary>
 	public class Sorting
 	{
 		#region 成员字段

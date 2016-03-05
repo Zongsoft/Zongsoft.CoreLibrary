@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2016 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -30,6 +30,9 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
+	/// <summary>
+	/// 表示数据分组的设置项。
+	/// </summary>
 	public class Grouping
 	{
 		#region 成员字段
@@ -57,6 +60,9 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取或设置分组成员的文本，各分组成员以逗号“,”分隔。
+		/// </summary>
 		public string MembersText
 		{
 			get
@@ -75,6 +81,9 @@ namespace Zongsoft.Data
 			}
 		}
 
+		/// <summary>
+		/// 获取或设置分组的成员数组。
+		/// </summary>
 		public string[] Members
 		{
 			get
@@ -104,6 +113,9 @@ namespace Zongsoft.Data
 			}
 		}
 
+		/// <summary>
+		/// 获取或设置分组的过滤条件，默认为空。
+		/// </summary>
 		public ICondition Condition
 		{
 			get
@@ -114,6 +126,34 @@ namespace Zongsoft.Data
 			{
 				_condition = value;
 			}
+		}
+		#endregion
+
+		#region 静态方法
+		/// <summary>
+		/// 创建一个分组。
+		/// </summary>
+		/// <param name="members">分组的成员集。</param>
+		/// <returns>返回创建的分组设置。</returns>
+		public static Grouping Group(params string[] members)
+		{
+			if(members == null || members.Length < 1)
+				throw new ArgumentNullException("members");
+
+			return new Grouping(members);
+		}
+		#endregion
+
+		#region 公共方法
+		/// <summary>
+		/// 设置分组的过滤条件。
+		/// </summary>
+		/// <param name="condition">指定的过滤条件。</param>
+		/// <returns>返回带过滤条件的分组设置。</returns>
+		public Grouping Filter(ICondition condition)
+		{
+			_condition = condition;
+			return this;
 		}
 		#endregion
 
