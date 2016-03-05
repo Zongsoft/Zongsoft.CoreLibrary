@@ -72,6 +72,22 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 符号重写
+		public static explicit operator ConditionCollection(IConditional value)
+		{
+			if(value == null)
+				return null;
+
+			value.ToCondition();
+		}
+
+		public static implicit operator ConditionCollection(IConditional value)
+		{
+			if(value == null)
+				return null;
+
+			value.ToCondition();
+		}
+
 		public static ConditionCollection operator +(Condition condition, ConditionCollection conditions)
 		{
 			if(conditions == null)
