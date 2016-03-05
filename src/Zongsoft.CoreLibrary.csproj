@@ -183,6 +183,7 @@
     <Compile Include="Data\DataService.cs" />
     <Compile Include="Data\Grouping.cs" />
     <Compile Include="Data\ICondition.cs" />
+    <Compile Include="Data\IConditional.cs" />
     <Compile Include="Data\IDataService.cs" />
     <Compile Include="Data\Metadata\DataEntityKeyAttribute.cs" />
     <Compile Include="Data\Paging.cs" />
