@@ -129,42 +129,42 @@ namespace Zongsoft.Data
 		#region 执行方法
 		public object Execute(IDictionary<string, object> inParameters)
 		{
-			return this.EnsureDataAccess().Execute(this.Name, inParameters);
+			IDictionary<string, object> outParameters;
+			return this.Execute(inParameters, out outParameters);
 		}
 
-		public object Execute(IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters)
+		public virtual object Execute(IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters)
 		{
 			return this.EnsureDataAccess().Execute(this.Name, inParameters, out outParameters);
 		}
 		#endregion
 
 		#region 存在方法
-		public bool Exists(ICondition condition)
+		public virtual bool Exists(ICondition condition)
 		{
 			return this.EnsureDataAccess().Exists(this.Name, condition);
 		}
 		#endregion
 
 		#region 计数方法
-		public int Count(ICondition condition, string includes = null)
+		public virtual int Count(ICondition condition, string includes = null)
 		{
 			return this.EnsureDataAccess().Count(this.Name, condition, includes);
 		}
 
 		public int Count(ICondition condition, Expression<Func<TEntity, object>> includes)
 		{
-			return this.EnsureDataAccess().Count(this.Name, condition, includes);
+			throw new NotImplementedException();
 		}
 		#endregion
 
 		#region 查询方法
 		public object Get<TKey>(TKey key, params Sorting[] sorting)
 		{
-			var result = this.EnsureDataAccess().Select<TEntity>(this.Name, this.ConvertKey(key), sorting);
-			return this.GetResult(result, 1);
+			return this.Get<TKey>(key, string.Empty, null, sorting);
 		}
 
-		public object Get<TKey>(TKey key, string scope, Paging paging = null, params Sorting[] sorting)
+		public virtual object Get<TKey>(TKey key, string scope, Paging paging = null, params Sorting[] sorting)
 		{
 			var result = this.EnsureDataAccess().Select<TEntity>(this.Name, this.ConvertKey(key), scope, paging, sorting);
 			return this.GetResult(result, 1);
@@ -172,17 +172,15 @@ namespace Zongsoft.Data
 
 		public object Get<TKey>(TKey key, Paging paging, string scope = null, params Sorting[] sorting)
 		{
-			var result = this.EnsureDataAccess().Select<TEntity>(this.Name, this.ConvertKey(key), paging, scope, sorting);
-			return this.GetResult(result, 1);
+			return this.Get<TKey>(key, scope, paging, sorting);
 		}
 
 		public object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, params Sorting[] sorting)
 		{
-			var result = this.EnsureDataAccess().Select<TEntity>(this.Name, this.ConvertKey(key1, key2), sorting);
-			return this.GetResult(result, 2);
+			return this.Get<TKey1, TKey2>(key1, key2, string.Empty, null, sorting);
 		}
 
-		public object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string scope, Paging paging = null, params Sorting[] sorting)
+		public virtual object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string scope, Paging paging = null, params Sorting[] sorting)
 		{
 			var result = this.EnsureDataAccess().Select<TEntity>(this.Name, this.ConvertKey(key1, key2), scope, paging, sorting);
 			return this.GetResult(result, 2);
@@ -190,17 +188,15 @@ namespace Zongsoft.Data
 
 		public object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, Paging paging, string scope = null, params Sorting[] sorting)
 		{
-			var result = this.EnsureDataAccess().Select<TEntity>(this.Name, this.ConvertKey(key1, key2), paging, scope, sorting);
-			return this.GetResult(result, 2);
+			return this.Get<TKey1, TKey2>(key1, key2, scope, paging, sorting);
 		}
 
 		public object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, params Sorting[] sorting)
 		{
-			var result = this.EnsureDataAccess().Select<TEntity>(this.Name, this.ConvertKey(key1, key2, key3), sorting);
-			return this.GetResult(result, 3);
+			return this.Get<TKey1, TKey2, TKey3>(key1, key2, key3, string.Empty, null, sorting);
 		}
 
-		public object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string scope, Paging paging = null, params Sorting[] sorting)
+		public virtual object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string scope, Paging paging = null, params Sorting[] sorting)
 		{
 			var result = this.EnsureDataAccess().Select<TEntity>(this.Name, this.ConvertKey(key1, key2, key3), scope, paging, sorting);
 			return this.GetResult(result, 3);
@@ -208,124 +204,133 @@ namespace Zongsoft.Data
 
 		public object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, Paging paging, string scope = null, params Sorting[] sorting)
 		{
-			var result = this.EnsureDataAccess().Select<TEntity>(this.Name, this.ConvertKey(key1, key2, key3), paging, scope, sorting);
-			return this.GetResult(result, 3);
+			return this.Get<TKey1, TKey2, TKey3>(key1, key2, key3, scope, paging, sorting);
 		}
 
 		public IEnumerable<TEntity> Select(ICondition condition = null, params Sorting[] sorting)
 		{
-			return this.EnsureDataAccess().Select<TEntity>(this.Name, condition, sorting);
+			return this.Select(condition, null, string.Empty, null, sorting);
 		}
 
 		public IEnumerable<TEntity> Select(ICondition condition, string scope, params Sorting[] sorting)
 		{
-			return this.EnsureDataAccess().Select<TEntity>(this.Name, condition, scope, sorting);
+			return this.Select(condition, null, scope, null, sorting);
 		}
 
 		public IEnumerable<TEntity> Select(ICondition condition, string scope, Paging paging, params Sorting[] sorting)
 		{
-			return this.EnsureDataAccess().Select<TEntity>(this.Name, condition, scope, paging, sorting);
-		}
-
-		public IEnumerable<TEntity> Select(ICondition condition, string scope, Grouping grouping, params Sorting[] sorting)
-		{
-			return this.EnsureDataAccess().Select<TEntity>(this.Name, condition, scope, grouping, sorting);
+			return this.Select(condition, null, scope, paging, sorting);
 		}
 
 		public IEnumerable<TEntity> Select(ICondition condition, Paging paging, params Sorting[] sorting)
 		{
-			return this.EnsureDataAccess().Select<TEntity>(this.Name, condition, paging, sorting);
+			return this.Select(condition, null, null, paging, sorting);
 		}
 
 		public IEnumerable<TEntity> Select(ICondition condition, Paging paging, string scope, params Sorting[] sorting)
 		{
-			return this.EnsureDataAccess().Select<TEntity>(this.Name, condition, paging, scope, sorting);
+			return this.Select(condition, null, scope, paging, sorting);
 		}
 
 		public IEnumerable<TEntity> Select(ICondition condition, Grouping grouping, params Sorting[] sorting)
 		{
-			return this.EnsureDataAccess().Select<TEntity>(this.Name, condition, grouping, sorting);
+			return this.Select(condition, grouping, string.Empty, null, sorting);
 		}
 
 		public IEnumerable<TEntity> Select(ICondition condition, Grouping grouping, string scope, params Sorting[] sorting)
 		{
-			return this.EnsureDataAccess().Select<TEntity>(this.Name, condition, grouping, scope, sorting);
+			return this.Select(condition, grouping, scope, null, sorting);
+		}
+
+		public virtual IEnumerable<TEntity> Select(ICondition condition, Grouping grouping, string scope, Paging paging, params Sorting[] sorting)
+		{
+			return this.EnsureDataAccess().Select<TEntity>(this.Name, condition, grouping, scope, paging, sorting);
+		}
+
+		public IEnumerable<TEntity> Select(ICondition condition, Grouping grouping, Paging paging, params Sorting[] sorting)
+		{
+			return this.Select(condition, grouping, null, paging, sorting);
+		}
+
+		public IEnumerable<TEntity> Select(ICondition condition, Grouping grouping, Paging paging, string scope, params Sorting[] sorting)
+		{
+			return this.Select(condition, grouping, scope, paging, sorting);
 		}
 		#endregion
 
 		#region 删除方法
-		public int Delete<TKey>(TKey key)
+		public virtual int Delete<TKey>(TKey key)
 		{
 			return this.EnsureDataAccess().Delete(this.Name, this.ConvertKey(key));
 		}
 
-		public int Delete<TKey1, TKey2>(TKey1 key1, TKey2 key2)
+		public virtual int Delete<TKey1, TKey2>(TKey1 key1, TKey2 key2)
 		{
 			return this.EnsureDataAccess().Delete(this.Name, this.ConvertKey(key1, key2));
 		}
 
-		public int Delete<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3)
+		public virtual int Delete<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3)
 		{
 			return this.EnsureDataAccess().Delete(this.Name, this.ConvertKey(key1, key2, key3));
 		}
 
 		public int Delete(ICondition condition)
 		{
-			return this.EnsureDataAccess().Delete(this.Name, condition);
+			return this.Delete(condition, string.Empty);
 		}
 
-		public int Delete(ICondition condition, string cascades)
+		public virtual int Delete(ICondition condition, string cascades)
 		{
 			return this.EnsureDataAccess().Delete(this.Name, condition, cascades);
 		}
 
 		public int Delete(ICondition condition, Expression<Func<TEntity, object>> cascades)
 		{
-			return this.EnsureDataAccess().Delete(this.Name, condition, cascades);
+			throw new NotImplementedException();
 		}
 		#endregion
 
 		#region 插入方法
-		public int Insert(TEntity entity, string scope = null)
+		public virtual int Insert(TEntity entity, string scope = null)
 		{
 			return this.EnsureDataAccess().Insert(this.Name, entity, scope);
 		}
 
 		public int Insert(TEntity entity, Expression<Func<TEntity, object>> includes, Expression<Func<TEntity, object>> excludes)
 		{
-			return this.EnsureDataAccess().Insert(this.Name, entity, includes, excludes);
+			throw new NotImplementedException();
 		}
 
-		public int Insert(IEnumerable<TEntity> entities, string scope = null)
+		public virtual int Insert(IEnumerable<TEntity> entities, string scope = null)
 		{
 			return this.EnsureDataAccess().Insert(this.Name, entities, scope);
 		}
 
 		public int Insert(IEnumerable<TEntity> entities, Expression<Func<TEntity, object>> includes, Expression<Func<TEntity, object>> excludes = null)
 		{
-			return this.EnsureDataAccess().Insert(this.Name, entities, includes, excludes);
+			throw new NotImplementedException();
 		}
 		#endregion
 
 		#region 修改方法
-		public int Update(TEntity entity, ICondition condition = null, string scope = null)
+		public virtual int Update(TEntity entity, ICondition condition = null, string scope = null)
 		{
-			return this.EnsureDataAccess().Update(this.Name, entity, condition, scope);
+			return this.Update(new TEntity[] { entity }, condition, scope);
 		}
 
 		public int Update(TEntity entity, ICondition condition, Expression<Func<TEntity, object>> includes, Expression<Func<TEntity, object>> excludes = null)
 		{
-			return this.EnsureDataAccess().Update(this.Name, entity, condition, includes, excludes);
+			throw new NotImplementedException();
 		}
 
-		public int Update(IEnumerable<TEntity> entities, ICondition condition = null, string scope = null)
+		public virtual int Update(IEnumerable<TEntity> entities, ICondition condition = null, string scope = null)
 		{
 			return this.EnsureDataAccess().Update(this.Name, entities, condition, scope);
 		}
 
 		public int Update(IEnumerable<TEntity> entities, ICondition condition, Expression<Func<TEntity, object>> includes, Expression<Func<TEntity, object>> excludes = null)
 		{
-			return this.EnsureDataAccess().Update(this.Name, entities, condition, includes, excludes);
+			throw new NotImplementedException();
 		}
 		#endregion
 
@@ -345,7 +350,7 @@ namespace Zongsoft.Data
 			var properties = this.GetEntityKeys();
 
 			if(properties.Length < 2)
-				throw new InvalidOperationException("Not match keys about '" + typeof(TEntity).FullName + "' type.");
+				throw new InvalidOperationException("No matched key(s) about '" + typeof(TEntity).FullName + "' type.");
 
 			return Condition.Equal(properties[0].Name, key1) & Condition.Equal(properties[1].Name, key2);
 		}
@@ -355,7 +360,7 @@ namespace Zongsoft.Data
 			var properties = this.GetEntityKeys();
 
 			if(properties.Length < 3)
-				throw new InvalidOperationException("Not match keys about '" + typeof(TEntity).FullName + "' type.");
+				throw new InvalidOperationException("No matched key(s) about '" + typeof(TEntity).FullName + "' type.");
 
 			return Condition.Equal(properties[0].Name, key1) & Condition.Equal(properties[1].Name, key2) & Condition.Equal(properties[2].Name, key3);
 		}

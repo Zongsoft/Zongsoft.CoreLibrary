@@ -59,11 +59,13 @@ namespace Zongsoft.Data
 		IEnumerable<T> Select<T>(string name, ICondition condition = null, params Sorting[] sorting);
 		IEnumerable<T> Select<T>(string name, ICondition condition, string scope, params Sorting[] sorting);
 		IEnumerable<T> Select<T>(string name, ICondition condition, string scope, Paging paging, params Sorting[] sorting);
-		IEnumerable<T> Select<T>(string name, ICondition condition, string scope, Grouping grouping, params Sorting[] sorting);
 		IEnumerable<T> Select<T>(string name, ICondition condition, Paging paging, params Sorting[] sorting);
 		IEnumerable<T> Select<T>(string name, ICondition condition, Paging paging, string scope, params Sorting[] sorting);
 		IEnumerable<T> Select<T>(string name, ICondition condition, Grouping grouping, params Sorting[] sorting);
 		IEnumerable<T> Select<T>(string name, ICondition condition, Grouping grouping, string scope, params Sorting[] sorting);
+		IEnumerable<T> Select<T>(string name, ICondition condition, Grouping grouping, string scope, Paging paging, params Sorting[] sorting);
+		IEnumerable<T> Select<T>(string name, ICondition condition, Grouping grouping, Paging paging, params Sorting[] sorting);
+		IEnumerable<T> Select<T>(string name, ICondition condition, Grouping grouping, Paging paging, string scope, params Sorting[] sorting);
 
 		[Obsolete]
 		IEnumerable Select(string name,

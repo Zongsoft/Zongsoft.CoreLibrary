@@ -106,11 +106,6 @@ namespace Zongsoft.Data
 			return this.Select<T>(name, condition, this.ResolveScope(name, scope, typeof(T)), paging, null, sorting);
 		}
 
-		public IEnumerable<T> Select<T>(string name, ICondition condition, string scope, Grouping grouping, params Sorting[] sorting)
-		{
-			return this.Select<T>(name, condition, this.ResolveScope(name, scope, typeof(T)), null, grouping, sorting);
-		}
-
 		public IEnumerable<T> Select<T>(string name, ICondition condition, Paging paging, params Sorting[] sorting)
 		{
 			return this.Select<T>(name, condition, this.ResolveScope(name, null, typeof(T)), paging, null, sorting);
@@ -129,6 +124,21 @@ namespace Zongsoft.Data
 		public IEnumerable<T> Select<T>(string name, ICondition condition, Grouping grouping, string scope, params Sorting[] sorting)
 		{
 			return this.Select<T>(name, condition, this.ResolveScope(name, scope, typeof(T)), null, grouping, sorting);
+		}
+
+		public IEnumerable<T> Select<T>(string name, ICondition condition, Grouping grouping, string scope, Paging paging, params Sorting[] sorting)
+		{
+			return this.Select<T>(name, condition, this.ResolveScope(name, scope, typeof(T)), paging, grouping, sorting);
+		}
+
+		public IEnumerable<T> Select<T>(string name, ICondition condition, Grouping grouping, Paging paging, params Sorting[] sorting)
+		{
+			return this.Select<T>(name, condition, this.ResolveScope(name, null, typeof(T)), paging, grouping, sorting);
+		}
+
+		public IEnumerable<T> Select<T>(string name, ICondition condition, Grouping grouping, Paging paging, string scope, params Sorting[] sorting)
+		{
+			return this.Select<T>(name, condition, this.ResolveScope(name, scope, typeof(T)), paging, grouping, sorting);
 		}
 
 		[Obsolete]

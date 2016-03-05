@@ -80,11 +80,13 @@ namespace Zongsoft.Data
 		IEnumerable<TEntity> Select(ICondition condition = null, params Sorting[] sorting);
 		IEnumerable<TEntity> Select(ICondition condition, string scope, params Sorting[] sorting);
 		IEnumerable<TEntity> Select(ICondition condition, string scope, Paging paging, params Sorting[] sorting);
-		IEnumerable<TEntity> Select(ICondition condition, string scope, Grouping grouping, params Sorting[] sorting);
 		IEnumerable<TEntity> Select(ICondition condition, Paging paging, params Sorting[] sorting);
 		IEnumerable<TEntity> Select(ICondition condition, Paging paging, string scope, params Sorting[] sorting);
 		IEnumerable<TEntity> Select(ICondition condition, Grouping grouping, params Sorting[] sorting);
 		IEnumerable<TEntity> Select(ICondition condition, Grouping grouping, string scope, params Sorting[] sorting);
+		IEnumerable<TEntity> Select(ICondition condition, Grouping grouping, string scope, Paging paging, params Sorting[] sorting);
+		IEnumerable<TEntity> Select(ICondition condition, Grouping grouping, Paging paging, params Sorting[] sorting);
+		IEnumerable<TEntity> Select(ICondition condition, Grouping grouping, Paging paging, string scope, params Sorting[] sorting);
 		#endregion
 
 		#region 删除方法
