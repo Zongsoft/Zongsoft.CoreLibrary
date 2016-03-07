@@ -124,6 +124,12 @@ namespace Zongsoft.Data
 
 		public static ConditionCollection operator &(ConditionCollection left, ConditionCollection right)
 		{
+			if(left == null)
+				return right;
+
+			if(right == null)
+				return left;
+
 			if(left.ConditionCombine == ConditionCombine.And)
 			{
 				if(right.ConditionCombine == ConditionCombine.And)
@@ -170,6 +176,12 @@ namespace Zongsoft.Data
 
 		public static ConditionCollection operator |(ConditionCollection left, ConditionCollection right)
 		{
+			if(left == null)
+				return right;
+
+			if(right == null)
+				return left;
+
 			if(left.ConditionCombine == ConditionCombine.Or)
 			{
 				if(right.ConditionCombine == ConditionCombine.Or)
