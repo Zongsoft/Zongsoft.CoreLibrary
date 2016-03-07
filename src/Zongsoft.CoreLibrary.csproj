@@ -175,6 +175,7 @@
     <Compile Include="ComponentModel\EncodingConverter.cs" />
     <Compile Include="ComponentModel\NotifyObject.cs" />
     <Compile Include="Data\Condition.cs" />
+    <Compile Include="Data\Conditional.cs" />
     <Compile Include="Data\ConditionCollection.cs" />
     <Compile Include="Data\ConditionCombine.cs" />
     <Compile Include="Data\ConditionOperator.cs" />
