@@ -63,6 +63,60 @@ namespace Zongsoft.Data
 
 			return conditional.ToConditions();
 		}
+
+		public static ConditionCollection operator &(Condition condition, Conditional conditional)
+		{
+			if(conditional == null)
+				return null;
+
+			return condition & conditional.ToConditions();
+		}
+
+		public static ConditionCollection operator &(Conditional conditional, Condition condition)
+		{
+			if(conditional == null)
+				return null;
+
+			return conditional.ToConditions() & condition;
+		}
+
+		public static ConditionCollection operator &(Conditional left, Conditional right)
+		{
+			if(left == null)
+				return right;
+
+			if(right == null)
+				return left;
+
+			return left.ToConditions() & right.ToConditions();
+		}
+
+		public static ConditionCollection operator |(Condition condition, Conditional conditional)
+		{
+			if(conditional == null)
+				return null;
+
+			return condition | conditional.ToConditions();
+		}
+
+		public static ConditionCollection operator |(Conditional conditional, Condition condition)
+		{
+			if(conditional == null)
+				return null;
+
+			return conditional.ToConditions() | condition;
+		}
+
+		public static ConditionCollection operator |(Conditional left, Conditional right)
+		{
+			if(left == null)
+				return right;
+
+			if(right == null)
+				return left;
+
+			return left.ToConditions() | right.ToConditions();
+		}
 		#endregion
 
 		#region 公共方法
