@@ -220,7 +220,10 @@ namespace Zongsoft.Data
 
 		public int Insert<T>(string name, T entity, string scope = null)
 		{
-			return this.Insert(name, entity, this.ResolveScope(name, scope, typeof(T)));
+			if(entity == null)
+				throw new ArgumentNullException("entity");
+
+			return this.Insert(name, entity, this.ResolveScope(name, scope, entity.GetType()));
 		}
 
 		public int Insert<T>(string name, T entity, Expression<Func<T, object>> includes, Expression<Func<T, object>> excludes = null)
@@ -266,11 +269,17 @@ namespace Zongsoft.Data
 
 		public int Update<T>(string name, T entity, ICondition condition = null, string scope = null)
 		{
-			return this.Update(name, entity, condition, this.ResolveScope(name, scope, typeof(T)));
+			if(entity == null)
+				throw new ArgumentNullException("entity");
+
+			return this.Update(name, entity, condition, this.ResolveScope(name, scope, entity.GetType()));
 		}
 
 		public int Update<T>(string name, T entity, ICondition condition, Expression<Func<T, object>> includes, Expression<Func<T, object>> excludes = null)
 		{
+			if(entity == null)
+				throw new ArgumentNullException("entity");
+
 			return this.Update(name, entity, condition, this.ResolveScopeExpression(name, includes, excludes));
 		}
 
