@@ -90,9 +90,9 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 删除方法
-		int Delete<TKey>(TKey key);
-		int Delete<TKey1, TKey2>(TKey1 key1, TKey2 key2);
-		int Delete<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3);
+		int Delete<TKey>(TKey key, string cascades = null);
+		int Delete<TKey1, TKey2>(TKey1 key1, TKey2 key2, string cascades = null);
+		int Delete<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string cascades = null);
 
 		int Delete(ICondition condition);
 		int Delete(ICondition condition, string cascades);
@@ -108,6 +108,19 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 更新方法
+		int Update<TKey>(TEntity entity, TKey key, string scope = null);
+		int Update<TKey1, TKey2>(TEntity entity, TKey1 key1, TKey2 key2, string scope = null);
+		int Update<TKey1, TKey2, TKey3>(TEntity entity, TKey1 key1, TKey2 key2, TKey3 key3, string scope = null);
+
+		int Update<TKey>(IEnumerable<TEntity> entities, TKey key, string scope = null);
+		int Update<TKey1, TKey2>(IEnumerable<TEntity> entities, TKey1 key1, TKey2 key2, string scope = null);
+		int Update<TKey1, TKey2, TKey3>(IEnumerable<TEntity> entities, TKey1 key1, TKey2 key2, TKey3 key3, string scope = null);
+
+		int Update(object entity, ICondition condition = null, string scope = null);
+		int Update<TKey>(object entity, TKey key, string scope = null);
+		int Update<TKey1, TKey2>(object entity, TKey1 key1, TKey2 key2, string scope = null);
+		int Update<TKey1, TKey2, TKey3>(object entity, TKey1 key1, TKey2 key2, TKey3 key3, string scope = null);
+
 		int Update(TEntity entity, ICondition condition = null, string scope = null);
 		int Update(TEntity entity, ICondition condition, Expression<Func<TEntity, object>> includes, Expression<Func<TEntity, object>> excludes = null);
 
