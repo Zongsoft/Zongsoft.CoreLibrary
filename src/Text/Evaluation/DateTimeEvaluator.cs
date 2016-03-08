@@ -36,7 +36,7 @@ namespace Zongsoft.Text.Evaluation
 		{
 		}
 
-		public DateTimeEvaluator(string schema) : base(schema)
+		public DateTimeEvaluator(string scheme) : base(scheme)
 		{
 		}
 		#endregion

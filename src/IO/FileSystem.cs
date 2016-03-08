@@ -37,7 +37,7 @@ namespace Zongsoft.IO
 		private static readonly IFile _file;
 		private static readonly IDirectory _directory;
 		private static Zongsoft.Services.IServiceProvider _providers;
-		private static string _schema;
+		private static string _scheme;
 		#endregion
 
 		#region 构造函数
@@ -93,17 +93,17 @@ namespace Zongsoft.IO
 		}
 
 		/// <summary>
-		/// 获取文件系统的默认模式。
+		/// 获取文件系统的默认方案。
 		/// </summary>
-		public static string Schema
+		public static string Scheme
 		{
 			get
 			{
-				return _schema;
+				return _scheme;
 			}
 			set
 			{
-				_schema = value;
+				_scheme = value;
 			}
 		}
 		#endregion
@@ -138,18 +138,18 @@ namespace Zongsoft.IO
 			if(!Path.TryParse(text, out path))
 				return null;
 
-			var schema = path.Schema;
+			var scheme = path.Scheme;
 
 			//如果路径模式为空则使用默认文件系统模式
-			if(string.IsNullOrWhiteSpace(schema))
-				schema = FileSystem.Schema;
+			if(string.IsNullOrWhiteSpace(scheme))
+				scheme = FileSystem.Scheme;
 
 			//如果文件系统模式为空则返回本地文件系统
-			if(string.IsNullOrWhiteSpace(schema))
+			if(string.IsNullOrWhiteSpace(scheme))
 				return LocalFileSystem.Instance;
 
 			//根据文件系统模式从服务容器中获得对应的文件系统提供程序
-			var fileSystem = _providers.Resolve<IFileSystem>(schema);
+			var fileSystem = _providers.Resolve<IFileSystem>(scheme);
 
 			if(fileSystem == null)
 				throw new InvalidOperationException(string.Format("Can not obtain the File or Directory provider by the '{0}' path.", path));
@@ -206,13 +206,13 @@ namespace Zongsoft.IO
 			public bool Match(object target, string parameter)
 			{
 				var fileSystem = target as IFileSystem;
-				return fileSystem != null && string.Equals(fileSystem.Schema, parameter, StringComparison.OrdinalIgnoreCase);
+				return fileSystem != null && string.Equals(fileSystem.Scheme, parameter, StringComparison.OrdinalIgnoreCase);
 			}
 
 			bool Zongsoft.Services.IMatcher.Match(object target, object parameter)
 			{
 				var fileSystem = target as IFileSystem;
-				return fileSystem != null && string.Equals(fileSystem.Schema, (parameter as string), StringComparison.OrdinalIgnoreCase);
+				return fileSystem != null && string.Equals(fileSystem.Scheme, (parameter as string), StringComparison.OrdinalIgnoreCase);
 			}
 		}
 		#endregion
@@ -257,7 +257,7 @@ namespace Zongsoft.IO
 				Path[] paths;
 				var services = FileSystem.GetDirectoryProviders(new string[] { source, destination }, out paths);
 
-				if(!string.Equals(paths[0].Schema, paths[1].Schema, StringComparison.OrdinalIgnoreCase))
+				if(!string.Equals(paths[0].Scheme, paths[1].Scheme, StringComparison.OrdinalIgnoreCase))
 					throw new InvalidOperationException();
 
 				services[0].Move(paths[0].FullPath, paths[1].FullPath);
@@ -268,7 +268,7 @@ namespace Zongsoft.IO
 				Path[] paths;
 				var services = FileSystem.GetDirectoryProviders(new string[] { source, destination }, out paths);
 
-				if(!string.Equals(paths[0].Schema, paths[1].Schema, StringComparison.OrdinalIgnoreCase))
+				if(!string.Equals(paths[0].Scheme, paths[1].Scheme, StringComparison.OrdinalIgnoreCase))
 					throw new InvalidOperationException();
 
 				return services[0].MoveAsync(paths[0].FullPath, paths[1].FullPath);
@@ -445,7 +445,7 @@ namespace Zongsoft.IO
 				Path[] paths;
 				var services = FileSystem.GetFileProviders(new string[] { source, destination }, out paths);
 
-				if(!string.Equals(paths[0].Schema, paths[1].Schema, StringComparison.OrdinalIgnoreCase))
+				if(!string.Equals(paths[0].Scheme, paths[1].Scheme, StringComparison.OrdinalIgnoreCase))
 					throw new InvalidOperationException();
 
 				services[0].Copy(paths[0].FullPath, paths[1].FullPath, overwrite);
@@ -461,7 +461,7 @@ namespace Zongsoft.IO
 				Path[] paths;
 				var services = FileSystem.GetFileProviders(new string[] { source, destination }, out paths);
 
-				if(!string.Equals(paths[0].Schema, paths[1].Schema, StringComparison.OrdinalIgnoreCase))
+				if(!string.Equals(paths[0].Scheme, paths[1].Scheme, StringComparison.OrdinalIgnoreCase))
 					throw new InvalidOperationException();
 
 				return services[0].CopyAsync(paths[0].FullPath, paths[1].FullPath, overwrite);
@@ -472,7 +472,7 @@ namespace Zongsoft.IO
 				Path[] paths;
 				var services = FileSystem.GetFileProviders(new string[] { source, destination }, out paths);
 
-				if(!string.Equals(paths[0].Schema, paths[1].Schema, StringComparison.OrdinalIgnoreCase))
+				if(!string.Equals(paths[0].Scheme, paths[1].Scheme, StringComparison.OrdinalIgnoreCase))
 					throw new InvalidOperationException();
 
 				services[0].Move(paths[0].FullPath, paths[1].FullPath);
@@ -483,7 +483,7 @@ namespace Zongsoft.IO
 				Path[] paths;
 				var services = FileSystem.GetFileProviders(new string[] { source, destination }, out paths);
 
-				if(!string.Equals(paths[0].Schema, paths[1].Schema, StringComparison.OrdinalIgnoreCase))
+				if(!string.Equals(paths[0].Scheme, paths[1].Scheme, StringComparison.OrdinalIgnoreCase))
 					throw new InvalidOperationException();
 
 				return services[0].MoveAsync(paths[0].FullPath, paths[1].FullPath);

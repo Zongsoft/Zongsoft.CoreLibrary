@@ -40,7 +40,7 @@ namespace Zongsoft.Text
 	///		<list type="table">
 	///			<listheader>
 	///				<term>表达式</term>
-	///				<term>模式(Schema)</term>
+	///				<term>方案(Scheme)</term>
 	///				<term>文本(Text)</term>
 	///				<term>格式字符串(Format)</term>
 	///				<term>参数数组(Arguments)</term>
@@ -114,7 +114,7 @@ namespace Zongsoft.Text
 		#endregion
 
 		#region 成员字段
-		private string _schema;
+		private string _scheme;
 		private string _text;
 		private string _format;
 		private TextExpressionArgument[] _arguments;
@@ -122,9 +122,9 @@ namespace Zongsoft.Text
 		#endregion
 
 		#region 构造函数
-		public TextExpression(string schema, string text, string format, TextExpressionArgument[] args)
+		public TextExpression(string scheme, string text, string format, TextExpressionArgument[] args)
 		{
-			_schema = string.IsNullOrWhiteSpace(schema) ? string.Empty : schema.Trim();
+			_scheme = string.IsNullOrWhiteSpace(scheme) ? string.Empty : scheme.Trim();
 			_text = string.IsNullOrWhiteSpace(text) ? string.Empty : text.Trim();
 			_format = string.IsNullOrWhiteSpace(format) ? string.Empty : format.Trim();
 			_arguments = args ?? new TextExpressionArgument[0];
@@ -135,16 +135,16 @@ namespace Zongsoft.Text
 		/// <summary>
 		/// 获取表达式的模式，该模式对应为某种解析器。
 		/// </summary>
-		public string Schema
+		public string Scheme
 		{
 			get
 			{
-				return _schema;
+				return _scheme;
 			}
 		}
 
 		/// <summary>
-		/// 获取表达式的文本，该属性值由<see cref="Schema"/>指定的解析器来解析。
+		/// 获取表达式的文本，该属性值由<see cref="Scheme"/>指定的解析器来解析。
 		/// </summary>
 		public string Text
 		{
@@ -203,7 +203,7 @@ namespace Zongsoft.Text
 		public override string ToString()
 		{
 			var result = "${" +
-						 (string.IsNullOrEmpty(_schema) ? string.Empty : _schema + ":") +
+						 (string.IsNullOrEmpty(_scheme) ? string.Empty : _scheme + ":") +
 						 _text +
 						 (string.IsNullOrEmpty(_format) ? string.Empty : "#" + _format);
 

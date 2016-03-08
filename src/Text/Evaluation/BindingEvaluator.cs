@@ -36,7 +36,7 @@ namespace Zongsoft.Text.Evaluation
 		{
 		}
 
-		public BindingEvaluator(string schema) : base(schema)
+		public BindingEvaluator(string scheme) : base(scheme)
 		{
 		}
 		#endregion

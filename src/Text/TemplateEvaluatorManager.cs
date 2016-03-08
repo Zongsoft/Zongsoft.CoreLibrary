@@ -35,7 +35,7 @@ namespace Zongsoft.Text
 	public class TemplateEvaluatorManager
 	{
 		#region 静态字段
-		private static readonly Regex _regex_ = new Regex(@"\$\{(?<schema>\w+(\.\w+)*)(:(?<text>[^\{\}]+))?\}", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.ExplicitCapture);
+		private static readonly Regex _regex_ = new Regex(@"\$\{(?<scheme>\w+(\.\w+)*)(:(?<text>[^\{\}]+))?\}", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.ExplicitCapture);
 		#endregion
 
 		#region 成员字段
@@ -86,13 +86,13 @@ namespace Zongsoft.Text
 			if(evaluator == null)
 				throw new ArgumentNullException("evaluator");
 
-			_evaluators[evaluator.Schema] = evaluator;
+			_evaluators[evaluator.Scheme] = evaluator;
 		}
 
-		public void Register(string schema, Type type)
+		public void Register(string scheme, Type type)
 		{
-			if(string.IsNullOrWhiteSpace(schema))
-				throw new ArgumentNullException("schema");
+			if(string.IsNullOrWhiteSpace(scheme))
+				throw new ArgumentNullException("scheme");
 
 			if(type == null)
 				throw new ArgumentNullException("type");
@@ -100,16 +100,16 @@ namespace Zongsoft.Text
 			if(!typeof(ITemplateEvaluator).IsAssignableFrom(type))
 				throw new ArgumentException();
 
-			_evaluators[schema] = (ITemplateEvaluator)Activator.CreateInstance(type);
+			_evaluators[scheme] = (ITemplateEvaluator)Activator.CreateInstance(type);
 		}
 
-		public bool Unregister(string schema)
+		public bool Unregister(string scheme)
 		{
-			if(schema == null)
+			if(scheme == null)
 				return false;
 
 			ITemplateEvaluator result;
-			return _evaluators.TryRemove(schema, out result);
+			return _evaluators.TryRemove(scheme, out result);
 		}
 
 		public object Evaluate(string text, object data)
@@ -127,7 +127,7 @@ namespace Zongsoft.Text
 				if(position < match.Index)
 					result.Add(new TemplateEvaluatorResult(text.Substring(position, match.Index - position), position, match.Index - position));
 
-				if(_evaluators.TryGetValue(match.Groups["schema"].Value, out evaluator))
+				if(_evaluators.TryGetValue(match.Groups["scheme"].Value, out evaluator))
 				{
 					object value = null;
 

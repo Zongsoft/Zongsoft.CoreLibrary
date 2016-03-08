@@ -31,7 +31,7 @@ namespace Zongsoft.Text
 {
 	public interface ITemplateEvaluator
 	{
-		string Schema
+		string Scheme
 		{
 			get;
 		}

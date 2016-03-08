@@ -35,9 +35,9 @@ namespace Zongsoft.IO
 	public interface IFileSystem
 	{
 		/// <summary>
-		/// 获取文件目录系统的模式名。
+		/// 获取文件目录系统的方案名。
 		/// </summary>
-		string Schema
+		string Scheme
 		{
 			get;
 		}

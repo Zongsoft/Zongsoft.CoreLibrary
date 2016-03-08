@@ -32,25 +32,25 @@ namespace Zongsoft.Text
 	public abstract class TemplateEvaluatorBase : ITemplateEvaluator
 	{
 		#region 成员字段
-		private string _schema;
+		private string _scheme;
 		#endregion
 
 		#region 构造函数
-		protected TemplateEvaluatorBase(string schema)
+		protected TemplateEvaluatorBase(string scheme)
 		{
-			if(string.IsNullOrWhiteSpace(schema))
-				throw new ArgumentNullException("schema");
+			if(string.IsNullOrWhiteSpace(scheme))
+				throw new ArgumentNullException("scheme");
 
-			_schema = schema.Trim();
+			_scheme = scheme.Trim();
 		}
 		#endregion
 
 		#region 公共属性
-		public string Schema
+		public string Scheme
 		{
 			get
 			{
-				return _schema;
+				return _scheme;
 			}
 		}
 		#endregion

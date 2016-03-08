@@ -34,8 +34,8 @@ namespace Zongsoft.IO
 	/// 表示不依赖操作系统的路径。
 	/// </summary>
 	/// <remarks>
-	///		<para>路径格式分为<seealso cref="Path.Schema"/>和<seealso cref="Path.FullPath"/>这两个部分，中间使用冒号(:)分隔，路径各层级间使用正斜杠(/)进行分隔。如果是目录路径则以正斜杠(/)结尾。</para>
-	///		<para>其中<seealso cref="Path.Schema"/>可以省略，如果为目录路径，则<see cref="Path.FileName"/>属性为空或空字符串("")。常用路径示例如下：</para>
+	///		<para>路径格式分为<seealso cref="Path.Scheme"/>和<seealso cref="Path.FullPath"/>这两个部分，中间使用冒号(:)分隔，路径各层级间使用正斜杠(/)进行分隔。如果是目录路径则以正斜杠(/)结尾。</para>
+	///		<para>其中<seealso cref="Path.Scheme"/>可以省略，如果为目录路径，则<see cref="Path.FileName"/>属性为空或空字符串("")。常用路径示例如下：</para>
 	///		<list type="bullet">
 	///			<item>
 	///				<term>某个文件的<see cref="Url"/>：zfs:/data/attachments/2014/07/file-name.ext</term>
@@ -50,37 +50,37 @@ namespace Zongsoft.IO
 	///				<term>某个目录的<see cref="Url"/>：zfs:/data/attachments/2014/07/</term>
 	///			</item>
 	///			<item>
-	///				<term>未指定模式(Schema)的<see cref="Url"/>：/data/attachements/images/</term>
+	///				<term>未指定模式(Scheme)的<see cref="Url"/>：/data/attachements/images/</term>
 	///			</item>
 	///		</list>
 	/// </remarks>
 	public sealed class Path
 	{
 		#region 常量定义
-		private const string SCHEMA_REGEX = @"\s*((?<schema>[A-Za-z]+(\.[A-Za-z_\-]+)?):)?";
+		private const string SCHEME_REGEX = @"\s*((?<scheme>[A-Za-z]+(\.[A-Za-z_\-]+)?):)?";
 		private const string PATH_REGEX = @"(?<path>(?<part>[/\\][^/\\\*\?:]+)*(?<part>[/\\])?)\s*";
 		#endregion
 
 		#region 私有变量
-		private static readonly Regex _regex = new Regex("^" + SCHEMA_REGEX + PATH_REGEX + "$", RegexOptions.Compiled | RegexOptions.ExplicitCapture | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+		private static readonly Regex _regex = new Regex("^" + SCHEME_REGEX + PATH_REGEX + "$", RegexOptions.Compiled | RegexOptions.ExplicitCapture | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 		#endregion
 
 		#region 成员字段
 		private string _originalString;
-		private string _schema;
+		private string _scheme;
 		private string _fullPath;
 		private string _directoryName;
 		private string _fileName;
 		#endregion
 
 		#region 构造函数
-		private Path(string originalString, string schema, string fullPath)
+		private Path(string originalString, string scheme, string fullPath)
 		{
 			if(string.IsNullOrWhiteSpace(originalString))
 				throw new ArgumentNullException("originalString");
 
 			_originalString = originalString.Trim();
-			_schema = schema == null ? string.Empty : schema.Trim().ToLowerInvariant();
+			_scheme = scheme == null ? string.Empty : scheme.Trim().ToLowerInvariant();
 
 			if(string.IsNullOrWhiteSpace(fullPath))
 			{
@@ -100,11 +100,11 @@ namespace Zongsoft.IO
 		#endregion
 
 		#region 公共属性
-		public string Schema
+		public string Scheme
 		{
 			get
 			{
-				return _schema;
+				return _scheme;
 			}
 		}
 
@@ -136,7 +136,7 @@ namespace Zongsoft.IO
 		{
 			get
 			{
-				return string.IsNullOrEmpty(_schema) ? _fullPath : (_schema + ":" + _fullPath);
+				return string.IsNullOrEmpty(_scheme) ? _fullPath : (_scheme + ":" + _fullPath);
 			}
 		}
 
@@ -160,10 +160,10 @@ namespace Zongsoft.IO
 		#region 重写方法
 		public override string ToString()
 		{
-			if(string.IsNullOrWhiteSpace(_schema))
+			if(string.IsNullOrWhiteSpace(_scheme))
 				return _fullPath;
 			else
-				return _schema + ":" + _fullPath;
+				return _scheme + ":" + _fullPath;
 		}
 
 		public override int GetHashCode()
@@ -172,9 +172,9 @@ namespace Zongsoft.IO
 			{
 				case PlatformID.MacOSX:
 				case PlatformID.Unix:
-					return (_schema + _fullPath).GetHashCode();
+					return (_scheme + _fullPath).GetHashCode();
 				default:
-					return (_schema + _fullPath.ToLowerInvariant()).GetHashCode();
+					return (_scheme + _fullPath.ToLowerInvariant()).GetHashCode();
 			}
 		}
 
@@ -185,7 +185,7 @@ namespace Zongsoft.IO
 
 			var other = (Path)obj;
 
-			if(!string.Equals(_schema, other._schema))
+			if(!string.Equals(_scheme, other._scheme))
 				return false;
 
 			switch(Environment.OSVersion.Platform)
@@ -212,10 +212,10 @@ namespace Zongsoft.IO
 			if(string.IsNullOrWhiteSpace(text))
 				throw new ArgumentNullException("text");
 
-			string schema, path;
+			string scheme, path;
 
-			if(TryParse(text, out schema, out path))
-				return new Path(text, schema, path);
+			if(TryParse(text, out scheme, out path))
+				return new Path(text, scheme, path);
 
 			throw new PathException(text);
 		}
@@ -229,20 +229,20 @@ namespace Zongsoft.IO
 		public static bool TryParse(string text, out Path result)
 		{
 			result = null;
-			string schema, path;
+			string scheme, path;
 
-			if(TryParse(text, out schema, out path))
+			if(TryParse(text, out scheme, out path))
 			{
-				result = new Path(text, schema, path);
+				result = new Path(text, scheme, path);
 				return true;
 			}
 
 			return false;
 		}
 
-		public static bool TryParse(string text, out string schema, out string path)
+		public static bool TryParse(string text, out string scheme, out string path)
 		{
-			schema = string.Empty;
+			scheme = string.Empty;
 			path = string.Empty;
 
 			if(string.IsNullOrWhiteSpace(text))
@@ -252,14 +252,14 @@ namespace Zongsoft.IO
 
 			if(match.Success)
 			{
-				schema = match.Groups["schema"].Value;
+				scheme = match.Groups["scheme"].Value;
 				path = match.Groups["path"].Value.Replace('\\', '/');
 			}
 
 			return match.Success;
 		}
 
-		public static string GetSchema(string text)
+		public static string GetScheme(string text)
 		{
 			if(string.IsNullOrWhiteSpace(text))
 				return string.Empty;
@@ -267,7 +267,7 @@ namespace Zongsoft.IO
 			var match = _regex.Match(text);
 
 			if(match.Success)
-				return match.Groups["schema"].Value;
+				return match.Groups["scheme"].Value;
 
 			return string.Empty;
 		}

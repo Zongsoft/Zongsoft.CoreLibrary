@@ -19,7 +19,7 @@ namespace Zongsoft.IO
 			var text = @"zfs.local:/d/temp/sub-dir/[1]123.jpg";
 			var path = Path.Parse(text);
 
-			var directoryUrl = path.Schema + ":" + path.DirectoryName;
+			var directoryUrl = path.Scheme + ":" + path.DirectoryName;
 
 			//创建目录
 			FileSystem.Directory.Create(directoryUrl);

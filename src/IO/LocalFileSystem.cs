@@ -47,9 +47,9 @@ namespace Zongsoft.IO
 
 		#region 公共属性
 		/// <summary>
-		/// 获取本地文件目录系统的模式，始终返回“zfs.local”。
+		/// 获取本地文件目录系统的方案，始终返回“zfs.local”。
 		/// </summary>
-		public string Schema
+		public string Scheme
 		{
 			get
 			{
@@ -96,7 +96,7 @@ namespace Zongsoft.IO
 					return path.FullPath;
 			}
 
-			var driveName = path.Schema;
+			var driveName = path.Scheme;
 			var fullPath = path.FullPath;
 
 			if(string.IsNullOrEmpty(driveName))

@@ -13,7 +13,7 @@ namespace Zongsoft.IO
 			var text = @"zfs.local:/data/images/1/year/month-day/[1]123.jpg";
 			var path = Path.Parse(text);
 
-			Assert.AreEqual("zfs.local", path.Schema);
+			Assert.AreEqual("zfs.local", path.Scheme);
 			Assert.AreEqual("/data/images/1/year/month-day/[1]123.jpg", path.FullPath);
 			Assert.AreEqual("/data/images/1/year/month-day/", path.DirectoryName);
 			Assert.AreEqual("[1]123.jpg", path.FileName);

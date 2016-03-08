@@ -125,7 +125,7 @@ namespace Zongsoft.Text
 			/*
 ^\s*(?<value>
 (
-	(?<schema>[A-Za-z]+)://
+	(?<scheme>[A-Za-z]+)://
 )?
 (?<host>
 	(?<domain>[A-Za-z0-9]+([-_][A-Za-z0-9]+)*)
@@ -152,7 +152,7 @@ namespace Zongsoft.Text
 )?
 )\s*$
 			 */
-			private const string URI_PATTERN = @"^\s*(?<value>((?<schema>${schema})://)?(?<host>(?<domain>[A-Za-z0-9]+([-_][A-Za-z0-9]+)*)(\.(?<domain>[A-Za-z0-9]+([-_][A-Za-z0-9]+)*))+)(:(?<port>\d{1,5}))?(?<path>(?<segment>/[^\s/:\*\?\&]*)*)?(?<query>\?((?<parameter>(?<parameter_name>[A-Za-z0-9]+([-_][A-Za-z0-9]+)*)(=(?<parameter_value>[^\?\&\s]*))?)\&?)*)?(?<fragment>\#[^\#\s]*)?)\s*$";
+			private const string URI_PATTERN = @"^\s*(?<value>((?<scheme>${scheme})://)?(?<host>(?<domain>[A-Za-z0-9]+([-_][A-Za-z0-9]+)*)(\.(?<domain>[A-Za-z0-9]+([-_][A-Za-z0-9]+)*))+)(:(?<port>\d{1,5}))?(?<path>(?<segment>/[^\s/:\*\?\&]*)*)?(?<query>\?((?<parameter>(?<parameter_name>[A-Za-z0-9]+([-_][A-Za-z0-9]+)*)(=(?<parameter_value>[^\?\&\s]*))?)\&?)*)?(?<fragment>\#[^\#\s]*)?)\s*$";
 			#endregion
 
 			#region 静态变量
@@ -161,22 +161,22 @@ namespace Zongsoft.Text
 
 			#region 单例字段
 			/// <summary>获取任意协议的URL文本验证器。</summary>
-			public static readonly TextRegular Url = new TextRegular(URI_PATTERN.Replace("${schema}", "[A-Za-z]+"));
+			public static readonly TextRegular Url = new TextRegular(URI_PATTERN.Replace("${scheme}", "[A-Za-z]+"));
 
 			/// <summary>获取Http协议的URL文本验证器。</summary>
-			public static readonly TextRegular Http = new TextRegular(URI_PATTERN.Replace("${schema}", "http[s]?"));
+			public static readonly TextRegular Http = new TextRegular(URI_PATTERN.Replace("${scheme}", "http[s]?"));
 
 			/// <summary>获取Ftp协议的URL文本验证器。</summary>
-			public static readonly TextRegular Ftp = new TextRegular(URI_PATTERN.Replace("${schema}", "ftp"));
+			public static readonly TextRegular Ftp = new TextRegular(URI_PATTERN.Replace("${scheme}", "ftp"));
 			#endregion
 
 			#region 静态方法
-			public static TextRegular GetRegular(string schema)
+			public static TextRegular GetRegular(string scheme)
 			{
-				if(string.IsNullOrWhiteSpace(schema))
-					throw new ArgumentNullException("schema");
+				if(string.IsNullOrWhiteSpace(scheme))
+					throw new ArgumentNullException("scheme");
 
-				return _instances.GetOrAdd(schema.Trim().ToLowerInvariant(), key => new TextRegular(URI_PATTERN.Replace("${schema}", key)));
+				return _instances.GetOrAdd(scheme.Trim().ToLowerInvariant(), key => new TextRegular(URI_PATTERN.Replace("${scheme}", key)));
 			}
 			#endregion
 		}
