@@ -35,7 +35,7 @@ namespace Zongsoft.Data
 			conditions.Add(condition = new Condition("Equals DBNull", DBNull.Value, ConditionOperator.Equal));
 			Console.WriteLine(condition);
 
-			Console.WriteLine(new ConditionCollection(ConditionCombine.And, conditions));
+			Console.WriteLine(new ConditionCollection(ConditionCombination.And, conditions));
 
 			Console.WriteLine("--------------------------------");
 

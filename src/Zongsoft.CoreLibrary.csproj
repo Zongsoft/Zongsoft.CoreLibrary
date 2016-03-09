@@ -177,7 +177,7 @@
     <Compile Include="Data\Condition.cs" />
     <Compile Include="Data\Conditional.cs" />
     <Compile Include="Data\ConditionCollection.cs" />
-    <Compile Include="Data\ConditionCombine.cs" />
+    <Compile Include="Data\ConditionCombination.cs" />
     <Compile Include="Data\ConditionOperator.cs" />
     <Compile Include="Data\Metadata\DataEntityAttribute.cs" />
     <Compile Include="Data\DataAccessBase.cs" />
@@ -369,7 +369,7 @@
     <Compile Include="Services\IServiceStorage.cs" />
     <Compile Include="Services\MatcherAttribute.cs" />
     <Compile Include="Services\Matcher.cs" />
-    <Compile Include="Services\ServiceAttribute.cs" />
+    <Compile Include="Services\ServiceDependencyAttribute.cs" />
     <Compile Include="Services\ServiceBase.cs" />
     <Compile Include="Services\ServiceNotFoundException.cs" />
     <Compile Include="Services\PredicationBase.cs" />
@@ -390,8 +390,7 @@
     <Compile Include="Services\ICommandLoader.cs" />
     <Compile Include="Services\ICommand`1.cs" />
     <Compile Include="Services\PredicationCollection.cs" />
-    <Compile Include="Services\PredicationCombine.cs" />
-    <Compile Include="Services\Predicator.cs" />
+    <Compile Include="Services\PredicationCombination.cs" />
     <Compile Include="Options\ISettingsProvider.cs" />
     <Compile Include="Services\Composition\ExecutionFilterCompositeCollection.cs" />
     <Compile Include="Services\Composition\ExecutionPipeline.cs" />

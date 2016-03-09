@@ -32,15 +32,15 @@ namespace Zongsoft.Services
 	public class PredicationCollection : Zongsoft.Collections.Collection<IPredication>, IPredication
 	{
 		#region 成员字段
-		private PredicationCombine _combine;
+		private PredicationCombination _combine;
 		#endregion
 
 		#region 构造函数
-		public PredicationCollection() : this(PredicationCombine.Or)
+		public PredicationCollection() : this(PredicationCombination.Or)
 		{
 		}
 
-		public PredicationCollection(PredicationCombine combine)
+		public PredicationCollection(PredicationCombination combine)
 		{
 			_combine = combine;
 		}
@@ -50,7 +50,7 @@ namespace Zongsoft.Services
 		/// <summary>
 		/// 获取或设置断言集合内各断言的逻辑组合方式。
 		/// </summary>
-		public PredicationCombine Combine
+		public PredicationCombination Combination
 		{
 			get
 			{
@@ -65,7 +65,7 @@ namespace Zongsoft.Services
 
 		#region 断言方法
 		/// <summary>
-		/// 对断言集合内的所有断言进行遍历断言调用，并根据<see cref="Combine"/>属性值进行组合判断。
+		/// 对断言集合内的所有断言进行遍历断言调用，并根据<see cref="Combination"/>属性值进行组合判断。
 		/// </summary>
 		/// <param name="parameter">对断言集合内所有断言调用时的传入参数。</param>
 		/// <returns>集合内所有断言的组合结果，如果集合为空则始终返回真(true)。</returns>
@@ -86,17 +86,17 @@ namespace Zongsoft.Services
 
 				if(predication.Predicate(parameter))
 				{
-					if(_combine == PredicationCombine.Or)
+					if(_combine == PredicationCombination.Or)
 						return true;
 				}
 				else
 				{
-					if(_combine == PredicationCombine.And)
+					if(_combine == PredicationCombination.And)
 						return false;
 				}
 			}
 
-			return _combine == PredicationCombine.Or ? false : true;
+			return _combine == PredicationCombination.Or ? false : true;
 		}
 		#endregion
 	}

@@ -111,7 +111,7 @@ namespace Zongsoft.Data
 			if(properties == null || properties.Count < 1)
 				return null;
 
-			var result = new ConditionCollection(ConditionCombine.Or);
+			var result = new ConditionCollection(ConditionCombination.Or);
 
 			foreach(PropertyDescriptor property in properties)
 			{
@@ -126,7 +126,7 @@ namespace Zongsoft.Data
 			if(condition == null || condition.Count < 1)
 				return null;
 
-			var result = new ConditionCollection(ConditionCombine.Or);
+			var result = new ConditionCollection(ConditionCombination.Or);
 
 			foreach(var parameter in condition)
 			{
@@ -151,7 +151,7 @@ namespace Zongsoft.Data
 
 			if(typeof(IDictionary).IsAssignableFrom(valueType))
 			{
-				var clauses = new ConditionCollection(ConditionCombine.Or);
+				var clauses = new ConditionCollection(ConditionCombination.Or);
 
 				foreach(DictionaryEntry entry in (IDictionary)value)
 				{
@@ -164,7 +164,7 @@ namespace Zongsoft.Data
 
 			if(typeof(IDictionary<string, object>).IsAssignableFrom(valueType))
 			{
-				var clauses = new ConditionCollection(ConditionCombine.Or);
+				var clauses = new ConditionCollection(ConditionCombination.Or);
 
 				foreach(var entry in (IDictionary<string, object>)value)
 				{

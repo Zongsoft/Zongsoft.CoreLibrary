@@ -34,21 +34,21 @@ namespace Zongsoft.Data
 	public class ConditionCollection : Zongsoft.Collections.Collection<ICondition>, ICondition
 	{
 		#region 成员字段
-		private ConditionCombine _conditionCombine;
+		private ConditionCombination _conditionCombine;
 		#endregion
 
 		#region 构造函数
-		public ConditionCollection(ConditionCombine conditionCombine)
+		public ConditionCollection(ConditionCombination conditionCombine)
 		{
 			_conditionCombine = conditionCombine;
 		}
 
-		public ConditionCollection(ConditionCombine conditionCombine, IEnumerable<ICondition> items) : base(items)
+		public ConditionCollection(ConditionCombination conditionCombine, IEnumerable<ICondition> items) : base(items)
 		{
 			_conditionCombine = conditionCombine;
 		}
 
-		public ConditionCollection(ConditionCombine conditionCombine, params ICondition[] items) : base(items)
+		public ConditionCollection(ConditionCombination conditionCombine, params ICondition[] items) : base(items)
 		{
 			_conditionCombine = conditionCombine;
 		}
@@ -58,7 +58,7 @@ namespace Zongsoft.Data
 		/// <summary>
 		/// 获取或设置查询条件的组合方式。
 		/// </summary>
-		public ConditionCombine ConditionCombine
+		public ConditionCombination ConditionCombination
 		{
 			get
 			{
@@ -80,7 +80,7 @@ namespace Zongsoft.Data
 			if(condition == null)
 				return conditions;
 
-			return new ConditionCollection(conditions.ConditionCombine, Combine(condition, conditions));
+			return new ConditionCollection(conditions.ConditionCombination, Combine(condition, conditions));
 		}
 
 		public static ConditionCollection operator +(ConditionCollection conditions, Condition condition)
@@ -91,7 +91,7 @@ namespace Zongsoft.Data
 			if(condition == null)
 				return conditions;
 
-			return new ConditionCollection(conditions.ConditionCombine, Combine(conditions, condition));
+			return new ConditionCollection(conditions.ConditionCombination, Combine(conditions, condition));
 		}
 
 		public static ConditionCollection operator &(Condition condition, ConditionCollection conditions)
@@ -102,10 +102,10 @@ namespace Zongsoft.Data
 			if(condition == null)
 				return conditions;
 
-			if(conditions.ConditionCombine == ConditionCombine.And)
-				return new ConditionCollection(ConditionCombine.And, Combine(condition, conditions));
+			if(conditions.ConditionCombination == ConditionCombination.And)
+				return new ConditionCollection(ConditionCombination.And, Combine(condition, conditions));
 			else
-				return new ConditionCollection(ConditionCombine.And, condition, conditions);
+				return new ConditionCollection(ConditionCombination.And, condition, conditions);
 		}
 
 		public static ConditionCollection operator &(ConditionCollection conditions, Condition condition)
@@ -116,10 +116,10 @@ namespace Zongsoft.Data
 			if(condition == null)
 				return conditions;
 
-			if(conditions.ConditionCombine == ConditionCombine.And)
-				return new ConditionCollection(ConditionCombine.And, Combine(conditions, condition));
+			if(conditions.ConditionCombination == ConditionCombination.And)
+				return new ConditionCollection(ConditionCombination.And, Combine(conditions, condition));
 			else
-				return new ConditionCollection(ConditionCombine.And, conditions, condition);
+				return new ConditionCollection(ConditionCombination.And, conditions, condition);
 		}
 
 		public static ConditionCollection operator &(ConditionCollection left, ConditionCollection right)
@@ -130,19 +130,19 @@ namespace Zongsoft.Data
 			if(right == null)
 				return left;
 
-			if(left.ConditionCombine == ConditionCombine.And)
+			if(left.ConditionCombination == ConditionCombination.And)
 			{
-				if(right.ConditionCombine == ConditionCombine.And)
-					return new ConditionCollection(ConditionCombine.And, Combine(left, right));
+				if(right.ConditionCombination == ConditionCombination.And)
+					return new ConditionCollection(ConditionCombination.And, Combine(left, right));
 				else
 					return left.Append(right);
 			}
 			else
 			{
-				if(right.ConditionCombine == ConditionCombine.And)
+				if(right.ConditionCombination == ConditionCombination.And)
 					return right.Prepend(left);
 				else
-					return new ConditionCollection(ConditionCombine.And, left, right);
+					return new ConditionCollection(ConditionCombination.And, left, right);
 			}
 		}
 
@@ -154,10 +154,10 @@ namespace Zongsoft.Data
 			if(condition == null)
 				return conditions;
 
-			if(conditions.ConditionCombine == ConditionCombine.Or)
-				return new ConditionCollection(ConditionCombine.Or, Combine(condition, conditions));
+			if(conditions.ConditionCombination == ConditionCombination.Or)
+				return new ConditionCollection(ConditionCombination.Or, Combine(condition, conditions));
 			else
-				return new ConditionCollection(ConditionCombine.Or, condition, conditions);
+				return new ConditionCollection(ConditionCombination.Or, condition, conditions);
 		}
 
 		public static ConditionCollection operator |(ConditionCollection conditions, Condition condition)
@@ -168,10 +168,10 @@ namespace Zongsoft.Data
 			if(condition == null)
 				return conditions;
 
-			if(conditions.ConditionCombine == ConditionCombine.Or)
-				return new ConditionCollection(ConditionCombine.Or, Combine(conditions, condition));
+			if(conditions.ConditionCombination == ConditionCombination.Or)
+				return new ConditionCollection(ConditionCombination.Or, Combine(conditions, condition));
 			else
-				return new ConditionCollection(ConditionCombine.Or, conditions, condition);
+				return new ConditionCollection(ConditionCombination.Or, conditions, condition);
 		}
 
 		public static ConditionCollection operator |(ConditionCollection left, ConditionCollection right)
@@ -182,19 +182,19 @@ namespace Zongsoft.Data
 			if(right == null)
 				return left;
 
-			if(left.ConditionCombine == ConditionCombine.Or)
+			if(left.ConditionCombination == ConditionCombination.Or)
 			{
-				if(right.ConditionCombine == ConditionCombine.Or)
-					return new ConditionCollection(ConditionCombine.Or, Combine(left, right));
+				if(right.ConditionCombination == ConditionCombination.Or)
+					return new ConditionCollection(ConditionCombination.Or, Combine(left, right));
 				else
 					return left.Append(right);
 			}
 			else
 			{
-				if(right.ConditionCombine == ConditionCombine.Or)
+				if(right.ConditionCombination == ConditionCombination.Or)
 					return right.Prepend(left);
 				else
-					return new ConditionCollection(ConditionCombine.Or, left, right);
+					return new ConditionCollection(ConditionCombination.Or, left, right);
 			}
 		}
 		#endregion
@@ -210,7 +210,7 @@ namespace Zongsoft.Data
 			if(items == null || items.Length < 1)
 				return this;
 
-			return new ConditionCollection(this.ConditionCombine, this.Items.Concat(items).Where(item => item != null));
+			return new ConditionCollection(this.ConditionCombination, this.Items.Concat(items).Where(item => item != null));
 		}
 
 		/// <summary>
@@ -223,7 +223,7 @@ namespace Zongsoft.Data
 			if(items == null || items.Length < 1)
 				return this;
 
-			return new ConditionCollection(this.ConditionCombine, items.Concat(this.Items).Where(item => item != null));
+			return new ConditionCollection(this.ConditionCombination, items.Concat(this.Items).Where(item => item != null));
 		}
 		#endregion
 

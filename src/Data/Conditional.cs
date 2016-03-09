@@ -32,7 +32,7 @@ namespace Zongsoft.Data
 	public abstract class Conditional : Zongsoft.ComponentModel.NotifyObject, IConditional
 	{
 		#region 成员字段
-		private ConditionCombine _conditionCombine;
+		private ConditionCombination _conditionCombine;
 		#endregion
 
 		#region 构造函数
@@ -42,7 +42,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 保护属性
-		protected ConditionCombine ConditionCombine
+		protected ConditionCombination ConditionCombine
 		{
 			get
 			{

@@ -1,8 +1,8 @@
-﻿/*
+/*
  * Authors:
- *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
+ *   �ӷ�(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2008-2013 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,17 +25,21 @@
  */
 
 using System;
+using System.ComponentModel;
 
-namespace Zongsoft.Services
+namespace Zongsoft.Data
 {
 	/// <summary>
-	/// 表示断言的逻辑组合方式。
+	/// ��ʾ��������Ϸ�ʽ��
 	/// </summary>
-	public enum PredicationCombine
+	public enum ConditionCombination
 	{
-		/// <summary>表示如果某个断言返回成功，则不再执行后续断言测试而直接返回成功；如果返回失败，则进行后续断言测试。即整个断言链中所有断言测试均失败则断言链返回失败。</summary>
-		Or,
-		/// <summary>表示如果某个断言返回成功，则进行下一个断言测试，如果返回失败，则不再执行后续断言测试而直接返回失败。即整个断言链中所有断言测试均成功则断言链返回成功。</summary>
+		/// <summary>�������롱��ϡ�</summary>
+		[Description("���롹���")]
 		And,
+
+		/// <summary>����������ϡ�</summary>
+		[Description("�������")]
+		Or
 	}
 }

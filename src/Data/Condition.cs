@@ -222,12 +222,12 @@ namespace Zongsoft.Data
 		#region 符号重写
 		public static ConditionCollection operator &(Condition a, Condition b)
 		{
-			return new ConditionCollection(ConditionCombine.And, a, b);
+			return new ConditionCollection(ConditionCombination.And, a, b);
 		}
 
 		public static ConditionCollection operator |(Condition a, Condition b)
 		{
-			return new ConditionCollection(ConditionCombine.Or, a, b);
+			return new ConditionCollection(ConditionCombination.Or, a, b);
 		}
 		#endregion
 

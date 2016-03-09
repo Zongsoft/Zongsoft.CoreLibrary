@@ -32,15 +32,15 @@ namespace Zongsoft.Services
 	public class PredicationCollection<T> : Zongsoft.Collections.Collection<IPredication<T>>, IPredication<T>
 	{
 		#region 成员字段
-		private PredicationCombine _combine;
+		private PredicationCombination _combine;
 		#endregion
 
 		#region 构造函数
-		public PredicationCollection() : this(PredicationCombine.Or)
+		public PredicationCollection() : this(PredicationCombination.Or)
 		{
 		}
 
-		public PredicationCollection(PredicationCombine combine)
+		public PredicationCollection(PredicationCombination combine)
 		{
 			_combine = combine;
 		}
@@ -50,7 +50,7 @@ namespace Zongsoft.Services
 		/// <summary>
 		/// 获取或设置断言集合内各断言的逻辑组合方式。
 		/// </summary>
-		public PredicationCombine Combine
+		public PredicationCombination Combination
 		{
 			get
 			{
@@ -85,17 +85,17 @@ namespace Zongsoft.Services
 
 				if(predication.Predicate(parameter))
 				{
-					if(_combine == PredicationCombine.Or)
+					if(_combine == PredicationCombination.Or)
 						return true;
 				}
 				else
 				{
-					if(_combine == PredicationCombine.And)
+					if(_combine == PredicationCombination.And)
 						return false;
 				}
 			}
 
-			return _combine == PredicationCombine.Or ? false : true;
+			return _combine == PredicationCombination.Or ? false : true;
 		}
 
 		bool IPredication.Predicate(object parameter)

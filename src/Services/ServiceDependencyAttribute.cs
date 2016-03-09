@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2016 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -30,7 +30,7 @@ using System.ComponentModel;
 namespace Zongsoft.Services
 {
 	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, Inherited = true)]
-	public class ServiceAttribute : Attribute
+	public class ServiceDependencyAttribute : Attribute
 	{
 		#region 成员字段
 		private string _name;
@@ -38,16 +38,16 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 构造函数
-		public ServiceAttribute()
+		public ServiceDependencyAttribute()
 		{
 		}
 
-		public ServiceAttribute(string name)
+		public ServiceDependencyAttribute(string name)
 		{
 			this.Name = name;
 		}
 
-		public ServiceAttribute(Type contract)
+		public ServiceDependencyAttribute(Type contract)
 		{
 			this.Contract = contract;
 		}
