@@ -41,26 +41,6 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataService(IDataAccess dataAccess)
-		{
-			if(dataAccess == null)
-				throw new ArgumentNullException("dataAccess");
-
-			_dataAccess = dataAccess;
-		}
-
-		public DataService(string name, IDataAccess dataAccess)
-		{
-			if(string.IsNullOrWhiteSpace(name))
-				throw new ArgumentNullException("name");
-
-			if(dataAccess == null)
-				throw new ArgumentNullException("dataAccess");
-
-			_name = name.Trim();
-			_dataAccess = dataAccess;
-		}
-
 		public DataService(Zongsoft.Services.IServiceProvider serviceProvider)
 		{
 			if(serviceProvider == null)
@@ -83,7 +63,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 公共属性
-		public virtual string Name
+		public string Name
 		{
 			get
 			{
@@ -95,25 +75,32 @@ namespace Zongsoft.Data
 
 				return _name;
 			}
-		}
-
-		public virtual IDataAccess DataAccess
-		{
-			get
+			protected set
 			{
-				if(_dataAccess == null)
-				{
-					var serviceProvider = this.ServiceProvider;
+				if(string.IsNullOrWhiteSpace(value))
+					throw new ArgumentNullException();
 
-					if(serviceProvider != null)
-						_dataAccess = serviceProvider.Resolve<IDataAccess>();
-				}
-
-				return _dataAccess;
+				_name = value.Trim();
 			}
 		}
 
-		public virtual Zongsoft.Services.IServiceProvider ServiceProvider
+		[Zongsoft.Services.ServiceDependency]
+		public IDataAccess DataAccess
+		{
+			get
+			{
+				return _dataAccess;
+			}
+			set
+			{
+				if(value == null)
+					throw new ArgumentNullException();
+
+				_dataAccess = value;
+			}
+		}
+
+		public Zongsoft.Services.IServiceProvider ServiceProvider
 		{
 			get
 			{
@@ -121,6 +108,9 @@ namespace Zongsoft.Data
 			}
 			set
 			{
+				if(value == null)
+					throw new ArgumentNullException();
+
 				_serviceProvider = value;
 			}
 		}
