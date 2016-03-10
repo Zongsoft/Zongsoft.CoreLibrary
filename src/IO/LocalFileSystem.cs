@@ -39,7 +39,7 @@ namespace Zongsoft.IO
 		public static readonly LocalFileSystem Instance = new LocalFileSystem();
 		#endregion
 
-		#region 构造函数
+		#region 私有构造
 		private LocalFileSystem()
 		{
 		}

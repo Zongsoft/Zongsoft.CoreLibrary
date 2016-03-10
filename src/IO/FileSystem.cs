@@ -128,8 +128,10 @@ namespace Zongsoft.IO
 		#region 私有方法
 		private static IFileSystem GetFileSystem(string text, out Path path)
 		{
-			if(_providers == null)
-				throw new InvalidOperationException("The value of 'Services' property is null.");
+			var providers = _providers;
+
+			if(providers == null)
+				throw new InvalidOperationException("The value of 'Providers' property is null.");
 
 			if(string.IsNullOrWhiteSpace(text))
 				throw new ArgumentNullException("text");
@@ -140,19 +142,21 @@ namespace Zongsoft.IO
 
 			var scheme = path.Scheme;
 
-			//如果路径模式为空则使用默认文件系统模式
+			//如果路径模式为空则使用默认文件系统方案
 			if(string.IsNullOrWhiteSpace(scheme))
+			{
 				scheme = FileSystem.Scheme;
 
-			//如果文件系统模式为空则返回本地文件系统
-			if(string.IsNullOrWhiteSpace(scheme))
-				return LocalFileSystem.Instance;
+				//如果文件系统模式为空则返回本地文件方案
+				if(string.IsNullOrWhiteSpace(scheme))
+					return LocalFileSystem.Instance;
+			}
 
 			//根据文件系统模式从服务容器中获得对应的文件系统提供程序
-			var fileSystem = _providers.Resolve<IFileSystem>(scheme);
+			var fileSystem = providers.Resolve<IFileSystem>(scheme);
 
 			if(fileSystem == null)
-				throw new InvalidOperationException(string.Format("Can not obtain the File or Directory provider by the '{0}' path.", path));
+				throw new InvalidOperationException(string.Format("Can not obtain the File or Directory provider by the '{0}'.", text));
 
 			return fileSystem;
 		}
