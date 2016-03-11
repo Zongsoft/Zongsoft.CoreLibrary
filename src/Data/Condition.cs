@@ -186,6 +186,14 @@ namespace Zongsoft.Data
 			return new Condition(name, new T[] { begin, end }, ConditionOperator.Between);
 		}
 
+		public static Condition Between<T>(string name, T? begin, T? end) where T : struct, IComparable<T>
+		{
+			if(begin.HasValue)
+				return end.HasValue ? new Condition(name, new T[] { begin.Value, end.Value }, ConditionOperator.Between) : Condition.GreaterThanEqual(name, begin.Value);
+			else
+				return end.HasValue ? Condition.LessThanEqual(name, end.Value) : null;
+		}
+
 		public static Condition In<T>(string name, IEnumerable<T> values) where T : IEquatable<T>
 		{
 			if(values == null)
