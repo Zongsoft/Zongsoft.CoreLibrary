@@ -40,6 +40,21 @@ namespace Zongsoft.Data
 	/// </summary>
 	public abstract class DataAccessBase : MarshalByRefObject, IDataAccess
 	{
+		#region 事件定义
+		public event EventHandler<DataCountedEventArgs> Counted;
+		public event EventHandler<DataCountingEventArgs> Counting;
+		public event EventHandler<DataExecutedEventArgs> Executed;
+		public event EventHandler<DataExecutingEventArgs> Executing;
+		public event EventHandler<DataSelectedEventArgs> Selected;
+		public event EventHandler<DataSelectingEventArgs> Selecting;
+		public event EventHandler<DataDeletedEventArgs> Deleted;
+		public event EventHandler<DataDeletingEventArgs> Deleting;
+		public event EventHandler<DataInsertedEventArgs> Inserted;
+		public event EventHandler<DataInsertingEventArgs> Inserting;
+		public event EventHandler<DataUpdatedEventArgs> Updated;
+		public event EventHandler<DataUpdatingEventArgs> Updating;
+		#endregion
+
 		#region 私有字段
 		private ConcurrentDictionary<Type, EntityDesciptior> _entityCache;
 		#endregion
@@ -66,101 +81,66 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 计数方法
-		public int Count(string name, ICondition condition)
+		public int Count(string name, ICondition condition, string includes = null)
 		{
-			return this.Count(name, condition, (string[])null);
-		}
-
-		public int Count(string name, ICondition condition, string includes)
-		{
-			if(includes == null)
+			if(string.IsNullOrWhiteSpace(includes))
 				return this.Count(name, condition, (string[])null);
 
 			return this.Count(name, condition, includes.Split(',', ';'));
-		}
-
-		public int Count<T>(string name, ICondition condition, Expression<Func<T, object>> includes)
-		{
-			if(includes == null)
-				return this.Count(name, condition, (string[])null);
-
-			return this.Count(name, condition, this.ResolveScopeExpression(name, includes, null));
 		}
 
 		protected abstract int Count(string name, ICondition condition, string[] includes);
 		#endregion
 
 		#region 查询方法
-		public IEnumerable<T> Select<T>(string name, ICondition condition = null, params Sorting[] sorting)
+		public IEnumerable<T> Select<T>(string name, ICondition condition = null, params Sorting[] sortings)
 		{
 			return this.Select<T>(name, condition, this.ResolveScope(name, null, typeof(T)), null, null, null);
 		}
 
-		public IEnumerable<T> Select<T>(string name, ICondition condition, string scope, params Sorting[] sorting)
+		public IEnumerable<T> Select<T>(string name, ICondition condition, string scope, params Sorting[] sortings)
 		{
-			return this.Select<T>(name, condition, this.ResolveScope(name, scope, typeof(T)), null, null, sorting);
+			return this.Select<T>(name, condition, this.ResolveScope(name, scope, typeof(T)), null, null, sortings);
 		}
 
-		public IEnumerable<T> Select<T>(string name, ICondition condition, string scope, Paging paging, params Sorting[] sorting)
+		public IEnumerable<T> Select<T>(string name, ICondition condition, string scope, Paging paging, params Sorting[] sortings)
 		{
-			return this.Select<T>(name, condition, this.ResolveScope(name, scope, typeof(T)), paging, null, sorting);
+			return this.Select<T>(name, condition, this.ResolveScope(name, scope, typeof(T)), paging, null, sortings);
 		}
 
-		public IEnumerable<T> Select<T>(string name, ICondition condition, Paging paging, params Sorting[] sorting)
+		public IEnumerable<T> Select<T>(string name, ICondition condition, Paging paging, params Sorting[] sortings)
 		{
-			return this.Select<T>(name, condition, this.ResolveScope(name, null, typeof(T)), paging, null, sorting);
+			return this.Select<T>(name, condition, this.ResolveScope(name, null, typeof(T)), paging, null, sortings);
 		}
 
-		public IEnumerable<T> Select<T>(string name, ICondition condition, Paging paging, string scope, params Sorting[] sorting)
+		public IEnumerable<T> Select<T>(string name, ICondition condition, Paging paging, string scope, params Sorting[] sortings)
 		{
-			return this.Select<T>(name, condition, this.ResolveScope(name, scope, typeof(T)), paging, null, sorting);
+			return this.Select<T>(name, condition, this.ResolveScope(name, scope, typeof(T)), paging, null, sortings);
 		}
 
-		public IEnumerable<T> Select<T>(string name, ICondition condition, Grouping grouping, params Sorting[] sorting)
+		public IEnumerable<T> Select<T>(string name, ICondition condition, Grouping grouping, params Sorting[] sortings)
 		{
-			return this.Select<T>(name, condition, this.ResolveScope(name, null, typeof(T)), null, grouping, sorting);
+			return this.Select<T>(name, condition, this.ResolveScope(name, null, typeof(T)), null, grouping, sortings);
 		}
 
-		public IEnumerable<T> Select<T>(string name, ICondition condition, Grouping grouping, string scope, params Sorting[] sorting)
+		public IEnumerable<T> Select<T>(string name, ICondition condition, Grouping grouping, string scope, params Sorting[] sortings)
 		{
-			return this.Select<T>(name, condition, this.ResolveScope(name, scope, typeof(T)), null, grouping, sorting);
+			return this.Select<T>(name, condition, this.ResolveScope(name, scope, typeof(T)), null, grouping, sortings);
 		}
 
-		public IEnumerable<T> Select<T>(string name, ICondition condition, Grouping grouping, string scope, Paging paging, params Sorting[] sorting)
+		public IEnumerable<T> Select<T>(string name, ICondition condition, Grouping grouping, string scope, Paging paging, params Sorting[] sortings)
 		{
-			return this.Select<T>(name, condition, this.ResolveScope(name, scope, typeof(T)), paging, grouping, sorting);
+			return this.Select<T>(name, condition, this.ResolveScope(name, scope, typeof(T)), paging, grouping, sortings);
 		}
 
-		public IEnumerable<T> Select<T>(string name, ICondition condition, Grouping grouping, Paging paging, params Sorting[] sorting)
+		public IEnumerable<T> Select<T>(string name, ICondition condition, Grouping grouping, Paging paging, params Sorting[] sortings)
 		{
-			return this.Select<T>(name, condition, this.ResolveScope(name, null, typeof(T)), paging, grouping, sorting);
+			return this.Select<T>(name, condition, this.ResolveScope(name, null, typeof(T)), paging, grouping, sortings);
 		}
 
-		public IEnumerable<T> Select<T>(string name, ICondition condition, Grouping grouping, Paging paging, string scope, params Sorting[] sorting)
+		public IEnumerable<T> Select<T>(string name, ICondition condition, Grouping grouping, Paging paging, string scope, params Sorting[] sortings)
 		{
-			return this.Select<T>(name, condition, this.ResolveScope(name, scope, typeof(T)), paging, grouping, sorting);
-		}
-
-		[Obsolete]
-		public IEnumerable Select(string name,
-		                          ICondition condition = null,
-		                          string scope = null,
-		                          Paging paging = null,
-		                          Grouping grouping = null,
-		                          params Sorting[] sorting)
-		{
-			return this.Select<object>(name, condition, this.ResolveScope(name, scope, null), paging, grouping, sorting);
-		}
-
-		[Obsolete]
-		public IEnumerable<T> Select<T>(string name,
-		                                ICondition condition = null,
-		                                string scope = null,
-		                                Paging paging = null,
-		                                Grouping grouping = null,
-		                                params Sorting[] sorting)
-		{
-			return this.Select<T>(name, condition, this.ResolveScope(name, scope, typeof(T)), paging, grouping, sorting);
+			return this.Select<T>(name, condition, this.ResolveScope(name, scope, typeof(T)), paging, grouping, sortings);
 		}
 
 		[Obsolete]
@@ -170,9 +150,9 @@ namespace Zongsoft.Data
 		                                Expression<Func<T, object>> excludes = null,
 		                                Paging paging = null,
 		                                Grouping grouping = null,
-		                                params Sorting[] sorting)
+		                                params Sorting[] sortings)
 		{
-			return this.Select<T>(name, condition, this.ResolveScopeExpression(name, includes, excludes), paging, grouping, sorting);
+			return this.Select<T>(name, condition, this.ResolveScopeExpression(name, includes, excludes), paging, grouping, sortings);
 		}
 
 		protected abstract IEnumerable<T> Select<T>(string name,
@@ -180,16 +160,11 @@ namespace Zongsoft.Data
 		                                            string[] members,
 		                                            Paging paging,
 		                                            Grouping grouping,
-		                                            Sorting[] sorting);
+		                                            Sorting[] sortings);
 		#endregion
 
 		#region 删除方法
-		public int Delete(string name, ICondition condition)
-		{
-			return this.Delete(name, condition, (string[])null);
-		}
-
-		public int Delete(string name, ICondition condition, string cascades)
+		public int Delete(string name, ICondition condition, string cascades = null)
 		{
 			if(string.IsNullOrWhiteSpace(cascades))
 				return this.Delete(name, condition, (string[])null);
@@ -209,44 +184,35 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 插入方法
-		[Obsolete]
-		public int Insert(string name, object entity, string scope = null)
+		public int Insert(string name, object data, string scope = null)
 		{
-			if(entity == null)
+			if(data == null)
 				throw new ArgumentNullException("entity");
 
-			return this.Insert(name, entity, this.ResolveScope(name, scope, entity.GetType()));
+			return this.Insert(name, data, this.ResolveScope(name, scope, data.GetType()));
 		}
 
-		public int Insert<T>(string name, T entity, string scope = null)
+		public int Insert<T>(string name, T data, Expression<Func<T, object>> includes, Expression<Func<T, object>> excludes = null)
 		{
-			if(entity == null)
-				throw new ArgumentNullException("entity");
-
-			return this.Insert(name, entity, this.ResolveScope(name, scope, entity.GetType()));
+			return this.Insert(name, data, this.ResolveScopeExpression(name, includes, excludes));
 		}
 
-		public int Insert<T>(string name, T entity, Expression<Func<T, object>> includes, Expression<Func<T, object>> excludes = null)
+		protected virtual int Insert(string name, object data, string[] members)
 		{
-			return this.Insert(name, entity, this.ResolveScopeExpression(name, includes, excludes));
+			return this.Insert(name, new object[] { data }, members);
 		}
 
-		protected virtual int Insert(string name, object entity, string[] members)
+		public int InsertMany<T>(string name, IEnumerable<T> data, string scope = null)
 		{
-			return this.Insert(name, new object[] { entity }, members);
+			return this.InsertMany(name, data, this.ResolveScope(name, scope, typeof(T)));
 		}
 
-		public int Insert<T>(string name, IEnumerable<T> entities, string scope = null)
+		public int InsertMany<T>(string name, IEnumerable<T> data, Expression<Func<T, object>> includes, Expression<Func<T, object>> excludes = null)
 		{
-			return this.Insert(name, entities, this.ResolveScope(name, scope, typeof(T)));
+			return this.InsertMany(name, data, this.ResolveScopeExpression(name, includes, excludes));
 		}
 
-		public int Insert<T>(string name, IEnumerable<T> entities, Expression<Func<T, object>> includes, Expression<Func<T, object>> excludes = null)
-		{
-			return this.Insert(name, entities, this.ResolveScopeExpression(name, includes, excludes));
-		}
-
-		protected abstract int Insert<T>(string name, IEnumerable<T> entities, string[] members);
+		protected abstract int InsertMany(string name, IEnumerable data, string[] members);
 		#endregion
 
 		#region 更新方法
@@ -254,38 +220,29 @@ namespace Zongsoft.Data
 		/// 根据指定的条件将指定的实体更新到数据源。
 		/// </summary>
 		/// <param name="name">指定的实体映射名。</param>
-		/// <param name="entity">要更新的实体对象。</param>
+		/// <param name="data">要更新的实体对象。</param>
 		/// <param name="condition">要更新的条件子句，如果为空(null)则根据实体的主键进行更新。</param>
 		/// <param name="scope">指定的要更新的和排除更新的属性名列表，如果指定的是多个属性则属性名之间使用逗号(,)分隔；要排除的属性以减号(-)打头，星号(*)表示所有属性，感叹号(!)表示排除所有属性；如果未指定该参数则默认只会更新所有单值属性而不会更新导航属性。</param>
 		/// <returns>返回受影响的记录行数，执行成功返回大于零的整数，失败则返回负数。</returns>
-		[Obsolete]
-		public int Update(string name, object entity, ICondition condition = null, string scope = null)
+		public int Update(string name, object data, ICondition condition = null, string scope = null)
 		{
-			if(entity == null)
+			if(data == null)
 				throw new ArgumentNullException("entity");
 
-			return this.Update(name, entity, condition, this.ResolveScope(name, scope, entity.GetType()));
+			return this.Update(name, data, condition, this.ResolveScope(name, scope, data.GetType()));
 		}
 
-		public int Update<T>(string name, T entity, ICondition condition = null, string scope = null)
+		public int Update<T>(string name, T data, ICondition condition, Expression<Func<T, object>> includes, Expression<Func<T, object>> excludes = null)
 		{
-			if(entity == null)
+			if(data == null)
 				throw new ArgumentNullException("entity");
 
-			return this.Update(name, entity, condition, this.ResolveScope(name, scope, entity.GetType()));
+			return this.Update(name, data, condition, this.ResolveScopeExpression(name, includes, excludes));
 		}
 
-		public int Update<T>(string name, T entity, ICondition condition, Expression<Func<T, object>> includes, Expression<Func<T, object>> excludes = null)
+		protected virtual int Update(string name, object data, ICondition condition, string[] members)
 		{
-			if(entity == null)
-				throw new ArgumentNullException("entity");
-
-			return this.Update(name, entity, condition, this.ResolveScopeExpression(name, includes, excludes));
-		}
-
-		protected virtual int Update(string name, object entity, ICondition condition, string[] members)
-		{
-			return this.Update(name, new object[] { entity }, condition, members);
+			return this.Update(name, new object[] { data }, condition, members);
 		}
 
 		/// <summary>
@@ -293,21 +250,21 @@ namespace Zongsoft.Data
 		/// </summary>
 		/// <typeparam name="T">指定的实体集中的实体的类型。</typeparam>
 		/// <param name="name">指定的实体映射名。</param>
-		/// <param name="entities">要更新的实体集。</param>
+		/// <param name="data">要更新的实体集。</param>
 		/// <param name="condition">要更新的条件子句，如果为空(null)则根据实体的主键进行更新。</param>
 		/// <param name="scope">指定的要更新的和排除更新的属性名列表，如果指定的是多个属性则属性名之间使用逗号(,)分隔；要排除的属性以减号(-)打头，星号(*)表示所有属性，感叹号(!)表示排除所有属性；如果未指定该参数则默认只会更新所有单值属性而不会更新导航属性。</param>
 		/// <returns>返回受影响的记录行数，执行成功返回大于零的整数，失败则返回负数。</returns>
-		public int Update<T>(string name, IEnumerable<T> entities, ICondition condition = null, string scope = null)
+		public int UpdateMany<T>(string name, IEnumerable<T> data, ICondition condition = null, string scope = null)
 		{
-			return this.Update(name, entities, condition, this.ResolveScope(name, scope, typeof(T)));
+			return this.UpdateMany(name, data, condition, this.ResolveScope(name, scope, typeof(T)));
 		}
 
-		public int Update<T>(string name, IEnumerable<T> entities, ICondition condition, Expression<Func<T, object>> includes, Expression<Func<T, object>> excludes = null)
+		public int UpdateMany<T>(string name, IEnumerable<T> data, ICondition condition, Expression<Func<T, object>> includes, Expression<Func<T, object>> excludes = null)
 		{
-			return this.Update(name, entities, condition, this.ResolveScopeExpression(name, includes, excludes));
+			return this.UpdateMany(name, data, condition, this.ResolveScopeExpression(name, includes, excludes));
 		}
 
-		protected abstract int Update<T>(string name, IEnumerable<T> entities, ICondition condition, string[] members);
+		protected abstract int UpdateMany(string name, IEnumerable data, ICondition condition, string[] members);
 		#endregion
 
 		#region 保护方法
@@ -319,8 +276,106 @@ namespace Zongsoft.Data
 		}
 		#endregion
 
+		#region 激发事件
+		protected virtual void OnCounted(DataCountedEventArgs args)
+		{
+			var e = this.Counted;
+
+			if(e != null)
+				e(this, args);
+		}
+
+		protected virtual void OnCounting(DataCountingEventArgs args)
+		{
+			var e = this.Counting;
+
+			if(e != null)
+				e(this, args);
+		}
+
+		protected virtual void OnExecuted(DataExecutedEventArgs args)
+		{
+			var e = this.Executed;
+
+			if(e != null)
+				e(this, args);
+		}
+
+		protected virtual void OnExecuting(DataExecutingEventArgs args)
+		{
+			var e = this.Executing;
+
+			if(e != null)
+				e(this, args);
+		}
+
+		protected virtual void OnSelected(DataSelectedEventArgs args)
+		{
+			var e = this.Selected;
+
+			if(e != null)
+				e(this, args);
+		}
+
+		protected virtual void OnSelecting(DataSelectingEventArgs args)
+		{
+			var e = this.Selecting;
+
+			if(e != null)
+				e(this, args);
+		}
+
+		protected virtual void OnDeleted(DataDeletedEventArgs args)
+		{
+			var e = this.Deleted;
+
+			if(e != null)
+				e(this, args);
+		}
+
+		protected virtual void OnDeleting(DataDeletingEventArgs args)
+		{
+			var e = this.Deleting;
+
+			if(e != null)
+				e(this, args);
+		}
+
+		protected virtual void OnInserted(DataInsertedEventArgs args)
+		{
+			var e = this.Inserted;
+
+			if(e != null)
+				e(this, args);
+		}
+
+		protected virtual void OnInserting(DataInsertingEventArgs args)
+		{
+			var e = this.Inserting;
+
+			if(e != null)
+				e(this, args);
+		}
+
+		protected virtual void OnUpdated(DataUpdatedEventArgs args)
+		{
+			var e = this.Updated;
+
+			if(e != null)
+				e(this, args);
+		}
+
+		protected virtual void OnUpdating(DataUpdatingEventArgs args)
+		{
+			var e = this.Updating;
+
+			if(e != null)
+				e(this, args);
+		}
+		#endregion
+
 		#region 私有方法
-		private string[] ResolveScope(string entityName, string scope, Type entityType = null)
+		private string[] ResolveScope(string entityName, string scope, Type entityType)
 		{
 			if(string.IsNullOrWhiteSpace(entityName))
 				throw new ArgumentNullException("entityName");

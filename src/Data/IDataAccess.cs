@@ -40,6 +40,21 @@ namespace Zongsoft.Data
 	/// </remarks>
 	public interface IDataAccess
 	{
+		#region 事件定义
+		event EventHandler<DataCountedEventArgs> Counted;
+		event EventHandler<DataCountingEventArgs> Counting;
+		event EventHandler<DataExecutedEventArgs> Executed;
+		event EventHandler<DataExecutingEventArgs> Executing;
+		event EventHandler<DataSelectedEventArgs> Selected;
+		event EventHandler<DataSelectingEventArgs> Selecting;
+		event EventHandler<DataDeletedEventArgs> Deleted;
+		event EventHandler<DataDeletingEventArgs> Deleting;
+		event EventHandler<DataInsertedEventArgs> Inserted;
+		event EventHandler<DataInsertingEventArgs> Inserting;
+		event EventHandler<DataUpdatedEventArgs> Updated;
+		event EventHandler<DataUpdatingEventArgs> Updating;
+		#endregion
+
 		#region 执行方法
 		object Execute(string name, IDictionary<string, object> inParameters);
 		object Execute(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters);
@@ -50,64 +65,30 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 计数方法
-		int Count(string name, ICondition condition);
-		int Count(string name, ICondition condition, string includes);
-		int Count<T>(string name, ICondition condition, Expression<Func<T, object>> includes);
+		int Count(string name, ICondition condition, string includes = null);
 		#endregion
 
 		#region 查询方法
-		IEnumerable<T> Select<T>(string name, ICondition condition = null, params Sorting[] sorting);
-		IEnumerable<T> Select<T>(string name, ICondition condition, string scope, params Sorting[] sorting);
-		IEnumerable<T> Select<T>(string name, ICondition condition, string scope, Paging paging, params Sorting[] sorting);
-		IEnumerable<T> Select<T>(string name, ICondition condition, Paging paging, params Sorting[] sorting);
-		IEnumerable<T> Select<T>(string name, ICondition condition, Paging paging, string scope, params Sorting[] sorting);
-		IEnumerable<T> Select<T>(string name, ICondition condition, Grouping grouping, params Sorting[] sorting);
-		IEnumerable<T> Select<T>(string name, ICondition condition, Grouping grouping, string scope, params Sorting[] sorting);
-		IEnumerable<T> Select<T>(string name, ICondition condition, Grouping grouping, string scope, Paging paging, params Sorting[] sorting);
-		IEnumerable<T> Select<T>(string name, ICondition condition, Grouping grouping, Paging paging, params Sorting[] sorting);
-		IEnumerable<T> Select<T>(string name, ICondition condition, Grouping grouping, Paging paging, string scope, params Sorting[] sorting);
-
-		[Obsolete]
-		IEnumerable Select(string name,
-		                   ICondition condition,
-		                   string scope = null,
-		                   Paging paging = null,
-		                   Grouping grouping = null,
-		                   params Sorting[] sorting);
-
-		[Obsolete]
-		IEnumerable<T> Select<T>(string name,
-		                         ICondition condition,
-		                         string scope = null,
-		                         Paging paging = null,
-		                         Grouping grouping = null,
-		                         params Sorting[] sorting);
-
-		[Obsolete]
-		IEnumerable<T> Select<T>(string name,
-		                         ICondition condition,
-		                         Expression<Func<T, object>> includes = null,
-		                         Expression<Func<T, object>> excludes = null,
-		                         Paging paging = null,
-		                         Grouping grouping = null,
-		                         params Sorting[] sorting);
+		IEnumerable<T> Select<T>(string name, ICondition condition = null, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(string name, ICondition condition, string scope, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(string name, ICondition condition, string scope, Paging paging, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(string name, ICondition condition, Paging paging, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(string name, ICondition condition, Paging paging, string scope, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(string name, ICondition condition, Grouping grouping, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(string name, ICondition condition, Grouping grouping, string scope, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(string name, ICondition condition, Grouping grouping, string scope, Paging paging, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(string name, ICondition condition, Grouping grouping, Paging paging, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(string name, ICondition condition, Grouping grouping, Paging paging, string scope, params Sorting[] sortings);
 		#endregion
 
 		#region 删除方法
-		int Delete(string name, ICondition condition);
-		int Delete(string name, ICondition condition, string cascades);
-		int Delete<T>(string name, ICondition condition, Expression<Func<T, object>> cascades);
+		int Delete(string name, ICondition condition, string cascades = null);
 		#endregion
 
 		#region 插入方法
-		[Obsolete]
-		int Insert(string name, object entity, string scope = null);
+		int Insert(string name, object data, string scope = null);
 
-		int Insert<T>(string name, T entity, string scope = null);
-		int Insert<T>(string name, T entity, Expression<Func<T, object>> includes, Expression<Func<T, object>> excludes);
-
-		int Insert<T>(string name, IEnumerable<T> entities, string scope = null);
-		int Insert<T>(string name, IEnumerable<T> entities, Expression<Func<T, object>> includes, Expression<Func<T, object>> excludes = null);
+		int InsertMany<T>(string name, IEnumerable<T> data, string scope = null);
 		#endregion
 
 		#region 更新方法
@@ -115,27 +96,22 @@ namespace Zongsoft.Data
 		/// 根据指定的条件将指定的实体更新到数据源。
 		/// </summary>
 		/// <param name="name">指定的实体映射名。</param>
-		/// <param name="entity">要更新的实体对象。</param>
+		/// <param name="data">要更新的数据实体。</param>
 		/// <param name="condition">要更新的条件子句，如果为空(null)则根据实体的主键进行更新。</param>
 		/// <param name="scope">指定的要更新的和排除更新的属性名列表，如果指定的是多个属性则属性名之间使用逗号(,)分隔；要排除的属性以减号(-)打头，星号(*)表示所有属性，感叹号(!)表示排除所有属性；如果未指定该参数则默认只会更新所有单值属性而不会更新导航属性。</param>
 		/// <returns>返回受影响的记录行数，执行成功返回大于零的整数，失败则返回负数。</returns>
-		[Obsolete]
-		int Update(string name, object entity, ICondition condition = null, string scope = null);
-
-		int Update<T>(string name, T entity, ICondition condition = null, string scope = null);
-		int Update<T>(string name, T entity, ICondition condition, Expression<Func<T, object>> includes, Expression<Func<T, object>> excludes = null);
+		int Update(string name, object data, ICondition condition = null, string scope = null);
 
 		/// <summary>
 		/// 根据指定的条件将指定的实体集更新到数据源。
 		/// </summary>
 		/// <typeparam name="T">指定的实体集中的实体的类型。</typeparam>
 		/// <param name="name">指定的实体映射名。</param>
-		/// <param name="entities">要更新的实体集。</param>
+		/// <param name="data">要更新的数据实体集。</param>
 		/// <param name="condition">要更新的条件子句，如果为空(null)则根据实体的主键进行更新。</param>
 		/// <param name="scope">指定的要更新的和排除更新的属性名列表，如果指定的是多个属性则属性名之间使用逗号(,)分隔；要排除的属性以减号(-)打头，星号(*)表示所有属性，感叹号(!)表示排除所有属性；如果未指定该参数则默认只会更新所有单值属性而不会更新导航属性。</param>
 		/// <returns>返回受影响的记录行数，执行成功返回大于零的整数，失败则返回负数。</returns>
-		int Update<T>(string name, IEnumerable<T> entities, ICondition condition = null, string scope = null);
-		int Update<T>(string name, IEnumerable<T> entities, ICondition condition, Expression<Func<T, object>> includes, Expression<Func<T, object>> excludes = null);
+		int UpdateMany<T>(string name, IEnumerable<T> data, ICondition condition = null, string scope = null);
 		#endregion
 	}
 }
