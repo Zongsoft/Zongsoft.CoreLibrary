@@ -66,7 +66,7 @@ namespace Zongsoft.Data
 
 		#region 公共属性
 		/// <summary>
-		/// 获取或设置子句的标量名称。
+		/// 获取条件项的名称。
 		/// </summary>
 		public string Name
 		{
@@ -74,17 +74,10 @@ namespace Zongsoft.Data
 			{
 				return _name;
 			}
-			set
-			{
-				if(string.IsNullOrWhiteSpace(value))
-					throw new ArgumentNullException();
-
-				_name = value.Trim();
-			}
 		}
 
 		/// <summary>
-		/// 获取或设置子句的标量值。
+		/// 获取或设置条件项的值。
 		/// </summary>
 		public object Value
 		{
@@ -99,17 +92,13 @@ namespace Zongsoft.Data
 		}
 
 		/// <summary>
-		/// 获取或设置子句的标量操作符。
+		/// 获取条件项的操作符。
 		/// </summary>
 		public ConditionOperator Operator
 		{
 			get
 			{
 				return _operator;
-			}
-			set
-			{
-				_operator = value;
 			}
 		}
 		#endregion
@@ -224,6 +213,42 @@ namespace Zongsoft.Data
 				throw new ArgumentNullException("values");
 
 			return new Condition(name, values, ConditionOperator.NotIn);
+		}
+
+		public static bool GetBetween(Condition condition, out object begin, out object end)
+		{
+			begin = end = null;
+
+			if(condition == null || condition.Operator != ConditionOperator.Between || condition.Value == null)
+				return false;
+
+			if(condition.Value is IEnumerable)
+			{
+				int index = 0;
+
+				foreach(var item in (IEnumerable)condition.Value)
+				{
+					if(index++ == 0)
+						begin = item;
+					else
+						end = item;
+
+					if(index >= 2)
+						break;
+				}
+
+				return index > 0;
+			}
+
+			if(Zongsoft.Common.TypeExtension.IsAssignableFrom(typeof(Tuple<,>), condition.Value.GetType()))
+			{
+				begin = Zongsoft.Common.Convert.GetValue(condition.Value, "Item1");
+				end = Zongsoft.Common.Convert.GetValue(condition.Value, "Item2");
+
+				return true;
+			}
+
+			return false;
 		}
 		#endregion
 
