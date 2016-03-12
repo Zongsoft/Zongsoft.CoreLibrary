@@ -39,7 +39,7 @@ namespace Zongsoft.Collections
 
 		#region 成员字段
 		private object _syncRoot;
-		private IList<T> _items;
+		private List<T> _items;
 		#endregion
 
 		#region 构造函数
@@ -74,7 +74,7 @@ namespace Zongsoft.Collections
 			}
 			set
 			{
-				if(_items.IsReadOnly)
+				if(this.Items.IsReadOnly)
 					throw new NotSupportedException();
 
 				if(index < 0 || index >= _items.Count)
@@ -98,7 +98,7 @@ namespace Zongsoft.Collections
 		#region 公共方法
 		public void Add(T item)
 		{
-			if(_items.IsReadOnly)
+			if(this.Items.IsReadOnly)
 				throw new NotSupportedException();
 
 			this.InsertItems(_items.Count, new T[] { item });
@@ -109,7 +109,7 @@ namespace Zongsoft.Collections
 			if(items == null)
 				throw new ArgumentNullException("items");
 
-			if(_items.IsReadOnly)
+			if(this.Items.IsReadOnly)
 				throw new NotSupportedException();
 
 			this.InsertItems(_items.Count, items);
@@ -117,7 +117,7 @@ namespace Zongsoft.Collections
 
 		public void Clear()
 		{
-			if(_items.IsReadOnly)
+			if(this.Items.IsReadOnly)
 				throw new NotSupportedException();
 
 			this.ClearItems();
@@ -137,7 +137,7 @@ namespace Zongsoft.Collections
 		{
 			get
 			{
-				return _items.IsReadOnly;
+				return this.Items.IsReadOnly;
 			}
 		}
 
@@ -148,7 +148,7 @@ namespace Zongsoft.Collections
 
 		public void Insert(int index, T item)
 		{
-			if(_items.IsReadOnly)
+			if(this.Items.IsReadOnly)
 				throw new NotSupportedException();
 
 			if(index < 0 || index > _items.Count)
@@ -159,7 +159,7 @@ namespace Zongsoft.Collections
 
 		public bool Remove(T item)
 		{
-			if(_items.IsReadOnly)
+			if(this.Items.IsReadOnly)
 				throw new NotSupportedException();
 
 			int index = _items.IndexOf(item);
@@ -172,7 +172,7 @@ namespace Zongsoft.Collections
 
 		public void RemoveAt(int index)
 		{
-			if(_items.IsReadOnly)
+			if(this.Items.IsReadOnly)
 				throw new NotSupportedException();
 
 			if(index < 0 || index >= _items.Count)
@@ -196,18 +196,16 @@ namespace Zongsoft.Collections
 			if(items == null)
 				return;
 
-			((List<T>)_items).AddRange(items);
+			_items.AddRange(items);
 
 			var list = items as IList;
 
 			if(list == null)
-			{
-				foreach(var item in items)
-					list.Add(item);
-			}
+				list = new List<T>(items);
 
 			//激发“CollectionChanged”事件
-			this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, list, index));
+			if(list.Count > 0)
+				this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, list, index));
 		}
 
 		protected virtual void RemoveItem(int index)
@@ -342,13 +340,13 @@ namespace Zongsoft.Collections
 				if(list != null)
 					return list.IsFixedSize;
 
-				return _items.IsReadOnly;
+				return this.Items.IsReadOnly;
 			}
 		}
 
 		int IList.Add(object value)
 		{
-			if(_items.IsReadOnly)
+			if(this.Items.IsReadOnly)
 				throw new NotSupportedException();
 
 			if(value == null)
@@ -386,7 +384,7 @@ namespace Zongsoft.Collections
 
 		void IList.Insert(int index, object value)
 		{
-			if(_items.IsReadOnly)
+			if(this.Items.IsReadOnly)
 				throw new NotSupportedException();
 
 			if(value == null)
@@ -402,7 +400,7 @@ namespace Zongsoft.Collections
 
 		void IList.Remove(object value)
 		{
-			if(_items.IsReadOnly)
+			if(this.Items.IsReadOnly)
 				throw new NotSupportedException();
 
 			T result;
