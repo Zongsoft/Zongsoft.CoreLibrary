@@ -34,23 +34,23 @@ namespace Zongsoft.Data
 	public class ConditionCollection : Zongsoft.Collections.Collection<ICondition>, ICondition
 	{
 		#region 成员字段
-		private ConditionCombination _conditionCombine;
+		private ConditionCombination _conditionCombination;
 		#endregion
 
 		#region 构造函数
-		public ConditionCollection(ConditionCombination conditionCombine)
+		public ConditionCollection(ConditionCombination conditionCombination)
 		{
-			_conditionCombine = conditionCombine;
+			_conditionCombination = conditionCombination;
 		}
 
-		public ConditionCollection(ConditionCombination conditionCombine, IEnumerable<ICondition> items) : base(items)
+		public ConditionCollection(ConditionCombination conditionCombination, IEnumerable<ICondition> items) : base(items)
 		{
-			_conditionCombine = conditionCombine;
+			_conditionCombination = conditionCombination;
 		}
 
-		public ConditionCollection(ConditionCombination conditionCombine, params ICondition[] items) : base(items)
+		public ConditionCollection(ConditionCombination conditionCombination, params ICondition[] items) : base(items)
 		{
-			_conditionCombine = conditionCombine;
+			_conditionCombination = conditionCombination;
 		}
 		#endregion
 
@@ -62,11 +62,11 @@ namespace Zongsoft.Data
 		{
 			get
 			{
-				return _conditionCombine;
+				return _conditionCombination;
 			}
 			set
 			{
-				_conditionCombine = value;
+				_conditionCombination = value;
 			}
 		}
 		#endregion
@@ -230,7 +230,7 @@ namespace Zongsoft.Data
 		#region 重写方法
 		public override string ToString()
 		{
-			var combiner = _conditionCombine.ToString().ToUpperInvariant();
+			var combiner = _conditionCombination.ToString().ToUpperInvariant();
 
 			if(this.Count < 1)
 				return combiner;
