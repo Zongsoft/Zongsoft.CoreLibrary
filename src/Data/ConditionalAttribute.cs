@@ -30,7 +30,7 @@ using System.Collections.Generic;
 namespace Zongsoft.Data
 {
 	/// <summary>
-	/// 表示条件成员组合成员的描述特性。
+	/// 表示条件组合成员的描述特性。
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Property)]
 	public class ConditionalAttribute : Attribute
@@ -70,7 +70,7 @@ namespace Zongsoft.Data
 		}
 
 		/// <summary>
-		/// 获取或设置一个值，指示是否忽略当前条件组合成员。
+		/// 获取或设置一个值，指示是否忽略当前条件成员。
 		/// </summary>
 		public bool Ignored
 		{
@@ -85,7 +85,7 @@ namespace Zongsoft.Data
 		}
 
 		/// <summary>
-		/// 获取或设置条件组合成员的运算符，如果为空则表示自动匹配一个合适的运算符。
+		/// 获取或设置条件成员的运算符，如果为空则表示自动匹配一个合适的运算符。
 		/// </summary>
 		public ConditionOperator? Operator
 		{

@@ -181,7 +181,7 @@ namespace Zongsoft.Data
 			if(names.Length == 1)
 			{
 				if(property.IsRange)
-					return ((ConditionalRange)property.GetValue(this)).ToCondition(names[0]);
+					return ((ConditionalRange)value).ToCondition(names[0]);
 				else
 					return new Condition(names[0], value, opt.Value);
 			}
@@ -192,7 +192,7 @@ namespace Zongsoft.Data
 			foreach(var name in names)
 			{
 				if(property.IsRange)
-					conditions.Add(((ConditionalRange)property.GetValue(this)).ToCondition(name));
+					conditions.Add(((ConditionalRange)value).ToCondition(name));
 				else
 					conditions.Add(new Condition(name, value, opt.Value));
 			}
@@ -276,8 +276,14 @@ namespace Zongsoft.Data
 
 				if(value == null || Convert.IsDBNull(value))
 					return this.DefaultValue == null || Convert.IsDBNull(this.DefaultValue);
-				else
-					return this.DefaultValue != null ? object.Equals(value, this.DefaultValue) : false;
+
+				if(this.DefaultValue == null)
+					return false;
+
+				object defaultValue;
+
+				return Zongsoft.Common.Convert.TryConvertValue(this.DefaultValue, value.GetType(), out defaultValue) &&
+				       object.Equals(value, defaultValue);
 			}
 		}
 		#endregion

@@ -92,13 +92,17 @@ namespace Zongsoft.Data
 		}
 
 		/// <summary>
-		/// 获取条件项的操作符。
+		/// 获取或设置条件项的操作符。
 		/// </summary>
 		public ConditionOperator Operator
 		{
 			get
 			{
 				return _operator;
+			}
+			set
+			{
+				_operator = value;
 			}
 		}
 		#endregion
