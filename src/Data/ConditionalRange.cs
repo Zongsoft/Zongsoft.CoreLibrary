@@ -25,6 +25,7 @@
  */
 
 using System;
+using System.Collections;
 
 namespace Zongsoft.Data
 {
@@ -36,10 +37,14 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
+		public ConditionalRange()
+		{
+		}
+
 		public ConditionalRange(object from, object to)
 		{
-			_from = from;
-			_to = to;
+			this.From = from;
+			this.To = to;
 		}
 		#endregion
 
@@ -52,7 +57,7 @@ namespace Zongsoft.Data
 			}
 			set
 			{
-				_from = value;
+				_from = GetValue(value);
 			}
 		}
 
@@ -64,7 +69,7 @@ namespace Zongsoft.Data
 			}
 			set
 			{
-				_to = value;
+				_to = GetValue(value);
 			}
 		}
 		#endregion
@@ -83,6 +88,40 @@ namespace Zongsoft.Data
 		public static bool IsEmpty(ConditionalRange value)
 		{
 			return value == null || (value.From == null && value.To == null);
+		}
+		#endregion
+
+		#region 私有方法
+		private static object GetValue(object value)
+		{
+			if(value == null || System.Convert.IsDBNull(value))
+				return null;
+
+			if(value is string)
+			{
+				if(string.IsNullOrWhiteSpace((string)value))
+					return null;
+
+				return value;
+			}
+
+			var items = value as IEnumerable;
+
+			if(items != null)
+			{
+				var enumerator = items.GetEnumerator();
+
+				if(enumerator != null && enumerator.MoveNext())
+				{
+					var current = enumerator.Current;
+					enumerator.Reset();
+					return GetValue(current);
+				}
+
+				return null;
+			}
+
+			return value;
 		}
 		#endregion
 	}
