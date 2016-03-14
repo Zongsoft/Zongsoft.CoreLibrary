@@ -35,6 +35,21 @@ namespace Zongsoft.Security.Membership
 	public interface IRoleProvider
 	{
 		/// <summary>
+		/// 确定指定编号的角色是否存在。
+		/// </summary>
+		/// <param name="roleId">指定要查找的角色编号。</param>
+		/// <returns>如果指定编号的角色是存在的则返回真(True)，否则返回假(False)。</returns>
+		bool Exists(int roleId);
+
+		/// <summary>
+		/// 确定指定的角色名在指定的命名空间内是否已经存在。
+		/// </summary>
+		/// <param name="name">要确定的角色名。</param>
+		/// <param name="namespace">要确定的角色所属的命名空间。</param>
+		/// <returns>如果指定名称的角色在命名空间内已经存在则返回真(True)，否则返回假(False)。</returns>
+		bool Exists(string name, string @namespace);
+
+		/// <summary>
 		/// 获取指定编号对应的角色对象。
 		/// </summary>
 		/// <param name="roleId">要查找的角色编号。</param>
