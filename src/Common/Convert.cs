@@ -155,18 +155,15 @@ namespace Zongsoft.Common
 			if(type == typeof(DBNull))
 				return DBNull.Value;
 
-			if(type == null || type.IsClass || type.IsInterface)
+			if(type == null || type.IsClass || type.IsInterface || type == typeof(Nullable<>))
 				return null;
 
 			if(type.IsEnum)
 			{
-				//var attributes = type.GetCustomAttributes(typeof(DefaultValueAttribute), true);
-				//if(attributes.Length > 0)
-				//	return ((DefaultValueAttribute)attributes[0]).Value;
+				var attribute = (DefaultValueAttribute)Attribute.GetCustomAttribute(type, typeof(DefaultValueAttribute), true);
 
-				var attribute = Attribute.GetCustomAttribute(type, typeof(DefaultValueAttribute), true);
 				if(attribute != null)
-					return ((DefaultValueAttribute)attribute).Value;
+					return attribute.Value;
 
 				Array values = Enum.GetValues(type);
 
