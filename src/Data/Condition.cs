@@ -259,12 +259,38 @@ namespace Zongsoft.Data
 		#region 符号重写
 		public static ConditionCollection operator &(Condition a, Condition b)
 		{
-			return new ConditionCollection(ConditionCombination.And, a, b);
+			if(a == null)
+			{
+				if(b == null)
+					return null;
+				else
+					return new ConditionCollection(ConditionCombination.And, b);
+			}
+			else
+			{
+				if(b == null)
+					return new ConditionCollection(ConditionCombination.And, a);
+				else
+					return new ConditionCollection(ConditionCombination.And, a, b);
+			}
 		}
 
 		public static ConditionCollection operator |(Condition a, Condition b)
 		{
-			return new ConditionCollection(ConditionCombination.Or, a, b);
+			if(a == null)
+			{
+				if(b == null)
+					return null;
+				else
+					return new ConditionCollection(ConditionCombination.Or, b);
+			}
+			else
+			{
+				if(b == null)
+					return new ConditionCollection(ConditionCombination.Or, a);
+				else
+					return new ConditionCollection(ConditionCombination.Or, a, b);
+			}
 		}
 		#endregion
 

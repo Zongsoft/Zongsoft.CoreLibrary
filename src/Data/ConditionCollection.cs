@@ -96,11 +96,11 @@ namespace Zongsoft.Data
 
 		public static ConditionCollection operator &(Condition condition, ConditionCollection conditions)
 		{
-			if(conditions == null)
-				throw new ArgumentNullException("conditions");
-
 			if(condition == null)
 				return conditions;
+
+			if(conditions == null)
+				return new ConditionCollection(ConditionCombination.And, condition);
 
 			if(conditions.ConditionCombination == ConditionCombination.And)
 				return new ConditionCollection(ConditionCombination.And, Combine(condition, conditions));
@@ -110,11 +110,11 @@ namespace Zongsoft.Data
 
 		public static ConditionCollection operator &(ConditionCollection conditions, Condition condition)
 		{
-			if(conditions == null)
-				throw new ArgumentNullException("conditions");
-
 			if(condition == null)
 				return conditions;
+
+			if(conditions == null)
+				return new ConditionCollection(ConditionCombination.And, condition);
 
 			if(conditions.ConditionCombination == ConditionCombination.And)
 				return new ConditionCollection(ConditionCombination.And, Combine(conditions, condition));
@@ -148,11 +148,11 @@ namespace Zongsoft.Data
 
 		public static ConditionCollection operator |(Condition condition, ConditionCollection conditions)
 		{
-			if(conditions == null)
-				throw new ArgumentNullException("conditions");
-
 			if(condition == null)
 				return conditions;
+
+			if(conditions == null)
+				return new ConditionCollection(ConditionCombination.Or, condition);
 
 			if(conditions.ConditionCombination == ConditionCombination.Or)
 				return new ConditionCollection(ConditionCombination.Or, Combine(condition, conditions));
@@ -162,11 +162,11 @@ namespace Zongsoft.Data
 
 		public static ConditionCollection operator |(ConditionCollection conditions, Condition condition)
 		{
-			if(conditions == null)
-				throw new ArgumentNullException("conditions");
-
 			if(condition == null)
 				return conditions;
+
+			if(conditions == null)
+				return new ConditionCollection(ConditionCombination.Or, condition);
 
 			if(conditions.ConditionCombination == ConditionCombination.Or)
 				return new ConditionCollection(ConditionCombination.Or, Combine(conditions, condition));
