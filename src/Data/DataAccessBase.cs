@@ -199,7 +199,7 @@ namespace Zongsoft.Data
 
 		protected virtual int Insert(string name, object data, string[] members)
 		{
-			return this.Insert(name, new object[] { data }, members);
+			return this.InsertMany(name, new object[] { data }, members);
 		}
 
 		public int InsertMany<T>(string name, IEnumerable<T> data, string scope = null)
@@ -242,7 +242,7 @@ namespace Zongsoft.Data
 
 		protected virtual int Update(string name, object data, ICondition condition, string[] members)
 		{
-			return this.Update(name, new object[] { data }, condition, members);
+			return this.UpdateMany(name, new object[] { data }, condition, members);
 		}
 
 		/// <summary>
