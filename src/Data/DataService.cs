@@ -465,35 +465,52 @@ namespace Zongsoft.Data
 		}
 		#endregion
 
-		#region 条件转换
+		#region 主键操作
+		/// <summary>
+		/// 根据指定的版本数获取对应的键名数组。
+		/// </summary>
+		/// <param name="version">版本数，表示键的数量。</param>
+		/// <returns>返回对应的键名数组，如果不支持指定的版本应返回空(null)。</returns>
+		/// <remarks>
+		///		<para>对于重载者的提示：如果<paramref name="version"/>参数值为零，则必须返回当前实体的主键名数组，不可范围空或空数组。</para>
+		/// </remarks>
+		protected virtual string[] GetKey(int version)
+		{
+			var result = new List<string>();
+			var properties = typeof(TEntity).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+
+			foreach(var property in properties)
+			{
+				if(Attribute.IsDefined(property, typeof(Metadata.DataEntityKeyAttribute), true))
+					result.Add(property.Name);
+			}
+
+			return result.ToArray();
+		}
+
 		protected virtual ICondition ConvertKey<TKey>(TKey key)
 		{
-			var properties = this.GetEntityKeys();
+			if(IsNothing(key))
+				return null;
 
-			if(properties.Length < 1)
-				throw new InvalidOperationException("Missing key(s) about '" + typeof(TEntity).FullName + "' type.");
-
-			return Condition.Equal(properties[0].Name, key);
+			return Condition.Equal(this.EnsureKey(1)[0], key);
 		}
 
 		protected virtual ICondition ConvertKey<TKey1, TKey2>(TKey1 key1, TKey2 key2)
 		{
-			var properties = this.GetEntityKeys();
+			var keys = this.EnsureKey(2);
 
-			if(properties.Length < 2)
-				throw new InvalidOperationException("No matched key(s) about '" + typeof(TEntity).FullName + "' type.");
-
-			return Condition.Equal(properties[0].Name, key1) & Condition.Equal(properties[1].Name, key2);
+			return (IsNothing(key1) ? null : Condition.Equal(keys[0], key1)) &
+				   (IsNothing(key2) ? null : Condition.Equal(keys[1], key2));
 		}
 
 		protected virtual ICondition ConvertKey<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3)
 		{
-			var properties = this.GetEntityKeys();
+			var keys = this.EnsureKey(3);
 
-			if(properties.Length < 3)
-				throw new InvalidOperationException("No matched key(s) about '" + typeof(TEntity).FullName + "' type.");
-
-			return Condition.Equal(properties[0].Name, key1) & Condition.Equal(properties[1].Name, key2) & Condition.Equal(properties[2].Name, key3);
+			return (IsNothing(key1) ? null : Condition.Equal(keys[0], key1)) &
+				   (IsNothing(key2) ? null : Condition.Equal(keys[1], key2)) &
+				   (IsNothing(key3) ? null : Condition.Equal(keys[2], key3));
 		}
 		#endregion
 
@@ -712,34 +729,59 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 私有方法
+		private static bool IsNothing<T>(T value)
+		{
+			if(typeof(T) == typeof(DBNull))
+				return System.Convert.IsDBNull(value);
+
+			if(typeof(T) == typeof(Nullable<>))
+				return ((object)value) == null;
+
+			if(typeof(T) == typeof(string))
+				return string.IsNullOrWhiteSpace((string)(object)value);
+
+			if(typeof(T).IsValueType)
+				return false;
+
+			return ((object)value) == null;
+		}
+
+		private string[] EnsureKey(int version)
+		{
+			if(version < 1 || version > 3)
+				throw new ArgumentOutOfRangeException("version");
+
+			var members = this.GetKey(version);
+
+			if(members == null)
+				throw new InvalidOperationException("Not supports for the version of operation.");
+
+			if(members.Length < 1)
+				throw new InvalidOperationException("Missing key(s) about '" + typeof(TEntity).FullName + "' type.");
+
+			if(members.Length < version)
+				throw new InvalidOperationException("No matched key(s) about '" + typeof(TEntity).FullName + "' type.");
+
+			return members;
+		}
+
+		private object GetResult(IEnumerable<TEntity> result, int version)
+		{
+			//获取当前实体类型对应的主键
+			var key = this.GetKey(0);
+
+			if(key != null && key.Length == version)
+				return result.FirstOrDefault();
+
+			return result;
+		}
+
 		private IDataAccess EnsureDataAccess()
 		{
 			var result = this.DataAccess;
 
 			if(result == null)
 				throw new InvalidOperationException("The value of 'DataAccess' property is null.");
-
-			return result;
-		}
-
-		private Property[] GetEntityKeys()
-		{
-			var result = new List<Property>();
-			var properties = typeof(TEntity).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
-
-			foreach(var property in properties)
-			{
-				if(Attribute.IsDefined(property, typeof(Metadata.DataEntityKeyAttribute), true))
-					result.Add(new Property(property.Name, property.PropertyType));
-			}
-
-			return result.ToArray();
-		}
-
-		private object GetResult(IEnumerable<TEntity> result, int keyCount)
-		{
-			if(this.GetEntityKeys().Length == keyCount)
-				return result.FirstOrDefault();
 
 			return result;
 		}
