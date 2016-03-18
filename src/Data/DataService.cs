@@ -439,6 +439,11 @@ namespace Zongsoft.Data
 			return this.OnUpdated(args.Data, args.Condition, args.Scope, args.Result);
 		}
 
+		public int Update(object data, string scope, ICondition condition = null)
+		{
+			return this.Update(data, condition, scope);
+		}
+
 		public int UpdateMany(IEnumerable<TEntity> data, ICondition condition = null, string scope = null)
 		{
 			//激发“Updating”事件
@@ -452,6 +457,11 @@ namespace Zongsoft.Data
 
 			//激发“Updated”事件
 			return this.OnUpdated(args.Data, args.Condition, args.Scope, args.Result);
+		}
+
+		public int UpdateMany(IEnumerable<TEntity> data, string scope, ICondition condition = null)
+		{
+			return this.UpdateMany(data, condition, scope);
 		}
 
 		protected virtual int UpdateCore(object data, ICondition condition, string scope)

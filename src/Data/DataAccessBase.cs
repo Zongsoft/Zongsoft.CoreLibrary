@@ -227,7 +227,15 @@ namespace Zongsoft.Data
 		public int Update(string name, object data, ICondition condition = null, string scope = null)
 		{
 			if(data == null)
-				throw new ArgumentNullException("entity");
+				throw new ArgumentNullException("data");
+
+			return this.Update(name, data, condition, this.ResolveScope(name, scope, data.GetType()));
+		}
+
+		public int Update(string name, object data, string scope, ICondition condition = null)
+		{
+			if(data == null)
+				throw new ArgumentNullException("data");
 
 			return this.Update(name, data, condition, this.ResolveScope(name, scope, data.GetType()));
 		}
@@ -235,7 +243,7 @@ namespace Zongsoft.Data
 		public int Update<T>(string name, T data, ICondition condition, Expression<Func<T, object>> includes, Expression<Func<T, object>> excludes = null)
 		{
 			if(data == null)
-				throw new ArgumentNullException("entity");
+				throw new ArgumentNullException("data");
 
 			return this.Update(name, data, condition, this.ResolveScopeExpression(name, includes, excludes));
 		}
@@ -255,6 +263,11 @@ namespace Zongsoft.Data
 		/// <param name="scope">指定的要更新的和排除更新的属性名列表，如果指定的是多个属性则属性名之间使用逗号(,)分隔；要排除的属性以减号(-)打头，星号(*)表示所有属性，感叹号(!)表示排除所有属性；如果未指定该参数则默认只会更新所有单值属性而不会更新导航属性。</param>
 		/// <returns>返回受影响的记录行数，执行成功返回大于零的整数，失败则返回负数。</returns>
 		public int UpdateMany<T>(string name, IEnumerable<T> data, ICondition condition = null, string scope = null)
+		{
+			return this.UpdateMany(name, data, condition, this.ResolveScope(name, scope, typeof(T)));
+		}
+
+		public int UpdateMany<T>(string name, IEnumerable<T> data, string scope, ICondition condition = null)
 		{
 			return this.UpdateMany(name, data, condition, this.ResolveScope(name, scope, typeof(T)));
 		}

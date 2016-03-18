@@ -132,7 +132,10 @@ namespace Zongsoft.Data
 		int UpdateMany<TKey1, TKey2, TKey3>(IEnumerable<TEntity> data, TKey1 key1, TKey2 key2, TKey3 key3, string scope = null);
 
 		int Update(object data, ICondition condition = null, string scope = null);
+		int Update(object data, string scope, ICondition condition = null);
+
 		int UpdateMany(IEnumerable<TEntity> data, ICondition condition = null, string scope = null);
+		int UpdateMany(IEnumerable<TEntity> data, string scope, ICondition condition = null);
 		#endregion
 	}
 }
