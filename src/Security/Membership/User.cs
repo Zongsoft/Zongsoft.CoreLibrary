@@ -122,7 +122,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				if(string.IsNullOrWhiteSpace(value))
+				if(string.IsNullOrWhiteSpace(value) && !string.IsNullOrEmpty(_name))
 					throw new ArgumentNullException();
 
 				this.SetPropertyValue(() => this.Name, ref _name, value.Trim());
