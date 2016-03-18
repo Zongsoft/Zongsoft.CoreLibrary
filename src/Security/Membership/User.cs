@@ -25,8 +25,7 @@
  */
 
 using System;
-using System.Data;
-using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Zongsoft.Security.Membership
 {
@@ -67,6 +66,12 @@ namespace Zongsoft.Security.Membership
 		#region 构造函数
 		public User()
 		{
+			_approved = true;
+			_approvedTime = _createdTime = DateTime.Now;
+
+			_maxInvalidPasswordAttempts = 3;
+			_minRequiredPasswordLength = 6;
+			_passwordAttemptWindow = 30;
 		}
 
 		public User(int userId, string name) : this(userId, name, null)
@@ -81,9 +86,12 @@ namespace Zongsoft.Security.Membership
 			_userId = userId;
 			_name = _fullName = name.Trim();
 			_namespace = @namespace;
-			_createdTime = DateTime.Now;
 			_approved = true;
-			_approvedTime = _createdTime;
+			_approvedTime = _createdTime = DateTime.Now;
+
+			_maxInvalidPasswordAttempts = 3;
+			_minRequiredPasswordLength = 6;
+			_passwordAttemptWindow = 30;
 		}
 		#endregion
 
@@ -289,6 +297,7 @@ namespace Zongsoft.Security.Membership
 		/// <summary>
 		/// 获取或设置一个值，指示该用户密码验证失败允许尝试的最大次数。
 		/// </summary>
+		[DefaultValue(3)]
 		public byte MaxInvalidPasswordAttempts
 		{
 			get
@@ -304,6 +313,7 @@ namespace Zongsoft.Security.Membership
 		/// <summary>
 		/// 获取或设置一个值，指示该用户设置密码的最小长度。
 		/// </summary>
+		[DefaultValue(6)]
 		public byte MinRequiredPasswordLength
 		{
 			get
@@ -319,6 +329,7 @@ namespace Zongsoft.Security.Membership
 		/// <summary>
 		/// 获取或设置一个值，指示当该用户密码验证失败次数达到<see cref="MaxInvalidPasswordAttempts"/>属性指定的数值后，再次进行密码验证的间隔时长(单位：秒)。
 		/// </summary>
+		[DefaultValue(30)]
 		public int PasswordAttemptWindow
 		{
 			get

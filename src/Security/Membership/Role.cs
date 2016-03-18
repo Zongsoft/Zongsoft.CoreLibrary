@@ -52,6 +52,7 @@ namespace Zongsoft.Security.Membership
 		#region 构造函数
 		public Role()
 		{
+			_createdTime = DateTime.Now;
 		}
 
 		public Role(int roleId, string name) : this(roleId, name, null)
@@ -64,7 +65,7 @@ namespace Zongsoft.Security.Membership
 				throw new ArgumentNullException("name");
 
 			_roleId = roleId;
-			_name = name.Trim();
+			_name = _fullName = name.Trim();
 			_namespace = @namespace;
 			_createdTime = DateTime.Now;
 		}
