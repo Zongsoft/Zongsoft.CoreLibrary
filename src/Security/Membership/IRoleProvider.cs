@@ -96,7 +96,8 @@ namespace Zongsoft.Security.Membership
 		/// 更新单个或多个角色信息。
 		/// </summary>
 		/// <param name="roles">要更新的角色对象集。</param>
+		/// <param name="scope">指定需要更新的字段集，字段名之间使用逗号分隔。</param>
 		/// <returns>返回更新成功的角色数量。</returns>
-		int UpdateRoles(IEnumerable<Role> roles);
+		int UpdateRoles(IEnumerable<Role> roles, string scope = null);
 	}
 }

@@ -179,8 +179,9 @@ namespace Zongsoft.Security.Membership
 		/// 更新单个或多个用户信息。
 		/// </summary>
 		/// <param name="users">要更新的用户对象集。</param>
+		/// <param name="scope">指定需要更新的字段集，字段名之间使用逗号分隔。</param>
 		/// <returns>返回更新成功的用户数量。</returns>
-		int UpdateUsers(IEnumerable<User> users);
+		int UpdateUsers(IEnumerable<User> users, string scope = null);
 		#endregion
 
 		#region 密码管理
