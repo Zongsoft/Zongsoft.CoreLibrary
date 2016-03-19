@@ -163,12 +163,14 @@ namespace Zongsoft.IO
 
 		private static IFile GetFileProvider(string text, out Path path)
 		{
-			return GetFileSystem(text, out path).File;
+			var fileSystem = GetFileSystem(text, out path);
+			return fileSystem == null ? null : fileSystem.File;
 		}
 
 		private static IDirectory GetDirectoryProvider(string text, out Path path)
 		{
-			return GetFileSystem(text, out path).Directory;
+			var fileSystem = GetFileSystem(text, out path);
+			return fileSystem == null ? null : fileSystem.Directory;
 		}
 
 		private static IFile[] GetFileProviders(string[] texts, out Path[] paths)
