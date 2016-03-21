@@ -84,8 +84,8 @@ namespace Zongsoft.Security.Membership
 				throw new ArgumentNullException("name");
 
 			_userId = userId;
-			_name = _fullName = name.Trim();
-			_namespace = @namespace;
+			this.Name = _fullName = name.Trim();
+			this.Namespace = @namespace;
 			_approved = true;
 			_approvedTime = _createdTime = DateTime.Now;
 
@@ -122,10 +122,36 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				if(string.IsNullOrWhiteSpace(value) && !string.IsNullOrEmpty(_name))
-					throw new ArgumentNullException();
+				//首先处理设置值为空或空字符串的情况
+				if(string.IsNullOrWhiteSpace(value))
+				{
+					//如果当前用户名为空，则说明是通过默认构造函数创建，因此现在不用做处理；否则抛出参数空异常
+					if(string.IsNullOrWhiteSpace(_name))
+						return;
 
-				this.SetPropertyValue(() => this.Name, ref _name, value.Trim());
+					throw new ArgumentNullException();
+				}
+
+				value = value.Trim();
+
+				//用户名的长度必须不少于2个字符
+				if(value.Length < 2)
+					throw new ArgumentOutOfRangeException();
+
+				//用户名的首字符必须是字母、下划线、美元符
+				if(!(Char.IsLetter(value[0]) || value[0] == '_' || value[0] == '$'))
+					throw new ArgumentException("Invalid user name.");
+
+				//检查用户名的其余字符的合法性
+				for(int i = 1; i < value.Length; i++)
+				{
+					//用户名的中间字符必须是字母、数字或下划线
+					if(!Char.IsLetterOrDigit(value[i]) && value[i] != '_')
+						throw new ArgumentException("The user name contains invalid character.");
+				}
+
+				//更新属性内容
+				this.SetPropertyValue(() => this.Name, ref _name, value);
 			}
 		}
 
@@ -155,7 +181,20 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.Namespace, ref _namespace, value);
+				if(!string.IsNullOrWhiteSpace(value))
+				{
+					value = value.Trim();
+
+					foreach(var chr in value)
+					{
+						//命名空间的字符必须是字母、数字、下划线或点号组成
+						if(!Char.IsLetterOrDigit(chr) && chr != '_' && chr != '.')
+							throw new ArgumentException("The user namespace contains invalid character.");
+					}
+				}
+
+				//更新属性内容
+				this.SetPropertyValue(() => this.Namespace, ref _namespace, string.IsNullOrWhiteSpace(value) ? null : value.Trim());
 			}
 		}
 
@@ -230,7 +269,13 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.Email, ref _email, value);
+				if(!string.IsNullOrWhiteSpace(value))
+				{
+					if(!Text.TextRegular.Web.Email.IsMatch(value))
+						throw new ArgumentException("Invalid email format.");
+				}
+
+				this.SetPropertyValue(() => this.Email, ref _email, string.IsNullOrWhiteSpace(value) ? null : value.Trim());
 			}
 		}
 
@@ -245,7 +290,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.PhoneNumber, ref _phoneNumber, value);
+				this.SetPropertyValue(() => this.PhoneNumber, ref _phoneNumber, string.IsNullOrWhiteSpace(value) ? null : value.Trim());
 			}
 		}
 
