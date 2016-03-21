@@ -177,6 +177,8 @@
     <Compile Include="Data\Condition.cs" />
     <Compile Include="Data\Conditional.cs" />
     <Compile Include="Data\ConditionalAttribute.cs" />
+    <Compile Include="Data\ConditionalConverter.cs" />
+    <Compile Include="Data\ConditionalConverterContext.cs" />
     <Compile Include="Data\ConditionalRange.cs" />
     <Compile Include="Data\ConditionCollection.cs" />
     <Compile Include="Data\ConditionCombination.cs" />
@@ -195,6 +197,7 @@
     <Compile Include="Data\DataSelectingEventArgs.cs" />
     <Compile Include="Data\DataUpdatedEventArgs.cs" />
     <Compile Include="Data\DataUpdatingEventArgs.cs" />
+    <Compile Include="Data\IConditionalConverter.cs" />
     <Compile Include="Data\Metadata\DataEntityAttribute.cs" />
     <Compile Include="Data\DataAccessBase.cs" />
     <Compile Include="Data\DataService.cs" />

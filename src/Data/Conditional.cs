@@ -157,47 +157,21 @@ namespace Zongsoft.Data
 		private ICondition GenerateCondition(ConditionalPropertyDescripor property)
 		{
 			//如果当前属性值为默认值，则忽略它
-			if(property == null || property.IsDefaultValue(this))
+			if(property == null)
 				return null;
 
 			//获取当前属性对应的条件命列表
 			var names = this.GetConditionNames(property);
 
-			var opt = property.Attribute != null && property.Attribute.Operator != null ? property.Attribute.Operator : null;
-			var value = property.GetValue(this);
+			//创建转换器上下文
+			var context = new ConditionalConverterContext(this, names, property.PropertyType, property.GetValue(this), property.Operator, property.DefaultValue);
 
-			//只有当属性没有指定运算符并且不是区间属性，才需要生成运算符
-			if(opt == null && (!property.IsRange))
-			{
-				opt = ConditionOperator.Equal;
+			//如果当前属性指定了特定的转换器，则使用该转换器来处理
+			if(property.Converter != null)
+				return property.Converter.Convert(context);
 
-				if(property.PropertyType == typeof(string))
-					opt = ConditionOperator.Like;
-				else if(typeof(IEnumerable).IsAssignableFrom(property.PropertyType) || Zongsoft.Common.TypeExtension.IsAssignableFrom(typeof(IEnumerable<>), property.PropertyType))
-					opt = ConditionOperator.In;
-			}
-
-			//如果当前属性只对应一个条件
-			if(names.Length == 1)
-			{
-				if(property.IsRange)
-					return ((ConditionalRange)value).ToCondition(names[0]);
-				else
-					return new Condition(names[0], value, opt.Value);
-			}
-
-			//当一个属性对应多个条件，则这些条件之间以“或”关系进行组合
-			var conditions = new ConditionCollection(ConditionCombination.Or);
-
-			foreach(var name in names)
-			{
-				if(property.IsRange)
-					conditions.Add(((ConditionalRange)value).ToCondition(name));
-				else
-					conditions.Add(new Condition(name, value, opt.Value));
-			}
-
-			return conditions;
+			//使用默认转换器进行转换处理
+			return ConditionalConverter.Default.Convert(context);
 		}
 
 		private string[] GetConditionNames(ConditionalPropertyDescripor property)
@@ -246,7 +220,7 @@ namespace Zongsoft.Data
 			public readonly PropertyInfo Info;
 			public readonly ConditionalAttribute Attribute;
 			public readonly object DefaultValue;
-			public readonly bool IsRange;
+			public readonly IConditionalConverter Converter;
 
 			public ConditionalPropertyDescripor(PropertyInfo property, ConditionalAttribute attribute)
 			{
@@ -254,36 +228,27 @@ namespace Zongsoft.Data
 				this.Attribute = attribute;
 				this.Name = property.Name;
 				this.PropertyType = property.PropertyType;
-				this.IsRange = Zongsoft.Common.TypeExtension.IsAssignableFrom(typeof(ConditionalRange), property.PropertyType);
 
 				var defaultAttribute = property.GetCustomAttribute<System.ComponentModel.DefaultValueAttribute>(true);
 
 				if(defaultAttribute != null)
 					this.DefaultValue = Convert.IsDBNull(defaultAttribute.Value) ? null : defaultAttribute.Value;
+
+				if(attribute != null && attribute.ConverterType != null)
+					this.Converter = Activator.CreateInstance(attribute.ConverterType) as IConditionalConverter;
+			}
+
+			public ConditionOperator? Operator
+			{
+				get
+				{
+					return this.Attribute != null ? this.Attribute.Operator : null;
+				}
 			}
 
 			public object GetValue(object target)
 			{
 				return this.Info.GetValue(target);
-			}
-
-			public bool IsDefaultValue(object target)
-			{
-				var value = this.GetValue(target);
-
-				if(this.IsRange)
-					return ConditionalRange.IsEmpty(value as ConditionalRange);
-
-				if(value == null || Convert.IsDBNull(value))
-					return this.DefaultValue == null || Convert.IsDBNull(this.DefaultValue);
-
-				if(this.DefaultValue == null)
-					return false;
-
-				object defaultValue;
-
-				return Zongsoft.Common.Convert.TryConvertValue(this.DefaultValue, value.GetType(), out defaultValue) &&
-				       object.Equals(value, defaultValue);
 			}
 		}
 		#endregion

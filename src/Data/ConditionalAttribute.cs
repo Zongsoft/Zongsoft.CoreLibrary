@@ -39,17 +39,35 @@ namespace Zongsoft.Data
 		private string[] _names;
 		private bool _ignored;
 		private ConditionOperator? _operator;
+		private Type _converterType;
 		#endregion
 
 		#region 构造函数
+		public ConditionalAttribute(bool ignored)
+		{
+			_ignored = ignored;
+		}
+
 		public ConditionalAttribute(params string[] names)
 		{
 			_names = EnsureNames(names);
 		}
 
-		public ConditionalAttribute(bool ignored)
+		public ConditionalAttribute(ConditionOperator? @operator, params string[] names)
 		{
-			_ignored = ignored;
+			_operator = @operator;
+			_names = EnsureNames(names);
+		}
+
+		public ConditionalAttribute(Type converterType, params string[] names) : this(converterType, null, names)
+		{
+		}
+
+		public ConditionalAttribute(Type converterType, ConditionOperator? @operator, params string[] names)
+		{
+			this.ConverterType = converterType;
+			_operator = @operator;
+			_names = EnsureNames(names);
 		}
 		#endregion
 
@@ -96,6 +114,24 @@ namespace Zongsoft.Data
 			set
 			{
 				_operator = value;
+			}
+		}
+
+		/// <summary>
+		/// 获取或设置条件转换器类型。
+		/// </summary>
+		public Type ConverterType
+		{
+			get
+			{
+				return _converterType;
+			}
+			set
+			{
+				if(value != null && !typeof(IConditionalConverter).IsAssignableFrom(value))
+					throw new ArgumentException();
+
+				_converterType = value;
 			}
 		}
 		#endregion
