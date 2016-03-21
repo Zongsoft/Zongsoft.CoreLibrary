@@ -99,11 +99,11 @@ namespace Zongsoft.IO
 		{
 			get
 			{
-				return _scheme;
+				return _scheme ?? LocalFileSystem.Instance.Scheme;
 			}
 			set
 			{
-				_scheme = value;
+				_scheme = string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 			}
 		}
 		#endregion
