@@ -74,6 +74,7 @@
     <Compile Include="Common\RandomGeneratorTests.cs" />
     <Compile Include="Runtime\Caching\MemoryCacheTest.cs" />
     <Compile Include="Security\CredentialTest.cs" />
+    <Compile Include="Security\UserTest.cs" />
     <Compile Include="Services\CommandTreeNodeCollectionTests.cs" />
   </ItemGroup>
   <ItemGroup>
