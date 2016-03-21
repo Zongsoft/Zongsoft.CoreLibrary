@@ -80,7 +80,7 @@ namespace Zongsoft.IO
 				throw new ArgumentNullException("originalString");
 
 			_originalString = originalString.Trim();
-			_scheme = scheme == null ? string.Empty : scheme.Trim().ToLowerInvariant();
+			_scheme = string.IsNullOrWhiteSpace(scheme) ? null : scheme.Trim().ToLowerInvariant();
 
 			if(string.IsNullOrWhiteSpace(fullPath))
 			{
@@ -242,8 +242,8 @@ namespace Zongsoft.IO
 
 		public static bool TryParse(string text, out string scheme, out string path)
 		{
-			scheme = string.Empty;
-			path = string.Empty;
+			scheme = null;
+			path = null;
 
 			if(string.IsNullOrWhiteSpace(text))
 				return false;
@@ -252,37 +252,42 @@ namespace Zongsoft.IO
 
 			if(match.Success)
 			{
-				scheme = match.Groups["scheme"].Value;
+				scheme = string.IsNullOrWhiteSpace(match.Groups["scheme"].Value) ? null : match.Groups["scheme"].Value;
 				path = match.Groups["path"].Value.Replace('\\', '/');
 			}
 
 			return match.Success;
 		}
 
+		/// <summary>
+		/// 解析路径文本中指定的方案名。
+		/// </summary>
+		/// <param name="text">指定的路径文本。</param>
+		/// <returns>返回的路径方案名，如果解析失败或者路径文本未包含方案则返回空。</returns>
 		public static string GetScheme(string text)
 		{
 			if(string.IsNullOrWhiteSpace(text))
-				return string.Empty;
+				return null;
 
 			var match = _regex.Match(text);
 
 			if(match.Success)
-				return match.Groups["scheme"].Value;
+				return string.IsNullOrWhiteSpace(match.Groups["scheme"].Value) ? null : match.Groups["scheme"].Value;
 
-			return string.Empty;
+			return null;
 		}
 
 		public static string GetPath(string text)
 		{
 			if(string.IsNullOrWhiteSpace(text))
-				return string.Empty;
+				return null;
 
 			var match = _regex.Match(text);
 
 			if(match.Success)
 				return match.Groups["path"].Value.Replace('\\', '/');
 
-			return string.Empty;
+			return null;
 		}
 
 		public static string Combine(params string[] parts)
