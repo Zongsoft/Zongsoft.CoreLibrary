@@ -102,6 +102,11 @@ namespace Zongsoft.Data
 				throw new NotImplementedException();
 			}
 
+			public override long Increment(string name, string member, ICondition condition, int interval = 1)
+			{
+				throw new NotImplementedException();
+			}
+
 			protected override Type GetEntityType(string name)
 			{
 				return null;

@@ -524,6 +524,21 @@ namespace Zongsoft.Data
 		}
 		#endregion
 
+		#region 递增方法
+		public virtual long Increment(string name, ICondition condition, int interval = 1)
+		{
+			if(string.IsNullOrWhiteSpace(name))
+				throw new ArgumentNullException("name");
+
+			return this.DataAccess.Increment(this.Name, name, condition, interval);
+		}
+
+		public long Decrement(string name, ICondition condition, int interval = 1)
+		{
+			return this.Increment(name, condition, -interval);
+		}
+		#endregion
+
 		#region 激发事件
 		protected int OnCounted(ICondition condition, string includes, int result)
 		{

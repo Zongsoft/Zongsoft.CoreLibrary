@@ -280,6 +280,15 @@ namespace Zongsoft.Data
 		protected abstract int UpdateMany(string name, IEnumerable data, ICondition condition, string[] members);
 		#endregion
 
+		#region 递增方法
+		public abstract long Increment(string name, string member, ICondition condition, int interval = 1);
+
+		public long Decrement(string name, string member, ICondition condition, int interval = 1)
+		{
+			return this.Increment(name, member, condition, -interval);
+		}
+		#endregion
+
 		#region 保护方法
 		protected abstract Type GetEntityType(string name);
 

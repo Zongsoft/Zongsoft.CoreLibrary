@@ -68,6 +68,11 @@ namespace Zongsoft.Data
 		int Count(string name, ICondition condition, string includes = null);
 		#endregion
 
+		#region 递增方法
+		long Increment(string name, string member, ICondition condition, int interval = 1);
+		long Decrement(string name, string member, ICondition condition, int interval = 1);
+		#endregion
+
 		#region 查询方法
 		IEnumerable<T> Select<T>(string name, ICondition condition = null, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(string name, ICondition condition, string scope, params Sorting[] sortings);

@@ -84,6 +84,11 @@ namespace Zongsoft.Data
 		int Count(ICondition condition, string includes = null);
 		#endregion
 
+		#region 递增方法
+		long Increment(string name, ICondition condition, int interval = 1);
+		long Decrement(string name, ICondition condition, int interval = 1);
+		#endregion
+
 		#region 查询方法
 		object Get<TKey>(TKey key, params Sorting[] sortings);
 		object Get<TKey>(TKey key, string scope, Paging paging = null, params Sorting[] sortings);
