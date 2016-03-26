@@ -96,7 +96,7 @@ namespace Zongsoft.Data
 			{
 				opt = ConditionOperator.Equal;
 
-				if(context.Type == typeof(string))
+				if(context.Type == typeof(string) && context.Value != null)
 					opt = ConditionOperator.Like;
 				else if(typeof(IEnumerable).IsAssignableFrom(context.Type) || Zongsoft.Common.TypeExtension.IsAssignableFrom(typeof(IEnumerable<>), context.Type))
 					opt = ConditionOperator.In;
@@ -108,7 +108,7 @@ namespace Zongsoft.Data
 				if(isRange)
 					return ((ConditionalRange)context.Value).ToCondition(context.Names[0]);
 				else
-					return new Condition(context.Names[0], (opt == ConditionOperator.In && _wildcard != '\0' ? _wildcard + context.Value.ToString() + _wildcard : context.Value), opt.Value);
+					return new Condition(context.Names[0], (opt == ConditionOperator.Like && _wildcard != '\0' ? _wildcard + context.Value.ToString().Trim(_wildcard) + _wildcard : context.Value), opt.Value);
 			}
 
 			//当一个属性对应多个条件，则这些条件之间以“或”关系进行组合
@@ -119,7 +119,7 @@ namespace Zongsoft.Data
 				if(isRange)
 					conditions.Add(((ConditionalRange)context.Value).ToCondition(name));
 				else
-					conditions.Add(new Condition(name, (opt == ConditionOperator.In && _wildcard != '\0' ? _wildcard + context.Value.ToString() + _wildcard : context.Value), opt.Value));
+					conditions.Add(new Condition(name, (opt == ConditionOperator.Like && _wildcard != '\0' ? _wildcard + context.Value.ToString().Trim(_wildcard) + _wildcard : context.Value), opt.Value));
 			}
 
 			return conditions;
