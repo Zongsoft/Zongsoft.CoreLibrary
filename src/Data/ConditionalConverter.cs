@@ -32,8 +32,53 @@ namespace Zongsoft.Data
 {
 	public class ConditionalConverter : IConditionalConverter
 	{
-		#region 单例字段
-		public static readonly ConditionalConverter Default = new ConditionalConverter();
+		#region 私有变量
+		private static IConditionalConverter _default;
+		#endregion
+
+		#region 单例属性
+		public static IConditionalConverter Default
+		{
+			get
+			{
+				if(_default == null)
+					System.Threading.Interlocked.CompareExchange(ref _default, new ConditionalConverter(), null);
+
+				return _default;
+			}
+			set
+			{
+				if(value == null)
+					throw new ArgumentNullException();
+
+				_default = value;
+			}
+		}
+		#endregion
+
+		#region 构造函数
+		public ConditionalConverter()
+		{
+			_wildcard = '%';
+		}
+		#endregion
+
+		#region 成员字段
+		private char _wildcard;
+		#endregion
+
+		#region 公共属性
+		public char Wildcard
+		{
+			get
+			{
+				return _wildcard;
+			}
+			set
+			{
+				_wildcard = value;
+			}
+		}
 		#endregion
 
 		#region 公共方法
@@ -63,7 +108,7 @@ namespace Zongsoft.Data
 				if(isRange)
 					return ((ConditionalRange)context.Value).ToCondition(context.Names[0]);
 				else
-					return new Condition(context.Names[0], context.Value, opt.Value);
+					return new Condition(context.Names[0], (opt == ConditionOperator.In && _wildcard != '\0' ? _wildcard + context.Value.ToString() + _wildcard : context.Value), opt.Value);
 			}
 
 			//当一个属性对应多个条件，则这些条件之间以“或”关系进行组合
@@ -74,7 +119,7 @@ namespace Zongsoft.Data
 				if(isRange)
 					conditions.Add(((ConditionalRange)context.Value).ToCondition(name));
 				else
-					conditions.Add(new Condition(name, context.Value, opt.Value));
+					conditions.Add(new Condition(name, (opt == ConditionOperator.In && _wildcard != '\0' ? _wildcard + context.Value.ToString() + _wildcard : context.Value), opt.Value));
 			}
 
 			return conditions;
