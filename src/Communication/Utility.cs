@@ -57,7 +57,7 @@ namespace Zongsoft.Communication
 			{
 			}
 
-			protected override ExecutionContext CreateContext(object parameter)
+			protected override IExecutionContext CreateContext(object parameter)
 			{
 				var args = parameter as ReceivedEventArgs;
 
@@ -67,7 +67,7 @@ namespace Zongsoft.Communication
 				return base.CreateContext(parameter);
 			}
 
-			protected override ExecutionPipelineContext CreatePipelineContext(ExecutionContext context, ExecutionPipeline pipeline, object parameter)
+			protected override ExecutionPipelineContext CreatePipelineContext(IExecutionContext context, ExecutionPipeline pipeline, object parameter)
 			{
 				var channelContext = context as IChannelContext;
 

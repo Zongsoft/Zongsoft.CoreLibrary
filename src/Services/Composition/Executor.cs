@@ -149,7 +149,7 @@ namespace Zongsoft.Services.Composition
 			return this.Execute(this.CreateContext(parameter));
 		}
 
-		protected ExecutionResult Execute(ExecutionContext context)
+		protected ExecutionResult Execute(IExecutionContext context)
 		{
 			if(context == null)
 				throw new ArgumentNullException("context");
@@ -187,7 +187,7 @@ namespace Zongsoft.Services.Composition
 		#endregion
 
 		#region 虚拟方法
-		protected virtual ExecutionContext CreateContext(object parameter)
+		protected virtual IExecutionContext CreateContext(object parameter)
 		{
 			return new ExecutionContext(this, parameter);
 		}
@@ -237,7 +237,7 @@ namespace Zongsoft.Services.Composition
 			return result;
 		}
 
-		protected virtual bool InvokePipeline(ExecutionPipelineContext context)
+		protected virtual bool InvokePipeline(IExecutionPipelineContext context)
 		{
 			var pipeline = context.Pipeline;
 
@@ -296,7 +296,7 @@ namespace Zongsoft.Services.Composition
 			return canHandle;
 		}
 
-		protected virtual ExecutionPipelineContext CreatePipelineContext(ExecutionContext context, ExecutionPipeline pipeline, object parameter)
+		protected virtual ExecutionPipelineContext CreatePipelineContext(IExecutionContext context, ExecutionPipeline pipeline, object parameter)
 		{
 			return new ExecutionPipelineContext(context, pipeline, parameter);
 		}

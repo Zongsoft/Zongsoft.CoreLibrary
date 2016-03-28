@@ -32,14 +32,13 @@ namespace Zongsoft.Services.Composition
 	public class ExecutionPipelineContext : ExecutionContext, IExecutionPipelineContext
 	{
 		#region 成员字段
-		private ExecutionContext _context;
-		private Exception _exception;
+		private IExecutionContext _context;
 		private ExecutionPipeline _pipeline;
 		private ExecutionPipelineCollection _children;
 		#endregion
 
 		#region 构造函数
-		public ExecutionPipelineContext(ExecutionContext context, ExecutionPipeline pipeline, object parameter) : base(context.Executor, parameter)
+		public ExecutionPipelineContext(IExecutionContext context, ExecutionPipeline pipeline, object parameter) : base(context.Executor, parameter)
 		{
 			if(pipeline == null)
 				throw new ArgumentNullException("pipeline");
@@ -69,38 +68,6 @@ namespace Zongsoft.Services.Composition
 			get
 			{
 				return _pipeline;
-			}
-		}
-
-		/// <summary>
-		/// 获取当前管道执行中发生的异常。
-		/// </summary>
-		public override Exception Exception
-		{
-			get
-			{
-				return _exception;
-			}
-			protected internal set
-			{
-				_exception = value;
-
-				if(value != null)
-				{
-					var exceptions = new List<Exception>(new Exception[] { value });
-
-					if(_context.Exception != null)
-					{
-						var aggregateException = _context.Exception as AggregateException;
-
-						if(aggregateException == null)
-							exceptions.Add(_context.Exception);
-						else
-							exceptions.AddRange(aggregateException.InnerExceptions);
-					}
-
-					_context.Exception = new AggregateException(exceptions);
-				}
 			}
 		}
 
