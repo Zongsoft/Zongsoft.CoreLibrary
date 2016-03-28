@@ -38,11 +38,11 @@ namespace Zongsoft.Data
 		private string _name;
 		private int _result;
 		private ICondition _condition;
-		private string _cascades;
+		private string[] _cascades;
 		#endregion
 
 		#region 构造函数
-		public DataDeletedEventArgs(string name, ICondition condition, string cascades, int result)
+		public DataDeletedEventArgs(string name, ICondition condition, string[] cascades, int result)
 		{
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException("name");
@@ -99,7 +99,7 @@ namespace Zongsoft.Data
 		/// <summary>
 		/// 获取或设置删除操作的关联成员。
 		/// </summary>
-		public string Cascades
+		public string[] Cascades
 		{
 			get
 			{

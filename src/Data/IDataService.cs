@@ -118,16 +118,16 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 删除方法
-		int Delete<TKey>(TKey key, string cascades = null);
-		int Delete<TKey1, TKey2>(TKey1 key1, TKey2 key2, string cascades = null);
-		int Delete<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string cascades = null);
+		int Delete<TKey>(TKey key, params string[] cascades);
+		int Delete<TKey1, TKey2>(TKey1 key1, TKey2 key2, params string[] cascades);
+		int Delete<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, params string[] cascades);
 
-		int Delete(ICondition condition, string cascades = null);
+		int Delete(ICondition condition, params string[] cascades);
 		#endregion
 
 		#region 插入方法
 		int Insert(object data, string scope = null);
-		int InsertMany(IEnumerable<TEntity> data, string scope = null);
+		int InsertMany(IEnumerable data, string scope = null);
 		#endregion
 
 		#region 更新方法
@@ -135,15 +135,15 @@ namespace Zongsoft.Data
 		int Update<TKey1, TKey2>(object data, TKey1 key1, TKey2 key2, string scope = null);
 		int Update<TKey1, TKey2, TKey3>(object data, TKey1 key1, TKey2 key2, TKey3 key3, string scope = null);
 
-		int UpdateMany<TKey>(IEnumerable<TEntity> data, TKey key, string scope = null);
-		int UpdateMany<TKey1, TKey2>(IEnumerable<TEntity> data, TKey1 key1, TKey2 key2, string scope = null);
-		int UpdateMany<TKey1, TKey2, TKey3>(IEnumerable<TEntity> data, TKey1 key1, TKey2 key2, TKey3 key3, string scope = null);
+		int UpdateMany<TKey>(IEnumerable data, TKey key, string scope = null);
+		int UpdateMany<TKey1, TKey2>(IEnumerable data, TKey1 key1, TKey2 key2, string scope = null);
+		int UpdateMany<TKey1, TKey2, TKey3>(IEnumerable data, TKey1 key1, TKey2 key2, TKey3 key3, string scope = null);
 
 		int Update(object data, ICondition condition = null, string scope = null);
 		int Update(object data, string scope, ICondition condition = null);
 
-		int UpdateMany(IEnumerable<TEntity> data, ICondition condition = null, string scope = null);
-		int UpdateMany(IEnumerable<TEntity> data, string scope, ICondition condition = null);
+		int UpdateMany(IEnumerable data, ICondition condition = null, string scope = null);
+		int UpdateMany(IEnumerable data, string scope, ICondition condition = null);
 		#endregion
 	}
 }

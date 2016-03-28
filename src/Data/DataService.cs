@@ -336,22 +336,22 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 删除方法
-		public virtual int Delete<TKey>(TKey key, string cascades = null)
+		public virtual int Delete<TKey>(TKey key, params string[] cascades)
 		{
 			return this.Delete(this.ConvertKey(key), cascades);
 		}
 
-		public virtual int Delete<TKey1, TKey2>(TKey1 key1, TKey2 key2, string cascades = null)
+		public virtual int Delete<TKey1, TKey2>(TKey1 key1, TKey2 key2, params string[] cascades)
 		{
 			return this.Delete(this.ConvertKey(key1, key2), cascades);
 		}
 
-		public virtual int Delete<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string cascades = null)
+		public virtual int Delete<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, params string[] cascades)
 		{
 			return this.Delete(this.ConvertKey(key1, key2, key3), cascades);
 		}
 
-		public int Delete(ICondition condition, string cascades = null)
+		public int Delete(ICondition condition, params string[] cascades)
 		{
 			//激发“Deleting”事件
 			var args = this.OnDeleting(condition, cascades);
@@ -366,7 +366,7 @@ namespace Zongsoft.Data
 			return this.OnDeleted(args.Condition, args.Cascades, args.Result);
 		}
 
-		protected virtual int DeleteCore(ICondition condition, string cascades)
+		protected virtual int DeleteCore(ICondition condition, string[] cascades)
 		{
 			return this.EnsureDataAccess().Delete(this.Name, condition, cascades);
 		}
@@ -388,7 +388,7 @@ namespace Zongsoft.Data
 			return this.OnInserted(args.Data, args.Scope, args.Result);
 		}
 
-		public int InsertMany(IEnumerable<TEntity> data, string scope = null)
+		public int InsertMany(IEnumerable data, string scope = null)
 		{
 			//激发“Inserting”事件
 			var args = this.OnInserting(data, scope);
@@ -408,7 +408,7 @@ namespace Zongsoft.Data
 			return this.EnsureDataAccess().Insert(this.Name, data, scope);
 		}
 
-		protected virtual int InsertManyCore(IEnumerable<TEntity> data, string scope)
+		protected virtual int InsertManyCore(IEnumerable data, string scope)
 		{
 			return this.EnsureDataAccess().InsertMany(this.Name, data, scope);
 		}
@@ -430,17 +430,17 @@ namespace Zongsoft.Data
 			return this.Update(data, this.ConvertKey(key1, key2, key3), scope);
 		}
 
-		public virtual int UpdateMany<TKey>(IEnumerable<TEntity> data, TKey key, string scope = null)
+		public virtual int UpdateMany<TKey>(IEnumerable data, TKey key, string scope = null)
 		{
 			return this.UpdateMany(data, this.ConvertKey(key), scope);
 		}
 
-		public virtual int UpdateMany<TKey1, TKey2>(IEnumerable<TEntity> data, TKey1 key1, TKey2 key2, string scope = null)
+		public virtual int UpdateMany<TKey1, TKey2>(IEnumerable data, TKey1 key1, TKey2 key2, string scope = null)
 		{
 			return this.UpdateMany(data, this.ConvertKey(key1, key2), scope);
 		}
 
-		public virtual int UpdateMany<TKey1, TKey2, TKey3>(IEnumerable<TEntity> data, TKey1 key1, TKey2 key2, TKey3 key3, string scope = null)
+		public virtual int UpdateMany<TKey1, TKey2, TKey3>(IEnumerable data, TKey1 key1, TKey2 key2, TKey3 key3, string scope = null)
 		{
 			return this.UpdateMany(data, this.ConvertKey(key1, key2, key3), scope);
 		}
@@ -465,7 +465,7 @@ namespace Zongsoft.Data
 			return this.Update(data, condition, scope);
 		}
 
-		public int UpdateMany(IEnumerable<TEntity> data, ICondition condition = null, string scope = null)
+		public int UpdateMany(IEnumerable data, ICondition condition = null, string scope = null)
 		{
 			//激发“Updating”事件
 			var args = this.OnUpdating(data, condition, scope);
@@ -480,7 +480,7 @@ namespace Zongsoft.Data
 			return this.OnUpdated(args.Data, args.Condition, args.Scope, args.Result);
 		}
 
-		public int UpdateMany(IEnumerable<TEntity> data, string scope, ICondition condition = null)
+		public int UpdateMany(IEnumerable data, string scope, ICondition condition = null)
 		{
 			return this.UpdateMany(data, condition, scope);
 		}
@@ -490,7 +490,7 @@ namespace Zongsoft.Data
 			return this.EnsureDataAccess().Update(this.Name, data, condition, scope);
 		}
 
-		protected virtual int UpdateManyCore(IEnumerable<TEntity> data, ICondition condition, string scope)
+		protected virtual int UpdateManyCore(IEnumerable data, ICondition condition, string scope)
 		{
 			return this.EnsureDataAccess().UpdateMany(this.Name, (IEnumerable<TEntity>)data, condition, scope);
 		}
@@ -619,14 +619,14 @@ namespace Zongsoft.Data
 			return args;
 		}
 
-		protected int OnDeleted(ICondition condition, string cascades, int result)
+		protected int OnDeleted(ICondition condition, string[] cascades, int result)
 		{
 			var args = new DataDeletedEventArgs(this.Name, condition, cascades, result);
 			this.OnDeleted(args);
 			return args.Result;
 		}
 
-		protected DataDeletingEventArgs OnDeleting(ICondition condition, string cascades)
+		protected DataDeletingEventArgs OnDeleting(ICondition condition, string[] cascades)
 		{
 			var args = new DataDeletingEventArgs(this.Name, condition, cascades);
 			this.OnDeleting(args);

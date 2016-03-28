@@ -29,26 +29,40 @@ using System.ComponentModel;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Zongsoft.Data
 {
 	public static class DataAccessExtension
 	{
 		#region 扩展方法
-		public static void Execute(this IDataAccess dataAccess, string name, object inParameters)
+		public static IEnumerable<T> Execute<T>(this IDataAccess dataAccess, string name, object inParameters)
 		{
 			if(dataAccess == null)
 				throw new ArgumentNullException("dataAccess");
 
-			dataAccess.Execute(name, ConvertToDictionary(inParameters));
+			return dataAccess.Execute<T>(name, ConvertToDictionary(inParameters));
 		}
 
-		public static void Execute(this IDataAccess dataAccess, string name, object inParameters, out IDictionary<string, object> outParameters)
+		public static IEnumerable<T> Execute<T>(this IDataAccess dataAccess, string name, object inParameters, out IDictionary<string, object> outParameters)
 		{
 			if(dataAccess == null)
 				throw new ArgumentNullException("dataAccess");
 
-			dataAccess.Execute(name, ConvertToDictionary(inParameters), out outParameters);
+			return dataAccess.Execute<T>(name, ConvertToDictionary(inParameters), out outParameters);
+		}
+
+		public static int Delete<T>(this IDataAccess dataAccess, string name, ICondition condition, Expression<Func<T, object>> cascades)
+		{
+			if(dataAccess == null)
+				throw new ArgumentNullException("dataAccess");
+
+			if(cascades == null)
+				return dataAccess.Delete(name, condition);
+
+			return dataAccess.Delete(name, condition, ResolveScopeExpression(name, cascades, null, type => IsScalarType(type, dataAccess)));
 		}
 
 		public static int Delete(this IDataAccess dataAccess, string name, IDictionary<string, object> condition, string scope = null)
@@ -97,6 +111,35 @@ namespace Zongsoft.Data
 				throw new ArgumentNullException("dataAccess");
 
 			return dataAccess.Update(name, entities, ResolveCondition(condition), scope);
+		}
+
+		public static int Update<T>(this IDataAccess dataAccess, string name, T data, ICondition condition, Expression<Func<T, object>> includes, Expression<Func<T, object>> excludes = null)
+		{
+			if(dataAccess == null)
+				throw new ArgumentNullException("dataAccess");
+
+			if(data == null)
+				throw new ArgumentNullException("data");
+
+			return dataAccess.Update(name, data, condition, ResolveScopeExpression(name, includes, excludes, type => IsScalarType(type, dataAccess)));
+		}
+
+		public static int UpdateMany<T>(this IDataAccess dataAccess, string name, IEnumerable<T> data, ICondition condition, Expression<Func<T, object>> includes, Expression<Func<T, object>> excludes = null)
+		{
+			if(dataAccess == null)
+				throw new ArgumentNullException("dataAccess");
+
+			return dataAccess.UpdateMany(name, data, condition, ResolveScopeExpression(name, includes, excludes, type => IsScalarType(type, dataAccess)));
+		}
+
+		public static int Insert<T>(this IDataAccess dataAccess, string name, T data, Expression<Func<T, object>> includes, Expression<Func<T, object>> excludes = null)
+		{
+			return dataAccess.Insert(name, data, ResolveScopeExpression(name, includes, excludes, type => IsScalarType(type, dataAccess)));
+		}
+
+		public static int InsertMany<T>(this IDataAccess dataAccess, string name, IEnumerable<T> data, Expression<Func<T, object>> includes, Expression<Func<T, object>> excludes = null)
+		{
+			return dataAccess.InsertMany(name, data, ResolveScopeExpression(name, includes, excludes, type => IsScalarType(type, dataAccess)));
 		}
 		#endregion
 
@@ -195,6 +238,97 @@ namespace Zongsoft.Data
 			}
 
 			return dictionary;
+		}
+
+		private static string ResolveScopeExpression<T>(string entityName, Expression<Func<T, object>> includes, Expression<Func<T, object>> excludes, Func<Type, bool> isScalarType)
+		{
+			var members = new HashSet<string>();
+
+			if(includes != null)
+				members.UnionWith(ResolveExpression(includes, isScalarType));
+
+			if(excludes != null)
+				members.ExceptWith(ResolveExpression(excludes, isScalarType));
+
+			return string.Join(",", members.ToArray());
+		}
+
+		private static IEnumerable<string> ResolveExpression<T>(Expression<Func<T, object>> expression, Func<Type, bool> isScalarType)
+		{
+			return ResolveExpression(expression.Body, expression.Parameters[0], isScalarType);
+		}
+
+		private static string[] ResolveExpression(Expression expression, ParameterExpression parameter, Func<Type, bool> isScalarType)
+		{
+			if(expression == parameter)
+				return GetMembers(expression.Type, null, isScalarType);
+
+			if(expression.NodeType == ExpressionType.MemberAccess)
+			{
+				if(isScalarType(expression.Type))
+					return new string[] { ExpressionToString(expression, parameter) };
+
+				var memberName = GetMemberName(expression, parameter);
+				return GetMembers(expression.Type, memberName, isScalarType);
+			}
+
+			if(expression is NewExpression)
+			{
+				HashSet<string> list = new HashSet<string>();
+				var ne = (NewExpression)expression;
+				foreach(var argument in ne.Arguments)
+				{
+					list.UnionWith(ResolveExpression(argument, parameter, isScalarType));
+				}
+				return list.ToArray();
+			}
+
+			if(expression.NodeType == ExpressionType.Convert && expression.Type == typeof(object))
+				return ResolveExpression(((UnaryExpression)expression).Operand, parameter, isScalarType);
+
+			throw new NotSupportedException();
+		}
+
+		private static string ExpressionToString(Expression expression, Expression stop)
+		{
+			if(expression == stop)
+				return string.Empty;
+
+			dynamic propertyExpression = expression;
+
+			var str = ExpressionToString(propertyExpression.Expression, stop);
+
+			if(string.IsNullOrEmpty(str))
+				return propertyExpression.Member.Name;
+
+			return str + "." + propertyExpression.Member.Name;
+		}
+
+		private static string GetMemberName(Expression expression, ParameterExpression parameter)
+		{
+			dynamic propertyExpression = expression;
+
+			var temp = (Expression)propertyExpression.Expression;
+
+			if(temp == parameter)
+				return propertyExpression.Member.Name;
+
+			return GetMemberName(temp, parameter) + "." + propertyExpression.Member.Name;
+		}
+
+		private static string[] GetMembers(Type type, string prev, Func<Type, bool> isScalarType)
+		{
+			if(prev == null)
+				prev = string.Empty;
+			else
+				prev += ".";
+
+			return type.GetProperties(BindingFlags.Instance | BindingFlags.Public).Where(p => isScalarType(p.PropertyType)).Select(p => prev + p.Name).ToArray();
+		}
+
+		private static bool IsScalarType(Type type, IDataAccess dataAccess)
+		{
+			return Zongsoft.Common.TypeExtension.IsScalarType(type) || typeof(Expression).IsAssignableFrom(type);
 		}
 		#endregion
 	}
