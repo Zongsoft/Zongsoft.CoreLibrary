@@ -72,8 +72,11 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 执行方法
-		object Execute(IDictionary<string, object> inParameters);
-		object Execute(IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters);
+		IEnumerable<T> Execute<T>(IDictionary<string, object> inParameters);
+		IEnumerable<T> Execute<T>(IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters);
+
+		object ExecuteScalar(IDictionary<string, object> inParameters);
+		object ExecuteScalar(IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters);
 		#endregion
 
 		#region 存在方法

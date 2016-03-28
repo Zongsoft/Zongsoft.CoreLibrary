@@ -57,7 +57,12 @@ namespace Zongsoft.Data
 
 		private class DataAccessDummy : DataAccessBase
 		{
-			public override object Execute(string name, System.Collections.Generic.IDictionary<string, object> inParameters, out System.Collections.Generic.IDictionary<string, object> outParameters)
+			public override IEnumerable<T> Execute<T>(string name, System.Collections.Generic.IDictionary<string, object> inParameters, out System.Collections.Generic.IDictionary<string, object> outParameters)
+			{
+				throw new NotImplementedException();
+			}
+
+			public override object ExecuteScalar(string name, System.Collections.Generic.IDictionary<string, object> inParameters, out System.Collections.Generic.IDictionary<string, object> outParameters)
 			{
 				throw new NotImplementedException();
 			}

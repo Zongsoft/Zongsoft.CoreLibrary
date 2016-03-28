@@ -133,25 +133,46 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 执行方法
-		public object Execute(IDictionary<string, object> inParameters)
+		public IEnumerable<T> Execute<T>(IDictionary<string, object> inParameters)
 		{
 			IDictionary<string, object> outParameters;
-			return this.Execute(inParameters, out outParameters);
+			return this.Execute<T>(inParameters, out outParameters);
 		}
 
-		public virtual object Execute(IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters)
+		public virtual IEnumerable<T> Execute<T>(IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters)
 		{
 			//激发“Executing”事件
-			var args = this.OnExecuting(inParameters, out outParameters);
+			var args = this.OnExecuting(typeof(T), inParameters, out outParameters);
+
+			if(args.Cancel)
+				return args.Result as IEnumerable<T>;
+
+			//执行数据操作方法
+			args.Result = this.EnsureDataAccess().Execute<T>(this.Name, args.InParameters, out outParameters);
+
+			//激发“Executed”事件
+			return this.OnExecuted(typeof(T), args.InParameters, ref outParameters, args.Result) as IEnumerable<T>;
+		}
+
+		public object ExecuteScalar(IDictionary<string, object> inParameters)
+		{
+			IDictionary<string, object> outParameters;
+			return this.ExecuteScalar(inParameters, out outParameters);
+		}
+
+		public virtual object ExecuteScalar(IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters)
+		{
+			//激发“Executing”事件
+			var args = this.OnExecuting(typeof(object), inParameters, out outParameters);
 
 			if(args.Cancel)
 				return args.Result;
 
 			//执行数据操作方法
-			args.Result = this.EnsureDataAccess().Execute(this.Name, args.InParameters, out outParameters);
+			args.Result = this.EnsureDataAccess().ExecuteScalar(this.Name, args.InParameters, out outParameters);
 
 			//激发“Executed”事件
-			return this.OnExecuted(args.InParameters, ref outParameters, args.Result);
+			return this.OnExecuted(typeof(object), args.InParameters, ref outParameters, args.Result);
 		}
 		#endregion
 
@@ -286,7 +307,7 @@ namespace Zongsoft.Data
 		public IEnumerable<TEntity> Select(ICondition condition, Grouping grouping, string scope, Paging paging, params Sorting[] sortings)
 		{
 			//激发“Selecting”事件
-			var args = this.OnSelecting(condition, grouping, scope, paging, sortings);
+			var args = this.OnSelecting(typeof(TEntity), condition, grouping, scope, paging, sortings);
 
 			if(args.Cancel)
 				return args.Result as IEnumerable<TEntity>;
@@ -295,7 +316,7 @@ namespace Zongsoft.Data
 			args.Result = this.SelectCore(args.Condition, args.Grouping, args.Scope, args.Paging, args.Sortings);
 
 			//激发“Selected”事件
-			return this.OnSelected(args.Condition, args.Grouping, args.Scope, args.Paging, args.Sortings, (IEnumerable<TEntity>)args.Result);
+			return this.OnSelected(typeof(TEntity), args.Condition, args.Grouping, args.Scope, args.Paging, args.Sortings, (IEnumerable<TEntity>)args.Result);
 		}
 
 		public IEnumerable<TEntity> Select(ICondition condition, Grouping grouping, Paging paging, params Sorting[] sortings)
@@ -554,17 +575,17 @@ namespace Zongsoft.Data
 			return args;
 		}
 
-		protected object OnExecuted(IDictionary<string, object> inParameters, ref IDictionary<string, object> outParameters, object result)
+		protected object OnExecuted(Type resultType, IDictionary<string, object> inParameters, ref IDictionary<string, object> outParameters, object result)
 		{
-			var args = new DataExecutedEventArgs(this.Name, inParameters, null, result);
+			var args = new DataExecutedEventArgs(this.Name, resultType, inParameters, null, result);
 			this.OnExecuted(args);
 			outParameters = args.OutParameters;
 			return args.Result;
 		}
 
-		protected DataExecutingEventArgs OnExecuting(IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters)
+		protected DataExecutingEventArgs OnExecuting(Type resultType, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters)
 		{
-			var args = new DataExecutingEventArgs(this.Name, inParameters);
+			var args = new DataExecutingEventArgs(this.Name, resultType, inParameters);
 			this.OnExecuting(args);
 			outParameters = args.OutParameters;
 			return args;
@@ -584,16 +605,16 @@ namespace Zongsoft.Data
 			return args;
 		}
 
-		protected IEnumerable<TEntity> OnSelected(ICondition condition, Grouping grouping, string scope, Paging paging, Sorting[] sortings, IEnumerable<TEntity> result)
+		protected IEnumerable<TEntity> OnSelected(Type entityType, ICondition condition, Grouping grouping, string scope, Paging paging, Sorting[] sortings, IEnumerable<TEntity> result)
 		{
-			var args = new DataSelectedEventArgs(this.Name, condition, grouping, scope, paging, sortings, result);
+			var args = new DataSelectedEventArgs(this.Name, entityType, condition, grouping, scope, paging, sortings, result);
 			this.OnSelected(args);
 			return args.Result as IEnumerable<TEntity>;
 		}
 
-		protected DataSelectingEventArgs OnSelecting(ICondition condition, Grouping grouping, string scope, Paging paging, Sorting[] sortings)
+		protected DataSelectingEventArgs OnSelecting(Type entityType, ICondition condition, Grouping grouping, string scope, Paging paging, Sorting[] sortings)
 		{
-			var args = new DataSelectingEventArgs(this.Name, condition, grouping, scope, paging, sortings);
+			var args = new DataSelectingEventArgs(this.Name, entityType, condition, grouping, scope, paging, sortings);
 			this.OnSelecting(args);
 			return args;
 		}

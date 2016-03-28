@@ -37,6 +37,7 @@ namespace Zongsoft.Data
 	{
 		#region 成员字段
 		private string _name;
+		private Type _entityType;
 		private IEnumerable _result;
 		private ICondition _condition;
 		private string _scope;
@@ -46,12 +47,16 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataSelectedEventArgs(string name, ICondition condition, Grouping grouping, string scope, Paging paging, Sorting[] sortings, IEnumerable result)
+		public DataSelectedEventArgs(string name, Type entityType, ICondition condition, Grouping grouping, string scope, Paging paging, Sorting[] sortings, IEnumerable result)
 		{
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException("name");
 
+			if(entityType == null)
+				throw new ArgumentNullException("entityType");
+
 			_name = name.Trim();
+			_entityType = entityType;
 			_condition = condition;
 			_grouping = grouping;
 			_scope = scope;
@@ -74,21 +79,20 @@ namespace Zongsoft.Data
 		}
 
 		/// <summary>
-		/// 获取查询结果集的实体类型。
+		/// 获取或设置查询结果集的实体类型。
 		/// </summary>
 		public Type EntityType
 		{
 			get
 			{
-				var result = this.Result;
+				return _entityType;
+			}
+			set
+			{
+				if(value == null)
+					throw new ArgumentNullException();
 
-				if(result == null)
-					return null;
-
-				if(Zongsoft.Common.TypeExtension.IsAssignableFrom(typeof(IEnumerable<>), result.GetType()))
-					return result.GetType().GetGenericArguments()[0];
-
-				return typeof(object);
+				_entityType = value;
 			}
 		}
 
