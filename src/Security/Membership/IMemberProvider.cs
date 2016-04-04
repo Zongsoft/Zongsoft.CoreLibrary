@@ -66,15 +66,21 @@ namespace Zongsoft.Security.Membership
 		IEnumerable<Member> GetMembers(int roleId);
 
 		/// <summary>
-		/// 设置更新指定角色下的所有成员。
+		/// 设置更新指定角色下的成员。
 		/// </summary>
 		/// <param name="roleId">指定要更新的角色编号。</param>
 		/// <param name="members">要更新的角色成员集。</param>
 		/// <returns>如果更新成功则返回更新的数量，否则返回零。</returns>
-		/// <remarks>
-		///		<para>该方法默认以覆盖方式进行更新。即先清空指定角色下的所有成员记录，然后再将<paramref name="members"/>参数指定的成员插入其中。</para>
-		/// </remarks>
-		int SetMembers(int roleId, IEnumerable<Member> members);
+		int SetMembers(int roleId, params Member[] members);
+
+		/// <summary>
+		/// 设置更新指定角色下的成员。
+		/// </summary>
+		/// <param name="roleId">指定要更新的角色编号。</param>
+		/// <param name="members">要更新的角色成员集。</param>
+		/// <param name="shouldResetting">指示是否以重置的方式更新角色成员，即是否在更新角色成员之前先清空指定角色下的所有成员。默认值为假(False)。</param>
+		/// <returns>如果更新成功则返回更新的数量，否则返回零。</returns>
+		int SetMembers(int roleId, IEnumerable<Member> members, bool shouldResetting = false);
 
 		/// <summary>
 		/// 删除一个或多个角色成员。

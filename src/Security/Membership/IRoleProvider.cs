@@ -57,6 +57,15 @@ namespace Zongsoft.Security.Membership
 		Role GetRole(int roleId);
 
 		/// <summary>
+		/// 获取指定名称对应的角色对象。
+		/// </summary>
+		/// <param name="name">要查找的角色名称。</param>
+		/// <param name="namespace">要查找的角色所属的命名空间。</param>
+		/// <returns>返回找到的角色对象；如果在指定的命名空间内没有找到指定名称的角色则返回空(null)。</returns>
+		/// <exception cref="System.ArgumentNullException">当<paramref name="name"/>参数为空(null)或者全空格字符。</exception>
+		Role GetRole(string name, string @namespace);
+
+		/// <summary>
 		/// 获取当前命名空间中的所有角色。
 		/// </summary>
 		/// <param name="namespace">要获取的用户集所属的命名空间。</param>
