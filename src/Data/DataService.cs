@@ -132,6 +132,29 @@ namespace Zongsoft.Data
 		}
 		#endregion
 
+		#region 保护属性
+		protected virtual Zongsoft.Security.CredentialPrincipal Principal
+		{
+			get
+			{
+				return Zongsoft.ComponentModel.ApplicationContextBase.Current.Principal as Zongsoft.Security.CredentialPrincipal;
+			}
+		}
+
+		protected virtual Zongsoft.Security.Credential Credential
+		{
+			get
+			{
+				var principal = this.Principal;
+
+				if(principal != null && principal.Identity != null)
+					return principal.Identity.Credential;
+
+				return null;
+			}
+		}
+		#endregion
+
 		#region 执行方法
 		public IEnumerable<T> Execute<T>(IDictionary<string, object> inParameters)
 		{
