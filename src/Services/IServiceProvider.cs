@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2014 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2016 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -34,6 +34,13 @@ namespace Zongsoft.Services
 		#region 事件定义
 		event EventHandler<ServiceRegisteredEventArgs> Registered;
 		event EventHandler<ServiceUnregisteredEventArgs> Unregistered;
+		#endregion
+
+		#region 属性定义
+		IServiceStorage Storage
+		{
+			get;
+		}
 		#endregion
 
 		#region 注册方法
