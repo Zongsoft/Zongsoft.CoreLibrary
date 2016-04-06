@@ -221,6 +221,36 @@ namespace Zongsoft.Services
 			return result;
 		}
 
+		public object ResolveRequired(string name)
+		{
+			var result = this.Resolve(name);
+
+			if(result == null)
+				throw new ServiceNotFoundException(string.Format("The named '{1}' of service is not found in '{0}' provider.", this, name));
+
+			return result;
+		}
+
+		public object ResolveRequired(Type type)
+		{
+			var result = this.Resolve(type);
+
+			if(result == null)
+				throw new ServiceNotFoundException(string.Format("The typed '{1}' of service is not found in '{0}' provider.", this, type.FullName));
+
+			return result;
+		}
+
+		public object ResolveRequired(Type type, object parameter)
+		{
+			var result = this.Resolve(type);
+
+			if(result == null)
+				throw new ServiceNotFoundException(string.Format("The typed '{1}' of service with '{2}' parameter is not found in '{0}' provider.", this, type.FullName, parameter));
+
+			return result;
+		}
+
 		public T Resolve<T>() where T : class
 		{
 			return (T)this.Resolve(typeof(T), null);
@@ -229,6 +259,26 @@ namespace Zongsoft.Services
 		public T Resolve<T>(object parameter) where T : class
 		{
 			return (T)this.Resolve(typeof(T), parameter);
+		}
+
+		public T ResolveRequired<T>() where T : class
+		{
+			var result = this.Resolve<T>();
+
+			if(result == null)
+				throw new ServiceNotFoundException(string.Format("The typed '{1}' of service is not found in '{0}' provider.", this, typeof(T).FullName));
+
+			return result;
+		}
+
+		public T ResolveRequired<T>(object parameter) where T : class
+		{
+			var result = this.Resolve<T>(parameter);
+
+			if(result == null)
+				throw new ServiceNotFoundException(string.Format("The typed '{1}' of service with '{2}' parameter is not found in '{0}' provider.", this, typeof(T).FullName, parameter));
+
+			return result;
 		}
 
 		public IEnumerable<object> ResolveAll(Type type)

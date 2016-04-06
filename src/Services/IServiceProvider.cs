@@ -58,8 +58,15 @@ namespace Zongsoft.Services
 		object Resolve(Type type);
 		object Resolve(Type type, object parameter);
 
+		object ResolveRequired(string name);
+		object ResolveRequired(Type type);
+		object ResolveRequired(Type type, object parameter);
+
 		T Resolve<T>() where T : class;
 		T Resolve<T>(object parameter) where T : class;
+
+		T ResolveRequired<T>() where T : class;
+		T ResolveRequired<T>(object parameter) where T : class;
 
 		IEnumerable<object> ResolveAll(Type type);
 		IEnumerable<object> ResolveAll(Type type, object parameter);
