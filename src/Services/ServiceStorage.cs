@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2016 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -36,8 +36,8 @@ namespace Zongsoft.Services
 	{
 		#region 成员字段
 		private IMatcher _matcher;
-		private List<ServiceEntry> _list;
-		private ConcurrentDictionary<string, ServiceEntry> _namedDictionary;
+		private List<ServiceEntry> _entries;
+		private ConcurrentDictionary<string, ServiceEntry> _namedEntries;
 		#endregion
 
 		#region 构造函数
@@ -48,8 +48,8 @@ namespace Zongsoft.Services
 		public ServiceStorage(IMatcher matcher)
 		{
 			_matcher = matcher;
-			_list = new List<ServiceEntry>();
-			_namedDictionary = new ConcurrentDictionary<string, ServiceEntry>(StringComparer.OrdinalIgnoreCase);
+			_entries = new List<ServiceEntry>();
+			_namedEntries = new ConcurrentDictionary<string, ServiceEntry>(StringComparer.OrdinalIgnoreCase);
 		}
 		#endregion
 
@@ -58,7 +58,7 @@ namespace Zongsoft.Services
 		{
 			get
 			{
-				return _list.Count;
+				return _entries.Count;
 			}
 		}
 
@@ -130,15 +130,15 @@ namespace Zongsoft.Services
 				return;
 
 			if(!string.IsNullOrWhiteSpace(entry.Name))
-				_namedDictionary[entry.Name] = entry;
+				_namedEntries[entry.Name] = entry;
 
-			_list.Add(entry);
+			_entries.Add(entry);
 		}
 
 		public virtual void Clear()
 		{
-			_namedDictionary.Clear();
-			_list.Clear();
+			_namedEntries.Clear();
+			_entries.Clear();
 		}
 
 		public virtual ServiceEntry Remove(string name)
@@ -148,8 +148,8 @@ namespace Zongsoft.Services
 
 			ServiceEntry entry = null;
 
-			if(_namedDictionary.TryRemove(name, out entry))
-				_list.Remove(entry);
+			if(_namedEntries.TryRemove(name, out entry))
+				_entries.Remove(entry);
 
 			return entry;
 		}
@@ -162,10 +162,10 @@ namespace Zongsoft.Services
 			name = name.Trim();
 			ServiceEntry entry;
 
-			if(_namedDictionary.TryGetValue(name, out entry))
+			if(_namedEntries.TryGetValue(name, out entry))
 				return entry;
 
-			return null;
+			return this.GetEntryFromOtherStorage(name);
 		}
 
 		public virtual ServiceEntry Get(Type type, object parameter = null)
@@ -175,7 +175,7 @@ namespace Zongsoft.Services
 
 			var entries = new List<ServiceEntry>();
 
-			foreach(var entry in _list)
+			foreach(var entry in _entries)
 			{
 				if(entry.ContractTypes == null || entry.ContractTypes.Length < 1)
 					entries.Add(entry);
@@ -198,7 +198,7 @@ namespace Zongsoft.Services
 				}
 			}
 
-			return null;
+			return this.GetEntryFromOtherStorage(type, parameter);
 		}
 
 		public virtual IEnumerable<ServiceEntry> GetAll(Type type, object parameter = null)
@@ -209,7 +209,7 @@ namespace Zongsoft.Services
 			var list = new List<ServiceEntry>();
 			var result = new List<ServiceEntry>();
 
-			foreach(var entry in _list)
+			foreach(var entry in _entries)
 			{
 				if(entry.ContractTypes == null || entry.ContractTypes.Length < 1)
 					list.Add(entry);
@@ -261,7 +261,7 @@ namespace Zongsoft.Services
 		{
 			for(int i = index; i < array.Length; index++)
 			{
-				array.SetValue(_list[i - index], i);
+				array.SetValue(_entries[i - index], i);
 			}
 		}
 
@@ -288,12 +288,12 @@ namespace Zongsoft.Services
 
 		bool ICollection<ServiceEntry>.Contains(ServiceEntry item)
 		{
-			return _list.Contains(item);
+			return _entries.Contains(item);
 		}
 
 		void ICollection<ServiceEntry>.CopyTo(ServiceEntry[] array, int arrayIndex)
 		{
-			_list.CopyTo(array, arrayIndex);
+			_entries.CopyTo(array, arrayIndex);
 		}
 
 
@@ -312,14 +312,63 @@ namespace Zongsoft.Services
 
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			foreach(var entry in _list)
+			foreach(var entry in _entries)
 				yield return entry;
 		}
 
 		IEnumerator<ServiceEntry> IEnumerable<ServiceEntry>.GetEnumerator()
 		{
-			foreach(var entry in _list)
+			foreach(var entry in _entries)
 				yield return entry;
+		}
+		#endregion
+
+		#region 私有方法
+		private ServiceEntry GetEntryFromOtherStorage(string name)
+		{
+			foreach(var entry in _entries.ToArray())
+			{
+				var result = this.GetEntryFromOtherStorage(entry, storage => storage.Get(name));
+
+				if(result != null)
+					return result;
+			}
+
+			return null;
+		}
+
+		private ServiceEntry GetEntryFromOtherStorage(Type type, object parameter)
+		{
+			foreach(var entry in _entries.ToArray())
+			{
+				var result = this.GetEntryFromOtherStorage(entry, storage => storage.Get(type, parameter));
+
+				if(result != null)
+					return result;
+			}
+
+			return null;
+		}
+
+		private ServiceEntry GetEntryFromOtherStorage(ServiceEntry entry, Func<IServiceStorage, ServiceEntry> getThunk)
+		{
+			if(entry == null || getThunk == null)
+				return null;
+
+			if(typeof(IServiceProvider).IsAssignableFrom(entry.ServiceType))
+			{
+				var provider = (IServiceProvider)entry.Service;
+
+				if(provider != null && provider.Storage != null)
+				{
+					var result = getThunk(provider.Storage);
+
+					if(result != null)
+						return result;
+				}
+			}
+
+			return null;
 		}
 		#endregion
 	}
