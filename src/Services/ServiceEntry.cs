@@ -47,6 +47,10 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 构造函数
+		protected ServiceEntry()
+		{
+		}
+
 		public ServiceEntry(string name, object service, Type[] contractTypes, object userToken = null)
 		{
 			if(string.IsNullOrWhiteSpace(name))
@@ -99,7 +103,7 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 公共属性
-		public string Name
+		public virtual string Name
 		{
 			get
 			{
@@ -107,7 +111,7 @@ namespace Zongsoft.Services
 			}
 		}
 
-		public Type ServiceType
+		public virtual Type ServiceType
 		{
 			get
 			{
@@ -172,7 +176,7 @@ namespace Zongsoft.Services
 			}
 		}
 
-		public Type[] ContractTypes
+		public virtual Type[] ContractTypes
 		{
 			get
 			{
