@@ -57,6 +57,7 @@ namespace Zongsoft.Services
 
 			_name = name.Trim();
 			_service = service;
+			_serviceType = service.GetType();
 			_contractTypes = contractTypes;
 			_userToken = userToken;
 		}
@@ -81,6 +82,7 @@ namespace Zongsoft.Services
 				throw new ArgumentNullException("service");
 
 			_service = service;
+			_serviceType = service.GetType();
 			_contractTypes = contractTypes;
 			_userToken = userToken;
 		}
@@ -136,9 +138,6 @@ namespace Zongsoft.Services
 							//创建一个新的服务实例
 							_service = this.CreateService();
 
-							//重置当前服务类型
-							_serviceType = null;
-
 							return _service;
 						}
 					}
@@ -153,9 +152,6 @@ namespace Zongsoft.Services
 				//至此，表明当前服务已被判定过期不可用，则重新创建一个新的服务实例(并确保当前服务没有被修改过)
 				System.Threading.Interlocked.CompareExchange(ref _service, this.CreateService(), result);
 
-				//重置服务类型
-				_serviceType = null;
-
 				return _service;
 			}
 		}
@@ -165,6 +161,14 @@ namespace Zongsoft.Services
 			get
 			{
 				return _service != null;
+			}
+		}
+
+		public bool HasContracts
+		{
+			get
+			{
+				return _contractTypes != null && _contractTypes.Length > 0;
 			}
 		}
 
@@ -220,7 +224,14 @@ namespace Zongsoft.Services
 			var builder = _builder;
 
 			if(builder != null)
-				return builder.Build(this);
+			{
+				var instance = builder.Build(this);
+
+				if(instance != null)
+					_serviceType = instance.GetType();
+
+				return instance;
+			}
 
 			var type = _serviceType;
 
@@ -228,6 +239,30 @@ namespace Zongsoft.Services
 				return Activator.CreateInstance(type);
 
 			return null;
+		}
+		#endregion
+
+		#region 重写方法
+		public override string ToString()
+		{
+			if(string.IsNullOrWhiteSpace(this.Name))
+				return this.ServiceType.FullName;
+			else
+				return string.Format("{0} ({1})", this.Name, this.ServiceType.FullName);
+		}
+
+		public override int GetHashCode()
+		{
+			var instance = this.Service;
+			return instance == null ? 0 : instance.GetHashCode();
+		}
+
+		public override bool Equals(object obj)
+		{
+			if(obj == null || obj.GetType() != typeof(ServiceEntry))
+				return false;
+
+			return object.ReferenceEquals(this.Service, ((ServiceEntry)obj).Service);
 		}
 		#endregion
 	}
