@@ -140,40 +140,14 @@ namespace Zongsoft.Services
 			if(string.IsNullOrWhiteSpace(name))
 				return null;
 
-			var storages = new List<IServiceStorage>(new[] { this });
+			//从当前容器及其外链容器中查找指定名称的服务
+			var result = this.Find(name, new List<IServiceStorage>(new[] { this }));
 
-			for(int i = 0; i < storages.Count; i++)
-			{
-				var storage = storages[i];
+			//如果上面的查找失败，则尝试从默认服务容器及其外链容器中查找指定名称的服务
+			if(result == null && ServiceProviderFactory.Instance.Default != null && !object.ReferenceEquals(ServiceProviderFactory.Instance.Default, this))
+				result = this.Find(name, new List<IServiceStorage>(new[] { ServiceProviderFactory.Instance.Default.Storage }));
 
-				//获取当前容器的迭代器
-				var enumerator = storage.GetEnumerator();
-
-				//迭代查找服务，首先进行类型匹配然后再进行匹配比对
-				while(enumerator.MoveNext())
-				{
-					var entry = enumerator.Current;
-
-					if(entry == null || entry.ServiceType == null)
-						continue;
-
-					if(string.Equals(entry.Name, name, StringComparison.OrdinalIgnoreCase))
-						return entry;
-
-					//如果当前服务项是一个服务容器
-					if(typeof(IServiceProvider).IsAssignableFrom(entry.ServiceType))
-					{
-						var provider = (IServiceProvider)entry.Service;
-
-						//如果当前服务项对应的服务容器不在外部容器列表中，则将当前服务项(服务容器)加入到外部服务容器列表中
-						if(provider != null && !storages.Contains(provider.Storage))
-							storages.Add(provider.Storage);
-					}
-				}
-			}
-
-			//返回空(查找失败)
-			return null;
+			return result;
 		}
 
 		public virtual ServiceEntry Get(Type type, object parameter = null)
@@ -201,7 +175,22 @@ namespace Zongsoft.Services
 		#region 查找方法
 		protected virtual object Find(Type type, object parameter, bool isMultiplex)
 		{
-			return Find(type, parameter, isMultiplex, new List<IServiceStorage>(new[] { this }));
+			//从当前容器及其外链容器中查找指定类型的服务
+			var result = Find(type, parameter, isMultiplex, new List<IServiceStorage>(new[] { this }));
+
+			var succeed = result != null;
+
+			if(succeed)
+			{
+				var entiries = result as ICollection<ServiceEntry>;
+				succeed &= entiries == null || entiries.Count > 0;
+			}
+
+			//如果上面的查找失败，则尝试从默认服务容器及其外链容器中查找指定名称的服务
+			if(!succeed && ServiceProviderFactory.Instance.Default != null && !object.ReferenceEquals(ServiceProviderFactory.Instance.Default, this))
+				result = this.Find(type, parameter, isMultiplex, new List<IServiceStorage>(new[] { ServiceProviderFactory.Instance.Default.Storage }));
+
+			return result;
 		}
 
 		private object Find(Type type, object parameter, bool isMultiplex, IList<IServiceStorage> storages)
@@ -287,6 +276,45 @@ namespace Zongsoft.Services
 					return strong.Union(weakly).ToArray();
 				else if(weakly.Count > 0)
 					return weakly[0];
+			}
+
+			//返回空(查找失败)
+			return null;
+		}
+
+		private ServiceEntry Find(string name, IList<IServiceStorage> storages)
+		{
+			if(string.IsNullOrWhiteSpace(name) || storages == null)
+				return null;
+
+			for(int i = 0; i < storages.Count; i++)
+			{
+				var storage = storages[i];
+
+				//获取当前容器的迭代器
+				var enumerator = storage.GetEnumerator();
+
+				//迭代查找服务，首先进行类型匹配然后再进行匹配比对
+				while(enumerator.MoveNext())
+				{
+					var entry = enumerator.Current;
+
+					if(entry == null || entry.ServiceType == null)
+						continue;
+
+					if(string.Equals(entry.Name, name, StringComparison.OrdinalIgnoreCase))
+						return entry;
+
+					//如果当前服务项是一个服务容器
+					if(typeof(IServiceProvider).IsAssignableFrom(entry.ServiceType))
+					{
+						var provider = (IServiceProvider)entry.Service;
+
+						//如果当前服务项对应的服务容器不在外部容器列表中，则将当前服务项(服务容器)加入到外部服务容器列表中
+						if(provider != null && !storages.Contains(provider.Storage))
+							storages.Add(provider.Storage);
+					}
+				}
 			}
 
 			//返回空(查找失败)
