@@ -20,6 +20,9 @@ namespace Zongsoft.Services.Tests
 			_provider2 = new ServiceProvider();
 			_provider3 = new ServiceProvider();
 
+			ServiceProviderFactory.Instance.Default = new ServiceProvider();
+			ServiceProviderFactory.Instance.Default.Register("string", "I'm a service.");
+
 			_provider1.Register("MC1", new Zongsoft.Runtime.Caching.MemoryCache("MemoryCache-1"), typeof(Zongsoft.Runtime.Caching.ICache));
 			_provider1.Register(typeof(Zongsoft.Tests.Address));
 
@@ -45,6 +48,12 @@ namespace Zongsoft.Services.Tests
 
 			cache = _provider1.Resolve("MC2") as Zongsoft.Runtime.Caching.ICache;
 			Assert.IsNull(cache);
+
+			Assert.IsNotNull(_provider1.Resolve("string"));
+			Assert.IsInstanceOfType(_provider1.Resolve("string"), typeof(string));
+			Assert.IsNotNull(_provider2.Resolve<string>());
+			Assert.IsNotNull(_provider3.Resolve<string>());
+			Assert.IsInstanceOfType(_provider3.Resolve("string"), typeof(string));
 
 			//将二号服务容器加入到一号服务容器中
 			_provider1.Register(_provider2);
@@ -74,6 +83,12 @@ namespace Zongsoft.Services.Tests
 
 			var person = _provider1.Resolve<Zongsoft.Tests.Person>();
 			Assert.IsNotNull(person);
+
+			Assert.IsNotNull(_provider1.Resolve("string"));
+			Assert.IsInstanceOfType(_provider1.Resolve("string"), typeof(string));
+			Assert.IsNotNull(_provider2.Resolve<string>());
+			Assert.IsNotNull(_provider3.Resolve<string>());
+			Assert.IsInstanceOfType(_provider3.Resolve("string"), typeof(string));
 
 			//测试不存在的服务
 			Assert.IsNull(_provider1.Resolve<IWorker>());
