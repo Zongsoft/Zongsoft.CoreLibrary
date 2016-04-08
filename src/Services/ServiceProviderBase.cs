@@ -146,7 +146,7 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 解析方法
-		public Type GetType(string name)
+		public Type GetServiceType(string name)
 		{
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException("name");

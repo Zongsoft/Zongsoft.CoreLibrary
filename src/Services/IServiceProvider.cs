@@ -62,7 +62,7 @@ namespace Zongsoft.Services
 		/// </summary>
 		/// <param name="name">指定的服务名称。</param>
 		/// <returns>返回指定名称的服务的类型，如果返回空(null)则表示没有找到指定名称的服务。</returns>
-		Type GetType(string name);
+		Type GetServiceType(string name);
 
 		object Resolve(string name);
 		object Resolve(Type type);
