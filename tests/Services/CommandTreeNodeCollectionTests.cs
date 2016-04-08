@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 
-using Zongsoft.Services;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Zongsoft.Services.Tests
