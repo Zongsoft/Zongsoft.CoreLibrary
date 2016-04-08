@@ -396,6 +396,7 @@
     <Compile Include="Services\ServiceProviderBase.cs" />
     <Compile Include="Services\ServiceEntry.cs" />
     <Compile Include="Services\ServiceRegisteredEventArgs.cs" />
+    <Compile Include="Services\ServiceStorageBase.cs" />
     <Compile Include="Services\ServiceStorage.cs" />
     <Compile Include="Services\ServiceUnregisteredEventArgs.cs" />
     <Compile Include="Services\WorkerStateChangedEventArgs.cs" />

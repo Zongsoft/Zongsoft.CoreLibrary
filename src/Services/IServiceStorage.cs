@@ -30,7 +30,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Services
 {
-	public interface IServiceStorage
+	public interface IServiceStorage : IEnumerable<ServiceEntry>
 	{
 		IMatcher Matcher
 		{

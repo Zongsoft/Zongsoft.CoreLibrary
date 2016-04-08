@@ -45,17 +45,13 @@ namespace Zongsoft.Services
 
 		#region 注册方法
 		void Register(string name, Type serviceType);
-		void Register(string name, Type serviceType, Type contractType);
-		void Register(string name, Type serviceType, Type[] contractTypes);
+		void Register(string name, Type serviceType, params Type[] contractTypes);
 
 		void Register(string name, object service);
-		void Register(string name, object service, Type contractType);
-		void Register(string name, object service, Type[] contractTypes);
+		void Register(string name, object service, params Type[] contractTypes);
 
-		void Register(Type serviceType, Type contractType);
-		void Register(Type serviceType, Type[] contractTypes);
-		void Register(object service, Type contractType);
-		void Register(object service, Type[] contractTypes);
+		void Register(Type serviceType, params Type[] contractTypes);
+		void Register(object service, params Type[] contractTypes);
 
 		void Unregister(string name);
 		#endregion

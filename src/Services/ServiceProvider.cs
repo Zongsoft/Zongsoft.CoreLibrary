@@ -26,21 +26,21 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
 
 namespace Zongsoft.Services
 {
 	public class ServiceProvider : ServiceProviderBase
 	{
 		#region 构造函数
-		public ServiceProvider() : this(new ServiceStorage(), null)
+		public ServiceProvider()
 		{
+			this.Storage = new ServiceStorage(this);
 		}
 
-		public ServiceProvider(IServiceBuilder builder) : this(new ServiceStorage(), builder)
+		public ServiceProvider(IServiceBuilder builder)
 		{
+			this.Builder = builder;
+			this.Storage = new ServiceStorage(this);
 		}
 
 		public ServiceProvider(IServiceStorage storage, IServiceBuilder builder) : base(storage, builder)

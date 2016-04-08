@@ -46,11 +46,11 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 构造函数
-		protected ServiceProviderBase(IServiceStorage storage) : this(storage, null)
+		protected ServiceProviderBase()
 		{
 		}
 
-		protected ServiceProviderBase(IServiceStorage storage, IServiceBuilder builder)
+		protected ServiceProviderBase(IServiceStorage storage, IServiceBuilder builder = null)
 		{
 			if(storage == null)
 				throw new ArgumentNullException("storage");
@@ -79,6 +79,13 @@ namespace Zongsoft.Services
 			{
 				return _storage;
 			}
+			protected set
+			{
+				if(value == null)
+					throw new ArgumentNullException();
+
+				_storage = value;
+			}
 		}
 		#endregion
 
@@ -88,12 +95,7 @@ namespace Zongsoft.Services
 			this.Register(name, serviceType, (Type[])null);
 		}
 
-		public void Register(string name, Type serviceType, Type contractType)
-		{
-			this.Register(name, serviceType, new Type[] { contractType });
-		}
-
-		public void Register(string name, Type serviceType, Type[] contractTypes)
+		public void Register(string name, Type serviceType, params Type[] contractTypes)
 		{
 			//创建一个服务描述项对象
 			var entry = this.CreateEntry(name, serviceType, contractTypes);
@@ -107,12 +109,7 @@ namespace Zongsoft.Services
 			this.Register(name, service, (Type[])null);
 		}
 
-		public void Register(string name, object service, Type contractType)
-		{
-			this.Register(name, service, new Type[] { contractType });
-		}
-
-		public void Register(string name, object service, Type[] contractTypes)
+		public void Register(string name, object service, params Type[] contractTypes)
 		{
 			//创建一个服务描述项对象
 			var entry = this.CreateEntry(name, service, contractTypes);
@@ -121,12 +118,7 @@ namespace Zongsoft.Services
 			this.Register(entry);
 		}
 
-		public void Register(Type serviceType, Type contractType)
-		{
-			this.Register(serviceType, new Type[] { contractType });
-		}
-
-		public void Register(Type serviceType, Type[] contractTypes)
+		public void Register(Type serviceType, params Type[] contractTypes)
 		{
 			//创建一个服务描述项对象
 			var entry = this.CreateEntry(serviceType, contractTypes);
@@ -135,12 +127,7 @@ namespace Zongsoft.Services
 			this.Register(entry);
 		}
 
-		public void Register(object service, Type contractType)
-		{
-			this.Register(service, new Type[] { contractType });
-		}
-
-		public void Register(object service, Type[] contractTypes)
+		public void Register(object service, params Type[] contractTypes)
 		{
 			//创建一个服务描述项对象
 			var entry = this.CreateEntry(service, contractTypes);
@@ -341,7 +328,7 @@ namespace Zongsoft.Services
 					result = builder.Build(entry);
 			}
 
-			return result;
+			return result ?? Activator.CreateInstance(entry.ServiceType);
 		}
 
 		protected virtual ServiceEntry CreateEntry(object service, Type[] contractTypes)
