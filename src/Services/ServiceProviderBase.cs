@@ -146,6 +146,15 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 解析方法
+		public Type GetType(string name)
+		{
+			if(string.IsNullOrWhiteSpace(name))
+				throw new ArgumentNullException("name");
+
+			var entry = _storage.Get(name);
+			return entry == null ? null : entry.ServiceType;
+		}
+
 		object System.IServiceProvider.GetService(Type serviceType)
 		{
 			return this.Resolve(serviceType);

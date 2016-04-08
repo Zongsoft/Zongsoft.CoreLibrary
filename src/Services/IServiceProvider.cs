@@ -57,6 +57,13 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 解析方法
+		/// <summary>
+		/// 获取指定名称的服务类型。
+		/// </summary>
+		/// <param name="name">指定的服务名称。</param>
+		/// <returns>返回指定名称的服务的类型，如果返回空(null)则表示没有找到指定名称的服务。</returns>
+		Type GetType(string name);
+
 		object Resolve(string name);
 		object Resolve(Type type);
 		object Resolve(Type type, object parameter);
