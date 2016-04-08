@@ -75,6 +75,7 @@
     <Compile Include="Security\CredentialTest.cs" />
     <Compile Include="Security\UserTest.cs" />
     <Compile Include="Services\CommandTreeNodeCollectionTests.cs" />
+    <Compile Include="Services\ServiceProviderTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\src\Zongsoft.CoreLibrary.csproj">
