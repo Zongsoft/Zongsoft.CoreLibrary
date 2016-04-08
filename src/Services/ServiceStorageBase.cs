@@ -294,19 +294,20 @@ namespace Zongsoft.Services
 				//获取当前容器的迭代器
 				var enumerator = storage.GetEnumerator();
 
-				//迭代查找服务，首先进行类型匹配然后再进行匹配比对
+				//迭代查找服务
 				while(enumerator.MoveNext())
 				{
 					var entry = enumerator.Current;
 
-					if(entry == null || entry.ServiceType == null)
+					if(entry == null)
 						continue;
 
+					//如果名称匹配成功则返回（名称不区分大小写）
 					if(string.Equals(entry.Name, name, StringComparison.OrdinalIgnoreCase))
 						return entry;
 
 					//如果当前服务项是一个服务容器
-					if(typeof(IServiceProvider).IsAssignableFrom(entry.ServiceType))
+					if(entry.ServiceType != null && typeof(IServiceProvider).IsAssignableFrom(entry.ServiceType))
 					{
 						var provider = (IServiceProvider)entry.Service;
 
