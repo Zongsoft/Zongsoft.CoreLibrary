@@ -187,6 +187,7 @@
     <Compile Include="Data\DataCountingEventArgs.cs" />
     <Compile Include="Data\DataDeletedEventArgs.cs" />
     <Compile Include="Data\DataDeletingEventArgs.cs" />
+    <Compile Include="Data\DataDictionary.cs" />
     <Compile Include="Data\DataException.cs" />
     <Compile Include="Data\DataExecutedEventArgs.cs" />
     <Compile Include="Data\DataExecutingEventArgs.cs" />
