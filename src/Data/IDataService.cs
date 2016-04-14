@@ -81,6 +81,9 @@ namespace Zongsoft.Data
 
 		#region 存在方法
 		bool Exists(ICondition condition);
+		bool Exists<TKey>(TKey key);
+		bool Exists<TKey1, TKey2>(TKey1 key1, TKey2 key2);
+		bool Exists<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3);
 		#endregion
 
 		#region 计数方法
