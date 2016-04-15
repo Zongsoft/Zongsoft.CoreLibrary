@@ -579,7 +579,7 @@ namespace Zongsoft.Common
 			var member = context.Member;
 
 			if(member == null)
-				throw new ArgumentException(string.Format("The '{0}' member is not exists in the '{1}' type.", context.MemberName, context.Container.GetType().FullName));
+				throw new KeyNotFoundException(string.Format("The '{0}' member is not exists in the '{1}' type.", context.MemberName, context.Container.GetType().FullName));
 
 			switch(member.MemberType)
 			{
@@ -958,9 +958,9 @@ namespace Zongsoft.Common
 				if(member == null)
 				{
 					if(container == null)
-						throw new ArgumentException(string.Format("The '{0}' member is not exists for '{1}' text.", this.MemberName, this.Text));
+						throw new KeyNotFoundException(string.Format("The '{0}' member is not exists for '{1}' text.", this.MemberName, this.Text));
 					else
-						throw new ArgumentException(string.Format("The '{0}' member is not exists in the '{1}' type.", this.MemberName, container.GetType().FullName));
+						throw new KeyNotFoundException(string.Format("The '{0}' member is not exists in the '{1}' type.", this.MemberName, container.GetType().FullName));
 				}
 
 				switch(member.MemberType)
