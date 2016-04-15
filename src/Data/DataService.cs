@@ -407,7 +407,7 @@ namespace Zongsoft.Data
 				return args.Result;
 
 			//执行数据插入操作
-			args.Result = this.InsertCore(args.Data, args.Scope);
+			args.Result = this.InsertCore(new DataDictionary<TEntity>(args.Data), args.Scope);
 
 			//激发“Inserted”事件
 			return this.OnInserted(args.Data, args.Scope, args.Result);
@@ -421,21 +421,43 @@ namespace Zongsoft.Data
 			if(args.Cancel)
 				return args.Result;
 
+			//创建数据包裹器列表
+			var items = new List<DataDictionary<TEntity>>();
+
+			//设置数据包裹器列表的内容
+			if(args.Data is IEnumerable)
+			{
+				foreach(var item in (IEnumerable)args.Data)
+				{
+					items.Add(new DataDictionary<TEntity>(item));
+				}
+			}
+			else
+			{
+				items.Add(new DataDictionary<TEntity>(data));
+			}
+
 			//执行数据插入操作
-			args.Result = this.InsertManyCore((IEnumerable<TEntity>)args.Data, args.Scope);
+			args.Result = this.InsertManyCore(items.ToArray(), args.Scope);
 
 			//激发“Inserted”事件
 			return this.OnInserted(args.Data, args.Scope, args.Result);
 		}
 
-		protected virtual int InsertCore(object data, string scope)
+		protected virtual int InsertCore(DataDictionary<TEntity> data, string scope)
 		{
-			return this.EnsureDataAccess().Insert(this.Name, data, scope);
+			if(data == null || data.Data == null)
+				return 0;
+
+			return this.EnsureDataAccess().Insert(this.Name, data.Data, scope);
 		}
 
-		protected virtual int InsertManyCore(IEnumerable data, string scope)
+		protected virtual int InsertManyCore(IEnumerable<DataDictionary<TEntity>> data, string scope)
 		{
-			return this.EnsureDataAccess().InsertMany(this.Name, data, scope);
+			if(data == null)
+				return 0;
+
+			return this.EnsureDataAccess().InsertMany(this.Name, data.Select(p => p.Data), scope);
 		}
 		#endregion
 
@@ -479,7 +501,7 @@ namespace Zongsoft.Data
 				return args.Result;
 
 			//执行数据更新操作
-			args.Result = this.UpdateCore(args.Data, args.Condition, args.Scope);
+			args.Result = this.UpdateCore(new DataDictionary<TEntity>(args.Data), args.Condition, args.Scope);
 
 			//激发“Updated”事件
 			return this.OnUpdated(args.Data, args.Condition, args.Scope, args.Result);
@@ -498,8 +520,24 @@ namespace Zongsoft.Data
 			if(args.Cancel)
 				return args.Result;
 
+			//创建数据包裹器列表
+			var items = new List<DataDictionary<TEntity>>();
+
+			//设置数据包裹器列表的内容
+			if(args.Data is IEnumerable)
+			{
+				foreach(var item in (IEnumerable)args.Data)
+				{
+					items.Add(new DataDictionary<TEntity>(item));
+				}
+			}
+			else
+			{
+				items.Add(new DataDictionary<TEntity>(data));
+			}
+
 			//执行数据更新操作
-			args.Result = this.UpdateManyCore((IEnumerable<TEntity>)args.Data, args.Condition, args.Scope);
+			args.Result = this.UpdateManyCore(items.ToArray(), args.Condition, args.Scope);
 
 			//激发“Updated”事件
 			return this.OnUpdated(args.Data, args.Condition, args.Scope, args.Result);
@@ -510,14 +548,20 @@ namespace Zongsoft.Data
 			return this.UpdateMany(data, condition, scope);
 		}
 
-		protected virtual int UpdateCore(object data, ICondition condition, string scope)
+		protected virtual int UpdateCore(DataDictionary<TEntity> data, ICondition condition, string scope)
 		{
-			return this.EnsureDataAccess().Update(this.Name, data, condition, scope);
+			if(data == null || data.Data == null)
+				return 0;
+
+			return this.EnsureDataAccess().Update(this.Name, data.Data, condition, scope);
 		}
 
-		protected virtual int UpdateManyCore(IEnumerable data, ICondition condition, string scope)
+		protected virtual int UpdateManyCore(IEnumerable<DataDictionary<TEntity>> data, ICondition condition, string scope)
 		{
-			return this.EnsureDataAccess().UpdateMany(this.Name, (IEnumerable<TEntity>)data, condition, scope);
+			if(data == null)
+				return 0;
+
+			return this.EnsureDataAccess().UpdateMany(this.Name, data.Select(p => p.Data), condition, scope);
 		}
 		#endregion
 
