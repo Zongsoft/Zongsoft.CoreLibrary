@@ -87,11 +87,21 @@ namespace Zongsoft.Common
 
 			try
 			{
-				//获取指定的类型转换器
-				var converter = GetTypeConverter(type);
+				//根据源类型获取指定的转换器
+				var converter = GetTypeConverter(value.GetType());
 
 				if(converter != null && converter.CanConvertFrom(value.GetType()))
 					return converter.ConvertFrom(value);
+
+				//根据目标类型获取指定的转换器
+				converter = GetTypeConverter(conversionType);
+
+				if(converter != null && converter.CanConvertTo(conversionType))
+					return converter.ConvertTo(value, conversionType);
+
+				//处理字典序列化的情况
+				if(typeof(IDictionary).IsAssignableFrom(value.GetType()) && !typeof(IDictionary).IsAssignableFrom(conversionType))
+					return Zongsoft.Runtime.Serialization.DictionarySerializer.Default.Deserialize((IDictionary)value, conversionType);
 
 				return System.Convert.ChangeType(value, type);
 			}
