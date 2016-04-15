@@ -25,6 +25,7 @@
  */
 
 using System;
+using System.ComponentModel;
 using System.Collections.Generic;
 
 namespace Zongsoft.Common
@@ -134,10 +135,16 @@ namespace Zongsoft.Common
 			if(type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
 				return IsScalarType(type.GetGenericArguments()[0]);
 
-			return type.IsPrimitive || type.IsEnum ||
-			       type == typeof(string) || type == typeof(decimal) ||
-			       type == typeof(DateTime) || type == typeof(TimeSpan) ||
-			       type == typeof(DateTimeOffset) || type == typeof(Guid);
+			var result = type.IsPrimitive || type.IsEnum ||
+			             type == typeof(string) || type == typeof(decimal) ||
+			             type == typeof(DateTime) || type == typeof(TimeSpan) ||
+			             type == typeof(DateTimeOffset) || type == typeof(Guid);
+
+			if(result)
+				return result;
+
+			var converter = TypeDescriptor.GetConverter(type);
+			return (converter != null && converter.CanConvertFrom(typeof(string)) && converter.CanConvertTo(typeof(string)));
 		}
 
 		public static Type GetType(string typeName, bool throwOnError = false, bool ignoreCase = true)
