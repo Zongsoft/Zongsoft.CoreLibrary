@@ -70,5 +70,37 @@ namespace Zongsoft.Collections
 			return _key + "=" + _value;
 		}
 		#endregion
+
+		#region 静态方法
+		public static KeyValuePair[] CreatePairs(string[] keys, params object[] values)
+		{
+			if(keys == null)
+				throw new ArgumentNullException("keys");
+
+			var result = new KeyValuePair[keys.Length];
+
+			for(int i = 0; i < result.Length; i++)
+			{
+				result[i] = new KeyValuePair(keys[0], (values != null && i < values.Length ? values[i] : null));
+			}
+
+			return result;
+		}
+
+		public static KeyValuePair[] CreatePairs(object[] values, params string[] keys)
+		{
+			if(keys == null)
+				throw new ArgumentNullException("keys");
+
+			var result = new KeyValuePair[keys.Length];
+
+			for(int i = 0; i < result.Length; i++)
+			{
+				result[i] = new KeyValuePair(keys[0], (values != null && i < values.Length ? values[i] : null));
+			}
+
+			return result;
+		}
+		#endregion
 	}
 }
