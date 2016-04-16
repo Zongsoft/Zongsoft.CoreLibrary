@@ -905,25 +905,11 @@ namespace Zongsoft.Data
 
 			for(int i = 0; i < a.Length; i++)
 			{
-				if(!string.Equals(a[i], b[i], StringComparison.OrdinalIgnoreCase))
+				if(!Array.Exists(b, item => string.Equals(a[i], item, StringComparison.OrdinalIgnoreCase)))
 					return false;
 			}
 
 			return true;
-		}
-		#endregion
-
-		#region 嵌套子类
-		private class Property
-		{
-			public Property(string name, Type propertyType)
-			{
-				this.Name = name;
-				this.PropertyType = propertyType;
-			}
-
-			public string Name;
-			public Type PropertyType;
 		}
 		#endregion
 	}
