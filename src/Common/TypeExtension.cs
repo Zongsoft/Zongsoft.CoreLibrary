@@ -147,6 +147,31 @@ namespace Zongsoft.Common
 			return (converter != null && converter.CanConvertFrom(typeof(string)) && converter.CanConvertTo(typeof(string)));
 		}
 
+		public static bool IsInteger(this Type type)
+		{
+			if(type == null)
+				throw new ArgumentNullException("type");
+
+			var code = Type.GetTypeCode(type);
+
+			return code == TypeCode.Byte || code == TypeCode.SByte ||
+			       code == TypeCode.Int16 || code == TypeCode.UInt16 ||
+			       code == TypeCode.Int32 || code == TypeCode.UInt32 ||
+			       code == TypeCode.Int64 || code == TypeCode.UInt64;
+		}
+
+		public static bool IsNumber(this Type type)
+		{
+			if(type == null)
+				throw new ArgumentNullException("type");
+
+			var code = Type.GetTypeCode(type);
+
+			return TypeExtension.IsInteger(type) ||
+				   code == TypeCode.Single || code == TypeCode.Double ||
+				   code == TypeCode.Decimal || code == TypeCode.Char;
+		}
+
 		public static Type GetType(string typeName, bool throwOnError = false, bool ignoreCase = true)
 		{
 			if(string.IsNullOrWhiteSpace(typeName))
