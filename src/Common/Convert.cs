@@ -531,24 +531,47 @@ namespace Zongsoft.Common
 		#region 设置方法
 		public static void SetValue(object target, string text, object value)
 		{
-			SetValue(target, text, value, null);
+			SetValue(target, text, () => value, null);
+		}
+
+		public static void SetValue(object target, string text, Func<object> valueThunk)
+		{
+			SetValue(target, text, valueThunk, null);
 		}
 
 		public static void SetValue(object target, string text, object value, Action<ObjectResolvingContext> resolve)
 		{
+			SetValue(target, text, () => value, resolve);
+		}
+
+		public static void SetValue(object target, string text, Func<object> valueThunk, Action<ObjectResolvingContext> resolve)
+		{
 			if(target == null || text == null || text.Length < 1)
 				return;
 
-			SetValue(target, text.Split('.'), value, resolve);
+			SetValue(target, text.Split('.'), valueThunk, resolve);
 		}
 
 		public static void SetValue(object target, string[] memberNames, object value)
 		{
-			SetValue(target, memberNames, value, null);
+			SetValue(target, memberNames, () => value, null);
+		}
+
+		public static void SetValue(object target, string[] memberNames, Func<object> valueThunk)
+		{
+			SetValue(target, memberNames, valueThunk, null);
 		}
 
 		public static void SetValue(object target, string[] memberNames, object value, Action<ObjectResolvingContext> resolve)
 		{
+			SetValue(target, memberNames, () => value, resolve);
+		}
+
+		public static void SetValue(object target, string[] memberNames, Func<object> valueThunk, Action<ObjectResolvingContext> resolve)
+		{
+			if(valueThunk == null)
+				throw new ArgumentNullException("valueThunk");
+
 			if(target == null || memberNames == null || memberNames.Length < 1)
 				return;
 
@@ -563,7 +586,7 @@ namespace Zongsoft.Common
 			}
 
 			//创建构件解析上下文对象
-			var context = new ObjectResolvingContext(target, container, memberNames[memberNames.Length - 1], value, string.Join(".", memberNames));
+			var context = new ObjectResolvingContext(target, container, memberNames[memberNames.Length - 1], valueThunk, string.Join(".", memberNames));
 
 			//调用解析回调方法
 			if(resolve == null)
@@ -736,6 +759,8 @@ namespace Zongsoft.Common
 			private string _memberName;
 			private object[] _memberParameters;
 			private object _value;
+			private int _valueEvaluated;
+			private Func<object> _valueThunk;
 			private bool _handled;
 			private bool _isTerminated;
 			#endregion
@@ -757,7 +782,7 @@ namespace Zongsoft.Common
 				_handled = true;
 			}
 
-			internal ObjectResolvingContext(object target, object container, string memberName, object value, string text)
+			internal ObjectResolvingContext(object target, object container, string memberName, Func<object> valueThunk, string text)
 			{
 				if(target == null)
 					throw new ArgumentNullException("target");
@@ -765,11 +790,14 @@ namespace Zongsoft.Common
 				if(string.IsNullOrWhiteSpace(text))
 					throw new ArgumentNullException("text");
 
+				if(valueThunk == null)
+					throw new ArgumentNullException("valueThunk");
+
 				_direction = ObjectResolvingDirection.Set;
 				_target = target;
 				_container = container;
 				_memberName = memberName;
-				_value = value;
+				_valueThunk = valueThunk;
 				_text = text;
 				_handled = true;
 			}
@@ -839,6 +867,9 @@ namespace Zongsoft.Common
 			{
 				get
 				{
+					if(System.Threading.Interlocked.CompareExchange(ref _valueEvaluated, 1, 0) == 0)
+						_value = _valueThunk();
+
 					return _value;
 				}
 				set
