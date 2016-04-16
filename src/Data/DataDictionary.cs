@@ -191,25 +191,33 @@ namespace Zongsoft.Data
 			return false;
 		}
 
-		public void Set(string key, object value)
+		public void Set(string key, object value, Func<object, bool> predicate = null)
 		{
-			if(!this.TrySet(key, value))
+			if(!this.TrySet(key, value, predicate))
 				throw new KeyNotFoundException(string.Format("The '{0}' property is not existed.", key));
 		}
 
-		public void Set<TMember>(Expression<Func<T, TMember>> member, TMember value)
+		public void Set<TMember>(Expression<Func<T, TMember>> member, TMember value, Func<TMember, bool> predicate = null)
 		{
-			if(!this.TrySet(member, value))
+			if(!this.TrySet(member, value, predicate))
 				throw new KeyNotFoundException(string.Format("The '{0}' property is not existed.", member));
 		}
 
-		public bool TrySet(string key, object value)
+		public bool TrySet(string key, object value, Func<object, bool> predicate = null)
+		{
+			return this.TrySet(key, () => value, predicate);
+		}
+
+		public bool TrySet(string key, Func<object> valueThunk, Func<object, bool> predicate = null)
 		{
 			if(key == null)
 				throw new ArgumentNullException("key");
 
+			if(valueThunk == null)
+				throw new ArgumentNullException("valueThunk");
+
 			//首先直接设置全键，如果成功则返回
-			if(_cache.TrySet(key, value))
+			if(_cache.TrySet(key, valueThunk, predicate))
 				return true;
 
 			//将键进行分解
@@ -230,35 +238,78 @@ namespace Zongsoft.Data
 			if(target == null)
 				return false;
 
-			return ObjectCache.TrySet(target, parts[parts.Length - 1], value);
+			return ObjectCache.TrySet(target, parts[parts.Length - 1], valueThunk, predicate);
 		}
 
-		public bool TrySet<TMember>(Expression<Func<T, TMember>> member, TMember value)
+		public bool TrySet<TMember>(Expression<Func<T, TMember>> member, TMember value, Func<TMember, bool> predicate = null)
+		{
+			return this.TrySet<TMember>(member, () => value, predicate);
+		}
+
+		public bool TrySet<TMember>(Expression<Func<T, TMember>> member, Expression<Func<T, TMember>> valueExpression, Func<TMember, bool> predicate = null)
 		{
 			if(member == null)
 				throw new ArgumentNullException("member");
+
+			if(valueExpression == null)
+				throw new ArgumentNullException("valueExpression");
+
+			return this.TrySet(member, () => this.Get(valueExpression), original =>
+			{
+				if(predicate == null)
+					return this.Contains(valueExpression);
+				else
+					return predicate(original) && this.Contains(valueExpression);
+			});
+		}
+
+		public bool TrySet<TMember>(Expression<Func<T, TMember>> member, Func<TMember> valueThunk, Func<TMember, bool> predicate = null)
+		{
+			if(member == null)
+				throw new ArgumentNullException("member");
+
+			if(valueThunk == null)
+				throw new ArgumentNullException("valueThunk");
 
 			var tuple = ResolveExpression(member, new Stack<MemberInfo>());
 
 			if(tuple == null)
 				throw new ArgumentException("Invalid member expression.");
 
-			return this.TrySet(tuple.Item1, value);
+			if(predicate == null)
+				return this.TrySet(tuple.Item1, valueThunk, null);
+			else
+				return this.TrySet(tuple.Item1, valueThunk, original => predicate((TMember)Zongsoft.Common.Convert.ConvertValue(original, tuple.Item2)));
 		}
 		#endregion
 
 		#region 私有方法
 		private static Tuple<string, Type> ResolveExpression(Expression expression, Stack<MemberInfo> stack)
 		{
+			var tuple = ResolveExpressionMember(expression, stack);
+
+			switch(tuple.Item2.MemberType)
+			{
+				case MemberTypes.Property:
+					return new Tuple<string, Type>(tuple.Item1, ((PropertyInfo)tuple.Item2).PropertyType);
+				case MemberTypes.Field:
+					return new Tuple<string, Type>(tuple.Item1, ((FieldInfo)tuple.Item2).FieldType);
+				default:
+					throw new InvalidOperationException("Invalid expression.");
+			}
+		}
+
+		private static Tuple<string, MemberInfo> ResolveExpressionMember(Expression expression, Stack<MemberInfo> stack)
+		{
 			if(expression.NodeType == ExpressionType.Lambda)
-				return ResolveExpression(((LambdaExpression)expression).Body, stack);
+				return ResolveExpressionMember(((LambdaExpression)expression).Body, stack);
 
 			if(expression.NodeType == ExpressionType.MemberAccess)
 			{
 				stack.Push(((MemberExpression)expression).Member);
 
 				if(((MemberExpression)expression).Expression != null)
-					return ResolveExpression(((MemberExpression)expression).Expression, stack);
+					return ResolveExpressionMember(((MemberExpression)expression).Expression, stack);
 			}
 
 			if(stack == null || stack.Count == 0)
@@ -278,19 +329,7 @@ namespace Zongsoft.Data
 				path += member.Name;
 			}
 
-			switch(member.MemberType)
-			{
-				case MemberTypes.Property:
-					type = ((PropertyInfo)member).PropertyType;
-					break;
-				case MemberTypes.Field:
-					type = ((FieldInfo)member).FieldType;
-					break;
-				default:
-					throw new InvalidOperationException("");
-			}
-
-			return new Tuple<string, Type>(path, type);
+			return new Tuple<string, MemberInfo>(path, member);
 		}
 		#endregion
 
@@ -311,10 +350,10 @@ namespace Zongsoft.Data
 
 				_container = container;
 
-				if(!(container is IDictionary || Zongsoft.Common.TypeExtension.IsAssignableFrom(typeof(IDictionary<,>), container.GetType())))
+				if(!(container is IDictionary || container is IDictionary<string, object> || container is IDictionary<string, string>))
 				{
 					_properties = TypeDescriptor.GetProperties(container);
-					_cache = new ConcurrentDictionary<string, object>();
+					_cache = new ConcurrentDictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 				}
 			}
 			#endregion
@@ -338,26 +377,10 @@ namespace Zongsoft.Data
 				result = null;
 				object value = null;
 
-				if(_container is IDictionary)
-					return Zongsoft.Collections.DictionaryExtension.TryGetValue((IDictionary)_container, name, out result);
-
-				if(_container is IDictionary<string, object>)
-					return ((IDictionary<string, object>)_container).TryGetValue(name, out result);
-
-				if(_container is IDictionary<string, string>)
-				{
-					string text;
-
-					if(((IDictionary<string, string>)_container).TryGetValue(name, out text))
-					{
-						result = text;
-						return true;
-					}
-
-					return false;
-				}
-
 				if(_cache.TryGetValue(name, out result))
+					return true;
+
+				if(TryGetDictionary(_container, name, out result))
 					return true;
 
 				var property = _properties.Find(name, true);
@@ -375,48 +398,41 @@ namespace Zongsoft.Data
 				return true;
 			}
 
-			public bool TrySet(string name, object value)
+			public bool TrySet(string name, Func<object> valueThunk, Func<object, bool> predicate)
 			{
 				if(name == null)
 					throw new ArgumentNullException("name");
 
-				if(_container is IDictionary)
-				{
-					((IDictionary)_container)[name] = value;
+				if(TrySetDictionary(_container, name, valueThunk, predicate))
 					return true;
-				}
 
-				if(_container is IDictionary<string, object>)
+				var property = _properties.Find(name, true);
+
+				if(property == null || property.IsReadOnly)
+					return false;
+
+				if(predicate != null)
 				{
-					((IDictionary<string, object>)_container)[name] = value;
-					return true;
-				}
+					object original;
 
-				if(_container is IDictionary<string, string> && (value == null || value is string))
-				{
-					((IDictionary<string, string>)_container)[name] = (string)value;
-					return true;
-				}
+					if(!_cache.TryGetValue(name, out original))
+						original = property.GetValue(_container);
 
-				if(_properties != null && _cache != null)
-				{
-					var property = _properties.Find(name, true);
-
-					if(property == null || property.IsReadOnly)
+					if(!predicate(original is ObjectCache ? ((ObjectCache)original).Container : original))
 						return false;
-
-					value = Zongsoft.Common.Convert.ConvertValue(value, property.PropertyType);
-					property.SetValue(_container, value);
-
-					if(value == null || Common.TypeExtension.IsScalarType(value.GetType()))
-						_cache[name] = value;
-					else
-						_cache[name] = new ObjectCache(value);
-
-					return true;
 				}
 
-				Zongsoft.Common.Convert.SetValue(_container, name, value);
+				//获取值并做类型转换
+				var value = Zongsoft.Common.Convert.ConvertValue(valueThunk(), property.PropertyType);
+
+				//首先设置容器对象的属性值
+				property.SetValue(_container, value);
+
+				if(value == null || Common.TypeExtension.IsScalarType(value.GetType()))
+					_cache[name] = value;
+				else
+					_cache[name] = new ObjectCache(value);
+
 				return true;
 			}
 			#endregion
@@ -427,6 +443,20 @@ namespace Zongsoft.Data
 				if(container == null)
 					throw new ArgumentNullException("container");
 
+				if(container is ObjectCache)
+					return ((ObjectCache)container).TryGet(name, out result);
+
+				if(TryGetDictionary(container, name, out result))
+					return true;
+
+				result = Zongsoft.Common.Convert.GetValue(container, name);
+				return result != null;
+			}
+
+			private static bool TryGetDictionary(object container, string name, out object result)
+			{
+				result = null;
+
 				if(container is IDictionary)
 					return Zongsoft.Collections.DictionaryExtension.TryGetValue((IDictionary)container, name, out result);
 
@@ -435,7 +465,6 @@ namespace Zongsoft.Data
 
 				if(container is IDictionary<string, string>)
 				{
-					result = null;
 					string text;
 
 					if(((IDictionary<string, string>)container).TryGetValue(name, out text))
@@ -447,41 +476,82 @@ namespace Zongsoft.Data
 					return false;
 				}
 
-				if(container is ObjectCache)
-					return ((ObjectCache)container).TryGet(name, out result);
-
-				result = Zongsoft.Common.Convert.GetValue(container, name);
-				return result != null;
+				return false;
 			}
 
-			public static bool TrySet(object container, string name, object value)
+			public static bool TrySet(object container, string name, Func<object> valueThunk, Func<object, bool> predicate)
 			{
 				if(container == null)
 					throw new ArgumentNullException("container");
 
+				if(valueThunk == null)
+					throw new ArgumentNullException("valueThunk");
+
+				if(container is ObjectCache)
+					return ((ObjectCache)container).TrySet(name, valueThunk, predicate);
+
+				if(TrySetDictionary(container, name, valueThunk, predicate))
+					return true;
+
+				bool isTerminated = false;
+
+				Zongsoft.Common.Convert.SetValue(container, name, valueThunk, ctx =>
+				{
+					if(ctx.Direction == Common.Convert.ObjectResolvingDirection.Set && predicate != null)
+						isTerminated = ctx.IsTerminated = !predicate(ctx.GetMemberValue());
+				});
+
+				return !isTerminated;
+			}
+
+			private static bool TrySetDictionary(object container, string name, Func<object> valueThunk, Func<object, bool> predicate)
+			{
+				object original = null;
+
 				if(container is IDictionary)
 				{
-					((IDictionary)container)[name] = value;
+					if(predicate != null)
+					{
+						Zongsoft.Collections.DictionaryExtension.TryGetValue((IDictionary)container, name, out original);
+
+						if(!predicate(original))
+							return false;
+					}
+
+					((IDictionary)container)[name] = valueThunk();
 					return true;
 				}
 
 				if(container is IDictionary<string, object>)
 				{
-					((IDictionary<string, object>)container)[name] = value;
+					if(predicate != null)
+					{
+						((IDictionary<string, object>)container).TryGetValue(name, out original);
+
+						if(!predicate(original))
+							return false;
+					}
+
+					((IDictionary<string, object>)container)[name] = valueThunk;
 					return true;
 				}
 
-				if(container is IDictionary<string, string> && (value == null || value is string))
+				if(container is IDictionary<string, string>)
 				{
-					((IDictionary<string, string>)container)[name] = (string)value;
+					if(predicate != null)
+					{
+						string originalText;
+						((IDictionary<string, string>)container).TryGetValue(name, out originalText);
+
+						if(!predicate(originalText))
+							return false;
+					}
+
+					((IDictionary<string, string>)container)[name] = Zongsoft.Common.Convert.ConvertValue<string>(valueThunk());
 					return true;
 				}
 
-				if(container is ObjectCache)
-					return ((ObjectCache)container).TrySet(name, value);
-
-				Zongsoft.Common.Convert.SetValue(container, name, value);
-				return true;
+				return false;
 			}
 			#endregion
 		}
