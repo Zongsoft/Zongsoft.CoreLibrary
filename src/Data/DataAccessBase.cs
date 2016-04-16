@@ -56,6 +56,10 @@ namespace Zongsoft.Data
 		}
 		#endregion
 
+		#region 获取主键
+		public abstract string[] GetKey(string name);
+		#endregion
+
 		#region 执行方法
 		public IEnumerable<T> Execute<T>(string name, IDictionary<string, object> inParameters)
 		{

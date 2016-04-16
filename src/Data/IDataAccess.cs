@@ -54,6 +54,15 @@ namespace Zongsoft.Data
 		event EventHandler<DataUpdatingEventArgs> Updating;
 		#endregion
 
+		#region 获取主键
+		/// <summary>
+		/// 获取指定名称的主键名数组。
+		/// </summary>
+		/// <param name="name">指定的数据映射名。</param>
+		/// <returns>返回的主键名数组。</returns>
+		string[] GetKey(string name);
+		#endregion
+
 		#region 执行方法
 		IEnumerable<T> Execute<T>(string name, IDictionary<string, object> inParameters);
 		IEnumerable<T> Execute<T>(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters);
