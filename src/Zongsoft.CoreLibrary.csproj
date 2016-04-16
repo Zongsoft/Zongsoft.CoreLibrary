@@ -88,6 +88,7 @@
     <Compile Include="Collections\BinaryComparer.cs" />
     <Compile Include="Collections\IQueueProvider.cs" />
     <Compile Include="Collections\IQueue`1.cs" />
+    <Compile Include="Collections\KeyValuePair.cs" />
     <Compile Include="Collections\NamedCollectionBase.cs" />
     <Compile Include="Collections\NamedCollection.cs" />
     <Compile Include="Collections\ObjectCache.cs" />
