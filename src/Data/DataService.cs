@@ -158,7 +158,7 @@ namespace Zongsoft.Data
 				return args.Result as IEnumerable<T>;
 
 			//执行数据操作方法
-			args.Result = this.EnsureDataAccess().Execute<T>(this.Name, args.InParameters, out outParameters);
+			args.Result = this.DataAccess.Execute<T>(this.Name, args.InParameters, out outParameters);
 
 			//激发“Executed”事件
 			return this.OnExecuted(typeof(T), args.InParameters, ref outParameters, args.Result) as IEnumerable<T>;
@@ -179,7 +179,7 @@ namespace Zongsoft.Data
 				return args.Result;
 
 			//执行数据操作方法
-			args.Result = this.EnsureDataAccess().ExecuteScalar(this.Name, args.InParameters, out outParameters);
+			args.Result = this.DataAccess.ExecuteScalar(this.Name, args.InParameters, out outParameters);
 
 			//激发“Executed”事件
 			return this.OnExecuted(typeof(object), args.InParameters, ref outParameters, args.Result);
@@ -189,7 +189,7 @@ namespace Zongsoft.Data
 		#region 存在方法
 		public virtual bool Exists(ICondition condition)
 		{
-			return this.EnsureDataAccess().Exists(this.Name, condition);
+			return this.DataAccess.Exists(this.Name, condition);
 		}
 
 		public virtual bool Exists<TKey>(TKey key)
@@ -218,10 +218,25 @@ namespace Zongsoft.Data
 				return args.Result;
 
 			//执行数据计数操作方法
-			args.Result = this.EnsureDataAccess().Count(this.Name, args.Condition, args.Includes);
+			args.Result = this.DataAccess.Count(this.Name, args.Condition, args.Includes);
 
 			//激发“Counted”事件
 			return this.OnCounted(args.Condition, args.Includes, args.Result);
+		}
+		#endregion
+
+		#region 递增方法
+		public virtual long Increment(string name, ICondition condition, int interval = 1)
+		{
+			if(string.IsNullOrWhiteSpace(name))
+				throw new ArgumentNullException("name");
+
+			return this.DataAccess.Increment(this.Name, name, condition, interval);
+		}
+
+		public long Decrement(string name, ICondition condition, int interval = 1)
+		{
+			return this.Increment(name, condition, -interval);
 		}
 		#endregion
 
@@ -233,7 +248,7 @@ namespace Zongsoft.Data
 
 		public virtual object Get<TKey>(TKey key, string scope, Paging paging = null, params Sorting[] sortings)
 		{
-			return this.Get(this.ConvertKey(key), scope, paging, sortings, items => this.GetResult(items, 1));
+			return this.Get(this.ConvertKey(key), scope, paging, sortings, items => this.GetResult(items, new object[] { key }));
 		}
 
 		public object Get<TKey>(TKey key, Paging paging, string scope = null, params Sorting[] sortings)
@@ -248,7 +263,7 @@ namespace Zongsoft.Data
 
 		public virtual object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string scope, Paging paging = null, params Sorting[] sortings)
 		{
-			return this.Get(this.ConvertKey(key1, key2), scope, paging, sortings, items => this.GetResult(items, 2));
+			return this.Get(this.ConvertKey(key1, key2), scope, paging, sortings, items => this.GetResult(items, new object[] { key1, key2 }));
 		}
 
 		public object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, Paging paging, string scope = null, params Sorting[] sortings)
@@ -263,7 +278,7 @@ namespace Zongsoft.Data
 
 		public virtual object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string scope, Paging paging = null, params Sorting[] sortings)
 		{
-			return this.Get(this.ConvertKey(key1, key2, key3), scope, paging, sortings, items => this.GetResult(items, 3));
+			return this.Get(this.ConvertKey(key1, key2, key3), scope, paging, sortings, items => this.GetResult(items, new object[] { key1, key2, key3 }));
 		}
 
 		public object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, Paging paging, string scope = null, params Sorting[] sortings)
@@ -291,7 +306,7 @@ namespace Zongsoft.Data
 
 		protected virtual IEnumerable<TEntity> GetCore(ICondition condition, string scope, Paging paging, params Sorting[] sortings)
 		{
-			return this.EnsureDataAccess().Select<TEntity>(this.Name, condition, scope, paging, sortings);
+			return this.DataAccess.Select<TEntity>(this.Name, condition, scope, paging, sortings);
 		}
 
 		public IEnumerable<TEntity> Select(ICondition condition = null, params Sorting[] sortings)
@@ -356,7 +371,7 @@ namespace Zongsoft.Data
 
 		protected virtual IEnumerable<TEntity> SelectCore(ICondition condition, Grouping grouping, string scope, Paging paging, params Sorting[] sortings)
 		{
-			return this.EnsureDataAccess().Select<TEntity>(this.Name, condition, grouping, scope, paging, sortings);
+			return this.DataAccess.Select<TEntity>(this.Name, condition, grouping, scope, paging, sortings);
 		}
 		#endregion
 
@@ -393,7 +408,7 @@ namespace Zongsoft.Data
 
 		protected virtual int DeleteCore(ICondition condition, string[] cascades)
 		{
-			return this.EnsureDataAccess().Delete(this.Name, condition, cascades);
+			return this.DataAccess.Delete(this.Name, condition, cascades);
 		}
 		#endregion
 
@@ -449,15 +464,15 @@ namespace Zongsoft.Data
 			if(data == null || data.Data == null)
 				return 0;
 
-			return this.EnsureDataAccess().Insert(this.Name, data.Data, scope);
+			return this.DataAccess.Insert(this.Name, data.Data, scope);
 		}
 
-		protected virtual int InsertManyCore(IEnumerable<DataDictionary<TEntity>> data, string scope)
+		protected virtual int InsertManyCore(IEnumerable<DataDictionary<TEntity>> items, string scope)
 		{
-			if(data == null)
+			if(items == null)
 				return 0;
 
-			return this.EnsureDataAccess().InsertMany(this.Name, data.Select(p => p.Data), scope);
+			return this.DataAccess.InsertMany(this.Name, items.Select(p => p.Data), scope);
 		}
 		#endregion
 
@@ -553,79 +568,61 @@ namespace Zongsoft.Data
 			if(data == null || data.Data == null)
 				return 0;
 
-			return this.EnsureDataAccess().Update(this.Name, data.Data, condition, scope);
+			return this.DataAccess.Update(this.Name, data.Data, condition, scope);
 		}
 
-		protected virtual int UpdateManyCore(IEnumerable<DataDictionary<TEntity>> data, ICondition condition, string scope)
+		protected virtual int UpdateManyCore(IEnumerable<DataDictionary<TEntity>> items, ICondition condition, string scope)
 		{
-			if(data == null)
+			if(items == null)
 				return 0;
 
-			return this.EnsureDataAccess().UpdateMany(this.Name, data.Select(p => p.Data), condition, scope);
+			return this.DataAccess.UpdateMany(this.Name, items.Select(p => p.Data), condition, scope);
 		}
 		#endregion
 
-		#region 主键操作
+		#region 键值操作
 		/// <summary>
-		/// 根据指定的版本数获取对应的键名数组。
+		/// 根据指定的查询参数值获取对应的查询键值对数组。
 		/// </summary>
-		/// <param name="version">版本数，表示键的数量。</param>
-		/// <returns>返回对应的键名数组，如果不支持指定的版本应返回空(null)。</returns>
+		/// <param name="values">传入的查询值数组。</param>
+		/// <returns>返回对应的键值对数组。</returns>
 		/// <remarks>
-		///		<para>对于重载者的提示：如果<paramref name="version"/>参数值为零，则必须返回当前实体的主键名数组，不可范围空或空数组。</para>
+		///		<para>基类的实现始终返回当前数据服务对应的主键的键值对数组。</para>
+		///		<para>对于重载者的提示：如果<paramref name="values"/>参数值为空(null)或空数组(零长度)，则应返回当前实体的主键的键值对数组（调用基类的<see cref="GetKey(object[])"/>即可）。</para>
 		/// </remarks>
-		protected virtual string[] GetKey(int version)
+		protected virtual Zongsoft.Collections.KeyValuePair[] GetKey(object[] values)
 		{
-			var result = new List<string>();
-			var properties = typeof(TEntity).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
-
-			foreach(var property in properties)
-			{
-				if(Attribute.IsDefined(property, typeof(Metadata.DataEntityKeyAttribute), true))
-					result.Add(property.Name);
-			}
-
-			return result.ToArray();
-		}
-
-		protected virtual ICondition ConvertKey<TKey>(TKey key)
-		{
-			if(IsNothing(key))
+			if(values == null || values.Length == 0)
 				return null;
 
-			return Condition.Equal(this.EnsureKey(1)[0], key);
+			var primaryKey = this.DataAccess.GetKey(this.Name);
+
+			if(primaryKey == null || primaryKey.Length == 0)
+				return null;
+
+			var result = new Zongsoft.Collections.KeyValuePair[Math.Min(primaryKey.Length, values.Length)];
+
+			for(int i = 0; i < result.Length; i++)
+			{
+				result[i] = new Collections.KeyValuePair(primaryKey[i], values[i]);
+			}
+
+			return result;
 		}
 
-		protected virtual ICondition ConvertKey<TKey1, TKey2>(TKey1 key1, TKey2 key2)
+		private ICondition ConvertKey<TKey>(TKey key)
 		{
-			var keys = this.EnsureKey(2);
-
-			return (IsNothing(key1) ? null : Condition.Equal(keys[0], key1)) &
-				   (IsNothing(key2) ? null : Condition.Equal(keys[1], key2));
+			return this.EnsureInquiryKey(new object[] { key });
 		}
 
-		protected virtual ICondition ConvertKey<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3)
+		private ICondition ConvertKey<TKey1, TKey2>(TKey1 key1, TKey2 key2)
 		{
-			var keys = this.EnsureKey(3);
-
-			return (IsNothing(key1) ? null : Condition.Equal(keys[0], key1)) &
-				   (IsNothing(key2) ? null : Condition.Equal(keys[1], key2)) &
-				   (IsNothing(key3) ? null : Condition.Equal(keys[2], key3));
-		}
-		#endregion
-
-		#region 递增方法
-		public virtual long Increment(string name, ICondition condition, int interval = 1)
-		{
-			if(string.IsNullOrWhiteSpace(name))
-				throw new ArgumentNullException("name");
-
-			return this.DataAccess.Increment(this.Name, name, condition, interval);
+			return this.EnsureInquiryKey(new object[] { key1, key2 });
 		}
 
-		public long Decrement(string name, ICondition condition, int interval = 1)
+		private ICondition ConvertKey<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3)
 		{
-			return this.Increment(name, condition, -interval);
+			return this.EnsureInquiryKey(new object[] { key1, key2, key3 });
 		}
 		#endregion
 
@@ -844,61 +841,75 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 私有方法
-		private static bool IsNothing<T>(T value)
+		private static bool IsNothing(object value)
 		{
-			if(typeof(T) == typeof(DBNull))
-				return System.Convert.IsDBNull(value);
+			if(value == null || System.Convert.IsDBNull(value))
+				return true;
 
-			if(typeof(T) == typeof(Nullable<>))
-				return ((object)value) == null;
+			if(value is string)
+				return string.IsNullOrWhiteSpace((string)value);
 
-			if(typeof(T) == typeof(string))
-				return string.IsNullOrWhiteSpace((string)(object)value);
-
-			if(typeof(T).IsValueType)
-				return false;
-
-			return ((object)value) == null;
+			return false;
 		}
 
-		private string[] EnsureKey(int version)
+		private ICondition EnsureInquiryKey(object[] values)
 		{
-			if(version < 1 || version > 3)
-				throw new ArgumentOutOfRangeException("version");
+			if(values != null && values.Length > 3)
+				throw new NotSupportedException("Too many the keys.");
 
-			var members = this.GetKey(version);
+			//获取查询键值对数组
+			var items = this.GetKey(values ?? new object[0]);
 
-			if(members == null)
-				throw new InvalidOperationException("Not supports for the version of operation.");
+			if(items == null || items.Length == 0)
+				return null;
 
-			if(members.Length < 1)
-				throw new InvalidOperationException("Missing key(s) about '" + typeof(TEntity).FullName + "' type.");
+			if(items.Length == 1 && !IsNothing(items[0].Value))
+				return Condition.Equal(items[0].Key, items[0].Value);
 
-			if(members.Length < version)
-				throw new InvalidOperationException("No matched key(s) about '" + typeof(TEntity).FullName + "' type.");
+			var conditions = new ConditionCollection(ConditionCombination.And);
 
-			return members;
+			foreach(var item in items)
+			{
+				if(!IsNothing(item.Value))
+					conditions.Add(Condition.Equal(item.Key, item.Value));
+			}
+
+			if(conditions.Count > 1)
+				return conditions;
+
+			return conditions.FirstOrDefault();
 		}
 
-		private object GetResult(IEnumerable<TEntity> result, int version)
+		private object GetResult(IEnumerable<TEntity> result, object[] values)
 		{
-			//获取当前实体类型对应的主键
-			var key = this.GetKey(0);
+			//获取当前数据服务对应的主键
+			var primaryKey = this.DataAccess.GetKey(this.Name);
 
-			if(key != null && key.Length == version)
+			//获取当前查询对应的查询键名称数组
+			var inquiryKey = this.GetKey(values);
+
+			//如果查询键与主键完全一致，则返回单数据（主键查询）
+			if(this.CompareStringArray(primaryKey, inquiryKey.Select(p => p.Key).ToArray()))
 				return result.FirstOrDefault();
 
 			return result;
 		}
 
-		private IDataAccess EnsureDataAccess()
+		private bool CompareStringArray(string[] a, string[] b)
 		{
-			var result = this.DataAccess;
+			if((a == null || a.Length == 0) && (b == null || b.Length == 0))
+				return true;
 
-			if(result == null)
-				throw new InvalidOperationException("The value of 'DataAccess' property is null.");
+			if((a == null && b != null) || (a != null && b == null) || a.Length != b.Length)
+				return false;
 
-			return result;
+			for(int i = 0; i < a.Length; i++)
+			{
+				if(!string.Equals(a[i], b[i], StringComparison.OrdinalIgnoreCase))
+					return false;
+			}
+
+			return true;
 		}
 		#endregion
 
