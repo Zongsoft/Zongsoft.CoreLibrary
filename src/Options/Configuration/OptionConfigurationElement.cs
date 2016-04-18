@@ -46,7 +46,7 @@ namespace Zongsoft.Options.Configuration
 		#region 实例字段
 		private OptionConfigurationProperty _elementProperty;
 		private Dictionary<OptionConfigurationProperty, object> _values;
-		private UnrecognizedPropertyCollection _unrecognizedProperties;
+		private IDictionary<string, string> _unrecognizedProperties;
 		#endregion
 
 		#region 构造函数
@@ -118,11 +118,19 @@ namespace Zongsoft.Options.Configuration
 			}
 		}
 
-		protected internal virtual OptionConfigurationPropertyCollection Properties
+		protected internal OptionConfigurationPropertyCollection Properties
 		{
 			get
 			{
 				return GetOptionPropertiesFromType(this.GetType());
+			}
+		}
+
+		protected bool HasUnrecognizedProperties
+		{
+			get
+			{
+				return _unrecognizedProperties != null && _unrecognizedProperties.Count > 0;
 			}
 		}
 
@@ -131,7 +139,7 @@ namespace Zongsoft.Options.Configuration
 			get
 			{
 				if(_unrecognizedProperties == null)
-					System.Threading.Interlocked.CompareExchange(ref _unrecognizedProperties, new UnrecognizedPropertyCollection(this), null);
+					System.Threading.Interlocked.CompareExchange(ref _unrecognizedProperties, new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase), null);
 
 				return _unrecognizedProperties;
 			}
@@ -399,206 +407,6 @@ namespace Zongsoft.Options.Configuration
 				result = new OptionConfigurationProperty(propertyInfo);
 
 			return result;
-		}
-		#endregion
-
-		#region 嵌套子类
-		private class UnrecognizedPropertyCollection : IDictionary<string, string>
-		{
-			#region 成员字段
-			private OptionConfigurationElement _element;
-			private HashSet<string> _unrecognizedProperties;
-			#endregion
-
-			#region 构造函数
-			internal UnrecognizedPropertyCollection(OptionConfigurationElement element)
-			{
-				if(element == null)
-					throw new ArgumentNullException("element");
-
-				_element = element;
-				_unrecognizedProperties = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-			}
-			#endregion
-
-			#region 公共属性
-			public int Count
-			{
-				get
-				{
-					return _unrecognizedProperties.Count;
-				}
-			}
-
-			public bool IsReadOnly
-			{
-				get
-				{
-					return false;
-				}
-			}
-
-			public ICollection<string> Keys
-			{
-				get
-				{
-					return _unrecognizedProperties;
-				}
-			}
-
-			public ICollection<string> Values
-			{
-				get
-				{
-					var result = new string[_unrecognizedProperties.Count];
-					var index = 0;
-
-					foreach(var name in _unrecognizedProperties)
-					{
-						result[index++] = (string)_element[name];
-					}
-
-					return result;
-				}
-			}
-
-			public string this[string name]
-			{
-				get
-				{
-					if(string.IsNullOrWhiteSpace(name))
-						throw new ArgumentNullException("name");
-
-					if(_unrecognizedProperties.Contains(name))
-						return (string)_element[name];
-
-					return null;
-				}
-				set
-				{
-					if(string.IsNullOrWhiteSpace(name))
-						throw new ArgumentNullException("name");
-
-					if(_unrecognizedProperties.Contains(name))
-						_element[name] = value;
-					else
-						this.Add(name, value);
-				}
-			}
-			#endregion
-
-			#region 公共方法
-			public void Add(string name, string value)
-			{
-				if(string.IsNullOrWhiteSpace(name))
-					throw new ArgumentNullException("name");
-
-				if(_unrecognizedProperties.Contains(name))
-					throw new OptionConfigurationException(string.Format("The '{0}' attribute is existed.", name));
-
-				var property = new OptionConfigurationProperty(name, typeof(string));
-				_element.Properties.Add(property);
-				_element.SetPropertyValue(property, value);
-
-				_unrecognizedProperties.Add(name);
-			}
-
-			public bool ContainsKey(string name)
-			{
-				return _unrecognizedProperties.Contains(name);
-			}
-
-			public bool Remove(string name)
-			{
-				if(string.IsNullOrWhiteSpace(name))
-					throw new ArgumentNullException("name");
-
-				if(_unrecognizedProperties.Remove(name))
-				{
-					var property = _element.Properties[name];
-
-					if(property != null)
-					{
-						_element.SetPropertyValue(property, null);
-						_element.Properties.Remove(property);
-					}
-
-					return true;
-				}
-
-				return false;
-			}
-
-			public bool TryGetValue(string name, out string value)
-			{
-				if(string.IsNullOrWhiteSpace(name))
-					throw new ArgumentNullException("name");
-
-				value = null;
-
-				if(_unrecognizedProperties.Contains(name))
-				{
-					value = (string)_element[name];
-					return true;
-				}
-
-				return false;
-			}
-
-			public void Clear()
-			{
-				if(_unrecognizedProperties.Count < 1)
-					return;
-
-				foreach(var name in _unrecognizedProperties)
-				{
-					var property = _element.Properties[name];
-
-					if(property != null)
-					{
-						_element.SetPropertyValue(property, null);
-						_element.Properties.Remove(property);
-					}
-				}
-
-				_unrecognizedProperties.Clear();
-			}
-			#endregion
-
-			#region 显式实现
-			void ICollection<KeyValuePair<string, string>>.Add(KeyValuePair<string, string> item)
-			{
-				this.Add(item.Key, item.Value);
-			}
-
-			bool ICollection<KeyValuePair<string, string>>.Contains(KeyValuePair<string, string> item)
-			{
-				return this.ContainsKey(item.Key);
-			}
-
-			void ICollection<KeyValuePair<string, string>>.CopyTo(KeyValuePair<string, string>[] array, int arrayIndex)
-			{
-				throw new NotImplementedException();
-			}
-
-			bool ICollection<KeyValuePair<string, string>>.Remove(KeyValuePair<string, string> item)
-			{
-				return this.Remove(item.Key);
-			}
-
-			public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
-			{
-				foreach(var name in _unrecognizedProperties)
-				{
-					yield return new KeyValuePair<string, string>(name, (string)_element[name]);
-				}
-			}
-
-			System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-			{
-				return this.GetEnumerator();
-			}
-			#endregion
 		}
 		#endregion
 	}

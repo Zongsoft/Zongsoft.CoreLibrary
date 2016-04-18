@@ -47,54 +47,57 @@ namespace Zongsoft.Diagnostics
 			if(context == null)
 				return;
 
+			//从当前应用的主配置文件中获取日志器的主配置节
 			var loggerElement = context.Configuration.GetOptionObject(@"/Diagnostics/Logger") as Configuration.LoggerElement;
 
-			if(loggerElement != null)
+			if(loggerElement == null)
+				return;
+
+			foreach(Configuration.LoggerHandlerElement handlerElement in loggerElement.Handlers)
 			{
-				foreach(Configuration.LoggerHandlerElement handlerElement in loggerElement.Handlers)
+				var type = Type.GetType(handlerElement.TypeName, true, true);
+
+				//如果当前处理节配置的日志处理器类型不是一个记录器则抛出异常
+				if(!typeof(ILogger).IsAssignableFrom(type))
+					throw new Options.Configuration.OptionConfigurationException(string.Format("The '{0}' type isn't a Logger.", type.FullName));
+
+				//获取日志记录器实现类的带参构造函数
+				var constructor = type.GetConstructor(new Type[] { typeof(Configuration.LoggerHandlerElement) });
+				ILogger instance;
+
+				//试图创建日志记录器实例
+				if(constructor == null)
+					instance = (ILogger)Activator.CreateInstance(type);
+				else
+					instance = (ILogger)Activator.CreateInstance(type, handlerElement);
+
+				//如果日志记录器实例创建失败则抛出异常
+				if(instance == null)
+					throw new Options.Configuration.OptionConfigurationException(string.Format("Can not create instance of '{0}' type.", type));
+
+				//如果日志记录器配置节含有扩展属性，则设置日志记录器实例的扩展属性
+				if(handlerElement.HasExtendedProperties)
 				{
-					var type = Type.GetType(handlerElement.TypeName, true, true);
-
-					if(!typeof(ILogger).IsAssignableFrom(type))
-						throw new Options.Configuration.OptionConfigurationException(string.Format("The '{0}' type isn't a Logger.", type.FullName));
-
-					var constructor = type.GetConstructor(new Type[] { typeof(Configuration.LoggerHandlerElement) });
-					ILogger instance;
-
-					if(constructor == null)
-						instance = (ILogger)Activator.CreateInstance(type);
-					else
-						instance = (ILogger)Activator.CreateInstance(type, handlerElement);
-
-					if(instance == null)
-						throw new Options.Configuration.OptionConfigurationException(string.Format("Can not create instance of '{0}' type.", type));
-
-					if(constructor == null)
+					foreach(var property in handlerElement.ExtendedProperties)
 					{
-						if(handlerElement.Properties != null && handlerElement.Properties.Count > 0)
-						{
-							foreach(var property in handlerElement.Properties)
-							{
-								Zongsoft.Common.Convert.SetValue(instance, property.Key, property.Value);
-							}
-						}
+						Zongsoft.Common.Convert.SetValue(instance, property.Key, property.Value);
 					}
-
-					LoggerHandlerPredication predication = null;
-
-					if(handlerElement.Predication != null)
-					{
-						predication = new LoggerHandlerPredication()
-						{
-							Source = handlerElement.Predication.Source,
-							ExceptionType = handlerElement.Predication.ExceptionType,
-							MaxLevel = handlerElement.Predication.MaxLevel,
-							MinLevel = handlerElement.Predication.MinLevel,
-						};
-					}
-
-					Logger.Handlers.Add(new LoggerHandler(handlerElement.Name, instance, predication));
 				}
+
+				LoggerHandlerPredication predication = null;
+
+				if(handlerElement.Predication != null)
+				{
+					predication = new LoggerHandlerPredication()
+					{
+						Source = handlerElement.Predication.Source,
+						ExceptionType = handlerElement.Predication.ExceptionType,
+						MaxLevel = handlerElement.Predication.MaxLevel,
+						MinLevel = handlerElement.Predication.MinLevel,
+					};
+				}
+
+				Logger.Handlers.Add(new LoggerHandler(handlerElement.Name, instance, predication));
 			}
 		}
 		#endregion

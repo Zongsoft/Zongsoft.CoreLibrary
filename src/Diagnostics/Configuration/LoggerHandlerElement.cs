@@ -92,7 +92,15 @@ namespace Zongsoft.Diagnostics.Configuration
 			}
 		}
 
-		public new IDictionary<string, string> Properties
+		public bool HasExtendedProperties
+		{
+			get
+			{
+				return base.HasUnrecognizedProperties;
+			}
+		}
+
+		public IDictionary<string, string> ExtendedProperties
 		{
 			get
 			{
