@@ -42,15 +42,15 @@ namespace Zongsoft.Diagnostics
 		#region 成员字段
 		private string _filePath;
 		private int _fileSize;
-
-		private int _flag;
-		private ConcurrentQueue<LogEntry> _queue;
+		private readonly object _syncRoot;
+		private readonly ConcurrentQueue<LogEntry> _queue;
 		#endregion
 
 		#region 构造函数
 		protected FileLogger()
 		{
 			_fileSize = FILE_SIZE;
+			_syncRoot = new object();
 			_queue = new ConcurrentQueue<LogEntry>();
 		}
 
@@ -61,6 +61,7 @@ namespace Zongsoft.Diagnostics
 
 			_filePath = filePath.Trim();
 			_fileSize = Math.Max(fileSize, 0);
+			_syncRoot = new object();
 			_queue = new ConcurrentQueue<LogEntry>();
 		}
 		#endregion
@@ -109,36 +110,41 @@ namespace Zongsoft.Diagnostics
 			_queue.Enqueue(entry);
 
 			//从线程池拉出一个后台线程进行具体的日志记录操作
-			ThreadPool.QueueUserWorkItem(this.LogCore, filePath);
+			ThreadPool.QueueUserWorkItem(this.LogFile, filePath);
 		}
 
-		private void LogCore(object filePath)
+		private void LogFile(object filePath)
 		{
-			var original = Interlocked.CompareExchange(ref _flag, 1, 0);
-
-			if(original != 0)
-				return;
-
 			Stream stream = null;
 
 			try
 			{
-				Monitor.Enter(this);
+				//当前线程获取日志写入锁
+				Monitor.Enter(_syncRoot);
 
-				LogEntry entry;
+				//以写模式打开日志文件
 				stream = new FileStream((string)filePath, FileMode.Append, FileAccess.Write, FileShare.Read);
+				LogEntry entry;
 
-				while((_flag = _queue.Count) > 0 && _queue.TryDequeue(out entry))
+				//从日志队列中取出一条日志信息
+				while(_queue.TryDequeue(out entry))
 				{
+					//将当前日志信息写入日志文件流
 					this.WriteLog(entry, stream);
 				}
 			}
 			finally
 			{
-				if(stream != null)
-					stream.Dispose();
+				//如果当前线程是日志写入线程
+				if(Monitor.IsEntered(_syncRoot))
+				{
+					//关闭日志文件流
+					if(stream != null)
+						stream.Dispose();
 
-				Monitor.Exit(this);
+					//释放日志写入锁
+					Monitor.Exit(_syncRoot);
+				}
 			}
 		}
 		#endregion
@@ -216,6 +222,10 @@ namespace Zongsoft.Diagnostics
 
 			if(position < fileName.Length)
 				pattern += Zongsoft.IO.LocalFileSystem.LocalDirectoryProvider.EscapePattern(fileName.Substring(position));
+
+			//设置正则匹配模式为完整匹配
+			if(pattern != null && pattern.Length > 0)
+				pattern = "^" + pattern + "$";
 
 			foreach(var info in infos)
 			{
