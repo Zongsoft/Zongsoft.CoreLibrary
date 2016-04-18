@@ -87,17 +87,12 @@ namespace Zongsoft.Common
 
 			try
 			{
-				//根据源类型获取指定的转换器
-				var converter = GetTypeConverter(value.GetType());
+				//获取目标类型的转换器
+				var converter = GetTypeConverter(type);
 
+				//判断目标类型转换器是否支持从源类型进行转换
 				if(converter != null && converter.CanConvertFrom(value.GetType()))
 					return converter.ConvertFrom(value);
-
-				//根据目标类型获取指定的转换器
-				converter = GetTypeConverter(conversionType);
-
-				if(converter != null && converter.CanConvertTo(conversionType))
-					return converter.ConvertTo(value, conversionType);
 
 				//处理字典序列化的情况
 				if(typeof(IDictionary).IsAssignableFrom(value.GetType()) && !typeof(IDictionary).IsAssignableFrom(conversionType))
@@ -778,6 +773,7 @@ namespace Zongsoft.Common
 				_target = target;
 				_container = target;
 				_value = target;
+				_valueEvaluated = 1;
 				_text = text;
 				_handled = true;
 			}
