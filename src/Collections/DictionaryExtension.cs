@@ -37,15 +37,29 @@ namespace Zongsoft.Collections
 		{
 			value = null;
 
-			if(dictionary == null)
+			if(dictionary == null || dictionary.Count < 1)
 				return false;
 
-			var result = dictionary.Contains(key);
+			var existed = dictionary.Contains(key);
 
-			if(result)
+			if(existed)
 				value = dictionary[key];
 
-			return result;
+			return existed;
+		}
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
+		public static bool TryGetValue(this IDictionary dictionary, object key, Action<object> onGot)
+		{
+			if(dictionary == null || dictionary.Count < 1)
+				return false;
+
+			var existed = dictionary.Contains(key);
+
+			if(existed && onGot != null)
+				onGot(dictionary[key]);
+
+			return existed;
 		}
 
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
@@ -53,15 +67,45 @@ namespace Zongsoft.Collections
 		{
 			value = default(TValue);
 
-			if(dictionary == null)
+			if(dictionary == null || dictionary.Count < 1)
 				return false;
 
-			var result = dictionary.Contains(key);
+			var existed = dictionary.Contains(key);
 
-			if(result)
+			if(existed)
 				value = Zongsoft.Common.Convert.ConvertValue<TValue>(dictionary[key]);
 
-			return result;
+			return existed;
+		}
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
+		public static bool TryGetValue<TValue>(this IDictionary dictionary, object key, Action<object> onGot)
+		{
+			if(dictionary == null || dictionary.Count < 1)
+				return false;
+
+			var existed = dictionary.Contains(key);
+
+			if(existed && onGot != null)
+				onGot(Zongsoft.Common.Convert.ConvertValue<TValue>(dictionary[key]));
+
+			return existed;
+		}
+
+		public static bool TryGetValue<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, Action<TValue> onGot)
+		{
+			if(dictionary == null || dictionary.Count < 1)
+				return false;
+
+			TValue value;
+
+			if(dictionary.TryGetValue(key, out value) && onGot != null)
+			{
+				onGot(value);
+				return true;
+			}
+
+			return false;
 		}
 
 		public static IDictionary<TKey, TValue> ToDictionary<TKey, TValue>(this IDictionary dictionary, Func<object, TKey> keyConvert = null, Func<object, TValue> valueConvert = null)
