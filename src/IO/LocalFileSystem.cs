@@ -436,6 +436,10 @@ namespace Zongsoft.IO
 							regularPattern += EscapePattern(pattern.Substring(position));
 
 						result = searcher("*");
+
+						//设置正则匹配模式为完整匹配
+						if(regularPattern != null && regularPattern.Length > 0)
+							regularPattern = "^" + regularPattern + "$";
 					}
 				}
 
