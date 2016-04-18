@@ -863,15 +863,20 @@ namespace Zongsoft.Data
 			if(items == null || items.Length == 0)
 				return null;
 
-			if(items.Length == 1 && !IsNothing(items[0].Value))
-				return Condition.Equal(items[0].Key, items[0].Value);
+			if(items.Length == 1)
+			{
+				if(IsNothing(items[0].Value))
+					return null;
+
+				return items[0].Value is ICondition ? (ICondition)items[0].Value : Condition.Equal(items[0].Key, items[0].Value);
+			}
 
 			var conditions = new ConditionCollection(ConditionCombination.And);
 
 			foreach(var item in items)
 			{
 				if(!IsNothing(item.Value))
-					conditions.Add(Condition.Equal(item.Key, item.Value));
+					conditions.Add(item.Value is ICondition ? (ICondition)item.Value : Condition.Equal(item.Key, item.Value));
 			}
 
 			if(conditions.Count > 1)
