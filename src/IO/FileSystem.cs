@@ -244,6 +244,9 @@ namespace Zongsoft.IO
 
 			public bool Delete(string virtualPath, bool recursive = false)
 			{
+				if(string.IsNullOrWhiteSpace(virtualPath))
+					return false;
+
 				Path path;
 				var service = FileSystem.GetDirectoryProvider(virtualPath, out path);
 
@@ -252,6 +255,9 @@ namespace Zongsoft.IO
 
 			public Task<bool> DeleteAsync(string virtualPath, bool recursive)
 			{
+				if(string.IsNullOrWhiteSpace(virtualPath))
+					return Task.Run(() => false);
+
 				Path path;
 				var service = FileSystem.GetDirectoryProvider(virtualPath, out path);
 
@@ -282,6 +288,9 @@ namespace Zongsoft.IO
 
 			public bool Exists(string virtualPath)
 			{
+				if(string.IsNullOrWhiteSpace(virtualPath))
+					return false;
+
 				Path path;
 				var service = FileSystem.GetDirectoryProvider(virtualPath, out path);
 
@@ -290,6 +299,9 @@ namespace Zongsoft.IO
 
 			public Task<bool> ExistsAsync(string virtualPath)
 			{
+				if(string.IsNullOrWhiteSpace(virtualPath))
+					return Task.Run(() => false);
+
 				Path path;
 				var service = FileSystem.GetDirectoryProvider(virtualPath, out path);
 
@@ -411,6 +423,9 @@ namespace Zongsoft.IO
 		{
 			public bool Delete(string virtualPath)
 			{
+				if(string.IsNullOrWhiteSpace(virtualPath))
+					return false;
+
 				Path path;
 				var service = FileSystem.GetFileProvider(virtualPath, out path);
 
@@ -419,6 +434,9 @@ namespace Zongsoft.IO
 
 			public Task<bool> DeleteAsync(string virtualPath)
 			{
+				if(string.IsNullOrWhiteSpace(virtualPath))
+					return Task.Run(() => false);
+
 				Path path;
 				var service = FileSystem.GetFileProvider(virtualPath, out path);
 
@@ -427,6 +445,9 @@ namespace Zongsoft.IO
 
 			public bool Exists(string virtualPath)
 			{
+				if(string.IsNullOrWhiteSpace(virtualPath))
+					return false;
+
 				Path path;
 				var service = FileSystem.GetFileProvider(virtualPath, out path);
 
@@ -435,6 +456,9 @@ namespace Zongsoft.IO
 
 			public Task<bool> ExistsAsync(string virtualPath)
 			{
+				if(string.IsNullOrWhiteSpace(virtualPath))
+					return Task.Run(() => false);
+
 				Path path;
 				var service = FileSystem.GetFileProvider(virtualPath, out path);
 
