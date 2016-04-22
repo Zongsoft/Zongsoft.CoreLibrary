@@ -408,6 +408,9 @@ namespace Zongsoft.Data
 
 		protected virtual int DeleteCore(ICondition condition, string[] cascades)
 		{
+			if(condition == null)
+				throw new NotSupportedException("The condition cann't is null on delete operation.");
+
 			return this.DataAccess.Delete(this.Name, condition, cascades);
 		}
 		#endregion
