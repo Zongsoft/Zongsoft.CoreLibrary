@@ -613,17 +613,17 @@ namespace Zongsoft.Data
 			return result;
 		}
 
-		private ICondition ConvertKey<TKey>(TKey key)
+		protected virtual ICondition ConvertKey<TKey>(TKey key)
 		{
 			return this.EnsureInquiryKey(new object[] { key });
 		}
 
-		private ICondition ConvertKey<TKey1, TKey2>(TKey1 key1, TKey2 key2)
+		protected virtual ICondition ConvertKey<TKey1, TKey2>(TKey1 key1, TKey2 key2)
 		{
 			return this.EnsureInquiryKey(new object[] { key1, key2 });
 		}
 
-		private ICondition ConvertKey<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3)
+		protected virtual ICondition ConvertKey<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3)
 		{
 			return this.EnsureInquiryKey(new object[] { key1, key2, key3 });
 		}
