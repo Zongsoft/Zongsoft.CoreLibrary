@@ -78,6 +78,12 @@ namespace Zongsoft.Data
 			return tuple == null ? false : this.Contains(tuple.Item1);
 		}
 
+		/// <summary>
+		/// 获取指定键的值，如果键不存在则激发异常。
+		/// </summary>
+		/// <param name="key">指定的键。</param>
+		/// <returns>返回获取的值。</returns>
+		/// <exception cref="KeyNotFoundException">当指定的键不存在。</exception>
 		public object Get(string key)
 		{
 			object result;
@@ -86,6 +92,22 @@ namespace Zongsoft.Data
 				return result;
 
 			throw new KeyNotFoundException(string.Format("The '{0}' property is not existed.", key));
+		}
+
+		/// <summary>
+		/// 获取指定键的值，如果键不存在则返回<paramref name="defaultValue"/>参数值。
+		/// </summary>
+		/// <param name="key">指定的键。</param>
+		/// <param name="defaultValue">指定的默认值，当键不存在则返回该参数值。</param>
+		/// <returns>返回获取的值或默认值。</returns>
+		public object Get(string key, object defaultValue)
+		{
+			object result;
+
+			if(this.TryGet(key, out result))
+				return result;
+
+			return defaultValue;
 		}
 
 		public TMember Get<TMember>(Expression<Func<T, TMember>> member)
@@ -97,6 +119,19 @@ namespace Zongsoft.Data
 
 			if(tuple == null)
 				throw new ArgumentException("Invalid member expression.");
+
+			return (TMember)Zongsoft.Common.Convert.ConvertValue(this.Get(tuple.Item1), tuple.Item2);
+		}
+
+		public TMember Get<TMember>(Expression<Func<T, TMember>> member, TMember defaultValue)
+		{
+			if(member == null)
+				throw new ArgumentNullException("member");
+
+			var tuple = ResolveExpression(member, new Stack<MemberInfo>());
+
+			if(tuple == null)
+				return defaultValue;
 
 			return (TMember)Zongsoft.Common.Convert.ConvertValue(this.Get(tuple.Item1), tuple.Item2);
 		}
