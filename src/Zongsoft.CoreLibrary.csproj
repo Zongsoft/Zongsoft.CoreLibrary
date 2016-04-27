@@ -184,6 +184,7 @@
     <Compile Include="Data\ConditionCollection.cs" />
     <Compile Include="Data\ConditionCombination.cs" />
     <Compile Include="Data\ConditionOperator.cs" />
+    <Compile Include="Data\DataConflictException.cs" />
     <Compile Include="Data\DataCountedEventArgs.cs" />
     <Compile Include="Data\DataCountingEventArgs.cs" />
     <Compile Include="Data\DataDeletedEventArgs.cs" />
