@@ -81,7 +81,7 @@ namespace Zongsoft.Collections
 
 			for(int i = 0; i < result.Length; i++)
 			{
-				result[i] = new KeyValuePair(keys[0], (values != null && i < values.Length ? values[i] : null));
+				result[i] = new KeyValuePair(keys[i], (values != null && i < values.Length ? values[i] : null));
 			}
 
 			return result;
@@ -96,7 +96,7 @@ namespace Zongsoft.Collections
 
 			for(int i = 0; i < result.Length; i++)
 			{
-				result[i] = new KeyValuePair(keys[0], (values != null && i < values.Length ? values[i] : null));
+				result[i] = new KeyValuePair(keys[i], (values != null && i < values.Length ? values[i] : null));
 			}
 
 			return result;

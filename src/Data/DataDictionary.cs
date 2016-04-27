@@ -312,9 +312,9 @@ namespace Zongsoft.Data
 				throw new ArgumentException("Invalid member expression.");
 
 			if(predicate == null)
-				return this.TrySet(tuple.Item1, valueThunk, null);
+				return this.TrySet(tuple.Item1, () => valueThunk(), null);
 			else
-				return this.TrySet(tuple.Item1, valueThunk, original => predicate((TMember)Zongsoft.Common.Convert.ConvertValue(original, tuple.Item2)));
+				return this.TrySet(tuple.Item1, () => valueThunk(), original => predicate((TMember)Zongsoft.Common.Convert.ConvertValue(original, tuple.Item2)));
 		}
 		#endregion
 
