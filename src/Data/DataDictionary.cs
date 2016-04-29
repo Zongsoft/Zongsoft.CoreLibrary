@@ -74,8 +74,7 @@ namespace Zongsoft.Data
 			if(member == null)
 				throw new ArgumentNullException("member");
 
-			var tuple = ResolveExpression(member, new Stack<MemberInfo>());
-			return tuple == null ? false : this.Contains(tuple.Item1);
+			return this.Contains(Common.ExpressionUtility.GetMemberName(member));
 		}
 
 		/// <summary>
@@ -115,11 +114,7 @@ namespace Zongsoft.Data
 			if(member == null)
 				throw new ArgumentNullException("member");
 
-			var tuple = ResolveExpression(member, new Stack<MemberInfo>());
-
-			if(tuple == null)
-				throw new ArgumentException("Invalid member expression.");
-
+			var tuple = Common.ExpressionUtility.GetMember(member);
 			return (TMember)Zongsoft.Common.Convert.ConvertValue(this.Get(tuple.Item1), tuple.Item2);
 		}
 
@@ -128,11 +123,7 @@ namespace Zongsoft.Data
 			if(member == null)
 				throw new ArgumentNullException("member");
 
-			var tuple = ResolveExpression(member, new Stack<MemberInfo>());
-
-			if(tuple == null)
-				return defaultValue;
-
+			var tuple = Common.ExpressionUtility.GetMember(member);
 			return (TMember)Zongsoft.Common.Convert.ConvertValue(this.Get(tuple.Item1), tuple.Item2);
 		}
 
@@ -204,11 +195,7 @@ namespace Zongsoft.Data
 			if(onGot == null)
 				throw new ArgumentNullException("onGot");
 
-			var tuple = ResolveExpression(member, new Stack<MemberInfo>());
-
-			if(tuple == null)
-				return false;
-
+			var tuple = Common.ExpressionUtility.GetMember(member);
 			return this.TryGet(tuple.Item1, value => onGot(tuple.Item1, (TMember)Zongsoft.Common.Convert.ConvertValue(value, tuple.Item2)));
 		}
 
@@ -306,65 +293,12 @@ namespace Zongsoft.Data
 			if(valueThunk == null)
 				throw new ArgumentNullException("valueThunk");
 
-			var tuple = ResolveExpression(member, new Stack<MemberInfo>());
-
-			if(tuple == null)
-				throw new ArgumentException("Invalid member expression.");
+			var tuple = Common.ExpressionUtility.GetMember(member);
 
 			if(predicate == null)
 				return this.TrySet(tuple.Item1, () => valueThunk(), null);
 			else
 				return this.TrySet(tuple.Item1, () => valueThunk(), original => predicate((TMember)Zongsoft.Common.Convert.ConvertValue(original, tuple.Item2)));
-		}
-		#endregion
-
-		#region 私有方法
-		private static Tuple<string, Type> ResolveExpression(Expression expression, Stack<MemberInfo> stack)
-		{
-			var tuple = ResolveExpressionMember(expression, stack);
-
-			switch(tuple.Item2.MemberType)
-			{
-				case MemberTypes.Property:
-					return new Tuple<string, Type>(tuple.Item1, ((PropertyInfo)tuple.Item2).PropertyType);
-				case MemberTypes.Field:
-					return new Tuple<string, Type>(tuple.Item1, ((FieldInfo)tuple.Item2).FieldType);
-				default:
-					throw new InvalidOperationException("Invalid expression.");
-			}
-		}
-
-		private static Tuple<string, MemberInfo> ResolveExpressionMember(Expression expression, Stack<MemberInfo> stack)
-		{
-			if(expression.NodeType == ExpressionType.Lambda)
-				return ResolveExpressionMember(((LambdaExpression)expression).Body, stack);
-
-			if(expression.NodeType == ExpressionType.MemberAccess)
-			{
-				stack.Push(((MemberExpression)expression).Member);
-
-				if(((MemberExpression)expression).Expression != null)
-					return ResolveExpressionMember(((MemberExpression)expression).Expression, stack);
-			}
-
-			if(stack == null || stack.Count == 0)
-				return null;
-
-			var path = string.Empty;
-			var type = typeof(object);
-			MemberInfo member = null;
-
-			while(stack.Count > 0)
-			{
-				member = stack.Pop();
-
-				if(path.Length > 0)
-					path += ".";
-
-				path += member.Name;
-			}
-
-			return new Tuple<string, MemberInfo>(path, member);
 		}
 		#endregion
 

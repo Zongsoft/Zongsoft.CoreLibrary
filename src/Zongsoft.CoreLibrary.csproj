@@ -93,6 +93,7 @@
     <Compile Include="Collections\NamedCollection.cs" />
     <Compile Include="Collections\ObjectCache.cs" />
     <Compile Include="Common\BitVector32.cs" />
+    <Compile Include="Common\ExpressionUtility.cs" />
     <Compile Include="Common\IDisposableObject.cs" />
     <Compile Include="Common\IAccumulator.cs" />
     <Compile Include="Common\IEventHandler.cs" />
@@ -181,6 +182,7 @@
     <Compile Include="Data\ConditionalConverter.cs" />
     <Compile Include="Data\ConditionalConverterContext.cs" />
     <Compile Include="Data\ConditionalRange.cs" />
+    <Compile Include="Data\ConditionBuilder.cs" />
     <Compile Include="Data\ConditionCollection.cs" />
     <Compile Include="Data\ConditionCombination.cs" />
     <Compile Include="Data\ConditionOperator.cs" />
@@ -202,6 +204,7 @@
     <Compile Include="Data\DataUpdatedEventArgs.cs" />
     <Compile Include="Data\DataUpdatingEventArgs.cs" />
     <Compile Include="Data\IConditionalConverter.cs" />
+    <Compile Include="Data\IConditionBuilder.cs" />
     <Compile Include="Data\Metadata\DataEntityAttribute.cs" />
     <Compile Include="Data\DataAccessBase.cs" />
     <Compile Include="Data\DataService.cs" />

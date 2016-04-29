@@ -219,6 +219,16 @@ namespace Zongsoft.Data
 			return new Condition(name, values, ConditionOperator.NotIn);
 		}
 
+		/// <summary>
+		/// 获取指定类型的条件构建器。
+		/// </summary>
+		/// <typeparam name="T">指定的实体类型。</typeparam>
+		/// <returns>返回一个特定类型的条件构建器。</returns>
+		public static IConditionBuilder<T> Get<T>()
+		{
+			return ConditionBuilder.Get<T>();
+		}
+
 		public static bool GetBetween(Condition condition, out object begin, out object end)
 		{
 			begin = end = null;
