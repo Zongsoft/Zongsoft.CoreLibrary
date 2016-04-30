@@ -123,8 +123,16 @@ namespace Zongsoft.Data
 			if(member == null)
 				throw new ArgumentNullException("member");
 
+			object result;
 			var tuple = Common.ExpressionUtility.GetMember(member);
-			return (TMember)Zongsoft.Common.Convert.ConvertValue(this.Get(tuple.Item1), tuple.Item2);
+
+			if(this.TryGet(tuple.Item1, out result))
+			{
+				if(Zongsoft.Common.Convert.TryConvertValue(result, tuple.Item2, out result))
+					return (TMember)result;
+			}
+
+			return defaultValue;
 		}
 
 		public bool TryGet(string key, Action<object> onGot)
@@ -346,11 +354,14 @@ namespace Zongsoft.Data
 				result = null;
 				object value = null;
 
-				if(_cache.TryGetValue(name, out result))
+				if(_cache != null && _cache.TryGetValue(name, out result))
 					return true;
 
 				if(TryGetDictionary(_container, name, out result))
 					return true;
+
+				if(_properties == null)
+					return false;
 
 				var property = _properties.Find(name, true);
 
@@ -374,6 +385,9 @@ namespace Zongsoft.Data
 
 				if(TrySetDictionary(_container, name, valueThunk, predicate))
 					return true;
+
+				if(_properties == null)
+					return false;
 
 				var property = _properties.Find(name, true);
 
