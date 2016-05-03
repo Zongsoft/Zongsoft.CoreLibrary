@@ -1,11 +1,10 @@
 ﻿using System;
 using System.IO;
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace Zongsoft.IO
 {
-	[TestClass]
 	public class FileSystemTest
 	{
 		public FileSystemTest()
@@ -13,7 +12,7 @@ namespace Zongsoft.IO
 			FileSystem.Providers.Register(LocalFileSystem.Instance, typeof(IFileSystem));
 		}
 
-		[TestMethod]
+		[Fact]
 		public void DirectoryCreate()
 		{
 			var text = @"zfs.local:/d/temp/sub-dir/[1]123.jpg";
@@ -24,11 +23,11 @@ namespace Zongsoft.IO
 			//创建目录
 			FileSystem.Directory.Create(directoryUrl);
 
-			Assert.IsTrue(FileSystem.Directory.Exists(directoryUrl));
-			Assert.IsTrue(FileSystem.Directory.Delete(directoryUrl));
+			Assert.True(FileSystem.Directory.Exists(directoryUrl));
+			Assert.True(FileSystem.Directory.Delete(directoryUrl));
 		}
 
-		[TestMethod]
+		[Fact]
 		public void DirectoryGetFilesTest()
 		{
 			const int FILE_COUNT = 10;
@@ -54,13 +53,13 @@ namespace Zongsoft.IO
 
 			foreach(var info in infos)
 			{
-				Assert.IsTrue(info.Name.StartsWith(prefix + "("));
-				Assert.IsTrue(info.Name.EndsWith(").log"));
+				Assert.True(info.Name.StartsWith(prefix + "("));
+				Assert.True(info.Name.EndsWith(").log"));
 
 				count++;
 			}
 
-			Assert.IsTrue(count >= FILE_COUNT / 2);
+			Assert.True(count >= FILE_COUNT / 2);
 			count = 0;
 
 			//使用文件系统匹配的方式查找文件
@@ -68,8 +67,8 @@ namespace Zongsoft.IO
 
 			foreach(var info in infos)
 			{
-				Assert.IsTrue(info.Name.StartsWith(prefix + "("));
-				Assert.IsTrue(info.Name.EndsWith(").log") || info.Name.EndsWith(").txt"));
+				Assert.True(info.Name.StartsWith(prefix + "("));
+				Assert.True(info.Name.EndsWith(").log") || info.Name.EndsWith(").txt"));
 
 				//删除临时文件
 				LocalFileSystem.Instance.File.Delete(info.Path.Url);
@@ -77,7 +76,7 @@ namespace Zongsoft.IO
 				count++;
 			}
 
-			Assert.IsTrue(count == FILE_COUNT);
+			Assert.True(count == FILE_COUNT);
 		}
 	}
 }

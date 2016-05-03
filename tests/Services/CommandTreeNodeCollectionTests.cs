@@ -2,41 +2,40 @@
 using System.Collections;
 using System.Collections.Generic;
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace Zongsoft.Services.Tests
 {
-	[TestClass]
 	public class CommandTreeNodeCollectionTests
 	{
-		[TestMethod]
+		[Fact]
 		public void AddTest()
 		{
 			var nodes = new CommandTreeNodeCollection(null);
 
 			//测试增加空节点
-			Assert.IsNotNull(nodes.Add("Empty"));
-			Assert.IsNotNull(nodes["Empty"]);
-			Assert.AreSame(typeof(CommandTreeNode), nodes["Empty"].GetType());
-			Assert.IsNull(nodes["Empty"].Command);
+			Assert.NotNull(nodes.Add("Empty"));
+			Assert.NotNull(nodes["Empty"]);
+			Assert.Same(typeof(CommandTreeNode), nodes["Empty"].GetType());
+			Assert.Null(nodes["Empty"].Command);
 
 			//以强类型的方式添加命令到命令树节点集合中
-			Assert.IsNotNull(nodes.Add(new DummyCommand("StronglyDummy")));
-			Assert.IsNotNull(nodes["StronglyDummy"]);
-			Assert.AreSame(typeof(CommandTreeNode), nodes["StronglyDummy"].GetType());
-			Assert.IsNotNull(nodes["StronglyDummy"].Command);
-			Assert.AreSame(typeof(DummyCommand), nodes["StronglyDummy"].Command.GetType());
+			Assert.NotNull(nodes.Add(new DummyCommand("StronglyDummy")));
+			Assert.NotNull(nodes["StronglyDummy"]);
+			Assert.Same(typeof(CommandTreeNode), nodes["StronglyDummy"].GetType());
+			Assert.NotNull(nodes["StronglyDummy"].Command);
+			Assert.Same(typeof(DummyCommand), nodes["StronglyDummy"].Command.GetType());
 
 			var list = (System.Collections.IList)nodes;
 
 			//以弱类型的方式添加命令到命令树节点集合中
-			Assert.IsNotNull(list.Add(new DummyCommand("WeaklyDummy")));
-			Assert.AreEqual(3, list.Count);
+			Assert.NotNull(list.Add(new DummyCommand("WeaklyDummy")));
+			Assert.Equal(3, list.Count);
 
-			Assert.IsNotNull(nodes["WeaklyDummy"]);
-			Assert.AreSame(typeof(CommandTreeNode), nodes["WeaklyDummy"].GetType());
-			Assert.IsNotNull(nodes["WeaklyDummy"].Command);
-			Assert.AreSame(typeof(DummyCommand), nodes["WeaklyDummy"].Command.GetType());
+			Assert.NotNull(nodes["WeaklyDummy"]);
+			Assert.Same(typeof(CommandTreeNode), nodes["WeaklyDummy"].GetType());
+			Assert.NotNull(nodes["WeaklyDummy"].Command);
+			Assert.Same(typeof(DummyCommand), nodes["WeaklyDummy"].Command.GetType());
 		}
 
 		private class DummyCommand : ICommand

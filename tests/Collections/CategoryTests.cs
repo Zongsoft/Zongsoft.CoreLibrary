@@ -5,11 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Zongsoft.Collections;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using Xunit;
 
 namespace Zongsoft.Collections.Tests
 {
-	[TestClass]
 	public class CategoryTests
 	{
 		private Category _root;
@@ -35,29 +35,29 @@ namespace Zongsoft.Collections.Tests
 			);
 		}
 
-		[TestMethod]
+		[Fact]
 		public void FindTest()
 		{
-			Assert.IsNotNull(_root.Find("File"));
-			Assert.IsNotNull(_root.Find("Edit"));
-			Assert.IsNotNull(_root.Find("Help"));
+			Assert.NotNull(_root.Find("File"));
+			Assert.NotNull(_root.Find("Edit"));
+			Assert.NotNull(_root.Find("Help"));
 
-			Assert.IsNotNull(_root.Find("File/Save"));
-			Assert.IsNotNull(_root.Find("File/Recents"));
-			Assert.IsNotNull(_root.Find("File/Recents/Document-1"));
+			Assert.NotNull(_root.Find("File/Save"));
+			Assert.NotNull(_root.Find("File/Recents"));
+			Assert.NotNull(_root.Find("File/Recents/Document-1"));
 
-			Assert.IsNotNull(_root.Find("/File/Save"));
-			Assert.IsNotNull(_root.Find("/File/Recents"));
-			Assert.IsNotNull(_root.Find("/File/Recents/Document-2"));
+			Assert.NotNull(_root.Find("/File/Save"));
+			Assert.NotNull(_root.Find("/File/Recents"));
+			Assert.NotNull(_root.Find("/File/Recents/Document-2"));
 
-			Assert.IsNotNull(_root.Find("File").Find("Open"));
-			Assert.IsNotNull(_root.Find("File").Find("./Recents"));
-			Assert.IsNotNull(_root.Find("File").Find("Recents").Find("Document-2"));
+			Assert.NotNull(_root.Find("File").Find("Open"));
+			Assert.NotNull(_root.Find("File").Find("./Recents"));
+			Assert.NotNull(_root.Find("File").Find("Recents").Find("Document-2"));
 
 			var node = _root.Find("Edit").Find("../File/Save");
 
-			Assert.IsNotNull(node);
-			Assert.AreEqual("Save", node.Name);
+			Assert.NotNull(node);
+			Assert.Equal("Save", node.Name);
 		}
 	}
 }

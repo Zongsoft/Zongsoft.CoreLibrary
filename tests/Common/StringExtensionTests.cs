@@ -5,14 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Zongsoft.Common;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using Xunit;
 
 namespace Zongsoft.Common.Tests
 {
-	[TestClass]
 	public class StringExtensionTests
 	{
-		[TestMethod]
+		[Fact]
 		public void GetStringHashCodeTest()
 		{
 			const int LENGTH = 100;
@@ -29,34 +29,34 @@ namespace Zongsoft.Common.Tests
 			var text1 = System.Convert.ToBase64String(data1);
 			var text2 = System.Convert.ToBase64String(data2);
 
-			Assert.AreNotEqual(Zongsoft.Common.StringExtension.GetStringHashCode(text1),
-			                   Zongsoft.Common.StringExtension.GetStringHashCode(text2));
+			Assert.NotEqual(Zongsoft.Common.StringExtension.GetStringHashCode(text1),
+			                Zongsoft.Common.StringExtension.GetStringHashCode(text2));
 			
 		}
 
-		[TestMethod]
+		[Fact]
 		public void ContainsCharactersTest()
 		{
-			Assert.IsTrue(Zongsoft.Common.StringExtension.ContainsCharacters("abcdefghijk", "big"));
-			Assert.IsTrue(Zongsoft.Common.StringExtension.ContainsCharacters("abcdefghijk", "biger"));
-			Assert.IsFalse(Zongsoft.Common.StringExtension.ContainsCharacters("abcdefghijk", "xyz"));
+			Assert.True(Zongsoft.Common.StringExtension.ContainsCharacters("abcdefghijk", "big"));
+			Assert.True(Zongsoft.Common.StringExtension.ContainsCharacters("abcdefghijk", "biger"));
+			Assert.False(Zongsoft.Common.StringExtension.ContainsCharacters("abcdefghijk", "xyz"));
 		}
 
-		[TestMethod]
+		[Fact]
 		public void RemoveCharactersTest()
 		{
 			const string TEXT = @"Read^me??.txt";
 
-			Assert.AreEqual("Read^me.txt", Zongsoft.Common.StringExtension.RemoveCharacters(TEXT, "?"));
-			Assert.AreEqual("Readme.txt", Zongsoft.Common.StringExtension.RemoveCharacters(TEXT, "?^"));
+			Assert.Equal("Read^me.txt", Zongsoft.Common.StringExtension.RemoveCharacters(TEXT, "?"));
+			Assert.Equal("Readme.txt", Zongsoft.Common.StringExtension.RemoveCharacters(TEXT, "?^"));
 		}
 
-		[TestMethod]
+		[Fact]
 		public void TrimStringTest()
 		{
-			Assert.AreEqual("ContentSuffix", Zongsoft.Common.StringExtension.TrimString("PrefixPrefixContentSuffix", "Prefix"));
-			Assert.AreEqual("PrefixPrefixContent", Zongsoft.Common.StringExtension.TrimString("PrefixPrefixContentSuffix", "Suffix"));
-			Assert.AreEqual("Content", Zongsoft.Common.StringExtension.TrimString("PrefixPrefixContentSuffix", "Prefix", "Suffix"));
+			Assert.Equal("ContentSuffix", Zongsoft.Common.StringExtension.TrimString("PrefixPrefixContentSuffix", "Prefix"));
+			Assert.Equal("PrefixPrefixContent", Zongsoft.Common.StringExtension.TrimString("PrefixPrefixContentSuffix", "Suffix"));
+			Assert.Equal("Content", Zongsoft.Common.StringExtension.TrimString("PrefixPrefixContentSuffix", "Prefix", "Suffix"));
 		}
 	}
 }

@@ -4,14 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace Zongsoft.Common.Tests
 {
-	[TestClass]
 	public class RandomGeneratorTests
 	{
-		[TestMethod]
+		[Fact]
 		public void TestGenerateString()
 		{
 			var data = new string[100];
@@ -22,7 +21,7 @@ namespace Zongsoft.Common.Tests
 				{
 					data[i] = Zongsoft.Common.RandomGenerator.GenerateString(j);
 
-					Assert.IsTrue(!string.IsNullOrEmpty(data[i]) && data[i].Length == j);
+					Assert.True(!string.IsNullOrEmpty(data[i]) && data[i].Length == j);
 				}
 			}
 		}

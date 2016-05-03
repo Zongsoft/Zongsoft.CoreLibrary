@@ -6,44 +6,54 @@ using System.Threading.Tasks;
 
 using Zongsoft.Common;
 using Zongsoft.Tests;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using Xunit;
 
 namespace Zongsoft.Common.Tests
 {
-	[TestClass]
 	public class ObjectReferenceTests
 	{
-		[TestMethod]
+		[Fact]
 		public void ObjectReferenceTest()
 		{
 			var reference = new ObjectReference<Person>(() => new Person());
 
-			Assert.IsFalse(reference.HasTarget);
+			Assert.False(reference.HasTarget);
 			var target = reference.Target;
-			Assert.IsTrue(reference.HasTarget);
+			Assert.True(reference.HasTarget);
 		}
 
-		[TestMethod]
-		[ExpectedException(typeof(ObjectDisposedException))]
+		[Fact]
 		public void DisposeTest()
 		{
 			var reference = new ObjectReference<Person>(() => new Person());
 			reference.Disposed += Reference_Disposed;
 
-			Assert.IsFalse(reference.HasTarget);
-			Assert.IsFalse(reference.IsDisposed);
+			Assert.False(reference.HasTarget);
+			Assert.False(reference.IsDisposed);
 
 			reference.Dispose();
-			Assert.IsTrue(reference.IsDisposed);
+			Assert.True(reference.IsDisposed);
 
-			var target = reference.Target;
+			ObjectDisposedException exception = null;
+
+			try
+			{
+				var target = reference.Target;
+			}
+			catch(ObjectDisposedException ex)
+			{
+				exception = ex;
+			}
+
+			Assert.NotNull(exception);
 		}
 
 		private void Reference_Disposed(object sender, DisposedEventArgs e)
 		{
 			var disposableObject = (IDisposableObject)sender;
 
-			Assert.IsTrue(disposableObject.IsDisposed);
+			Assert.True(disposableObject.IsDisposed);
 		}
 	}
 }

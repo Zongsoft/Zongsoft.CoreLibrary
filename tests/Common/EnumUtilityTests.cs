@@ -6,49 +6,49 @@ using System.Threading.Tasks;
 
 using Zongsoft.Common;
 using Zongsoft.Tests;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using Xunit;
 
 namespace Zongsoft.Common.Tests
 {
-	[TestClass]
 	public class EnumUtilityTests
 	{
-		[TestMethod]
+		[Fact]
 		public void GetEnumEntryTest()
 		{
 			var entry = EnumUtility.GetEnumEntry(Gender.Female);
 
-			Assert.AreEqual("Female", entry.Name);
-			Assert.AreEqual(Gender.Female, entry.Value); //注意：entry.Value 为枚举类型
-			Assert.AreEqual("F", entry.Alias);
-			Assert.AreEqual("女士", entry.Description);
+			Assert.Equal("Female", entry.Name);
+			Assert.Equal(Gender.Female, entry.Value); //注意：entry.Value 为枚举类型
+			Assert.Equal("F", entry.Alias);
+			Assert.Equal("女士", entry.Description);
 
 			entry = EnumUtility.GetEnumEntry(Gender.Male, true);
 
-			Assert.AreEqual("Male", entry.Name);
-			Assert.AreEqual(0, entry.Value); //注意：entry.Value 为枚举项的基元类型
-			Assert.AreEqual("M", entry.Alias);
-			Assert.AreEqual("先生", entry.Description);
+			Assert.Equal("Male", entry.Name);
+			Assert.Equal(0, entry.Value); //注意：entry.Value 为枚举项的基元类型
+			Assert.Equal("M", entry.Alias);
+			Assert.Equal("先生", entry.Description);
 		}
 
-		[TestMethod]
+		[Fact]
 		public void GetEnumEntriesTest()
 		{
 			var entries = EnumUtility.GetEnumEntries(typeof(Gender), true);
 
-			Assert.AreEqual(2, entries.Length);
-			Assert.AreEqual("Male", entries[0].Name);
-			Assert.AreEqual("Female", entries[1].Name);
+			Assert.Equal(2, entries.Length);
+			Assert.Equal("Male", entries[0].Name);
+			Assert.Equal("Female", entries[1].Name);
 
 			entries = EnumUtility.GetEnumEntries(typeof(Nullable<Gender>), true, null, "<Unknown>");
 
-			Assert.AreEqual(3, entries.Length);
-			Assert.AreEqual("", entries[0].Name);
-			Assert.AreEqual(null, entries[0].Value);
-			Assert.AreEqual("<Unknown>", entries[0].Description);
+			Assert.Equal(3, entries.Length);
+			Assert.Equal("", entries[0].Name);
+			Assert.Equal(null, entries[0].Value);
+			Assert.Equal("<Unknown>", entries[0].Description);
 
-			Assert.AreEqual("Male", entries[1].Name);
-			Assert.AreEqual("Female", entries[2].Name);
+			Assert.Equal("Male", entries[1].Name);
+			Assert.Equal("Female", entries[2].Name);
 		}
 	}
 }

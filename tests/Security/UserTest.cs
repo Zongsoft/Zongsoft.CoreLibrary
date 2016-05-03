@@ -4,14 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace Zongsoft.Security
 {
-	[TestClass]
 	public class UserTest
 	{
-		[TestMethod]
+		[Fact]
 		public void TestName()
 		{
 			var user = new Zongsoft.Security.Membership.User();
@@ -21,49 +20,47 @@ namespace Zongsoft.Security
 			user.Name = "$123";
 		}
 
-		[TestMethod]
-		[ExpectedException(typeof(ArgumentNullException))]
+		[Fact]
 		public void TestNameException1()
 		{
-			var user = new Zongsoft.Security.Membership.User(1, "");
+			Assert.Throws<ArgumentNullException>(() => new Zongsoft.Security.Membership.User(1, ""));
 		}
 
-		[TestMethod]
-		[ExpectedException(typeof(ArgumentNullException))]
+		[Fact]
 		public void TestNameException2()
 		{
 			var user = new Zongsoft.Security.Membership.User(1, "admin");
-			user.Name = string.Empty;
+
+			Assert.Throws<ArgumentNullException>(() => user.Name = string.Empty);
 		}
 
-		[TestMethod]
-		[ExpectedException(typeof(ArgumentOutOfRangeException))]
+		[Fact]
 		public void TestNameException3()
 		{
 			var user = new Zongsoft.Security.Membership.User();
-			user.Name = "a";
+			Assert.Throws<ArgumentOutOfRangeException>(() => user.Name = "a");
 		}
 
-		[TestMethod]
-		[ExpectedException(typeof(ArgumentException))]
+		[Fact]
 		public void TestNameException4()
 		{
 			var user = new Zongsoft.Security.Membership.User();
-			user.Name = "123";
+			Assert.Throws<ArgumentException>(() => user.Name = "123");
 		}
 
-		[TestMethod]
+		[Fact]
 		public void TestNamespace()
 		{
 			var user = new Zongsoft.Security.Membership.User(1, "admin", "zongsoft");
 			user.Namespace = "Zongsoft.CMS";
+
+			Assert.Equal("Zongsoft.CMS", user.Namespace);
 		}
 
-		[TestMethod]
-		[ExpectedException(typeof(ArgumentException))]
+		[Fact]
 		public void TestNamespaceException1()
 		{
-			var user = new Zongsoft.Security.Membership.User(1, "admin", "zongsoft-tests");
+			Assert.Throws<ArgumentException>(() => new Zongsoft.Security.Membership.User(1, "admin", "zongsoft-tests"));
 		}
 	}
 }

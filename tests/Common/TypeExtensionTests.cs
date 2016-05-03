@@ -6,60 +6,60 @@ using System.Text;
 
 using Zongsoft.Common;
 using Zongsoft.Tests;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using Xunit;
 
 namespace Zongsoft.Common.Tests
 {
-	[TestClass]
 	public class TypeExtensionTests
 	{
-		[TestMethod]
+		[Fact]
 		public void IsAssignableFromTest()
 		{
 			var baseType = typeof(ICollection<Person>);
 			var instanceType = typeof(Collection<Person>);
 
-			Assert.IsTrue(Zongsoft.Common.TypeExtension.IsAssignableFrom(baseType, instanceType));
-			Assert.IsTrue(baseType.IsAssignableFrom(instanceType));
+			Assert.True(Zongsoft.Common.TypeExtension.IsAssignableFrom(baseType, instanceType));
+			Assert.True(baseType.IsAssignableFrom(instanceType));
 
 			baseType = typeof(ICollection<>);
 
-			Assert.IsTrue(Zongsoft.Common.TypeExtension.IsAssignableFrom(baseType, instanceType));
-			Assert.IsFalse(baseType.IsAssignableFrom(instanceType));
+			Assert.True(Zongsoft.Common.TypeExtension.IsAssignableFrom(baseType, instanceType));
+			Assert.False(baseType.IsAssignableFrom(instanceType));
 		}
 
-		[TestMethod]
+		[Fact]
 		public void GetTypeTest()
 		{
-			Assert.AreSame(typeof(void), Zongsoft.Common.TypeExtension.GetType("void"));
-			Assert.AreSame(typeof(object), Zongsoft.Common.TypeExtension.GetType("object"));
-			Assert.AreSame(typeof(object), Zongsoft.Common.TypeExtension.GetType("System.object"));
+			Assert.Same(typeof(void), Zongsoft.Common.TypeExtension.GetType("void"));
+			Assert.Same(typeof(object), Zongsoft.Common.TypeExtension.GetType("object"));
+			Assert.Same(typeof(object), Zongsoft.Common.TypeExtension.GetType("System.object"));
 
-			Assert.AreSame(typeof(string), Zongsoft.Common.TypeExtension.GetType("string"));
-			Assert.AreSame(typeof(string), Zongsoft.Common.TypeExtension.GetType("System.string"));
+			Assert.Same(typeof(string), Zongsoft.Common.TypeExtension.GetType("string"));
+			Assert.Same(typeof(string), Zongsoft.Common.TypeExtension.GetType("System.string"));
 
-			Assert.AreSame(typeof(int), Zongsoft.Common.TypeExtension.GetType("int"));
-			Assert.AreSame(typeof(int), Zongsoft.Common.TypeExtension.GetType("int32"));
-			Assert.AreSame(typeof(int), Zongsoft.Common.TypeExtension.GetType("System.Int32"));
-			Assert.AreSame(typeof(int?), Zongsoft.Common.TypeExtension.GetType("int?"));
-			Assert.AreSame(typeof(int[]), Zongsoft.Common.TypeExtension.GetType("int[]"));
+			Assert.Same(typeof(int), Zongsoft.Common.TypeExtension.GetType("int"));
+			Assert.Same(typeof(int), Zongsoft.Common.TypeExtension.GetType("int32"));
+			Assert.Same(typeof(int), Zongsoft.Common.TypeExtension.GetType("System.Int32"));
+			Assert.Same(typeof(int?), Zongsoft.Common.TypeExtension.GetType("int?"));
+			Assert.Same(typeof(int[]), Zongsoft.Common.TypeExtension.GetType("int[]"));
 
-			Assert.AreSame(typeof(DateTime), Zongsoft.Common.TypeExtension.GetType("date"));
-			Assert.AreSame(typeof(DateTime), Zongsoft.Common.TypeExtension.GetType("time"));
-			Assert.AreSame(typeof(DateTime), Zongsoft.Common.TypeExtension.GetType("datetime"));
-			Assert.AreSame(typeof(DateTime?), Zongsoft.Common.TypeExtension.GetType("date?"));
-			Assert.AreSame(typeof(DateTime?), Zongsoft.Common.TypeExtension.GetType("time?"));
-			Assert.AreSame(typeof(DateTime?), Zongsoft.Common.TypeExtension.GetType("datetime?"));
-			Assert.AreSame(typeof(DateTime[]), Zongsoft.Common.TypeExtension.GetType("date[]"));
-			Assert.AreSame(typeof(DateTime[]), Zongsoft.Common.TypeExtension.GetType("time[]"));
-			Assert.AreSame(typeof(DateTime[]), Zongsoft.Common.TypeExtension.GetType("datetime[]"));
+			Assert.Same(typeof(DateTime), Zongsoft.Common.TypeExtension.GetType("date"));
+			Assert.Same(typeof(DateTime), Zongsoft.Common.TypeExtension.GetType("time"));
+			Assert.Same(typeof(DateTime), Zongsoft.Common.TypeExtension.GetType("datetime"));
+			Assert.Same(typeof(DateTime?), Zongsoft.Common.TypeExtension.GetType("date?"));
+			Assert.Same(typeof(DateTime?), Zongsoft.Common.TypeExtension.GetType("time?"));
+			Assert.Same(typeof(DateTime?), Zongsoft.Common.TypeExtension.GetType("datetime?"));
+			Assert.Same(typeof(DateTime[]), Zongsoft.Common.TypeExtension.GetType("date[]"));
+			Assert.Same(typeof(DateTime[]), Zongsoft.Common.TypeExtension.GetType("time[]"));
+			Assert.Same(typeof(DateTime[]), Zongsoft.Common.TypeExtension.GetType("datetime[]"));
 
-			Assert.AreSame(typeof(Guid), Zongsoft.Common.TypeExtension.GetType("GUID"));
-			Assert.AreSame(typeof(Guid), Zongsoft.Common.TypeExtension.GetType("system.guid"));
-			Assert.AreSame(typeof(Guid?), Zongsoft.Common.TypeExtension.GetType("guid?"));
-			Assert.AreSame(typeof(Guid[]), Zongsoft.Common.TypeExtension.GetType("guid[]"));
+			Assert.Same(typeof(Guid), Zongsoft.Common.TypeExtension.GetType("GUID"));
+			Assert.Same(typeof(Guid), Zongsoft.Common.TypeExtension.GetType("system.guid"));
+			Assert.Same(typeof(Guid?), Zongsoft.Common.TypeExtension.GetType("guid?"));
+			Assert.Same(typeof(Guid[]), Zongsoft.Common.TypeExtension.GetType("guid[]"));
 
-			Assert.AreSame(typeof(Person), Zongsoft.Common.TypeExtension.GetType("Zongsoft.Tests.Person, Zongsoft.CoreLibrary.Tests"));
+			Assert.Same(typeof(Person), Zongsoft.Common.TypeExtension.GetType("Zongsoft.Tests.Person, Zongsoft.CoreLibrary.Tests"));
 		}
 	}
 }

@@ -4,11 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace Zongsoft.Data
 {
-	[TestClass]
 	public class ConditionTest
 	{
 		private const string TEXT = "This's a string.";
