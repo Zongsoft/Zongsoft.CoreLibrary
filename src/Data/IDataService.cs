@@ -130,7 +130,7 @@ namespace Zongsoft.Data
 
 		#region 插入方法
 		int Insert(object data, string scope = null);
-		int InsertMany(IEnumerable data, string scope = null);
+		int InsertMany(IEnumerable items, string scope = null);
 		#endregion
 
 		#region 更新方法
@@ -138,15 +138,15 @@ namespace Zongsoft.Data
 		int Update<TKey1, TKey2>(object data, TKey1 key1, TKey2 key2, string scope = null);
 		int Update<TKey1, TKey2, TKey3>(object data, TKey1 key1, TKey2 key2, TKey3 key3, string scope = null);
 
-		int UpdateMany<TKey>(IEnumerable data, TKey key, string scope = null);
-		int UpdateMany<TKey1, TKey2>(IEnumerable data, TKey1 key1, TKey2 key2, string scope = null);
-		int UpdateMany<TKey1, TKey2, TKey3>(IEnumerable data, TKey1 key1, TKey2 key2, TKey3 key3, string scope = null);
+		int UpdateMany<TKey>(IEnumerable items, TKey key, string scope = null);
+		int UpdateMany<TKey1, TKey2>(IEnumerable items, TKey1 key1, TKey2 key2, string scope = null);
+		int UpdateMany<TKey1, TKey2, TKey3>(IEnumerable items, TKey1 key1, TKey2 key2, TKey3 key3, string scope = null);
 
 		int Update(object data, ICondition condition = null, string scope = null);
 		int Update(object data, string scope, ICondition condition = null);
 
-		int UpdateMany(IEnumerable data, ICondition condition = null, string scope = null);
-		int UpdateMany(IEnumerable data, string scope, ICondition condition = null);
+		int UpdateMany(IEnumerable items, ICondition condition = null, string scope = null);
+		int UpdateMany(IEnumerable items, string scope, ICondition condition = null);
 		#endregion
 	}
 }

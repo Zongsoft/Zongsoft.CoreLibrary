@@ -104,7 +104,7 @@ namespace Zongsoft.Data
 		#region 插入方法
 		int Insert(string name, object data, string scope = null);
 
-		int InsertMany(string name, IEnumerable data, string scope = null);
+		int InsertMany(string name, IEnumerable items, string scope = null);
 		#endregion
 
 		#region 更新方法
@@ -123,12 +123,12 @@ namespace Zongsoft.Data
 		/// 根据指定的条件将指定的实体集更新到数据源。
 		/// </summary>
 		/// <param name="name">指定的实体映射名。</param>
-		/// <param name="data">要更新的数据实体集。</param>
+		/// <param name="items">要更新的数据集。</param>
 		/// <param name="condition">要更新的条件子句，如果为空(null)则根据实体的主键进行更新。</param>
 		/// <param name="scope">指定的要更新的和排除更新的属性名列表，如果指定的是多个属性则属性名之间使用逗号(,)分隔；要排除的属性以减号(-)打头，星号(*)表示所有属性，感叹号(!)表示排除所有属性；如果未指定该参数则默认只会更新所有单值属性而不会更新导航属性。</param>
 		/// <returns>返回受影响的记录行数，执行成功返回大于零的整数，失败则返回负数。</returns>
-		int UpdateMany(string name, IEnumerable data, ICondition condition = null, string scope = null);
-		int UpdateMany(string name, IEnumerable data, string scope, ICondition condition = null);
+		int UpdateMany(string name, IEnumerable items, ICondition condition = null, string scope = null);
+		int UpdateMany(string name, IEnumerable items, string scope, ICondition condition = null);
 		#endregion
 	}
 }
