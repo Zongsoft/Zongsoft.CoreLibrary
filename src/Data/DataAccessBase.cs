@@ -235,36 +235,36 @@ namespace Zongsoft.Data
 				return args.Result;
 
 			//执行数据插入操作
-			args.Result = this.OnInsert(name, data, scope);
+			args.Result = this.OnInsert(name, GetDataDictionary(data), scope);
 
 			//激发“Inserted”事件
 			return this.OnInserted(name, args.Data, args.Scope, args.Result);
 		}
 
-		protected virtual int OnInsert(string name, object data, string scope)
+		protected virtual int OnInsert(string name, DataDictionary data, string scope)
 		{
-			return this.OnInsertMany(name, new object[] { data }, scope);
+			return this.OnInsertMany(name, new[] { data }, scope);
 		}
 
-		public int InsertMany(string name, IEnumerable data, string scope = null)
+		public int InsertMany(string name, IEnumerable items, string scope = null)
 		{
-			if(data == null)
+			if(items == null)
 				return 0;
 
 			//激发“Inserting”事件
-			var args = this.OnInserting(name, data, scope);
+			var args = this.OnInserting(name, items, scope);
 
 			if(args.Cancel)
 				return args.Result;
 
 			//执行数据插入操作
-			args.Result = this.OnInsertMany(name, data, scope);
+			args.Result = this.OnInsertMany(name, GetDataDictionaries(items), scope);
 
 			//激发“Inserted”事件
 			return this.OnInserted(name, args.Data, args.Scope, args.Result);
 		}
 
-		protected abstract int OnInsertMany(string name, IEnumerable data, string scope);
+		protected abstract int OnInsertMany(string name, IEnumerable<DataDictionary> items, string scope);
 		#endregion
 
 		#region 更新方法
@@ -288,7 +288,7 @@ namespace Zongsoft.Data
 				return args.Result;
 
 			//执行数据更新操作
-			args.Result = this.OnUpdate(name, data, condition, scope);
+			args.Result = this.OnUpdate(name, GetDataDictionary(data), condition, scope);
 
 			//激发“Updated”事件
 			return this.OnUpdated(name, args.Data, args.Condition, args.Scope, args.Result);
@@ -299,12 +299,12 @@ namespace Zongsoft.Data
 			return this.Update(name, data, condition, scope);
 		}
 
-		protected virtual int OnUpdate(string name, object data, ICondition condition, string scope)
+		protected virtual int OnUpdate(string name, DataDictionary data, ICondition condition, string scope)
 		{
 			if(data == null)
-				throw new ArgumentNullException("data");
+				return 0;
 
-			return this.OnUpdateMany(name, new object[] { data }, condition, scope);
+			return this.OnUpdateMany(name, new[] { data }, condition, scope);
 		}
 
 		/// <summary>
@@ -312,34 +312,34 @@ namespace Zongsoft.Data
 		/// </summary>
 		/// <typeparam name="T">指定的实体集中的实体的类型。</typeparam>
 		/// <param name="name">指定的实体映射名。</param>
-		/// <param name="data">要更新的实体集。</param>
+		/// <param name="items">要更新的数据集。</param>
 		/// <param name="condition">要更新的条件子句，如果为空(null)则根据实体的主键进行更新。</param>
 		/// <param name="scope">指定的要更新的和排除更新的属性名列表，如果指定的是多个属性则属性名之间使用逗号(,)分隔；要排除的属性以减号(-)打头，星号(*)表示所有属性，感叹号(!)表示排除所有属性；如果未指定该参数则默认只会更新所有单值属性而不会更新导航属性。</param>
 		/// <returns>返回受影响的记录行数，执行成功返回大于零的整数，失败则返回负数。</returns>
-		public int UpdateMany(string name, IEnumerable data, ICondition condition = null, string scope = null)
+		public int UpdateMany(string name, IEnumerable items, ICondition condition = null, string scope = null)
 		{
-			if(data == null)
+			if(items == null)
 				return 0;
 
 			//激发“Updating”事件
-			var args = this.OnUpdating(name, data, condition, scope);
+			var args = this.OnUpdating(name, items, condition, scope);
 
 			if(args.Cancel)
 				return args.Result;
 
 			//执行数据更新操作
-			args.Result = this.OnUpdateMany(name, data, condition, scope);
+			args.Result = this.OnUpdateMany(name, GetDataDictionaries(items), condition, scope);
 
 			//激发“Updated”事件
 			return this.OnUpdated(name, args.Data, args.Condition, args.Scope, args.Result);
 		}
 
-		public int UpdateMany(string name, IEnumerable data, string scope, ICondition condition = null)
+		public int UpdateMany(string name, IEnumerable items, string scope, ICondition condition = null)
 		{
-			return this.UpdateMany(name, data, condition, scope);
+			return this.UpdateMany(name, items, condition, scope);
 		}
 
-		protected abstract int OnUpdateMany(string name, IEnumerable data, ICondition condition, string scope);
+		protected abstract int OnUpdateMany(string name, IEnumerable<DataDictionary> items, ICondition condition, string scope);
 		#endregion
 
 		#region 递增方法
@@ -532,6 +532,28 @@ namespace Zongsoft.Data
 
 			if(e != null)
 				e(this, args);
+		}
+		#endregion
+
+		#region 私有方法
+		private static DataDictionary GetDataDictionary(object data)
+		{
+			if(data == null)
+				throw new ArgumentNullException("data");
+
+			return data as DataDictionary ?? new DataDictionary(data);
+		}
+
+		private static IEnumerable<DataDictionary> GetDataDictionaries(IEnumerable items)
+		{
+			if(items == null)
+				throw new ArgumentNullException("items");
+
+			foreach(var item in items)
+			{
+				if(item != null)
+					yield return (item as DataDictionary) ?? new DataDictionary(item);
+			}
 		}
 		#endregion
 	}
