@@ -41,7 +41,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		protected DataDictionary(object data)
+		internal protected DataDictionary(object data)
 		{
 			if(data == null)
 				throw new ArgumentNullException("data");
@@ -316,7 +316,7 @@ namespace Zongsoft.Data
 			#region 私有变量
 			private readonly object _container;
 			private readonly PropertyDescriptorCollection _properties;
-			private readonly ConcurrentDictionary<string, object> _cache;
+			private readonly ConcurrentDictionary<string, object> _values;
 			#endregion
 
 			#region 构造函数
@@ -330,7 +330,7 @@ namespace Zongsoft.Data
 				if(!(container is IDictionary || container is IDictionary<string, object> || container is IDictionary<string, string>))
 				{
 					_properties = TypeDescriptor.GetProperties(container);
-					_cache = new ConcurrentDictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+					_values = new ConcurrentDictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 				}
 			}
 			#endregion
@@ -377,7 +377,7 @@ namespace Zongsoft.Data
 				result = null;
 				object value = null;
 
-				if(_cache != null && _cache.TryGetValue(name, out result))
+				if(_values != null && _values.TryGetValue(name, out result))
 					return true;
 
 				if(TryGetDictionary(_container, name, out result))
@@ -394,9 +394,9 @@ namespace Zongsoft.Data
 				value = property.GetValue(_container);
 
 				if(value == null || Common.TypeExtension.IsScalarType(value.GetType()))
-					result = _cache[name] = value;
+					result = _values[name] = value;
 				else
-					result = _cache[name] = new ObjectCache(value);
+					result = _values[name] = new ObjectCache(value);
 
 				return true;
 			}
@@ -421,7 +421,7 @@ namespace Zongsoft.Data
 				{
 					object original;
 
-					if(!_cache.TryGetValue(name, out original))
+					if(!_values.TryGetValue(name, out original))
 						original = property.GetValue(_container);
 
 					if(!predicate(original is ObjectCache ? ((ObjectCache)original).Container : original))
@@ -435,9 +435,9 @@ namespace Zongsoft.Data
 				property.SetValue(_container, value);
 
 				if(value == null || Common.TypeExtension.IsScalarType(value.GetType()))
-					_cache[name] = value;
+					_values[name] = value;
 				else
-					_cache[name] = new ObjectCache(value);
+					_values[name] = new ObjectCache(value);
 
 				return true;
 			}
@@ -569,7 +569,7 @@ namespace Zongsoft.Data
 					foreach(PropertyDescriptor property in _properties)
 					{
 						yield return new KeyValuePair<string, object>(property.Name,
-																	  _cache.GetOrAdd(property.Name, key => property.GetValue(_container)));
+																	  _values.GetOrAdd(property.Name, key => property.GetValue(_container)));
 					}
 				}
 				else
