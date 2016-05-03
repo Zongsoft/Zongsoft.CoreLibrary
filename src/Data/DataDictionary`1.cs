@@ -29,11 +29,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.ComponentModel;
+using System.Reflection;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace Zongsoft.Data
 {
-	public class DataDictionary : IDictionary<string, object>
+	public class DataDictionary<T> : IDictionary<string, object>
 	{
 		#region 成员字段
 		private object _data;
@@ -41,7 +43,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		protected DataDictionary(object data)
+		private DataDictionary(object data)
 		{
 			if(data == null)
 				throw new ArgumentNullException("data");
@@ -105,6 +107,14 @@ namespace Zongsoft.Data
 			return this.TryGet(key, out value);
 		}
 
+		public bool Contains<TMember>(Expression<Func<T, TMember>> member)
+		{
+			if(member == null)
+				throw new ArgumentNullException("member");
+
+			return this.Contains(Common.ExpressionUtility.GetMemberName(member));
+		}
+
 		/// <summary>
 		/// 获取指定键的值，如果键不存在则激发异常。
 		/// </summary>
@@ -133,6 +143,32 @@ namespace Zongsoft.Data
 
 			if(this.TryGet(key, out result))
 				return result;
+
+			return defaultValue;
+		}
+
+		public TMember Get<TMember>(Expression<Func<T, TMember>> member)
+		{
+			if(member == null)
+				throw new ArgumentNullException("member");
+
+			var tuple = Common.ExpressionUtility.GetMember(member);
+			return (TMember)Zongsoft.Common.Convert.ConvertValue(this.Get(tuple.Item1), tuple.Item2);
+		}
+
+		public TMember Get<TMember>(Expression<Func<T, TMember>> member, TMember defaultValue)
+		{
+			if(member == null)
+				throw new ArgumentNullException("member");
+
+			object result;
+			var tuple = Common.ExpressionUtility.GetMember(member);
+
+			if(this.TryGet(tuple.Item1, out result))
+			{
+				if(Zongsoft.Common.Convert.TryConvertValue(result, tuple.Item2, out result))
+					return (TMember)result;
+			}
 
 			return defaultValue;
 		}
@@ -197,10 +233,42 @@ namespace Zongsoft.Data
 			return false;
 		}
 
+		public bool TryGet<TMember>(Expression<Func<T, TMember>> member, Action<string, TMember> onGot)
+		{
+			if(member == null)
+				throw new ArgumentNullException("member");
+
+			if(onGot == null)
+				throw new ArgumentNullException("onGot");
+
+			var tuple = Common.ExpressionUtility.GetMember(member);
+			return this.TryGet(tuple.Item1, value => onGot(tuple.Item1, (TMember)Zongsoft.Common.Convert.ConvertValue(value, tuple.Item2)));
+		}
+
+		public bool TryGet<TMember>(Expression<Func<T, TMember>> member, out TMember result)
+		{
+			TMember memberValue = default(TMember);
+
+			if(this.TryGet(member, (key, value) => memberValue = value))
+			{
+				result = memberValue;
+				return true;
+			}
+
+			result = default(TMember);
+			return false;
+		}
+
 		public void Set(string key, object value, Func<object, bool> predicate = null)
 		{
 			if(!this.TrySet(key, value, predicate))
 				throw new KeyNotFoundException(string.Format("The '{0}' property is not existed.", key));
+		}
+
+		public void Set<TMember>(Expression<Func<T, TMember>> member, TMember value, Func<TMember, bool> predicate = null)
+		{
+			if(!this.TrySet(member, value, predicate))
+				throw new KeyNotFoundException(string.Format("The '{0}' property is not existed.", member));
 		}
 
 		public bool TrySet(string key, object value, Func<object, bool> predicate = null)
@@ -239,6 +307,60 @@ namespace Zongsoft.Data
 				return false;
 
 			return ObjectCache.TrySet(target, parts[parts.Length - 1], valueThunk, predicate);
+		}
+
+		public bool TrySet<TMember>(Expression<Func<T, TMember>> member, TMember value, Func<TMember, bool> predicate = null)
+		{
+			return this.TrySet<TMember>(member, () => value, predicate);
+		}
+
+		public bool TrySet<TMember>(Expression<Func<T, TMember>> member, Expression<Func<T, TMember>> valueExpression, Func<TMember, bool> predicate = null)
+		{
+			if(member == null)
+				throw new ArgumentNullException("member");
+
+			if(valueExpression == null)
+				throw new ArgumentNullException("valueExpression");
+
+			return this.TrySet(member, () => this.Get(valueExpression), original =>
+			{
+				if(predicate == null)
+					return this.Contains(valueExpression);
+				else
+					return predicate(original) && this.Contains(valueExpression);
+			});
+		}
+
+		public bool TrySet<TMember>(Expression<Func<T, TMember>> member, Func<TMember> valueThunk, Func<TMember, bool> predicate = null)
+		{
+			if(member == null)
+				throw new ArgumentNullException("member");
+
+			if(valueThunk == null)
+				throw new ArgumentNullException("valueThunk");
+
+			var tuple = Common.ExpressionUtility.GetMember(member);
+
+			if(predicate == null)
+				return this.TrySet(tuple.Item1, () => valueThunk(), null);
+			else
+				return this.TrySet(tuple.Item1, () => valueThunk(), original => predicate((TMember)Zongsoft.Common.Convert.ConvertValue(original, tuple.Item2)));
+		}
+		#endregion
+
+		#region 静态方法
+		public static DataDictionary<T> GetDataDictionary(object data)
+		{
+			if(data == null)
+				throw new ArgumentNullException("data");
+
+			if(data is DataDictionary<T>)
+				return (DataDictionary<T>)data;
+
+			if(Common.TypeExtension.IsAssignableFrom(typeof(DataDictionary<>), data.GetType()))
+				data = data.GetType().GetProperty("Data", BindingFlags.Public | BindingFlags.Instance).GetValue(data);
+
+			return new DataDictionary<T>(data);
 		}
 		#endregion
 

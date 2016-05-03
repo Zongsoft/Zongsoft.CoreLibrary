@@ -425,7 +425,7 @@ namespace Zongsoft.Data
 				return args.Result;
 
 			//执行数据插入操作
-			args.Result = this.InsertCore(new DataDictionary<TEntity>(args.Data), args.Scope);
+			args.Result = this.InsertCore(DataDictionary<TEntity>.GetDataDictionary(args.Data), args.Scope);
 
 			//激发“Inserted”事件
 			return this.OnInserted(args.Data, args.Scope, args.Result);
@@ -447,12 +447,12 @@ namespace Zongsoft.Data
 			{
 				foreach(var item in (IEnumerable)args.Data)
 				{
-					items.Add(new DataDictionary<TEntity>(item));
+					items.Add(DataDictionary<TEntity>.GetDataDictionary(item));
 				}
 			}
 			else
 			{
-				items.Add(new DataDictionary<TEntity>(data));
+				items.Add(DataDictionary<TEntity>.GetDataDictionary(data));
 			}
 
 			//执行数据插入操作
@@ -519,7 +519,7 @@ namespace Zongsoft.Data
 				return args.Result;
 
 			//执行数据更新操作
-			args.Result = this.UpdateCore(new DataDictionary<TEntity>(args.Data), args.Condition, args.Scope);
+			args.Result = this.UpdateCore(DataDictionary<TEntity>.GetDataDictionary(args.Data), args.Condition, args.Scope);
 
 			//激发“Updated”事件
 			return this.OnUpdated(args.Data, args.Condition, args.Scope, args.Result);
@@ -546,12 +546,12 @@ namespace Zongsoft.Data
 			{
 				foreach(var item in (IEnumerable)args.Data)
 				{
-					items.Add(new DataDictionary<TEntity>(item));
+					items.Add(DataDictionary<TEntity>.GetDataDictionary(item));
 				}
 			}
 			else
 			{
-				items.Add(new DataDictionary<TEntity>(data));
+				items.Add(DataDictionary<TEntity>.GetDataDictionary(data));
 			}
 
 			//执行数据更新操作
