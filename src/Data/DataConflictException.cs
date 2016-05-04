@@ -29,7 +29,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
-	public class DataConflictException : ApplicationException
+	public class DataConflictException : DataException
 	{
 		#region 构造函数
 		public DataConflictException()
