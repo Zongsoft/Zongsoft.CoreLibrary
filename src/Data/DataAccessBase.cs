@@ -235,7 +235,7 @@ namespace Zongsoft.Data
 				return args.Result;
 
 			//执行数据插入操作
-			args.Result = this.OnInsert(name, GetDataDictionary(data), scope);
+			args.Result = this.OnInsert(name, GetDataDictionary(args.Data), scope);
 
 			//激发“Inserted”事件
 			return this.OnInserted(name, args.Data, args.Scope, args.Result);
@@ -258,7 +258,7 @@ namespace Zongsoft.Data
 				return args.Result;
 
 			//执行数据插入操作
-			args.Result = this.OnInsertMany(name, GetDataDictionaries(items), scope);
+			args.Result = this.OnInsertMany(name, GetDataDictionaries(args.Data), scope);
 
 			//激发“Inserted”事件
 			return this.OnInserted(name, args.Data, args.Scope, args.Result);
@@ -288,7 +288,7 @@ namespace Zongsoft.Data
 				return args.Result;
 
 			//执行数据更新操作
-			args.Result = this.OnUpdate(name, GetDataDictionary(data), condition, scope);
+			args.Result = this.OnUpdate(name, GetDataDictionary(args.Data), condition, scope);
 
 			//激发“Updated”事件
 			return this.OnUpdated(name, args.Data, args.Condition, args.Scope, args.Result);
@@ -310,7 +310,6 @@ namespace Zongsoft.Data
 		/// <summary>
 		/// 根据指定的条件将指定的实体集更新到数据源。
 		/// </summary>
-		/// <typeparam name="T">指定的实体集中的实体的类型。</typeparam>
 		/// <param name="name">指定的实体映射名。</param>
 		/// <param name="items">要更新的数据集。</param>
 		/// <param name="condition">要更新的条件子句，如果为空(null)则根据实体的主键进行更新。</param>
@@ -328,7 +327,7 @@ namespace Zongsoft.Data
 				return args.Result;
 
 			//执行数据更新操作
-			args.Result = this.OnUpdateMany(name, GetDataDictionaries(items), condition, scope);
+			args.Result = this.OnUpdateMany(name, GetDataDictionaries(args.Data), condition, scope);
 
 			//激发“Updated”事件
 			return this.OnUpdated(name, args.Data, args.Condition, args.Scope, args.Result);
@@ -541,18 +540,25 @@ namespace Zongsoft.Data
 			if(data == null)
 				throw new ArgumentNullException("data");
 
-			return data as DataDictionary ?? new DataDictionary(data);
+			return (data as DataDictionary) ?? new DataDictionary(data);
 		}
 
-		private static IEnumerable<DataDictionary> GetDataDictionaries(IEnumerable items)
+		private static IEnumerable<DataDictionary> GetDataDictionaries(object data)
 		{
-			if(items == null)
-				throw new ArgumentNullException("items");
+			if(data == null)
+				throw new ArgumentNullException("data");
 
-			foreach(var item in items)
+			var items = data as IEnumerable;
+
+			if(items == null)
+				yield return (data as DataDictionary) ?? new DataDictionary(data);
+			else
 			{
-				if(item != null)
-					yield return (item as DataDictionary) ?? new DataDictionary(item);
+				foreach(var item in items)
+				{
+					if(item != null)
+						yield return (item as DataDictionary) ?? new DataDictionary(item);
+				}
 			}
 		}
 		#endregion
