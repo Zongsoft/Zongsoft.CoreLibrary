@@ -25,8 +25,8 @@
  */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Linq.Expressions;
 
 namespace Zongsoft.Data
@@ -154,10 +154,29 @@ namespace Zongsoft.Data
 			if(data is DataDictionary<T>)
 				return (DataDictionary<T>)data;
 
-			if(Common.TypeExtension.IsAssignableFrom(typeof(DataDictionary<>), data.GetType()))
-				data = data.GetType().GetProperty("Data", BindingFlags.Public | BindingFlags.Instance).GetValue(data);
+			if(data is DataDictionary)
+				data = ((DataDictionary)data).Data;
 
 			return new DataDictionary<T>(data);
+		}
+
+		public static IEnumerable<DataDictionary<T>> GetDataDictionaries(object data)
+		{
+			if(data == null)
+				throw new ArgumentNullException("data");
+
+			var items = data as IEnumerable;
+
+			if(items == null)
+				yield return GetDataDictionary(data);
+			else
+			{
+				foreach(var item in items)
+				{
+					if(item != null)
+						yield return GetDataDictionary(item);
+				}
+			}
 		}
 		#endregion
 	}
