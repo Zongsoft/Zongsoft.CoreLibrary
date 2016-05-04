@@ -295,7 +295,7 @@ namespace Zongsoft.Data
 				return args.Result;
 
 			//执行数据获取操作方法
-			var items = this.GetCore(args.Condition, args.Scope, args.Paging, args.Sortings);
+			var items = this.OnGet(args.Condition, args.Scope, args.Paging, args.Sortings);
 
 			//进一步处理数据结果
 			args.Result = resultThunk != null ? resultThunk(items) : items;
@@ -304,7 +304,7 @@ namespace Zongsoft.Data
 			return this.OnGetted(args.Condition, args.Scope, args.Paging, args.Sortings, args.Result);
 		}
 
-		protected virtual IEnumerable<TEntity> GetCore(ICondition condition, string scope, Paging paging, params Sorting[] sortings)
+		protected virtual IEnumerable<TEntity> OnGet(ICondition condition, string scope, Paging paging, params Sorting[] sortings)
 		{
 			return this.DataAccess.Select<TEntity>(this.Name, condition, scope, paging, sortings);
 		}
@@ -353,7 +353,7 @@ namespace Zongsoft.Data
 				return args.Result as IEnumerable<TEntity>;
 
 			//执行数据查询操作
-			args.Result = this.SelectCore(args.Condition, args.Grouping, args.Scope, args.Paging, args.Sortings);
+			args.Result = this.OnSelect(args.Condition, args.Grouping, args.Scope, args.Paging, args.Sortings);
 
 			//激发“Selected”事件
 			return this.OnSelected(typeof(TEntity), args.Condition, args.Grouping, args.Scope, args.Paging, args.Sortings, (IEnumerable<TEntity>)args.Result);
@@ -369,7 +369,7 @@ namespace Zongsoft.Data
 			return this.Select(condition, grouping, scope, paging, sortings);
 		}
 
-		protected virtual IEnumerable<TEntity> SelectCore(ICondition condition, Grouping grouping, string scope, Paging paging, params Sorting[] sortings)
+		protected virtual IEnumerable<TEntity> OnSelect(ICondition condition, Grouping grouping, string scope, Paging paging, params Sorting[] sortings)
 		{
 			return this.DataAccess.Select<TEntity>(this.Name, condition, grouping, scope, paging, sortings);
 		}
@@ -400,13 +400,13 @@ namespace Zongsoft.Data
 				return args.Result;
 
 			//执行数据删除操作
-			args.Result = this.DeleteCore(args.Condition, args.Cascades);
+			args.Result = this.OnDelete(args.Condition, args.Cascades);
 
 			//激发“Deleted”事件
 			return this.OnDeleted(args.Condition, args.Cascades, args.Result);
 		}
 
-		protected virtual int DeleteCore(ICondition condition, string[] cascades)
+		protected virtual int OnDelete(ICondition condition, string[] cascades)
 		{
 			if(condition == null)
 				throw new NotSupportedException("The condition cann't is null on delete operation.");
@@ -425,7 +425,7 @@ namespace Zongsoft.Data
 				return args.Result;
 
 			//执行数据插入操作
-			args.Result = this.InsertCore(DataDictionary<TEntity>.GetDataDictionary(args.Data), args.Scope);
+			args.Result = this.OnInsert(DataDictionary<TEntity>.GetDataDictionary(args.Data), args.Scope);
 
 			//激发“Inserted”事件
 			return this.OnInserted(args.Data, args.Scope, args.Result);
@@ -439,43 +439,37 @@ namespace Zongsoft.Data
 			if(args.Cancel)
 				return args.Result;
 
-			//创建数据包裹器列表
-			var items = new List<DataDictionary<TEntity>>();
-
-			//设置数据包裹器列表的内容
-			if(args.Data is IEnumerable)
-			{
-				foreach(var item in (IEnumerable)args.Data)
-				{
-					items.Add(DataDictionary<TEntity>.GetDataDictionary(item));
-				}
-			}
-			else
-			{
-				items.Add(DataDictionary<TEntity>.GetDataDictionary(data));
-			}
-
 			//执行数据插入操作
-			args.Result = this.InsertManyCore(items.ToArray(), args.Scope);
+			args.Result = this.OnInsertMany(DataDictionary<TEntity>.GetDataDictionaries(args.Data), args.Scope);
 
 			//激发“Inserted”事件
 			return this.OnInserted(args.Data, args.Scope, args.Result);
 		}
 
-		protected virtual int InsertCore(DataDictionary<TEntity> data, string scope)
+		protected virtual int OnInsert(DataDictionary<TEntity> data, string scope)
 		{
 			if(data == null || data.Data == null)
 				return 0;
 
-			return this.DataAccess.Insert(this.Name, data.Data, scope);
+			return this.DataAccess.Insert(this.Name, data, scope);
 		}
 
-		protected virtual int InsertManyCore(IEnumerable<DataDictionary<TEntity>> items, string scope)
+		protected virtual int OnInsertMany(IEnumerable<DataDictionary<TEntity>> items, string scope)
 		{
 			if(items == null)
 				return 0;
 
-			return this.DataAccess.InsertMany(this.Name, items.Select(p => p.Data), scope);
+			int count = 0;
+
+			using(var transaction = new Zongsoft.Transactions.Transaction())
+			{
+				foreach(var item in items)
+				{
+					count += this.OnInsert(item, scope);
+				}
+			}
+
+			return count;
 		}
 		#endregion
 
@@ -519,7 +513,7 @@ namespace Zongsoft.Data
 				return args.Result;
 
 			//执行数据更新操作
-			args.Result = this.UpdateCore(DataDictionary<TEntity>.GetDataDictionary(args.Data), args.Condition, args.Scope);
+			args.Result = this.OnUpdate(DataDictionary<TEntity>.GetDataDictionary(args.Data), args.Condition, args.Scope);
 
 			//激发“Updated”事件
 			return this.OnUpdated(args.Data, args.Condition, args.Scope, args.Result);
@@ -538,24 +532,8 @@ namespace Zongsoft.Data
 			if(args.Cancel)
 				return args.Result;
 
-			//创建数据包裹器列表
-			var items = new List<DataDictionary<TEntity>>();
-
-			//设置数据包裹器列表的内容
-			if(args.Data is IEnumerable)
-			{
-				foreach(var item in (IEnumerable)args.Data)
-				{
-					items.Add(DataDictionary<TEntity>.GetDataDictionary(item));
-				}
-			}
-			else
-			{
-				items.Add(DataDictionary<TEntity>.GetDataDictionary(data));
-			}
-
 			//执行数据更新操作
-			args.Result = this.UpdateManyCore(items.ToArray(), args.Condition, args.Scope);
+			args.Result = this.OnUpdateMany(DataDictionary<TEntity>.GetDataDictionaries(args.Data), args.Condition, args.Scope);
 
 			//激发“Updated”事件
 			return this.OnUpdated(args.Data, args.Condition, args.Scope, args.Result);
@@ -566,20 +544,30 @@ namespace Zongsoft.Data
 			return this.UpdateMany(data, condition, scope);
 		}
 
-		protected virtual int UpdateCore(DataDictionary<TEntity> data, ICondition condition, string scope)
+		protected virtual int OnUpdate(DataDictionary<TEntity> data, ICondition condition, string scope)
 		{
 			if(data == null || data.Data == null)
 				return 0;
 
-			return this.DataAccess.Update(this.Name, data.Data, condition, scope);
+			return this.DataAccess.Update(this.Name, data, condition, scope);
 		}
 
-		protected virtual int UpdateManyCore(IEnumerable<DataDictionary<TEntity>> items, ICondition condition, string scope)
+		protected virtual int OnUpdateMany(IEnumerable<DataDictionary<TEntity>> items, ICondition condition, string scope)
 		{
 			if(items == null)
 				return 0;
 
-			return this.DataAccess.UpdateMany(this.Name, items.Select(p => p.Data), condition, scope);
+			int count = 0;
+
+			using(var transaction = new Zongsoft.Transactions.Transaction())
+			{
+				foreach(var item in items)
+				{
+					count += this.OnUpdate(item, condition, scope);
+				}
+			}
+
+			return count;
 		}
 		#endregion
 
