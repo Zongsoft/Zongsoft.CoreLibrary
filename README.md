@@ -20,8 +20,6 @@ Zongsoft.CoreLibrary 类库提供了.NET开发的常用功能集以及一些相�
 - Collections
 	> 该命名空间内包括有关集合的类。其中包括相对.NET BCL中同名集合类进行了功能强化的 `NamedCollectionBase`、`Collection<T>`、`Queue` 类，以及表示树型层次结构的 `HierarchicalNode`、`HierarchicalNodeCollection`、`Category`、`CategoryCollection` 这些类，以及一个支持线程安全的提供对象池管理的 `ObjectPool` 类和支持指定容积的内存缓存`ObjectCache`。
 
-	> 当然，不排除在未来的某个时间我们会为它们添加并发处理、线程安全的支持，或者让 `Queue` 内置内存映射文件机制的持久化，当然所有这些功能特性(features)必须是易于扩展和可替换的。
-
 - Communication
 	> 该命名空间内包括进行通讯和自定义通讯协议包解析的基类、接口，设计通讯处理程序时应尽量使用这里定义的接口或基类。
 
@@ -108,7 +106,7 @@ Zongsoft.CoreLibrary 类库提供了.NET开发的常用功能集以及一些相�
 ## 授权协议
 
 - Zongsoft.CoreLibrary 是基于 [LGPL v2.1授权协议](http://www.gnu.org/licenses/lgpl-2.1.html)。
-- 您可以使用该项目应用于您的商业活动中，但是**必须确保项目的完整（含版权声明），不要分割或部分引用该项目的源码**，我们保留追究违反授权协议的权利。
+- 您可以将本项目应用于商业活动中，但是**必须确保对本项目的完整（含版权声明）引用，不要分割或部分引用该项目的源码**，我们保留追究违反授权协议的权利。
 
 ------------
 
