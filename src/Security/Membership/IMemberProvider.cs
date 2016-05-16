@@ -99,14 +99,14 @@ namespace Zongsoft.Security.Membership
 		/// <summary>
 		/// 创建单个或多个角色成员。
 		/// </summary>
-		/// <param name="members">要删除的角色成员数组。</param>
+		/// <param name="members">要创建的角色成员数组。</param>
 		/// <returns>返回创建成功的角色成员数量。</returns>
 		int CreateMembers(params Member[] members);
 
 		/// <summary>
 		/// 创建单个或多个角色成员。
 		/// </summary>
-		/// <param name="members">要删除的角色成员集合。</param>
+		/// <param name="members">要创建的角色成员集合。</param>
 		/// <returns>返回创建成功的角色成员数量。</returns>
 		int CreateMembers(IEnumerable<Member> members);
 	}
