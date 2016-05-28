@@ -89,7 +89,7 @@ namespace Zongsoft.Messaging
 			var queue = this.Queue;
 
 			if(queue == null)
-				throw new MissingMemberException(this.GetType().FullName, "Queue");
+				throw new InvalidOperationException("Missing the 'Queue' for the operation.");
 
 			_channel = new MessageQueueChannel(1, queue);
 			this.Receiver = _channel;
