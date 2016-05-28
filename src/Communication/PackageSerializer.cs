@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2011-2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2011-2016 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -82,7 +82,7 @@ namespace Zongsoft.Communication
 		T Zongsoft.Runtime.Serialization.ISerializer.Deserialize<T>(Stream serializationStream)
 		{
 			if(typeof(T) == typeof(Package))
-				return (T)this.Deserialize(serializationStream);
+				return (T)(object)this.Deserialize(serializationStream);
 
 			throw new NotSupportedException();
 		}
@@ -95,13 +95,29 @@ namespace Zongsoft.Communication
 			throw new NotSupportedException();
 		}
 
-		public object Deserialize(Stream serializationStream)
+		object Zongsoft.Runtime.Serialization.ISerializer.Deserialize(Stream serializationStream)
+		{
+			return this.Deserialize(serializationStream);
+		}
+
+		public Package Deserialize(byte[] serializationBuffer, int index = 0, int count = 0)
+		{
+			if(serializationBuffer == null || serializationBuffer.Length == 0)
+				return null;
+
+			using(var stream = new MemoryStream(serializationBuffer, index, (count > 0 ? count : serializationBuffer.Length - index)))
+			{
+				return this.Deserialize(stream);
+			}
+		}
+
+		public Package Deserialize(Stream serializationStream)
 		{
 			if(serializationStream == null)
 				throw new ArgumentNullException("serializationStream");
 
 			if(this.BufferManager == null)
-				throw new InvalidOperationException("The value of BufferManager property is null.");
+				throw new InvalidOperationException("The value of 'BufferManager' property is null.");
 
 			int lower = serializationStream.ReadByte();
 			int upper = serializationStream.ReadByte();
@@ -179,18 +195,24 @@ namespace Zongsoft.Communication
 		#endregion
 
 		#region 序列方法
-		public void Serialize(Stream serializationStream, object graph, SerializationSettings settings = null)
+		void Zongsoft.Runtime.Serialization.ISerializer.Serialize(Stream serializationStream, object graph, SerializationSettings settings)
 		{
 			if(graph == null)
 				return;
 
+			if(!(graph is Package))
+				throw new ArgumentException("Not supports serialize the graph.");
+
+			this.Serialize(serializationStream, (Package)graph);
+		}
+
+		public void Serialize(Stream serializationStream, Package package)
+		{
+			if(package == null)
+				return;
+
 			if(serializationStream == null)
 				throw new ArgumentNullException("serializationStream");
-
-			Package package = graph as Package;
-
-			if(package == null)
-				throw new NotSupportedException();
 
 			byte[] value = Encoding.ASCII.GetBytes(Uri.EscapeUriString(package.Url));
 
