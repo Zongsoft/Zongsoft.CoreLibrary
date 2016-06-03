@@ -56,13 +56,13 @@ namespace Zongsoft.Security
 			_message = string.IsNullOrEmpty(message) ? Resources.ResourceUtility.GetString("Text.CredentialException.Message") : message;
 		}
 
-		public CredentialException(string certificationId, string message) : this(certificationId, message, null)
+		public CredentialException(string credentialId, string message) : this(credentialId, message, null)
 		{
 		}
 
-		public CredentialException(string certificationId, string message, Exception innerException) : base(message, innerException)
+		public CredentialException(string credentialId, string message, Exception innerException) : base(message, innerException)
 		{
-			_credentialId = certificationId;
+			_credentialId = credentialId;
 			_message = string.IsNullOrEmpty(message) ? Resources.ResourceUtility.GetString("Text.CredentialException.Message") : message;
 		}
 
