@@ -351,6 +351,7 @@
     <Compile Include="Security\Membership\Role.cs" />
     <Compile Include="Security\Membership\User.cs" />
     <Compile Include="Security\PasswordUtility.cs" />
+    <Compile Include="Security\SecurityException.cs" />
     <Compile Include="Services\CommandBase.cs" />
     <Compile Include="Services\CommandContextBase.cs" />
     <Compile Include="Services\CommandExecutorBase.cs" />
