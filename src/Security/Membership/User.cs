@@ -51,27 +51,16 @@ namespace Zongsoft.Security.Membership
 		private string _principalId;
 		private string _email;
 		private string _phoneNumber;
-		private bool _approved;
-		private bool _suspended;
-		private bool _changePasswordOnFirstTime;
-		private byte _maxInvalidPasswordAttempts;
-		private byte _minRequiredPasswordLength;
-		private int _passwordAttemptWindow;
-		private DateTime _passwordExpires;
+		private UserStatus _status;
+		private DateTime? _statusTime;
 		private DateTime _createdTime;
-		private DateTime? _approvedTime;
-		private DateTime? _suspendedTime;
 		#endregion
 
 		#region 构造函数
 		public User()
 		{
-			_approved = true;
-			_approvedTime = _createdTime = DateTime.Now;
-
-			_maxInvalidPasswordAttempts = 3;
-			_minRequiredPasswordLength = 6;
-			_passwordAttemptWindow = 30;
+			_status = UserStatus.Unapproved;
+			_createdTime = DateTime.Now;
 		}
 
 		public User(int userId, string name) : this(userId, name, null)
@@ -86,12 +75,8 @@ namespace Zongsoft.Security.Membership
 			_userId = userId;
 			this.Name = _fullName = name.Trim();
 			this.Namespace = @namespace;
-			_approved = true;
-			_approvedTime = _createdTime = DateTime.Now;
-
-			_maxInvalidPasswordAttempts = 3;
-			_minRequiredPasswordLength = 6;
-			_passwordAttemptWindow = 30;
+			_status = UserStatus.Unapproved;
+			_createdTime = DateTime.Now;
 		}
 		#endregion
 
@@ -295,110 +280,38 @@ namespace Zongsoft.Security.Membership
 		}
 
 		/// <summary>
-		/// 获取或设置用户是否被禁用标志。
+		/// 获取或设置用户的状态。
 		/// </summary>
-		public bool Suspended
+		public UserStatus Status
 		{
 			get
 			{
-				return _suspended;
+				return _status;
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.Suspended, ref _suspended, value);
+				if(value == _status)
+					return;
+
+				this.SetPropertyValue(() => this.Status, ref _status, value);
+
+				//同步设置状态更新时间戳
+				_statusTime = DateTime.Now;
 			}
 		}
 
 		/// <summary>
-		/// 获取或设置用户是否已被审核通过。
+		/// 获取或设置用户状态的更新时间。
 		/// </summary>
-		public bool Approved
+		public DateTime? StatusTime
 		{
 			get
 			{
-				return _approved;
+				return _statusTime;
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.Approved, ref _approved, value);
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置一个值，指示当该用户被首次使用时是否必须修改密码。
-		/// </summary>
-		public bool ChangePasswordOnFirstTime
-		{
-			get
-			{
-				return _changePasswordOnFirstTime;
-			}
-			set
-			{
-				this.SetPropertyValue(() => this.ChangePasswordOnFirstTime, ref _changePasswordOnFirstTime, value);
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置一个值，指示该用户密码验证失败允许尝试的最大次数。
-		/// </summary>
-		[DefaultValue(3)]
-		public byte MaxInvalidPasswordAttempts
-		{
-			get
-			{
-				return _maxInvalidPasswordAttempts;
-			}
-			set
-			{
-				this.SetPropertyValue(() => this.MaxInvalidPasswordAttempts, ref _maxInvalidPasswordAttempts, value);
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置一个值，指示该用户设置密码的最小长度。
-		/// </summary>
-		[DefaultValue(6)]
-		public byte MinRequiredPasswordLength
-		{
-			get
-			{
-				return _minRequiredPasswordLength;
-			}
-			set
-			{
-				this.SetPropertyValue(() => this.MinRequiredPasswordLength, ref _minRequiredPasswordLength, value);
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置一个值，指示当该用户密码验证失败次数达到<see cref="MaxInvalidPasswordAttempts"/>属性指定的数值后，再次进行密码验证的间隔时长(单位：秒)。
-		/// </summary>
-		[DefaultValue(30)]
-		public int PasswordAttemptWindow
-		{
-			get
-			{
-				return _passwordAttemptWindow;
-			}
-			set
-			{
-				this.SetPropertyValue(() => this.PasswordAttemptWindow, ref _passwordAttemptWindow, value);
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置当前用户密码的过期时间。
-		/// </summary>
-		public DateTime PasswordExpires
-		{
-			get
-			{
-				return _passwordExpires;
-			}
-			set
-			{
-				this.SetPropertyValue(() => this.PasswordExpires, ref _passwordExpires, value);
+				this.SetPropertyValue(() => this.StatusTime, ref _statusTime, value);
 			}
 		}
 
@@ -414,36 +327,6 @@ namespace Zongsoft.Security.Membership
 			set
 			{
 				this.SetPropertyValue(() => this.CreatedTime, ref _createdTime, value);
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置当前用户被审核通过的时间。
-		/// </summary>
-		public DateTime? ApprovedTime
-		{
-			get
-			{
-				return _approvedTime;
-			}
-			set
-			{
-				this.SetPropertyValue(() => this.ApprovedTime, ref _approvedTime, value);
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置当前用户被禁用的时间。
-		/// </summary>
-		public DateTime? SuspendedTime
-		{
-			get
-			{
-				return _suspendedTime;
-			}
-			set
-			{
-				this.SetPropertyValue(() => this.SuspendedTime, ref _suspendedTime, value);
 			}
 		}
 		#endregion

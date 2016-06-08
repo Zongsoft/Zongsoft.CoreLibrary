@@ -36,22 +36,6 @@ namespace Zongsoft.Security.Membership
 	{
 		#region 用户管理
 		/// <summary>
-		/// 审核指定编号的用户帐户。
-		/// </summary>
-		/// <param name="userId">要审核的用户编号。</param>
-		/// <param name="approved">是否审核通过。</param>
-		/// <returns>返回执行结果是否成功，如果为真(True)则表示操作成功；否则返回假(False)。</returns>
-		bool Approve(int userId, bool approved = true);
-
-		/// <summary>
-		/// 禁用指定编号的用户帐户。
-		/// </summary>
-		/// <param name="userId">要禁用的用户编号。</param>
-		/// <param name="suspended">是否禁用的标志。</param>
-		/// <returns>返回执行结果是否成功，如果为真(True)则表示操作成功；否则返回假(False)。</returns>
-		bool Suspend(int userId, bool suspended = true);
-
-		/// <summary>
 		/// 获取指定编号对应的用户对象。
 		/// </summary>
 		/// <param name="userId">要查找的用户编号。</param>
@@ -145,6 +129,14 @@ namespace Zongsoft.Security.Membership
 		/// <param name="principalId">要设置的用户主体标识。</param>
 		/// <returns>如果设置成功则返回真(True)，否则返回假(False)。</returns>
 		bool SetPrincipalId(int userId, string principalId);
+
+		/// <summary>
+		/// 设置指定编号的用户状态。
+		/// </summary>
+		/// <param name="userId">要设置的用户编号。</param>
+		/// <param name="status">指定的用户状态。</param>
+		/// <returns>如果设置成功则返回真(True)，否则返回假(False)。</returns>
+		bool SetStatus(int userId, UserStatus status);
 
 		/// <summary>
 		/// 删除指定编号集的多个用户。
