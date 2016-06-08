@@ -172,7 +172,7 @@ namespace Zongsoft.ComponentModel
 
 		protected void SetPropertyValue<T>(string propertyName, ref T target, T value)
 		{
-			if(object.ReferenceEquals(target, value))
+			if(object.Equals(target, value))
 				return;
 
 			target = value;
@@ -181,7 +181,7 @@ namespace Zongsoft.ComponentModel
 
 		protected void SetPropertyValue<T>(Expression<Func<T>> propertyExpression, ref T target, T value)
 		{
-			if(object.ReferenceEquals(target, value))
+			if(object.Equals(target, value))
 				return;
 
 			if(propertyExpression == null)
