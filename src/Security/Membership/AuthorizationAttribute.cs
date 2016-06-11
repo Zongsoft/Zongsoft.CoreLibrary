@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2003-2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2003-2016 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -35,29 +35,28 @@ namespace Zongsoft.Security.Membership
 		#region 成员变量
 		private string _schemaId;
 		private string _actionId;
+		private string[] _roles;
 		private AuthorizationMode _mode;
 		private Type _validatorType;
 		private ICredentialValidator _validator;
 		#endregion
 
 		#region 构造函数
-		public AuthorizationAttribute()
+		public AuthorizationAttribute(AuthorizationMode mode)
 		{
-			_actionId = string.Empty;
-			_schemaId = string.Empty;
+			_mode = mode;
+		}
 
+		public AuthorizationAttribute(string[] roles)
+		{
+			if(roles == null || roles.Length == 0)
+				throw new ArgumentNullException("roles");
+
+			_roles = roles;
 			_mode = AuthorizationMode.Identity;
 		}
 
-		public AuthorizationAttribute(bool disabled)
-		{
-			_actionId = string.Empty;
-			_schemaId = string.Empty;
-
-			_mode = disabled ? AuthorizationMode.Disabled : AuthorizationMode.Identity;
-		}
-
-		public AuthorizationAttribute(string schemaId) : this(schemaId, null)
+		public AuthorizationAttribute(string schemaId) : this(schemaId, (string)null)
 		{
 		}
 
@@ -72,7 +71,7 @@ namespace Zongsoft.Security.Membership
 
 		#region 公共属性
 		/// <summary>
-		/// 获取或设置授权验证的方式。
+		/// 获取授权验证的方式。
 		/// </summary>
 		public AuthorizationMode Mode
 		{
@@ -80,14 +79,10 @@ namespace Zongsoft.Security.Membership
 			{
 				return _mode;
 			}
-			set
-			{
-				_mode = value;
-			}
 		}
 
 		/// <summary>
-		/// 获取或设置操作编号。
+		/// 获取操作编号。
 		/// </summary>
 		public string ActionId
 		{
@@ -95,14 +90,10 @@ namespace Zongsoft.Security.Membership
 			{
 				return _actionId;
 			}
-			set
-			{
-				_actionId = value;
-			}
 		}
 
 		/// <summary>
-		/// 获取或设置模式编号。
+		/// 获取模式编号。
 		/// </summary>
 		public string SchemaId
 		{
@@ -110,16 +101,23 @@ namespace Zongsoft.Security.Membership
 			{
 				return _schemaId;
 			}
-			set
+		}
+
+		/// <summary>
+		/// 获取验证的所属角色名数组。
+		/// </summary>
+		public string[] Roles
+		{
+			get
 			{
-				_schemaId = value;
+				return _roles;
 			}
 		}
 
 		/// <summary>
 		/// 获取凭证验证器实例。
 		/// </summary>
-		public ICredentialValidator Validator
+		public virtual ICredentialValidator Validator
 		{
 			get
 			{

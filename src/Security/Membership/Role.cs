@@ -55,6 +55,10 @@ namespace Zongsoft.Security.Membership
 			_createdTime = DateTime.Now;
 		}
 
+		public Role(string name, string @namespace) : this(0, name, @namespace)
+		{
+		}
+
 		public Role(int roleId, string name) : this(roleId, name, null)
 		{
 		}

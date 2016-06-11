@@ -63,6 +63,10 @@ namespace Zongsoft.Security.Membership
 			_createdTime = DateTime.Now;
 		}
 
+		public User(string name, string @namespace) : this(0, name, @namespace)
+		{
+		}
+
 		public User(int userId, string name) : this(userId, name, null)
 		{
 		}
