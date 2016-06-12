@@ -61,12 +61,18 @@ namespace Zongsoft.Common
 			if(expression.NodeType == ExpressionType.Lambda)
 				return ResolveMemberExpression(((LambdaExpression)expression).Body, stack);
 
-			if(expression.NodeType == ExpressionType.MemberAccess)
+			switch(expression.NodeType)
 			{
-				stack.Push(((MemberExpression)expression).Member);
+				case ExpressionType.MemberAccess:
+					stack.Push(((MemberExpression)expression).Member);
 
-				if(((MemberExpression)expression).Expression != null)
-					return ResolveMemberExpression(((MemberExpression)expression).Expression, stack);
+					if(((MemberExpression)expression).Expression != null)
+						return ResolveMemberExpression(((MemberExpression)expression).Expression, stack);
+
+					break;
+				case ExpressionType.Convert:
+				case ExpressionType.ConvertChecked:
+					return ResolveMemberExpression(((UnaryExpression)expression).Operand, stack);
 			}
 
 			if(stack == null || stack.Count == 0)
