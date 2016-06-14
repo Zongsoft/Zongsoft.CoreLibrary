@@ -225,7 +225,7 @@ namespace Zongsoft.Data
 
 			//如果键不可分解则返回失败（因为之前已经全键设置过一次）
 			if(parts.Length == 1)
-				throw new KeyNotFoundException(string.Format("The '{0}' property is not existed.", key));
+				return false;
 
 			object target = _cache;
 
