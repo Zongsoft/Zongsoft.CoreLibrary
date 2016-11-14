@@ -232,6 +232,7 @@
     <Compile Include="IO\DirectoryInfo.cs" />
     <Compile Include="IO\FileInfo.cs" />
     <Compile Include="IO\FileSystem.cs" />
+    <Compile Include="IO\PathAnchor.cs" />
     <Compile Include="IO\PathInfo.cs" />
     <Compile Include="IO\IDirectory.cs" />
     <Compile Include="IO\IFile.cs" />
@@ -361,6 +362,9 @@
     <Compile Include="Services\CommandExecutorEventArgs.cs" />
     <Compile Include="Services\CommandExecutorExecutedEventArgs.cs" />
     <Compile Include="Services\CommandExecutorExecutingEventArgs.cs" />
+    <Compile Include="Services\CommandExpression.cs" />
+    <Compile Include="Services\CommandExpressionException.cs" />
+    <Compile Include="Services\CommandExpressionParser.cs" />
     <Compile Include="Services\CommandHelper.cs" />
     <Compile Include="Services\CommandLine.cs" />
     <Compile Include="Services\CommandLoaderBase.cs" />
@@ -386,6 +390,7 @@
     <Compile Include="Services\Composition\IExecutor.cs" />
     <Compile Include="Services\Composition\ExecutionUtility.cs" />
     <Compile Include="Services\ICommandExecutor.cs" />
+    <Compile Include="Services\ICommandExpressionParser.cs" />
     <Compile Include="Services\ICommandLineParser.cs" />
     <Compile Include="Services\IMatchable`1.cs" />
     <Compile Include="Services\IMatcher.cs" />
