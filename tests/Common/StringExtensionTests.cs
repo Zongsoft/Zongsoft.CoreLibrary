@@ -13,7 +13,7 @@ namespace Zongsoft.Common.Tests
 	public class StringExtensionTests
 	{
 		[Fact]
-		public void GetStringHashCodeTest()
+		public void TestGetStringHashCode()
 		{
 			const int LENGTH = 100;
 
@@ -35,7 +35,7 @@ namespace Zongsoft.Common.Tests
 		}
 
 		[Fact]
-		public void ContainsCharactersTest()
+		public void TestContainsCharacters()
 		{
 			Assert.True(Zongsoft.Common.StringExtension.ContainsCharacters("abcdefghijk", "big"));
 			Assert.True(Zongsoft.Common.StringExtension.ContainsCharacters("abcdefghijk", "biger"));
@@ -43,7 +43,7 @@ namespace Zongsoft.Common.Tests
 		}
 
 		[Fact]
-		public void RemoveCharactersTest()
+		public void TestRemoveCharacters()
 		{
 			const string TEXT = @"Read^me??.txt";
 
@@ -52,11 +52,24 @@ namespace Zongsoft.Common.Tests
 		}
 
 		[Fact]
-		public void TrimStringTest()
+		public void TestTrimString()
 		{
 			Assert.Equal("ContentSuffix", Zongsoft.Common.StringExtension.TrimString("PrefixPrefixContentSuffix", "Prefix"));
 			Assert.Equal("PrefixPrefixContent", Zongsoft.Common.StringExtension.TrimString("PrefixPrefixContentSuffix", "Suffix"));
 			Assert.Equal("Content", Zongsoft.Common.StringExtension.TrimString("PrefixPrefixContentSuffix", "Prefix", "Suffix"));
+		}
+
+		[Fact]
+		public void TestEscape()
+		{
+			var items = StringExtension.Escape(@"\ta\b\c\t\\def x'y\""z");
+
+			foreach(var item in items)
+			{
+				Assert.Equal(@"	abc	\def x'y""z", item);
+			}
+
+			Assert.Equal(@"", StringExtension.Escape(@"").FirstOrDefault());
 		}
 	}
 }

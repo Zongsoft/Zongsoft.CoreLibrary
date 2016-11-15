@@ -98,7 +98,7 @@ namespace Zongsoft.Services
 					}
 					else if(chr == '"' || chr == '\'')
 					{
-						ParseString(reader, chr);
+						Common.StringExtension.Escape(reader, chr);
 					}
 					else if(Char.IsLetterOrDigit(chr) || chr == '_')
 					{
@@ -229,69 +229,19 @@ namespace Zongsoft.Services
 			}
 		}
 
-		private static string ParseString(string text, int index = 0, char quote = '"')
+		private static string EscapeString(StringReader reader, params char[] delimiters)
 		{
-			return ParseString(text, index, -1, quote);
+			return EscapeString(reader, null, delimiters);
 		}
 
-		private static string ParseString(string text, int index, int count, char quote)
-		{
-			if(string.IsNullOrEmpty(text))
-				return string.Empty;
-
-			if(index < 0)
-				throw new ArgumentOutOfRangeException(nameof(index));
-
-			if(index >= text.Length)
-				throw new ArgumentOutOfRangeException(nameof(index));
-
-			if(count == 0)
-				throw new ArgumentOutOfRangeException(nameof(count));
-
-			if(count > 0 && count > text.Length - index)
-				throw new ArgumentOutOfRangeException(nameof(count));
-
-			var isEscaping = false;
-			var result = string.Empty;
-
-			if(count < 0)
-				count = text.Length - index;
-
-			for(int i = 0; i < count; i++)
-			{
-				var chr = text[index + i];
-
-				if(isEscaping)
-				{
-					if(chr == 't')
-						chr = '\t';
-					else if(chr != quote && chr != '\\')
-						result += '\\';
-				}
-				else
-				{
-					if(chr == quote)
-						return result;
-				}
-
-				//设置转义状态：即当前字符为转义符并且当前状态不为转义状态
-				isEscaping = chr == '\\' && (!isEscaping);
-
-				if(isEscaping)
-					continue;
-
-				result += chr;
-			}
-
-			return result;
-		}
-
-		private static string EscapeString(StringReader reader, string delimiters, Func<char, char> escape = null)
+		private static string EscapeString(StringReader reader, Func<char, char> escape, params char[] delimiters)
 		{
 			if(reader == null)
 				throw new ArgumentNullException(nameof(reader));
 
+			//如果未指定转义处理函数则设置一个默认的转义处理函数
 			if(escape == null)
+			{
 				escape = chr =>
 				{
 					if(delimiters.Contains(chr))
@@ -307,10 +257,11 @@ namespace Zongsoft.Services
 							return chr;
 					}
 				};
+			}
 
-			bool isEscaping = false;
-			char character;
+			var isEscaping = false;
 			var result = string.Empty;
+			char character;
 
 			while((character = (char)reader.Read()) > 0)
 			{
@@ -326,82 +277,6 @@ namespace Zongsoft.Services
 					continue;
 
 				result += character;
-			}
-
-			return result;
-		}
-
-		private static string ParseString(StringReader reader, char quote = '"')
-		{
-			if(reader == null)
-				throw new ArgumentNullException(nameof(reader));
-
-			int value;
-			var isEscaping = false;
-			var result = string.Empty;
-
-			while((value = reader.Read()) > 0)
-			{
-				var chr = (char)value;
-
-				if(isEscaping)
-				{
-					if(chr == 't')
-						chr = '\t';
-					else if(chr != quote && chr != '\\')
-						result += '\\';
-				}
-				else
-				{
-					if(chr == quote)
-						return result;
-				}
-
-				//设置转义状态：即当前字符为转义符并且当前状态不为转义状态
-				isEscaping = chr == '\\' && (!isEscaping);
-
-				if(isEscaping)
-					continue;
-
-				result += chr;
-			}
-
-			return result;
-		}
-
-		private static string ParseStringNew(StringReader reader, char quote = '"')
-		{
-			if(reader == null)
-				throw new ArgumentNullException(nameof(reader));
-
-			int value;
-			var isEscaping = false;
-			var result = string.Empty;
-
-			while((value = reader.Read()) > 0)
-			{
-				var chr = (char)value;
-
-				//设置转义状态：即当前字符为转义符并且当前状态不为转义状态
-				isEscaping = chr == '\\' && (!isEscaping);
-
-				if(isEscaping)
-				{
-					if(chr == 't')
-						chr = '\t';
-					else if(chr != quote && chr != '\\')
-						result += '\\';
-				}
-				else
-				{
-					if(chr == quote)
-						return result;
-				}
-
-				if(isEscaping)
-					continue;
-
-				result += chr;
 			}
 
 			return result;

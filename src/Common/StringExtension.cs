@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2008-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2008-2016 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,9 +25,9 @@
  */
 
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Zongsoft.Common
 {
@@ -201,6 +201,77 @@ namespace Zongsoft.Common
 				return false;
 
 			return collection.Any(item => string.Equals(item, text, comparisonType));
+		}
+
+		public static IEnumerable<string> Escape(this string text, params char[] delimiters)
+		{
+			return Escape(text, null, delimiters);
+		}
+
+		public static IEnumerable<string> Escape(this string text, Func<char, char> escape, params char[] delimiters)
+		{
+			if(string.IsNullOrEmpty(text))
+				yield break;
+
+			using(var reader = new StringReader(text))
+			{
+				yield return Escape(reader, escape, delimiters);
+			}
+		}
+
+		public static string Escape(TextReader reader, params char[] delimiters)
+		{
+			return Escape(reader, null, delimiters);
+		}
+
+		public static string Escape(TextReader reader, Func<char, char> escape, params char[] delimiters)
+		{
+			if(reader == null)
+				throw new ArgumentNullException(nameof(reader));
+
+			//如果未指定转义处理函数则设置一个默认的转义处理函数
+			if(escape == null)
+			{
+				escape = chr =>
+				{
+					if(delimiters.Contains(chr))
+						return chr;
+
+					switch(chr)
+					{
+						case 't':
+							return '\t';
+						case '\\':
+							return '\\';
+						default:
+							return chr;
+					}
+				};
+			}
+
+			var isEscaping = false;
+			var result = string.Empty;
+			int value;
+
+			while((value = reader.Read()) > 0)
+			{
+				var chr = (char)value;
+
+				if(isEscaping)
+					chr = escape(chr);
+				else if(delimiters.Contains(chr))
+					return result;
+
+				//设置转义状态：即当前字符为转义符并且当前状态不为转义状态
+				isEscaping = chr == '\\' && (!isEscaping);
+
+				if(isEscaping)
+					continue;
+
+				result += chr;
+			}
+
+			return result;
 		}
 	}
 }
