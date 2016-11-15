@@ -286,6 +286,51 @@ namespace Zongsoft.Services
 			return result;
 		}
 
+		private static string EscapeString(StringReader reader, string delimiters, Func<char, char> escape = null)
+		{
+			if(reader == null)
+				throw new ArgumentNullException(nameof(reader));
+
+			if(escape == null)
+				escape = chr =>
+				{
+					if(delimiters.Contains(chr))
+						return chr;
+
+					switch(chr)
+					{
+						case 't':
+							return '\t';
+						case '\\':
+							return '\\';
+						default:
+							return chr;
+					}
+				};
+
+			bool isEscaping = false;
+			char character;
+			var result = string.Empty;
+
+			while((character = (char)reader.Read()) > 0)
+			{
+				if(isEscaping)
+					character = escape(character);
+				else if(delimiters.Contains(character))
+					return result;
+
+				//设置转义状态：即当前字符为转义符并且当前状态不为转义状态
+				isEscaping = character == '\\' && (!isEscaping);
+
+				if(isEscaping)
+					continue;
+
+				result += character;
+			}
+
+			return result;
+		}
+
 		private static string ParseString(StringReader reader, char quote = '"')
 		{
 			if(reader == null)
