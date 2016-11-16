@@ -57,6 +57,7 @@ namespace Zongsoft.Services
 			OptionKey,
 			OptionValue,
 			OptionDelimiter,
+			Assignment,
 		}
 		#endregion
 
@@ -88,9 +89,19 @@ namespace Zongsoft.Services
 							state = CommandExpressionState.OptionKey;
 						else
 							throw new CommandExpressionException("");
+
+						name = string.Empty;
 					}
 					else if(chr == '=' || chr == ':')
 					{
+						state = CommandExpressionState.Assignment;
+
+						value = Escape(reader, '"', '\'');
+
+						expression.Options.Add(name, value);
+
+						state = CommandExpressionState.None;
+
 						if(state == CommandExpressionState.OptionKey)
 							state = CommandExpressionState.OptionDelimiter;
 						else
@@ -98,7 +109,7 @@ namespace Zongsoft.Services
 					}
 					else if(chr == '"' || chr == '\'')
 					{
-						Common.StringExtension.Escape(reader, chr);
+						Escape(reader, chr);
 					}
 					else if(Char.IsLetterOrDigit(chr) || chr == '_')
 					{
@@ -229,12 +240,31 @@ namespace Zongsoft.Services
 			}
 		}
 
-		private static string EscapeString(StringReader reader, params char[] delimiters)
+		public static IEnumerable<string> Escape(string text, params char[] delimiters)
 		{
-			return EscapeString(reader, null, delimiters);
+			return Escape(text, null, delimiters);
 		}
 
-		private static string EscapeString(StringReader reader, Func<char, char> escape, params char[] delimiters)
+		public static IEnumerable<string> Escape(string text, Func<char, char> escape, params char[] delimiters)
+		{
+			if(text == null)
+				yield break;
+
+			using(var reader = new StringReader(text))
+			{
+				do
+				{
+					yield return Escape(reader, escape, delimiters);
+				} while(reader.Peek() > 0);
+			}
+		}
+
+		public static string Escape(TextReader reader, params char[] delimiters)
+		{
+			return Escape(reader, null, delimiters);
+		}
+
+		public static string Escape(TextReader reader, Func<char, char> escape, params char[] delimiters)
 		{
 			if(reader == null)
 				throw new ArgumentNullException(nameof(reader));
@@ -249,34 +279,70 @@ namespace Zongsoft.Services
 
 					switch(chr)
 					{
+						case 's':
+							return ' ';
 						case 't':
 							return '\t';
 						case '\\':
 							return '\\';
 						default:
-							return chr;
+							return '\0';
 					}
 				};
 			}
 
+			var delimiter = '\0';
 			var isEscaping = false;
 			var result = string.Empty;
-			char character;
+			int value;
 
-			while((character = (char)reader.Read()) > 0)
+			while((value = reader.Read()) > 0)
 			{
+				var chr = (char)value;
+
+				//如果当前是空白字符，并且位于分隔符的外面
+				if(delimiter == '\0' && Char.IsWhiteSpace(chr))
+				{
+					//如果结果字符串为空则表示当前空白字符位于分隔符的头部，则可忽略它；
+					if(string.IsNullOrEmpty(result))
+						continue;
+					else //否则当前空白字符位于分割字符的尾部，则可直接返回。
+						return result;
+				}
+
 				if(isEscaping)
-					character = escape(character);
-				else if(delimiters.Contains(character))
-					return result;
+				{
+					var escapedChar = escape(chr);
+
+					if(escapedChar == '\0')
+						result += '\\';
+					else
+						chr = escapedChar;
+				}
+				else
+				{
+					if(delimiter != '\0')
+					{
+						if(chr == delimiter)
+							return result;
+					}
+					else
+					{
+						if(delimiters.Contains(chr))
+						{
+							delimiter = chr;
+							continue;
+						}
+					}
+				}
 
 				//设置转义状态：即当前字符为转义符并且当前状态不为转义状态
-				isEscaping = character == '\\' && (!isEscaping);
+				isEscaping = chr == '\\' && (!isEscaping);
 
 				if(isEscaping)
 					continue;
 
-				result += character;
+				result += chr;
 			}
 
 			return result;

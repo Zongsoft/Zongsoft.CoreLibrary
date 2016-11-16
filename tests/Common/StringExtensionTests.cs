@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Zongsoft.Common;
 
 using Xunit;
 
@@ -57,18 +53,6 @@ namespace Zongsoft.Common.Tests
 			Assert.Equal("ContentSuffix", Zongsoft.Common.StringExtension.TrimString("PrefixPrefixContentSuffix", "Prefix"));
 			Assert.Equal("PrefixPrefixContent", Zongsoft.Common.StringExtension.TrimString("PrefixPrefixContentSuffix", "Suffix"));
 			Assert.Equal("Content", Zongsoft.Common.StringExtension.TrimString("PrefixPrefixContentSuffix", "Prefix", "Suffix"));
-		}
-
-		[Fact]
-		public void TestEscape()
-		{
-			Assert.Equal(@"", StringExtension.Escape(@"").FirstOrDefault());
-			Assert.Equal(@"	a\b\c	\def'\""$", StringExtension.Escape(@"\ta\b\c\t\\def'\""$").FirstOrDefault());
-
-			var items = StringExtension.Escape(" \t abc\tdef", '"', '\'').ToArray();
-			Assert.Equal(2, items.Length);
-			Assert.Equal("abc", items[0]);
-			Assert.Equal("def", items[1]);
 		}
 	}
 }
