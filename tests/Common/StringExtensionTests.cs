@@ -62,14 +62,13 @@ namespace Zongsoft.Common.Tests
 		[Fact]
 		public void TestEscape()
 		{
-			var items = StringExtension.Escape(@"\ta\b\c\t\\def x'y\""z");
-
-			foreach(var item in items)
-			{
-				Assert.Equal(@"	abc	\def x'y""z", item);
-			}
-
 			Assert.Equal(@"", StringExtension.Escape(@"").FirstOrDefault());
+			Assert.Equal(@"	a\b\c	\def'\""$", StringExtension.Escape(@"\ta\b\c\t\\def'\""$").FirstOrDefault());
+
+			var items = StringExtension.Escape(" \t abc\tdef", '"', '\'').ToArray();
+			Assert.Equal(2, items.Length);
+			Assert.Equal("abc", items[0]);
+			Assert.Equal("def", items[1]);
 		}
 	}
 }

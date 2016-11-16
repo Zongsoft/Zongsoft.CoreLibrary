@@ -210,7 +210,7 @@ namespace Zongsoft.Common
 
 		public static IEnumerable<string> Escape(this string text, Func<char, char> escape, params char[] delimiters)
 		{
-			if(string.IsNullOrEmpty(text))
+			if(text == null)
 				yield break;
 
 			using(var reader = new StringReader(text))
@@ -239,16 +239,19 @@ namespace Zongsoft.Common
 
 					switch(chr)
 					{
+						case 's':
+							return ' ';
 						case 't':
 							return '\t';
 						case '\\':
 							return '\\';
 						default:
-							return chr;
+							return '\0';
 					}
 				};
 			}
 
+			var delimiter = '\0';
 			var isEscaping = false;
 			var result = string.Empty;
 			int value;
@@ -257,10 +260,41 @@ namespace Zongsoft.Common
 			{
 				var chr = (char)value;
 
+				//如果当前是空白字符，并且位于分隔符的外面
+				if(delimiter == '\0' && Char.IsWhiteSpace(chr))
+				{
+					//如果结果字符串为空则表示当前空白字符位于分隔符的头部，则可忽略它；
+					if(string.IsNullOrEmpty(result))
+						continue;
+					else //否则当前空白字符位于分割字符的尾部，则可直接返回。
+						return result;
+				}
+
 				if(isEscaping)
-					chr = escape(chr);
-				else if(delimiters.Contains(chr))
-					return result;
+				{
+					var escapedChar = escape(chr);
+
+					if(escapedChar == '\0')
+						result += '\\';
+					else
+						chr = escapedChar;
+				}
+				else
+				{
+					if(delimiter != '\0')
+					{
+						if(chr == delimiter)
+							return result;
+					}
+					else
+					{
+						if(delimiters.Contains(chr))
+						{
+							delimiter = chr;
+							continue;
+						}
+					}	
+				}
 
 				//设置转义状态：即当前字符为转义符并且当前状态不为转义状态
 				isEscaping = chr == '\\' && (!isEscaping);
