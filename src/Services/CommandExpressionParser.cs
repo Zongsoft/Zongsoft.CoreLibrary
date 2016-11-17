@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2011-2016 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2016 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -27,12 +27,10 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Zongsoft.Services
 {
-	public class CommandExpressionParser : ICommandExpressionParser
+	internal static class CommandExpressionParser
 	{
 		#region 私有枚举
 		private enum CommandPathState
@@ -41,124 +39,88 @@ namespace Zongsoft.Services
 			Dot,
 			DoubleDot,
 			Slash,
-			Character,
+			Part,
 		}
-
-		private enum CommandExpressionState
-		{
-			None,
-			Dot,
-			DoubleDot,
-			Slash,
-			Character,
-			Whitespace,
-			Pipe,
-			Option,
-			OptionKey,
-			OptionValue,
-			OptionDelimiter,
-			Assignment,
-		}
-		#endregion
-
-		#region 单例字段
-		public static readonly ICommandExpressionParser Default = new CommandExpressionParser();
 		#endregion
 
 		#region 解析方法
-		public CommandExpression Parse(string text)
+		public static CommandExpression Parse(string text)
 		{
 			if(string.IsNullOrWhiteSpace(text))
 				throw new ArgumentNullException(nameof(text));
 
-			var name = string.Empty;
-			var value = string.Empty;
-			var state = CommandExpressionState.None;
-			CommandExpression expression = null;
+			CommandExpression result = null;
+			CommandExpression current = null;
 
 			using(var reader = new StringReader(text))
 			{
-				var path = ParsePath(reader);
-				char chr;
+				var fullPath = ParsePath(reader);
 
-				while((chr = (char)reader.Read()) > 0)
+				if(string.IsNullOrWhiteSpace(fullPath))
+					return null;
+
+				current = new CommandExpression(fullPath);
+
+				if(result == null)
+					result = current;
+				else
 				{
-					if(chr == '-' || chr == '/')
+					var previous = result;
+
+					while(previous.Next != null)
 					{
-						if(state == CommandExpressionState.None)
-							state = CommandExpressionState.OptionKey;
+						previous = previous.Next;
+					}
+
+					previous.Next = current;
+				}
+
+				KeyValuePair<string, string>? pair = null;
+
+				while((pair = ParsePair(reader)) != null)
+				{
+					if(pair != null)
+					{
+						if(string.IsNullOrEmpty(pair.Value.Key))
+							current.Arguments.Add(pair.Value.Value);
 						else
-							throw new CommandExpressionException("");
-
-						name = string.Empty;
+							current.Options.Add(pair.Value);
 					}
-					else if(chr == '=' || chr == ':')
-					{
-						state = CommandExpressionState.Assignment;
 
-						value = Escape(reader, '"', '\'');
-
-						expression.Options.Add(name, value);
-
-						state = CommandExpressionState.None;
-
-						if(state == CommandExpressionState.OptionKey)
-							state = CommandExpressionState.OptionDelimiter;
-						else
-							value += chr;
-					}
-					else if(chr == '"' || chr == '\'')
-					{
-						Escape(reader, chr);
-					}
-					else if(Char.IsLetterOrDigit(chr) || chr == '_')
-					{
-						if(state == CommandExpressionState.OptionKey)
-							name += chr;
-						else if(state == CommandExpressionState.OptionValue)
-							value += chr;
-					}
-					else if(Char.IsWhiteSpace(chr))
-					{
-						if(string.IsNullOrEmpty(name))
-							expression.Arguments.Add(value);
-						else
-							expression.Options.Add(name, value);
-
-						state = CommandExpressionState.None;
-					}
+					if(reader.Peek() == '|')
+						break;
 				}
 			}
 
-			throw new NotImplementedException();
+			return result;
 		}
 		#endregion
 
-		private CommandPathDesciption ParsePath(TextReader reader)
+		#region 私有方法
+		private static string ParsePath(TextReader reader)
 		{
 			if(reader == null)
 				throw new ArgumentNullException(nameof(reader));
 
+			var result = string.Empty;
 			var state = CommandPathState.None;
-			var path = new CommandPathDesciption();
+			var valueRead = 0;
 
-			char chr;
-
-			while((chr = (char)reader.Read()) > 0)
+			while((valueRead = reader.Read()) > 0)
 			{
+				var chr = (char)valueRead;
+
 				if(chr == '.')
 				{
 					switch(state)
 					{
 						case CommandPathState.None:
 							state = CommandPathState.Dot;
-							path.Anchor = IO.PathAnchor.Current;
 							break;
 						case CommandPathState.Dot:
 							state = CommandPathState.DoubleDot;
-							path.Anchor = IO.PathAnchor.Parent;
 							break;
-						case CommandPathState.Character:
+						case CommandPathState.Part:
 							state = CommandPathState.Slash;
 							chr = '/';
 							break;
@@ -178,74 +140,20 @@ namespace Zongsoft.Services
 					if(state == CommandPathState.Dot || state == CommandPathState.DoubleDot)
 						throw new CommandExpressionException("Invalid command expression.");
 
-					state = CommandPathState.Character;
+					state = CommandPathState.Part;
 				}
 				else if(Char.IsWhiteSpace(chr))
 				{
-					if(state == CommandPathState.Character)
-						return path;
+					return result;
 				}
 
-				if(!Char.IsWhiteSpace(chr))
-					path.FullPath += chr;
+				result += chr;
 			}
 
-			return path;
+			return result;
 		}
 
-		private void ParsePath(string text, int index)
-		{
-			var state = CommandPathState.None;
-			var path = string.Empty;
-
-			while(index < text.Length)
-			{
-				var chr = text[index];
-
-				if(chr == '.')
-				{
-					switch(state)
-					{
-						case CommandPathState.None:
-							state = CommandPathState.Dot;
-							break;
-						case CommandPathState.Dot:
-							state = CommandPathState.DoubleDot;
-							break;
-						case CommandPathState.Character:
-							state = CommandPathState.Slash;
-							chr = '/';
-							break;
-						default:
-							throw new CommandExpressionException("Invalid command expression.");
-					}
-				}
-				else if(chr == '/')
-				{
-					if(state == CommandPathState.Slash)
-						throw new CommandExpressionException("Invalid command expression.");
-
-					state = CommandPathState.Slash;
-				}
-				else if(Char.IsLetterOrDigit(chr) || chr == '_')
-				{
-					if(state == CommandPathState.Dot || state == CommandPathState.DoubleDot)
-						throw new CommandExpressionException("Invalid command expression.");
-
-					state = CommandPathState.Character;
-				}
-
-				if(!Char.IsWhiteSpace(chr))
-					path += chr;
-			}
-		}
-
-		public static IEnumerable<string> Escape(string text, params char[] delimiters)
-		{
-			return Escape(text, null, delimiters);
-		}
-
-		public static IEnumerable<string> Escape(string text, Func<char, char> escape, params char[] delimiters)
+		private static IEnumerable<KeyValuePair<string, string>?> ParsePairs(string text)
 		{
 			if(text == null)
 				yield break;
@@ -254,83 +162,78 @@ namespace Zongsoft.Services
 			{
 				do
 				{
-					yield return Escape(reader, escape, delimiters);
+					yield return ParsePair(reader);
 				} while(reader.Peek() > 0);
 			}
 		}
 
-		public static string Escape(TextReader reader, params char[] delimiters)
-		{
-			return Escape(reader, null, delimiters);
-		}
-
-		public static string Escape(TextReader reader, Func<char, char> escape, params char[] delimiters)
+		private static KeyValuePair<string, string>? ParsePair(TextReader reader)
 		{
 			if(reader == null)
 				throw new ArgumentNullException(nameof(reader));
 
-			//如果未指定转义处理函数则设置一个默认的转义处理函数
-			if(escape == null)
-			{
-				escape = chr =>
-				{
-					if(delimiters.Contains(chr))
-						return chr;
-
-					switch(chr)
-					{
-						case 's':
-							return ' ';
-						case 't':
-							return '\t';
-						case '\\':
-							return '\\';
-						default:
-							return '\0';
-					}
-				};
-			}
-
-			var delimiter = '\0';
+			var quote = '\0';
 			var isEscaping = false;
-			var result = string.Empty;
-			int value;
+			var isKey = false;
+			var key = string.Empty;
+			var value = string.Empty;
+			int valueRead;
 
-			while((value = reader.Read()) > 0)
+			while((valueRead = reader.Read()) > 0)
 			{
-				var chr = (char)value;
+				var chr = (char)valueRead;
 
-				//如果当前是空白字符，并且位于分隔符的外面
-				if(delimiter == '\0' && Char.IsWhiteSpace(chr))
+				//如果当前位置位于引用符的外面
+				if(quote == '\0')
 				{
-					//如果结果字符串为空则表示当前空白字符位于分隔符的头部，则可忽略它；
-					if(string.IsNullOrEmpty(result))
-						continue;
-					else //否则当前空白字符位于分割字符的尾部，则可直接返回。
-						return result;
+					if(Char.IsWhiteSpace(chr))
+					{
+						//如果结果字符串为空则表示当前空白字符位于引用符的头部，则可忽略它；
+						if(string.IsNullOrEmpty(key) && string.IsNullOrEmpty(value))
+							continue;
+						else //否则当前空白字符位于引用符的尾部，则可直接返回。
+							return new KeyValuePair<string, string>(key, value);
+					}
+					else if(chr == '|')
+					{
+						if(string.IsNullOrEmpty(key) && string.IsNullOrEmpty(value))
+							return null;
+
+						return new KeyValuePair<string, string>(key, value);
+					}
 				}
 
 				if(isEscaping)
 				{
-					var escapedChar = escape(chr);
+					var escapedChar = IsQuote(chr) ? chr : EscapeChar(chr);
 
 					if(escapedChar == '\0')
-						result += '\\';
+						value += '\\';
 					else
 						chr = escapedChar;
 				}
 				else
 				{
-					if(delimiter != '\0')
+					if(chr == '-' || chr == '/')
 					{
-						if(chr == delimiter)
-							return result;
+						isKey = true;
+					}
+					else if(chr == ':' || chr == '=')
+					{
+						isKey = false;
+					}
+					else if(quote != '\0' && chr == quote)
+					{
+						if(isKey)
+							key = value;
+						else
+							return new KeyValuePair<string, string>(key, value);
 					}
 					else
 					{
-						if(delimiters.Contains(chr))
+						if(IsQuote(chr))
 						{
-							delimiter = chr;
+							quote = chr;
 							continue;
 						}
 					}
@@ -342,17 +245,37 @@ namespace Zongsoft.Services
 				if(isEscaping)
 					continue;
 
-				result += chr;
+				if(isKey)
+					key += chr;
+				else
+					value += chr;
 			}
 
-			return result;
+			if(string.IsNullOrEmpty(key) && string.IsNullOrEmpty(value))
+				return null;
+
+			return new KeyValuePair<string, string>(key, value);
 		}
 
-		private struct CommandPathDesciption
+		private static bool IsQuote(char chr)
 		{
-			public Zongsoft.IO.PathAnchor Anchor;
-			public string FullPath;
-			public string Name;
+			return (chr == '"' || chr == '\'');
 		}
+
+		private static char EscapeChar(char chr)
+		{
+			switch(chr)
+			{
+				case 's':
+					return ' ';
+				case 't':
+					return '\t';
+				case '\\':
+					return '\\';
+				default:
+					return '\0';
+			}
+		}
+		#endregion
 	}
 }

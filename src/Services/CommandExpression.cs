@@ -37,17 +37,17 @@ namespace Zongsoft.Services
 		private string _fullPath;
 		private Zongsoft.IO.PathAnchor _anchor;
 		private IDictionary<string, string> _options;
-		private ICollection<string> _arguments;
+		private IList<string> _arguments;
 		private CommandExpression _next;
 		#endregion
 
-		#region 构造函数
-		public CommandExpression(string fullPath, IDictionary<string, string> options = null, params string[] arguments)
+		#region 私有构造
+		internal CommandExpression(string fullPath, IDictionary<string, string> options = null, params string[] arguments)
 		{
 			if(string.IsNullOrWhiteSpace(fullPath))
 				throw new ArgumentNullException("fullPath");
 
-			var parts = fullPath.Split('/', '.');
+			var parts = fullPath.Split('/');
 
 			for(int i = parts.Length - 1; i >= 0; i--)
 			{
@@ -80,60 +80,11 @@ namespace Zongsoft.Services
 					_fullPath = _path + "/" + _name;
 			}
 
-			if(_options == null)
-			{
-				if(options == null)
-					_options = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-				else
-					_options = new Dictionary<string, string>(options, StringComparer.OrdinalIgnoreCase);
-			}
-			else
-			{
-				if(options != null && options.Count > 0)
-				{
-					foreach(var option in options)
-						_options[option.Key] = option.Value;
-				}
-			}
+			if(_options != null)
+				_options = new Dictionary<string, string>(options, StringComparer.OrdinalIgnoreCase);
 
-			_arguments = arguments;
-		}
-
-		private CommandExpression(string[] parts, string prefix)
-		{
-			if(parts == null)
-				throw new ArgumentNullException("parts");
-
-			_name = string.Empty;
-			_path = string.Empty;
-
-			for(int i = parts.Length - 1; i >= 0; i--)
-			{
-				if(string.IsNullOrWhiteSpace(parts[i]))
-					continue;
-
-				if(string.IsNullOrEmpty(_name))
-					_name = parts[i].Trim();
-				else
-				{
-					if(string.IsNullOrEmpty(_path))
-						_path = parts[i].Trim();
-					else
-						_path = parts[i].Trim() + "/" + _path;
-				}
-			}
-
-			if(prefix == "..")
-				_path = ".." + (string.IsNullOrEmpty(_path) ? "" : "/") + _path;
-			else if(prefix == "/")
-				_path = "/" + _path;
-
-			if(string.IsNullOrWhiteSpace(_path))
-				_fullPath = _name;
-			else
-				_fullPath = _path.TrimEnd('/') + "/" + _name;
-
-			_options = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+			if(arguments != null)
+				_arguments = new List<string>(arguments);
 		}
 		#endregion
 
@@ -170,15 +121,34 @@ namespace Zongsoft.Services
 			}
 		}
 
+		public bool HasOptions
+		{
+			get
+			{
+				return _options?.Count > 0;
+			}
+		}
+
+		public bool HasArguments
+		{
+			get
+			{
+				return _arguments?.Count > 0;
+			}
+		}
+
 		public IDictionary<string, string> Options
 		{
 			get
 			{
+				if(_options == null)
+					System.Threading.Interlocked.CompareExchange(ref _options, new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase), null);
+
 				return _options;
 			}
 		}
 
-		public ICollection<string> Arguments
+		public IList<string> Arguments
 		{
 			get
 			{
@@ -199,6 +169,13 @@ namespace Zongsoft.Services
 			{
 				_next = value;
 			}
+		}
+		#endregion
+
+		#region 解析方法
+		public static CommandExpression Parse(string text)
+		{
+			return CommandExpressionParser.Parse(text);
 		}
 		#endregion
 	}
