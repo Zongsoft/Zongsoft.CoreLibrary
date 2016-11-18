@@ -41,7 +41,56 @@ namespace Zongsoft.Services
 		private CommandExpression _next;
 		#endregion
 
-		#region 私有构造
+		#region 构造函数
+		internal CommandExpression(Zongsoft.IO.PathAnchor anchor, string name, string path, IDictionary<string, string> options = null, params string[] arguments)
+		{
+			if(string.IsNullOrWhiteSpace(name))
+				throw new ArgumentNullException(nameof(name));
+
+			//修缮传入的路径参数值
+			path = path.Trim('/', ' ', '\t', '\r', '\n');
+
+			_anchor = anchor;
+			_name = name.Trim();
+
+			switch(anchor)
+			{
+				case IO.PathAnchor.Root:
+					if(string.IsNullOrEmpty(path))
+						_path = "/";
+					else
+						_path = "/" + path + "/";
+					break;
+				case IO.PathAnchor.Current:
+					if(string.IsNullOrEmpty(path))
+						_path = "./";
+					else
+						_path = "./" + path + "/";
+					break;
+				case IO.PathAnchor.Parent:
+					if(string.IsNullOrEmpty(path))
+						_path = "../";
+					else
+						_path = "../" + path + "/";
+					break;
+				default:
+					if(string.IsNullOrEmpty(path))
+						_path = string.Empty;
+					else
+						_path = path + "/";
+					break;
+			}
+
+			_fullPath = _path + _name;
+
+			if(options != null)
+				_options = new Dictionary<string, string>(options, StringComparer.OrdinalIgnoreCase);
+
+			if(arguments != null)
+				_arguments = new List<string>(arguments);
+		}
+
+		[Obsolete]
 		internal CommandExpression(string fullPath, IDictionary<string, string> options = null, params string[] arguments)
 		{
 			if(string.IsNullOrWhiteSpace(fullPath))
@@ -80,7 +129,7 @@ namespace Zongsoft.Services
 					_fullPath = _path + "/" + _name;
 			}
 
-			if(_options != null)
+			if(options != null)
 				_options = new Dictionary<string, string>(options, StringComparer.OrdinalIgnoreCase);
 
 			if(arguments != null)
@@ -176,6 +225,18 @@ namespace Zongsoft.Services
 		public static CommandExpression Parse(string text)
 		{
 			return CommandExpressionParser.Parse(text);
+		}
+		#endregion
+
+		#region 重写方法
+		public override string ToString()
+		{
+			var next = this.Next;
+
+			if(next == null)
+				return _fullPath;
+			else
+				return _fullPath + " | " + next.ToString();
 		}
 		#endregion
 	}

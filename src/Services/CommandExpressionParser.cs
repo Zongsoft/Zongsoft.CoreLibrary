@@ -41,54 +41,72 @@ namespace Zongsoft.Services
 			Slash,
 			Part,
 		}
+
+		private enum CommandPairState
+		{
+			None,
+			Slash,
+			Assign,
+			Part,
+		}
 		#endregion
 
 		#region 解析方法
 		public static CommandExpression Parse(string text)
 		{
 			if(string.IsNullOrWhiteSpace(text))
-				throw new ArgumentNullException(nameof(text));
+				return null;
 
 			CommandExpression result = null;
 			CommandExpression current = null;
 
 			using(var reader = new StringReader(text))
 			{
-				var fullPath = ParsePath(reader);
-
-				if(string.IsNullOrWhiteSpace(fullPath))
-					return null;
-
-				current = new CommandExpression(fullPath);
-
-				if(result == null)
-					result = current;
-				else
+				while(reader.Peek() > 0)
 				{
-					var previous = result;
+					current = Parse(reader);
 
-					while(previous.Next != null)
+					if(result == null)
+						result = current;
+					else //线性查找命令表达式的管道链，并更新其指向
 					{
-						previous = previous.Next;
-					}
+						var previous = result;
 
-					previous.Next = current;
+						while(previous.Next != null)
+						{
+							previous = previous.Next;
+						}
+
+						previous.Next = current;
+					}
 				}
+			}
 
-				KeyValuePair<string, string>? pair = null;
+			return result;
+		}
 
-				while((pair = ParsePair(reader)) != null)
+		private static CommandExpression Parse(TextReader reader)
+		{
+			IO.PathAnchor anchor;
+			string name, path;
+
+			//解析命令表达式中的路径部分，如果表达式有误则该解析方法内部抛出异常
+			ParsePath(reader, out anchor, out name, out path);
+
+			//创建一个初步解析后的命令表达式对象
+			var result = new CommandExpression(anchor, name, path);
+
+			KeyValuePair<string, string>? pair = null;
+
+			//依次解析命令表达式中的选项和参数
+			while((pair = ParsePair(reader)) != null)
+			{
+				if(pair != null)
 				{
-					if(pair != null)
-					{
-						if(string.IsNullOrEmpty(pair.Value.Key))
-							current.Arguments.Add(pair.Value.Value);
-						else
-							current.Options.Add(pair.Value);
-					}
-
-					if(reader.Peek() == '|')
-						break;
+					if(string.IsNullOrEmpty(pair.Value.Key))
+						result.Arguments.Add(pair.Value.Value);
+					else
+						result.Options.Add(pair.Value);
 				}
 			}
 
@@ -97,18 +115,27 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 私有方法
-		private static string ParsePath(TextReader reader)
+		private static void ParsePath(TextReader reader, out IO.PathAnchor anchor, out string name, out string path)
 		{
 			if(reader == null)
 				throw new ArgumentNullException(nameof(reader));
 
-			var result = string.Empty;
 			var state = CommandPathState.None;
+			var parts = new List<string>();
 			var valueRead = 0;
+
+			//设置输出参数的默认值
+			anchor = IO.PathAnchor.None;
+			name = string.Empty;
+			path = string.Empty;
 
 			while((valueRead = reader.Read()) > 0)
 			{
 				var chr = (char)valueRead;
+
+				//首先对位于路径中间的点号进行转换，以方便后续的处理
+				if(chr == '.' && state == CommandPathState.Part)
+					chr = '/';
 
 				if(chr == '.')
 				{
@@ -116,41 +143,77 @@ namespace Zongsoft.Services
 					{
 						case CommandPathState.None:
 							state = CommandPathState.Dot;
+							anchor = IO.PathAnchor.Current;
 							break;
 						case CommandPathState.Dot:
 							state = CommandPathState.DoubleDot;
-							break;
-						case CommandPathState.Part:
-							state = CommandPathState.Slash;
-							chr = '/';
+							anchor = IO.PathAnchor.Parent;
 							break;
 						default:
-							throw new CommandExpressionException("Invalid command expression.");
+							throw new CommandExpressionException("Invalid anchor of command path.");
 					}
 				}
 				else if(chr == '/')
 				{
 					if(state == CommandPathState.Slash)
-						throw new CommandExpressionException("Invalid command expression.");
+						throw new CommandExpressionException("Duplicate '/' slash characters.");
+
+					if(state == CommandPathState.None)
+						anchor = IO.PathAnchor.Root;
+					else if(state == CommandPathState.Part)
+					{
+						parts.Add(name);
+						name = string.Empty;
+					}
 
 					state = CommandPathState.Slash;
 				}
 				else if(Char.IsLetterOrDigit(chr) || chr == '_')
 				{
 					if(state == CommandPathState.Dot || state == CommandPathState.DoubleDot)
-						throw new CommandExpressionException("Invalid command expression.");
+						throw new CommandExpressionException("Missing '/' slash character between dot and letter or digit.");
 
+					name += chr;
 					state = CommandPathState.Part;
 				}
 				else if(Char.IsWhiteSpace(chr))
 				{
-					return result;
+					if(state == CommandPathState.None)
+						continue;
+					else
+						break;
 				}
-
-				result += chr;
+				else
+				{
+					throw new CommandExpressionException($"Contains '{chr}' illegal character(s) in the command path.");
+				}
 			}
 
-			return result;
+			//如果路径以斜杠符结尾，即为非法路径格式
+			if(state == CommandPathState.Slash && ((parts != null && parts.Count > 0) || anchor != IO.PathAnchor.Root))
+				throw new CommandExpressionException("The command path can not at the end of '/' character.");
+
+			if(parts != null && parts.Count > 0)
+			{
+				path = string.Join(".", parts);
+			}
+			else if(string.IsNullOrEmpty(name))
+			{
+				switch(anchor)
+				{
+					case IO.PathAnchor.Root:
+						name = "/";
+						break;
+					case IO.PathAnchor.Current:
+						name = ".";
+						break;
+					case IO.PathAnchor.Parent:
+						name = "..";
+						break;
+				}
+
+				anchor = IO.PathAnchor.None;
+			}
 		}
 
 		private static IEnumerable<KeyValuePair<string, string>?> ParsePairs(string text)
@@ -174,27 +237,37 @@ namespace Zongsoft.Services
 
 			var quote = '\0';
 			var isEscaping = false;
-			var isKey = false;
 			var key = string.Empty;
 			var value = string.Empty;
+			var state = CommandPairState.None;
 			int valueRead;
 
 			while((valueRead = reader.Read()) > 0)
 			{
 				var chr = (char)valueRead;
 
-				//如果当前位置位于引用符的外面
-				if(quote == '\0')
+				if(chr == '-' || chr == '/')
 				{
-					if(Char.IsWhiteSpace(chr))
+					if(state == CommandPairState.Slash)
+						throw new CommandExpressionException($"Duplicate '{chr}' option indicator of command expression.");
+
+					if(state == CommandPairState.None)
 					{
-						//如果结果字符串为空则表示当前空白字符位于引用符的头部，则可忽略它；
-						if(string.IsNullOrEmpty(key) && string.IsNullOrEmpty(value))
-							continue;
-						else //否则当前空白字符位于引用符的尾部，则可直接返回。
-							return new KeyValuePair<string, string>(key, value);
+						state = CommandPairState.Slash;
+						continue;
 					}
-					else if(chr == '|')
+				}
+				else if(chr == ':' || chr == '=')
+				{
+					if(state == CommandPairState.Part && !string.IsNullOrEmpty(key))
+					{
+						state = CommandPairState.Assign;
+						continue;
+					}
+				}
+				else if(chr == '|')
+				{
+					if(quote == '\0')
 					{
 						if(string.IsNullOrEmpty(key) && string.IsNullOrEmpty(value))
 							return null;
@@ -202,40 +275,27 @@ namespace Zongsoft.Services
 						return new KeyValuePair<string, string>(key, value);
 					}
 				}
-
-				if(isEscaping)
+				else if(Char.IsWhiteSpace(chr))
 				{
-					var escapedChar = IsQuote(chr) ? chr : EscapeChar(chr);
+					if(state == CommandPairState.Slash)
+						throw new CommandExpressionException("A white-space character at the back of the option indicator.");
 
-					if(escapedChar == '\0')
-						value += '\\';
-					else
-						chr = escapedChar;
+					if(state == CommandPairState.None)
+						continue;
+					else if(quote == '\0')
+						return new KeyValuePair<string, string>(key, value);
 				}
-				else
+				else if(IsQuote(chr) && !isEscaping)
 				{
-					if(chr == '-' || chr == '/')
+					if(quote != '\0')
 					{
-						isKey = true;
+						quote = '\0';
+						continue;
 					}
-					else if(chr == ':' || chr == '=')
+					else if(state != CommandPairState.Part)
 					{
-						isKey = false;
-					}
-					else if(quote != '\0' && chr == quote)
-					{
-						if(isKey)
-							key = value;
-						else
-							return new KeyValuePair<string, string>(key, value);
-					}
-					else
-					{
-						if(IsQuote(chr))
-						{
-							quote = chr;
-							continue;
-						}
+						quote = chr;
+						continue;
 					}
 				}
 
@@ -245,10 +305,24 @@ namespace Zongsoft.Services
 				if(isEscaping)
 					continue;
 
-				if(isKey)
-					key += chr;
-				else
-					value += chr;
+				switch(state)
+				{
+					case CommandPairState.Slash:
+						key += chr;
+						break;
+					case CommandPairState.None:
+					case CommandPairState.Assign:
+						value += chr;
+						break;
+					default:
+						if(string.IsNullOrEmpty(value))
+							key += chr;
+						else
+							value += chr;
+						break;
+				}
+
+				state = CommandPairState.Part;
 			}
 
 			if(string.IsNullOrEmpty(key) && string.IsNullOrEmpty(value))
