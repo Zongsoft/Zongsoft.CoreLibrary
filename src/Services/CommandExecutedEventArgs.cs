@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2016 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -34,7 +34,7 @@ namespace Zongsoft.Services
 	public class CommandExecutedEventArgs : EventArgs
 	{
 		#region 成员变量
-		private CommandContextBase _context;
+		private CommandContext _context;
 		private object _parameter;
 		private object _result;
 		private IDictionary<string, object> _extendedProperties;
@@ -43,7 +43,7 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 构造函数
-		public CommandExecutedEventArgs(CommandContextBase context, Exception exception = null)
+		public CommandExecutedEventArgs(CommandContext context, Exception exception = null)
 		{
 			if(context != null)
 			{
@@ -64,7 +64,7 @@ namespace Zongsoft.Services
 		/// <param name="extendedProperties">指定的扩展属性集。</param>
 		public CommandExecutedEventArgs(object parameter, object result, IDictionary<string, object> extendedProperties = null)
 		{
-			var context = parameter as CommandContextBase;
+			var context = parameter as CommandContext;
 
 			if(context != null)
 			{
@@ -89,7 +89,7 @@ namespace Zongsoft.Services
 		/// <param name="extendedProperties">指定的扩展属性集。</param>
 		public CommandExecutedEventArgs(object parameter, Exception exception, IDictionary<string, object> extendedProperties = null)
 		{
-			var context = parameter as CommandContextBase;
+			var context = parameter as CommandContext;
 
 			if(context != null)
 			{
@@ -137,7 +137,7 @@ namespace Zongsoft.Services
 		/// <summary>
 		/// 获取命令的执行上下文对象。
 		/// </summary>
-		public CommandContextBase Context
+		public CommandContext Context
 		{
 			get
 			{

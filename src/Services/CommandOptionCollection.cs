@@ -28,14 +28,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-using Zongsoft.Services;
-
 namespace Zongsoft.Services
 {
 	public class CommandOptionCollection : IDictionary<string, object>
 	{
 		#region 成员字段
-		private Zongsoft.Services.ICommand _command;
+		private ICommand _command;
 		private IDictionary<string, object> _items;
 		#endregion
 

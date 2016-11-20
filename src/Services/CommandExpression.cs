@@ -42,7 +42,7 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 构造函数
-		internal CommandExpression(Zongsoft.IO.PathAnchor anchor, string name, string path, IDictionary<string, string> options = null, params string[] arguments)
+		public CommandExpression(Zongsoft.IO.PathAnchor anchor, string name, string path, IDictionary<string, string> options = null, params string[] arguments)
 		{
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException(nameof(name));
@@ -83,56 +83,10 @@ namespace Zongsoft.Services
 
 			_fullPath = _path + _name;
 
-			if(options != null)
+			if(options != null && options.Count > 0)
 				_options = new Dictionary<string, string>(options, StringComparer.OrdinalIgnoreCase);
 
-			if(arguments != null)
-				_arguments = new List<string>(arguments);
-		}
-
-		[Obsolete]
-		internal CommandExpression(string fullPath, IDictionary<string, string> options = null, params string[] arguments)
-		{
-			if(string.IsNullOrWhiteSpace(fullPath))
-				throw new ArgumentNullException("fullPath");
-
-			var parts = fullPath.Split('/');
-
-			for(int i = parts.Length - 1; i >= 0; i--)
-			{
-				if(string.IsNullOrWhiteSpace(parts[i]))
-					continue;
-
-				if(_name == null)
-					_name = parts[i].Trim();
-				else
-				{
-					if(_path == null)
-						_path = parts[i].Trim();
-					else
-						_path = parts[i].Trim() + "/" + _path;
-				}
-			}
-
-			if(_name == null)
-				_name = "/";
-			else
-				_path = "/" + _path;
-
-			if(_name == "/")
-				_fullPath = "/";
-			else
-			{
-				if(_path == "/")
-					_fullPath = _path + _name;
-				else
-					_fullPath = _path + "/" + _name;
-			}
-
-			if(options != null)
-				_options = new Dictionary<string, string>(options, StringComparer.OrdinalIgnoreCase);
-
-			if(arguments != null)
+			if(arguments != null && arguments.Length > 0)
 				_arguments = new List<string>(arguments);
 		}
 		#endregion
@@ -224,19 +178,48 @@ namespace Zongsoft.Services
 		#region 解析方法
 		public static CommandExpression Parse(string text)
 		{
-			return CommandExpressionParser.Parse(text);
+			return CommandExpressionParser.Instance.Parse(text);
 		}
 		#endregion
 
 		#region 重写方法
 		public override string ToString()
 		{
+			string result = this.FullPath;
+
+			if(_options?.Count > 0)
+			{
+				foreach(var option in _options)
+				{
+					if(string.IsNullOrWhiteSpace(option.Value))
+						result += string.Format(" /{0}", option.Key);
+					else
+					{
+						if(option.Value.Contains("\""))
+							result += $" -{option.Key}:'{option.Value}'";
+						else
+							result += $" -{option.Key}:\"{option.Value}\"";
+					}
+				}
+			}
+
+			if(_arguments?.Count > 0)
+			{
+				foreach(var argument in _arguments)
+				{
+					if(argument.Contains("\""))
+						result += $" '{argument}'";
+					else
+						result += $" \"{argument}\"";
+				}
+			}
+
 			var next = this.Next;
 
 			if(next == null)
-				return _fullPath;
+				return result;
 			else
-				return _fullPath + " | " + next.ToString();
+				return result + " | " + next.ToString();
 		}
 		#endregion
 	}

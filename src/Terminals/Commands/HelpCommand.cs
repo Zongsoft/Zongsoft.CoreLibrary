@@ -56,7 +56,7 @@ namespace Zongsoft.Terminals.Commands
 		#region 重写方法
 		protected override void OnExecute(TerminalCommandContext context)
 		{
-			if(context.Arguments.Length < 1)
+			if(context.Expression.Arguments.Count < 1)
 			{
 				foreach(var node in context.Executor.Root.Children)
 				{
@@ -66,7 +66,7 @@ namespace Zongsoft.Terminals.Commands
 				return;
 			}
 
-			foreach(var argument in context.Arguments)
+			foreach(var argument in context.Expression.Arguments)
 			{
 				if(argument == "?")
 				{

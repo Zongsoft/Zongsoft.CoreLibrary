@@ -355,10 +355,9 @@
     <Compile Include="Security\SecurityException.cs" />
     <Compile Include="Security\Membership\UserStatus.cs" />
     <Compile Include="Services\CommandBase.cs" />
-    <Compile Include="Services\CommandContextBase.cs" />
-    <Compile Include="Services\CommandExecutorBase.cs" />
+    <Compile Include="Services\CommandContext.cs" />
+    <Compile Include="Services\CommandExecutor.cs" />
     <Compile Include="Services\CommandExecutorContext.cs" />
-    <Compile Include="Services\CommandExecutorContextBase.cs" />
     <Compile Include="Services\CommandExecutorEventArgs.cs" />
     <Compile Include="Services\CommandExecutorExecutedEventArgs.cs" />
     <Compile Include="Services\CommandExecutorExecutingEventArgs.cs" />
@@ -366,7 +365,6 @@
     <Compile Include="Services\CommandExpressionException.cs" />
     <Compile Include="Services\CommandExpressionParser.cs" />
     <Compile Include="Services\CommandHelper.cs" />
-    <Compile Include="Services\CommandLine.cs" />
     <Compile Include="Services\CommandLoaderBase.cs" />
     <Compile Include="Services\CommandOption.cs" />
     <Compile Include="Services\CommandOptionAttribute.cs" />
@@ -374,8 +372,6 @@
     <Compile Include="Services\CommandOptionException.cs" />
     <Compile Include="Services\CommandOptionMissingException.cs" />
     <Compile Include="Services\CommandOptionValueException.cs" />
-    <Compile Include="Services\CommandContext.cs" />
-    <Compile Include="Services\CommandExecutor.cs" />
     <Compile Include="Services\Composition\ExecutedEventArgs.cs" />
     <Compile Include="Services\Composition\ExecutionContext.cs" />
     <Compile Include="Services\Composition\ExecutionEventArgs.cs" />
@@ -390,7 +386,7 @@
     <Compile Include="Services\Composition\IExecutor.cs" />
     <Compile Include="Services\Composition\ExecutionUtility.cs" />
     <Compile Include="Services\ICommandExecutor.cs" />
-    <Compile Include="Services\ICommandLineParser.cs" />
+    <Compile Include="Services\ICommandExpressionParser.cs" />
     <Compile Include="Services\IMatchable`1.cs" />
     <Compile Include="Services\IMatcher.cs" />
     <Compile Include="Services\IMatcher`1.cs" />

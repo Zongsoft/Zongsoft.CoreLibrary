@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2016 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -29,36 +29,60 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Services
 {
-	public class CommandExecutorContext : CommandExecutorContextBase
+	public class CommandExecutorContext : MarshalByRefObject
 	{
 		#region 成员字段
-		private CommandLine _commandLine;
+		private ICommandExecutor _executor;
+		private CommandExpression _expression;
+		private object _parameter;
 		#endregion
 
 		#region 构造函数
-		public CommandExecutorContext(ICommandExecutor executor, CommandLine commandLine, CommandTreeNode commandNode, object parameter) : base(executor, null, commandNode, parameter)
+		public CommandExecutorContext(ICommandExecutor executor, CommandExpression expression, object parameter)
 		{
-			if(commandLine == null)
-				throw new ArgumentNullException("commandLine");
+			if(executor == null)
+				throw new ArgumentNullException(nameof(executor));
 
-			_commandLine = commandLine;
+			if(expression == null)
+				throw new ArgumentNullException(nameof(expression));
+
+			_executor = executor;
+			_expression = expression;
+			_parameter = parameter;
 		}
 		#endregion
 
 		#region 公共属性
-		public override string CommandText
+		/// <summary>
+		/// 获取当前命令执行器对象。
+		/// </summary>
+		public ICommandExecutor Executor
 		{
 			get
 			{
-				return _commandLine.ToString();
+				return _executor;
 			}
 		}
 
-		public CommandLine CommandLine
+		/// <summary>
+		/// 获取当前命令执行器的命令表达式。
+		/// </summary>
+		public CommandExpression Expression
 		{
 			get
 			{
-				return _commandLine;
+				return _expression;
+			}
+		}
+
+		/// <summary>
+		/// 获取从命令执行器传入的参数值。
+		/// </summary>
+		public object Parameter
+		{
+			get
+			{
+				return _parameter;
 			}
 		}
 		#endregion

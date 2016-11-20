@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2016 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -34,7 +34,7 @@ namespace Zongsoft.Services
 	public class CommandExecutingEventArgs : EventArgs
 	{
 		#region 成员变量
-		private CommandContextBase _context;
+		private CommandContext _context;
 		private object _parameter;
 		private IDictionary<string, object> _extendedProperties;
 		private object _result;
@@ -42,7 +42,7 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 构造函数
-		public CommandExecutingEventArgs(CommandContextBase context, bool cancel = false)
+		public CommandExecutingEventArgs(CommandContext context, bool cancel = false)
 		{
 			if(context != null)
 			{
@@ -57,7 +57,7 @@ namespace Zongsoft.Services
 
 		public CommandExecutingEventArgs(object parameter, IDictionary<string, object> extendedProperties, bool cancel = false)
 		{
-			var context = parameter as CommandContextBase;
+			var context = parameter as CommandContext;
 
 			if(context != null)
 			{
@@ -95,7 +95,7 @@ namespace Zongsoft.Services
 		/// <summary>
 		/// 获取命令的执行上下文对象。
 		/// </summary>
-		public CommandContextBase Context
+		public CommandContext Context
 		{
 			get
 			{

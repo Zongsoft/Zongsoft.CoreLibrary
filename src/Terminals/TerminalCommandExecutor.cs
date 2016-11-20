@@ -48,17 +48,20 @@ namespace Zongsoft.Terminals
 		#endregion
 
 		#region 构造函数
-		public TerminalCommandExecutor(ITerminal terminal) : this(terminal, null)
-		{
-		}
-
-		public TerminalCommandExecutor(ITerminal terminal, ICommandLineParser parser)
+		public TerminalCommandExecutor(ITerminal terminal)
 		{
 			if(terminal == null)
 				throw new ArgumentNullException("terminal");
 
 			_terminal = terminal;
-			this.Parser = parser;
+		}
+
+		public TerminalCommandExecutor(ITerminal terminal, ICommandExpressionParser parser) : base(parser)
+		{
+			if(terminal == null)
+				throw new ArgumentNullException("terminal");
+
+			_terminal = terminal;
 		}
 		#endregion
 
@@ -138,37 +141,29 @@ namespace Zongsoft.Terminals
 		#endregion
 
 		#region 重写方法
-		protected override CommandLine OnParse(string commandText)
+		protected override CommandContext CreateCommandContext(CommandExpression expression, CommandTreeNode node, object parameter)
 		{
-			switch(commandText.Trim())
-			{
-				case "/":
-					return new CommandLine("/", null, null);
-				case ".":
-					return new CommandLine((_current ?? this.Root).FullPath, null, null);
-				case "..":
-					return new CommandLine((_current == null || _current.Parent == null ? this.Root : _current.Parent).FullPath, null, null);
-			}
-
-			return base.OnParse(commandText);
-		}
-
-		protected override void OnExecute(CommandExecutorContext context)
-		{
-			var command = context.Command;
-
-			if(command != null)
-				context.Result = command.Execute(new TerminalCommandContext(this, context.CommandLine, context.CommandNode, context.Parameter));
+			return new TerminalCommandContext(this, expression, node, parameter);
 		}
 
 		protected override void OnExecuted(CommandExecutorExecutedEventArgs args)
 		{
-			var commandNode = args.CommandNode;
+			var last = args.Context.Expression;
 
-			//更新当前命令节点，只有当前命令树节点不是叶子节点并且为空命令节点
-			if(commandNode != null && commandNode.Children.Count > 0 && commandNode.Command == null)
-				this.Current = commandNode;
+			//从执行器的命令表达式中找出最后一个命令表达式
+			while(last != null && last.Next != null)
+			{
+				last = last.Next;
+			}
 
+			//查找表达式中最后一个命令节点
+			var node = this.Find(last.FullPath);
+
+			//更新当前命令节点，只有命令树节点不是叶子节点并且为空命令节点
+			if(node != null && node.Children.Count > 0 && node.Command == null)
+				this.Current = node;
+
+			//调用基类同名方法
 			base.OnExecuted(args);
 		}
 		#endregion

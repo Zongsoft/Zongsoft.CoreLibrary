@@ -100,7 +100,7 @@ namespace Zongsoft.Services.Tests
 		[Fact]
 		public void TestCommandExpressionParseWithPipeline()
 		{
-			var expression = CommandExpression.Parse("sms.generate -template:'user.register' -authenticode:12345 phonenumber#1 phonenumber:2 phonenumber-3 'phonenumber|4' | queue.in sms");
+			var expression = CommandExpression.Parse("sms.generate -template:'user.register' -authenticode:12345 phonenumber'1 phonenumber:2 phonenumber-3 'phonenumber|4' | queue.in sms");
 
 			Assert.Equal("generate", expression.Name);
 			Assert.Equal("sms/", expression.Path);
@@ -110,7 +110,7 @@ namespace Zongsoft.Services.Tests
 			Assert.Equal(4, expression.Arguments.Count);
 			Assert.Equal("user.register", expression.Options["template"]);
 			Assert.Equal("12345", expression.Options["authenticode"]);
-			Assert.Equal("phonenumber#1", expression.Arguments[0]);
+			Assert.Equal("phonenumber'1", expression.Arguments[0]);
 			Assert.Equal("phonenumber:2", expression.Arguments[1]);
 			Assert.Equal("phonenumber-3", expression.Arguments[2]);
 			Assert.Equal("phonenumber|4", expression.Arguments[3]);

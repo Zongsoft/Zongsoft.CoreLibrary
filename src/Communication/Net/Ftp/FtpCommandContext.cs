@@ -28,11 +28,10 @@ using System;
 using System.Collections.Generic;
 
 using Zongsoft.Services;
-using Zongsoft.Services.Composition;
 
 namespace Zongsoft.Communication.Net.Ftp
 {
-	internal class FtpCommandContext : CommandContextBase
+	internal class FtpCommandContext : CommandContext
 	{
 		#region 私有字段
 		private FtpServerChannel _channel;
@@ -40,7 +39,7 @@ namespace Zongsoft.Communication.Net.Ftp
 		#endregion
 
 		#region 构造函数
-		internal FtpCommandContext(ICommandExecutor executor, ICommand command, FtpServerChannel channel, FtpStatement statement) : base(executor, command, null, null)
+		internal FtpCommandContext(ICommandExecutor executor, CommandExpression expression, ICommand command, FtpServerChannel channel, FtpStatement statement) : base(executor, expression, command, null, null)
 		{
 			_channel = channel;
 			_statement = statement;

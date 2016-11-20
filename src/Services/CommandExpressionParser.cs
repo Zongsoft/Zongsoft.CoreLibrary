@@ -30,8 +30,12 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Services
 {
-	internal static class CommandExpressionParser
+	public class CommandExpressionParser : ICommandExpressionParser
 	{
+		#region 单例字段
+		public static readonly CommandExpressionParser Instance = new CommandExpressionParser();
+		#endregion
+
 		#region 私有枚举
 		private enum CommandPathState
 		{
@@ -51,8 +55,14 @@ namespace Zongsoft.Services
 		}
 		#endregion
 
+		#region 私有构造
+		private CommandExpressionParser()
+		{
+		}
+		#endregion
+
 		#region 解析方法
-		public static CommandExpression Parse(string text)
+		public CommandExpression Parse(string text)
 		{
 			if(string.IsNullOrWhiteSpace(text))
 				return null;
@@ -85,7 +95,7 @@ namespace Zongsoft.Services
 			return result;
 		}
 
-		private static CommandExpression Parse(TextReader reader)
+		private CommandExpression Parse(TextReader reader)
 		{
 			IO.PathAnchor anchor;
 			string name, path;

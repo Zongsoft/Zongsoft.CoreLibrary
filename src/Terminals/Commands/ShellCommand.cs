@@ -53,13 +53,13 @@ namespace Zongsoft.Terminals.Commands
 			   Environment.OSVersion.Platform == PlatformID.Unix)
 				throw new NotSupportedException(string.Format("Not supported in the {0} OS.", Environment.OSVersion));
 
-			if(context.Arguments.Length < 1)
+			if(context.Expression.Arguments.Count < 1)
 			{
 				context.Result = 0;
 				return;
 			}
 
-			ProcessStartInfo info = new ProcessStartInfo(@"cmd.exe", " /C " + context.Arguments[0])
+			ProcessStartInfo info = new ProcessStartInfo(@"cmd.exe", " /C " + context.Expression.Arguments[0])
 			{
 				CreateNoWindow = true,
 				UseShellExecute = false,

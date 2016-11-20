@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2016 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -34,7 +34,7 @@ namespace Zongsoft.Services
 	/// 提供实现<see cref="ICommand"/>接口功能的基类，建议需要完成<see cref="ICommand"/>接口功能的实现者从此类继承。
 	/// </summary>
 	/// <typeparam name="TContext">指定命令的执行上下文类型。</typeparam>
-	public abstract class CommandBase<TContext> : CommandBase, ICommand<TContext>, IPredication<TContext> where TContext : CommandContextBase
+	public abstract class CommandBase<TContext> : CommandBase, ICommand<TContext>, IPredication<TContext> where TContext : CommandContext
 	{
 		#region 构造函数
 		protected CommandBase() : base(null, true)

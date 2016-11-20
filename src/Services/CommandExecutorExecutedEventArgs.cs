@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2016 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -32,7 +32,7 @@ namespace Zongsoft.Services
 	public class CommandExecutorExecutedEventArgs : CommandExecutorEventArgs
 	{
 		#region 构造函数
-		public CommandExecutorExecutedEventArgs(CommandExecutorContextBase context) : base(context)
+		public CommandExecutorExecutedEventArgs(CommandExecutorContext context, object result) : base(context, result)
 		{
 		}
 		#endregion

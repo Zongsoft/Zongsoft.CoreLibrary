@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2011-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2011-2016 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -31,13 +31,14 @@ namespace Zongsoft.Services
 	/// <summary>
 	/// 提供命令行文本解析功能。
 	/// </summary>
-	public interface ICommandLineParser
+	public interface ICommandExpressionParser
 	{
 		/// <summary>
-		/// 将指定的命令行文本解析成命令行对象。
+		/// 将指定的命令行文本解析成命令表达式对象。
 		/// </summary>
-		/// <param name="commandText">指定的要解析的命令行文本。</param>
-		/// <returns>返回解析的命令行对象，如果解析失败则返回空(null)。</returns>
-		CommandLine Parse(string commandText);
+		/// <param name="text">指定的要解析的命令行文本。</param>
+		/// <returns>返回解析的命令表达式对象，如果解析失败则返回空(null)。</returns>
+		/// <exception cref="CommandExpressionException">无效的命令行文本。</exception>
+		CommandExpression Parse(string text);
 	}
 }

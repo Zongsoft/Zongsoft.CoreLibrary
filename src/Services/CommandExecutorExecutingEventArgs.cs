@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2016 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -36,7 +36,7 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 构造函数
-		public CommandExecutorExecutingEventArgs(CommandExecutorContextBase context, bool cancel = false) : base(context)
+		public CommandExecutorExecutingEventArgs(CommandExecutorContext context, bool cancel = false) : base(context, null)
 		{
 			_cancel = cancel;
 		}

@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2016 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -32,21 +32,23 @@ namespace Zongsoft.Services
 	public class CommandExecutorEventArgs : EventArgs
 	{
 		#region 成员字段
-		private CommandExecutorContextBase _context;
+		private CommandExecutorContext _context;
+		private object _result;
 		#endregion
 
 		#region 构造函数
-		public CommandExecutorEventArgs(CommandExecutorContextBase context)
+		public CommandExecutorEventArgs(CommandExecutorContext context, object result)
 		{
 			if(context == null)
 				throw new ArgumentNullException("context");
 
 			_context = context;
+			_result = result;
 		}
 		#endregion
 
 		#region 公共属性
-		public CommandExecutorContextBase Context
+		public CommandExecutorContext Context
 		{
 			get
 			{
@@ -54,55 +56,15 @@ namespace Zongsoft.Services
 			}
 		}
 
-		public ICommandExecutor CommandExecutor
-		{
-			get
-			{
-				return _context.Executor;
-			}
-		}
-
-		public string CommandText
-		{
-			get
-			{
-				return _context.CommandText;
-			}
-		}
-
-		public object Parameter
-		{
-			get
-			{
-				return _context.Parameter;
-			}
-		}
-
-		public CommandTreeNode CommandNode
-		{
-			get
-			{
-				return _context.CommandNode;
-			}
-		}
-
-		public ICommand Command
-		{
-			get
-			{
-				return _context.Command;
-			}
-		}
-
 		public object Result
 		{
 			get
 			{
-				return _context.Result;
+				return _result;
 			}
 			set
 			{
-				_context.Result = value;
+				_result = value;
 			}
 		}
 		#endregion

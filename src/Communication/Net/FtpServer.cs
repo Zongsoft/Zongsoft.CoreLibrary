@@ -184,24 +184,19 @@ namespace Zongsoft.Communication.Net
 				this.Root.Loader = new FtpCommandLoader();
 			}
 
-			public object Execute(string name, ReceivedEventArgs args)
+			protected override CommandContext CreateCommandContext(CommandExpression expression, CommandTreeNode node, object parameter)
 			{
-				return base.Execute(name, args);
-			}
-
-			protected override void OnExecute(CommandExecutorContext context)
-			{
-				var args = context.Parameter as ReceivedEventArgs;
+				var args = parameter as ReceivedEventArgs;
 
 				if(args == null)
 					throw new InvalidOperationException("Invalid execution parameter.");
 
-				context.Result = context.Command.Execute(
-					new FtpCommandContext(
+				return new FtpCommandContext(
 						this,
-						context.Command,
+						expression,
+						node.Command,
 						(FtpServerChannel)args.Channel,
-						(FtpStatement)args.ReceivedObject));
+						(FtpStatement)args.ReceivedObject);
 			}
 		}
 		#endregion

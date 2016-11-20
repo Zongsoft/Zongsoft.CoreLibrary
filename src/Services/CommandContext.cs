@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2011-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2016 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -26,49 +26,109 @@
 
 using System;
 using System.Collections.Generic;
-
-using Zongsoft.Services;
+using System.Collections.Concurrent;
 
 namespace Zongsoft.Services
 {
-	public class CommandContext : Zongsoft.Services.CommandContextBase
+	public class CommandContext : MarshalByRefObject
 	{
+		#region 静态字段
+		private static ConcurrentDictionary<string, object> _states;
+		private static ConcurrentDictionary<ICommandExecutor, ConcurrentDictionary<string, object>> _statesProvider;
+		#endregion
+
 		#region 成员字段
-		private CommandLine _commandLine;
+		private ICommand _command;
+		private CommandTreeNode _commandNode;
+		private CommandExpression _expression;
+		private ICommandExecutor _executor;
+		private object _parameter;
 		private CommandOptionCollection _options;
+		private IDictionary<string, object> _extendedProperties;
+		private object _result;
 		#endregion
 
 		#region 构造函数
-		public CommandContext(ICommandExecutor executor, CommandLine commandLine, ICommand command, object parameter, IDictionary<string, object> items = null) : base(executor, command, parameter, items)
+		public CommandContext(ICommandExecutor executor, CommandExpression expression, ICommand command, object parameter, IDictionary<string, object> extendedProperties = null)
 		{
-			_commandLine = commandLine;
+			if(command == null)
+				throw new ArgumentNullException("command");
 
-			if(commandLine == null)
+			_executor = executor;
+			_command = command;
+			_parameter = parameter;
+			_expression = expression;
+
+			if(expression == null)
 				_options = new CommandOptionCollection(command);
 			else
-				_options = new CommandOptionCollection(command, (System.Collections.IDictionary)commandLine.Options);
+				_options = new CommandOptionCollection(command, (System.Collections.IDictionary)expression.Options);
+
+			if(extendedProperties != null && extendedProperties.Count > 0)
+				_extendedProperties = new Dictionary<string, object>(extendedProperties, StringComparer.OrdinalIgnoreCase);
 		}
 
-		public CommandContext(ICommandExecutor executor, CommandLine commandLine, CommandTreeNode commandNode, object parameter, IDictionary<string, object> items = null) : base(executor, commandNode, parameter, items)
+		public CommandContext(ICommandExecutor executor, CommandExpression expression, CommandTreeNode commandNode, object parameter, IDictionary<string, object> extendedProperties = null)
 		{
-			_commandLine = commandLine;
+			if(commandNode == null)
+				throw new ArgumentNullException("commandNode");
 
-			if(commandLine == null)
-				_options = new CommandOptionCollection(this.Command);
+			if(commandNode.Command == null)
+				throw new ArgumentException(string.Format("The Command property of '{0}' command-node is null.", commandNode.FullPath));
+
+			_executor = executor;
+			_commandNode = commandNode;
+			_command = commandNode.Command;
+			_parameter = parameter;
+			_expression = expression;
+
+			if(expression == null)
+				_options = new CommandOptionCollection(commandNode.Command);
 			else
-				_options = new CommandOptionCollection(this.Command, (System.Collections.IDictionary)commandLine.Options);
+				_options = new CommandOptionCollection(commandNode.Command, (System.Collections.IDictionary)expression.Options);
+
+			if(extendedProperties != null && extendedProperties.Count > 0)
+				_extendedProperties = new Dictionary<string, object>(extendedProperties, StringComparer.OrdinalIgnoreCase);
 		}
 		#endregion
 
 		#region 公共属性
-		public CommandLine CommandLine
+		/// <summary>
+		/// 获取执行的命令对象。
+		/// </summary>
+		public ICommand Command
 		{
 			get
 			{
-				return _commandLine;
+				return _command;
 			}
 		}
 
+		/// <summary>
+		/// 获取执行的命令所在节点。
+		/// </summary>
+		public CommandTreeNode CommandNode
+		{
+			get
+			{
+				return _commandNode;
+			}
+		}
+
+		/// <summary>
+		/// 获取命令执行的传入参数。
+		/// </summary>
+		public object Parameter
+		{
+			get
+			{
+				return _parameter;
+			}
+		}
+
+		/// <summary>
+		/// 获取当前命令对应的表达式选项集。
+		/// </summary>
 		public CommandOptionCollection Options
 		{
 			get
@@ -77,14 +137,93 @@ namespace Zongsoft.Services
 			}
 		}
 
-		public string[] Arguments
+		/// <summary>
+		/// 获取当前命令对应的表达式。
+		/// </summary>
+		public CommandExpression Expression
 		{
 			get
 			{
-				if(_commandLine == null)
-					return new string[0];
-				else
-					return _commandLine.Arguments;
+				return _expression;
+			}
+		}
+
+		/// <summary>
+		/// 获取扩展属性集是否有内容。
+		/// </summary>
+		/// <remarks>
+		///		<para>在不确定扩展属性集是否含有内容之前，建议先使用该属性来检测。</para>
+		/// </remarks>
+		public bool HasExtendedProperties
+		{
+			get
+			{
+				return _extendedProperties != null && _extendedProperties.Count > 0;
+			}
+		}
+
+		/// <summary>
+		/// 获取可用于在本次执行过程中在各处理模块之间组织和共享数据的键/值集合。
+		/// </summary>
+		public IDictionary<string, object> ExtendedProperties
+		{
+			get
+			{
+				if(_extendedProperties == null)
+					System.Threading.Interlocked.CompareExchange(ref _extendedProperties, new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase), null);
+
+				return _extendedProperties;
+			}
+		}
+
+		/// <summary>
+		/// 获取执行命令所在的命令执行器。
+		/// </summary>
+		public ICommandExecutor Executor
+		{
+			get
+			{
+				return _executor;
+			}
+		}
+
+		/// <summary>
+		/// 获取一个由当前命令执行器为宿主的字典容器。
+		/// </summary>
+		/// <remarks>
+		///		<para>在本属性返回的字典集合中的内容对于相同<see cref="ICommandExecutor"/>中的命令而言都是可见(读写)的，但对于不同<seealso cref="ICommandExecutor"/>下的命令而言，这些字典集合内的内容则是不可见的。</para>
+		/// </remarks>
+		public ConcurrentDictionary<string, object> States
+		{
+			get
+			{
+				if(_executor == null)
+				{
+					if(_states == null)
+						System.Threading.Interlocked.CompareExchange(ref _states, new ConcurrentDictionary<string, object>(StringComparer.OrdinalIgnoreCase), null);
+
+					return _states;
+				}
+
+				if(_statesProvider == null)
+					System.Threading.Interlocked.CompareExchange(ref _statesProvider, new ConcurrentDictionary<ICommandExecutor, ConcurrentDictionary<string, object>>(), null);
+
+				return _statesProvider.GetOrAdd(_executor, _ => new ConcurrentDictionary<string, object>(StringComparer.OrdinalIgnoreCase));
+			}
+		}
+
+		/// <summary>
+		/// 获取或设置命令的执行结果。
+		/// </summary>
+		public object Result
+		{
+			get
+			{
+				return _result;
+			}
+			set
+			{
+				_result = value;
 			}
 		}
 		#endregion
