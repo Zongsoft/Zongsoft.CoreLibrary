@@ -41,8 +41,10 @@ namespace Zongsoft.Communication.Net.Ftp
         {
         }
 
-		protected override void OnExecute(FtpCommandContext context)
+		protected override object OnExecute(FtpCommandContext context)
         {
+			const string MESSAGE = "250 Deleted directory successfully.";
+
             context.Channel.CheckLogin();
 
             if (string.IsNullOrEmpty(context.Statement.Argument))
@@ -64,7 +66,8 @@ namespace Zongsoft.Communication.Net.Ftp
                 throw new InternalException("delete dir");
             }
 
-            context.Channel.Send("250 Deleted directory successfully");
+            context.Channel.Send(MESSAGE);
+			return MESSAGE;
         }
     }
 }

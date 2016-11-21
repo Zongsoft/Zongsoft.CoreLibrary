@@ -41,30 +41,34 @@ namespace Zongsoft.Communication.Net.Ftp
         {
         }
 
-		protected override void OnExecute(FtpCommandContext context)
-        {
-            context.Channel.CheckLogin();
+		protected override object OnExecute(FtpCommandContext context)
+		{
+			const string MESSAGE = "250 Deleted file successfully.";
 
-            if (string.IsNullOrEmpty(context.Statement.Argument))
-                throw new SyntaxException();
+			context.Channel.CheckLogin();
 
-            var path = context.Statement.Argument;
-            var localPath = context.Channel.MapVirtualPathToLocalPath(path);
-            context.Statement.Result = localPath;
+			if(string.IsNullOrEmpty(context.Statement.Argument))
+				throw new SyntaxException();
 
-            if (Directory.Exists(localPath))
-                throw new FileNotFoundException(path);
+			var path = context.Statement.Argument;
+			var localPath = context.Channel.MapVirtualPathToLocalPath(path);
+			context.Statement.Result = localPath;
 
-            try
-            {
-                File.Delete(localPath);
-            }
-            catch (Exception)
-            {
-                throw new InternalException("delete file");
-            }
+			if(!Directory.Exists(localPath))
+				throw new FileNotFoundException(path);
 
-            context.Channel.Send("250 Deleted file successfully");
-        }
+			try
+			{
+				File.Delete(localPath);
+			}
+			catch(Exception)
+			{
+				throw new InternalException("delete file");
+			}
+
+			context.Channel.Send(MESSAGE);
+
+			return MESSAGE;
+		}
     }
 }

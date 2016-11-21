@@ -36,15 +36,13 @@ namespace Zongsoft.Communication.Net.Ftp
 	/// </summary>
 	internal class FtpFeatCommand : FtpCommand
 	{
-		public FtpFeatCommand()
-			: base("FEAT")
+		public FtpFeatCommand() : base("FEAT")
 		{
 		}
 
-		protected override void OnExecute(FtpCommandContext context)
+		protected override object OnExecute(FtpCommandContext context)
 		{
-			context.Channel.Send(
-				@"211-Features:
+			const string MESSAGE = @"211-Features:
  MDTM
  SIZE
  PASV
@@ -56,7 +54,10 @@ namespace Zongsoft.Communication.Net.Ftp
  REST
  OPTS
  NOOP
-211 End");
+211 End";
+			context.Channel.Send(MESSAGE);
+
+			return MESSAGE;
 		}
 	}
 }

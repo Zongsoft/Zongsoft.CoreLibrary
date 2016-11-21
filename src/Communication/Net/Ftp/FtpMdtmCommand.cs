@@ -41,7 +41,7 @@ namespace Zongsoft.Communication.Net.Ftp
 		{
 		}
 
-		protected override void OnExecute(FtpCommandContext context)
+		protected override object OnExecute(FtpCommandContext context)
 		{
 			context.Channel.CheckLogin();
 
@@ -55,11 +55,12 @@ namespace Zongsoft.Communication.Net.Ftp
 			var info = new FileInfo(localPath);
 			if(info.Exists)
 			{
-				var str = string.Format("213 {0}", FtpDateUtils.FormatFtpDate(info.LastWriteTimeUtc));
-				context.Channel.Send(str);
+				var message = string.Format("213 {0}", FtpDateUtils.FormatFtpDate(info.LastWriteTimeUtc));
+				context.Channel.Send(message);
+				return message;
 			}
-			else
-				throw new FileNotFoundException(path);
+
+			throw new FileNotFoundException(path);
 		}
 	}
 }

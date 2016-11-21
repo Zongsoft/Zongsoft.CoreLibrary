@@ -49,7 +49,7 @@ namespace Zongsoft.Terminals.Commands
 		#endregion
 
 		#region 重写方法
-		protected override void OnExecute(TerminalCommandContext context)
+		protected override object OnExecute(TerminalCommandContext context)
 		{
 			if(context.Options.Contains("yes"))
 				throw new TerminalCommandExecutor.ExitException();
@@ -58,6 +58,8 @@ namespace Zongsoft.Terminals.Commands
 
 			if(string.Equals(context.Terminal.Input.ReadLine().Trim(), "yes", StringComparison.OrdinalIgnoreCase))
 				throw new TerminalCommandExecutor.ExitException();
+
+			return null;
 		}
 		#endregion
 	}

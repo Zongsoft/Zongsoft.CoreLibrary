@@ -25,11 +25,9 @@
  */
 
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
+using System.Collections.Generic;
+
 using Zongsoft.Diagnostics;
 
 namespace Zongsoft.Communication.Net.Ftp
@@ -40,9 +38,9 @@ namespace Zongsoft.Communication.Net.Ftp
         {
         }
 
-		protected override void OnExecute(FtpCommandContext context)
+		protected override object OnExecute(FtpCommandContext context)
         {
-            context.Result = null;
+			const string MESSAGE = "150 Opening data connection for file transfer.";
 
             context.Channel.CheckLogin();
             context.Channel.CheckDataChannel();
@@ -69,7 +67,9 @@ namespace Zongsoft.Communication.Net.Ftp
 
                 dataChannel.Receive();
 
-                context.Channel.Send("150 Opening data connection for file transfer.");
+                context.Channel.Send(MESSAGE);
+
+				return MESSAGE;
             }
             catch (Exception ex)
             {

@@ -41,23 +41,22 @@ namespace Zongsoft.Communication.Net.Ftp
         {
         }
 
-		protected override void OnExecute(FtpCommandContext context)
-        {
-            context.Channel.CheckLogin();
+		protected override object OnExecute(FtpCommandContext context)
+		{
+			context.Channel.CheckLogin();
 
-            var localPath = context.Channel.MapVirtualPathToLocalPath("..");
-            context.Statement.Result = localPath;
-            var virtualPath = context.Channel.MapLocalPathToVirtualPath(localPath);
+			var localPath = context.Channel.MapVirtualPathToLocalPath("..");
+			context.Statement.Result = localPath;
+			var virtualPath = context.Channel.MapLocalPathToVirtualPath(localPath);
 
-            if (Directory.Exists(localPath))
-            {
-                context.Channel.CurrentDir = virtualPath;
-                context.Channel.Send("250 \"" + context.Channel.CurrentDir + "\" is current directory.");
-            }
-            else
-            {
-                throw new DirectoryNotFoundException(virtualPath);
-            }
-        }
+			if(Directory.Exists(localPath))
+			{
+				context.Channel.CurrentDir = virtualPath;
+				context.Channel.Send($"250 the '{context.Channel.CurrentDir}' is current directory.");
+				return $"250 the '{context.Channel.CurrentDir}' is current directory.";
+			}
+
+			throw new DirectoryNotFoundException(virtualPath);
+		}
     }
 }

@@ -38,11 +38,15 @@ namespace Zongsoft.Communication.Net.Ftp
 		{
 		}
 
-		protected override void OnExecute(FtpCommandContext context)
+		protected override object OnExecute(FtpCommandContext context)
 		{
+			const string MESSAGE = "226 Data connection closed.";
+
 			context.Channel.CheckLogin();
 			context.Channel.CloseDataChannel();
-			context.Channel.Send("226 Data connection closed.");
+			context.Channel.Send(MESSAGE);
+
+			return MESSAGE;
 		}
 	}
 }

@@ -40,7 +40,7 @@ namespace Zongsoft.Communication.Net.Ftp
         {
         }
 
-		protected override void OnExecute(FtpCommandContext context)
+		protected override object OnExecute(FtpCommandContext context)
         {
             context.Channel.CheckLogin();
 
@@ -48,21 +48,26 @@ namespace Zongsoft.Communication.Net.Ftp
                 throw new SyntaxException();
 
             var args = context.Statement.Argument;
+			string message;
 
             if (args.Equals("UTF8 ON", StringComparison.OrdinalIgnoreCase))
             {
                 context.Channel.Encoding = Encoding.UTF8;
-                context.Channel.Send("200 UTF enabled mode.");
+				message = "200 UTF enabled mode.";
             }
             else if (args.Equals("UTF8 OFF", StringComparison.OrdinalIgnoreCase))
             {
                 context.Channel.Encoding = Encoding.ASCII;
-                context.Channel.Send("200 ASCII enabled mode.");
+				message = "200 ASCII enabled mode.";
             }
             else
             {
                 throw new SyntaxException();
             }
+
+			context.Channel.Send(message);
+
+			return message;
         }
     }
 }

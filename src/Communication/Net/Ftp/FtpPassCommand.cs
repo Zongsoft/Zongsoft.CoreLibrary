@@ -38,7 +38,7 @@ namespace Zongsoft.Communication.Net.Ftp
         {
         }
 
-		protected override void OnExecute(FtpCommandContext context)
+		protected override object OnExecute(FtpCommandContext context)
         {
 			var user = context.Server.Configuration.Users[context.Channel.UserName];
 
@@ -49,12 +49,13 @@ namespace Zongsoft.Communication.Net.Ftp
                     context.Channel.User = user;
                     context.Channel.Send("230 User successfully logged in.", null);
                     context.Statement.Result = true;
-                    return;
+                    return true;
                 }
             }
 
             context.Channel.Send("530 Not logged in, user or password incorrect!", null);
             context.Statement.Result = false;
+			return false;
         }
     }
 }

@@ -40,12 +40,14 @@ namespace Zongsoft.Communication.Net.Ftp
         {
         }
 
-		protected override void OnExecute(FtpCommandContext context)
+		protected override object OnExecute(FtpCommandContext context)
         {
             context.Channel.Status = FtpSessionStatus.NotLogin;
             context.Channel.User = null;
             context.Channel.Send("221 Bye-bye.");
             context.Channel.Close();
+
+			return "221 Bye-bye.";
         }
     }
 }

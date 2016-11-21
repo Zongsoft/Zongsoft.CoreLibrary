@@ -43,7 +43,7 @@ namespace Zongsoft.Communication.Net.Ftp
         {
         }
 
-		protected override void OnExecute(FtpCommandContext context)
+		protected override object OnExecute(FtpCommandContext context)
 		{
 			string result;
 			var user = context.Server.Configuration.Users[context.Statement.Argument];
@@ -71,6 +71,8 @@ namespace Zongsoft.Communication.Net.Ftp
 			}
 
 			context.Channel.Send(result);
+
+			return result;
 		}
     }
 }

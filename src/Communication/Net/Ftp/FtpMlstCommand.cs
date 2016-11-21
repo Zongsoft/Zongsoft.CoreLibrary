@@ -41,7 +41,7 @@ namespace Zongsoft.Communication.Net.Ftp
         {
         }
 
-		protected override void OnExecute(FtpCommandContext context)
+		protected override object OnExecute(FtpCommandContext context)
         {
             context.Channel.CheckLogin();
 
@@ -66,8 +66,9 @@ namespace Zongsoft.Communication.Net.Ftp
                 else
                     throw new FileNotFoundException(path);
                 
-                var str = string.Format("250-Listing {0}\r\n{1}250 END", path, FtpMlstFileFormater.Format(context, fileInfo));
-                context.Channel.Send(str);
+                var message = string.Format("250-Listing {0}\r\n{1}250 END", path, FtpMlstFileFormater.Format(context, fileInfo));
+                context.Channel.Send(message);
+				return message;
             }
             catch (IOException e)
             {

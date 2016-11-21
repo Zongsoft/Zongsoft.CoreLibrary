@@ -41,7 +41,7 @@ namespace Zongsoft.Communication.Net.Ftp
         {
         }
 
-		protected override void OnExecute(FtpCommandContext context)
+		protected override object OnExecute(FtpCommandContext context)
         {
             context.Channel.CheckLogin();
 
@@ -50,44 +50,44 @@ namespace Zongsoft.Communication.Net.Ftp
 
             context.Channel.CheckDataChannel();
 
-            try
-            {
-                //context.Channel.Status = FtpSessionStatus.Download;
+			try
+			{
+				//context.Channel.Status = FtpSessionStatus.Download;
 
-                var path = context.Statement.Argument;
-                string localPath = context.Channel.MapVirtualPathToLocalPath(path);
-                context.Statement.Result = localPath;
+				var path = context.Statement.Argument;
+				string localPath = context.Channel.MapVirtualPathToLocalPath(path);
+				context.Statement.Result = localPath;
 
-                var fileInfo = new FileInfo(localPath);
-                if (fileInfo.Exists)
-                {
-                    context.Channel.Send("150 Open data connection for file transfer.");
+				var fileInfo = new FileInfo(localPath);
 
-                    if (context.Channel.DataChannel.SendFile(fileInfo, context.Channel.FileOffset))
-                        context.Channel.Send("226 Transfer complete.");
-                    else
-                        context.Channel.Send("426 Connection closed; transfer aborted.");
+				if(!fileInfo.Exists)
+					throw new FileNotFoundException(path);
 
-                    context.Channel.FileOffset = 0;
-                }
-                else
-                {
-                    throw new FileNotFoundException(path);
-                }
-            }
-            catch (FtpException)
-            {
-                throw;
-            }
-            catch (Exception e)
-            {
-                throw new InternalException(e.Message);
-            }
-            finally
-            {
-                context.Channel.CloseDataChannel();
-                //context.Channel.Status = FtpSessionStatus.Wait;
-            }
+				var message = "150 Open data connection for file transfer.";
+
+				if(context.Channel.DataChannel.SendFile(fileInfo, context.Channel.FileOffset))
+					message = "226 Transfer complete.";
+				else
+					message = "426 Connection closed; transfer aborted.";
+
+				context.Channel.Send(message);
+				context.Channel.FileOffset = 0;
+
+				return message;
+			}
+			catch(FtpException)
+			{
+				throw;
+			}
+			catch(Exception e)
+			{
+				throw new InternalException(e.Message);
+			}
+			finally
+			{
+				context.Channel.CloseDataChannel();
+				//context.Channel.Status = FtpSessionStatus.Wait;
+			}
         }
     }
 }

@@ -40,8 +40,10 @@ namespace Zongsoft.Communication.Net.Ftp
         {
         }
 
-		protected override void OnExecute(FtpCommandContext context)
+		protected override object OnExecute(FtpCommandContext context)
         {
+			const string MESSAGE = "350 File or directory exists, ready for destination name.";
+
             context.Channel.CheckLogin();
 
             if (string.IsNullOrEmpty(context.Statement.Argument))
@@ -49,7 +51,8 @@ namespace Zongsoft.Communication.Net.Ftp
 
             context.Channel.RenamePath = context.Channel.MapVirtualPathToLocalPath(context.Statement.Argument);
             context.Statement.Result = context.Channel.RenamePath;
-            context.Channel.Send("350 File or directory exists, ready for destination name.");
+            context.Channel.Send(MESSAGE);
+			return MESSAGE;
         }
     }
 }

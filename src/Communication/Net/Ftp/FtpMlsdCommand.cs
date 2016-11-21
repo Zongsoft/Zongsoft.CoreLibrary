@@ -41,7 +41,7 @@ namespace Zongsoft.Communication.Net.Ftp
         {
         }
 
-		protected override void OnExecute(FtpCommandContext context)
+		protected override object OnExecute(FtpCommandContext context)
         {
             context.Channel.CheckLogin();
 
@@ -92,7 +92,8 @@ namespace Zongsoft.Communication.Net.Ftp
                     throw new DirectoryNotFoundException(path);
                 }
 
-                context.Channel.Send("226 Transfer complete.");
+                context.Channel.Send("226 Transfer completed.");
+				return "226 Transfer completed.";
             }
             catch (IOException e)
             {

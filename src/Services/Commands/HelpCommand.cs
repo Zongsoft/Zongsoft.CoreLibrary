@@ -48,7 +48,7 @@ namespace Zongsoft.Services.Commands
 		#endregion
 
 		#region 重写方法
-		protected override void OnExecute(CommandContext context)
+		protected override object OnExecute(CommandContext context)
 		{
 			if(context.Expression.Arguments.Count < 1)
 			{
@@ -57,7 +57,7 @@ namespace Zongsoft.Services.Commands
 					PrintCommandNode(context.Output, node, 0);
 				}
 
-				return;
+				return null;
 			}
 
 			foreach(var argument in context.Expression.Arguments)
@@ -82,6 +82,8 @@ namespace Zongsoft.Services.Commands
 					PrintHelpInfo(context.Output, node.Command);
 				}
 			}
+
+			return null;
 		}
 		#endregion
 

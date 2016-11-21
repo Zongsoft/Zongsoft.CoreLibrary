@@ -85,7 +85,7 @@ namespace Zongsoft.Services
 			return parameter as TContext;
 		}
 
-		protected abstract void OnExecute(TContext context);
+		protected abstract object OnExecute(TContext context);
 		#endregion
 
 		#region 重写方法
@@ -107,9 +107,7 @@ namespace Zongsoft.Services
 				context = this.CreateContext(parameter);
 
 			//执行具体的命令操作
-			this.OnExecute(context);
-
-			return context.Result;
+			return this.OnExecute(context);
 		}
 		#endregion
 

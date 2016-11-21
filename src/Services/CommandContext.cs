@@ -46,7 +46,6 @@ namespace Zongsoft.Services
 		private object _parameter;
 		private CommandOptionCollection _options;
 		private IDictionary<string, object> _extendedProperties;
-		private object _result;
 		#endregion
 
 		#region 构造函数
@@ -180,7 +179,7 @@ namespace Zongsoft.Services
 		/// <summary>
 		/// 获取当前命令的标准输出器。
 		/// </summary>
-		public ICommandOutlet Output
+		public virtual ICommandOutlet Output
 		{
 			get
 			{
@@ -191,7 +190,7 @@ namespace Zongsoft.Services
 		/// <summary>
 		/// 获取当前命令的错误输出器。
 		/// </summary>
-		public TextWriter Error
+		public virtual TextWriter Error
 		{
 			get
 			{
@@ -232,21 +231,6 @@ namespace Zongsoft.Services
 					System.Threading.Interlocked.CompareExchange(ref _statesProvider, new ConcurrentDictionary<ICommandExecutor, ConcurrentDictionary<string, object>>(), null);
 
 				return _statesProvider.GetOrAdd(_executor, _ => new ConcurrentDictionary<string, object>(StringComparer.OrdinalIgnoreCase));
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置命令的执行结果。
-		/// </summary>
-		public object Result
-		{
-			get
-			{
-				return _result;
-			}
-			set
-			{
-				_result = value;
 			}
 		}
 		#endregion

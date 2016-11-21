@@ -38,11 +38,13 @@ namespace Zongsoft.Communication.Net.Ftp
         {
         }
 
-		protected override void OnExecute(FtpCommandContext context)
+		protected override object OnExecute(FtpCommandContext context)
         {
             context.Channel.CheckLogin();
 
             context.Channel.CreatePasvDataChannel();
+
+			return true;
         }
     }
 }

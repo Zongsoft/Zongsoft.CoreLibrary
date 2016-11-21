@@ -42,10 +42,8 @@ namespace Zongsoft.Communication.Net.Ftp
         {
         }
 
-		protected override void OnExecute(FtpCommandContext context)
+		protected override object OnExecute(FtpCommandContext context)
         {
-            context.Result = null;
-
             context.Channel.CheckLogin();
             context.Channel.CheckDataChannel();
 
@@ -88,6 +86,8 @@ namespace Zongsoft.Communication.Net.Ftp
                 dataChannel.Receive();
 
                 context.Channel.Send("150 Opening data connection for file transfer.");
+
+				return null;
             }
             catch (Exception ex)
             {

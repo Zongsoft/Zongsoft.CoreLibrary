@@ -40,34 +40,40 @@ namespace Zongsoft.Communication.Net.Ftp
 		{
 		}
 
-		protected override void OnExecute(FtpCommandContext context)
+		protected override object OnExecute(FtpCommandContext context)
 		{
+			string message;
+
 			if(string.IsNullOrEmpty(context.Statement.Argument))
 			{
 				var cmd = context.Statement.Argument;
+
 				if(context.Executor.Root.Children.Contains(cmd))
-					context.Channel.Send(string.Format("214 Command {0} is supported by Ftp Server", cmd.ToUpper()));
+					message = string.Format("214 Command {0} is supported by Ftp Server", cmd.ToUpper());
 				else
-					context.Channel.Send(string.Format("502 Command {0} is not recognized or supported by Ftp Server",
-													   cmd.ToUpper()));
+					message = string.Format("502 Command {0} is not recognized or supported by Ftp Server", cmd.ToUpper());
 			}
 			else
 			{
 				var cmds = context.Executor.Root.Children.Keys.ToArray();
 
-				var str = new StringBuilder();
-				str.Append("214-The following commands are recognized:");
+				var text = new StringBuilder();
+				text.Append("214-The following commands are recognized:");
 
 				for(int i = 0; i < cmds.Length; i++)
 				{
 					if(i % 8 == 0)
-						str.Append("\r\n");
+						text.Append("\r\n");
 
-					str.AppendFormat("    {0}", cmds[i]);
+					text.AppendFormat("    {0}", cmds[i]);
 				}
 
-				context.Channel.Send(str.ToString());
+				message = text.ToString();
 			}
+
+			context.Channel.Send(message);
+
+			return message;
 		}
 	}
 }

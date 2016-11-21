@@ -49,7 +49,6 @@ namespace Zongsoft.Services
 			{
 				_context = context;
 				_parameter = context.Parameter;
-				_result = context.Result;
 				_extendedProperties = context.HasExtendedProperties ? context.ExtendedProperties : null;
 			}
 
@@ -70,7 +69,7 @@ namespace Zongsoft.Services
 			{
 				_context = context;
 				_parameter = context.Parameter;
-				_result = result ?? context.Result;
+				_result = result;
 				_extendedProperties = extendedProperties ?? (context.HasExtendedProperties ? context.ExtendedProperties : null);
 			}
 			else
@@ -165,9 +164,6 @@ namespace Zongsoft.Services
 			set
 			{
 				_result = value;
-
-				if(_context != null)
-					_context.Result = value;
 			}
 		}
 

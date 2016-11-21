@@ -35,8 +35,7 @@ namespace Zongsoft.Communication.Net.Ftp
 	internal abstract class FtpCommand : CommandBase<FtpCommandContext>
 	{
 		#region 构造函数
-		protected FtpCommand(string name)
-			: base(name)
+		protected FtpCommand(string name) : base(name)
 		{
 		}
 		#endregion

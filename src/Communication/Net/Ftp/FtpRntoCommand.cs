@@ -41,8 +41,10 @@ namespace Zongsoft.Communication.Net.Ftp
         {
         }
 
-		protected override void OnExecute(FtpCommandContext context)
+		protected override object OnExecute(FtpCommandContext context)
         {
+			const string MESSAGE = "250 Rename successful.";
+
             context.Channel.CheckLogin();
 
             try
@@ -72,7 +74,8 @@ namespace Zongsoft.Communication.Net.Ftp
                     throw new InternalException("rename path");
                 }
 
-                context.Channel.Send("250 Rename successful.");
+                context.Channel.Send(MESSAGE);
+				return MESSAGE;
             }
             finally
             {

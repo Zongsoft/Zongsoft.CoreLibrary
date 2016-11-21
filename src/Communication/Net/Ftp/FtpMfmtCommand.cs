@@ -27,8 +27,6 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Zongsoft.Communication.Net.Ftp
 {
@@ -41,8 +39,10 @@ namespace Zongsoft.Communication.Net.Ftp
 		{
 		}
 
-		protected override void OnExecute(FtpCommandContext context)
+		protected override object OnExecute(FtpCommandContext context)
 		{
+			const string MESSAGE = "213 Date/time changed OK.";
+
 			context.Channel.CheckLogin();
 
 			try
@@ -63,7 +63,9 @@ namespace Zongsoft.Communication.Net.Ftp
 
 				fileInfo.LastWriteTimeUtc = dateTime;
 
-				context.Channel.Send("213 Date/time changed OK");
+				context.Channel.Send(MESSAGE);
+
+				return MESSAGE;
 			}
 			catch(FtpException)
 			{

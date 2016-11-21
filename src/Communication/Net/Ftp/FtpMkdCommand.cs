@@ -41,30 +41,34 @@ namespace Zongsoft.Communication.Net.Ftp
         {
         }
 
-		protected override void OnExecute(FtpCommandContext context)
-        {
-            context.Channel.CheckLogin();
+		protected override object OnExecute(FtpCommandContext context)
+		{
+			const string MESSAGE = "257 Created directory successfully.";
 
-            if (string.IsNullOrEmpty(context.Statement.Argument))
-                throw new SyntaxException();
+			context.Channel.CheckLogin();
 
-            var path = context.Statement.Argument;
-            var localPath = context.Channel.MapVirtualPathToLocalPath(path);
-            context.Statement.Result = localPath;
+			if(string.IsNullOrEmpty(context.Statement.Argument))
+				throw new SyntaxException();
 
-            if (File.Exists(localPath))
-                throw new DirectoryNotFoundException(path);
+			var path = context.Statement.Argument;
+			var localPath = context.Channel.MapVirtualPathToLocalPath(path);
+			context.Statement.Result = localPath;
 
-            try
-            {
-                Directory.CreateDirectory(localPath);
-            }
-            catch (Exception)
-            {
-                throw new InternalException("create dir");
-            }
+			if(File.Exists(localPath))
+				throw new DirectoryNotFoundException(path);
 
-            context.Channel.Send("257 Created directory successfully");
-        }
+			try
+			{
+				Directory.CreateDirectory(localPath);
+			}
+			catch(Exception)
+			{
+				throw new InternalException("create dir");
+			}
+
+			context.Channel.Send(MESSAGE);
+
+			return MESSAGE;
+		}
     }
 }

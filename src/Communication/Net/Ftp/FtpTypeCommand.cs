@@ -38,28 +38,34 @@ namespace Zongsoft.Communication.Net.Ftp
 		{
 		}
 
-		protected override void OnExecute(FtpCommandContext context)
+		protected override object OnExecute(FtpCommandContext context)
 		{
 			context.Channel.CheckLogin();
 
 			if(string.IsNullOrEmpty(context.Statement.Argument))
 				throw new SyntaxException();
 
+			string message = null;
+
 			var arg = context.Statement.Argument.ToUpper();
 			if(arg == "A")
 			{
 				context.Channel.TransferMode = FtpTransferMode.Ascii;
-				context.Channel.Send("200 ASCII transfer mode active.");
+				message = "200 ASCII transfer mode active.";
+				context.Channel.Send(message);
 			}
 			else if(arg == "I")
 			{
 				context.Channel.TransferMode = FtpTransferMode.Binary;
-				context.Channel.Send("200 Binary transfer mode active.");
+				message = "200 Binary transfer mode active.";
+				context.Channel.Send(message);
 			}
 			else
 			{
 				throw new UnknownTransferModeException();
 			}
+
+			return message;
 		}
 	}
 }

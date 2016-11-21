@@ -41,7 +41,7 @@ namespace Zongsoft.Communication.Net.Ftp
         {
         }
 
-		protected override void OnExecute(FtpCommandContext context)
+		protected override object OnExecute(FtpCommandContext context)
         {
             context.Channel.CheckLogin();
 
@@ -60,7 +60,11 @@ namespace Zongsoft.Communication.Net.Ftp
                 if (info.Exists)
                     length = info.Length;
 
-                context.Channel.Send(string.Concat("213 ", length.ToString()));
+				var message = string.Concat("213 ", length.ToString());
+
+				context.Channel.Send(message);
+
+				return message;
             }
             catch (FtpException)
             {

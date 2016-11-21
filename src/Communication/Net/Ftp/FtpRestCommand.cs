@@ -37,7 +37,7 @@ namespace Zongsoft.Communication.Net.Ftp
         {
         }
 
-        protected override void OnExecute(FtpCommandContext context)
+        protected override object OnExecute(FtpCommandContext context)
         {
             context.Channel.CheckLogin();
 
@@ -47,7 +47,11 @@ namespace Zongsoft.Communication.Net.Ftp
 
             context.Channel.FileOffset = offset;
 
-            context.Channel.Send(string.Format("350 Restarting at {0}. Send STORE or RETR to initiate transfer.", offset));
+			var message = string.Format("350 Restarting at {0}. Send STORE or RETR to initiate transfer.", offset);
+
+			context.Channel.Send(message);
+
+			return message;
         }
     }
 }

@@ -38,7 +38,7 @@ namespace Zongsoft.Communication.Net.Ftp
         {
         }
 
-		protected override void OnExecute(FtpCommandContext context)
+		protected override object OnExecute(FtpCommandContext context)
         {
             context.Channel.CheckLogin();
 
@@ -55,6 +55,8 @@ namespace Zongsoft.Communication.Net.Ftp
             var address = new IPEndPoint(IPAddress.Parse(ip), port);
 
             context.Channel.CreatePortDataChannel(address);
+
+			return true;
         }
     }
 }

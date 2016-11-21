@@ -41,7 +41,7 @@ namespace Zongsoft.Communication.Net.Ftp
         {
         }
 
-		protected override void OnExecute(FtpCommandContext context)
+		protected override object OnExecute(FtpCommandContext context)
         {
             context.Channel.CheckLogin();
 
@@ -58,7 +58,9 @@ namespace Zongsoft.Communication.Net.Ftp
             context.Statement.Result = path;
 
             context.Channel.CurrentDir = context.Channel.MapLocalPathToVirtualPath(path);
-            context.Channel.Send(string.Format("250 \"{0}\" is current directory.", context.Channel.CurrentDir));
+			var message = string.Format("250 \"{0}\" is current directory.", context.Channel.CurrentDir);
+			context.Channel.Send(message);
+			return message;
         }
     }
 }

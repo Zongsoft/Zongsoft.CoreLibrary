@@ -35,10 +35,13 @@ namespace Zongsoft.Communication.Net.Ftp
 		{
 		}
 
-		protected override void OnExecute(FtpCommandContext context)
+		protected override object OnExecute(FtpCommandContext context)
 		{
+			const string MESSAGE = "200 NOOP Command Successful.";
+
 			context.Channel.CheckLogin();
-			context.Channel.Send("200 NOOP Command Successful.");
+			context.Channel.Send(MESSAGE);
+			return MESSAGE;
 		}
 	}
 }
