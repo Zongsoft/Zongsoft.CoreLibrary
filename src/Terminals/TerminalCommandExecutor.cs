@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2011-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2011-2016 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,11 +25,8 @@
  */
 
 using System;
-using System.Linq;
-using System.Collections.Generic;
+using System.IO;
 
-using Zongsoft.Diagnostics;
-using Zongsoft.Resources;
 using Zongsoft.Services;
 
 namespace Zongsoft.Terminals
@@ -39,7 +36,6 @@ namespace Zongsoft.Terminals
 		#region 事件声明
 		public event EventHandler CurrentChanged;
 		public event EventHandler<ExitEventArgs> Exit;
-		public event EventHandler<FailureEventArgs> Failed;
 		#endregion
 
 		#region 成员字段
@@ -48,10 +44,15 @@ namespace Zongsoft.Terminals
 		#endregion
 
 		#region 构造函数
+		public TerminalCommandExecutor()
+		{
+			_terminal = new ConsoleTerminal(this);
+		}
+
 		public TerminalCommandExecutor(ITerminal terminal)
 		{
 			if(terminal == null)
-				throw new ArgumentNullException("terminal");
+				throw new ArgumentNullException(nameof(terminal));
 
 			_terminal = terminal;
 		}
@@ -59,7 +60,7 @@ namespace Zongsoft.Terminals
 		public TerminalCommandExecutor(ITerminal terminal, ICommandExpressionParser parser) : base(parser)
 		{
 			if(terminal == null)
-				throw new ArgumentNullException("terminal");
+				throw new ArgumentNullException(nameof(terminal));
 
 			_terminal = terminal;
 		}
@@ -91,6 +92,30 @@ namespace Zongsoft.Terminals
 				this.OnCurrentChanged(EventArgs.Empty);
 			}
 		}
+
+		public override ICommandOutlet Output
+		{
+			get
+			{
+				return _terminal;
+			}
+			set
+			{
+				throw new NotSupportedException();
+			}
+		}
+
+		public override TextWriter Error
+		{
+			get
+			{
+				return _terminal.Error;
+			}
+			set
+			{
+				_terminal.Error = value ?? TextWriter.Null;
+			}
+		}
 		#endregion
 
 		#region 运行方法
@@ -108,7 +133,6 @@ namespace Zongsoft.Terminals
 				{
 					var commandText = _terminal.Input.ReadLine();
 
-					//执行单行命令
 					if(!string.IsNullOrWhiteSpace(commandText))
 						this.Execute(commandText);
 				}
@@ -116,10 +140,6 @@ namespace Zongsoft.Terminals
 				{
 					if(this.RaiseExit(ex.ExitCode))
 						return ex.ExitCode;
-				}
-				catch(Exception ex)
-				{
-					this.OnFailed(new FailureEventArgs(ex));
 				}
 			}
 		}
@@ -169,14 +189,6 @@ namespace Zongsoft.Terminals
 		#endregion
 
 		#region 激发事件
-		protected virtual void OnCurrentChanged(EventArgs args)
-		{
-			var currentChanged = this.CurrentChanged;
-
-			if(currentChanged != null)
-				currentChanged(this, args);
-		}
-
 		private bool RaiseExit(int exitCode)
 		{
 			var args = new ExitEventArgs(exitCode);
@@ -189,18 +201,12 @@ namespace Zongsoft.Terminals
 
 		protected virtual void OnExit(ExitEventArgs args)
 		{
-			var exit = this.Exit;
-
-			if(exit != null)
-				exit(this, args);
+			this.Exit?.Invoke(this, args);
 		}
 
-		protected virtual void OnFailed(FailureEventArgs args)
+		protected virtual void OnCurrentChanged(EventArgs args)
 		{
-			var failed = this.Failed;
-
-			if(failed != null)
-				failed(this, args);
+			this.CurrentChanged?.Invoke(this, args);
 		}
 		#endregion
 

@@ -25,6 +25,7 @@
  */
 
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 
@@ -173,6 +174,28 @@ namespace Zongsoft.Services
 					System.Threading.Interlocked.CompareExchange(ref _extendedProperties, new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase), null);
 
 				return _extendedProperties;
+			}
+		}
+
+		/// <summary>
+		/// 获取当前命令的标准输出器。
+		/// </summary>
+		public ICommandOutlet Output
+		{
+			get
+			{
+				return _executor.Output;
+			}
+		}
+
+		/// <summary>
+		/// 获取当前命令的错误输出器。
+		/// </summary>
+		public TextWriter Error
+		{
+			get
+			{
+				return _executor.Error;
 			}
 		}
 

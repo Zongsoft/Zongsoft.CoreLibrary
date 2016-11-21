@@ -25,7 +25,7 @@
  */
 
 using System;
-using System.Collections.Generic;
+using System.IO;
 
 namespace Zongsoft.Services
 {
@@ -83,6 +83,28 @@ namespace Zongsoft.Services
 			get
 			{
 				return _parameter;
+			}
+		}
+
+		/// <summary>
+		/// 获取当前命令执行器的标准输出器。
+		/// </summary>
+		public ICommandOutlet Output
+		{
+			get
+			{
+				return _executor.Output;
+			}
+		}
+
+		/// <summary>
+		/// 获取当前命令执行器的错误输出器。
+		/// </summary>
+		public TextWriter Error
+		{
+			get
+			{
+				return _executor.Error;
 			}
 		}
 		#endregion

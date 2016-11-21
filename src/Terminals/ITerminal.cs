@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2011-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2011-2016 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -26,21 +26,19 @@
 
 using System;
 using System.IO;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Zongsoft.Terminals
 {
-	public interface ITerminal
+	public interface ITerminal : Zongsoft.Services.ICommandOutlet
 	{
 		#region 属性定义
-		TerminalColor BackgroundColor
+		Zongsoft.Services.CommandOutletColor BackgroundColor
 		{
 			get;
 			set;
 		}
 
-		TerminalColor ForegroundColor
+		Zongsoft.Services.CommandOutletColor ForegroundColor
 		{
 			get;
 			set;
@@ -52,20 +50,10 @@ namespace Zongsoft.Terminals
 			set;
 		}
 
-		Stream InputStream
-		{
-			get;
-		}
-
 		TextWriter Output
 		{
 			get;
 			set;
-		}
-
-		Stream OutputStream
-		{
-			get;
 		}
 
 		TextWriter Error
@@ -73,32 +61,12 @@ namespace Zongsoft.Terminals
 			get;
 			set;
 		}
-
-		Stream ErrorStream
-		{
-			get;
-		}
 		#endregion
 
 		#region 方法定义
 		void Clear();
 		void Reset();
 		void ResetStyles(TerminalStyles styles);
-
-		void Write(string text);
-		void Write(object value);
-		void Write(string format, params object[] args);
-		void Write(TerminalColor foregroundColor, string text);
-		void Write(TerminalColor foregroundColor, object value);
-		void Write(TerminalColor foregroundColor, string format, params object[] args);
-
-		void WriteLine();
-		void WriteLine(string text);
-		void WriteLine(object value);
-		void WriteLine(string format, params object[] args);
-		void WriteLine(TerminalColor foregroundColor, string text);
-		void WriteLine(TerminalColor foregroundColor, object value);
-		void WriteLine(TerminalColor foregroundColor, string format, params object[] args);
 		#endregion
 	}
 }

@@ -80,7 +80,7 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 抽象方法
-		protected virtual TContext CreateContext(object parameter, IDictionary<string, object> items)
+		protected virtual TContext CreateContext(object parameter)
 		{
 			return parameter as TContext;
 		}
@@ -94,7 +94,7 @@ namespace Zongsoft.Services
 			var context = parameter as TContext;
 
 			if(context == null)
-				context = this.CreateContext(parameter, null);
+				context = this.CreateContext(parameter);
 
 			return this.CanExecute(context);
 		}
@@ -104,7 +104,7 @@ namespace Zongsoft.Services
 			var context = parameter as TContext;
 
 			if(context == null)
-				context = this.CreateContext(parameter, null);
+				context = this.CreateContext(parameter);
 
 			//执行具体的命令操作
 			this.OnExecute(context);

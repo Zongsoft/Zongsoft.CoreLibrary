@@ -219,6 +219,7 @@
     <Compile Include="Diagnostics\Configuration\LoggerHandlerElementCollection.cs" />
     <Compile Include="Diagnostics\ConsoleLogger.cs" />
     <Compile Include="Diagnostics\DataLogger.cs" />
+    <Compile Include="Diagnostics\FailureEventArgs.cs" />
     <Compile Include="Diagnostics\FileLogger.cs" />
     <Compile Include="Diagnostics\ILogger.cs" />
     <Compile Include="Diagnostics\LogEntry.cs" />
@@ -358,6 +359,7 @@
     <Compile Include="Services\CommandContext.cs" />
     <Compile Include="Services\CommandExecutor.cs" />
     <Compile Include="Services\CommandExecutorContext.cs" />
+    <Compile Include="Services\CommandExecutorFailureEventArgs.cs" />
     <Compile Include="Services\CommandExecutorEventArgs.cs" />
     <Compile Include="Services\CommandExecutorExecutedEventArgs.cs" />
     <Compile Include="Services\CommandExecutorExecutingEventArgs.cs" />
@@ -372,6 +374,8 @@
     <Compile Include="Services\CommandOptionException.cs" />
     <Compile Include="Services\CommandOptionMissingException.cs" />
     <Compile Include="Services\CommandOptionValueException.cs" />
+    <Compile Include="Services\ICommandOutlet.cs" />
+    <Compile Include="Services\CommandOutletColor.cs" />
     <Compile Include="Services\Composition\ExecutedEventArgs.cs" />
     <Compile Include="Services\Composition\ExecutionContext.cs" />
     <Compile Include="Services\Composition\ExecutionEventArgs.cs" />
@@ -408,7 +412,6 @@
     <Compile Include="Services\ServiceUnregisteredEventArgs.cs" />
     <Compile Include="Services\WorkerStateChangedEventArgs.cs" />
     <Compile Include="TaskUtility.cs" />
-    <Compile Include="Terminals\CommandHelper.cs" />
     <Compile Include="Services\CommandNotFoundException.cs" />
     <Compile Include="Services\CommandTreeNodeCollection.cs" />
     <Compile Include="Services\CommandTreeNode.cs" />
@@ -469,7 +472,6 @@
     <Compile Include="Services\WorkerState.cs" />
     <Compile Include="Data\IDataAccess.cs" />
     <Compile Include="Data\DataAccessExtension.cs" />
-    <Compile Include="Diagnostics\FailureEventArgs.cs" />
     <Compile Include="Services\ICommand.cs" />
     <Compile Include="Services\IMatchable.cs" />
     <Compile Include="Services\IServiceProvider.cs" />
@@ -477,7 +479,6 @@
     <Compile Include="Services\IWorker.cs" />
     <Compile Include="Services\WorkerBase.cs" />
     <Compile Include="ComponentModel\ApplicationContextBase.cs" />
-    <Compile Include="Diagnostics\FailureHandleEventArgs.cs" />
     <Compile Include="ComponentModel\IApplicationModule.cs" />
     <Compile Include="Communication\IReceiver.cs" />
     <Compile Include="Communication\ISender.cs" />
@@ -505,9 +506,8 @@
     <Compile Include="Terminals\Commands\ShellCommand.cs" />
     <Compile Include="Terminals\ConsoleTerminal.cs" />
     <Compile Include="Terminals\Commands\ExitCommand.cs" />
-    <Compile Include="Terminals\Commands\HelpCommand.cs" />
+    <Compile Include="Services\Commands\HelpCommand.cs" />
     <Compile Include="Terminals\ITerminal.cs" />
-    <Compile Include="Terminals\TerminalColor.cs" />
     <Compile Include="Terminals\TerminalCommandContext.cs" />
     <Compile Include="Terminals\TerminalCommandExecutor.cs" />
     <Compile Include="Terminals\TerminalStyles.cs" />

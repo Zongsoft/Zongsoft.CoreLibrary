@@ -25,13 +25,17 @@
  */
 
 using System;
+using System.IO;
 using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Zongsoft.Services
 {
 	public class CommandExecutor : MarshalByRefObject, ICommandExecutor
 	{
 		#region 声明事件
+		public event EventHandler<CommandExecutorFailureEventArgs> Failed;
 		public event EventHandler<CommandExecutorExecutingEventArgs> Executing;
 		public event EventHandler<CommandExecutorExecutedEventArgs> Executed;
 		#endregion
@@ -43,6 +47,8 @@ namespace Zongsoft.Services
 		#region 成员字段
 		private readonly CommandTreeNode _root;
 		private ICommandExpressionParser _parser;
+		private ICommandOutlet _output;
+		private TextWriter _error;
 		#endregion
 
 		#region 构造函数
@@ -50,6 +56,8 @@ namespace Zongsoft.Services
 		{
 			_root = new CommandTreeNode();
 			_parser = parser ?? CommandExpressionParser.Instance;
+			_output = NullCommandOutlet.Instance;
+			_error = CommandErrorWriter.Instance;
 		}
 		#endregion
 
@@ -99,6 +107,30 @@ namespace Zongsoft.Services
 				_parser = value;
 			}
 		}
+
+		public virtual ICommandOutlet Output
+		{
+			get
+			{
+				return _output;
+			}
+			set
+			{
+				_output = value ?? NullCommandOutlet.Instance;
+			}
+		}
+
+		public virtual TextWriter Error
+		{
+			get
+			{
+				return _error;
+			}
+			set
+			{
+				_error = value ?? TextWriter.Null;
+			}
+		}
 		#endregion
 
 		#region 查找方法
@@ -129,8 +161,19 @@ namespace Zongsoft.Services
 			if(executingArgs.Cancel)
 				return executingArgs.Result;
 
-			//调用执行请求
-			var result = this.OnExecute(context);
+			object result = null;
+
+			try
+			{
+				//调用执行请求
+				result = this.OnExecute(context);
+			}
+			catch(Exception ex)
+			{
+				//激发“Error”事件
+				if(!this.OnFailed(context, ex))
+					throw;
+			}
 
 			//创建事件参数对象
 			var executedArgs = new CommandExecutorExecutedEventArgs(context, result);
@@ -220,20 +263,184 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 激发事件
+		protected bool OnFailed(CommandExecutorContext context, Exception ex)
+		{
+			var args = new CommandExecutorFailureEventArgs(context, ex);
+
+			//激发“Failed”事件
+			this.OnFailed(args);
+
+			//输出异常信息
+			if(!args.Handled && args.Exception != null)
+				this.Error.WriteLine(args.Exception);
+
+			return args.Handled;
+		}
+
+		protected virtual void OnFailed(CommandExecutorFailureEventArgs args)
+		{
+			this.Failed?.Invoke(this, args);
+		}
+
 		protected virtual void OnExecuting(CommandExecutorExecutingEventArgs args)
 		{
-			var executing = this.Executing;
-
-			if(executing != null)
-				executing(this, args);
+			this.Executing?.Invoke(this, args);
 		}
 
 		protected virtual void OnExecuted(CommandExecutorExecutedEventArgs args)
 		{
-			var executed = this.Executed;
+			this.Executed?.Invoke(this, args);
+		}
+		#endregion
 
-			if(executed != null)
-				executed(this, args);
+		#region 嵌套子类
+		private class NullCommandOutlet : ICommandOutlet
+		{
+			#region 单例字段
+			public static readonly ICommandOutlet Instance = new NullCommandOutlet();
+			#endregion
+
+			public System.Text.Encoding Encoding
+			{
+				get
+				{
+					return null;
+				}
+				set
+				{
+				}
+			}
+
+			public TextWriter Writer
+			{
+				get
+				{
+					return TextWriter.Null;
+				}
+			}
+
+			public void Write(object value)
+			{
+			}
+
+			public void Write(string text)
+			{
+			}
+
+			public void Write(CommandOutletColor color, object value)
+			{
+			}
+
+			public void Write(CommandOutletColor color, string text)
+			{
+			}
+
+			public void Write(string format, params object[] args)
+			{
+			}
+
+			public void Write(CommandOutletColor color, string format, params object[] args)
+			{
+			}
+
+			public void WriteLine()
+			{
+			}
+
+			public void WriteLine(object value)
+			{
+			}
+
+			public void WriteLine(string text)
+			{
+			}
+
+			public void WriteLine(CommandOutletColor color, object value)
+			{
+			}
+
+			public void WriteLine(CommandOutletColor color, string text)
+			{
+			}
+
+			public void WriteLine(string format, params object[] args)
+			{
+			}
+
+			public void WriteLine(CommandOutletColor color, string format, params object[] args)
+			{
+			}
+		}
+
+		private class CommandErrorWriter : TextWriter
+		{
+			#region 单例字段
+			public static readonly TextWriter Instance = new CommandErrorWriter();
+			#endregion
+
+			public override Encoding Encoding
+			{
+				get
+				{
+					return Encoding.UTF8;
+				}
+			}
+
+			public override void Write(object value)
+			{
+				if(value == null)
+					return;
+
+				if(value is string)
+					Zongsoft.Diagnostics.Logger.Error((string)value);
+				else if(value is StringBuilder)
+					Zongsoft.Diagnostics.Logger.Error(value.ToString());
+				else
+					Zongsoft.Diagnostics.Logger.Error("An error occurred.", value);
+			}
+
+			public override void Write(string value)
+			{
+				Zongsoft.Diagnostics.Logger.Error(value);
+			}
+
+			public override void Write(string format, params object[] args)
+			{
+				Zongsoft.Diagnostics.Logger.Error(string.Format(format, args));
+			}
+
+			public override Task WriteAsync(string value)
+			{
+				return Task.Run(() => Zongsoft.Diagnostics.Logger.Error(value));
+			}
+
+			public override void WriteLine(object value)
+			{
+				if(value == null)
+					return;
+
+				if(value is string)
+					Zongsoft.Diagnostics.Logger.Error((string)value + this.NewLine);
+				else if(value is StringBuilder)
+					Zongsoft.Diagnostics.Logger.Error(value.ToString() + this.NewLine);
+				else
+					Zongsoft.Diagnostics.Logger.Error("An error occurred.", value);
+			}
+
+			public override void WriteLine(string value)
+			{
+				Zongsoft.Diagnostics.Logger.Error(value + this.NewLine);
+			}
+
+			public override void WriteLine(string format, params object[] args)
+			{
+				Zongsoft.Diagnostics.Logger.Error(string.Format(format, args) + this.NewLine);
+			}
+
+			public override Task WriteLineAsync(string value)
+			{
+				return Task.Run(() => Zongsoft.Diagnostics.Logger.Error(value + this.NewLine));
+			}
 		}
 		#endregion
 	}

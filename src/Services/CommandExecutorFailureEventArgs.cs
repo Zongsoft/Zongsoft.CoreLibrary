@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2016 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,57 +25,40 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Zongsoft.Diagnostics
+namespace Zongsoft.Services
 {
 	[Serializable]
-	[Obsolete]
-	public class FailureHandleEventArgs : FailureEventArgs
+	public class CommandExecutorFailureEventArgs : Zongsoft.Diagnostics.FailureEventArgs
 	{
 		#region 成员字段
-		private bool _handled;
+		private CommandExecutorContext _context;
 		#endregion
 
 		#region 构造函数
-		public FailureHandleEventArgs(Exception exception) : this(exception, null, false)
+		public CommandExecutorFailureEventArgs(CommandExecutorContext context, Exception exception) : base(exception, false)
 		{
+			if(context == null)
+				throw new ArgumentNullException(nameof(context));
+
+			_context = context;
 		}
 
-		public FailureHandleEventArgs(Exception exception, object state) : this(exception, state, false)
+		public CommandExecutorFailureEventArgs(CommandExecutorContext context, Exception exception, bool handled) : base(exception, handled)
 		{
-		}
+			if(context == null)
+				throw new ArgumentNullException(nameof(context));
 
-		public FailureHandleEventArgs(Exception exception, object state, bool handled) : base(exception, state)
-		{
-			_handled = handled;
-		}
-
-		public FailureHandleEventArgs(string message) : this(message, null, false)
-		{
-		}
-
-		public FailureHandleEventArgs(string message, object state) : this(message, state, false)
-		{
-		}
-
-		public FailureHandleEventArgs(string message, object state, bool handled) : base(message, state)
-		{
-			_handled = handled;
+			_context = context;
 		}
 		#endregion
 
 		#region 公共属性
-		public bool Handled
+		public CommandExecutorContext Context
 		{
 			get
 			{
-				return _handled;
-			}
-			set
-			{
-				_handled = value;
+				return _context;
 			}
 		}
 		#endregion

@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2011-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2011-2016 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -26,8 +26,9 @@
 
 using System;
 using System.IO;
-using System.Collections.Generic;
 using System.Text;
+
+using Zongsoft.Services;
 
 namespace Zongsoft.Terminals
 {
@@ -45,7 +46,6 @@ namespace Zongsoft.Terminals
 		public ConsoleTerminal()
 		{
 			_syncRoot = new object();
-			_executor = new TerminalCommandExecutor(this);
 		}
 
 		public ConsoleTerminal(TerminalCommandExecutor executor)
@@ -65,23 +65,49 @@ namespace Zongsoft.Terminals
 			{
 				return _executor;
 			}
-			set
-			{
-				if(value == null)
-					throw new ArgumentNullException();
-
-				if(object.ReferenceEquals(_executor, value))
-					return;
-
-				_executor = value;
-			}
 		}
 
-		public TerminalColor BackgroundColor
+		public TextReader Input
 		{
 			get
 			{
-				return this.ConvertColor(Console.BackgroundColor, TerminalColor.Black);
+				return Console.In;
+			}
+			set
+			{
+				Console.SetIn(value);
+			}
+		}
+
+		public TextWriter Output
+		{
+			get
+			{
+				return Console.Out;
+			}
+			set
+			{
+				Console.SetOut(value);
+			}
+		}
+
+		public TextWriter Error
+		{
+			get
+			{
+				return Console.Error;
+			}
+			set
+			{
+				Console.SetError(value);
+			}
+		}
+
+		public CommandOutletColor BackgroundColor
+		{
+			get
+			{
+				return this.ConvertColor(Console.BackgroundColor, CommandOutletColor.Black);
 			}
 			set
 			{
@@ -89,11 +115,11 @@ namespace Zongsoft.Terminals
 			}
 		}
 
-		public TerminalColor ForegroundColor
+		public CommandOutletColor ForegroundColor
 		{
 			get
 			{
-				return this.ConvertColor(Console.ForegroundColor, TerminalColor.White);
+				return this.ConvertColor(Console.ForegroundColor, CommandOutletColor.White);
 			}
 			set
 			{
@@ -145,7 +171,7 @@ namespace Zongsoft.Terminals
 			Console.Write(value);
 		}
 
-		public void Write(TerminalColor foregroundColor, string text)
+		public void Write(CommandOutletColor foregroundColor, string text)
 		{
 			lock(_syncRoot)
 			{
@@ -158,7 +184,7 @@ namespace Zongsoft.Terminals
 			}
 		}
 
-		public void Write(TerminalColor foregroundColor, object value)
+		public void Write(CommandOutletColor foregroundColor, object value)
 		{
 			lock(_syncRoot)
 			{
@@ -176,7 +202,7 @@ namespace Zongsoft.Terminals
 			Console.Write(format, args);
 		}
 
-		public void Write(TerminalColor foregroundColor, string format, params object[] args)
+		public void Write(CommandOutletColor foregroundColor, string format, params object[] args)
 		{
 			lock(_syncRoot)
 			{
@@ -204,7 +230,7 @@ namespace Zongsoft.Terminals
 			Console.WriteLine(value);
 		}
 
-		public void WriteLine(TerminalColor foregroundColor, string text)
+		public void WriteLine(CommandOutletColor foregroundColor, string text)
 		{
 			lock(_syncRoot)
 			{
@@ -217,7 +243,7 @@ namespace Zongsoft.Terminals
 			}
 		}
 
-		public void WriteLine(TerminalColor foregroundColor, object value)
+		public void WriteLine(CommandOutletColor foregroundColor, object value)
 		{
 			lock(_syncRoot)
 			{
@@ -235,7 +261,7 @@ namespace Zongsoft.Terminals
 			Console.WriteLine(format, args);
 		}
 
-		public void WriteLine(TerminalColor foregroundColor, string format, params object[] args)
+		public void WriteLine(CommandOutletColor foregroundColor, string format, params object[] args)
 		{
 			lock(_syncRoot)
 			{
@@ -249,80 +275,40 @@ namespace Zongsoft.Terminals
 		}
 		#endregion
 
-		#region 显示实现
-		TextReader ITerminal.Input
+		#region 显式实现
+		Encoding ICommandOutlet.Encoding
 		{
 			get
 			{
-				return Console.In;
+				return Console.OutputEncoding;
 			}
 			set
 			{
-				Console.SetIn(value);
+				Console.OutputEncoding = value;
 			}
 		}
 
-		Stream ITerminal.InputStream
-		{
-			get
-			{
-				return Console.OpenStandardInput();
-			}
-		}
-
-		TextWriter ITerminal.Output
+		TextWriter ICommandOutlet.Writer
 		{
 			get
 			{
 				return Console.Out;
 			}
-			set
-			{
-				Console.SetOut(value);
-			}
-		}
-
-		Stream ITerminal.OutputStream
-		{
-			get
-			{
-				return Console.OpenStandardOutput();
-			}
-		}
-
-		TextWriter ITerminal.Error
-		{
-			get
-			{
-				return Console.Error;
-			}
-			set
-			{
-				Console.SetError(value);
-			}
-		}
-
-		Stream ITerminal.ErrorStream
-		{
-			get
-			{
-				return Console.OpenStandardError();
-			}
 		}
 		#endregion
 
 		#region 私有方法
-		private TerminalColor ConvertColor(ConsoleColor color, TerminalColor defaultColor)
+		private CommandOutletColor ConvertColor(ConsoleColor color, CommandOutletColor defaultColor)
 		{
-			TerminalColor result;
+			CommandOutletColor result;
 
-			if(Enum.TryParse<TerminalColor>(color.ToString(), out result))
+			if(Enum.TryParse<CommandOutletColor>(color.ToString(), out result))
 				return result;
 			else
 				return defaultColor;
 		}
 
-		private ConsoleColor ConvertColor(TerminalColor color, ConsoleColor defaultColor)
+		private ConsoleColor ConvertColor(CommandOutletColor color, ConsoleColor defaultColor)
 		{
 			ConsoleColor result;
 
