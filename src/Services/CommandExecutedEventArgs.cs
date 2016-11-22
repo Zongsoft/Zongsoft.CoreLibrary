@@ -43,15 +43,21 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 构造函数
-		public CommandExecutedEventArgs(CommandContext context, Exception exception = null)
+		public CommandExecutedEventArgs(CommandContext context, object result)
 		{
-			if(context != null)
-			{
-				_context = context;
-				_parameter = context.Parameter;
-				_extendedProperties = context.HasExtendedProperties ? context.ExtendedProperties : null;
-			}
+			if(context == null)
+				throw new ArgumentNullException(nameof(context));
 
+			_context = context;
+			_result = result;
+		}
+
+		public CommandExecutedEventArgs(CommandContext context, Exception exception)
+		{
+			if(context == null)
+				throw new ArgumentNullException(nameof(context));
+
+			_context = context;
 			_exception = exception;
 		}
 
@@ -68,16 +74,20 @@ namespace Zongsoft.Services
 			if(context != null)
 			{
 				_context = context;
-				_parameter = context.Parameter;
-				_result = result;
-				_extendedProperties = extendedProperties ?? (context.HasExtendedProperties ? context.ExtendedProperties : null);
+
+				if(extendedProperties != null && extendedProperties.Count > 0)
+				{
+					foreach(var pair in extendedProperties)
+						context.ExtendedProperties[pair.Key] = pair.Value;
+				}
 			}
 			else
 			{
 				_parameter = parameter;
-				_result = result;
 				_extendedProperties = extendedProperties;
 			}
+
+			_result = result;
 		}
 
 		/// <summary>
@@ -93,8 +103,12 @@ namespace Zongsoft.Services
 			if(context != null)
 			{
 				_context = context;
-				_parameter = context.Parameter;
-				_extendedProperties = extendedProperties ?? (context.HasExtendedProperties ? context.ExtendedProperties : null);
+
+				if(extendedProperties != null && extendedProperties.Count > 0)
+				{
+					foreach(var pair in extendedProperties)
+						context.ExtendedProperties[pair.Key] = pair.Value;
+				}
 			}
 			else
 			{

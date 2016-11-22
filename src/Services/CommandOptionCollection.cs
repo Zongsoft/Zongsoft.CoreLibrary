@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2016 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -30,55 +30,42 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Services
 {
-	public class CommandOptionCollection : IDictionary<string, object>
+	public class CommandOptionCollection : IEnumerable<KeyValuePair<string, string>>
 	{
 		#region 成员字段
-		private ICommand _command;
-		private IDictionary<string, object> _items;
+		private bool _requiredDeclared;
+		private IDictionary<string, CommandOptionAttribute> _attributes;
+		private IDictionary<string, string> _items;
 		#endregion
 
 		#region 构造函数
-		public CommandOptionCollection(ICommand command) : this(command, (IDictionary)null)
+		public CommandOptionCollection()
 		{
+			_items = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 		}
 
-		public CommandOptionCollection(ICommand command, IDictionary options)
+		public CommandOptionCollection(IEnumerable<KeyValuePair<string, string>> items)
 		{
-			if(command == null)
-				throw new ArgumentNullException("command");
+			if(items == null)
+				throw new ArgumentNullException(nameof(items));
 
-			_command = command;
+			_items = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-			if(options == null || options.Count == 0)
-				_items = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-			else
+			foreach(var item in items)
+				_items[item.Key] = item.Value;
+		}
+		#endregion
+
+		#region 内部属性
+		internal bool RequiredDeclared
+		{
+			get
 			{
-				_items = new Dictionary<string, object>(options.Count, StringComparer.OrdinalIgnoreCase);
-
-				foreach(DictionaryEntry entry in options)
-				{
-					this[entry.Key.ToString()] = entry.Value;
-				}
+				return _requiredDeclared;
 			}
-		}
-
-		public CommandOptionCollection(ICommand command, IDictionary<string, object> options)
-		{
-			if(command == null)
-				throw new ArgumentNullException("command");
-
-			_command = command;
-
-			if(options == null || options.Count == 0)
-				_items = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-			else
+			set
 			{
-				_items = new Dictionary<string, object>(options.Count, StringComparer.OrdinalIgnoreCase);
-
-				foreach(var entry in options)
-				{
-					this[entry.Key] = entry.Value;
-				}
+				_requiredDeclared = value;
 			}
 		}
 		#endregion
@@ -92,25 +79,24 @@ namespace Zongsoft.Services
 			}
 		}
 
-		public object this[string key]
+		public string this[string key]
 		{
 			get
 			{
-				object value;
+				if(string.IsNullOrWhiteSpace(key))
+					throw new ArgumentNullException(nameof(key));
 
-				if(_items.TryGetValue(key, out value))
-					return value;
-
-				var option = CommandHelper.GetOption(_command, key);
-
-				if(option == null)
-					throw new CommandOptionException(key);
-
-				return option.DefaultValue;
+				return _items[key];
 			}
 			set
 			{
-				_items[key] = this.ValidateOptionValue(key, value);
+				if(string.IsNullOrWhiteSpace(key))
+					throw new ArgumentNullException(nameof(key));
+
+				//确认指定的选项名是否存在并且选项值是否有效
+				this.EnsureOptionValue(key, value);
+
+				_items[key] = value;
 			}
 		}
 
@@ -122,7 +108,7 @@ namespace Zongsoft.Services
 			}
 		}
 
-		public ICollection<object> Values
+		public ICollection<string> Values
 		{
 			get
 			{
@@ -137,111 +123,130 @@ namespace Zongsoft.Services
 			return _items.ContainsKey(name);
 		}
 
+		public object GetValue(string name)
+		{
+			if(string.IsNullOrWhiteSpace(name))
+				throw new ArgumentNullException(nameof(name));
+
+			string value;
+
+			if(_items.TryGetValue(name, out value))
+				return value;
+
+			CommandOptionAttribute attribute;
+
+			if(_attributes.TryGetValue(name, out attribute))
+				return Common.Convert.ConvertValue(attribute.DefaultValue, attribute.Type);
+			else
+				throw new KeyNotFoundException($"The '{name}' command option is not existed.");
+		}
+
+		public T GetValue<T>(string name)
+		{
+			if(string.IsNullOrWhiteSpace(name))
+				throw new ArgumentNullException(nameof(name));
+
+			string value;
+
+			if(_items.TryGetValue(name, out value))
+				return Common.Convert.ConvertValue<T>(value);
+
+			CommandOptionAttribute attribute;
+
+			if(_attributes.TryGetValue(name, out attribute))
+				return Common.Convert.ConvertValue<T>(attribute.DefaultValue);
+			else
+				throw new KeyNotFoundException($"The '{name}' command option is not existed.");
+		}
+
 		public bool TryGetValue(string name, out object value)
 		{
-			return _items.TryGetValue(name, out value);
+			if(string.IsNullOrWhiteSpace(name))
+				throw new ArgumentNullException(nameof(name));
+
+			string result;
+
+			if(_items.TryGetValue(name, out result))
+			{
+				CommandOptionAttribute attribute;
+
+				if(_attributes.TryGetValue(name, out attribute))
+					value = Common.Convert.ConvertValue(result, attribute.Type);
+				else
+					value = result;
+
+				return true;
+			}
+
+			value = null;
+			return false;
 		}
 
 		public bool TryGetValue<T>(string name, out T value)
 		{
-			object result;
+			if(string.IsNullOrWhiteSpace(name))
+				throw new ArgumentNullException(nameof(name));
+
+			string result;
 
 			if(_items.TryGetValue(name, out result))
 			{
-				value = (T)result;
+				value = Common.Convert.ConvertValue<T>(result);
 				return true;
 			}
-			else
-			{
-				value = default(T);
-				return false;
-			}
+
+			value = default(T);
+			return false;
 		}
 		#endregion
 
-		#region 显式实现
-		void IDictionary<string, object>.Add(string key, object value)
+		#region 静态方法
+		public static CommandOptionCollection GetOptions(ICommand command, IEnumerable<KeyValuePair<string, string>> options)
 		{
-			_items.Add(key, this.ValidateOptionValue(key, value));
-		}
-
-		bool IDictionary<string, object>.ContainsKey(string key)
-		{
-			return _items.ContainsKey(key);
-		}
-
-		bool IDictionary<string, object>.Remove(string key)
-		{
-			return _items.Remove(key);
-		}
-
-		bool IDictionary<string, object>.TryGetValue(string key, out object value)
-		{
-			return _items.TryGetValue(key, out value);
-		}
-
-		bool ICollection<KeyValuePair<string, object>>.IsReadOnly
-		{
-			get
-			{
-				return true;
-			}
-		}
-
-		void ICollection<KeyValuePair<string, object>>.Add(KeyValuePair<string, object> item)
-		{
-			var value = this.ValidateOptionValue(item.Key, item.Value);
-			_items.Add(item.Key, value);
-		}
-
-		void ICollection<KeyValuePair<string, object>>.Clear()
-		{
-			_items.Clear();
-		}
-
-		bool ICollection<KeyValuePair<string, object>>.Contains(KeyValuePair<string, object> item)
-		{
-			return _items.Contains(item);
-		}
-
-		void ICollection<KeyValuePair<string, object>>.CopyTo(KeyValuePair<string, object>[] array, int arrayIndex)
-		{
-			_items.CopyTo(array, arrayIndex);
-		}
-
-		bool ICollection<KeyValuePair<string, object>>.Remove(KeyValuePair<string, object> item)
-		{
-			return _items.Remove(item);
+			throw new NotImplementedException();
 		}
 		#endregion
 
 		#region 私有方法
-		private object ValidateOptionValue(string name, object value)
+		private void EnsureOptionValue(string name, string value)
 		{
-			var option = CommandHelper.GetOption(_command, name);
+			if(!_requiredDeclared || _attributes == null)
+				return;
 
-			if(option == null)
-				throw new CommandOptionException(name);
+			CommandOptionAttribute attribute;
 
-			if(option.Type != null)
+			if(!_attributes.TryGetValue(name, out attribute))
+				throw new CommandOptionException($"The '{name}' command option is not declared.");
+
+			if(attribute.Type == null)
+				return;
+
+			object temp;
+
+			if(attribute.Converter != null)
 			{
-				if(option.Converter != null)
-					return option.Converter.ConvertTo(value, option.Type);
+				if(!attribute.Converter.CanConvertFrom(typeof(string)))
+					throw new CommandOptionValueException(name, value);
 
-				object result;
-
-				if(Zongsoft.Common.Convert.TryConvertValue(value, option.Type, out result))
-					return result;
-
-				throw new CommandOptionValueException(name, value);
+				try
+				{
+					attribute.Converter.ConvertFrom(value);
+				}
+				catch
+				{
+					throw new CommandOptionValueException(name, value);
+				}
 			}
-
-			return value;
+			else
+			{
+				if(!Common.Convert.TryConvertValue(value, attribute.Type, out temp))
+					throw new CommandOptionValueException(name, value);
+			}
 		}
 		#endregion
 
 		#region 枚举遍历
-		IEnumerator<KeyValuePair<string, object>> IEnumerable<KeyValuePair<string, object>>.GetEnumerator()
+		IEnumerator<KeyValuePair<string, string>> IEnumerable<KeyValuePair<string, string>>.GetEnumerator()
 		{
 			return _items.GetEnumerator();
 		}

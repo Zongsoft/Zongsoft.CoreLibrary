@@ -35,8 +35,8 @@ namespace Zongsoft.Services
 	{
 		#region 成员变量
 		private CommandContext _context;
-		private object _parameter;
 		private IDictionary<string, object> _extendedProperties;
+		private object _parameter;
 		private object _result;
 		private bool _cancel;
 		#endregion
@@ -44,25 +44,26 @@ namespace Zongsoft.Services
 		#region 构造函数
 		public CommandExecutingEventArgs(CommandContext context, bool cancel = false)
 		{
-			if(context != null)
-			{
-				_context = context;
-				_parameter = context.Parameter;
-				_extendedProperties = context.HasExtendedProperties ? context.ExtendedProperties : null;
-			}
+			if(context == null)
+				throw new ArgumentNullException(nameof(context));
 
+			_context = context;
 			_cancel = cancel;
 		}
 
-		public CommandExecutingEventArgs(object parameter, IDictionary<string, object> extendedProperties, bool cancel = false)
+		public CommandExecutingEventArgs(object parameter, IDictionary<string, object> extendedProperties = null, bool cancel = false)
 		{
 			var context = parameter as CommandContext;
 
 			if(context != null)
 			{
 				_context = context;
-				_parameter = context.Parameter;
-				_extendedProperties = context.HasExtendedProperties ? context.ExtendedProperties : null;
+
+				if(extendedProperties != null && extendedProperties.Count > 0)
+				{
+					foreach(var pair in extendedProperties)
+						context.ExtendedProperties[pair.Key] = pair.Value;
+				}
 			}
 			else
 			{
@@ -108,10 +109,13 @@ namespace Zongsoft.Services
 		{
 			get
 			{
-				return _parameter;
+				return _context != null ? _context.Parameter : _parameter;
 			}
 		}
 
+		/// <summary>
+		/// 获取或设置命令的执行结果。
+		/// </summary>
 		public object Result
 		{
 			get
@@ -128,7 +132,10 @@ namespace Zongsoft.Services
 		{
 			get
 			{
-				return _extendedProperties != null && _extendedProperties.Count > 0;
+				if(_context != null)
+					return _context.HasExtendedProperties;
+				else
+					return _extendedProperties != null && _extendedProperties.Count > 0;
 			}
 		}
 
@@ -139,6 +146,9 @@ namespace Zongsoft.Services
 		{
 			get
 			{
+				if(_context != null)
+					return _context.ExtendedProperties;
+
 				if(_extendedProperties == null)
 					System.Threading.Interlocked.CompareExchange(ref _extendedProperties, new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase), null);
 

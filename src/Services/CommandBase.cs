@@ -231,7 +231,7 @@ namespace Zongsoft.Services
 				return null;
 
 			//创建事件参数对象
-			var executingArgs = new CommandExecutingEventArgs(parameter, null);
+			var executingArgs = this.CreateExecutingEventArgs(parameter);
 			//激发“Executing”事件
 			this.OnExecuting(executingArgs);
 
@@ -250,7 +250,7 @@ namespace Zongsoft.Services
 			catch(Exception ex)
 			{
 				//创建事件参数对象
-				executedArgs = new CommandExecutedEventArgs(parameter, ex);
+				executedArgs = this.CreateExecutedEventArgs(parameter, ex);
 
 				//激发“Executed”事件
 				this.OnExecuted(executedArgs);
@@ -262,7 +262,7 @@ namespace Zongsoft.Services
 			}
 
 			//创建事件参数对象
-			executedArgs = new CommandExecutedEventArgs(parameter, result);
+			executedArgs = this.CreateExecutedEventArgs(parameter, result);
 
 			//激发“Executed”事件
 			this.OnExecuted(executedArgs);
@@ -274,6 +274,32 @@ namespace Zongsoft.Services
 
 		#region 抽象方法
 		protected abstract object OnExecute(object parameter);
+		#endregion
+
+		#region 事件参数
+		private CommandExecutingEventArgs CreateExecutingEventArgs(object parameter)
+		{
+			if(parameter is CommandContext)
+				return new CommandExecutingEventArgs((CommandContext)parameter);
+
+			return new CommandExecutingEventArgs(parameter);
+		}
+
+		private CommandExecutedEventArgs CreateExecutedEventArgs(object parameter, object result)
+		{
+			if(parameter is CommandContext)
+				return new CommandExecutedEventArgs((CommandContext)parameter, result);
+
+			return new CommandExecutedEventArgs(parameter, result);
+		}
+
+		private CommandExecutedEventArgs CreateExecutedEventArgs(object parameter, Exception exception)
+		{
+			if(parameter is CommandContext)
+				return new Services.CommandExecutedEventArgs((CommandContext)parameter, exception);
+
+			return new CommandExecutedEventArgs(parameter, exception);
+		}
 		#endregion
 
 		#region 显式实现
