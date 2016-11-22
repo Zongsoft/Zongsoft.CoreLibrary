@@ -368,6 +368,7 @@
     <Compile Include="Services\CommandExpressionParser.cs" />
     <Compile Include="Services\CommandHelper.cs" />
     <Compile Include="Services\CommandLoaderBase.cs" />
+    <Compile Include="Services\CommandAttribute.cs" />
     <Compile Include="Services\CommandOptionAttribute.cs" />
     <Compile Include="Services\CommandOptionCollection.cs" />
     <Compile Include="Services\CommandOptionException.cs" />

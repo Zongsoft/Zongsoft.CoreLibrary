@@ -44,7 +44,6 @@ namespace Zongsoft.Services
 		private CommandExpression _expression;
 		private ICommandExecutor _executor;
 		private object _parameter;
-		private CommandOptionCollection _options;
 		private IDictionary<string, object> _extendedProperties;
 		#endregion
 
@@ -58,11 +57,6 @@ namespace Zongsoft.Services
 			_command = command;
 			_parameter = parameter;
 			_expression = expression;
-
-			if(expression == null)
-				_options = new CommandOptionCollection(command);
-			else
-				_options = new CommandOptionCollection(command, (System.Collections.IDictionary)expression.Options);
 
 			if(extendedProperties != null && extendedProperties.Count > 0)
 				_extendedProperties = new Dictionary<string, object>(extendedProperties, StringComparer.OrdinalIgnoreCase);
@@ -81,11 +75,6 @@ namespace Zongsoft.Services
 			_command = commandNode.Command;
 			_parameter = parameter;
 			_expression = expression;
-
-			if(expression == null)
-				_options = new CommandOptionCollection(commandNode.Command);
-			else
-				_options = new CommandOptionCollection(commandNode.Command, (System.Collections.IDictionary)expression.Options);
 
 			if(extendedProperties != null && extendedProperties.Count > 0)
 				_extendedProperties = new Dictionary<string, object>(extendedProperties, StringComparer.OrdinalIgnoreCase);
@@ -123,17 +112,6 @@ namespace Zongsoft.Services
 			get
 			{
 				return _parameter;
-			}
-		}
-
-		/// <summary>
-		/// 获取当前命令对应的表达式选项集。
-		/// </summary>
-		public CommandOptionCollection Options
-		{
-			get
-			{
-				return _options;
 			}
 		}
 

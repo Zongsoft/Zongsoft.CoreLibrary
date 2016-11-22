@@ -99,14 +99,13 @@ namespace Zongsoft.Services
 		{
 			IO.PathAnchor anchor;
 			string name, path;
+			var arguments = new List<string>();
+			var options = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
 			//解析命令表达式中的路径部分，如果表达式有误则该解析方法内部抛出异常
 			ParsePath(reader, out anchor, out name, out path);
 
-			//创建一个初步解析后的命令表达式对象
-			var result = new CommandExpression(anchor, name, path);
-
-			KeyValuePair<string, string>? pair = null;
+			KeyValuePair<string, string>? pair;
 
 			//依次解析命令表达式中的选项和参数
 			while((pair = ParsePair(reader)) != null)
@@ -114,13 +113,14 @@ namespace Zongsoft.Services
 				if(pair != null)
 				{
 					if(string.IsNullOrEmpty(pair.Value.Key))
-						result.Arguments.Add(pair.Value.Value);
+						arguments.Add(pair.Value.Value);
 					else
-						result.Options.Add(pair.Value);
+						options.Add(pair.Value.Key, pair.Value.Value);
 				}
 			}
 
-			return result;
+			//返回一个命令表达式
+			return new CommandExpression(anchor, name, path, options, arguments.ToArray());
 		}
 		#endregion
 

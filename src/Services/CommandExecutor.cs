@@ -201,6 +201,10 @@ namespace Zongsoft.Services
 				if(node == null)
 					throw new CommandNotFoundException(expression.FullPath);
 
+				//将命令表达式的选项集绑定到当前命令上
+				if(node.Command != null)
+					expression.Options.Bind(node.Command);
+
 				//将找到的命令表达式和对应的节点加入队列中
 				queue.Enqueue(new Tuple<CommandExpression, CommandTreeNode>(expression, node));
 

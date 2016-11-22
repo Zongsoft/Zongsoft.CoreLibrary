@@ -53,7 +53,7 @@ namespace Zongsoft.Terminals.Commands
 			   Environment.OSVersion.Platform == PlatformID.Unix)
 				throw new NotSupportedException(string.Format("Not supported in the {0} OS.", Environment.OSVersion));
 
-			if(context.Expression.Arguments.Count < 1)
+			if(context.Expression.Arguments.Length < 1)
 				return 0;
 
 			ProcessStartInfo info = new ProcessStartInfo(@"cmd.exe", " /C " + context.Expression.Arguments[0])
@@ -85,7 +85,7 @@ namespace Zongsoft.Terminals.Commands
 
 				if(!process.HasExited)
 				{
-					var timeout = (int)context.Options["timeout"];
+					var timeout = context.Expression.Options.GetValue<int>("timeout");
 
 					if(!process.WaitForExit(timeout > 0 ? timeout : int.MaxValue))
 					{

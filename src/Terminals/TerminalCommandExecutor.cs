@@ -156,7 +156,18 @@ namespace Zongsoft.Terminals
 			if(current == null)
 				return base.Find(path);
 
-			return current.Find(path);
+			//如果查找的路径完全等于当前节点名，则优先返回当前节点
+			if(string.Equals(path, current.Name, StringComparison.OrdinalIgnoreCase))
+				return current;
+
+			//以当前节点为锚点开始查找
+			var node = current.Find(path);
+
+			//如果以当前节点为锚点查找失败，并且查找的路径没有指定特定的锚点，则再从根节点查找一次并返回其查找结果
+			if(node == null && path[0] != '.' && path[0] != '/')
+				return this.Root.Find(path);
+
+			return node;
 		}
 		#endregion
 

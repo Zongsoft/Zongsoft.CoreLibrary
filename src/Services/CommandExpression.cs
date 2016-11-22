@@ -36,13 +36,13 @@ namespace Zongsoft.Services
 		private string _path;
 		private string _fullPath;
 		private Zongsoft.IO.PathAnchor _anchor;
-		private IDictionary<string, string> _options;
-		private IList<string> _arguments;
+		private CommandOptionCollection _options;
+		private string[] _arguments;
 		private CommandExpression _next;
 		#endregion
 
 		#region 构造函数
-		public CommandExpression(Zongsoft.IO.PathAnchor anchor, string name, string path, IDictionary<string, string> options = null, params string[] arguments)
+		public CommandExpression(Zongsoft.IO.PathAnchor anchor, string name, string path, IDictionary<string, string> options, params string[] arguments)
 		{
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException(nameof(name));
@@ -83,11 +83,12 @@ namespace Zongsoft.Services
 
 			_fullPath = _path + _name;
 
-			if(options != null && options.Count > 0)
-				_options = new Dictionary<string, string>(options, StringComparer.OrdinalIgnoreCase);
+			if(options == null || options.Count == 0)
+				_options = new CommandOptionCollection();
+			else
+				_options = new CommandOptionCollection(options);
 
-			if(arguments != null && arguments.Length > 0)
-				_arguments = new List<string>(arguments);
+			_arguments = arguments ?? new string[0];
 		}
 		#endregion
 
@@ -124,40 +125,18 @@ namespace Zongsoft.Services
 			}
 		}
 
-		public bool HasOptions
+		public CommandOptionCollection Options
 		{
 			get
 			{
-				return _options?.Count > 0;
-			}
-		}
-
-		public bool HasArguments
-		{
-			get
-			{
-				return _arguments?.Count > 0;
-			}
-		}
-
-		public IDictionary<string, string> Options
-		{
-			get
-			{
-				if(_options == null)
-					System.Threading.Interlocked.CompareExchange(ref _options, new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase), null);
-
 				return _options;
 			}
 		}
 
-		public IList<string> Arguments
+		public string[] Arguments
 		{
 			get
 			{
-				if(_arguments == null)
-					System.Threading.Interlocked.CompareExchange(ref _arguments, new List<string>(), null);
-
 				return _arguments;
 			}
 		}
@@ -187,7 +166,7 @@ namespace Zongsoft.Services
 		{
 			string result = this.FullPath;
 
-			if(_options?.Count > 0)
+			if(_options.Count > 0)
 			{
 				foreach(var option in _options)
 				{
@@ -203,7 +182,7 @@ namespace Zongsoft.Services
 				}
 			}
 
-			if(_arguments?.Count > 0)
+			if(_arguments.Length > 0)
 			{
 				foreach(var argument in _arguments)
 				{

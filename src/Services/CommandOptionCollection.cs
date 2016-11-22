@@ -25,15 +25,20 @@
  */
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
+using System.Linq;
 
 namespace Zongsoft.Services
 {
 	public class CommandOptionCollection : IEnumerable<KeyValuePair<string, string>>
 	{
+		#region 静态变量
+		private static readonly ConcurrentDictionary<Type, CommandDescriptor> Cache = new ConcurrentDictionary<Type, CommandDescriptor>();
+		#endregion
+
 		#region 成员字段
-		private bool _requiredDeclared;
+		private bool _isBound;
 		private IDictionary<string, CommandOptionAttribute> _attributes;
 		private IDictionary<string, string> _items;
 		#endregion
@@ -56,20 +61,6 @@ namespace Zongsoft.Services
 		}
 		#endregion
 
-		#region 内部属性
-		internal bool RequiredDeclared
-		{
-			get
-			{
-				return _requiredDeclared;
-			}
-			set
-			{
-				_requiredDeclared = value;
-			}
-		}
-		#endregion
-
 		#region 公共属性
 		public int Count
 		{
@@ -87,16 +78,6 @@ namespace Zongsoft.Services
 					throw new ArgumentNullException(nameof(key));
 
 				return _items[key];
-			}
-			set
-			{
-				if(string.IsNullOrWhiteSpace(key))
-					throw new ArgumentNullException(nameof(key));
-
-				//确认指定的选项名是否存在并且选项值是否有效
-				this.EnsureOptionValue(key, value);
-
-				_items[key] = value;
 			}
 		}
 
@@ -135,10 +116,10 @@ namespace Zongsoft.Services
 
 			CommandOptionAttribute attribute;
 
-			if(_attributes.TryGetValue(name, out attribute))
-				return Common.Convert.ConvertValue(attribute.DefaultValue, attribute.Type);
+			if(_attributes != null && _attributes.TryGetValue(name, out attribute))
+				return attribute.Type == null ? attribute.DefaultValue : Common.Convert.ConvertValue(attribute.DefaultValue, attribute.Type);
 			else
-				throw new KeyNotFoundException($"The '{name}' command option is not existed.");
+				throw new KeyNotFoundException($"The '{name}' command option is undefined.");
 		}
 
 		public T GetValue<T>(string name)
@@ -153,10 +134,10 @@ namespace Zongsoft.Services
 
 			CommandOptionAttribute attribute;
 
-			if(_attributes.TryGetValue(name, out attribute))
+			if(_attributes != null && _attributes.TryGetValue(name, out attribute))
 				return Common.Convert.ConvertValue<T>(attribute.DefaultValue);
 			else
-				throw new KeyNotFoundException($"The '{name}' command option is not existed.");
+				throw new KeyNotFoundException($"The '{name}' command option is undefined.");
 		}
 
 		public bool TryGetValue(string name, out object value)
@@ -170,8 +151,8 @@ namespace Zongsoft.Services
 			{
 				CommandOptionAttribute attribute;
 
-				if(_attributes.TryGetValue(name, out attribute))
-					value = Common.Convert.ConvertValue(result, attribute.Type);
+				if(_attributes != null && _attributes.TryGetValue(name, out attribute))
+					value = attribute.Type == null ? result : Common.Convert.ConvertValue(result, attribute.Type);
 				else
 					value = result;
 
@@ -200,17 +181,54 @@ namespace Zongsoft.Services
 		}
 		#endregion
 
-		#region 静态方法
-		public static CommandOptionCollection GetOptions(ICommand command, IEnumerable<KeyValuePair<string, string>> options)
+		#region 绑定方法
+		public void Bind(ICommand command)
 		{
-			throw new NotImplementedException();
+			if(command == null)
+				throw new ArgumentNullException(nameof(command));
+
+			//如果已经绑定完成则退出
+			if(_isBound)
+				return;
+
+			//从命令描述器的缓存中获取到当前命令的描述器，如果缓存中没有则新建一个描述器并添加到缓存中
+			var descriptor = Cache.GetOrAdd(command.GetType(),
+			                              type => new CommandDescriptor()
+			                              {
+											  Metadata = (CommandAttribute)Attribute.GetCustomAttribute(type, typeof(CommandAttribute)),
+											  Options = Attribute.GetCustomAttributes(type, typeof(CommandOptionAttribute), true).Cast<CommandOptionAttribute>()
+										  });
+
+			if(_attributes == null)
+				System.Threading.Interlocked.CompareExchange(ref _attributes, new Dictionary<string, CommandOptionAttribute>(descriptor.Options.Count(), StringComparer.OrdinalIgnoreCase), null);
+
+			lock(_attributes)
+			{
+				foreach(var attribute in descriptor.Options)
+				{
+					_attributes[attribute.Name] = attribute;
+				}
+			}
+
+			//如果命令没有定义元数据，或者命令的元数据中声明了必须进行选项验证
+			if(descriptor.Metadata == null || !descriptor.Metadata.IgnoreOptions)
+			{
+				//确保所有选项都是被定义的，并且它们的值都是类型正确的
+				foreach(var item in _items)
+				{
+					this.EnsureOptionValue(item.Key, item.Value);
+				}
+			}
+
+			//设置绑定已完成标志
+			_isBound = true;
 		}
 		#endregion
 
 		#region 私有方法
 		private void EnsureOptionValue(string name, string value)
 		{
-			if(!_requiredDeclared || _attributes == null)
+			if(_attributes == null)
 				return;
 
 			CommandOptionAttribute attribute;
@@ -254,6 +272,14 @@ namespace Zongsoft.Services
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 		{
 			return _items.GetEnumerator();
+		}
+		#endregion
+
+		#region 嵌套子类
+		private class CommandDescriptor
+		{
+			public CommandAttribute Metadata;
+			public IEnumerable<CommandOptionAttribute> Options;
 		}
 		#endregion
 	}

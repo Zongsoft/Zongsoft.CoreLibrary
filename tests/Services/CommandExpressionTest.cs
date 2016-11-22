@@ -107,7 +107,7 @@ namespace Zongsoft.Services.Tests
 			Assert.Equal("sms/generate", expression.FullPath);
 			Assert.Equal(PathAnchor.None, expression.Anchor);
 			Assert.Equal(2, expression.Options.Count);
-			Assert.Equal(4, expression.Arguments.Count);
+			Assert.Equal(4, expression.Arguments.Length);
 			Assert.Equal("user.register", expression.Options["template"]);
 			Assert.Equal("12345", expression.Options["authenticode"]);
 			Assert.Equal("phonenumber'1", expression.Arguments[0]);
@@ -120,8 +120,6 @@ namespace Zongsoft.Services.Tests
 			Assert.Equal("queue/", expression.Next.Path);
 			Assert.Equal("queue/in", expression.Next.FullPath);
 			Assert.Equal(PathAnchor.None, expression.Next.Anchor);
-			Assert.False(expression.Next.HasOptions);
-			Assert.True(expression.Next.HasArguments);
 			Assert.Equal("sms", expression.Next.Arguments[0]);
 		}
 	}

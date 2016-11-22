@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2011-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2011-2016 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,41 +25,41 @@
  */
 
 using System;
-using System.ComponentModel;
 
-using Zongsoft.Services;
-using Zongsoft.Resources;
-using Zongsoft.Terminals;
-
-namespace Zongsoft.Terminals.Commands
+namespace Zongsoft.Services
 {
-	[DisplayName("${Text.ExitCommand.Title}")]
-	[Description("${Text.ExitCommand.Description}")]
-	[CommandOption("yes", Type = null, Description = "${Text.ExitCommand.Options.Confirm}")]
-	public class ExitCommand : Zongsoft.Services.CommandBase<TerminalCommandContext>
+	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+	public class CommandAttribute : Attribute
 	{
+		#region 成员变量
+		private bool _ignoreOptions;
+		#endregion
+
 		#region 构造函数
-		public ExitCommand() : base("Exit")
+		public CommandAttribute()
 		{
 		}
 
-		public ExitCommand(string name) : base(name)
+		public CommandAttribute(bool ignoreOptions)
 		{
+			_ignoreOptions = ignoreOptions;
 		}
 		#endregion
 
-		#region 重写方法
-		protected override object OnExecute(TerminalCommandContext context)
+		#region 公共属性
+		/// <summary>
+		/// 获取或设置是否忽略验证传入的命令选项是否合法，默认值为假(False)。
+		/// </summary>
+		public bool IgnoreOptions
 		{
-			if(context.Expression.Options.Contains("yes"))
-				throw new TerminalCommandExecutor.ExitException();
-
-			context.Terminal.Write(ResourceUtility.GetString("${Text.ExitCommand.Confirm}"));
-
-			if(string.Equals(context.Terminal.Input.ReadLine().Trim(), "yes", StringComparison.OrdinalIgnoreCase))
-				throw new TerminalCommandExecutor.ExitException();
-
-			return null;
+			get
+			{
+				return _ignoreOptions;
+			}
+			set
+			{
+				_ignoreOptions = value;
+			}
 		}
 		#endregion
 	}

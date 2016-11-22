@@ -50,7 +50,7 @@ namespace Zongsoft.Services.Commands
 		#region 重写方法
 		protected override object OnExecute(CommandContext context)
 		{
-			if(context.Expression.Arguments.Count < 1)
+			if(context.Expression.Arguments.Length < 1)
 			{
 				foreach(var node in context.Executor.Root.Children)
 				{
