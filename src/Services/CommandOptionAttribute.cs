@@ -26,9 +26,6 @@
 
 using System;
 using System.ComponentModel;
-using System.Collections;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Zongsoft.Services
 {
@@ -39,6 +36,7 @@ namespace Zongsoft.Services
 		private string _name;
 		private object _defaultValue;
 		private Type _type;
+		private Type _converterType;
 		private TypeConverter _converter;
 		private bool _required;
 		private string _description;
@@ -70,10 +68,10 @@ namespace Zongsoft.Services
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException("name");
 
-			if(type != null)
-				_defaultValue = Zongsoft.Common.Convert.ConvertValue(defaultValue, type);
-			else
+			if(type == null)
 				_defaultValue = defaultValue;
+			else
+				_defaultValue = Zongsoft.Common.Convert.ConvertValue(defaultValue, type);
 
 			_name = name;
 			_type = type;
@@ -131,17 +129,43 @@ namespace Zongsoft.Services
 		}
 
 		/// <summary>
-		/// 获取或设置命令选项的值类型转换器。
+		/// 获取命令选项的值类型转换器。
 		/// </summary>
 		public TypeConverter Converter
 		{
 			get
 			{
+				if(_converter == null)
+				{
+					var converterType = _converterType;
+
+					if(converterType != null)
+						System.Threading.Interlocked.CompareExchange(ref _converter, (TypeConverter)Activator.CreateInstance(converterType), null);
+				}
+
 				return _converter;
+			}
+		}
+
+		/// <summary>
+		/// 获取或设置命令选项值的类型转换器的类型。
+		/// </summary>
+		public Type ConverterType
+		{
+			get
+			{
+				return _converterType;
 			}
 			set
 			{
-				_converter = value;
+				if(_converterType == value)
+					return;
+
+				if(value != null && !typeof(TypeConverter).IsAssignableFrom(value))
+					throw new ArgumentException($"The '{value.FullName}' type is not TypeConverter.");
+
+				_converterType = value;
+				_converter = null;
 			}
 		}
 
@@ -159,8 +183,10 @@ namespace Zongsoft.Services
 				if(_type != null)
 					_defaultValue = Zongsoft.Common.Convert.ConvertValue(value, _type, () =>
 					{
-						if(_converter != null && _converter.CanConvertTo(_type))
-							return _converter.ConvertTo(value, _type);
+						var converter = this.Converter;
+
+						if(converter != null)
+							return converter.ConvertFrom(value);
 						else
 							return Zongsoft.Common.Convert.GetDefaultValue(_type);
 					});

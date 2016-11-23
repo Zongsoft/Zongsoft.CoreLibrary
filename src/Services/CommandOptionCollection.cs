@@ -117,7 +117,7 @@ namespace Zongsoft.Services
 			CommandOptionAttribute attribute;
 
 			if(_attributes != null && _attributes.TryGetValue(name, out attribute))
-				return attribute.Type == null ? attribute.DefaultValue : Common.Convert.ConvertValue(attribute.DefaultValue, attribute.Type);
+				return attribute.DefaultValue;
 			else
 				throw new KeyNotFoundException($"The '{name}' command option is undefined.");
 		}
@@ -182,14 +182,14 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 绑定方法
-		public void Bind(ICommand command)
+		public bool Bind(ICommand command)
 		{
 			if(command == null)
 				throw new ArgumentNullException(nameof(command));
 
 			//如果已经绑定完成则退出
 			if(_isBound)
-				return;
+				return false;
 
 			//从命令描述器的缓存中获取到当前命令的描述器，如果缓存中没有则新建一个描述器并添加到缓存中
 			var descriptor = Cache.GetOrAdd(command.GetType(),
@@ -221,7 +221,7 @@ namespace Zongsoft.Services
 			}
 
 			//设置绑定已完成标志
-			_isBound = true;
+			return _isBound = true;
 		}
 		#endregion
 
@@ -239,8 +239,6 @@ namespace Zongsoft.Services
 			if(attribute.Type == null)
 				return;
 
-			object temp;
-
 			if(attribute.Converter != null)
 			{
 				if(!attribute.Converter.CanConvertFrom(typeof(string)))
@@ -257,6 +255,8 @@ namespace Zongsoft.Services
 			}
 			else
 			{
+				object temp;
+
 				if(!Common.Convert.TryConvertValue(value, attribute.Type, out temp))
 					throw new CommandOptionValueException(name, value);
 			}

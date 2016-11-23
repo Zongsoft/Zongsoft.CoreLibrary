@@ -366,7 +366,6 @@
     <Compile Include="Services\CommandExpression.cs" />
     <Compile Include="Services\CommandExpressionException.cs" />
     <Compile Include="Services\CommandExpressionParser.cs" />
-    <Compile Include="Services\CommandHelper.cs" />
     <Compile Include="Services\CommandLoaderBase.cs" />
     <Compile Include="Services\CommandAttribute.cs" />
     <Compile Include="Services\CommandOptionAttribute.cs" />
@@ -506,7 +505,6 @@
     <Compile Include="Terminals\Commands\ShellCommand.cs" />
     <Compile Include="Terminals\ConsoleTerminal.cs" />
     <Compile Include="Terminals\Commands\ExitCommand.cs" />
-    <Compile Include="Services\Commands\HelpCommand.cs" />
     <Compile Include="Terminals\ITerminal.cs" />
     <Compile Include="Terminals\TerminalCommandContext.cs" />
     <Compile Include="Terminals\TerminalCommandExecutor.cs" />
