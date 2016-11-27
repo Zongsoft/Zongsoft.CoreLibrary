@@ -186,12 +186,6 @@
   <data name="Text.ExitCommand.Title" xml:space="preserve">
     <value>退出命令</value>
   </data>
-  <data name="Text.HelpCommand.Description" xml:space="preserve">
-    <value>提供对命令的相关使用信息的命令。</value>
-  </data>
-  <data name="Text.HelpCommand.Title" xml:space="preserve">
-    <value>帮助命令</value>
-  </data>
   <data name="Text.MessageQueueListener.Description" xml:space="preserve">
     <value>这是一个侦听消息队列的后台服务程序，它以堵塞方式不断轮询消息队列(即循环以堵塞式调用消息队列的出队方法)，一旦队列中有消息可用则立即将消息出队，然后交给侦听器中的执行器去执行。</value>
   </data>
@@ -234,7 +228,7 @@
   <data name="Text.AuthenticationReason.InvalidPassword" xml:space="preserve">
     <value>无效的密码。</value>
   </data>
-	<data name="Text.AuthenticationReason.AccountDisabled" xml:space="preserve">
+  <data name="Text.AuthenticationReason.AccountDisabled" xml:space="preserve">
     <value>帐户已被封。</value>
   </data>
   <data name="Text.AuthenticationReason.AccountSuspended" xml:space="preserve">

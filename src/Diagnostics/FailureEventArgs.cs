@@ -33,7 +33,7 @@ namespace Zongsoft.Diagnostics
 	{
 		#region 成员字段
 		private Exception _exception;
-		private bool _handled;
+		private bool _exceptionHandled;
 		#endregion
 
 		#region 构造函数
@@ -41,10 +41,10 @@ namespace Zongsoft.Diagnostics
 		{
 		}
 
-		public FailureEventArgs(Exception exception, bool handled)
+		public FailureEventArgs(Exception exception, bool exceptionHandled)
 		{
 			_exception = exception;
-			_handled = handled;
+			_exceptionHandled = exceptionHandled;
 		}
 		#endregion
 
@@ -57,15 +57,15 @@ namespace Zongsoft.Diagnostics
 			}
 		}
 
-		public bool Handled
+		public bool ExceptionHandled
 		{
 			get
 			{
-				return _handled;
+				return _exceptionHandled;
 			}
 			set
 			{
-				_handled = value;
+				_exceptionHandled = value;
 			}
 		}
 		#endregion

@@ -239,7 +239,10 @@ namespace Zongsoft.Services
 			if(node == null)
 				throw new ArgumentNullException(nameof(node));
 
-			return node?.Command.Execute(this.CreateCommandContext(expression, node, parameter));
+			if(node.Command == null)
+				return null;
+
+			return node.Command.Execute(this.CreateCommandContext(expression, node, parameter));
 		}
 		#endregion
 
@@ -275,10 +278,10 @@ namespace Zongsoft.Services
 			this.OnFailed(args);
 
 			//输出异常信息
-			if(!args.Handled && args.Exception != null)
+			if(!args.ExceptionHandled && args.Exception != null)
 				this.Error.WriteLine(args.Exception);
 
-			return args.Handled;
+			return args.ExceptionHandled;
 		}
 
 		protected virtual void OnFailed(CommandExecutorFailureEventArgs args)

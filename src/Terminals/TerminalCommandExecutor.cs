@@ -197,6 +197,22 @@ namespace Zongsoft.Terminals
 			//调用基类同名方法
 			base.OnExecuted(args);
 		}
+
+		protected override void OnFailed(CommandExecutorFailureEventArgs args)
+		{
+			args.ExceptionHandled = !(args.Exception is ExitException);
+
+			if(args.ExceptionHandled)
+			{
+				if(args.Exception is CommandException)
+					this.Terminal.WriteLine(CommandOutletColor.Red, args.Exception.Message);
+				else
+					this.Terminal.WriteLine(CommandOutletColor.Red, args.Exception);
+			}
+
+			//调用基类同名方法
+			base.OnFailed(args);
+		}
 		#endregion
 
 		#region 激发事件
