@@ -261,7 +261,7 @@ namespace Zongsoft.Services
 					if(state == CommandPairState.Slash)
 						throw new CommandExpressionException($"Duplicate '{chr}' option indicator of command expression.");
 
-					if(state == CommandPairState.None)
+					if(state == CommandPairState.None && quote == '\0')
 					{
 						state = CommandPairState.Slash;
 						continue;

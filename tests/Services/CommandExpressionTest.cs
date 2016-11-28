@@ -100,7 +100,19 @@ namespace Zongsoft.Services.Tests
 		[Fact]
 		public void TestCommandExpressionParseWithPipeline()
 		{
-			var expression = CommandExpression.Parse("sms.generate -template:'user.register' -authenticode:12345 phonenumber'1 phonenumber:2 phonenumber-3 'phonenumber|4' | queue.in sms");
+			CommandExpression expression;
+
+			expression = CommandExpression.Parse("plugins.find '/Workbench'");
+
+			Assert.Equal("find", expression.Name);
+			Assert.Equal("plugins/", expression.Path);
+			Assert.Equal("plugins/find", expression.FullPath);
+			Assert.Equal(PathAnchor.None, expression.Anchor);
+			Assert.Equal(0, expression.Options.Count);
+			Assert.Equal(1, expression.Arguments.Length);
+			Assert.Equal("/Workbench", expression.Arguments[0]);
+
+			expression = CommandExpression.Parse("sms.generate -template:'user.register' -authenticode:12345 phonenumber'1 phonenumber:2 phonenumber-3 'phonenumber|4' | queue.in sms");
 
 			Assert.Equal("generate", expression.Name);
 			Assert.Equal("sms/", expression.Path);
