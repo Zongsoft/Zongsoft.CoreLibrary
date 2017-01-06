@@ -1,8 +1,8 @@
 ﻿/*
  * Authors:
- *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
+ *   钟峰(Popeye Zhong) <9555843@qq.com>
  *
- * Copyright (C) 2013-2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2013-2016 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,12 +25,18 @@
  */
 
 using System;
-using System.Collections.Generic;
 
 namespace Zongsoft.Runtime.Caching
 {
-	public interface ICacheCreator
+	public struct CacheEntry
 	{
-		object Create(string cacheName, string key, out TimeSpan duration);
+		public readonly TimeSpan? Expiry;
+		public readonly object Value;
+
+		public CacheEntry(object value, TimeSpan? expiry)
+		{
+			this.Value = value;
+			this.Expiry = expiry;
+		}
 	}
 }

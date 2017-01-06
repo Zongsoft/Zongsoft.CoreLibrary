@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2013-2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2013-2016 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -55,15 +55,6 @@ namespace Zongsoft.Runtime.Caching
 		}
 
 		/// <summary>
-		/// 获取或设置一个缓存项的创建器。
-		/// </summary>
-		ICacheCreator Creator
-		{
-			get;
-			set;
-		}
-
-		/// <summary>
 		/// 检测指定键的缓存项是否存在。
 		/// </summary>
 		/// <param name="key">指定要检测的键。</param>
@@ -75,14 +66,14 @@ namespace Zongsoft.Runtime.Caching
 		/// </summary>
 		/// <param name="key">指定要设置的键。</param>
 		/// <returns>返回指定缓存项的生成时长，如果为空则表示该缓存项为永久缓存项。</returns>
-		TimeSpan? GetDuration(string key);
+		TimeSpan? GetExpiry(string key);
 
 		/// <summary>
 		/// 设置指定键的缓存项的生存时长。
 		/// </summary>
 		/// <param name="key">指定要设置的键。</param>
 		/// <param name="duration">指定要设置的生存时长，如果为零则将该缓存项设置成永不过期。</param>
-		void SetDuration(string key, TimeSpan duration);
+		void SetExpiry(string key, TimeSpan duration);
 
 		/// <summary>
 		/// 从缓存字典中获取指定键的缓存值。
@@ -104,15 +95,7 @@ namespace Zongsoft.Runtime.Caching
 		/// <param name="key">指定要获取的键。</param>
 		/// <param name="valueCreator">如果指定的键不存在则使用该委托进行创建它，如果该参数为空则当指定的键不存在时返回空(null)。</param>
 		/// <returns>返回指定键的值或新增并保存的缓存项的值。</returns>
-		object GetValue(string key, Func<string, Tuple<object, DateTime>> valueCreator);
-
-		/// <summary>
-		/// 从缓存字典中获取指定键的缓存值。
-		/// </summary>
-		/// <param name="key">指定要获取的键。</param>
-		/// <param name="valueCreator">如果指定的键不存在则使用该委托进行创建它，如果该参数为空则当指定的键不存在时返回空(null)。</param>
-		/// <returns>返回指定键的值或新增并保存的缓存项的值。</returns>
-		object GetValue(string key, Func<string, Tuple<object, TimeSpan>> valueCreator);
+		object GetValue(string key, Func<string, CacheEntry> valueCreator);
 
 		/// <summary>
 		/// 设置指定的值保存到缓存字典中。

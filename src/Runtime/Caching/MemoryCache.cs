@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2013-2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2013-2016 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -41,22 +41,16 @@ namespace Zongsoft.Runtime.Caching
 		#endregion
 
 		#region 成员字段
-		private ICacheCreator _creator;
 		private System.Runtime.Caching.MemoryCache _innerCache;
 		#endregion
 
 		#region 构造函数
-		public MemoryCache(string name) : this(name, null)
-		{
-		}
-
-		public MemoryCache(string name, ICacheCreator creator)
+		public MemoryCache(string name)
 		{
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException("name");
 
 			_innerCache = new System.Runtime.Caching.MemoryCache(name);
-			_creator = creator;
 		}
 		#endregion
 
@@ -77,18 +71,6 @@ namespace Zongsoft.Runtime.Caching
 			}
 		}
 
-		public ICacheCreator Creator
-		{
-			get
-			{
-				return _creator;
-			}
-			set
-			{
-				_creator = value;
-			}
-		}
-
 		public bool IsDisposed
 		{
 			get
@@ -104,12 +86,12 @@ namespace Zongsoft.Runtime.Caching
 			return _innerCache.Contains(key);
 		}
 
-		public TimeSpan? GetDuration(string key)
+		public TimeSpan? GetExpiry(string key)
 		{
 			throw new NotSupportedException();
 		}
 
-		public void SetDuration(string key, TimeSpan duration)
+		public void SetExpiry(string key, TimeSpan duration)
 		{
 			throw new NotSupportedException();
 		}
@@ -121,44 +103,19 @@ namespace Zongsoft.Runtime.Caching
 
 		public object GetValue(string key)
 		{
-			var creator = this.Creator;
-
-			if(creator == null || _innerCache.Contains(key))
-				return _innerCache.Get(key);
-
-			return this.GetValue(key, _ =>
-			{
-				TimeSpan duration;
-				var value = creator.Create(this.Name, _, out duration);
-				return new Tuple<object, TimeSpan>(value, duration);
-			});
+			return _innerCache.Get(key);
 		}
 
-		public object GetValue(string key, Func<string, Tuple<object, TimeSpan>> valueCreator)
+		public object GetValue(string key, Func<string, CacheEntry> valueCreator)
 		{
 			if(valueCreator == null)
 				return _innerCache.Get(key);
 
-			var result = valueCreator(key);
+			var entry = valueCreator(key);
 
-			return _innerCache.AddOrGetExisting(key, result.Item1, new System.Runtime.Caching.CacheItemPolicy()
+			return _innerCache.AddOrGetExisting(key, entry.Value, new System.Runtime.Caching.CacheItemPolicy()
 			{
-				SlidingExpiration = result.Item2,
-				//UpdateCallback = this.OnUpdateCallback,
-				RemovedCallback = this.OnRemovedCallback,
-			});
-		}
-
-		public object GetValue(string key, Func<string, Tuple<object, DateTime>> valueCreator)
-		{
-			if(valueCreator == null)
-				return _innerCache.Get(key);
-
-			var result = valueCreator(key);
-
-			return _innerCache.AddOrGetExisting(key, result.Item1, new System.Runtime.Caching.CacheItemPolicy()
-			{
-				AbsoluteExpiration = result.Item2 > DateTime.Now ? result.Item2 : System.Runtime.Caching.ObjectCache.InfiniteAbsoluteExpiration,
+				SlidingExpiration = entry.Expiry ?? System.Runtime.Caching.ObjectCache.NoSlidingExpiration,
 				//UpdateCallback = this.OnUpdateCallback,
 				RemovedCallback = this.OnRemovedCallback,
 			});
