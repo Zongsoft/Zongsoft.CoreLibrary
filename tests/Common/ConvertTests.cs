@@ -84,6 +84,10 @@ namespace Zongsoft.Common.Tests
 
 			empY = (Employee)Zongsoft.Common.Convert.GetValue(department, "['Popeye']");
 			Assert.NotNull(empX);
+
+			var type = Zongsoft.Common.Convert.GetMemberType(department, "[0]");
+			Assert.NotNull(type);
+			Assert.Same(typeof(Employee), type);
 		}
 
 		[Fact]
