@@ -10,7 +10,7 @@ namespace Zongsoft.Expressions.Tests
 		[Fact]
 		public void Test()
 		{
-			const string EXPRESSION = @"1+2f	_abc123'text\'suffix'	-30L*4.5 / 5.5m (true || FALSE)null";
+			const string EXPRESSION = @"1+2f	_abc123'text\'suffix'	-30L*4.5 / 5.5m (true || FALSE?yes:no)null??nothing";
 
 			var scanner = Lexer.Instance.GetScanner(EXPRESSION);
 			Assert.NotNull(scanner);
@@ -91,11 +91,41 @@ namespace Zongsoft.Expressions.Tests
 
 			token = scanner.Scan();
 			Assert.NotNull(token);
+			Assert.Equal(SymbolToken.Question, token);
+
+			token = scanner.Scan();
+			Assert.NotNull(token);
+			Assert.Equal(TokenType.Identifier, token.Type);
+			Assert.IsType(typeof(string), token.Value);
+			Assert.Equal("yes", (string)token.Value);
+
+			token = scanner.Scan();
+			Assert.NotNull(token);
+			Assert.Equal(SymbolToken.Colon, token);
+
+			token = scanner.Scan();
+			Assert.NotNull(token);
+			Assert.Equal(TokenType.Identifier, token.Type);
+			Assert.IsType(typeof(string), token.Value);
+			Assert.Equal("no", (string)token.Value);
+
+			token = scanner.Scan();
+			Assert.NotNull(token);
 			Assert.Equal(SymbolToken.ClosingParenthesis, token);
 
 			token = scanner.Scan();
 			Assert.NotNull(token);
 			Assert.Equal(Token.Null, token);
+
+			token = scanner.Scan();
+			Assert.NotNull(token);
+			Assert.Equal(SymbolToken.Coalesce, token);
+
+			token = scanner.Scan();
+			Assert.NotNull(token);
+			Assert.Equal(TokenType.Identifier, token.Type);
+			Assert.IsType(typeof(string), token.Value);
+			Assert.Equal("nothing", (string)token.Value);
 
 			token = scanner.Scan();
 			Assert.Null(token);

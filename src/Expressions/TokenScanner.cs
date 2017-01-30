@@ -74,6 +74,9 @@ namespace Zongsoft.Expressions
 					return result.Token;
 			}
 
+			if(_reader.Peek() > 0)
+				throw new SyntaxException($"Illegal literal at {_reader.Position + 1} character in the expression.");
+
 			return null;
 		}
 		#endregion
