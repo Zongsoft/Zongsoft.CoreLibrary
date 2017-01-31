@@ -52,6 +52,9 @@ namespace Zongsoft.Expressions.Tokenization
 			{
 				chr = (char)valueRead;
 
+				if(chr == '\n' || chr == '\r')
+					throw new SyntaxException("The string literal contains new-line symbol.");
+
 				if(escaping)
 				{
 					if(chr != quote)
@@ -78,7 +81,7 @@ namespace Zongsoft.Expressions.Tokenization
 				escaping = chr == '\\' && (!escaping);
 			}
 
-			return TokenResult.Fail(-content.Length);
+			throw new SyntaxException($"Missing a closing symbol({quote}) of string.");
 		}
 		#endregion
 
@@ -89,11 +92,22 @@ namespace Zongsoft.Expressions.Tokenization
 
 			switch(chr)
 			{
+				case '"':
+				case '\'':
+				case '\\':
+					escapedChar = chr;
+					return true;
 				case 's':
 					escapedChar = ' ';
 					return true;
 				case 't':
 					escapedChar = '\t';
+					return true;
+				case 'n':
+					escapedChar = '\n';
+					return true;
+				case 'r':
+					escapedChar = '\r';
 					return true;
 			}
 

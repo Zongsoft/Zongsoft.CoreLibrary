@@ -71,6 +71,10 @@ namespace Zongsoft.Expressions
 		private const string QUESTION = "?";
 		//冒号(:)
 		private const string COLON = ":";
+		//逗号(,)
+		private const string COMMA = ",";
+		//分号(;)
+		private const string SEMICOLON = ";";
 		//管道符(|)
 		private const string PIPELINE = "|";
 		//左小括号：(
@@ -157,6 +161,10 @@ namespace Zongsoft.Expressions
 					return SymbolToken.Question;
 				case COLON:
 					return SymbolToken.Colon;
+				case COMMA:
+					return SymbolToken.Comma;
+				case SEMICOLON:
+					return SymbolToken.Semicolon;
 				case PIPELINE:
 					return SymbolToken.Pipeline;
 				case OPENINGPARENTHESIS:
@@ -183,7 +191,7 @@ namespace Zongsoft.Expressions
 			PLUS, MINUS, MULTIPLY, DIVIDE, MODULO,
 			ASSIGN, NOT, ANDALSO, ORELSE, EQUAL, NOTEQUAL,
 			LESSTHAN, LESSTHANOREQUAL, GREATERTHAN, GREATERTHANOREQUAL,
-			COALESCE, QUESTION, COLON, PIPELINE,
+			COALESCE, QUESTION, COLON, COMMA, SEMICOLON, PIPELINE,
 			OPENINGPARENTHESIS, CLOSINGPARENTHESIS,
 			OPENINGBRACKET, CLOSINGBRACKET,
 			OPENINGBRACE, CLOSINGBRACE,
@@ -242,6 +250,12 @@ namespace Zongsoft.Expressions
 
 		/// <summary>冒号(:)</summary>
 		public static readonly SymbolToken Colon = new SymbolToken(COLON);
+
+		/// <summary>逗号(|)</summary>
+		public static readonly SymbolToken Comma = new SymbolToken(COMMA);
+
+		/// <summary>分号(|)</summary>
+		public static readonly SymbolToken Semicolon = new SymbolToken(SEMICOLON);
 
 		/// <summary>管道符(|)</summary>
 		public static readonly SymbolToken Pipeline = new SymbolToken(PIPELINE);
