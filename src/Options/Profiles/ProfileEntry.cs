@@ -79,7 +79,7 @@ namespace Zongsoft.Options.Profiles
 		{
 			get
 			{
-				return (ProfileSection)base.Owner;
+				return base.Owner as ProfileSection;
 			}
 		}
 
