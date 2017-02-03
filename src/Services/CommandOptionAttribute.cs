@@ -54,7 +54,7 @@ namespace Zongsoft.Services
 
 			_name = name.Trim();
 			_type = type;
-			_defaultValue = Zongsoft.Common.Convert.GetDefaultValue(type);
+			_defaultValue = Zongsoft.Common.TypeExtension.GetDefaultValue(type);
 			_required = false;
 			_description = string.Empty;
 		}
@@ -188,7 +188,7 @@ namespace Zongsoft.Services
 						if(converter != null)
 							return converter.ConvertFrom(value);
 						else
-							return Zongsoft.Common.Convert.GetDefaultValue(_type);
+							return Zongsoft.Common.TypeExtension.GetDefaultValue(_type);
 					});
 				else
 					_defaultValue = value;

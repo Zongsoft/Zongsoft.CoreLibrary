@@ -53,7 +53,7 @@ namespace Zongsoft.Common
 
 		public static object ConvertValue(object value, Type conversionType)
 		{
-			return ConvertValue(value, conversionType, () => GetDefaultValue(conversionType));
+			return ConvertValue(value, conversionType, () => TypeExtension.GetDefaultValue(conversionType));
 		}
 
 		public static object ConvertValue(object value, Type conversionType, object defaultValue)
@@ -155,29 +155,6 @@ namespace Zongsoft.Common
 		#endregion
 
 		#region 取默认值
-		public static object GetDefaultValue(Type type)
-		{
-			if(type == typeof(DBNull))
-				return DBNull.Value;
-
-			if(type == null || type.IsClass || type.IsInterface || type == typeof(Nullable<>))
-				return null;
-
-			if(type.IsEnum)
-			{
-				var attribute = (DefaultValueAttribute)Attribute.GetCustomAttribute(type, typeof(DefaultValueAttribute), true);
-
-				if(attribute != null)
-					return attribute.Value;
-
-				Array values = Enum.GetValues(type);
-
-				if(values.Length > 0)
-					return values.GetValue(0);
-			}
-
-			return Activator.CreateInstance(type);
-		}
 		#endregion
 
 		#region 字节文本
@@ -377,37 +354,21 @@ namespace Zongsoft.Common
 
 		#region 对象解析
 
-		#region 获取方法
+		#region 获取成员类型
 		public static Type GetMemberType(object target, string text)
 		{
 			if(target == null)
 				return null;
 
-			if(string.IsNullOrWhiteSpace(text))
-				return target.GetType();
+			return GetMemberType(target.GetType(), text);
+		}
 
-			var type = target.GetType();
-			var parts = text.Split(new char[]{ '.' }, StringSplitOptions.RemoveEmptyEntries);
-
-			foreach(var part in parts)
+		public static Type GetMemberType(Type targetType, string text)
+		{
+			return FindMemberType(targetType, text, (type, part) =>
 			{
-				var member = GetMember(type, part, (BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static), true);
-
-				if(member == null)
-					throw new ArgumentException(string.Format("The '{0}' member is not existed in the '{1}' type, the original text is '{2}'.", part, type.FullName, text));
-
-				switch(member.MemberType)
-				{
-					case MemberTypes.Field:
-						type = ((FieldInfo)member).FieldType;
-						break;
-					case MemberTypes.Property:
-						type = ((PropertyInfo)member).PropertyType;
-						break;
-				}
-			}
-
-			return type;
+				throw new ArgumentException(string.Format("The '{0}' member is not existed in the '{1}' type, the original text is '{2}'.", part, type.FullName, text));
+			});
 		}
 
 		public static bool TryGetMemberType(object target, string text, out Type memberType)
@@ -417,10 +378,22 @@ namespace Zongsoft.Common
 			if(target == null)
 				return false;
 
-			memberType = target.GetType();
+			return TryGetMemberType(target.GetType(), text, out memberType);
+		}
 
-			if(string.IsNullOrWhiteSpace(text))
-				return true;
+		public static bool TryGetMemberType(Type targetType, string text, out Type memberType)
+		{
+			var result = true;
+			memberType = FindMemberType(targetType, text, (_, __) => result = false);
+			return result;
+		}
+
+		private static Type FindMemberType(Type targetType, string text, Func<Type, string, bool> failure)
+		{
+			var memberType = targetType;
+
+			if(targetType == null || string.IsNullOrWhiteSpace(text))
+				return memberType;
 
 			var parts = text.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -429,7 +402,10 @@ namespace Zongsoft.Common
 				var member = GetMember(memberType, part, (BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static), true);
 
 				if(member == null)
-					return false;
+				{
+					failure?.Invoke(memberType, part);
+					return null;
+				}
 
 				switch(member.MemberType)
 				{
@@ -442,9 +418,11 @@ namespace Zongsoft.Common
 				}
 			}
 
-			return true;
+			return memberType;
 		}
+		#endregion
 
+		#region 获取成员内容
 		public static object GetValue(object target, string text)
 		{
 			if(target == null || text == null || text.Length < 1)
@@ -523,7 +501,7 @@ namespace Zongsoft.Common
 		}
 		#endregion
 
-		#region 设置方法
+		#region 设置成员内容
 		public static void SetValue(object target, string text, object value)
 		{
 			SetValue(target, text, () => value, null);

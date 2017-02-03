@@ -160,7 +160,7 @@ namespace Zongsoft.Common
 			       code == TypeCode.Int64 || code == TypeCode.UInt64;
 		}
 
-		public static bool IsNumber(this Type type)
+		public static bool IsNumeric(this Type type)
 		{
 			if(type == null)
 				throw new ArgumentNullException("type");
@@ -170,6 +170,35 @@ namespace Zongsoft.Common
 			return TypeExtension.IsInteger(type) ||
 				   code == TypeCode.Single || code == TypeCode.Double ||
 				   code == TypeCode.Decimal || code == TypeCode.Char;
+		}
+
+		public static object GetDefaultValue(this Type type)
+		{
+			if(type == typeof(DBNull))
+				return DBNull.Value;
+
+			if(type == null || type.IsClass || type.IsInterface || type == typeof(Nullable<>) || TypeExtension.IsAssignableFrom(typeof(Nullable<>), type))
+				return null;
+
+			if(type.IsEnum)
+			{
+				var attribute = (DefaultValueAttribute)Attribute.GetCustomAttribute(type, typeof(DefaultValueAttribute), true);
+
+				if(attribute != null && attribute.Value != null)
+				{
+					if(attribute.Value is string)
+						return Enum.Parse(type, attribute.Value.ToString(), true);
+					else
+						return Enum.ToObject(type, attribute.Value);
+				}
+
+				Array values = Enum.GetValues(type);
+
+				if(values.Length > 0)
+					return System.Convert.ChangeType(values.GetValue(0), type);
+			}
+
+			return Activator.CreateInstance(type);
 		}
 
 		public static Type GetType(string typeName, bool throwOnError = false, bool ignoreCase = true)

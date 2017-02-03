@@ -3,6 +3,7 @@ using System.ComponentModel;
 
 namespace Zongsoft.Tests
 {
+	[DefaultValue(Female)]
 	public enum Gender
 	{
 		[Zongsoft.ComponentModel.Alias("M")]

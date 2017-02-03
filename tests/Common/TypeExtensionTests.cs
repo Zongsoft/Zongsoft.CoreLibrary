@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
 
-using Zongsoft.Common;
 using Zongsoft.Tests;
 
 using Xunit;
@@ -60,6 +57,17 @@ namespace Zongsoft.Common.Tests
 			Assert.Same(typeof(Guid[]), Zongsoft.Common.TypeExtension.GetType("guid[]"));
 
 			Assert.Same(typeof(Person), Zongsoft.Common.TypeExtension.GetType("Zongsoft.Tests.Person, Zongsoft.CoreLibrary.Tests"));
+		}
+
+		[Fact]
+		public void GetDefaultValueTest()
+		{
+			Assert.Equal(0, TypeExtension.GetDefaultValue(typeof(int)));
+			Assert.Equal(0d, TypeExtension.GetDefaultValue(typeof(double)));
+			Assert.Equal(DBNull.Value, TypeExtension.GetDefaultValue(typeof(DBNull)));
+			Assert.Equal(Gender.Female, TypeExtension.GetDefaultValue(typeof(Gender)));
+			Assert.Null(TypeExtension.GetDefaultValue(typeof(int?)));
+			Assert.Null(TypeExtension.GetDefaultValue(typeof(string)));
 		}
 	}
 }

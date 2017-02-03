@@ -61,7 +61,7 @@ namespace Zongsoft.ComponentModel
 		public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
 		{
 			if(value == null || System.Convert.IsDBNull(value))
-				return Zongsoft.Common.Convert.GetDefaultValue(this.EnumType);
+				return Zongsoft.Common.TypeExtension.GetDefaultValue(this.EnumType);
 
 			if(value is string)
 			{
