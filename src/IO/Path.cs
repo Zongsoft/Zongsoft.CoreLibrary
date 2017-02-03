@@ -290,32 +290,124 @@ namespace Zongsoft.IO
 			return null;
 		}
 
+		/// <summary>
+		/// 将字符串数组组合成一个路径。
+		/// </summary>
+		/// <param name="parts">由路径的各部分构成的数组。</param>
+		/// <returns>组合后的路径。</returns>
+		/// <remarks>
+		///		<para>该方法支持连接字符串中相对路径的解析处理，并自动忽略每个路径节两边的空白字符。如下代码所示：</para>
+		///		<code><![CDATA[
+		///		Path.Combine(@"D:\data\images\", "avatars/001.jpg");                            // D:/data/images/avatars/001.jpg
+		///		Path.Combine(@"D:\data\images\", "./avatars / 001.jpg");                        // D:/data/images/avatars/001.jpg
+		///		Path.Combine(@"D:\data\images\", ".. /avatars / 001.jpg");                      // D:/data/avatars/001.jpg
+		///		Path.Combine(@"D:\data\images\", "/avatars/001.jpg");                           // /avatars/001.jpg
+		///		Path.Combine(@"D:\data\images\", "avatars / 001.jpg", " / final.ext");          // /final.ext
+		///		Path.Combine(@"D:\data\images\", "avatars / 001.jpg", " / final.ext", " tail")  // /final.ext/tail
+		///		Path.Combine(@"zfs.local:/data/images/", "./bin");                              // zfs.local:/data/images/bin
+		///		Path.Combine(@"zfs.local:/data/images/", "../bin/Debug");                       // zfs.local:/data/bin/Debug
+		///		Path.Combine(@"zfs.local:/data/images/", "./bin", "../bin/Debug");              // zfs.local:/data/images/bin/Debug
+		///		Path.Combine(@"zfs.local:/data/images/", "/root");                              // /root
+		///		Path.Combine(@"zfs.local:/data/images/", "./bin", "../bin/Debug", "/root/");    // /root/
+		///		]]></code>
+		/// </remarks>
 		public static string Combine(params string[] parts)
 		{
-			if(parts == null || parts.Length == 0)
-				throw new ArgumentNullException("parts");
+			if(parts == null)
+				throw new ArgumentNullException(nameof(parts));
 
-			string result = string.Empty;
+			var slashed = false;
+			var segments = new List<string>();
 
 			for(int i = 0; i < parts.Length; i++)
 			{
-				if(string.IsNullOrWhiteSpace(parts[i]))
+				if(string.IsNullOrEmpty(parts[i]))
 					continue;
 
-				var part = parts[i].Replace('\\', '/').Trim();
+				var part = string.Empty;
+				var spaces = 0;
 
-				if(result.Length == 0)
-					result = part;
-				else
+				foreach(var chr in parts[i])
 				{
-					if(result.EndsWith("/"))
-						result += part.TrimStart('/');
-					else
-						result += "/" + part.TrimStart('/');
+					switch(chr)
+					{
+						case ' ':
+							if(part.Length > 0)
+								spaces++;
+							break;
+						case '\t':
+						case '\n':
+						case '\r':
+							break;
+						case '/':
+						case '\\':
+							spaces = 0;
+							slashed = true;
+
+							switch(part)
+							{
+								case "":
+									segments.Clear();
+									segments.Add("");
+									break;
+								case ".":
+									break;
+								case "..":
+									if(segments.Count > 0)
+										segments.RemoveAt(segments.Count - 1);
+									break;
+								default:
+									if(part.Contains(":"))
+										segments.Clear();
+
+									segments.Add(part);
+									break;
+							}
+
+							part = string.Empty;
+							break;
+						//注意：忽略对“?”、“*”字符的检验处理，因为需要支持对通配符模式路径的链接。
+						//case '?':
+						//case '*':
+						case '"':
+						case '|':
+						case '<':
+						case '>':
+							throw new ArgumentException("Invalid path, it contains a illegal character.");
+						default:
+							if(spaces > 0)
+							{
+								part += new string(' ', spaces);
+								spaces = 0;
+							}
+
+							part += chr;
+							slashed = false;
+							break;
+					}
+				}
+
+				if(part.Length > 0)
+				{
+					switch(part)
+					{
+						case ".":
+							break;
+						case "..":
+							if(segments.Count > 0)
+								segments.RemoveAt(segments.Count - 1);
+							break;
+						default:
+							if(part.Contains(":"))
+								segments.Clear();
+
+							segments.Add(part);
+							break;
+					}
 				}
 			}
 
-			return result;
+			return (segments.Count == 0 ? string.Empty : string.Join("/", segments)) + (slashed ? "/" : "");
 		}
 		#endregion
 	}
