@@ -293,7 +293,7 @@ namespace Zongsoft.IO
 		/// <summary>
 		/// 将字符串数组组合成一个路径。
 		/// </summary>
-		/// <param name="parts">由路径的各部分构成的数组。</param>
+		/// <param name="paths">由路径的各部分构成的数组。</param>
 		/// <returns>组合后的路径。</returns>
 		/// <remarks>
 		///		<para>该方法支持连接字符串中相对路径的解析处理，并自动忽略每个路径节两边的空白字符。如下代码所示：</para>
@@ -311,28 +311,28 @@ namespace Zongsoft.IO
 		///		Path.Combine(@"zfs.local:/data/images/", "./bin", "../bin/Debug", "/root/");    // /root/
 		///		]]></code>
 		/// </remarks>
-		public static string Combine(params string[] parts)
+		public static string Combine(params string[] paths)
 		{
-			if(parts == null)
-				throw new ArgumentNullException(nameof(parts));
+			if(paths == null)
+				throw new ArgumentNullException(nameof(paths));
 
 			var slashed = false;
 			var segments = new List<string>();
 
-			for(int i = 0; i < parts.Length; i++)
+			for(int i = 0; i < paths.Length; i++)
 			{
-				if(string.IsNullOrEmpty(parts[i]))
+				if(string.IsNullOrEmpty(paths[i]))
 					continue;
 
-				var part = string.Empty;
+				var segment = string.Empty;
 				var spaces = 0;
 
-				foreach(var chr in parts[i])
+				foreach(var chr in paths[i])
 				{
 					switch(chr)
 					{
 						case ' ':
-							if(part.Length > 0)
+							if(segment.Length > 0)
 								spaces++;
 							break;
 						case '\t':
@@ -344,7 +344,7 @@ namespace Zongsoft.IO
 							spaces = 0;
 							slashed = true;
 
-							switch(part)
+							switch(segment)
 							{
 								case "":
 									segments.Clear();
@@ -357,14 +357,14 @@ namespace Zongsoft.IO
 										segments.RemoveAt(segments.Count - 1);
 									break;
 								default:
-									if(part.Contains(":"))
+									if(segment.Contains(":"))
 										segments.Clear();
 
-									segments.Add(part);
+									segments.Add(segment);
 									break;
 							}
 
-							part = string.Empty;
+							segment = string.Empty;
 							break;
 						//注意：忽略对“?”、“*”字符的检验处理，因为需要支持对通配符模式路径的链接。
 						//case '?':
@@ -377,19 +377,19 @@ namespace Zongsoft.IO
 						default:
 							if(spaces > 0)
 							{
-								part += new string(' ', spaces);
+								segment += new string(' ', spaces);
 								spaces = 0;
 							}
 
-							part += chr;
+							segment += chr;
 							slashed = false;
 							break;
 					}
 				}
 
-				if(part.Length > 0)
+				if(segment.Length > 0)
 				{
-					switch(part)
+					switch(segment)
 					{
 						case ".":
 							break;
@@ -398,10 +398,10 @@ namespace Zongsoft.IO
 								segments.RemoveAt(segments.Count - 1);
 							break;
 						default:
-							if(part.Contains(":"))
+							if(segment.Contains(":"))
 								segments.Clear();
 
-							segments.Add(part);
+							segments.Add(segment);
 							break;
 					}
 				}

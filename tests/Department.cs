@@ -7,27 +7,48 @@ namespace Zongsoft.Tests
 	public class Department
 	{
 		#region 成员字段
-		private IList<Employee> _employees;
+		private string _name;
+		private EmployeeCollection _employees;
 		#endregion
 
 		#region 构造函数
 		public Department()
 		{
-			_employees = new List<Employee>();
+			_employees = new EmployeeCollection(this);
 		}
 
 		public Department(string name, IEnumerable<Employee> employees = null)
 		{
-			this.Name = name;
+			if(string.IsNullOrEmpty(name))
+				throw new ArgumentNullException(nameof(name));
 
-			if(employees == null)
-				_employees = new List<Employee>();
-			else
-				_employees = new List<Employee>(employees);
+			_name = name;
+			_employees = new EmployeeCollection(this);
+
+			if(employees != null)
+				_employees.AddRange(employees);
 		}
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取或设置部门的名称。
+		/// </summary>
+		public string Name
+		{
+			get
+			{
+				return _name;
+			}
+			set
+			{
+				if(string.IsNullOrEmpty(value))
+					throw new ArgumentNullException();
+
+				_name = value;
+			}
+		}
+
 		/// <summary>
 		/// 获取当前部门中指定名称的员工。
 		/// </summary>
@@ -37,7 +58,7 @@ namespace Zongsoft.Tests
 		{
 			get
 			{
-				return _employees.FirstOrDefault(e => string.Equals(e.Name, name, StringComparison.OrdinalIgnoreCase));
+				return _employees[name];
 			}
 		}
 
@@ -50,38 +71,19 @@ namespace Zongsoft.Tests
 		{
 			get
 			{
-				if(_employees == null || _employees.Count < 1)
-					return null;
-
 				return _employees[index];
 			}
 		}
 
 		/// <summary>
-		/// 获取或设置部门的名称。
+		/// 获取当前部门的员工集合。
 		/// </summary>
-		public string Name
+		public EmployeeCollection Employees
 		{
-			get;
-			set;
-		}
-		#endregion
-
-		#region 公共方法
-		public void AddEmployee(Employee employee)
-		{
-			if(employee == null)
-				throw new ArgumentNullException("employee");
-
-			_employees.Add(employee);
-		}
-
-		public void RemoveEmployee(Employee employee)
-		{
-			if(employee == null)
-				return;
-
-			_employees.Remove(employee);
+			get
+			{
+				return _employees;
+			}
 		}
 		#endregion
 	}

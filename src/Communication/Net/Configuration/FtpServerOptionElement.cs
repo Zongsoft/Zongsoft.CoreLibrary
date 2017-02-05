@@ -26,8 +26,6 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 using Zongsoft.Options;
@@ -48,7 +46,7 @@ namespace Zongsoft.Communication.Net.Configuration
 		/// <summary>
 		/// 获取或设置<see cref="FtpServer"/>服务器的侦听端口号，默认值为21。
 		/// </summary>
-		[OptionConfigurationProperty(XML_PORT_ATTRIBUTE, Type = typeof(int), DefaultValue = 21)]
+		[OptionConfigurationProperty(XML_PORT_ATTRIBUTE, DefaultValue = 21)]
 		public int Port
 		{
 			get
@@ -64,7 +62,7 @@ namespace Zongsoft.Communication.Net.Configuration
 		/// <summary>
 		/// 获取或设置<see cref="FtpServer"/>服务器的文本编码类型，默认值为Ascii编码。
 		/// </summary>
-		[OptionConfigurationProperty(XML_ENCODING_ATTRIBUTE, Type = typeof(Encoding), DefaultValue = "ASCII")]
+		[OptionConfigurationProperty(XML_ENCODING_ATTRIBUTE, DefaultValue = "ASCII")]
 		public Encoding Encoding
 		{
 			get
@@ -80,7 +78,7 @@ namespace Zongsoft.Communication.Net.Configuration
 		/// <summary>
 		/// 获取或设置<see cref="FtpServer"/>服务器的操作超时时长，单位为秒。默认值为60秒。
 		/// </summary>
-		[OptionConfigurationProperty(XML_TIMEOUT_ATTRIBUTE, Type = typeof(int), DefaultValue = 60)]
+		[OptionConfigurationProperty(XML_TIMEOUT_ATTRIBUTE, DefaultValue = 60)]
 		public int Timeout
 		{
 			get

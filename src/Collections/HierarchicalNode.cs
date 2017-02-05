@@ -35,10 +35,6 @@ namespace Zongsoft.Collections
 	[Serializable]
 	public class HierarchicalNode : MarshalByRefObject
 	{
-		#region 私有常量
-		private const char DefaultPathSeparatorChar = '/';
-		#endregion
-
 		#region 公共常量
 		public readonly char PathSeparatorChar = '/';
 		#endregion
@@ -56,15 +52,11 @@ namespace Zongsoft.Collections
 		#region 构造函数
 		protected HierarchicalNode()
 		{
-			_name = DefaultPathSeparatorChar.ToString();
-			PathSeparatorChar = DefaultPathSeparatorChar;
+			_name = "/";
+			PathSeparatorChar = '/';
 		}
 
-		protected HierarchicalNode(string name) : this(name, null, DefaultPathSeparatorChar)
-		{
-		}
-
-		protected HierarchicalNode(string name, HierarchicalNode parent, char pathSeparatorChar = DefaultPathSeparatorChar)
+		protected HierarchicalNode(string name, HierarchicalNode parent = null, char pathSeparatorChar = '/')
 		{
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException("name");
@@ -157,6 +149,32 @@ namespace Zongsoft.Collections
 				//更新层次结构节点的路径
 				_path = null;
 			}
+		}
+		#endregion
+
+		#region 公共方法
+		public virtual HierarchicalNode FindRoot()
+		{
+			var current = this;
+			var stack = new Stack<HierarchicalNode>();
+
+			while(current != null)
+			{
+				if(current._parent == null)
+					return current;
+
+				//如果当前节点是否已经在遍历的栈中，则抛出循环引用的异常
+				if(stack.Contains(current))
+					throw new InvalidOperationException($"Error occurred: The name as '{current.Name}' hierarchical node is circular referenced.");
+
+				//将当前节点加入到遍历栈中
+				stack.Push(current);
+
+				//指向当前节点的父节点
+				current = current._parent;
+			}
+
+			return current;
 		}
 		#endregion
 
@@ -273,23 +291,6 @@ namespace Zongsoft.Collections
 		protected virtual HierarchicalNode GetChild(string name)
 		{
 			return null;
-		}
-		#endregion
-
-		#region 私有方法
-		private HierarchicalNode FindRoot()
-		{
-			var current = this;
-
-			while(current != null)
-			{
-				if(current._parent == null)
-					return current;
-
-				current = current._parent;
-			}
-
-			return current;
 		}
 		#endregion
 

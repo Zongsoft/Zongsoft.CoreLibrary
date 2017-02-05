@@ -46,7 +46,7 @@ namespace Zongsoft.Communication.Net.Configuration
 		/// <summary>
 		/// 获取或设置<see cref="FtpServer"/>服务器的登录用户名。
 		/// </summary>
-		[OptionConfigurationProperty(XML_USERNAME_ATTRIBUTE, Type = typeof(string), Behavior = OptionConfigurationPropertyBehavior.IsKey)]
+		[OptionConfigurationProperty(XML_USERNAME_ATTRIBUTE, Behavior = OptionConfigurationPropertyBehavior.IsKey)]
 		public string Name
 		{
 			get
@@ -62,7 +62,7 @@ namespace Zongsoft.Communication.Net.Configuration
 		/// <summary>
 		/// 获取或设置<see cref="FtpServer"/>服务器的登录用户密码。
 		/// </summary>
-		[OptionConfigurationProperty(XML_PASSWORD_ATTRIBUTE, Type = typeof(string))]
+		[OptionConfigurationProperty(XML_PASSWORD_ATTRIBUTE)]
 		public string Password
 		{
 			get
@@ -78,7 +78,7 @@ namespace Zongsoft.Communication.Net.Configuration
 		/// <summary>
 		/// 获取或设置<see cref="FtpServer"/>服务器的用户的主目录路径。
 		/// </summary>
-		[OptionConfigurationProperty(XML_HOMEDIRECTORY_ATTRIBUTE, Type = typeof(string))]
+		[OptionConfigurationProperty(XML_HOMEDIRECTORY_ATTRIBUTE)]
 		public string HomeDirectory
 		{
 			get
@@ -94,7 +94,7 @@ namespace Zongsoft.Communication.Net.Configuration
 		/// <summary>
 		/// 获取或设置<see cref="FtpServer"/>服务器的用户是否只读，默认为只读(true)。
 		/// </summary>
-		[OptionConfigurationProperty(XML_READONLY_ATTRIBUTE, Type = typeof(bool), DefaultValue = true)]
+		[OptionConfigurationProperty(XML_READONLY_ATTRIBUTE, DefaultValue = true)]
 		public bool ReadOnly
 		{
 			get
