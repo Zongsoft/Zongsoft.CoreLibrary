@@ -38,17 +38,11 @@ namespace Zongsoft.Services
 		#region 构造函数
 		public CommandExecutorFailureEventArgs(CommandExecutorContext context, Exception exception) : base(exception, false)
 		{
-			if(context == null)
-				throw new ArgumentNullException(nameof(context));
-
 			_context = context;
 		}
 
 		public CommandExecutorFailureEventArgs(CommandExecutorContext context, Exception exception, bool handled) : base(exception, handled)
 		{
-			if(context == null)
-				throw new ArgumentNullException(nameof(context));
-
 			_context = context;
 		}
 		#endregion

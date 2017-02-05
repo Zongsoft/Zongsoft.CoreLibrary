@@ -200,18 +200,16 @@ namespace Zongsoft.Terminals
 
 		protected override void OnFailed(CommandExecutorFailureEventArgs args)
 		{
-			args.ExceptionHandled = !(args.Exception is ExitException);
-
-			if(args.ExceptionHandled)
-			{
-				if(args.Exception is CommandException)
-					this.Terminal.WriteLine(CommandOutletColor.Red, args.Exception.Message);
-				else
-					this.Terminal.WriteLine(CommandOutletColor.Red, args.Exception);
-			}
-
 			//调用基类同名方法
 			base.OnFailed(args);
+
+			if(args.Exception is ExitException)
+				args.Exception = null;
+			else
+			{
+				args.ExceptionHandled = true;
+				this.Terminal.WriteLine(CommandOutletColor.Red, args.Exception.Message);
+			}
 		}
 		#endregion
 

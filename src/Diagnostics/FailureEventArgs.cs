@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2016 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2017 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -54,6 +54,10 @@ namespace Zongsoft.Diagnostics
 			get
 			{
 				return _exception;
+			}
+			set
+			{
+				_exception = value;
 			}
 		}
 

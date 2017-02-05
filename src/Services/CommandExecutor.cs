@@ -146,11 +146,24 @@ namespace Zongsoft.Services
 			if(string.IsNullOrWhiteSpace(commandText))
 				throw new ArgumentNullException(nameof(commandText));
 
-			//创建命令执行器上下文对象
-			var context = this.CreateExecutorContext(commandText, parameter);
+			CommandExecutorContext context = null;
 
-			if(context == null)
-				throw new InvalidOperationException("The context of this command executor is null.");
+			try
+			{
+				//创建命令执行器上下文对象
+				context = this.CreateExecutorContext(commandText, parameter);
+
+				if(context == null)
+					throw new InvalidOperationException("Create executor context failed.");
+			}
+			catch(Exception ex)
+			{
+				//激发“Error”事件
+				if(!this.OnFailed(context, ex))
+					throw;
+
+				return null;
+			}
 
 			//创建事件参数对象
 			var executingArgs = new CommandExecutorExecutingEventArgs(context);
