@@ -360,14 +360,27 @@ namespace Zongsoft.Common
 			if(target == null)
 				return null;
 
-			return GetMemberType(target.GetType(), text);
+			return GetMemberType(target.GetType(), SplitMembers(text));
 		}
 
 		public static Type GetMemberType(Type targetType, string text)
 		{
-			return FindMemberType(targetType, text, (type, part) =>
+			return GetMemberType(targetType, SplitMembers(text));
+		}
+
+		public static Type GetMemberType(object target, string[] memberNames)
+		{
+			if(target == null)
+				return null;
+
+			return GetMemberType(target.GetType(), memberNames);
+		}
+
+		public static Type GetMemberType(Type targetType, string[] memberNames)
+		{
+			return FindMemberType(targetType, memberNames, (type, member) =>
 			{
-				throw new ArgumentException(string.Format("The '{0}' member is not existed in the '{1}' type, the original text is '{2}'.", part, type.FullName, text));
+				throw new ArgumentException($"The '{member}' member is not existed in the '{type.FullName}' type.");
 			});
 		}
 
@@ -378,32 +391,45 @@ namespace Zongsoft.Common
 			if(target == null)
 				return false;
 
-			return TryGetMemberType(target.GetType(), text, out memberType);
+			return TryGetMemberType(target.GetType(), SplitMembers(text), out memberType);
+		}
+
+		public static bool TryGetMemberType(object target, string[] memberNames, out Type memberType)
+		{
+			memberType = null;
+
+			if(target == null)
+				return false;
+
+			return TryGetMemberType(target.GetType(), memberNames, out memberType);
 		}
 
 		public static bool TryGetMemberType(Type targetType, string text, out Type memberType)
 		{
+			return TryGetMemberType(targetType, SplitMembers(text), out memberType);
+		}
+
+		public static bool TryGetMemberType(Type targetType, string[] memberNames, out Type memberType)
+		{
 			var result = true;
-			memberType = FindMemberType(targetType, text, (_, __) => result = false);
+			memberType = FindMemberType(targetType, memberNames, (_, __) => result = false);
 			return result;
 		}
 
-		private static Type FindMemberType(Type targetType, string text, Func<Type, string, bool> failure)
+		private static Type FindMemberType(Type targetType, string[] memberNames, Func<Type, string, bool> failure)
 		{
+			if(targetType == null || memberNames == null || memberNames.Length == 0)
+				return targetType;
+
 			var memberType = targetType;
 
-			if(targetType == null || string.IsNullOrWhiteSpace(text))
-				return memberType;
-
-			var parts = text.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
-
-			foreach(var part in parts)
+			foreach(var memberName in memberNames)
 			{
-				var member = GetMember(memberType, part, (BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static), true);
+				var member = GetMember(memberType, memberName, (BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static), true);
 
 				if(member == null)
 				{
-					failure?.Invoke(memberType, part);
+					failure?.Invoke(memberType, memberName);
 					return null;
 				}
 
@@ -428,7 +454,7 @@ namespace Zongsoft.Common
 			if(target == null || text == null || text.Length < 1)
 				return target;
 
-			return GetValue(target, text.Split('.'), null);
+			return GetValue(target, SplitMembers(text), null);
 		}
 
 		public static object GetValue(object target, string text, Action<ObjectResolvingContext> resolve)
@@ -436,7 +462,7 @@ namespace Zongsoft.Common
 			if(target == null || text == null || text.Length < 1)
 				return target;
 
-			return GetValue(target, text.Split('.'), resolve);
+			return GetValue(target, SplitMembers(text), resolve);
 		}
 
 		public static object GetValue(object target, string[] memberNames)
@@ -470,7 +496,7 @@ namespace Zongsoft.Common
 			{
 				string memberName = memberNames[start + i];
 
-				if(memberName == null || memberName.Trim().Length < 1)
+				if(memberName == null || memberName.Trim().Length == 0)
 					continue;
 
 				if(context.Value == null)
@@ -522,7 +548,7 @@ namespace Zongsoft.Common
 			if(target == null || text == null || text.Length < 1)
 				return;
 
-			SetValue(target, text.Split('.'), valueThunk, resolve);
+			SetValue(target, SplitMembers(text), valueThunk, resolve);
 		}
 
 		public static void SetValue(object target, string[] memberNames, object value)
@@ -703,6 +729,14 @@ namespace Zongsoft.Common
 
 			indexer = name;
 			return false;
+		}
+
+		private static string[] SplitMembers(string text)
+		{
+			if(string.IsNullOrWhiteSpace(text))
+				return null;
+
+			return text.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
 		}
 		#endregion
 
