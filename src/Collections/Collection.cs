@@ -104,6 +104,14 @@ namespace Zongsoft.Collections
 			this.InsertItems(_items.Count, new T[] { item });
 		}
 
+		public void AddRange(params T[] items)
+		{
+			if(items == null)
+				throw new ArgumentNullException("items");
+
+			this.AddRange((IEnumerable<T>)items);
+		}
+
 		public virtual void AddRange(IEnumerable<T> items)
 		{
 			if(items == null)
