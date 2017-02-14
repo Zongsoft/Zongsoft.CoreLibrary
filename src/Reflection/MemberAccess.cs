@@ -38,13 +38,30 @@ namespace Zongsoft.Reflection
 			if(string.IsNullOrWhiteSpace(path))
 				return null;
 
-			return ResolveCore(path, message =>
+			return Resolve(path, message =>
 			{
 				throw new ArgumentException(message);
 			});
 		}
 
-		private static MemberToken[] ResolveCore(string path, Action<string> onError)
+		public static bool TryResolve(string path, out MemberToken[] members)
+		{
+			members = null;
+
+			if(string.IsNullOrWhiteSpace(path))
+				return false;
+
+			var succeed = true;
+
+			members = Resolve(path, _ =>
+			{
+				succeed = false;
+			});
+
+			return succeed;
+		}
+
+		public static MemberToken[] Resolve(string path, Action<string> onError)
 		{
 			if(string.IsNullOrWhiteSpace(path))
 				return null;
