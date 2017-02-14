@@ -1,8 +1,8 @@
 ﻿/*
  * Authors:
- *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
+ *   钟峰(Popeye Zhong) <9555843@qq.com>
  *
- * Copyright (C) 2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2017 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,39 +25,18 @@
  */
 
 using System;
-using System.Collections.Generic;
 
-namespace Zongsoft.Text.Evaluation
+namespace Zongsoft.Reflection
 {
-	public class BindingEvaluator : TemplateEvaluatorBase
+	public struct MemberGettingResult
 	{
-		#region 构造函数
-		public BindingEvaluator() : base("binding")
+		public bool Cancel;
+		public object Value;
+
+		public MemberGettingResult(object value, bool cancel = false)
 		{
+			this.Value = value;
+			this.Cancel = cancel;
 		}
-
-		public BindingEvaluator(string scheme) : base(scheme)
-		{
-		}
-		#endregion
-
-		#region 评估方法
-		public override object Evaluate(TemplateEvaluatorContext context)
-		{
-			if(context.Data == null)
-				return null;
-
-			if(string.IsNullOrWhiteSpace(context.Text))
-				return context.Data;
-
-			var index = context.Text.IndexOf('#');
-			var result = Reflection.MemberAccess.GetMemberValue<object>(context.Data, (index > 0 ? context.Text.Substring(0, index) : context.Text));
-
-			if(index > 0 && index < context.Text.Length - 1)
-				return string.Format("{0:" + context.Text.Substring(index + 1) + "}", result);
-
-			return result;
-		}
-		#endregion
 	}
 }

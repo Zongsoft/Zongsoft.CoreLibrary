@@ -30,6 +30,7 @@ using System.Collections.Generic;
 using System.Reflection;
 
 using Zongsoft.Common;
+using Zongsoft.Reflection;
 
 namespace Zongsoft.Runtime.Serialization
 {
@@ -78,7 +79,7 @@ namespace Zongsoft.Runtime.Serialization
 			return this.Deserialize(dictionary, type, null);
 		}
 
-		public object Deserialize(IDictionary dictionary, Type type, Action<Zongsoft.Common.Convert.ObjectResolvingContext> resolve)
+		public object Deserialize(IDictionary dictionary, Type type, Func<MemberGettingContext, MemberGettingResult> resolve)
 		{
 			if(type == null)
 				throw new ArgumentNullException("type");
@@ -91,45 +92,19 @@ namespace Zongsoft.Runtime.Serialization
 			return (T)this.Deserialize(dictionary, typeof(T));
 		}
 
-		public T Deserialize<T>(IDictionary dictionary, Func<T> creator, Action<Zongsoft.Common.Convert.ObjectResolvingContext> resolve)
+		public T Deserialize<T>(IDictionary dictionary, Func<T> creator, Func<MemberGettingContext, MemberGettingResult> resolve)
 		{
 			if(dictionary == null)
 				return default(T);
 
 			var result = creator != null ? creator() : Activator.CreateInstance<T>();
 
-			if(resolve == null)
-			{
-				resolve = ctx =>
-				{
-					if(ctx.Direction == Zongsoft.Common.Convert.ObjectResolvingDirection.Get)
-					{
-						ctx.Value = ctx.GetMemberValue();
-
-						if(ctx.Value == null)
-						{
-							ctx.Value = Activator.CreateInstance(ctx.MemberType);
-
-							switch(ctx.Member.MemberType)
-							{
-								case MemberTypes.Field:
-									((FieldInfo)ctx.Member).SetValue(ctx.Container, ctx.Value);
-									break;
-								case MemberTypes.Property:
-									((PropertyInfo)ctx.Member).SetValue(ctx.Container, ctx.Value);
-									break;
-							}
-						}
-					}
-				};
-			}
-
 			foreach(DictionaryEntry entry in dictionary)
 			{
 				if(entry.Key == null)
 					continue;
 
-				Zongsoft.Common.Convert.SetValue(result, entry.Key.ToString(), entry.Value, resolve);
+				MemberAccess.SetMemberValue(result, entry.Key.ToString(), entry.Value);
 			}
 
 			return result;

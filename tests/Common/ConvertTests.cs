@@ -12,43 +12,6 @@ namespace Zongsoft.Common.Tests
 {
 	public class ConvertTests
 	{
-		#region 全局变量
-		private Department _department;
-		#endregion
-
-		#region 构造函数
-		public ConvertTests()
-		{
-			_department = new Department("Develop");
-
-			_department.Employees.AddRange(
-				new Employee()
-				{
-					Name = "Popeye Zhong",
-					Gender = Gender.Male,
-					Salary = 10000.01m,
-					HomeAddress = new Address
-					{
-						CountryId = 123,
-						City = "Wuhan",
-						Detail = "光谷",
-					},
-				},
-				new Employee()
-				{
-					Name = "Jason Yang",
-					Gender = Gender.Female,
-					Salary = 100,
-					HomeAddress = new Address
-					{
-						CountryId = 456,
-						City = "Shenzhen",
-						Detail = "大白石洲",
-					}
-				});
-		}
-		#endregion
-
 		[Fact]
 		public void ConvertValueTest()
 		{
@@ -81,45 +44,6 @@ namespace Zongsoft.Common.Tests
 			//根据枚举项的 DescriptionAttribute 值来解析
 			Assert.Equal(Gender.Male, Zongsoft.Common.Convert.ConvertValue<Gender>("先生"));
 			Assert.Equal(Gender.Female, Zongsoft.Common.Convert.ConvertValue<Gender>("女士"));
-		}
-
-		[Fact]
-		public void GetMemberTypeTest()
-		{
-			Assert.Same(typeof(Employee), Zongsoft.Common.Convert.GetMemberType(_department, "[0]"));
-			Assert.Same(typeof(Employee), Zongsoft.Common.Convert.GetMemberType(_department, "['Popeye Zhong']"));
-			Assert.Same(typeof(Employee), Zongsoft.Common.Convert.GetMemberType(_department, "Employees[0]"));
-			Assert.Same(typeof(Employee), Zongsoft.Common.Convert.GetMemberType(_department, "Employees['Popeye Zhong']"));
-
-			Assert.Same(typeof(string), Zongsoft.Common.Convert.GetMemberType(_department, "[0].Name"));
-			Assert.Same(typeof(string), Zongsoft.Common.Convert.GetMemberType(_department, "['Popeye Zhong'].Name"));
-			Assert.Same(typeof(string), Zongsoft.Common.Convert.GetMemberType(_department, "Employees[0].Name"));
-			Assert.Same(typeof(string), Zongsoft.Common.Convert.GetMemberType(_department, "Employees['Popeye Zhong'].Name"));
-		}
-
-		[Fact]
-		public void GetMemberValueTest()
-		{
-			var emp1 = _department[0];
-
-			Assert.Equal("Popeye Zhong", Zongsoft.Common.Convert.GetValue(emp1, "Name"));
-			Assert.Equal("Wuhan", Zongsoft.Common.Convert.GetValue(emp1, "HomeAddress.City"));
-
-			Zongsoft.Common.Convert.SetValue(emp1, "Name", "Popeye");
-			Assert.Equal("Popeye", Zongsoft.Common.Convert.GetValue(emp1, "Name"));
-
-			Zongsoft.Common.Convert.SetValue(emp1, "HomeAddress.City", "Shenzhen");
-			Assert.Equal("Shenzhen", Zongsoft.Common.Convert.GetValue(emp1, "HomeAddress.City"));
-
-			Assert.NotNull(Zongsoft.Common.Convert.GetValue(_department, "[0]"));
-			Assert.NotNull(Zongsoft.Common.Convert.GetValue(_department, "['Popeye Zhong']"));
-			Assert.Equal("Popeye Zhong", Zongsoft.Common.Convert.GetValue(_department, "[0].Name"));
-			Assert.Equal("Popeye Zhong", Zongsoft.Common.Convert.GetValue(_department, "['Popeye Zhong'].Name"));
-
-			Assert.NotNull(Zongsoft.Common.Convert.GetValue(_department, "Employees[0]"));
-			Assert.NotNull(Zongsoft.Common.Convert.GetValue(_department, "Employees['Popeye Zhong']"));
-			Assert.Equal("Popeye Zhong", Zongsoft.Common.Convert.GetValue(_department, "Employees[0].Name"));
-			Assert.Equal("Popeye Zhong", Zongsoft.Common.Convert.GetValue(_department, "Employees['Popeye Zhong'].Name"));
 		}
 
 		[Fact]

@@ -80,7 +80,7 @@ namespace Zongsoft.Diagnostics
 				{
 					foreach(var property in handlerElement.ExtendedProperties)
 					{
-						Zongsoft.Common.Convert.SetValue(instance, property.Key, property.Value);
+						Reflection.MemberAccess.SetMemberValue(instance, property.Key, property.Value);
 					}
 				}
 

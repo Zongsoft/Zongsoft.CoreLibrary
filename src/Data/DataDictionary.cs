@@ -455,7 +455,7 @@ namespace Zongsoft.Data
 				if(TryGetDictionary(container, name, out result))
 					return true;
 
-				result = Zongsoft.Common.Convert.GetValue(container, name);
+				result = Reflection.MemberAccess.GetMemberValue<object>(container, name);
 				return result != null;
 			}
 
@@ -499,15 +499,17 @@ namespace Zongsoft.Data
 				if(TrySetDictionary(container, name, valueThunk, predicate))
 					return true;
 
-				bool isTerminated = false;
+				var requireSetup = false;
 
-				Zongsoft.Common.Convert.SetValue(container, name, valueThunk, ctx =>
+				Reflection.MemberAccess.SetMemberValue<object>(container, name, valueThunk, null, ctx =>
 				{
-					if(ctx.Direction == Common.Convert.ObjectResolvingDirection.Set && predicate != null)
-						isTerminated = ctx.IsTerminated = !predicate(ctx.GetMemberValue());
+					requireSetup = predicate == null || predicate(ctx.GetMemberValue());
+
+					if(requireSetup)
+						ctx.Setup();
 				});
 
-				return !isTerminated;
+				return requireSetup;
 			}
 
 			private static bool TrySetDictionary(object container, string name, Func<object> valueThunk, Func<object, bool> predicate)

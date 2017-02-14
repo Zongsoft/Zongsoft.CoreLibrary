@@ -282,6 +282,11 @@
     <Compile Include="Options\Profiles\ProfileItemType.cs" />
     <Compile Include="Options\Profiles\ProfileSection.cs" />
     <Compile Include="Options\Profiles\ProfileSectionCollection.cs" />
+    <Compile Include="Reflection\MemberAccess.cs" />
+    <Compile Include="Reflection\MemberGettingContext.cs" />
+    <Compile Include="Reflection\MemberGettingResult.cs" />
+    <Compile Include="Reflection\MemberSettingContext.cs" />
+    <Compile Include="Reflection\MemberToken.cs" />
     <Compile Include="Runtime\Caching\BufferManager.cs" />
     <Compile Include="Runtime\Caching\BufferManagerBase.cs" />
     <Compile Include="Runtime\Caching\BufferManagerSelector.cs" />

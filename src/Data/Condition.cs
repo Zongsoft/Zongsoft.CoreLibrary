@@ -256,8 +256,8 @@ namespace Zongsoft.Data
 
 			if(Zongsoft.Common.TypeExtension.IsAssignableFrom(typeof(Tuple<,>), condition.Value.GetType()))
 			{
-				begin = Zongsoft.Common.Convert.GetValue(condition.Value, "Item1");
-				end = Zongsoft.Common.Convert.GetValue(condition.Value, "Item2");
+				begin = Reflection.MemberAccess.GetMemberValue<object>(condition.Value, "Item1");
+				end = Reflection.MemberAccess.GetMemberValue<object>(condition.Value, "Item2");
 
 				return true;
 			}
