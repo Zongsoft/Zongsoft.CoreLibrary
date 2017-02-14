@@ -313,9 +313,6 @@
     <Compile Include="Options\Configuration\OptionConfigurationUtility.cs" />
     <Compile Include="Options\Configuration\SettingElement.cs" />
     <Compile Include="Options\Configuration\SettingElementCollection.cs" />
-    <Compile Include="Reporting\IReport.cs" />
-    <Compile Include="Reporting\IReportProvider.cs" />
-    <Compile Include="Reporting\IReportView.cs" />
     <Compile Include="Runtime\Caching\ICache.cs" />
     <Compile Include="Runtime\Caching\ICacheProvider.cs" />
     <Compile Include="Runtime\Caching\MemoryCache.cs" />
