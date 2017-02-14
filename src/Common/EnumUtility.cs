@@ -84,7 +84,14 @@ namespace Zongsoft.Common
 		/// <returns>返回指定枚举值对应的<seealso cref="EnumEntry"/>对象。</returns>
 		public static EnumEntry GetEnumEntry(this Enum enumValue, bool underlyingType)
 		{
+			if(enumValue == null)
+				throw new ArgumentNullException(nameof(enumValue));
+
 			FieldInfo field = enumValue.GetType().GetField(enumValue.ToString());
+
+			if(field == null)
+				return null;
+
 			var alias = field.GetCustomAttributes(typeof(AliasAttribute), false).OfType<AliasAttribute>().FirstOrDefault();
 			var description = field.GetCustomAttributes(typeof(DescriptionAttribute), false).OfType<DescriptionAttribute>().FirstOrDefault();
 
