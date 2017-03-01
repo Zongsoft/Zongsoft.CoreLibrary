@@ -289,6 +289,16 @@ namespace Zongsoft.Reflection
 			if(isString)
 				return value;
 
+			switch(value)
+			{
+				case "null":
+					return null;
+				case "true":
+					return true;
+				case "false":
+					return false;
+			}
+
 			if(value.Contains("."))
 			{
 				double result;
