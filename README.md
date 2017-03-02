@@ -21,15 +21,7 @@ Zongsoft.CoreLibrary 类库提供了.NET开发的常用功能集以及一些相�
 	> 该命名空间内包括有关集合的类。其中包括相对.NET BCL中同名集合类进行了功能强化的 `NamedCollectionBase`、`Collection<T>`、`Queue` 类，以及表示树型层次结构的 `HierarchicalNode`、`HierarchicalNodeCollection`、`Category`、`CategoryCollection` 这些类，以及一个支持线程安全的提供对象池管理的 `ObjectPool` 类和支持指定容积的内存缓存`ObjectCache`。
 
 - Communication
-	> 该命名空间内包括进行通讯和自定义通讯协议包解析的基类、接口，设计通讯处理程序时应尽量使用这里定义的接口或基类。
-
-	- Net
-		> 该命名空间内包括进行TCP通讯处理的默认实现类，这些默认实现采用的是 .NET Socket 提供的异步事件处理模型机制，在 Windows 平台中由底层 WinSocket 提供IOCP支持。
-
-		- Ftp
- 			> 该命名空间内包括重新实现的一套 FTP 服务器类库，支持 FTP 数据传输的“主动”和“被动”两种模式的完整实现。为什么我们要重新实现一个 FTP 服务器？因为我们需要在FTP服务器收到任何命令时执行业务系统中的某些事务，而市面上的第三方FTP服务器似乎都没有提供这种灵活而高效的扩展机制。
-
-			> 当然，如果您需要利用这些扩展机制的话，那么请先参考 `Services.Composition` 命令空间的那些类，我们称这套扩展机制为“执行管道(ExecutionPipelines)”模型。
+	> 该命名空间内包括进行通讯和自定义通讯协议包解析的基类、接口，设计通讯处理程序时应尽量使用这里定义的接口或基类。具体实现请参考 [Zongsoft.Net](https://github.com/Zongsoft/Zongsoft.Net) 项目。
 
 - ComponentModel
 	> 该命名空间内包括一些相对 .NET BCL 中进行了功能强化的 `TypeConverter`，譬如：`EnumConverter`、`CustomBooleanConverter`、`GuidConverter` 类；表示应用程序上下文的 `ApplicationContextBase` 类，该基类提供了一个应用程序可能会使用到的常用服务；其中的 `AliasAttribute` 类可用来定义枚举项或其他元素的别称。
@@ -39,6 +31,9 @@ Zongsoft.CoreLibrary 类库提供了.NET开发的常用功能集以及一些相�
 
 - Diagnostics
 	> 该命名空间内包括日志处理、诊断跟踪相关的类和接口。
+
+- Expressions
+	> 该命名空间内包括一个表达式解析以及词法解析等功能实现。
 
 - IO
 	> 该命名空间内包括一个虚拟文件目录系统的功能集，使用该虚拟文件系统可隔离不同操作系统中IO处理的差异，并支持其他外部文件系统的扩展。具体实现可参考 [Zongsoft.Externals.Aliyun](https://github.com/Zongsoft/Zongsoft.Externals.Aliyun) 这个项目中的分布式文件存储部分。
@@ -57,8 +52,8 @@ Zongsoft.CoreLibrary 类库提供了.NET开发的常用功能集以及一些相�
 	- Profiles
 		> 该命名空间内包括一套对 Windows 中 INI 配置文件的开发接口，并且支持对 `Section` 以层次结构的访问方式。
 
-- Reporting
-	> 该命名空间内包括关于对报表访问、操作的基础接口。
+- Reflection
+	> 该命名空间内包括一个对成员动态访问的类。
 
 - Resources
 	> 该命名空间内包括一个对资源处理的 `ResourceUtility` 工具类。
