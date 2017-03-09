@@ -42,10 +42,6 @@ namespace Zongsoft.Security.Membership
 
 		#region 成员字段
 		private int _roleId;
-		private string _name;
-		private string _fullName;
-		private string _namespace;
-		private string _description;
 		private DateTime _createdTime;
 		#endregion
 
@@ -69,7 +65,7 @@ namespace Zongsoft.Security.Membership
 				throw new ArgumentNullException("name");
 
 			_roleId = roleId;
-			this.Name = _fullName = name.Trim();
+			this.Name = this.FullName = name.Trim();
 			this.Namespace = @namespace;
 			_createdTime = DateTime.Now;
 		}
@@ -92,7 +88,7 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return _name;
+				return this.GetPropertyValue(() => this.Name);
 			}
 			set
 			{
@@ -100,7 +96,7 @@ namespace Zongsoft.Security.Membership
 				if(string.IsNullOrWhiteSpace(value))
 				{
 					//如果当前角色名为空，则说明是通过默认构造函数创建，因此现在不用做处理；否则抛出参数空异常
-					if(string.IsNullOrWhiteSpace(_name))
+					if(string.IsNullOrWhiteSpace(this.Name))
 						return;
 
 					throw new ArgumentNullException();
@@ -125,7 +121,7 @@ namespace Zongsoft.Security.Membership
 				}
 
 				//更新属性内容
-				this.SetPropertyValue(() => this.Name, ref _name, value);
+				this.SetPropertyValue(() => this.Name, value);
 			}
 		}
 
@@ -133,11 +129,11 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return _fullName;
+				return this.GetPropertyValue(() => this.FullName);
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.FullName, ref _fullName, value);
+				this.SetPropertyValue(() => this.FullName, value);
 			}
 		}
 
@@ -145,7 +141,7 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return _namespace;
+				return this.GetPropertyValue(() => this.Namespace);
 			}
 			set
 			{
@@ -162,7 +158,7 @@ namespace Zongsoft.Security.Membership
 				}
 
 				//更新属性内容
-				this.SetPropertyValue(() => this.Namespace, ref _namespace, string.IsNullOrWhiteSpace(value) ? null : value.Trim());
+				this.SetPropertyValue(() => this.Namespace, string.IsNullOrWhiteSpace(value) ? null : value.Trim());
 			}
 		}
 
@@ -170,11 +166,11 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return _description;
+				return this.GetPropertyValue(() => this.Description);
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.Description, ref _description, value);
+				this.SetPropertyValue(() => this.Description, value);
 			}
 		}
 
@@ -199,20 +195,20 @@ namespace Zongsoft.Security.Membership
 
 			var other = (Role)obj;
 
-			return _roleId == other._roleId && string.Equals(_namespace, other._namespace, StringComparison.OrdinalIgnoreCase);
+			return _roleId == other._roleId && string.Equals(this.Namespace, other.Namespace, StringComparison.OrdinalIgnoreCase);
 		}
 
 		public override int GetHashCode()
 		{
-			return (_namespace + ":" + _roleId).ToLowerInvariant().GetHashCode();
+			return (this.Namespace + ":" + _roleId.ToString()).ToLowerInvariant().GetHashCode();
 		}
 
 		public override string ToString()
 		{
-			if(string.IsNullOrWhiteSpace(_namespace))
-				return string.Format("[{0}]{1}", _roleId, _name);
+			if(string.IsNullOrWhiteSpace(this.Namespace))
+				return string.Format("[{0}]{1}", _roleId.ToString(), this.Name);
 			else
-				return string.Format("[{0}]{1}@{2}", _roleId, _name, _namespace);
+				return string.Format("[{0}]{1}@{2}", _roleId.ToString(), this.Name, this.Namespace);
 		}
 		#endregion
 

@@ -42,17 +42,8 @@ namespace Zongsoft.Security.Membership
 
 		#region 成员字段
 		private int _userId;
-		private string _name;
-		private string _fullName;
-		private string _description;
-		private string _namespace;
-		private string _avatar;
-		private object _principal;
-		private string _principalId;
-		private string _email;
-		private string _phoneNumber;
 		private UserStatus _status;
-		private DateTime? _statusTime;
+		private DateTime? _statusTimestamp;
 		private DateTime _createdTime;
 		#endregion
 
@@ -77,7 +68,7 @@ namespace Zongsoft.Security.Membership
 				throw new ArgumentNullException("name");
 
 			_userId = userId;
-			this.Name = _fullName = name.Trim();
+			this.Name = this.FullName = name.Trim();
 			this.Namespace = @namespace;
 			_status = UserStatus.Unapproved;
 			_createdTime = DateTime.Now;
@@ -107,7 +98,7 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return _name;
+				return this.GetPropertyValue(() => this.Name);
 			}
 			set
 			{
@@ -115,7 +106,7 @@ namespace Zongsoft.Security.Membership
 				if(string.IsNullOrWhiteSpace(value))
 				{
 					//如果当前用户名为空，则说明是通过默认构造函数创建，因此现在不用做处理；否则抛出参数空异常
-					if(string.IsNullOrWhiteSpace(_name))
+					if(string.IsNullOrWhiteSpace(this.Name))
 						return;
 
 					throw new ArgumentNullException();
@@ -140,7 +131,7 @@ namespace Zongsoft.Security.Membership
 				}
 
 				//更新属性内容
-				this.SetPropertyValue(() => this.Name, ref _name, value);
+				this.SetPropertyValue(() => this.Name, value);
 			}
 		}
 
@@ -151,11 +142,11 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return _fullName;
+				return this.GetPropertyValue(() => this.FullName);
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.FullName, ref _fullName, value);
+				this.SetPropertyValue(() => this.FullName, value);
 			}
 		}
 
@@ -166,7 +157,7 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return _namespace;
+				return this.GetPropertyValue(()=>this.Namespace);
 			}
 			set
 			{
@@ -183,7 +174,7 @@ namespace Zongsoft.Security.Membership
 				}
 
 				//更新属性内容
-				this.SetPropertyValue(() => this.Namespace, ref _namespace, string.IsNullOrWhiteSpace(value) ? null : value.Trim());
+				this.SetPropertyValue(() => this.Namespace, string.IsNullOrWhiteSpace(value) ? null : value.Trim());
 			}
 		}
 
@@ -194,11 +185,11 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return _description;
+				return this.GetPropertyValue(() => this.Description);
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.Description, ref _description, value);
+				this.SetPropertyValue(() => this.Description, value);
 			}
 		}
 
@@ -209,11 +200,11 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return _avatar;
+				return this.GetPropertyValue(() => this.Avatar);
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.Avatar, ref _avatar, value);
+				this.SetPropertyValue(() => this.Avatar, value);
 			}
 		}
 
@@ -224,11 +215,11 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return _principal;
+				return this.GetPropertyValue(() => this.Principal);
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.Principal, ref _principal, value);
+				this.SetPropertyValue(() => this.Principal, value);
 			}
 		}
 
@@ -239,11 +230,11 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return _principalId;
+				return this.GetPropertyValue(() => this.PrincipalId);
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.PrincipalId, ref _principalId, value);
+				this.SetPropertyValue(() => this.PrincipalId, value);
 			}
 		}
 
@@ -254,7 +245,7 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return _email;
+				return this.GetPropertyValue(() => this.Email);
 			}
 			set
 			{
@@ -264,7 +255,7 @@ namespace Zongsoft.Security.Membership
 						throw new ArgumentException("Invalid email format.");
 				}
 
-				this.SetPropertyValue(() => this.Email, ref _email, string.IsNullOrWhiteSpace(value) ? null : value.Trim());
+				this.SetPropertyValue(() => this.Email, string.IsNullOrWhiteSpace(value) ? null : value.Trim());
 			}
 		}
 
@@ -275,11 +266,11 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return _phoneNumber;
+				return this.GetPropertyValue(() => this.PhoneNumber);
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.PhoneNumber, ref _phoneNumber, string.IsNullOrWhiteSpace(value) ? null : value.Trim());
+				this.SetPropertyValue(() => this.PhoneNumber, string.IsNullOrWhiteSpace(value) ? null : value.Trim());
 			}
 		}
 
@@ -300,22 +291,22 @@ namespace Zongsoft.Security.Membership
 				this.SetPropertyValue(() => this.Status, ref _status, value);
 
 				//同步设置状态更新时间戳
-				_statusTime = DateTime.Now;
+				_statusTimestamp = DateTime.Now;
 			}
 		}
 
 		/// <summary>
 		/// 获取或设置用户状态的更新时间。
 		/// </summary>
-		public DateTime? StatusTime
+		public DateTime? StatusTimestamp
 		{
 			get
 			{
-				return _statusTime;
+				return _statusTimestamp;
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.StatusTime, ref _statusTime, value);
+				this.SetPropertyValue(() => this.StatusTimestamp, ref _statusTimestamp, value);
 			}
 		}
 
@@ -343,20 +334,20 @@ namespace Zongsoft.Security.Membership
 
 			var other = (User)obj;
 
-			return _userId == other._userId && string.Equals(_namespace, other._namespace, StringComparison.OrdinalIgnoreCase);
+			return _userId == other._userId && string.Equals(this.Namespace, other.Namespace, StringComparison.OrdinalIgnoreCase);
 		}
 
 		public override int GetHashCode()
 		{
-			return (_namespace + ":" + _userId).ToLowerInvariant().GetHashCode();
+			return (this.Namespace + ":" + _userId.ToString()).ToLowerInvariant().GetHashCode();
 		}
 
 		public override string ToString()
 		{
-			if(string.IsNullOrWhiteSpace(_namespace))
-				return string.Format("[{0}]{1}", _userId, _name);
+			if(string.IsNullOrWhiteSpace(this.Namespace))
+				return string.Format("[{0}]{1}", _userId.ToString(), this.Name);
 			else
-				return string.Format("[{0}]{1}@{2}", _userId, _name, _namespace);
+				return string.Format("[{0}]{1}@{2}", _userId.ToString(), this.Name, this.Namespace);
 		}
 		#endregion
 
