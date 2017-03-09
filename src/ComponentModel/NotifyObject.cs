@@ -65,51 +65,15 @@ namespace Zongsoft.ComponentModel
 		#endregion
 
 		#region 保护方法
-		[Obsolete("Please use the GetPropertyValue<T>(...) method.")]
-		protected T GetValue<T>(string propertyName, T defaultValue = default(T))
-		{
-			return this.GetPropertyValue<T>(propertyName, defaultValue);
-		}
-
-		[Obsolete("Please use the GetPropertyValue<T>(...) method.")]
-		protected T GetValue<T>(Expression<Func<T>> propertyExpression, T defaultValue = default(T))
-		{
-			return this.GetPropertyValue<T>(propertyExpression, defaultValue);
-		}
-
-		[Obsolete("Please use the SetPropertyValue<T>(...) method.")]
-		protected void SetValue(object value, string propertyName)
-		{
-			this.SetPropertyValue(propertyName, value);
-		}
-
-		[Obsolete("Please use the SetPropertyValue<T>(...) method.")]
-		protected void SetValue<T>(T value, Expression<Func<T>> propertyExpression)
-		{
-			this.SetPropertyValue<T>(propertyExpression, value);
-		}
-
-		[Obsolete("Please use the SetPropertyValue<T>(...) method.")]
-		protected void SetValue<T>(ref T target, T value, string propertyName)
-		{
-			this.SetPropertyValue<T>(propertyName, ref target, value);
-		}
-
-		[Obsolete("Please use the SetPropertyValue<T>(...) method.")]
-		protected void SetValue<T>(ref T target, T value, Expression<Func<T>> propertyExpression)
-		{
-			this.SetPropertyValue<T>(propertyExpression, ref target, value);
-		}
-
 		protected T GetPropertyValue<T>(string propertyName, T defaultValue = default(T))
 		{
 			if(string.IsNullOrWhiteSpace(propertyName))
 				throw new ArgumentNullException("propertyName");
 
-			var properties = this.Properties;
+			var properties = _properties;
 			object value;
 
-			if(properties.TryGetValue(propertyName.Trim(), out value))
+			if(properties != null && properties.TryGetValue(propertyName.Trim(), out value))
 				return (T)value;
 
 			var property = this.GetType().GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
@@ -131,10 +95,10 @@ namespace Zongsoft.ComponentModel
 			if(property == null)
 				throw new ArgumentException("Invalid expression of the argument", "propertyExpression");
 
-			var properties = this.Properties;
+			var properties = _properties;
 			object value;
 
-			if(properties.TryGetValue(property.Name, out value))
+			if(properties != null && properties.TryGetValue(property.Name, out value))
 				return (T)value;
 
 			//返回属性的默认值
