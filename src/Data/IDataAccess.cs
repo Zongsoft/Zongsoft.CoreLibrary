@@ -54,7 +54,16 @@ namespace Zongsoft.Data
 		event EventHandler<DataUpdatingEventArgs> Updating;
 		#endregion
 
+		#region 属性声明
+		DataAccessMapper Mapper
+		{
+			get;
+		}
+		#endregion
+
 		#region 获取主键
+		string[] GetKey<T>();
+
 		/// <summary>
 		/// 获取指定名称的主键名数组。
 		/// </summary>
@@ -72,19 +81,35 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 存在方法
+		bool Exists<T>(ICondition condition);
 		bool Exists(string name, ICondition condition);
 		#endregion
 
 		#region 计数方法
+		int Count<T>(ICondition condition, string includes = null);
 		int Count(string name, ICondition condition, string includes = null);
 		#endregion
 
 		#region 递增方法
+		long Increment<T>(string member, ICondition condition, int interval = 1);
 		long Increment(string name, string member, ICondition condition, int interval = 1);
+
+		long Decrement<T>(string member, ICondition condition, int interval = 1);
 		long Decrement(string name, string member, ICondition condition, int interval = 1);
 		#endregion
 
 		#region 查询方法
+		IEnumerable<T> Select<T>(ICondition condition = null, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(ICondition condition, string scope, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(ICondition condition, string scope, Paging paging, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(ICondition condition, Paging paging, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(ICondition condition, Paging paging, string scope, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(ICondition condition, Grouping grouping, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(ICondition condition, Grouping grouping, string scope, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(ICondition condition, Grouping grouping, string scope, Paging paging, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(ICondition condition, Grouping grouping, Paging paging, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(ICondition condition, Grouping grouping, Paging paging, string scope, params Sorting[] sortings);
+
 		IEnumerable<T> Select<T>(string name, ICondition condition = null, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(string name, ICondition condition, string scope, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(string name, ICondition condition, string scope, Paging paging, params Sorting[] sortings);
@@ -98,16 +123,23 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 删除方法
+		int Delete<T>(ICondition condition, params string[] cascades);
+
 		int Delete(string name, ICondition condition, params string[] cascades);
 		#endregion
 
 		#region 插入方法
-		int Insert(string name, object data, string scope = null);
+		int Insert<T>(T data, string scope = null);
+		int InsertMany<T>(IEnumerable<T> items, string scope = null);
 
+		int Insert(string name, object data, string scope = null);
 		int InsertMany(string name, IEnumerable items, string scope = null);
 		#endregion
 
 		#region 更新方法
+		int Update<T>(T data, ICondition condition = null, string scope = null);
+		int Update<T>(T data, string scope, ICondition condition = null);
+
 		/// <summary>
 		/// 根据指定的条件将指定的实体更新到数据源。
 		/// </summary>
@@ -118,6 +150,9 @@ namespace Zongsoft.Data
 		/// <returns>返回受影响的记录行数，执行成功返回大于零的整数，失败则返回负数。</returns>
 		int Update(string name, object data, ICondition condition = null, string scope = null);
 		int Update(string name, object data, string scope, ICondition condition = null);
+
+		int UpdateMany<T>(IEnumerable<T> items, ICondition condition = null, string scope = null);
+		int UpdateMany<T>(IEnumerable<T> items, string scope, ICondition condition = null);
 
 		/// <summary>
 		/// 根据指定的条件将指定的实体集更新到数据源。

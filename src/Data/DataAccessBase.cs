@@ -50,13 +50,36 @@ namespace Zongsoft.Data
 		public event EventHandler<DataUpdatingEventArgs> Updating;
 		#endregion
 
+		#region 成员字段
+		private DataAccessMapper _mapper;
+		#endregion
+
 		#region 构造函数
 		protected DataAccessBase()
 		{
+			_mapper = new DataAccessMapper();
+		}
+		#endregion
+
+		#region 公共属性
+		/// <summary>
+		/// 获取数据访问映射器。
+		/// </summary>
+		public DataAccessMapper Mapper
+		{
+			get
+			{
+				return _mapper;
+			}
 		}
 		#endregion
 
 		#region 获取主键
+		public string[] GetKey<T>()
+		{
+			return this.GetKey(this.GetName<T>());
+		}
+
 		public abstract string[] GetKey(string name);
 		#endregion
 
@@ -69,6 +92,9 @@ namespace Zongsoft.Data
 
 		public IEnumerable<T> Execute<T>(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters)
 		{
+			if(string.IsNullOrWhiteSpace(name))
+				throw new ArgumentNullException(nameof(name));
+
 			//激发“Executing”事件
 			var args = this.OnExecuting(name, typeof(T), inParameters, out outParameters);
 
@@ -92,6 +118,9 @@ namespace Zongsoft.Data
 
 		public object ExecuteScalar(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters)
 		{
+			if(string.IsNullOrWhiteSpace(name))
+				throw new ArgumentNullException(nameof(name));
+
 			//激发“Executing”事件
 			var args = this.OnExecuting(name, typeof(object), inParameters, out outParameters);
 
@@ -109,12 +138,25 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 存在方法
+		public bool Exists<T>(ICondition condition)
+		{
+			return this.Exists(this.GetName<T>(), condition);
+		}
+
 		public abstract bool Exists(string name, ICondition condition);
 		#endregion
 
 		#region 计数方法
+		public int Count<T>(ICondition condition, string includes = null)
+		{
+			return this.Count(this.GetName<T>(), condition, includes);
+		}
+
 		public int Count(string name, ICondition condition, string includes = null)
 		{
+			if(string.IsNullOrWhiteSpace(name))
+				throw new ArgumentNullException(nameof(name));
+
 			//激发“Counting”事件
 			var args = this.OnCounting(name, condition, includes);
 
@@ -132,6 +174,56 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 查询方法
+		public IEnumerable<T> Select<T>(ICondition condition = null, params Sorting[] sortings)
+		{
+			return this.Select<T>(this.GetName<T>(), condition, null, string.Empty, null, sortings);
+		}
+
+		public IEnumerable<T> Select<T>(ICondition condition, string scope, params Sorting[] sortings)
+		{
+			return this.Select<T>(this.GetName<T>(), condition, null, scope, null, sortings);
+		}
+
+		public IEnumerable<T> Select<T>(ICondition condition, string scope, Paging paging, params Sorting[] sortings)
+		{
+			return this.Select<T>(this.GetName<T>(), condition, null, scope, paging, sortings);
+		}
+
+		public IEnumerable<T> Select<T>(ICondition condition, Paging paging, params Sorting[] sortings)
+		{
+			return this.Select<T>(this.GetName<T>(), condition, null, string.Empty, paging, sortings);
+		}
+
+		public IEnumerable<T> Select<T>(ICondition condition, Paging paging, string scope, params Sorting[] sortings)
+		{
+			return this.Select<T>(this.GetName<T>(), condition, null, scope, paging, sortings);
+		}
+
+		public IEnumerable<T> Select<T>(ICondition condition, Grouping grouping, params Sorting[] sortings)
+		{
+			return this.Select<T>(this.GetName<T>(), condition, grouping, string.Empty, null, sortings);
+		}
+
+		public IEnumerable<T> Select<T>(ICondition condition, Grouping grouping, string scope, params Sorting[] sortings)
+		{
+			return this.Select<T>(this.GetName<T>(), condition, grouping, scope, null, sortings);
+		}
+
+		public IEnumerable<T> Select<T>(ICondition condition, Grouping grouping, string scope, Paging paging, params Sorting[] sortings)
+		{
+			return this.Select<T>(this.GetName<T>(), condition, grouping, scope, paging, sortings);
+		}
+
+		public IEnumerable<T> Select<T>(ICondition condition, Grouping grouping, Paging paging, params Sorting[] sortings)
+		{
+			return this.Select<T>(this.GetName<T>(), condition, grouping, string.Empty, paging, sortings);
+		}
+
+		public IEnumerable<T> Select<T>(ICondition condition, Grouping grouping, Paging paging, string scope, params Sorting[] sortings)
+		{
+			return this.Select<T>(this.GetName<T>(), condition, grouping, scope, paging, sortings);
+		}
+
 		public IEnumerable<T> Select<T>(string name, ICondition condition = null, params Sorting[] sortings)
 		{
 			return this.Select<T>(name, condition, null, string.Empty, null, sortings);
@@ -169,6 +261,9 @@ namespace Zongsoft.Data
 
 		public IEnumerable<T> Select<T>(string name, ICondition condition, Grouping grouping, string scope, Paging paging, params Sorting[] sortings)
 		{
+			if(string.IsNullOrWhiteSpace(name))
+				throw new ArgumentNullException(nameof(name));
+
 			//激发“Selecting”事件
 			var args = this.OnSelecting(name, typeof(T), condition, grouping, scope, paging, sortings);
 
@@ -201,8 +296,16 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 删除方法
+		public int Delete<T>(ICondition condition, params string[] cascades)
+		{
+			return this.Delete(this.GetName<T>(), condition, cascades);
+		}
+
 		public int Delete(string name, ICondition condition, params string[] cascades)
 		{
+			if(string.IsNullOrWhiteSpace(name))
+				throw new ArgumentNullException(nameof(name));
+
 			if(cascades != null && cascades.Length == 1)
 				cascades = cascades[0].Split(',', ';');
 
@@ -223,8 +326,16 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 插入方法
+		public int Insert<T>(T data, string scope = null)
+		{
+			return this.Insert(this.GetName<T>(), data, scope);
+		}
+
 		public int Insert(string name, object data, string scope = null)
 		{
+			if(string.IsNullOrWhiteSpace(name))
+				throw new ArgumentNullException(nameof(name));
+
 			if(data == null)
 				return 0;
 
@@ -246,8 +357,16 @@ namespace Zongsoft.Data
 			return this.OnInsertMany(name, new[] { data }, scope);
 		}
 
+		public int InsertMany<T>(IEnumerable<T> items, string scope = null)
+		{
+			return this.InsertMany(this.GetName<T>(), items, scope);
+		}
+
 		public int InsertMany(string name, IEnumerable items, string scope = null)
 		{
+			if(string.IsNullOrWhiteSpace(name))
+				throw new ArgumentNullException(nameof(name));
+
 			if(items == null)
 				return 0;
 
@@ -268,6 +387,16 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 更新方法
+		public int Update<T>(T data, ICondition condition = null, string scope = null)
+		{
+			return this.Update(this.GetName<T>(), data, condition, scope);
+		}
+
+		public int Update<T>(T data, string scope, ICondition condition = null)
+		{
+			return this.Update(this.GetName<T>(), data, condition, scope);
+		}
+
 		/// <summary>
 		/// 根据指定的条件将指定的实体更新到数据源。
 		/// </summary>
@@ -278,6 +407,9 @@ namespace Zongsoft.Data
 		/// <returns>返回受影响的记录行数，执行成功返回大于零的整数，失败则返回负数。</returns>
 		public int Update(string name, object data, ICondition condition = null, string scope = null)
 		{
+			if(string.IsNullOrWhiteSpace(name))
+				throw new ArgumentNullException(nameof(name));
+
 			if(data == null)
 				return 0;
 
@@ -307,6 +439,16 @@ namespace Zongsoft.Data
 			return this.OnUpdateMany(name, new[] { data }, condition, scope);
 		}
 
+		public int UpdateMany<T>(IEnumerable<T> items, ICondition condition = null, string scope = null)
+		{
+			return this.UpdateMany(this.GetName<T>(), items, condition, scope);
+		}
+
+		public int UpdateMany<T>(IEnumerable<T> items, string scope, ICondition condition = null)
+		{
+			return this.UpdateMany(this.GetName<T>(), items, condition, scope);
+		}
+
 		/// <summary>
 		/// 根据指定的条件将指定的实体集更新到数据源。
 		/// </summary>
@@ -317,6 +459,9 @@ namespace Zongsoft.Data
 		/// <returns>返回受影响的记录行数，执行成功返回大于零的整数，失败则返回负数。</returns>
 		public int UpdateMany(string name, IEnumerable items, ICondition condition = null, string scope = null)
 		{
+			if(string.IsNullOrWhiteSpace(name))
+				throw new ArgumentNullException(nameof(name));
+
 			if(items == null)
 				return 0;
 
@@ -342,11 +487,33 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 递增方法
+		public long Increment<T>(string member, ICondition condition, int interval = 1)
+		{
+			return this.Increment(this.GetName<T>(), member, condition, interval);
+		}
+
 		public abstract long Increment(string name, string member, ICondition condition, int interval = 1);
+
+		public long Decrement<T>(string member, ICondition condition, int interval = 1)
+		{
+			return this.Increment(this.GetName<T>(), member, condition, -interval);
+		}
 
 		public long Decrement(string name, string member, ICondition condition, int interval = 1)
 		{
 			return this.Increment(name, member, condition, -interval);
+		}
+		#endregion
+
+		#region 虚拟方法
+		protected virtual string GetName(Type type)
+		{
+			var name = _mapper.Get(type);
+
+			if(string.IsNullOrEmpty(name))
+				throw new InvalidOperationException($"Missing data access name mapping of the '{type.FullName}' type.");
+
+			return name;
 		}
 		#endregion
 
@@ -535,6 +702,11 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 私有方法
+		private string GetName<T>()
+		{
+			return this.GetName(typeof(T));
+		}
+
 		private static DataDictionary GetDataDictionary(object data)
 		{
 			if(data == null)
