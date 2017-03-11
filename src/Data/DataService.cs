@@ -57,13 +57,13 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		//public DataService(Zongsoft.Services.IServiceProvider serviceProvider)
-		//{
-		//	if(serviceProvider == null)
-		//		throw new ArgumentNullException("serviceProvider");
+		public DataService(Zongsoft.Services.IServiceProvider serviceProvider)
+		{
+			if(serviceProvider == null)
+				throw new ArgumentNullException("serviceProvider");
 
-		//	_serviceProvider = serviceProvider;
-		//}
+			_serviceProvider = serviceProvider;
+		}
 
 		public DataService(string name, Zongsoft.Services.IServiceProvider serviceProvider)
 		{
@@ -83,6 +83,14 @@ namespace Zongsoft.Data
 		{
 			get
 			{
+				if(string.IsNullOrWhiteSpace(_name))
+				{
+					var dataAccess = this.DataAccess;
+
+					if(dataAccess != null && dataAccess.Mapper != null)
+						_name = dataAccess.Mapper.Get<TEntity>();
+				}
+
 				return _name;
 			}
 			protected set
