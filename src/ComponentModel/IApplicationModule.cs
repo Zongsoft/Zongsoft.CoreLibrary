@@ -30,9 +30,9 @@ using System.Collections.Generic;
 namespace Zongsoft.ComponentModel
 {
 	/// <summary>
-	/// 向实现类提供应用扩展模块初始化和处置事件。
+	/// 向实现类提供应用扩展模块初始化机制的接口。
 	/// </summary>
-	public interface IApplicationModule : IDisposable
+	public interface IApplicationModule
 	{
 		/// <summary>
 		/// 获取应用扩展模块名称。
