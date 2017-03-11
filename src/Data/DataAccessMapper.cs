@@ -30,9 +30,9 @@ using System.Collections.Concurrent;
 namespace Zongsoft.Data
 {
 	/// <summary>
-	/// 提供数据访问名的映射功能。
+	/// 提供数据访问名映射功能的类。
 	/// </summary>
-	public class DataAccessMapper
+	public class DataAccessMapper : IDataAccessMapper
 	{
 		#region 成员字段
 		private ConcurrentDictionary<Type, string> _mapping;

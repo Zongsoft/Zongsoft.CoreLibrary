@@ -51,7 +51,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 成员字段
-		private DataAccessMapper _mapper;
+		private IDataAccessMapper _mapper;
 		#endregion
 
 		#region 构造函数
@@ -59,13 +59,21 @@ namespace Zongsoft.Data
 		{
 			_mapper = new DataAccessMapper();
 		}
+
+		protected DataAccessBase(IDataAccessMapper mapper)
+		{
+			if(mapper == null)
+				throw new ArgumentNullException(nameof(mapper));
+
+			_mapper = mapper;
+		}
 		#endregion
 
 		#region 公共属性
 		/// <summary>
 		/// 获取数据访问映射器。
 		/// </summary>
-		public DataAccessMapper Mapper
+		public IDataAccessMapper Mapper
 		{
 			get
 			{
