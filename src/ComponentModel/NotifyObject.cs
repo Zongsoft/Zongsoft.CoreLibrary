@@ -68,7 +68,7 @@ namespace Zongsoft.ComponentModel
 		protected T GetPropertyValue<T>(string propertyName, T defaultValue = default(T))
 		{
 			if(string.IsNullOrWhiteSpace(propertyName))
-				throw new ArgumentNullException("propertyName");
+				throw new ArgumentNullException(nameof(propertyName));
 
 			var properties = _properties;
 			object value;
@@ -85,16 +85,34 @@ namespace Zongsoft.ComponentModel
 			return this.GetPropertyDefaultValue(property, defaultValue);
 		}
 
+		protected T GetPropertyValue<T>(string propertyName, Func<T> valueFactory)
+		{
+			if(string.IsNullOrWhiteSpace(propertyName))
+				throw new ArgumentNullException(nameof(propertyName));
+
+			if(valueFactory == null)
+				throw new ArgumentNullException(nameof(valueFactory));
+
+			var properties = this.Properties;
+			object value;
+
+			if(properties.TryGetValue(propertyName.Trim(), out value))
+				return (T)value;
+
+			var property = this.GetType().GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
+			if(property == null)
+				throw new InvalidOperationException(string.Format("The '{0}' property is not exists.", propertyName));
+
+			return (T)(properties[property.Name] = valueFactory());
+		}
+
 		protected T GetPropertyValue<T>(Expression<Func<T>> propertyExpression, T defaultValue = default(T))
 		{
 			if(propertyExpression == null)
-				throw new ArgumentNullException("propertyExpression");
+				throw new ArgumentNullException(nameof(propertyExpression));
 
 			var property = this.GetPropertyInfo<T>(propertyExpression);
-
-			if(property == null)
-				throw new ArgumentException("Invalid expression of the argument", "propertyExpression");
-
 			var properties = _properties;
 			object value;
 
@@ -105,10 +123,28 @@ namespace Zongsoft.ComponentModel
 			return this.GetPropertyDefaultValue(property, defaultValue);
 		}
 
+		protected T GetPropertyValue<T>(Expression<Func<T>> propertyExpression, Func<T> valueFactory)
+		{
+			if(propertyExpression == null)
+				throw new ArgumentNullException(nameof(propertyExpression));
+
+			if(valueFactory == null)
+				throw new ArgumentNullException(nameof(valueFactory));
+
+			var property = this.GetPropertyInfo<T>(propertyExpression);
+			var properties = this.Properties;
+			object value;
+
+			if(properties.TryGetValue(property.Name, out value))
+				return (T)value;
+			else
+				return (T)(properties[property.Name] = valueFactory());
+		}
+
 		protected void SetPropertyValue(string propertyName, object value)
 		{
 			if(string.IsNullOrWhiteSpace(propertyName))
-				throw new ArgumentNullException("propertyName");
+				throw new ArgumentNullException(nameof(propertyName));
 
 			var properties = this.Properties;
 
@@ -120,43 +156,45 @@ namespace Zongsoft.ComponentModel
 		protected void SetPropertyValue<T>(Expression<Func<T>> propertyExpression, T value)
 		{
 			if(propertyExpression == null)
-				throw new ArgumentNullException("propertyExpression");
+				throw new ArgumentNullException(nameof(propertyExpression));
 
 			var property = this.GetPropertyInfo<T>(propertyExpression);
 
-			if(property == null)
-				throw new ArgumentException("Invalid expression of the argument", "propertyExpression");
-
-			var properties = this.Properties;
-
-			properties[property.Name] = value;
+			this.Properties[property.Name] = value;
 
 			this.OnPropertyChanged(property.Name);
 		}
 
 		protected void SetPropertyValue<T>(string propertyName, ref T target, T value)
 		{
+			if(string.IsNullOrWhiteSpace(propertyName))
+				throw new ArgumentNullException(nameof(propertyName));
+
 			if(object.Equals(target, value))
 				return;
 
+			//更新目标值
 			target = value;
+
+			//激发“PropertyChanged”事件
 			this.OnPropertyChanged(propertyName);
 		}
 
 		protected void SetPropertyValue<T>(Expression<Func<T>> propertyExpression, ref T target, T value)
 		{
+			if(propertyExpression == null)
+				throw new ArgumentNullException(nameof(propertyExpression));
+
 			if(object.Equals(target, value))
 				return;
 
-			if(propertyExpression == null)
-				throw new ArgumentNullException("propertyExpression");
-
+			//获取属性表达式指定的属性信息
 			var property = this.GetPropertyInfo<T>(propertyExpression);
 
-			if(property == null)
-				throw new ArgumentException("Invalid expression of the argument", "propertyExpression");
-
+			//更新目标的值
 			target = value;
+
+			//激发“PropertyChanged”事件
 			this.OnPropertyChanged(property.Name);
 		}
 		#endregion
@@ -173,10 +211,6 @@ namespace Zongsoft.ComponentModel
 				throw new ArgumentNullException("propertyExpression");
 
 			var property = this.GetPropertyInfo<T>(propertyExpression);
-
-			if(property == null)
-				throw new ArgumentException("Invalid expression of the argument", "propertyExpression");
-
 			this.OnPropertyChanged(property.Name);
 		}
 
@@ -193,14 +227,17 @@ namespace Zongsoft.ComponentModel
 		private PropertyInfo GetPropertyInfo<T>(Expression<Func<T>> propertyExpression)
 		{
 			if(propertyExpression == null)
-				throw new ArgumentNullException("propertyExpression");
+				throw new ArgumentNullException(nameof(propertyExpression));
 
 			var memberExpression = propertyExpression.Body as MemberExpression;
 
 			if(memberExpression == null)
 				throw new ArgumentException("Invalid expression of the argument.", "propertyExpression");
 
-			return memberExpression.Member as PropertyInfo;
+			if(memberExpression.Member.MemberType != MemberTypes.Property)
+				throw new InvalidOperationException($"The '{memberExpression.Member.Name}' member type is not property.");
+
+			return (PropertyInfo)memberExpression.Member;
 		}
 
 		private T GetPropertyDefaultValue<T>(PropertyInfo property, T defaultValue)
