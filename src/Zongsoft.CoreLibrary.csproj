@@ -210,6 +210,8 @@
     <Compile Include="Messaging\MessageEnqueueSettings.cs" />
     <Compile Include="Messaging\MessageQueueBase.cs" />
     <Compile Include="Messaging\MessageQueueListener.cs" />
+    <Compile Include="Options\Configuration\ConnectionStringElement.cs" />
+    <Compile Include="Options\Configuration\ConnectionStringElementCollection.cs" />
     <Compile Include="Options\Configuration\ModuleElement.cs" />
     <Compile Include="Options\Configuration\ModuleElementCollection.cs" />
     <Compile Include="Options\Configuration\OptionConfigurationLoader.cs" />

@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2013-2017 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,59 +25,37 @@
  */
 
 using System;
-using System.Collections.Generic;
 
 namespace Zongsoft.Options.Configuration
 {
-	public class SettingElement : OptionConfigurationElement
+	public class ConnectionStringElement : SettingElement
 	{
 		#region 常量定义
-		private const string XML_NAME_ATTRIBUTE = "name";
-		private const string XML_VALUE_ATTRIBUTE = "value";
+		private const string XML_PROVIDER_ATTRIBUTE = "provider";
 		#endregion
 
 		#region 构造函数
-		internal SettingElement()
+		public ConnectionStringElement()
 		{
 		}
 
-		internal SettingElement(string name, string value)
+		public ConnectionStringElement(string name, string value, string provider = null) : base(name, value)
 		{
-			if(string.IsNullOrWhiteSpace(name))
-				throw new ArgumentNullException("name");
-
-			this.Name = name;
-			this.Value = value;
+			this.Provider = provider;
 		}
 		#endregion
 
 		#region 公共属性
-		[OptionConfigurationProperty(XML_NAME_ATTRIBUTE, Behavior = OptionConfigurationPropertyBehavior.IsKey)]
-		public string Name
+		[OptionConfigurationProperty(XML_PROVIDER_ATTRIBUTE)]
+		public string Provider
 		{
 			get
 			{
-				return (string)this[XML_NAME_ATTRIBUTE];
+				return (string)this[XML_PROVIDER_ATTRIBUTE];
 			}
 			set
 			{
-				if(string.IsNullOrWhiteSpace(value))
-					throw new ArgumentNullException();
-
-				this[XML_NAME_ATTRIBUTE] = value.Trim();
-			}
-		}
-
-		[OptionConfigurationProperty(XML_VALUE_ATTRIBUTE)]
-		public string Value
-		{
-			get
-			{
-				return (string)this[XML_VALUE_ATTRIBUTE];
-			}
-			set
-			{
-				this[XML_VALUE_ATTRIBUTE] = value;
+				this[XML_PROVIDER_ATTRIBUTE] = value;
 			}
 		}
 		#endregion

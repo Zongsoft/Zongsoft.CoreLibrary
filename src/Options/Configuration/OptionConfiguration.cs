@@ -80,6 +80,9 @@ namespace Zongsoft.Options.Configuration
 
 						_declarations.Add("setting", typeof(SettingElement));
 						_declarations.Add("settings", typeof(SettingElementCollection));
+
+						_declarations.Add("connectionString", typeof(ConnectionStringElement));
+						_declarations.Add("connectionStrings", typeof(ConnectionStringElementCollection));
 					}
 				}
 
