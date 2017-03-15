@@ -263,7 +263,7 @@ namespace Zongsoft.Options.Profiles
 		/// <remarks>
 		///		<para>如果<paramref name="path"/>参数指定的配置路径以“/”斜杠结尾则将返回指定配置段的所有条目集；否则返回指定的配置条目的值。</para>
 		/// </remarks>
-		public object GetOptionObject(string path)
+		public object GetOptionValue(string path)
 		{
 			string name;
 			bool isSectionPath;
@@ -300,7 +300,7 @@ namespace Zongsoft.Options.Profiles
 				return entry.Value;
 		}
 
-		public void SetOptionObject(string path, object optionObject)
+		public void SetOptionValue(string path, object optionObject)
 		{
 			string name;
 			bool isSectionPath;

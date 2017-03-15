@@ -25,45 +25,25 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Zongsoft.Options
 {
 	internal static class OptionUtility
 	{
-		internal static bool ResolveOptionPath(string fullPath, out string path, out string name, out string member)
+		internal static void ResolveOptionPath(string fullPath, out string path, out string name)
 		{
 			path = string.Empty;
 			name = string.Empty;
-			member = string.Empty;
 
 			if(string.IsNullOrWhiteSpace(fullPath))
-				return false;
+				throw new ArgumentNullException(nameof(fullPath));
 
-			fullPath = fullPath.Trim().Trim('/').Trim();
-
-			if(string.IsNullOrWhiteSpace(fullPath))
-				return false;
-
-			var parts = fullPath.Split('/');
-
-			if(parts.Length > 1)
-				path = string.Join("/", parts, 0, parts.Length - 1);
-			else
-				path = "/";
-
-			name = parts[parts.Length - 1].Trim();
-			var index = Math.Min(name.IndexOf('.'), name.IndexOf('['));
+			var index = fullPath.LastIndexOf('/');
 
 			if(index >= 0)
-			{
-				name = name.Substring(0, index);
-				member = name.Substring(index + 1);
-			}
+				path = fullPath.Substring(0, Math.Max(1, index));
 
-			return true;
+			name = fullPath.Substring(index + 1);
 		}
 	}
 }

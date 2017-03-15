@@ -162,7 +162,7 @@ namespace Zongsoft.Options
 					if(notifiable != null)
 						notifiable.PropertyChanged -= new PropertyChangedEventHandler(OptionObject_PropertyChanged);
 
-					_optionObject = _provider.GetOptionObject(_node.FullPath);
+					_optionObject = _provider.GetOptionValue(_node.FullPath);
 
 					notifiable = _optionObject as INotifyPropertyChanged;
 					if(notifiable != null)
@@ -239,7 +239,7 @@ namespace Zongsoft.Options
 		protected virtual void OnApply()
 		{
 			if(_provider != null)
-				_provider.SetOptionObject(_node.FullPath, _optionObject);
+				_provider.SetOptionValue(_node.FullPath, _optionObject);
 		}
 		#endregion
 

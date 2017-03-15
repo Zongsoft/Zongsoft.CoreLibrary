@@ -45,7 +45,7 @@ namespace Zongsoft.Options
 			if(string.IsNullOrWhiteSpace(path))
 				return default(T);
 			else
-				return optionProvider.GetOptionObject(path) as T;
+				return optionProvider.GetOptionValue(path) as T;
 		}
 
 		public static void SetOptionObject<T>(this IOptionProvider optionProvider, object optionObject) where T : class
@@ -58,7 +58,7 @@ namespace Zongsoft.Options
 			if(string.IsNullOrWhiteSpace(path))
 				throw new InvalidOperationException(string.Format("Invalid generic type '{0}'.", typeof(T).AssemblyQualifiedName));
 
-			optionProvider.SetOptionObject(path, optionObject);
+			optionProvider.SetOptionValue(path, optionObject);
 		}
 		#endregion
 

@@ -48,7 +48,7 @@ namespace Zongsoft.Diagnostics
 				return;
 
 			//从当前应用的主配置文件中获取日志器的主配置节
-			var loggerElement = context.Configuration.GetOptionObject(@"/Diagnostics/Logger") as Configuration.LoggerElement;
+			var loggerElement = context.Configuration.GetOptionValue(@"/Diagnostics/Logger") as Configuration.LoggerElement;
 
 			if(loggerElement == null)
 				return;

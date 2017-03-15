@@ -52,7 +52,7 @@ namespace Zongsoft.Options
 
 		#region 成员字段
 		private OptionNode _root;
-		private Zongsoft.Collections.Collection<IOptionProvider> _providers;
+		private Collections.Collection<IOptionProvider> _providers;
 		private IOptionLoaderSelector _loaderSelector;
 		#endregion
 
@@ -141,22 +141,37 @@ namespace Zongsoft.Options
 			this.Invoke(_root, InvokeMethod.Reset);
 		}
 
-		public object GetOptionObject(string path)
+		public object GetOptionValue(string text)
 		{
-			var node = this.Find(path);
+			if(string.IsNullOrWhiteSpace(text))
+				throw new ArgumentNullException(nameof(text));
+
+			var expression = Collections.HierarchicalExpression.Parse(text);
+			var node = this.Find(expression.Segments);
 
 			if(node != null && node.Option != null)
-				return node.Option.OptionObject;
+			{
+				var target = node.Option.OptionObject;
+
+				if(target != null && expression.Members.Length > 0)
+					return Reflection.MemberAccess.GetMemberValue<object>(target, expression.Members);
+
+				return target;
+			}
 
 			return null;
 		}
 
-		public void SetOptionObject(string path, object optionObject)
+		public void SetOptionValue(string text, object value)
 		{
-			var node = this.Find(path);
+			if(string.IsNullOrWhiteSpace(text))
+				throw new ArgumentNullException(nameof(text));
+
+			var expression = Collections.HierarchicalExpression.Parse(text);
+			var node = this.Find(expression.Segments);
 
 			if(node != null && node.Option != null && node.Option.Provider != null)
-				node.Option.Provider.SetOptionObject(path, optionObject);
+				node.Option.Provider.SetOptionValue(text, value);
 		}
 
 		public OptionNode Find(string path)

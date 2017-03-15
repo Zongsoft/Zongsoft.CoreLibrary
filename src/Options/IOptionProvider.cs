@@ -25,8 +25,6 @@
  */
 
 using System;
-using System.ComponentModel;
-using System.Collections.Generic;
 
 namespace Zongsoft.Options
 {
@@ -38,15 +36,15 @@ namespace Zongsoft.Options
 		/// <summary>
 		/// 根据指定的选项路径获取对应的选项数据。
 		/// </summary>
-		/// <param name="path">要获取的选项路径。</param>
+		/// <param name="text">要获取的选项路径表达式文本，该表达式的结构请参考<seealso cref="Zongsoft.Collections.HierarchicalExpression"/>。</param>
 		/// <returns>获取到的选项数据对象。</returns>
-		object GetOptionObject(string path);
+		object GetOptionValue(string text);
 
 		/// <summary>
 		/// 将指定的选项数据保存到指定路径的存储容器中。
 		/// </summary>
-		/// <param name="path">待保存的选项路径。</param>
-		/// <param name="optionObject">待保存的选项对象。</param>
-		void SetOptionObject(string path, object optionObject);
+		/// <param name="text">待保存的选项路径表达式文本，该表达式的结构请参考<seealso cref="Zongsoft.Collections.HierarchicalExpression"/>。</param>
+		/// <param name="value">待保存的选项对象。</param>
+		void SetOptionValue(string text, object value);
 	}
 }

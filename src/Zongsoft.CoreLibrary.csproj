@@ -83,6 +83,7 @@
     <Compile Include="Collections\DictionaryExtension.cs" />
     <Compile Include="Collections\EnqueuedEventArgs.cs" />
     <Compile Include="Collections\HashSetExtension.cs" />
+    <Compile Include="Collections\HierarchicalExpression.cs" />
     <Compile Include="Collections\HierarchicalNode.cs" />
     <Compile Include="Collections\HierarchicalNodeCollection.cs" />
     <Compile Include="Collections\BinaryComparer.cs" />

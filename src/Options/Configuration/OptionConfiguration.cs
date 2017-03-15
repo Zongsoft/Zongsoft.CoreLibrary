@@ -116,42 +116,74 @@ namespace Zongsoft.Options.Configuration
 		public OptionConfigurationSection GetSection(string path)
 		{
 			if(string.IsNullOrWhiteSpace(path))
-				throw new ArgumentNullException("path");
+				throw new ArgumentNullException(nameof(path));
 
 			path = path.Trim().Trim('/');
 
 			if(!_sections.Contains(path))
-				throw new OptionConfigurationException(string.Format("No found specified by '{0}' path of option section in the '{1}' configuration file.", path, _filePath));
+				throw new OptionConfigurationException($"No found specified by '{path}' path of option section in the '{this.FilePath}' configuration file.");
 
 			return _sections[path];
 		}
 
-		public object GetOptionObject(string path)
+		public object GetOptionValue(string text)
 		{
-			if(string.IsNullOrWhiteSpace(path))
-				throw new ArgumentNullException("path");
+			if(string.IsNullOrWhiteSpace(text))
+				throw new ArgumentNullException(nameof(text));
 
-			string sectionPath, nodeName, memberPath;
+			//解析层次结构表达式
+			var expression = Collections.HierarchicalExpression.Parse(text);
 
-			if(!OptionUtility.ResolveOptionPath(path, out sectionPath, out nodeName, out memberPath))
-				return null;
+			string sectionPath, elementName;
 
+			//拆解路径文本中的Section和Element部分
+			OptionUtility.ResolveOptionPath(expression.Path, out sectionPath, out elementName);
+
+			//获取指定路径的配置节
 			var section = this.GetSection(sectionPath);
 
 			if(section == null)
-				return null;
+				throw new ArgumentException($"Not found '{sectionPath}' configuration option section in the '{this.FilePath}' file.");
 
-			var target = section.Children[nodeName];
+			//获取指定配置节下面的配置元素
+			var element = section.Children[elementName];
 
-			if(target == null || string.IsNullOrWhiteSpace(memberPath))
-				return target;
-			else
-				return Reflection.MemberAccess.GetMemberValue<object>(target, memberPath);
+			if(element == null)
+				throw new ArgumentException($"Not found '{elementName}' configuration element in the '{this.FilePath}' file.");
+
+			if(expression.Members.Length > 0)
+				return Reflection.MemberAccess.GetMemberValue<object>(element, expression.Members);
+
+			return element;
 		}
 
-		public void SetOptionObject(string path, object optionObject)
+		public void SetOptionValue(string text, object value)
 		{
-			this.Save();
+			if(string.IsNullOrWhiteSpace(text))
+				throw new ArgumentNullException(nameof(text));
+
+			//解析层次结构表达式
+			var expression = Collections.HierarchicalExpression.Parse(text);
+
+			string sectionPath, elementName;
+
+			//拆解路径文本中的Section和Element部分
+			OptionUtility.ResolveOptionPath(expression.Path, out sectionPath, out elementName);
+
+			//获取指定路径的配置节
+			var section = this.GetSection(sectionPath);
+
+			if(section == null)
+				throw new ArgumentException($"Not found '{sectionPath}' configuration option section in the '{this.FilePath}' file.");
+
+			//获取指定配置节下面的配置元素
+			var element = section.Children[elementName];
+
+			if(element == null)
+				throw new ArgumentException($"Not found '{elementName}' configuration element in the '{this.FilePath}' file.");
+
+			if(expression.Members.Length > 0)
+				Reflection.MemberAccess.SetMemberValue(element, expression.Members, value);
 		}
 		#endregion
 
