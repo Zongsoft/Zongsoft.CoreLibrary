@@ -33,10 +33,11 @@ namespace Zongsoft.Options
 {
 	internal static class OptionUtility
 	{
-		internal static bool ResolveOptionPath(string fullPath, out string path, out string name)
+		internal static bool ResolveOptionPath(string fullPath, out string path, out string name, out string member)
 		{
 			path = string.Empty;
 			name = string.Empty;
+			member = string.Empty;
 
 			if(string.IsNullOrWhiteSpace(fullPath))
 				return false;
@@ -54,6 +55,13 @@ namespace Zongsoft.Options
 				path = "/";
 
 			name = parts[parts.Length - 1].Trim();
+			var index = Math.Min(name.IndexOf('.'), name.IndexOf('['));
+
+			if(index >= 0)
+			{
+				name = name.Substring(0, index);
+				member = name.Substring(index + 1);
+			}
 
 			return true;
 		}

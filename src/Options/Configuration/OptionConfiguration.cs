@@ -131,9 +131,9 @@ namespace Zongsoft.Options.Configuration
 			if(string.IsNullOrWhiteSpace(path))
 				throw new ArgumentNullException("path");
 
-			string sectionPath, nodeName;
+			string sectionPath, nodeName, memberPath;
 
-			if(!OptionUtility.ResolveOptionPath(path, out sectionPath, out nodeName))
+			if(!OptionUtility.ResolveOptionPath(path, out sectionPath, out nodeName, out memberPath))
 				return null;
 
 			var section = this.GetSection(sectionPath);
@@ -141,7 +141,12 @@ namespace Zongsoft.Options.Configuration
 			if(section == null)
 				return null;
 
-			return section.Children[nodeName];
+			var target = section.Children[nodeName];
+
+			if(target == null || string.IsNullOrWhiteSpace(memberPath))
+				return target;
+			else
+				return Reflection.MemberAccess.GetMemberValue<object>(target, memberPath);
 		}
 
 		public void SetOptionObject(string path, object optionObject)
