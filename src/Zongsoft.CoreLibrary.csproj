@@ -119,7 +119,6 @@
     <Compile Include="Communication\PackageSerializer.cs" />
     <Compile Include="Communication\PacketizerFactory.cs" />
     <Compile Include="Communication\ChannelPipelineContext.cs" />
-    <Compile Include="Data\DataAccessAttribute.cs" />
     <Compile Include="Data\DataAccessMapper.cs" />
     <Compile Include="Data\IDataAccessMapper.cs" />
     <Compile Include="Expressions\ITokenizer.cs" />

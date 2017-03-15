@@ -62,14 +62,7 @@ namespace Zongsoft.Data
 				throw new ArgumentNullException(nameof(type));
 
 			if(string.IsNullOrWhiteSpace(name))
-			{
-				var attribute = (DataAccessAttribute)Attribute.GetCustomAttribute(type, typeof(DataAccessAttribute), false);
-
-				if(attribute == null || string.IsNullOrWhiteSpace(attribute.Name))
-					name = type.Name;
-				else
-					name = attribute.Name;
-			}
+				name = type.Name;
 
 			_mapping[type] = name.Trim();
 		}
@@ -89,15 +82,7 @@ namespace Zongsoft.Data
 			if(_mapping.TryGetValue(type, out result))
 				return result;
 
-			var attribute = (DataAccessAttribute)Attribute.GetCustomAttribute(type, typeof(DataAccessAttribute), false);
-
-			if(attribute != null && !string.IsNullOrWhiteSpace(attribute.Name))
-			{
-				_mapping[type] = attribute.Name;
-				return attribute.Name;
-			}
-
-			return null;
+			throw new InvalidOperationException($"Missing data access mapping of the '{type.FullName}' type.");
 		}
 
 		public string Get<T>()
