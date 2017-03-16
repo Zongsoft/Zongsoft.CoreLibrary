@@ -456,7 +456,6 @@
     <Compile Include="ComponentModel\EnumConverter.cs" />
     <Compile Include="Common\EnumEntry.cs" />
     <Compile Include="ComponentModel\CustomBooleanConverter.cs" />
-    <Compile Include="Options\OptionProviderExtension.cs" />
     <Compile Include="Options\OptionUtility.cs" />
     <Compile Include="Collections\Category.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
