@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2003-2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2003-2017 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -114,21 +114,9 @@ namespace Zongsoft.Security.Membership
 
 				value = value.Trim();
 
-				//用户名的长度必须不少于2个字符
-				if(value.Length < 2)
-					throw new ArgumentOutOfRangeException();
-
-				//用户名的首字符必须是字母、下划线、美元符
-				if(!(Char.IsLetter(value[0]) || value[0] == '_' || value[0] == '$'))
-					throw new ArgumentException("Invalid user name.");
-
-				//检查用户名的其余字符的合法性
-				for(int i = 1; i < value.Length; i++)
-				{
-					//用户名的中间字符必须是字母、数字或下划线
-					if(!Char.IsLetterOrDigit(value[i]) && value[i] != '_')
-						throw new ArgumentException("The user name contains invalid character.");
-				}
+				//用户名的长度必须不少于4个字符
+				if(value.Length < 4)
+					throw new ArgumentOutOfRangeException($"The '{value}' user name length must be greater than 3.");
 
 				//更新属性内容
 				this.SetPropertyValue(() => this.Name, value);
