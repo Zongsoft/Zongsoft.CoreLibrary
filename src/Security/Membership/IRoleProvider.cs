@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2003-2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2003-2017 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -66,12 +66,12 @@ namespace Zongsoft.Security.Membership
 		Role GetRole(string name, string @namespace);
 
 		/// <summary>
-		/// 获取当前命名空间中的所有角色。
+		/// 获取指定命名空间中的角色集。
 		/// </summary>
-		/// <param name="namespace">要获取的用户集所属的命名空间。</param>
+		/// <param name="namespace">要获取的用户集所属的命名空间。如果为空(null)则忽略命名空间即系统中的所有用户，如果为空字符串("")则查找未设置命名空间的用户集。</param>
 		/// <param name="paging">查询的分页设置，默认为第一页。</param>
 		/// <returns>返回当前命名空间中的所有角色对象集。</returns>
-		IEnumerable<Role> GetAllRoles(string @namespace, Zongsoft.Data.Paging paging = null);
+		IEnumerable<Role> GetRoles(string @namespace, Zongsoft.Data.Paging paging = null);
 
 		/// <summary>
 		/// 删除指定编号集的多个角色。
