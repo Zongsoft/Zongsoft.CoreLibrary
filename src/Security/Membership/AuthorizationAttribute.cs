@@ -65,7 +65,7 @@ namespace Zongsoft.Security.Membership
 			_actionId = actionId ?? string.Empty;
 			_schemaId = schemaId ?? string.Empty;
 
-			_mode = AuthorizationMode.Required;
+			_mode = AuthorizationMode.Requires;
 		}
 		#endregion
 
