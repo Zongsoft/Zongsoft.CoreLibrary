@@ -504,9 +504,60 @@ namespace Zongsoft.Reflection
 			}
 
 			if(setter == null)
-				SetMemberValueCore(owner, members[members.Length - 1], valueFactory);
+				SetMemberValueCore(owner, members[members.Length - 1], valueFactory, true);
 			else
 				setter(new MemberSettingContext<T>(owner, members[members.Length - 1], valueFactory, context));
+		}
+
+		public static bool TrySetMemberValue<T>(object origin, string path, T value, Func<MemberGettingContext, object> getter = null, Action<MemberSettingContext<T>> setter = null)
+		{
+			return TrySetMemberValue(origin, Resolve(path), () => value, getter, setter);
+		}
+
+		public static bool TrySetMemberValue<T>(object origin, string path, Func<T> valueFactory, Func<MemberGettingContext, object> getter = null, Action<MemberSettingContext<T>> setter = null)
+		{
+			return TrySetMemberValue(origin, Resolve(path), valueFactory, getter, setter);
+		}
+
+		public static bool TrySetMemberValue<T>(object origin, MemberToken[] members, T value, Func<MemberGettingContext, object> getter = null, Action<MemberSettingContext<T>> setter = null)
+		{
+			return TrySetMemberValue(origin, members, () => value, getter, setter);
+		}
+
+		public static bool TrySetMemberValue<T>(object origin, MemberToken[] members, Func<T> valueFactory, Func<MemberGettingContext, object> getter = null, Action<MemberSettingContext<T>> setter = null)
+		{
+			if(origin == null || members == null || valueFactory == null || members.Length == 0)
+				return false;
+
+			var owner = origin;
+			MemberGettingContext context = null;
+
+			for(int i = 0; i < members.Length - 1; i++)
+			{
+				if(getter == null)
+				{
+					if(!TryGetMemberValueCore(owner, members[i], out owner))
+						return false;
+				}
+				else
+				{
+					//创建获取操作上下文对象
+					context = new MemberGettingContext(owner, members[i], context);
+
+					//执行获取操作
+					owner = getter(context);
+
+					if(owner == null)
+						return false;
+				}
+			}
+
+			if(setter == null)
+				SetMemberValueCore(owner, members[members.Length - 1], valueFactory, false);
+			else
+				setter(new MemberSettingContext<T>(owner, members[members.Length - 1], valueFactory, context));
+
+			return true;
 		}
 		#endregion
 
@@ -622,7 +673,7 @@ namespace Zongsoft.Reflection
 			return false;
 		}
 
-		internal static void SetMemberValueCore<T>(object owner, MemberToken member, Func<T> valueFactory)
+		internal static void SetMemberValueCore<T>(object owner, MemberToken member, Func<T> valueFactory, bool throwsOnError)
 		{
 			if(owner == null)
 				throw new ArgumentNullException(nameof(owner));
@@ -630,8 +681,14 @@ namespace Zongsoft.Reflection
 			var type = owner is Type ? (Type)owner : owner.GetType();
 			var memberInfo = GetMemberInfo(type, member);
 
+			//如果没有找到指定的成员
 			if(memberInfo == null)
-				throw new ArgumentException(string.Format("The '{0}' member is not exists in the '{1}' type.", member, (owner is Type ? ((Type)owner).FullName : owner.GetType().FullName)));
+			{
+				if(throwsOnError)
+					throw new ArgumentException(string.Format("The '{0}' member is not exists in the '{1}' type.", member, (owner is Type ? ((Type)owner).FullName : owner.GetType().FullName)));
+
+				return;
+			}
 
 			switch(memberInfo.MemberType)
 			{
@@ -642,7 +699,9 @@ namespace Zongsoft.Reflection
 					((PropertyInfo)memberInfo).SetValue(owner, valueFactory());
 					break;
 				default:
-					throw new InvalidOperationException($"Dont support set value of '{member}' member in the '{type}' type.");
+					if(throwsOnError)
+						throw new InvalidOperationException($"Dont support set value of '{member}' member in the '{type}' type.");
+					return;
 			}
 		}
 

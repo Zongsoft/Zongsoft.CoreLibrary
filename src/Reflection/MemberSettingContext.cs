@@ -73,9 +73,9 @@ namespace Zongsoft.Reflection
 		#endregion
 
 		#region 公共方法
-		public void Setup()
+		public void Setup(bool throwsOnError = true)
 		{
-			MemberAccess.SetMemberValueCore(this.Owner, this.MemberToken, () => this.Value);
+			MemberAccess.SetMemberValueCore(this.Owner, this.MemberToken, () => this.Value, throwsOnError);
 		}
 		#endregion
 	}
