@@ -76,7 +76,7 @@ namespace Zongsoft.Options.Configuration
 			foreach(var section in configuration.Sections)
 			{
 				//必须先确保选项节对应的空节点被添加
-				var sectionNode = _root.FindNode(section.Path, token =>
+				var sectionNode = (OptionNode)_root.FindNode(section.Path, token =>
 				{
 					if(token.Current == null)
 					{
@@ -92,18 +92,17 @@ namespace Zongsoft.Options.Configuration
 				//在添加了选项上级空节点添加完成之后再添加选项元素的节点
 				foreach(var elementName in section.Children.Keys)
 				{
-					var node = (OptionNode)_root.FindNode(new string[] { section.Path, elementName }, token =>
+					var elementNode = sectionNode.Children[elementName];
+
+					if(elementNode == null)
 					{
-						if(token.Current == null)
-						{
-							var parent = token.Parent as OptionNode;
-
-							if(parent != null)
-								return parent.Children.Add(token.Name, configuration);
-						}
-
-						return token.Current;
-					});
+						sectionNode.Children.Add(elementName, configuration);
+					}
+					else
+					{
+						if(elementNode.Option == null)
+							elementNode.Option = new Option(elementNode, configuration);
+					}
 				}
 			}
 		}

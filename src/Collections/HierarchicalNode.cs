@@ -181,8 +181,9 @@ namespace Zongsoft.Collections
 		#region 保护方法
 		internal protected HierarchicalNode FindNode(string path, Func<HierarchicalNodeToken, HierarchicalNode> onStep = null)
 		{
+			//注意：一定要确保空字符串路径是返回自身
 			if(string.IsNullOrWhiteSpace(path))
-				return null;
+				return this;
 
 			return this.FindNode(path.Split(PathSeparatorChar), onStep);
 		}
