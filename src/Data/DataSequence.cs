@@ -101,12 +101,14 @@ namespace Zongsoft.Data
 		#region 公共方法
 		public long Increment(params string[] keys)
 		{
-			return this.Sequence.Increment(this.GetSequenceKey(keys));
+			DataSequenceToken token;
+			return this.Sequence.Increment(this.GetSequenceKey(keys, out token), 1, token.Seed);
 		}
 
 		public long Decrement(params string[] keys)
 		{
-			return this.Sequence.Decrement(this.GetSequenceKey(keys));
+			DataSequenceToken token;
+			return this.Sequence.Decrement(this.GetSequenceKey(keys, out token), 1, token.Seed);
 		}
 		#endregion
 
@@ -129,12 +131,11 @@ namespace Zongsoft.Data
 			return result;
 		}
 
-		private string GetSequenceKey(string[] keys)
+		private string GetSequenceKey(string[] keys, out DataSequenceToken token)
 		{
 			if(keys == null || keys.Length == 0)
 				throw new ArgumentNullException(nameof(keys));
 
-			DataSequenceToken token;
 			var cacheKey = this.GetCacheKey(keys);
 
 			if(!_cache.TryGetValue(cacheKey, out token))
