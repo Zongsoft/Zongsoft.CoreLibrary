@@ -203,6 +203,12 @@ namespace Zongsoft.Data
 				throw new KeyNotFoundException(string.Format("The '{0}' property is not existed.", key));
 		}
 
+		public void Set(string key, Func<object> valueThunk, Func<object, bool> predicate = null)
+		{
+			if(!this.TrySet(key, valueThunk, predicate))
+				throw new KeyNotFoundException(string.Format("The '{0}' property is not existed.", key));
+		}
+
 		public bool TrySet(string key, object value, Func<object, bool> predicate = null)
 		{
 			return this.TrySet(key, () => value, predicate);
@@ -212,7 +218,6 @@ namespace Zongsoft.Data
 		{
 			if(key == null)
 				throw new ArgumentNullException("key");
-
 			if(valueThunk == null)
 				throw new ArgumentNullException("valueThunk");
 

@@ -106,9 +106,15 @@ namespace Zongsoft.Data
 				throw new KeyNotFoundException(string.Format("The '{0}' property is not existed.", member));
 		}
 
+		public void Set<TMember>(Expression<Func<T, TMember>> member, Func<string, TMember> valueThunk, Func<TMember, bool> predicate = null)
+		{
+			if(!this.TrySet(member, valueThunk, predicate))
+				throw new KeyNotFoundException(string.Format("The '{0}' property is not existed.", member));
+		}
+
 		public bool TrySet<TMember>(Expression<Func<T, TMember>> member, TMember value, Func<TMember, bool> predicate = null)
 		{
-			return this.TrySet<TMember>(member, () => value, predicate);
+			return this.TrySet<TMember>(member, (string _) => value, predicate);
 		}
 
 		public bool TrySet<TMember>(Expression<Func<T, TMember>> member, Expression<Func<T, TMember>> valueExpression, Func<TMember, bool> predicate = null)
@@ -119,7 +125,7 @@ namespace Zongsoft.Data
 			if(valueExpression == null)
 				throw new ArgumentNullException("valueExpression");
 
-			return this.TrySet(member, () => this.Get(valueExpression), original =>
+			return this.TrySet(member, (string _) => this.Get(valueExpression), original =>
 			{
 				if(predicate == null)
 					return this.Contains(valueExpression);
@@ -128,20 +134,19 @@ namespace Zongsoft.Data
 			});
 		}
 
-		public bool TrySet<TMember>(Expression<Func<T, TMember>> member, Func<TMember> valueThunk, Func<TMember, bool> predicate = null)
+		public bool TrySet<TMember>(Expression<Func<T, TMember>> member, Func<string, TMember> valueThunk, Func<TMember, bool> predicate = null)
 		{
 			if(member == null)
 				throw new ArgumentNullException("member");
-
 			if(valueThunk == null)
 				throw new ArgumentNullException("valueThunk");
 
 			var tuple = Common.ExpressionUtility.GetMember(member);
 
 			if(predicate == null)
-				return this.TrySet(tuple.Item1, () => valueThunk(), null);
+				return this.TrySet(tuple.Item1, () => valueThunk(tuple.Item1), null);
 			else
-				return this.TrySet(tuple.Item1, () => valueThunk(), original => predicate((TMember)Zongsoft.Common.Convert.ConvertValue(original, tuple.Item2)));
+				return this.TrySet(tuple.Item1, () => valueThunk(tuple.Item1), original => predicate((TMember)Zongsoft.Common.Convert.ConvertValue(original, tuple.Item2)));
 		}
 		#endregion
 
