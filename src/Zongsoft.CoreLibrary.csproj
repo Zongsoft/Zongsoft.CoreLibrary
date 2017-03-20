@@ -96,14 +96,12 @@
     <Compile Include="Common\BitVector32.cs" />
     <Compile Include="Common\ExpressionUtility.cs" />
     <Compile Include="Common\IDisposableObject.cs" />
-    <Compile Include="Common\IAccumulator.cs" />
     <Compile Include="Common\IEventHandler.cs" />
     <Compile Include="Common\IEventHandler`1.cs" />
     <Compile Include="Common\IObjectReference.cs" />
     <Compile Include="Common\ISequence.cs" />
     <Compile Include="Common\ObjectReference.cs" />
     <Compile Include="Common\RandomGenerator.cs" />
-    <Compile Include="Common\SequenceInfo.cs" />
     <Compile Include="Common\TypeExtension.cs" />
     <Compile Include="Common\Buffer.cs" />
     <Compile Include="Communication\ChannelAsyncEventArgs.cs" />
@@ -120,6 +118,7 @@
     <Compile Include="Communication\PacketizerFactory.cs" />
     <Compile Include="Communication\ChannelPipelineContext.cs" />
     <Compile Include="Data\DataAccessMapper.cs" />
+    <Compile Include="Data\DataSequence.cs" />
     <Compile Include="Data\IDataAccessMapper.cs" />
     <Compile Include="Expressions\ITokenizer.cs" />
     <Compile Include="Expressions\Lexer.cs" />

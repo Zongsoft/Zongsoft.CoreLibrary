@@ -53,6 +53,7 @@ namespace Zongsoft.Data
 		#region 成员字段
 		private string _name;
 		private IDataAccess _dataAccess;
+		private DataSequence<TEntity> _sequence;
 		private Zongsoft.Services.IServiceProvider _serviceProvider;
 		#endregion
 
@@ -135,6 +136,17 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 保护属性
+		public DataSequence<TEntity> Sequence
+		{
+			get
+			{
+				if(_sequence == null)
+					System.Threading.Interlocked.CompareExchange(ref _sequence, new DataSequence<TEntity>(this, _serviceProvider.ResolveRequired<Zongsoft.Common.ISequence>()), null);
+
+				return _sequence;
+			}
+		}
+
 		protected virtual Zongsoft.Security.CredentialPrincipal Principal
 		{
 			get

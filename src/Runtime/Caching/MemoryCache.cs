@@ -29,7 +29,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Runtime.Caching
 {
-	public class MemoryCache : ICache, Zongsoft.Common.IDisposableObject, Zongsoft.Common.IAccumulator
+	public class MemoryCache : ICache, Zongsoft.Common.IDisposableObject, Zongsoft.Common.ISequence
 	{
 		#region 单例字段
 		public static readonly MemoryCache Default = new MemoryCache("Zongsoft.Runtime.Caching.MemoryCache");
@@ -271,15 +271,15 @@ namespace Zongsoft.Runtime.Caching
 		}
 		#endregion
 
-		#region 递增接口
-		public long Increment(string key, int interval = 1)
+		#region 序列号器
+		public long Increment(string key, int interval = 1, int seed = 0)
 		{
 			var value = this.GetValue(key);
 
 			if(value == null)
 			{
-				this.SetValue(key, interval);
-				return interval;
+				this.SetValue(key, seed);
+				return this.GetValue<long>(key);
 			}
 
 			long number;
@@ -294,9 +294,14 @@ namespace Zongsoft.Runtime.Caching
 			return number;
 		}
 
-		public long Decrement(string key, int interval = 1)
+		public long Decrement(string key, int interval = 1, int seed = 0)
 		{
 			return this.Increment(key, -interval);
+		}
+
+		void Zongsoft.Common.ISequence.Reset(string key, int value)
+		{
+			this.SetValue(key, value);
 		}
 		#endregion
 	}
