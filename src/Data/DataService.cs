@@ -64,18 +64,19 @@ namespace Zongsoft.Data
 				throw new ArgumentNullException("serviceProvider");
 
 			_serviceProvider = serviceProvider;
+			_dataAccess = serviceProvider.ResolveRequired<IDataAccess>();
 		}
 
 		public DataService(string name, Zongsoft.Services.IServiceProvider serviceProvider)
 		{
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException("name");
-
 			if(serviceProvider == null)
 				throw new ArgumentNullException("serviceProvider");
 
 			_name = name.Trim();
 			_serviceProvider = serviceProvider;
+			_dataAccess = serviceProvider.ResolveRequired<IDataAccess>();
 		}
 		#endregion
 
@@ -103,7 +104,6 @@ namespace Zongsoft.Data
 			}
 		}
 
-		[Zongsoft.Services.ServiceDependency]
 		public IDataAccess DataAccess
 		{
 			get
