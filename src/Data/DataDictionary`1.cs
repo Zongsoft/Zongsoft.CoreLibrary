@@ -102,14 +102,33 @@ namespace Zongsoft.Data
 
 		public void Set<TMember>(Expression<Func<T, TMember>> member, TMember value, Func<TMember, bool> predicate = null)
 		{
-			if(!this.TrySet(member, value, predicate))
-				throw new KeyNotFoundException(string.Format("The '{0}' property is not existed.", member));
+			this.Set<TMember>(member, name => value, predicate);
 		}
 
 		public void Set<TMember>(Expression<Func<T, TMember>> member, Func<string, TMember> valueThunk, Func<TMember, bool> predicate = null)
 		{
-			if(!this.TrySet(member, valueThunk, predicate))
-				throw new KeyNotFoundException(string.Format("The '{0}' property is not existed.", member));
+			if(member == null)
+				throw new ArgumentNullException("member");
+			if(valueThunk == null)
+				throw new ArgumentNullException("valueThunk");
+
+			var requiredThorws = true;
+			var predicateProxy = predicate;
+
+			//如果条件断言不为空，则必须进行是否抛出异常的条件处理
+			if(predicate != null)
+			{
+				//如果是因为设置条件没有通过，则不能抛出异常，因为这是设置方法的正常逻辑
+				predicateProxy = p => requiredThorws = predicate(p);
+			}
+
+			if(!this.TrySet(member, valueThunk, predicateProxy) && requiredThorws)
+			{
+				//获取指定的成员信息
+				var tuple = Common.ExpressionUtility.GetMember(member);
+
+				throw new KeyNotFoundException(string.Format("The '{0}' property is not existed.", tuple.Item1));
+			}
 		}
 
 		public bool TrySet<TMember>(Expression<Func<T, TMember>> member, TMember value, Func<TMember, bool> predicate = null)
@@ -141,6 +160,7 @@ namespace Zongsoft.Data
 			if(valueThunk == null)
 				throw new ArgumentNullException("valueThunk");
 
+			//获取指定的成员信息
 			var tuple = Common.ExpressionUtility.GetMember(member);
 
 			if(predicate == null)

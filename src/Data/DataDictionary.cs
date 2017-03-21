@@ -199,13 +199,22 @@ namespace Zongsoft.Data
 
 		public void Set(string key, object value, Func<object, bool> predicate = null)
 		{
-			if(!this.TrySet(key, value, predicate))
-				throw new KeyNotFoundException(string.Format("The '{0}' property is not existed.", key));
+			this.Set(key, () => value, predicate);
 		}
 
 		public void Set(string key, Func<object> valueThunk, Func<object, bool> predicate = null)
 		{
-			if(!this.TrySet(key, valueThunk, predicate))
+			var requiredThorws = true;
+			var predicateProxy = predicate;
+
+			//如果条件断言不为空，则必须进行是否抛出异常的条件处理
+			if(predicate != null)
+			{
+				//如果是因为设置条件没有通过，则不能抛出异常，因为这是设置方法的正常逻辑
+				predicateProxy = p => requiredThorws = predicate(p);
+			}
+
+			if(!this.TrySet(key, valueThunk, predicateProxy) && requiredThorws)
 				throw new KeyNotFoundException(string.Format("The '{0}' property is not existed.", key));
 		}
 
