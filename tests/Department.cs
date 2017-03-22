@@ -32,6 +32,24 @@ namespace Zongsoft.Tests
 
 		#region 公共属性
 		/// <summary>
+		/// 获取或设置企业编号。
+		/// </summary>
+		public int CorporationId
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// 获取或设置部门编号。
+		/// </summary>
+		public short DepartmentId
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
 		/// 获取或设置部门的名称。
 		/// </summary>
 		public string Name

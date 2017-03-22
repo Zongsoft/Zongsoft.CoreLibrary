@@ -37,6 +37,15 @@ namespace Zongsoft.Tests
 	public class Employee : Person
 	{
 		/// <summary>
+		/// 获取或设置员工编号。
+		/// </summary>
+		public int EmployeeId
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
 		/// 获取或设置员工所属的部门。
 		/// </summary>
 		public Department Department
