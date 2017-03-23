@@ -34,12 +34,15 @@ namespace Zongsoft.IO
 	{
 		#region 成员字段
 		private long _size;
+		private string _type;
 		private byte[] _checksum;
 		#endregion
 
 		#region 构造函数
 		protected FileInfo()
 		{
+			_size = -1;
+			_type = string.Empty;
 		}
 
 		public FileInfo(string path, long size, DateTime? createdTime = null, DateTime? modifiedTime = null, string url = null) : base(path, createdTime, modifiedTime, url)
@@ -56,14 +59,14 @@ namespace Zongsoft.IO
 			: base(path, createdTime, modifiedTime, url)
 		{
 			_size = size;
-			_checksum = checksum;
+			this.Checksum = checksum;
 		}
 
 		public FileInfo(Path path, long size, byte[] checksum, DateTime? createdTime = null, DateTime? modifiedTime = null, string url = null)
 			: base(path, createdTime, modifiedTime, url)
 		{
 			_size = size;
-			_checksum = checksum;
+			this.Checksum = checksum;
 		}
 		#endregion
 
@@ -76,7 +79,7 @@ namespace Zongsoft.IO
 			}
 			set
 			{
-				_checksum = value;
+				_checksum = (value != null && value.Length == 0) ? null : value;
 			}
 		}
 
@@ -89,6 +92,18 @@ namespace Zongsoft.IO
 			set
 			{
 				_size = value;
+			}
+		}
+
+		public string Type
+		{
+			get
+			{
+				return _type;
+			}
+			set
+			{
+				_type = string.IsNullOrWhiteSpace(value) ? string.Empty : value.Trim();
 			}
 		}
 
