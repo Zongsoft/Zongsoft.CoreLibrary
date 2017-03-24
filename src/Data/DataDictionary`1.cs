@@ -166,7 +166,7 @@ namespace Zongsoft.Data
 			if(predicate == null)
 				return this.TrySet(tuple.Item1, () => valueThunk(tuple.Item1), null);
 			else
-				return this.TrySet(tuple.Item1, () => valueThunk(tuple.Item1), original => predicate((TMember)System.Convert.ChangeType(Zongsoft.Common.Convert.ConvertValue(original, tuple.Item2), typeof(TMember))));
+				return this.TrySet(tuple.Item1, () => valueThunk(tuple.Item1), original => predicate((TMember)Zongsoft.Common.Convert.ConvertValue(original, tuple.Item2)));
 		}
 		#endregion
 
