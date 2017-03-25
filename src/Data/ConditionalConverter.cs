@@ -84,21 +84,24 @@ namespace Zongsoft.Data
 		#region 公共方法
 		public virtual ICondition Convert(ConditionalConverterContext context)
 		{
-			//如果当前属性值为默认值，则忽略它
-			if(this.IsDefaultValue(context))
+			Type type;
+			object value;
+
+			//判断当前属性是否可以忽略
+			if(this.IsIgnorable(context, out type, out value))
 				return null;
 
 			var opt = context.Operator;
-			var isRange = Zongsoft.Common.TypeExtension.IsAssignableFrom(typeof(ConditionalRange), context.Type);
+			var isRange = Zongsoft.Common.TypeExtension.IsAssignableFrom(typeof(ConditionalRange), type);
 
 			//只有当属性没有指定运算符并且不是区间属性，才需要生成运算符
 			if(opt == null && (!isRange))
 			{
 				opt = ConditionOperator.Equal;
 
-				if(context.Type == typeof(string) && context.Value != null)
+				if(type == typeof(string) && value != null)
 					opt = ConditionOperator.Like;
-				else if(typeof(IEnumerable).IsAssignableFrom(context.Type) || Zongsoft.Common.TypeExtension.IsAssignableFrom(typeof(IEnumerable<>), context.Type))
+				else if(typeof(IEnumerable).IsAssignableFrom(type) || Zongsoft.Common.TypeExtension.IsAssignableFrom(typeof(IEnumerable<>), type))
 					opt = ConditionOperator.In;
 			}
 
@@ -106,9 +109,9 @@ namespace Zongsoft.Data
 			if(context.Names.Length == 1)
 			{
 				if(isRange)
-					return ((ConditionalRange)context.Value).ToCondition(context.Names[0]);
+					return ((ConditionalRange)value).ToCondition(context.Names[0]);
 				else
-					return new Condition(context.Names[0], (opt == ConditionOperator.Like && _wildcard != '\0' ? _wildcard + context.Value.ToString().Trim(_wildcard) + _wildcard : context.Value), opt.Value);
+					return new Condition(context.Names[0], (opt == ConditionOperator.Like && _wildcard != '\0' ? _wildcard + value.ToString().Trim(_wildcard) + _wildcard : value), opt.Value);
 			}
 
 			//当一个属性对应多个条件，则这些条件之间以“或”关系进行组合
@@ -117,9 +120,9 @@ namespace Zongsoft.Data
 			foreach(var name in context.Names)
 			{
 				if(isRange)
-					conditions.Add(((ConditionalRange)context.Value).ToCondition(name));
+					conditions.Add(((ConditionalRange)value).ToCondition(name));
 				else
-					conditions.Add(new Condition(name, (opt == ConditionOperator.Like && _wildcard != '\0' ? _wildcard + context.Value.ToString().Trim(_wildcard) + _wildcard : context.Value), opt.Value));
+					conditions.Add(new Condition(name, (opt == ConditionOperator.Like && _wildcard != '\0' ? _wildcard + value.ToString().Trim(_wildcard) + _wildcard : value), opt.Value));
 			}
 
 			return conditions;
@@ -127,21 +130,24 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 保护方法
-		protected bool IsDefaultValue(ConditionalConverterContext context)
+		protected bool IsIgnorable(ConditionalConverterContext context, out Type type, out object value)
 		{
+			type = context.Type;
+			value = context.Value;
+
+			if(Zongsoft.Common.TypeExtension.IsAssignableFrom(typeof(ConditionalValue<>), context.Type))
+			{
+				if(context.Value == null)
+					return true;
+
+				type = context.Value.GetType().GetGenericArguments()[0];
+				value = System.ComponentModel.TypeDescriptor.GetProperties(context.Type).Find("Value", true).GetValue(context.Value);
+			}
+
 			if(Zongsoft.Common.TypeExtension.IsAssignableFrom(typeof(ConditionalRange), context.Type))
-				return ConditionalRange.IsEmpty(context.Value as ConditionalRange);
+				return ConditionalRange.IsEmpty((ConditionalRange)context.Value);
 
-			if(context.Value == null || System.Convert.IsDBNull(context.Value))
-				return context.DefaultValue == null || System.Convert.IsDBNull(context.DefaultValue);
-
-			if(context.DefaultValue == null)
-				return false;
-
-			object defaultValue;
-
-			return Zongsoft.Common.Convert.TryConvertValue(context.DefaultValue, context.Value.GetType(), out defaultValue) &&
-				   object.Equals(context.Value, defaultValue);
+			return false;
 		}
 		#endregion
 	}

@@ -130,6 +130,21 @@ namespace Zongsoft.Data
 		}
 		#endregion
 
+		#region 重写方法
+		protected override object OnPropertySet(string name, Type type, object oldValue, object newValue)
+		{
+			if(Common.TypeExtension.IsAssignableFrom(typeof(ConditionalValue<>), type))
+			{
+				if(oldValue == null)
+					return Activator.CreateInstance(type, Common.Convert.ConvertValue(newValue, type.GetGenericArguments()[0]));
+				else
+					return newValue;
+			}
+
+			return base.OnPropertySet(name, type, oldValue, newValue);
+		}
+		#endregion
+
 		#region 公共方法
 		public virtual ConditionCollection ToConditions()
 		{
@@ -164,7 +179,7 @@ namespace Zongsoft.Data
 			var names = this.GetConditionNames(property);
 
 			//创建转换器上下文
-			var context = new ConditionalConverterContext(this, names, property.PropertyType, property.GetValue(this), property.Operator, property.DefaultValue);
+			var context = new ConditionalConverterContext(this, names, property.PropertyType, property.GetValue(this), property.Operator);
 
 			//如果当前属性指定了特定的转换器，则使用该转换器来处理
 			if(property.Converter != null)
@@ -219,7 +234,6 @@ namespace Zongsoft.Data
 			public readonly Type PropertyType;
 			public readonly PropertyInfo Info;
 			public readonly ConditionalAttribute Attribute;
-			public readonly object DefaultValue;
 			public readonly IConditionalConverter Converter;
 
 			public ConditionalPropertyDescripor(PropertyInfo property, ConditionalAttribute attribute)
@@ -228,11 +242,6 @@ namespace Zongsoft.Data
 				this.Attribute = attribute;
 				this.Name = property.Name;
 				this.PropertyType = property.PropertyType;
-
-				var defaultAttribute = property.GetCustomAttribute<System.ComponentModel.DefaultValueAttribute>(true);
-
-				if(defaultAttribute != null)
-					this.DefaultValue = Convert.IsDBNull(defaultAttribute.Value) ? null : defaultAttribute.Value;
 
 				if(attribute != null && attribute.ConverterType != null)
 					this.Converter = Activator.CreateInstance(attribute.ConverterType) as IConditionalConverter;

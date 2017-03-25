@@ -36,12 +36,11 @@ namespace Zongsoft.Data
 		private string[] _names;
 		private Type _type;
 		private object _value;
-		private object _defaultValue;
 		private ConditionOperator? _operator;
 		#endregion
 
 		#region 构造函数
-		public ConditionalConverterContext(IConditional conditional, string[] names, Type type, object value, ConditionOperator? @operator = null, object defaultValue = null)
+		public ConditionalConverterContext(IConditional conditional, string[] names, Type type, object value, ConditionOperator? @operator = null)
 		{
 			if(conditional == null)
 				throw new ArgumentNullException("conditional");
@@ -57,7 +56,6 @@ namespace Zongsoft.Data
 			_type = type;
 			_value = value;
 			_operator = @operator;
-			_defaultValue = defaultValue;
 		}
 		#endregion
 
@@ -91,14 +89,6 @@ namespace Zongsoft.Data
 			get
 			{
 				return _value;
-			}
-		}
-
-		public object DefaultValue
-		{
-			get
-			{
-				return _defaultValue;
 			}
 		}
 
