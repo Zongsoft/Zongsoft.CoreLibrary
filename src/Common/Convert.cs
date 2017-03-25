@@ -82,7 +82,7 @@ namespace Zongsoft.Common
 				type = conversionType.GetGenericArguments()[0];
 
 			if(type == value.GetType() || type.IsAssignableFrom(value.GetType()))
-				return System.Convert.ChangeType(value, type);
+				return value;
 
 			try
 			{
