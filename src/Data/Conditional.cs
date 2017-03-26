@@ -29,6 +29,7 @@ using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
+using Zongsoft.ComponentModel;
 
 namespace Zongsoft.Data
 {
@@ -130,30 +131,16 @@ namespace Zongsoft.Data
 		}
 		#endregion
 
-		#region 重写方法
-		protected override object OnPropertySet(string name, Type type, object oldValue, object newValue)
-		{
-			if(Common.TypeExtension.IsAssignableFrom(typeof(ConditionalValue<>), type))
-			{
-				if(oldValue == null)
-					return Activator.CreateInstance(type, Common.Convert.ConvertValue(newValue, type.GetGenericArguments()[0]));
-				else
-					return newValue;
-			}
-
-			return base.OnPropertySet(name, type, oldValue, newValue);
-		}
-		#endregion
-
 		#region 公共方法
 		public virtual ConditionCollection ToConditions()
 		{
 			ConditionCollection conditions = null;
 			var descriptor = _cache.GetOrAdd(this.GetType(), type => new ConditionalDescriptor(type));
 
-			foreach(var property in descriptor.Properties)
+			//只遍历基类属性字典中的属性（即显式设置过的属性）
+			foreach(var property in this.Properties)
 			{
-				var condition = this.GenerateCondition(property);
+				var condition = this.GenerateCondition(descriptor.Properties[property.Key]);
 
 				if(condition != null)
 				{
@@ -202,14 +189,14 @@ namespace Zongsoft.Data
 		private class ConditionalDescriptor
 		{
 			public readonly Type Type;
-			public readonly ConditionalPropertyDescripor[] Properties;
+			public readonly IDictionary<string, ConditionalPropertyDescripor> Properties;
 
 			public ConditionalDescriptor(Type type)
 			{
 				this.Type = type;
 
 				var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
-				var list = new List<ConditionalPropertyDescripor>(properties.Length);
+				this.Properties = new ConcurrentDictionary<string, ConditionalPropertyDescripor>();
 
 				foreach(var property in properties)
 				{
@@ -221,10 +208,8 @@ namespace Zongsoft.Data
 					if(attribute != null && attribute.Ignored)
 						continue;
 
-					list.Add(new ConditionalPropertyDescripor(property, attribute));
+					this.Properties.Add(property.Name, new ConditionalPropertyDescripor(property, attribute));
 				}
-
-				this.Properties = list.ToArray();
 			}
 		}
 

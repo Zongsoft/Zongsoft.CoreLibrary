@@ -154,7 +154,7 @@ namespace Zongsoft.ComponentModel
 				if(property == null)
 					throw new ArgumentException($"The '{propertyName}' property is not existed.");
 
-				token = new PropertyToken(property.PropertyType, null);
+				token = this.CreatePropertyToken(property.Name, property.PropertyType, null);
 			}
 
 			//调用属性设置通知
@@ -226,7 +226,7 @@ namespace Zongsoft.ComponentModel
 
 			//如果指定的属性没有被缓存
 			if(!properties.TryGetValue(property.Name, out token))
-				token = new PropertyToken(property.PropertyType, null);
+				token = this.CreatePropertyToken(property.Name, property.PropertyType, null);
 
 			//调用属性设置通知
 			token.Value = this.OnPropertySet(property.Name, token.Type, token.Value, value);
@@ -246,6 +246,11 @@ namespace Zongsoft.ComponentModel
 		protected virtual object OnPropertySet(string name, Type type, object oldValue, object newValue)
 		{
 			return newValue;
+		}
+
+		protected virtual PropertyToken CreatePropertyToken(string name, Type type, object value)
+		{
+			return new PropertyToken(name, type, value);
 		}
 		#endregion
 
@@ -307,14 +312,18 @@ namespace Zongsoft.ComponentModel
 		#region 嵌套子类
 		public class PropertyToken
 		{
+			public string Name;
 			public object Value;
 			public readonly Type Type;
 
-			public PropertyToken(Type type, object value)
+			public PropertyToken(string name, Type type, object value)
 			{
+				if(string.IsNullOrWhiteSpace((name)))
+					throw new ArgumentNullException(nameof(name));
 				if(type == null)
 					throw new ArgumentNullException(nameof(type));
 
+				this.Name = name;
 				this.Type = type;
 				this.Value = value;
 			}

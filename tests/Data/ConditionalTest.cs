@@ -22,21 +22,13 @@ namespace Zongsoft.Data
 			conditional.CorporationId = 0;
 			conditional.DepartmentId = null;
 			Assert.NotNull(conditional.CorporationId);
-			Assert.NotNull(conditional.DepartmentId);
+			Assert.Null(conditional.DepartmentId);
 			Assert.Equal(0, conditional.CorporationId);
-			Assert.Null(conditional.DepartmentId.Value);
-
-			conditions = conditional.ToConditions();
-			Assert.Equal(2, conditions.Count);
-			Assert.Equal("CorporationId", ((Condition)conditions[0]).Name);
-			Assert.Equal(0, ((Condition)conditions[0]).Value);
-			Assert.Equal("DepartmentId", ((Condition)conditions[1]).Name);
-			Assert.Null(((Condition)conditions[1]).Value);
 		}
 
 		public class DummyConditional : Conditional
 		{
-			public ConditionalValue<int?> CorporationId
+			public int? CorporationId
 			{
 				get
 				{
@@ -48,7 +40,7 @@ namespace Zongsoft.Data
 				}
 			}
 
-			public ConditionalValue<short?> DepartmentId
+			public short? DepartmentId
 			{
 				get
 				{
@@ -56,12 +48,12 @@ namespace Zongsoft.Data
 				}
 				set
 				{
-					this.SetPropertyValue(() => this.DepartmentId, (ConditionalValue<short?>)value);
+					this.SetPropertyValue(() => this.DepartmentId, value);
 				}
 			}
 
 			[Conditional("Name", "PinYin")]
-			public ConditionalValue<string> Name
+			public string Name
 			{
 				get
 				{
