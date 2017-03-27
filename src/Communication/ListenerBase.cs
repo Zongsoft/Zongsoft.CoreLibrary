@@ -25,13 +25,8 @@
  */
 
 using System;
-using System.Net;
-using System.ComponentModel;
-using System.Collections.Generic;
-using System.Text;
 
 using Zongsoft.Services;
-using Zongsoft.Services.Composition;
 
 namespace Zongsoft.Communication
 {
@@ -51,7 +46,7 @@ namespace Zongsoft.Communication
 
 		#region 成员变量
 		private IReceiver _receiver;
-		private IExecutor _executor;
+		private Composition.IExecutor _executor;
 		#endregion
 
 		#region 构造函数
@@ -99,7 +94,7 @@ namespace Zongsoft.Communication
 			}
 		}
 
-		public IExecutor Executor
+		public Composition.IExecutor Executor
 		{
 			get
 			{
@@ -125,7 +120,7 @@ namespace Zongsoft.Communication
 			return this;
 		}
 
-		protected virtual IExecutor CreateExecutor()
+		protected virtual Composition.IExecutor CreateExecutor()
 		{
 			return new Utility.CommunicationExecutor(this);
 		}

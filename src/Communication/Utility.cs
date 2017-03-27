@@ -25,18 +25,15 @@
  */
 
 using System;
-using System.IO;
-using System.Collections.Generic;
 
-using Zongsoft.Services;
-using Zongsoft.Services.Composition;
+using Zongsoft.Communication.Composition;
 
 namespace Zongsoft.Communication
 {
 	internal static class Utility
 	{
 		#region 公共方法
-		public static void ProcessReceive(IExecutor executor, ReceivedEventArgs args)
+		public static void ProcessReceive(Composition.IExecutor executor, ReceivedEventArgs args)
 		{
 			if(args == null)
 				throw new ArgumentNullException("args");
@@ -51,7 +48,7 @@ namespace Zongsoft.Communication
 		#endregion
 
 		#region 嵌套子类
-		public class CommunicationExecutor : Zongsoft.Services.Composition.Executor
+		public class CommunicationExecutor : Composition.Executor
 		{
 			internal CommunicationExecutor(object host) : base(host)
 			{

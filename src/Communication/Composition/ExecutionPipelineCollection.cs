@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2011-2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2013 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -26,29 +26,45 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
-namespace Zongsoft.Communication
+namespace Zongsoft.Communication.Composition
 {
-	public class ChannelContext : Composition.ExecutionContext, IChannelContext
+	public class ExecutionPipelineCollection : Zongsoft.Collections.Collection<ExecutionPipeline>
 	{
-		#region 成员变量
-		private IChannel _channel;
-		#endregion
-
 		#region 构造函数
-		public ChannelContext(Composition.IExecutor executor, object data, IChannel channel) : base(executor, data)
+		public ExecutionPipelineCollection()
 		{
-			_channel = channel;
+		}
+
+		public ExecutionPipelineCollection(IEnumerable<ExecutionPipeline> pipelines) : base(pipelines)
+		{
 		}
 		#endregion
 
-		#region 公共属性
-		public IChannel Channel
+		#region 重写方法
+		protected override bool TryConvertItem(object value, out ExecutionPipeline item)
 		{
-			get
+			if(value is IExecutionHandler)
 			{
-				return _channel;
+				item = new ExecutionPipeline((IExecutionHandler)value);
+				return true;
 			}
+
+			return base.TryConvertItem(value, out item);
+		}
+		#endregion
+
+		#region 公共方法
+		public ExecutionPipeline Add(IExecutionHandler handler, Services.IPredication predication = null)
+		{
+			if(handler == null)
+				throw new ArgumentNullException("handler");
+
+			var item = new ExecutionPipeline(handler, predication);
+			base.Add(item);
+
+			return item;
 		}
 		#endregion
 	}

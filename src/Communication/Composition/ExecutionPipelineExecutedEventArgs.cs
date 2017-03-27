@@ -25,17 +25,14 @@
  */
 
 using System;
+using System.Collections.Generic;
 
-namespace Zongsoft.Communication
+namespace Zongsoft.Communication.Composition
 {
-	public interface IChannelContext : Composition.IExecutionContext
+	public class ExecutionPipelineExecutedEventArgs : ExecutionEventArgs<IExecutionPipelineContext>
 	{
-		/// <summary>
-		/// 获取当前通讯的<seealso cref="IChannel"/>通道。
-		/// </summary>
-		IChannel Channel
+		public ExecutionPipelineExecutedEventArgs(IExecutionPipelineContext context) : base(context)
 		{
-			get;
 		}
 	}
 }

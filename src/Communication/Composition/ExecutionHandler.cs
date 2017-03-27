@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2011-2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2013 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -27,28 +27,59 @@
 using System;
 using System.Collections.Generic;
 
-namespace Zongsoft.Communication
+namespace Zongsoft.Communication.Composition
 {
-	public class ChannelContext : Composition.ExecutionContext, IChannelContext
+	public class ExecutionHandler : ExecutionHandlerBase
 	{
-		#region 成员变量
-		private IChannel _channel;
+		#region 成员字段
+		private Services.ICommand _command;
 		#endregion
 
 		#region 构造函数
-		public ChannelContext(Composition.IExecutor executor, object data, IChannel channel) : base(executor, data)
+		public ExecutionHandler()
 		{
-			_channel = channel;
+		}
+
+		public ExecutionHandler(Services.ICommand command)
+		{
+			if(command == null)
+				throw new ArgumentNullException("command");
+
+			_command = command;
+			this.Name = command.Name;
 		}
 		#endregion
 
 		#region 公共属性
-		public IChannel Channel
+		public Services.ICommand Command
 		{
 			get
 			{
-				return _channel;
+				return _command;
 			}
+			set
+			{
+				if(value == null)
+					throw new ArgumentNullException();
+
+				_command = value;
+			}
+		}
+		#endregion
+
+		#region 重写方法
+		public override bool CanHandle(IExecutionPipelineContext context)
+		{
+			if(_command == null)
+				return false;
+
+			return base.CanHandle(context) && _command.CanExecute(context);
+		}
+
+		protected override void OnExecute(IExecutionPipelineContext context)
+		{
+			if(_command != null)
+				context.Result = _command.Execute(context);
 		}
 		#endregion
 	}

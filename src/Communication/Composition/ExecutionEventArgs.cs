@@ -25,17 +25,34 @@
  */
 
 using System;
+using System.Collections.Generic;
 
-namespace Zongsoft.Communication
+namespace Zongsoft.Communication.Composition
 {
-	public interface IChannelContext : Composition.IExecutionContext
+	public class ExecutionEventArgs<TContext> : EventArgs where TContext : IExecutionContext
 	{
-		/// <summary>
-		/// 获取当前通讯的<seealso cref="IChannel"/>通道。
-		/// </summary>
-		IChannel Channel
+		#region 成员字段
+		private TContext _context;
+		#endregion
+
+		#region 构造函数
+		public ExecutionEventArgs(TContext context)
 		{
-			get;
+			if(context == null)
+				throw new ArgumentNullException("context");
+
+			_context = context;
 		}
+		#endregion
+
+		#region 公共属性
+		public TContext Context
+		{
+			get
+			{
+				return _context;
+			}
+		}
+		#endregion
 	}
 }

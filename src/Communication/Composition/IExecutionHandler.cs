@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2013 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,17 +25,26 @@
  */
 
 using System;
+using System.Collections.Generic;
 
-namespace Zongsoft.Communication
+namespace Zongsoft.Communication.Composition
 {
-	public interface IChannelContext : Composition.IExecutionContext
+	/// <summary>
+	/// 提供执行处理程序的功能。
+	/// </summary>
+	public interface IExecutionHandler
 	{
 		/// <summary>
-		/// 获取当前通讯的<seealso cref="IChannel"/>通道。
+		/// 确认当前处理程序能否处理本次执行请求。
 		/// </summary>
-		IChannel Channel
-		{
-			get;
-		}
+		/// <param name="context">当前执行上下文对象。</param>
+		/// <returns>如果能处理本次执行请求则返回真(true)，否则返回假(false)。</returns>
+		bool CanHandle(IExecutionPipelineContext context);
+
+		/// <summary>
+		/// 处理本次执行请求。
+		/// </summary>
+		/// <param name="context">当前执行上下文对象。</param>
+		void Handle(IExecutionPipelineContext context);
 	}
 }

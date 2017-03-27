@@ -27,19 +27,16 @@
 using System;
 using System.Collections.Generic;
 
-using Zongsoft.Services;
-using Zongsoft.Services.Composition;
-
 namespace Zongsoft.Communication
 {
-	public class ChannelPipelineContext : ExecutionPipelineContext, IChannelContext
+	public class ChannelPipelineContext : Composition.ExecutionPipelineContext, IChannelContext
 	{
 		#region 成员字段
 		private IChannel _channel;
 		#endregion
 
 		#region 构造函数
-		public ChannelPipelineContext(IExecutionContext context, ExecutionPipeline pipeline, object data, IChannel channel) : base(context, pipeline, data)
+		public ChannelPipelineContext(Composition.IExecutionContext context, Composition.ExecutionPipeline pipeline, object data, IChannel channel) : base(context, pipeline, data)
 		{
 			_channel = channel;
 		}

@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,17 +25,35 @@
  */
 
 using System;
+using System.Collections.Generic;
 
-namespace Zongsoft.Communication
+namespace Zongsoft.Communication.Composition
 {
-	public interface IChannelContext : Composition.IExecutionContext
+	public class ExecutingEventArgs : ExecutionEventArgs<IExecutionContext>
 	{
-		/// <summary>
-		/// 获取当前通讯的<seealso cref="IChannel"/>通道。
-		/// </summary>
-		IChannel Channel
+		#region 成员字段
+		private bool _cancel;
+		#endregion
+
+		#region 构造函数
+		public ExecutingEventArgs(IExecutionContext context, bool cancel = false) : base(context)
 		{
-			get;
+			_cancel = cancel;
 		}
+		#endregion
+
+		#region 公共属性
+		public bool Cancel
+		{
+			get
+			{
+				return _cancel;
+			}
+			set
+			{
+				_cancel = value;
+			}
+		}
+		#endregion
 	}
 }

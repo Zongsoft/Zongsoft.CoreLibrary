@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2014 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,15 +25,32 @@
  */
 
 using System;
+using System.Collections.Generic;
 
-namespace Zongsoft.Communication
+namespace Zongsoft.Communication.Composition
 {
-	public interface IChannelContext : Composition.IExecutionContext
+	public interface IExecutionPipelineContext : IExecutionContext
 	{
 		/// <summary>
-		/// 获取当前通讯的<seealso cref="IChannel"/>通道。
+		/// 获取当前上下文所属的执行管道。
 		/// </summary>
-		IChannel Channel
+		ExecutionPipeline Pipeline
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 判断当前管道是否有子管道集。
+		/// </summary>
+		bool HasChildren
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取当前管道的子管道集合。
+		/// </summary>
+		ExecutionPipelineCollection Children
 		{
 			get;
 		}
