@@ -58,6 +58,7 @@ namespace Zongsoft.ComponentModel
 		private IPrincipal _principal;
 		private ICollection<IApplicationModule> _modules;
 		private Options.ISettingsProvider _settings;
+		private IDictionary<string, object> _states;
 		#endregion
 
 		#region 构造函数
@@ -265,6 +266,20 @@ namespace Zongsoft.ComponentModel
 					//激发“PropertyChanged”事件
 					this.OnPropertyChanged("Principal");
 				}
+			}
+		}
+
+		/// <summary>
+		/// 获取当前应用的状态字典。
+		/// </summary>
+		public virtual IDictionary<string, object> States
+		{
+			get
+			{
+				if(_states == null)
+					System.Threading.Interlocked.CompareExchange(ref _states, new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase), null);
+
+				return _states;
 			}
 		}
 		#endregion
