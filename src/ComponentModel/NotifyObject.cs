@@ -162,7 +162,7 @@ namespace Zongsoft.ComponentModel
 
 			//设置属性值
 			properties.AddOrUpdate(propertyName, token, (_, original) => {
-				changed = object.Equals(token.Value, original.Value);
+				changed = !object.Equals(token.Value, original.Value);
 				return token;
 			});
 
@@ -233,7 +233,7 @@ namespace Zongsoft.ComponentModel
 
 			//设置属性值
 			properties.AddOrUpdate(property.Name, token, (_, original) => {
-				changed = object.Equals(token.Value, original.Value);
+				changed = !object.Equals(token.Value, original.Value);
 				return token;
 			});
 
