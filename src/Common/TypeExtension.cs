@@ -26,6 +26,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Zongsoft.Common
@@ -122,6 +123,26 @@ namespace Zongsoft.Common
 			}
 
 			return type.IsAssignableFrom(instanceType);
+		}
+
+		public static bool IsEnumerable(this Type type)
+		{
+			return typeof(IEnumerable).IsAssignableFrom(type) || IsAssignableFrom(typeof(IEnumerable<>), type);
+		}
+
+		public static bool IsCollection(this Type type)
+		{
+			return typeof(ICollection).IsAssignableFrom(type) || IsAssignableFrom(typeof(ICollection<>), type);
+		}
+
+		public static bool IsList(this Type type)
+		{
+			return typeof(IList).IsAssignableFrom(type) || IsAssignableFrom(typeof(IList<>), type);
+		}
+
+		public static bool IsDictionary(this Type type)
+		{
+			return typeof(IDictionary).IsAssignableFrom(type) || IsAssignableFrom(typeof(IDictionary<,>), type);
 		}
 
 		public static bool IsScalarType(this Type type)

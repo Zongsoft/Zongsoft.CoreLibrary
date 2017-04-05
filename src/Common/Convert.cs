@@ -63,7 +63,7 @@ namespace Zongsoft.Common
 		public static object ConvertValue(object value, Type conversionType, Func<object> defaultValueThunk)
 		{
 			if(defaultValueThunk == null)
-				throw new ArgumentNullException("defaultValueThunk");
+				throw new ArgumentNullException(nameof(defaultValueThunk));
 
 			if(conversionType == null)
 				return value;

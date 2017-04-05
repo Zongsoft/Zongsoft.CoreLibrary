@@ -27,6 +27,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Linq.Expressions;
 
 namespace Zongsoft.Data
@@ -63,11 +64,11 @@ namespace Zongsoft.Data
 				throw new ArgumentNullException("member");
 
 			object result;
-			var tuple = Common.ExpressionUtility.GetMember(member);
+			var name = Common.ExpressionUtility.GetMemberName(member);
 
-			if(this.TryGet(tuple.Item1, out result))
+			if(this.TryGet(name, out result))
 			{
-				if(Zongsoft.Common.Convert.TryConvertValue(result, tuple.Item2, out result))
+				if(Zongsoft.Common.Convert.TryConvertValue(result, typeof(TMember), out result))
 					return (TMember)result;
 			}
 
@@ -82,8 +83,8 @@ namespace Zongsoft.Data
 			if(onGot == null)
 				throw new ArgumentNullException("onGot");
 
-			var tuple = Common.ExpressionUtility.GetMember(member);
-			return this.TryGet(tuple.Item1, value => onGot(tuple.Item1, (TMember)Zongsoft.Common.Convert.ConvertValue(value, tuple.Item2)));
+			var name = Common.ExpressionUtility.GetMemberName(member);
+			return this.TryGet(name, value => onGot(name, (TMember)this.ConvertValue(value, typeof(TMember))));
 		}
 
 		public bool TryGet<TMember>(Expression<Func<T, TMember>> member, out TMember result)
@@ -202,6 +203,98 @@ namespace Zongsoft.Data
 						yield return GetDataDictionary(item);
 				}
 			}
+		}
+		#endregion
+
+		#region 私有方法
+		private object ConvertValue(object value, Type conversionType)
+		{
+			object result;
+
+			//如果类型转换成功，则直接返回
+			if(Common.Convert.TryConvertValue(value, conversionType, out result))
+				return result;
+
+			if(value == null)
+				return Common.TypeExtension.GetDefaultValue(conversionType);
+
+			if(conversionType.IsInterface)
+			{
+				if(Common.TypeExtension.IsEnumerable(conversionType))
+				{
+					if(conversionType.IsGenericType)
+					{
+						conversionType = conversionType.GetGenericArguments()[0];
+						result = Activator.CreateInstance(typeof(List<>).MakeGenericType(conversionType));
+					}
+					else
+					{
+						conversionType = typeof(object);
+						result = new List<object>();
+					}
+				}
+				else
+				{
+					throw new InvalidOperationException();
+				}
+			}
+
+			if(result is IList)
+			{
+				this.MapMany(value, (IList)result, conversionType);
+				return result;
+			}
+			else
+			{
+				return this.MapSingle(value, conversionType);
+			}
+		}
+
+		private void MapMany(object source, IList destination, Type conversionType)
+		{
+			var items = source as IEnumerable;
+
+			if(items == null)
+				destination.Add(MapSingle(source, conversionType));
+			else
+			{
+				foreach(var item in items)
+					destination.Add(MapSingle(item, conversionType));
+			}
+		}
+
+		private object MapSingle(object value, Type conversionType)
+		{
+			object result;
+
+			//如果类型转换成功，则直接返回
+			if(Common.Convert.TryConvertValue(value, conversionType, out result))
+				return result;
+
+			if(value == null)
+				return Common.TypeExtension.GetDefaultValue(conversionType);
+
+			//创建目标类型的实例
+			result = Activator.CreateInstance(conversionType);
+
+			if(value is IEnumerable)
+			{
+				foreach(var item in (IEnumerable)value)
+					;
+			}
+
+			//获取源对象的属性集合
+			var sources = value.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+			foreach(var source in sources)
+			{
+				var destination = conversionType.GetProperty(source.Name);
+
+				if(destination != null)
+					destination.SetValue(result, Common.Convert.ConvertValue(source.GetValue(value), destination.PropertyType));
+			}
+
+			return result;
 		}
 		#endregion
 	}
