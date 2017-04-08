@@ -277,10 +277,16 @@ namespace Zongsoft.Data
 			//创建目标类型的实例
 			result = Activator.CreateInstance(conversionType);
 
-			if(value is IEnumerable)
+			if(Common.TypeExtension.IsDictionary(conversionType))
 			{
-				foreach(var item in (IEnumerable)value)
-					;
+				if(Common.TypeExtension.IsDictionary(value.GetType()))
+				{
+					foreach(var entry in (IEnumerable)value)
+						;
+				}
+			}
+			else
+			{
 			}
 
 			//获取源对象的属性集合

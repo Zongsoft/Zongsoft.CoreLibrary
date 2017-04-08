@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2017 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,15 +25,12 @@
  */
 
 using System;
-using System.Collections;
 
-namespace Zongsoft.Runtime.Serialization
+namespace Zongsoft.Common
 {
-	public interface IDictionarySerializer
+	public interface IActivator
 	{
-		IDictionary Serialize(object graph);
-		void Serialize(object graph, IDictionary dictionary);
-
-		object Deserialize(IDictionary dictionary, Type type);
+		bool CanCreate(Type type, object source);
+		object Create(Type type, object source);
 	}
 }

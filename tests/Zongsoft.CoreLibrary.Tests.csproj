@@ -89,6 +89,7 @@
     <Compile Include="Common\RandomGeneratorTests.cs" />
     <Compile Include="Reflection\MemberAccessTest.cs" />
     <Compile Include="Runtime\Caching\MemoryCacheTest.cs" />
+    <Compile Include="Runtime\Serialization\DictionarySerializerTest.cs" />
     <Compile Include="Security\CredentialTest.cs" />
     <Compile Include="Security\UserTest.cs" />
     <Compile Include="Services\CommandExpressionTest.cs" />
