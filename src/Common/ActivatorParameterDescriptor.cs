@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2014 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2017 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -27,50 +27,65 @@
 using System;
 using System.Collections.Generic;
 
-namespace Zongsoft.Runtime.Expressions
+namespace Zongsoft.Common
 {
-	public class ExpressionParserContext : MarshalByRefObject
+	public class ActivatorParameterDescriptor
 	{
 		#region 成员字段
-		private IExpressionAnalyzer _analyzer;
-		private object _parameter;
-		private object _value;
+		private object _argument;
+		private string _parameterName;
+		private Type _parameterType;
+		private object _parameterValue;
 		#endregion
 
 		#region 构造函数
-		public ExpressionParserContext(IExpressionAnalyzer analyzer, object parameter, object value)
+		public ActivatorParameterDescriptor(string parameterName, Type parameterType, object argument)
 		{
-			if(analyzer == null)
-				throw new ArgumentNullException("analyzer");
+			if(string.IsNullOrWhiteSpace(parameterName))
+				throw new ArgumentNullException(nameof(parameterName));
+			if(parameterType == null)
+				throw new ArgumentNullException(nameof(parameterType));
 
-			_analyzer = analyzer;
-			_parameter = parameter;
-			_value = value;
+			_parameterName = parameterName;
+			_parameterType = parameterType;
+			_argument = argument;
 		}
 		#endregion
 
 		#region 公共属性
-		public IExpressionAnalyzer Analyzer
+		public string ParameterName
 		{
 			get
 			{
-				return _analyzer;
+				return _parameterName;
 			}
 		}
 
-		public object Parameter
+		public Type ParameterType
 		{
 			get
 			{
-				return _parameter;
+				return _parameterType;
 			}
 		}
 
-		public object Value
+		public object Argument
 		{
 			get
 			{
-				return _value;
+				return _argument;
+			}
+		}
+
+		public object ParameterValue
+		{
+			get
+			{
+				return _parameterValue;
+			}
+			set
+			{
+				_parameterValue = value;
 			}
 		}
 		#endregion

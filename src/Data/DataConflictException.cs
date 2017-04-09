@@ -25,22 +25,21 @@
  */
 
 using System;
-using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
-	public class DataConflictException : DataException
+	public class DataConflictException : DataAccessException
 	{
 		#region 构造函数
-		public DataConflictException()
+		public DataConflictException(string driverName, int code) : base(driverName, code)
 		{
 		}
 
-		public DataConflictException(string message) : base(message)
+		public DataConflictException(string driverName, int code, string message) : base(driverName, code, message)
 		{
 		}
 
-		public DataConflictException(string message, Exception innerException) : base(message, innerException)
+		public DataConflictException(string driverName, int code, string message, Exception innerException) : base(driverName, code, message, innerException)
 		{
 		}
 		#endregion

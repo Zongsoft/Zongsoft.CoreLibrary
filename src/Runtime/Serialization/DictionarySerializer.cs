@@ -70,19 +70,8 @@ namespace Zongsoft.Runtime.Serialization
 
 			if(graph.GetType().IsScalarType())
 			{
-				if(graph.GetType().IsArray)
-				{
-					var index = 0;
-
-					foreach(var entry in (IEnumerable)graph)
-					{
-						dictionary.Add((string.IsNullOrEmpty(prefix) ? string.Empty : prefix) + $"[{index++}]", entry);
-					}
-				}
-				else
-				{
-					dictionary.Add(string.IsNullOrEmpty(prefix) ? string.Empty : prefix, graph);
-				}
+				//写入单值到字典中
+				this.WriteScalarValue(graph, dictionary, prefix);
 
 				return;
 			}
@@ -104,7 +93,9 @@ namespace Zongsoft.Runtime.Serialization
 				var key = string.IsNullOrEmpty(prefix) ? property.Name : prefix + "." + property.Name;
 
 				if(property.PropertyType.IsScalarType())
-					dictionary.Add(key, property.GetValue(graph));
+				{
+					this.WriteScalarValue(property.GetValue(graph), dictionary, key);
+				}
 				else
 				{
 					if(property.PropertyType.IsDictionary())
@@ -136,6 +127,23 @@ namespace Zongsoft.Runtime.Serialization
 				}
 			}
 		}
+
+		private void WriteScalarValue(object value, IDictionary dictionary, string prefix)
+		{
+			if(value.GetType().IsArray)
+			{
+				var index = 0;
+
+				foreach(var entry in (IEnumerable)value)
+				{
+					dictionary.Add((string.IsNullOrEmpty(prefix) ? string.Empty : prefix) + $"[{index++}]", entry);
+				}
+			}
+			else
+			{
+				dictionary.Add(string.IsNullOrEmpty(prefix) ? string.Empty : prefix, value);
+			}
+		}
 		#endregion
 
 		#region 反序列化
@@ -161,7 +169,7 @@ namespace Zongsoft.Runtime.Serialization
 			if(type == null)
 				throw new ArgumentNullException(nameof(type));
 
-			var result = ActivatorProvider.Default.CreateInstance(type, dictionary);
+			var result = Common.Activator.CreateInstance(type, dictionary);
 
 			if(result == null)
 				return null;
@@ -170,19 +178,54 @@ namespace Zongsoft.Runtime.Serialization
 
 			foreach(var property in properties)
 			{
-				if(!property.CanWrite || property.GetIndexParameters().Length > 0)
+				object propertyValue = null;
+
+				if(property.GetIndexParameters().Length > 0)
 					continue;
 
-				dictionary.TryGetValue(property.Name, value =>
+				if(property.PropertyType.IsDictionary())
 				{
-					object propertyValue;
+					object value;
 
-					if(Common.Convert.TryConvertValue(value, property.PropertyType, out propertyValue))
-						property.SetValue(result, propertyValue);
-				});
+					if(dictionary.TryGetValue(property.Name, out value))
+					{
+						if(value == null)
+							continue;
+
+						if(value.GetType().IsDictionary())
+						{
+							propertyValue = property.GetValue(result);
+
+							if(property == null && property.CanWrite)
+								propertyValue = Common.Activator.CreateInstance(property.PropertyType, value);
+						}
+					}
+				}
+				else if(property.PropertyType.IsCollection())
+				{
+				}
+				else
+				{
+					if(!property.CanWrite)
+						continue;
+
+				}
 			}
 
 			throw new NotImplementedException();
+		}
+
+		private void SetProperties(object target, IEnumerable source)
+		{
+			if(target == null || source == null)
+				return;
+
+			if(target.GetType().IsDictionary())
+			{
+				var entries = DictionaryExtension.ToDictionary(source);
+
+
+			}
 		}
 		#endregion
 	}

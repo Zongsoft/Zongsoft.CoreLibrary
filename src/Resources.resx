@@ -252,4 +252,7 @@
   <data name="Text.CredentialException.Message" xml:space="preserve">
     <value>凭证错误：指定的凭证是无效的或已经过期。</value>
   </data>
+  <data name="Text.DataAccessException.Message" xml:space="preserve">
+    <value>数据访问发生异常，请与您的系统管理员联系。</value>
+  </data>
 </root>

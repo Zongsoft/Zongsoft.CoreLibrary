@@ -219,7 +219,7 @@ namespace Zongsoft.Common
 					return System.Convert.ChangeType(values.GetValue(0), type);
 			}
 
-			return Activator.CreateInstance(type);
+			return System.Activator.CreateInstance(type);
 		}
 
 		public static Type GetType(string typeName, bool throwOnError = false, bool ignoreCase = true)

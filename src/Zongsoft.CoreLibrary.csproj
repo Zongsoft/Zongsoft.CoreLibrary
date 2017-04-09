@@ -93,7 +93,8 @@
     <Compile Include="Collections\NamedCollectionBase.cs" />
     <Compile Include="Collections\NamedCollection.cs" />
     <Compile Include="Collections\ObjectCache.cs" />
-    <Compile Include="Common\ActivatorProvider.cs" />
+    <Compile Include="Common\Activator.cs" />
+    <Compile Include="Common\ActivatorParameterDescriptor.cs" />
     <Compile Include="Common\BitVector32.cs" />
     <Compile Include="Common\ExpressionUtility.cs" />
     <Compile Include="Common\IActivator.cs" />
@@ -102,6 +103,7 @@
     <Compile Include="Common\IEventHandler`1.cs" />
     <Compile Include="Common\IObjectReference.cs" />
     <Compile Include="Common\ISequence.cs" />
+    <Compile Include="Common\ModelBase.cs" />
     <Compile Include="Common\ObjectReference.cs" />
     <Compile Include="Common\RandomGenerator.cs" />
     <Compile Include="Common\TypeExtension.cs" />
@@ -119,6 +121,7 @@
     <Compile Include="Communication\PackageSerializer.cs" />
     <Compile Include="Communication\PacketizerFactory.cs" />
     <Compile Include="Communication\ChannelPipelineContext.cs" />
+    <Compile Include="Data\DataAccessException.cs" />
     <Compile Include="Data\DataAccessMapper.cs" />
     <Compile Include="Data\DataSequenceAttribute.cs" />
     <Compile Include="Data\IDataAccessMapper.cs" />
@@ -139,7 +142,6 @@
     <Compile Include="Expressions\TokenScanner.cs" />
     <Compile Include="Expressions\TokenType.cs" />
     <Compile Include="ComponentModel\EncodingConverter.cs" />
-    <Compile Include="ComponentModel\NotifyObject.cs" />
     <Compile Include="Data\Condition.cs" />
     <Compile Include="Data\Conditional.cs" />
     <Compile Include="Data\ConditionalAttribute.cs" />

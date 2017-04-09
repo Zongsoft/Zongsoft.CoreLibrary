@@ -29,7 +29,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Runtime.Serialization
 {
-	public class SerializationSettings : Zongsoft.ComponentModel.NotifyObject
+	public class SerializationSettings : Zongsoft.Common.ModelBase
 	{
 		#region 成员变量
 		private int _maximumDepth;
@@ -66,7 +66,7 @@ namespace Zongsoft.Runtime.Serialization
 				_maximumDepth = newValue;
 
 				if(changed)
-					this.OnPropertyChanged(() => this.MaximumDepth);
+					this.RaisePropertyChanged("MaximumDepth");
 			}
 		}
 

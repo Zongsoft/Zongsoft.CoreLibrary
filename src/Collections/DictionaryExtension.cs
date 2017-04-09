@@ -27,6 +27,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace Zongsoft.Collections
 {
@@ -127,6 +128,33 @@ namespace Zongsoft.Collections
 			}
 
 			return result;
+		}
+
+		public static IEnumerable<DictionaryEntry> ToDictionary(this IEnumerable source)
+		{
+			if(source == null)
+				yield break;
+
+			if(source is IDictionary || source is IEnumerable<DictionaryEntry>)
+			{
+				foreach(var item in source)
+					yield return (DictionaryEntry)item;
+			}
+			else
+			{
+				foreach(var item in source)
+				{
+					if(item == null)
+						continue;
+
+					if(item.GetType().IsGenericType && item.GetType().GetGenericTypeDefinition() == typeof(KeyValuePair<,>))
+					{
+						yield return new DictionaryEntry(
+							item.GetType().GetProperty("Key", BindingFlags.Public | BindingFlags.Instance).GetValue(item),
+							item.GetType().GetProperty("Value", BindingFlags.Public | BindingFlags.Instance).GetValue(item));
+					}
+				}
+			}
 		}
 	}
 }

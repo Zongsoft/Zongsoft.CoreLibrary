@@ -33,7 +33,7 @@ namespace Zongsoft.Security.Membership
 	/// 表示角色的实体类。
 	/// </summary>
 	[Serializable]
-	public class Role : Zongsoft.ComponentModel.NotifyObject
+	public class Role : Zongsoft.Common.ModelBase
 	{
 		#region 静态字段
 		public static readonly string Administrators = "Administrators";

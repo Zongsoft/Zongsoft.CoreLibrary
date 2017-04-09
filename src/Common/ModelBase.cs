@@ -1,8 +1,8 @@
 ﻿/*
  * Authors:
- *   陈德宝(Debao Chen) <chendebao1985@163.com>
+ *   钟峰(Popeye Zhong) <9555843@qq.com>
  *
- * Copyright (C) 2014 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2014-2017 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,21 +25,34 @@
  */
 
 using System;
-using System.Collections.Concurrent;
 using System.ComponentModel;
+using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Zongsoft.ComponentModel
+namespace Zongsoft.Common
 {
-	public class NotifyObject : System.ComponentModel.INotifyPropertyChanged
+	public abstract class ModelBase : System.ComponentModel.INotifyPropertyChanged
 	{
+		#region 静态常量
+		private static readonly string[] EmptyArray = new string[0];
+		#endregion
+
 		#region 事件声明
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
 		#endregion
 
+		#region 构造函数
+		protected ModelBase()
+		{
+		}
+		#endregion
+
 		#region 成员字段
 		private ConcurrentDictionary<string, PropertyToken> _properties;
+		private HashSet<string> _changedNames;
+		private string[] _changedNameArray;
 		#endregion
 
 		#region 保护属性
@@ -167,7 +180,7 @@ namespace Zongsoft.ComponentModel
 			});
 
 			if(changed)
-				this.OnPropertyChanged(propertyName);
+				this.RaisePropertyChanged(propertyName);
 		}
 
 		protected void SetPropertyValue<T>(Expression<Func<T>> propertyExpression, T value)
@@ -187,23 +200,17 @@ namespace Zongsoft.ComponentModel
 			if(string.IsNullOrWhiteSpace(propertyName))
 				throw new ArgumentNullException(nameof(propertyName));
 
-			if(object.Equals(target, value))
-				return;
-
 			//更新目标值
 			target = value;
 
 			//激发“PropertyChanged”事件
-			this.OnPropertyChanged(propertyName);
+			this.RaisePropertyChanged(propertyName);
 		}
 
 		protected void SetPropertyValue<T>(Expression<Func<T>> propertyExpression, ref T target, T value)
 		{
 			if(propertyExpression == null)
 				throw new ArgumentNullException(nameof(propertyExpression));
-
-			if(object.Equals(target, value))
-				return;
 
 			//获取属性表达式指定的属性信息
 			var property = this.GetPropertyInfo<T>(propertyExpression);
@@ -212,7 +219,7 @@ namespace Zongsoft.ComponentModel
 			target = value;
 
 			//激发“PropertyChanged”事件
-			this.OnPropertyChanged(property.Name);
+			this.RaisePropertyChanged(property.Name);
 		}
 
 		private void SetPropertyValueCore(PropertyInfo property, object value)
@@ -238,7 +245,26 @@ namespace Zongsoft.ComponentModel
 			});
 
 			if(changed)
-				this.OnPropertyChanged(property.Name);
+				this.RaisePropertyChanged(property.Name);
+		}
+		#endregion
+
+		#region 公共方法
+		public string[] GetChangedPropertyNames()
+		{
+			var names = _changedNameArray;
+
+			if(names == null)
+			{
+				if(_changedNames == null)
+					return EmptyArray;
+
+				_changedNameArray = new string[_changedNames.Count];
+				_changedNames.CopyTo(_changedNameArray, 0, _changedNameArray.Length);
+				return _changedNameArray;
+			}
+
+			return names;
 		}
 		#endregion
 
@@ -255,18 +281,13 @@ namespace Zongsoft.ComponentModel
 		#endregion
 
 		#region 激发事件
-		protected void OnPropertyChanged(string propertyName)
+		protected void RaisePropertyChanged(string propertyName)
 		{
+			//将发生改变的属性名加入到变更属性名集中
+			this.SetChangedName(propertyName);
+
+			//激发“PropertyChanged”事件
 			this.OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
-		}
-
-		protected void OnPropertyChanged<T>(Expression<Func<T>> propertyExpression)
-		{
-			if(propertyExpression == null)
-				throw new ArgumentNullException("propertyExpression");
-
-			var property = this.GetPropertyInfo<T>(propertyExpression);
-			this.OnPropertyChanged(property.Name);
 		}
 
 		protected virtual void OnPropertyChanged(PropertyChangedEventArgs args)
@@ -279,6 +300,18 @@ namespace Zongsoft.ComponentModel
 		#endregion
 
 		#region 私有方法
+		private void SetChangedName(string name)
+		{
+			if(string.IsNullOrWhiteSpace(name))
+				return;
+
+			if(_changedNames == null)
+				System.Threading.Interlocked.CompareExchange(ref _changedNames, new HashSet<string>(), null);
+
+			if(_changedNames.Add(name))
+				_changedNameArray = null;
+		}
+
 		private PropertyInfo GetPropertyInfo<T>(Expression<Func<T>> propertyExpression)
 		{
 			if(propertyExpression == null)

@@ -29,14 +29,13 @@ using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
-using Zongsoft.ComponentModel;
 
 namespace Zongsoft.Data
 {
 	/// <summary>
 	/// 表示数据过滤条件的组合实体。
 	/// </summary>
-	public abstract class Conditional : Zongsoft.ComponentModel.NotifyObject, IConditional
+	public abstract class Conditional : Zongsoft.Common.ModelBase, IConditional
 	{
 		#region 静态变量
 		private static readonly ConcurrentDictionary<Type, ConditionalDescriptor> _cache = new ConcurrentDictionary<Type, ConditionalDescriptor>();

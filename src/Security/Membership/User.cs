@@ -33,7 +33,7 @@ namespace Zongsoft.Security.Membership
 	/// 表示用户的实体类。
 	/// </summary>
 	[Serializable]
-	public class User : Zongsoft.ComponentModel.NotifyObject
+	public class User : Zongsoft.Common.ModelBase
 	{
 		#region 静态字段
 		public static readonly string Administrator = "Administrator";
