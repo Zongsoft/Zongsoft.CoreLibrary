@@ -43,16 +43,15 @@ namespace Zongsoft.Common
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
 		#endregion
 
+		#region 成员字段
+		private ConcurrentDictionary<string, PropertyToken> _properties;
+		private ConcurrentDictionary<string, object> _changedProperties;
+		#endregion
+
 		#region 构造函数
 		protected ModelBase()
 		{
 		}
-		#endregion
-
-		#region 成员字段
-		private ConcurrentDictionary<string, PropertyToken> _properties;
-		private HashSet<string> _changedNames;
-		private string[] _changedNameArray;
 		#endregion
 
 		#region 保护属性
@@ -180,7 +179,7 @@ namespace Zongsoft.Common
 			});
 
 			if(changed)
-				this.RaisePropertyChanged(propertyName);
+				this.RaisePropertyChanged(propertyName, token.Value);
 		}
 
 		protected void SetPropertyValue<T>(Expression<Func<T>> propertyExpression, T value)
@@ -204,7 +203,7 @@ namespace Zongsoft.Common
 			target = value;
 
 			//激发“PropertyChanged”事件
-			this.RaisePropertyChanged(propertyName);
+			this.RaisePropertyChanged(propertyName, value);
 		}
 
 		protected void SetPropertyValue<T>(Expression<Func<T>> propertyExpression, ref T target, T value)
@@ -219,7 +218,7 @@ namespace Zongsoft.Common
 			target = value;
 
 			//激发“PropertyChanged”事件
-			this.RaisePropertyChanged(property.Name);
+			this.RaisePropertyChanged(property.Name, value);
 		}
 
 		private void SetPropertyValueCore(PropertyInfo property, object value)
@@ -245,26 +244,17 @@ namespace Zongsoft.Common
 			});
 
 			if(changed)
-				this.RaisePropertyChanged(property.Name);
+				this.RaisePropertyChanged(property.Name, token.Value);
 		}
 		#endregion
 
 		#region 公共方法
-		public string[] GetChangedPropertyNames()
+		public IDictionary<string, object> GetChangedProperties()
 		{
-			var names = _changedNameArray;
+			if(_changedProperties == null)
+				System.Threading.Interlocked.CompareExchange(ref _changedProperties, new ConcurrentDictionary<string, object>(), null);
 
-			if(names == null)
-			{
-				if(_changedNames == null)
-					return EmptyArray;
-
-				_changedNameArray = new string[_changedNames.Count];
-				_changedNames.CopyTo(_changedNameArray, 0, _changedNameArray.Length);
-				return _changedNameArray;
-			}
-
-			return names;
+			return _changedProperties;
 		}
 		#endregion
 
@@ -281,10 +271,10 @@ namespace Zongsoft.Common
 		#endregion
 
 		#region 激发事件
-		protected void RaisePropertyChanged(string propertyName)
+		protected void RaisePropertyChanged(string propertyName, object value)
 		{
-			//将发生改变的属性名加入到变更属性名集中
-			this.SetChangedName(propertyName);
+			//将发生改变的属性加入到变更集中
+			this.SetChangedProperty(propertyName, value);
 
 			//激发“PropertyChanged”事件
 			this.OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
@@ -300,16 +290,15 @@ namespace Zongsoft.Common
 		#endregion
 
 		#region 私有方法
-		private void SetChangedName(string name)
+		private void SetChangedProperty(string name, object value)
 		{
 			if(string.IsNullOrWhiteSpace(name))
-				return;
+				throw new ArgumentNullException(nameof(name));
 
-			if(_changedNames == null)
-				System.Threading.Interlocked.CompareExchange(ref _changedNames, new HashSet<string>(), null);
+			if(_changedProperties == null)
+				System.Threading.Interlocked.CompareExchange(ref _changedProperties, new ConcurrentDictionary<string, object>(), null);
 
-			if(_changedNames.Add(name))
-				_changedNameArray = null;
+			_changedProperties[name] = value;
 		}
 
 		private PropertyInfo GetPropertyInfo<T>(Expression<Func<T>> propertyExpression)

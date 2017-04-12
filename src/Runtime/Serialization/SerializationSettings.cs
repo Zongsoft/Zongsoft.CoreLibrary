@@ -66,7 +66,7 @@ namespace Zongsoft.Runtime.Serialization
 				_maximumDepth = newValue;
 
 				if(changed)
-					this.RaisePropertyChanged("MaximumDepth");
+					this.RaisePropertyChanged("MaximumDepth", newValue);
 			}
 		}
 
