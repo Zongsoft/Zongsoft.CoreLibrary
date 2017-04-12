@@ -31,11 +31,23 @@ namespace Zongsoft.Data
 	public class DataConflictException : DataAccessException
 	{
 		#region 构造函数
+		public DataConflictException(string message) : base("", 0, message)
+		{
+		}
+
+		public DataConflictException(string message, Exception innerException) : base("", 0, message, innerException)
+		{
+		}
+
 		public DataConflictException(string driverName, int code) : base(driverName, code)
 		{
 		}
 
 		public DataConflictException(string driverName, int code, string message) : base(driverName, code, message)
+		{
+		}
+
+		public DataConflictException(string driverName, int code, Exception innerException) : base(driverName, code, innerException)
 		{
 		}
 

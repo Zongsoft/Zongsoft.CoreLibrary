@@ -421,6 +421,8 @@ namespace Zongsoft.IO
 
 		private class FileProvider : IFile
 		{
+			private const int BUFFERSIZE = 64 * 1024;
+
 			public bool Delete(string virtualPath)
 			{
 				if(string.IsNullOrWhiteSpace(virtualPath))
@@ -475,10 +477,10 @@ namespace Zongsoft.IO
 				Path[] paths;
 				var services = FileSystem.GetFileProviders(new string[] { source, destination }, out paths);
 
-				if(!string.Equals(paths[0].Scheme, paths[1].Scheme, StringComparison.OrdinalIgnoreCase))
-					throw new InvalidOperationException();
-
-				services[0].Copy(paths[0].FullPath, paths[1].FullPath, overwrite);
+				if(string.Equals(paths[0].Scheme, paths[1].Scheme, StringComparison.OrdinalIgnoreCase))
+					services[0].Copy(paths[0].FullPath, paths[1].FullPath, overwrite);
+				else
+					this.CopyFile(services[0], paths[0].FullPath, services[1], paths[1].FullPath, overwrite);
 			}
 
 			public Task CopyAsync(string source, string destination)
@@ -491,10 +493,10 @@ namespace Zongsoft.IO
 				Path[] paths;
 				var services = FileSystem.GetFileProviders(new string[] { source, destination }, out paths);
 
-				if(!string.Equals(paths[0].Scheme, paths[1].Scheme, StringComparison.OrdinalIgnoreCase))
-					throw new InvalidOperationException();
-
-				return services[0].CopyAsync(paths[0].FullPath, paths[1].FullPath, overwrite);
+				if(string.Equals(paths[0].Scheme, paths[1].Scheme, StringComparison.OrdinalIgnoreCase))
+					return services[0].CopyAsync(paths[0].FullPath, paths[1].FullPath, overwrite);
+				else
+					return this.CopyFileAsync(services[0], paths[0].FullPath, services[1], paths[1].FullPath, overwrite);
 			}
 
 			public void Move(string source, string destination)
@@ -502,10 +504,13 @@ namespace Zongsoft.IO
 				Path[] paths;
 				var services = FileSystem.GetFileProviders(new string[] { source, destination }, out paths);
 
-				if(!string.Equals(paths[0].Scheme, paths[1].Scheme, StringComparison.OrdinalIgnoreCase))
-					throw new InvalidOperationException();
-
-				services[0].Move(paths[0].FullPath, paths[1].FullPath);
+				if(string.Equals(paths[0].Scheme, paths[1].Scheme, StringComparison.OrdinalIgnoreCase))
+					services[0].Move(paths[0].FullPath, paths[1].FullPath);
+				else
+				{
+					this.CopyFile(services[0], paths[0].FullPath, services[1], paths[1].FullPath, false);
+					services[0].Delete(paths[0].FullPath);
+				}
 			}
 
 			public Task MoveAsync(string source, string destination)
@@ -513,10 +518,14 @@ namespace Zongsoft.IO
 				Path[] paths;
 				var services = FileSystem.GetFileProviders(new string[] { source, destination }, out paths);
 
-				if(!string.Equals(paths[0].Scheme, paths[1].Scheme, StringComparison.OrdinalIgnoreCase))
-					throw new InvalidOperationException();
+				if(string.Equals(paths[0].Scheme, paths[1].Scheme, StringComparison.OrdinalIgnoreCase))
+					return services[0].MoveAsync(paths[0].FullPath, paths[1].FullPath);
 
-				return services[0].MoveAsync(paths[0].FullPath, paths[1].FullPath);
+				return Task.Run(async () =>
+				{
+					await this.CopyFileAsync(services[0], paths[0].FullPath, services[1], paths[1].FullPath, false);
+					services[0].Delete(paths[0].FullPath);
+				});
 			}
 
 			public FileInfo GetInfo(string virtualPath)
@@ -581,6 +590,40 @@ namespace Zongsoft.IO
 				var service = FileSystem.GetFileProvider(virtualPath, out path);
 
 				return service.Open(path.FullPath, mode, access, share, properties);
+			}
+
+			private void CopyFile(IFile source, string sourcePath, IFile destination, string destinationPath, bool overwrite)
+			{
+				using(var sourceStream = source.Open(sourcePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+				{
+					using(var destinationStream = destination.Open(destinationPath, overwrite ? FileMode.Create : FileMode.CreateNew, FileAccess.Write))
+					{
+						var buffer = new byte[BUFFERSIZE];
+						int bytesRead;
+
+						while((bytesRead = sourceStream.Read(buffer, 0, buffer.Length)) > 0)
+						{
+							destinationStream.Write(buffer, 0, bytesRead);
+						}
+					}
+				}
+			}
+
+			private async Task CopyFileAsync(IFile source, string sourcePath, IFile destination, string destinationPath, bool overwrite)
+			{
+				using(var sourceStream = source.Open(sourcePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+				{
+					using(var destinationStream = destination.Open(destinationPath, overwrite ? FileMode.Create : FileMode.CreateNew, FileAccess.Write))
+					{
+						var buffer = new byte[BUFFERSIZE];
+						int bytesRead;
+
+						while((bytesRead = await sourceStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+						{
+							await destinationStream.WriteAsync(buffer, 0, bytesRead);
+						}
+					}
+				}
 			}
 		}
 		#endregion
