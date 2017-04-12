@@ -209,6 +209,9 @@ namespace Zongsoft.Data
 				return false;
 			}
 
+			if(_data is Zongsoft.Common.ModelBase)
+				return ((Zongsoft.Common.ModelBase)_data).GetChangedProperties().TryGetValue(key, out result);
+
 			if(_values.TryGetValue(key, out result))
 				return true;
 
@@ -335,61 +338,6 @@ namespace Zongsoft.Data
 
 			return true;
 		}
-
-		/// <summary>
-		/// 获取有效的数据字典的数据属性集。
-		/// </summary>
-		/// <returns>返回的有效（即发生变化的）的数据属性集。</returns>
-		public IEnumerable<KeyValuePair<string, object>> GetEntries()
-		{
-			if(_properties != null)
-			{
-				var model = _data as Zongsoft.Common.ModelBase;
-
-				if(model != null)
-				{
-					foreach(var name in model.GetChangedPropertyNames())
-					{
-						var property = _properties[name];
-
-						if(property != null)
-							yield return new KeyValuePair<string, object>(name, _values.GetOrAdd(name, key => property.GetValue(_data)));
-					}
-				}
-				else
-				{
-					foreach(PropertyDescriptor property in _properties)
-					{
-						yield return new KeyValuePair<string, object>(property.Name,
-																	  _values.GetOrAdd(property.Name, key => property.GetValue(_data)));
-					}
-				}
-			}
-			else
-			{
-				if(_data is IDictionary)
-				{
-					foreach(var key in ((IDictionary)_data).Keys)
-					{
-						yield return new KeyValuePair<string, object>(key == null ? null : key.ToString(), ((IDictionary)_data)[key]);
-					}
-				}
-				else if(_data is IDictionary<string, object>)
-				{
-					foreach(var key in ((IDictionary<string, object>)_data).Keys)
-					{
-						yield return new KeyValuePair<string, object>(key, ((IDictionary<string, object>)_data)[key]);
-					}
-				}
-				else if(_data is IDictionary<string, string>)
-				{
-					foreach(var key in ((IDictionary<string, string>)_data).Keys)
-					{
-						yield return new KeyValuePair<string, object>(key, ((IDictionary<string, string>)_data)[key]);
-					}
-				}
-			}
-		}
 		#endregion
 
 		#region 接口实现
@@ -453,10 +401,22 @@ namespace Zongsoft.Data
 		{
 			if(_properties != null)
 			{
-				foreach(PropertyDescriptor property in _properties)
+				var model = _data as Zongsoft.Common.ModelBase;
+
+				if(model != null)
 				{
-					yield return new KeyValuePair<string, object>(property.Name,
-																  _values.GetOrAdd(property.Name, key => property.GetValue(_data)));
+					foreach(var property in model.GetChangedProperties())
+					{
+						yield return property;
+					}
+				}
+				else
+				{
+					foreach(PropertyDescriptor property in _properties)
+					{
+						yield return new KeyValuePair<string, object>(property.Name,
+																	  _values.GetOrAdd(property.Name, key => property.GetValue(_data)));
+					}
 				}
 			}
 			else
