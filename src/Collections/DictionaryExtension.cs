@@ -121,10 +121,11 @@ namespace Zongsoft.Collections
 				valueConvert = value => Zongsoft.Common.Convert.ConvertValue<TValue>(value);
 
 			var result = new Dictionary<TKey, TValue>(dictionary.Count);
+			var iterator = dictionary.GetEnumerator();
 
-			foreach(DictionaryEntry entry in dictionary)
+			while(iterator.MoveNext())
 			{
-				result.Add(keyConvert(entry.Key), valueConvert(entry.Value));
+				result.Add(keyConvert(iterator.Entry.Key), valueConvert(iterator.Entry.Value));
 			}
 
 			return result;
