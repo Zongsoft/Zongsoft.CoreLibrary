@@ -33,7 +33,7 @@ using System.Linq;
 
 namespace Zongsoft.Data
 {
-	public class DataDictionary : IDictionary<string, object>
+	public class DataDictionary : IDictionary<string, object>, IDictionary
 	{
 		#region 成员字段
 		private readonly object _data;
@@ -92,7 +92,14 @@ namespace Zongsoft.Data
 			get
 			{
 				if(_properties != null)
-					return _properties.Count;
+				{
+					var model = _data as Zongsoft.Common.ModelBase;
+
+					if(model != null)
+						return model.GetChangedProperties().Count;
+					else
+						return _properties.Count;
+				}
 
 				if(_data is ICollection)
 					return ((ICollection)_data).Count;
@@ -349,6 +356,121 @@ namespace Zongsoft.Data
 			}
 		}
 
+		ICollection IDictionary.Keys
+		{
+			get
+			{
+				return (ICollection)this.Keys;
+			}
+		}
+
+		ICollection IDictionary.Values
+		{
+			get
+			{
+				return (ICollection)this.Values;
+			}
+		}
+
+		bool IDictionary.IsReadOnly
+		{
+			get
+			{
+				return false;
+			}
+		}
+
+		bool IDictionary.IsFixedSize
+		{
+			get
+			{
+				return false;
+			}
+		}
+
+		int ICollection.Count
+		{
+			get
+			{
+				return this.Count;
+			}
+		}
+
+		private readonly object _syncRoot = new object();
+
+		object ICollection.SyncRoot
+		{
+			get
+			{
+				return _syncRoot;
+			}
+		}
+
+		bool ICollection.IsSynchronized
+		{
+			get
+			{
+				return false;
+			}
+		}
+
+		object IDictionary.this[object key]
+		{
+			get
+			{
+				return key == null ? null : this[key.ToString()];
+			}
+			set
+			{
+				if(key == null)
+					throw new ArgumentNullException();
+
+				this[key.ToString()] = value;
+			}
+		}
+
+		bool IDictionary.Contains(object key)
+		{
+			if(key == null)
+				return false;
+
+			return this.Contains(key.ToString());
+		}
+
+		void IDictionary.Add(object key, object value)
+		{
+			if(key == null)
+				throw new ArgumentNullException(nameof(key));
+
+			this.Set(key.ToString(), value);
+		}
+
+		void IDictionary.Clear()
+		{
+			throw new NotSupportedException();
+		}
+
+		void IDictionary.Remove(object key)
+		{
+			throw new NotSupportedException();
+		}
+
+		void ICollection.CopyTo(Array array, int arrayIndex)
+		{
+			if(array == null)
+				throw new ArgumentNullException(nameof(array));
+
+			var offset = 0;
+
+			foreach(var entry in this)
+			{
+				var index = arrayIndex + offset++;
+
+				if(index < array.Length)
+					array.SetValue(entry, index);
+			}
+		}
+
 		bool IDictionary<string, object>.ContainsKey(string key)
 		{
 			return this.Contains(key);
@@ -389,7 +511,18 @@ namespace Zongsoft.Data
 
 		void ICollection<KeyValuePair<string, object>>.CopyTo(KeyValuePair<string, object>[] array, int arrayIndex)
 		{
-			throw new NotImplementedException();
+			if(array == null)
+				throw new ArgumentNullException(nameof(array));
+
+			var offset = 0;
+
+			foreach(var entry in this)
+			{
+				var index = arrayIndex + offset++;
+
+				if(index < array.Length)
+					array[index] = entry;
+			}
 		}
 
 		bool ICollection<KeyValuePair<string, object>>.Remove(KeyValuePair<string, object> item)
@@ -445,9 +578,72 @@ namespace Zongsoft.Data
 			}
 		}
 
+		IDictionaryEnumerator IDictionary.GetEnumerator()
+		{
+			return new DictionaryEnumerator(this.GetEnumerator());
+		}
+
 		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return this.GetEnumerator();
+		}
+		#endregion
+
+		#region 嵌套子类
+		private class DictionaryEnumerator : IDictionaryEnumerator
+		{
+			private IEnumerator<KeyValuePair<string, object>> _iterator;
+
+			public DictionaryEnumerator(IEnumerator<KeyValuePair<string, object>> iterator)
+			{
+				if(iterator == null)
+					throw new ArgumentNullException(nameof(iterator));
+
+				_iterator = iterator;
+			}
+
+			public object Key
+			{
+				get
+				{
+					return _iterator.Current.Key;
+				}
+			}
+
+			public object Value
+			{
+				get
+				{
+					return _iterator.Current.Value;
+				}
+			}
+
+			public DictionaryEntry Entry
+			{
+				get
+				{
+					var current = _iterator.Current;
+					return new DictionaryEntry(current.Key, current.Value);
+				}
+			}
+
+			public object Current
+			{
+				get
+				{
+					return _iterator.Current;
+				}
+			}
+
+			public bool MoveNext()
+			{
+				return _iterator.MoveNext();
+			}
+
+			public void Reset()
+			{
+				_iterator.Reset();
+			}
 		}
 		#endregion
 	}
