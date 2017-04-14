@@ -376,7 +376,7 @@ namespace Zongsoft.Data
 		{
 			get
 			{
-				return false;
+				return _properties != null;
 			}
 		}
 
@@ -384,7 +384,7 @@ namespace Zongsoft.Data
 		{
 			get
 			{
-				return false;
+				return _properties != null;
 			}
 		}
 

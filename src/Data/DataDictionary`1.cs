@@ -137,23 +137,6 @@ namespace Zongsoft.Data
 			return this.TrySet<TMember>(member, (string _) => value, predicate);
 		}
 
-		public bool TrySet<TMember>(Expression<Func<T, TMember>> member, Expression<Func<T, TMember>> valueExpression, Func<TMember, bool> predicate = null)
-		{
-			if(member == null)
-				throw new ArgumentNullException("member");
-
-			if(valueExpression == null)
-				throw new ArgumentNullException("valueExpression");
-
-			return this.TrySet(member, (string _) => this.Get(valueExpression), original =>
-			{
-				if(predicate == null)
-					return this.Contains(valueExpression);
-				else
-					return predicate(original) && this.Contains(valueExpression);
-			});
-		}
-
 		public bool TrySet<TMember>(Expression<Func<T, TMember>> member, Func<string, TMember> valueThunk, Func<TMember, bool> predicate = null)
 		{
 			if(member == null)
