@@ -175,18 +175,29 @@ namespace Zongsoft.Services
 				return executingArgs.Result;
 
 			object result = null;
+			bool complateInvoked = false;
+			IEnumerable<CommandCompleterDescriptor> descriptors = null;
 
 			try
 			{
 				//调用执行请求
-				result = this.OnExecute(context);
+				result = this.OnExecute(context, out descriptors);
 			}
 			catch(Exception ex)
 			{
+				complateInvoked = true;
+
+				//执行命令完成通知
+				this.OnCompleted(context, descriptors, ex);
+
 				//激发“Error”事件
 				if(!this.OnFailed(context, ex))
 					throw;
 			}
+
+			//执行命令完成通知
+			if(!complateInvoked)
+				this.OnCompleted(context, descriptors);
 
 			//创建事件参数对象
 			var executedArgs = new CommandExecutorExecutedEventArgs(context, result);
@@ -200,10 +211,13 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 执行实现
-		protected virtual object OnExecute(CommandExecutorContext context)
+		protected virtual object OnExecute(CommandExecutorContext context, out IEnumerable<CommandCompleterDescriptor> descriptors)
 		{
 			var queue = new Queue<Tuple<CommandExpression, CommandTreeNode>>();
 			var expression = context.Expression;
+
+			//设置输出参数默认值
+			descriptors = System.Linq.Enumerable.Empty<CommandCompleterDescriptor>();
 
 			while(expression != null)
 			{
@@ -229,6 +243,9 @@ namespace Zongsoft.Services
 			if(queue.Count < 1)
 				return null;
 
+			//创建输出参数的列表对象
+			descriptors = new List<CommandCompleterDescriptor>();
+
 			//初始化第一个输入参数
 			var parameter = context.Parameter;
 
@@ -238,6 +255,10 @@ namespace Zongsoft.Services
 
 				//执行队列中的命令
 				parameter = this.ExecuteCommand(context, entry.Item1, entry.Item2, parameter);
+
+				//判断命令是否需要清理，如果是则加入到清理列表中
+				if(entry.Item2 != null && entry.Item2.Command is ICommandCompletion)
+					((IList<CommandCompleterDescriptor>)descriptors).Add(new CommandCompleterDescriptor((ICommandCompletion)entry.Item2.Command, parameter));
 			}
 
 			//返回最后一个命令的执行结果
@@ -313,7 +334,42 @@ namespace Zongsoft.Services
 		}
 		#endregion
 
+		#region 私有方法
+		private void OnCompleted(CommandExecutorContext context, IEnumerable<CommandCompleterDescriptor> descriptors, Exception exception = null)
+		{
+			if(descriptors == null)
+				return;
+
+			foreach(var descriptor in descriptors)
+			{
+				try
+				{
+					descriptor.Command.OnCompleted(CommandCompletionContext.Create(context, descriptor.Result, exception));
+				}
+				catch(Exception ex)
+				{
+					Zongsoft.Diagnostics.Logger.Error(ex);
+				}
+			}
+		}
+		#endregion
+
 		#region 嵌套子类
+		protected class CommandCompleterDescriptor
+		{
+			public ICommandCompletion Command;
+			public object Result;
+
+			public CommandCompleterDescriptor(ICommandCompletion command, object result)
+			{
+				if(command == null)
+					throw new ArgumentNullException(nameof(command));
+
+				this.Command = command;
+				this.Result = result;
+			}
+		}
+
 		private class NullCommandOutlet : ICommandOutlet
 		{
 			#region 单例字段

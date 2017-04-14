@@ -326,6 +326,7 @@
     <Compile Include="Security\SecurityException.cs" />
     <Compile Include="Security\Membership\UserStatus.cs" />
     <Compile Include="Services\CommandBase.cs" />
+    <Compile Include="Services\CommandCompletionContext.cs" />
     <Compile Include="Services\CommandContext.cs" />
     <Compile Include="Services\CommandExecutor.cs" />
     <Compile Include="Services\CommandExecutorContext.cs" />
@@ -343,6 +344,7 @@
     <Compile Include="Services\CommandOptionException.cs" />
     <Compile Include="Services\CommandOptionMissingException.cs" />
     <Compile Include="Services\CommandOptionValueException.cs" />
+    <Compile Include="Services\ICommandCompletion.cs" />
     <Compile Include="Services\ICommandOutlet.cs" />
     <Compile Include="Services\CommandOutletColor.cs" />
     <Compile Include="Communication\Composition\ExecutedEventArgs.cs" />
