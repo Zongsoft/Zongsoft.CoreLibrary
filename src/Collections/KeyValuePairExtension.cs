@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2016 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2016-2017 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,81 +25,51 @@
  */
 
 using System;
+using System.Collections.Generic;
 
 namespace Zongsoft.Collections
 {
-	public struct KeyValuePair
+	public static class KeyValuePairExtension
 	{
-		#region 成员字段
-		private string _key;
-		private object _value;
-		#endregion
-
-		#region 构造函数
-		public KeyValuePair(string key, object value)
-		{
-			if(key == null)
-				throw new ArgumentNullException("key");
-
-			_key = key;
-			_value = value;
-		}
-		#endregion
-
-		#region 公共属性
-		public string Key
-		{
-			get
-			{
-				return _key;
-			}
-		}
-
-		public object Value
-		{
-			get
-			{
-				return _value;
-			}
-		}
-		#endregion
-
-		#region 重写方法
-		public override string ToString()
-		{
-			return _key + "=" + _value;
-		}
-		#endregion
-
-		#region 静态方法
-		public static KeyValuePair[] CreatePairs(string[] keys, params object[] values)
+		#region 公共方法
+		public static KeyValuePair<string, object>[] CreatePairs(string[] keys, params object[] values)
 		{
 			if(keys == null)
-				throw new ArgumentNullException("keys");
+				throw new ArgumentNullException(nameof(keys));
 
-			var result = new KeyValuePair[keys.Length];
+			var result = new KeyValuePair<string, object>[keys.Length];
 
 			for(int i = 0; i < result.Length; i++)
 			{
-				result[i] = new KeyValuePair(keys[i], (values != null && i < values.Length ? values[i] : null));
+				result[i] = new KeyValuePair<string, object>(keys[i], (values != null && i < values.Length ? values[i] : null));
 			}
 
 			return result;
 		}
 
-		public static KeyValuePair[] CreatePairs(object[] values, params string[] keys)
+		public static KeyValuePair<string, object>[] CreatePairs(object[] values, params string[] keys)
 		{
 			if(keys == null)
-				throw new ArgumentNullException("keys");
+				throw new ArgumentNullException(nameof(keys));
 
-			var result = new KeyValuePair[keys.Length];
+			var result = new KeyValuePair<string, object>[keys.Length];
 
 			for(int i = 0; i < result.Length; i++)
 			{
-				result[i] = new KeyValuePair(keys[i], (values != null && i < values.Length ? values[i] : null));
+				result[i] = new KeyValuePair<string, object>(keys[i], (values != null && i < values.Length ? values[i] : null));
 			}
 
 			return result;
+		}
+
+		public static object[] ToArray(this KeyValuePair<string, object>[] pairs)
+		{
+			if(pairs == null)
+				return null;
+
+			var array = new object[pairs.Length];
+			Array.Copy(pairs, array, array.Length);
+			return array;
 		}
 		#endregion
 	}

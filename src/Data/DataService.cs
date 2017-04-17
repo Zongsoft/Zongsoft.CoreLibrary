@@ -584,52 +584,6 @@ namespace Zongsoft.Data
 		}
 		#endregion
 
-		#region 键值操作
-		/// <summary>
-		/// 根据指定的查询参数值获取对应的查询键值对数组。
-		/// </summary>
-		/// <param name="values">传入的查询值数组。</param>
-		/// <returns>返回对应的键值对数组。</returns>
-		/// <remarks>
-		///		<para>基类的实现始终返回当前数据服务对应的主键的键值对数组。</para>
-		///		<para>对于重载者的提示：如果<paramref name="values"/>参数值为空(null)或空数组(零长度)，则应返回当前实体的主键的键值对数组（调用基类的<see cref="GetKey(object[])"/>即可）。</para>
-		/// </remarks>
-		protected virtual Zongsoft.Collections.KeyValuePair[] GetKey(object[] values)
-		{
-			if(values == null || values.Length == 0)
-				return null;
-
-			var primaryKey = this.DataAccess.GetKey(this.Name);
-
-			if(primaryKey == null || primaryKey.Length == 0)
-				return null;
-
-			var result = new Zongsoft.Collections.KeyValuePair[Math.Min(primaryKey.Length, values.Length)];
-
-			for(int i = 0; i < result.Length; i++)
-			{
-				result[i] = new Collections.KeyValuePair(primaryKey[i], values[i]);
-			}
-
-			return result;
-		}
-
-		protected virtual ICondition ConvertKey<TKey>(TKey key)
-		{
-			return this.EnsureInquiryKey(new object[] { key });
-		}
-
-		protected virtual ICondition ConvertKey<TKey1, TKey2>(TKey1 key1, TKey2 key2)
-		{
-			return this.EnsureInquiryKey(new object[] { key1, key2 });
-		}
-
-		protected virtual ICondition ConvertKey<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3)
-		{
-			return this.EnsureInquiryKey(new object[] { key1, key2, key3 });
-		}
-		#endregion
-
 		#region 激发事件
 		protected int OnCounted(ICondition condition, string includes, int result)
 		{
@@ -844,49 +798,105 @@ namespace Zongsoft.Data
 		}
 		#endregion
 
-		#region 私有方法
-		private static bool IsNothing(object value)
+		#region 键值操作
+		/// <summary>
+		/// 根据指定的查询参数值获取对应的查询键值对数组或<see cref="ICondition"/>条件。
+		/// </summary>
+		/// <param name="values">传入的查询值数组。</param>
+		/// <returns>返回对应的键值对数组或者<see cref="ICondition"/>条件。</returns>
+		/// <remarks>
+		///		<para>基类的实现始终返回当前数据服务对应的主键的键值对数组。</para>
+		///		<para>对于重载者的提示：如果<paramref name="values"/>参数值为空(null)或空数组(零长度)，则应返回当前实体的主键的键值对数组（调用基类的<see cref="GetKey(object[])"/>即可）。</para>
+		/// </remarks>
+		protected virtual object GetKey(object[] values)
 		{
-			if(value == null || System.Convert.IsDBNull(value))
-				return true;
+			if(values == null || values.Length == 0)
+				return null;
 
-			if(value is string)
-				return string.IsNullOrWhiteSpace((string)value);
+			var primaryKey = this.DataAccess.GetKey(this.Name);
 
-			return false;
+			if(primaryKey == null || primaryKey.Length == 0)
+				return null;
+
+			var result = new object[Math.Min(primaryKey.Length, values.Length)];
+
+			for(int i = 0; i < result.Length; i++)
+			{
+				result[i] = new KeyValuePair<string, object>(primaryKey[i], values[i]);
+			}
+
+			return result;
 		}
 
+		protected virtual ICondition ConvertKey<TKey>(TKey key)
+		{
+			return this.EnsureInquiryKey(new object[] { key });
+		}
+
+		protected virtual ICondition ConvertKey<TKey1, TKey2>(TKey1 key1, TKey2 key2)
+		{
+			return this.EnsureInquiryKey(new object[] { key1, key2 });
+		}
+
+		protected virtual ICondition ConvertKey<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3)
+		{
+			return this.EnsureInquiryKey(new object[] { key1, key2, key3 });
+		}
+		#endregion
+
+		#region 私有方法
 		private ICondition EnsureInquiryKey(object[] values)
 		{
 			if(values != null && values.Length > 3)
 				throw new NotSupportedException("Too many the keys.");
 
 			//获取查询键值对数组
-			var items = this.GetKey(values ?? new object[0]);
+			var inquiryKey = this.GetKey(values ?? new object[0]);
 
-			if(items == null || items.Length == 0)
+			if(inquiryKey == null)
 				return null;
 
-			if(items.Length == 1)
-			{
-				if(IsNothing(items[0].Value))
-					return null;
+			//如果查询键可别转换成条件，则直接返回转换后的条件
+			var condition = this.GetCondition(inquiryKey);
 
-				return items[0].Value is ICondition ? (ICondition)items[0].Value : Condition.Equal(items[0].Key, items[0].Value);
-			}
+			if(condition != null)
+				return condition;
+
+			//如果最后查询键不可遍历，则抛出异常
+			var items = inquiryKey as IEnumerable;
+
+			if(items == null)
+				throw new InvalidOperationException($"Invalid inquiry key: {inquiryKey}");
 
 			var conditions = new ConditionCollection(ConditionCombination.And);
 
 			foreach(var item in items)
 			{
-				if(!IsNothing(item.Value))
-					conditions.Add(item.Value is ICondition ? (ICondition)item.Value : Condition.Equal(item.Key, item.Value));
+				condition = this.GetCondition(item);
+
+				if(condition != null)
+					conditions.Add(condition);
 			}
 
 			if(conditions.Count > 1)
 				return conditions;
 
 			return conditions.FirstOrDefault();
+		}
+
+		private ICondition GetCondition(object item)
+		{
+			var condition = item as ICondition;
+
+			if(condition != null)
+				return condition;
+
+			if(item is DictionaryEntry && ((DictionaryEntry)item).Key != null)
+				return Condition.Equal(((DictionaryEntry)item).Key.ToString(), ((DictionaryEntry)item).Value);
+			if(item is KeyValuePair<string, object> && ((KeyValuePair<string, object>)item).Key != null)
+				return Condition.Equal(((KeyValuePair<string, object>)item).Key, ((KeyValuePair<string, object>)item).Value);
+
+			return null;
 		}
 
 		private object GetResult(IEnumerable<TEntity> result, object[] values)
@@ -897,8 +907,20 @@ namespace Zongsoft.Data
 			//获取当前查询对应的查询键名称数组
 			var inquiryKey = this.GetKey(values);
 
+			if(inquiryKey == null)
+				return result;
+
+			string[] keys = null;
+
+			if(inquiryKey is IEnumerable<KeyValuePair<string, object>>)
+				keys = ((IEnumerable<KeyValuePair<string, object>>)inquiryKey).Select(p => p.Key).ToArray();
+			else if(inquiryKey is IEnumerable<object>)
+				keys = ((IEnumerable<object>)inquiryKey).Where(p => p is KeyValuePair<string, object>).Select(p => ((KeyValuePair<string, object>)p).Key).ToArray();
+			else if(inquiryKey is KeyValuePair<string, object>)
+				keys = new string[] { ((KeyValuePair<string, object>)inquiryKey).Key };
+
 			//如果查询键与主键完全一致，则返回单数据（主键查询）
-			if(this.CompareStringArray(primaryKey, inquiryKey.Select(p => p.Key).ToArray()))
+			if(primaryKey != null && keys != null && this.CompareStringArray(primaryKey, keys))
 				return result.FirstOrDefault();
 
 			return result;
