@@ -73,7 +73,7 @@ namespace Zongsoft.Common
 				if(conversionType == typeof(DBNull))
 					return DBNull.Value;
 				else
-					return defaultValueThunk();
+					return conversionType.IsValueType ? defaultValueThunk() : null;
 			}
 
 			Type type = conversionType;
