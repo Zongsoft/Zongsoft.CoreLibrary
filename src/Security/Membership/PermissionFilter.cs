@@ -41,7 +41,7 @@ namespace Zongsoft.Security.Membership
 		{
 		}
 
-		public PermissionFilter(int memberId, MemberType memberType, string schemaId, string actionId, string filter) : base(memberId, memberType, schemaId, actionId, false)
+		public PermissionFilter(uint memberId, MemberType memberType, string schemaId, string actionId, string filter) : base(memberId, memberType, schemaId, actionId, false)
 		{
 			if(string.IsNullOrWhiteSpace(filter))
 				throw new ArgumentNullException("filter");

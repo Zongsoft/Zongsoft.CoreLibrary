@@ -41,7 +41,7 @@ namespace Zongsoft.Security.Membership
 		#endregion
 
 		#region 成员字段
-		private int _roleId;
+		private uint _roleId;
 		private DateTime _createdTime;
 		#endregion
 
@@ -55,11 +55,11 @@ namespace Zongsoft.Security.Membership
 		{
 		}
 
-		public Role(int roleId, string name) : this(roleId, name, null)
+		public Role(uint roleId, string name) : this(roleId, name, null)
 		{
 		}
 
-		public Role(int roleId, string name, string @namespace)
+		public Role(uint roleId, string name, string @namespace)
 		{
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException("name");
@@ -72,7 +72,7 @@ namespace Zongsoft.Security.Membership
 		#endregion
 
 		#region 公共属性
-		public int RoleId
+		public uint RoleId
 		{
 			get
 			{

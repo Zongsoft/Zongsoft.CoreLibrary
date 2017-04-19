@@ -41,7 +41,7 @@ namespace Zongsoft.Security.Membership
 		#endregion
 
 		#region 成员字段
-		private int _userId;
+		private uint _userId;
 		private UserStatus _status;
 		private DateTime? _statusTimestamp;
 		private DateTime _createdTime;
@@ -58,11 +58,11 @@ namespace Zongsoft.Security.Membership
 		{
 		}
 
-		public User(int userId, string name) : this(userId, name, null)
+		public User(uint userId, string name) : this(userId, name, null)
 		{
 		}
 
-		public User(int userId, string name, string @namespace)
+		public User(uint userId, string name, string @namespace)
 		{
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException("name");
@@ -79,7 +79,7 @@ namespace Zongsoft.Security.Membership
 		/// <summary>
 		/// 获取或设置用户编号。
 		/// </summary>
-		public int UserId
+		public uint UserId
 		{
 			get
 			{

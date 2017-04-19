@@ -39,7 +39,7 @@ namespace Zongsoft.Security.Membership
 		/// </summary>
 		/// <param name="roleId">指定要查找的角色编号。</param>
 		/// <returns>如果指定编号的角色是存在的则返回真(True)，否则返回假(False)。</returns>
-		bool Exists(int roleId);
+		bool Exists(uint roleId);
 
 		/// <summary>
 		/// 确定指定的角色名在指定的命名空间内是否已经存在。
@@ -54,7 +54,7 @@ namespace Zongsoft.Security.Membership
 		/// </summary>
 		/// <param name="roleId">要查找的角色编号。</param>
 		/// <returns>返回由<paramref name="roleId"/>参数指定的角色对象，如果没有找到指定编号的角色则返回空。</returns>
-		Role GetRole(int roleId);
+		Role GetRole(uint roleId);
 
 		/// <summary>
 		/// 获取指定名称对应的角色对象。
@@ -78,7 +78,7 @@ namespace Zongsoft.Security.Membership
 		/// </summary>
 		/// <param name="roleIds">要删除的角色编号集合。</param>
 		/// <returns>如果删除成功则返回删除的数量，否则返回零。</returns>
-		int DeleteRoles(params int[] roleIds);
+		int DeleteRoles(params uint[] roleIds);
 
 		/// <summary>
 		/// 创建单个或者多个角色。

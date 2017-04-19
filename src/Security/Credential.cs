@@ -148,7 +148,7 @@ namespace Zongsoft.Security
 		/// 获取安全凭证对应的用户编号。
 		/// </summary>
 		[Zongsoft.Runtime.Serialization.SerializationMember(Runtime.Serialization.SerializationMemberBehavior.Ignored)]
-		public int UserId
+		public uint UserId
 		{
 			get
 			{

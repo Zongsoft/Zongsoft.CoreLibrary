@@ -36,15 +36,15 @@ namespace Zongsoft.Security.Membership
 	public class Member
 	{
 		#region 成员字段
-		private int _roleId;
+		private uint _roleId;
 		private Role _role;
-		private int _memberId;
+		private uint _memberId;
 		private MemberType _memberType;
 		private object _memberObject;
 		#endregion
 
 		#region 构造函数
-		public Member(int roleId, int memberId, MemberType memberType)
+		public Member(uint roleId, uint memberId, MemberType memberType)
 		{
 			_roleId = roleId;
 			_memberId = memberId;
@@ -56,7 +56,7 @@ namespace Zongsoft.Security.Membership
 		/// <summary>
 		/// 获取或设置成员的父角色编号。
 		/// </summary>
-		public int RoleId
+		public uint RoleId
 		{
 			get
 			{
@@ -86,7 +86,7 @@ namespace Zongsoft.Security.Membership
 		/// <summary>
 		/// 获取或设置成员编号。
 		/// </summary>
-		public int MemberId
+		public uint MemberId
 		{
 			get
 			{

@@ -40,7 +40,7 @@ namespace Zongsoft.Security.Membership
 		/// </summary>
 		/// <param name="userId">要查找的用户编号。</param>
 		/// <returns>返回由<paramref name="userId"/>参数指定的用户对象，如果没有找到指定编号的用户则返回空。</returns>
-		User GetUser(int userId);
+		User GetUser(uint userId);
 
 		/// <summary>
 		/// 获取指定标识对应的用户对象。
@@ -64,7 +64,7 @@ namespace Zongsoft.Security.Membership
 		/// </summary>
 		/// <param name="userId">指定要查找的用户编号。</param>
 		/// <returns>如果指定编号的用户是存在的则返回真(True)，否则返回假(False)。</returns>
-		bool Exists(int userId);
+		bool Exists(uint userId);
 
 		/// <summary>
 		/// 确定指定的用户标识在指定的命名空间内是否已经存在。
@@ -80,7 +80,7 @@ namespace Zongsoft.Security.Membership
 		/// <param name="userId">要设置的用户编号。</param>
 		/// <param name="avatar">要设置的用户头像标识(头像代码或头像图片的URL)。</param>
 		/// <returns>如果设置成功则返回真(True)，否则返回假(False)。</returns>
-		bool SetAvatar(int userId, string avatar);
+		bool SetAvatar(uint userId, string avatar);
 
 		/// <summary>
 		/// 设置指定编号的用户邮箱地址。
@@ -88,7 +88,7 @@ namespace Zongsoft.Security.Membership
 		/// <param name="userId">要设置的用户编号。</param>
 		/// <param name="email">要设置的邮箱地址。</param>
 		/// <returns>如果设置成功则返回真(True)，否则返回假(False)。</returns>
-		bool SetEmail(int userId, string email);
+		bool SetEmail(uint userId, string email);
 
 		/// <summary>
 		/// 设置指定编号的用户手机号码。
@@ -96,7 +96,7 @@ namespace Zongsoft.Security.Membership
 		/// <param name="userId">要设置的用户编号。</param>
 		/// <param name="phoneNumber">要设置的手机号码。</param>
 		/// <returns>如果设置成功则返回真(True)，否则返回假(False)。</returns>
-		bool SetPhoneNumber(int userId, string phoneNumber);
+		bool SetPhoneNumber(uint userId, string phoneNumber);
 
 		/// <summary>
 		/// 设置指定编号的用户名称。
@@ -104,7 +104,7 @@ namespace Zongsoft.Security.Membership
 		/// <param name="userId">要设置的用户编号。</param>
 		/// <param name="name">要设置的用户名称。</param>
 		/// <returns>如果设置成功则返回真(True)，否则返回假(False)。</returns>
-		bool SetName(int userId, string name);
+		bool SetName(uint userId, string name);
 
 		/// <summary>
 		/// 设置指定编号的用户全称(昵称)。
@@ -112,7 +112,7 @@ namespace Zongsoft.Security.Membership
 		/// <param name="userId">要设置的用户编号。</param>
 		/// <param name="fullName">要设置的用户全称(昵称)。</param>
 		/// <returns>如果设置成功则返回真(True)，否则返回假(False)。</returns>
-		bool SetFullName(int userId, string fullName);
+		bool SetFullName(uint userId, string fullName);
 
 		/// <summary>
 		/// 设置指定编号的用户描述信息。
@@ -120,7 +120,7 @@ namespace Zongsoft.Security.Membership
 		/// <param name="userId">要设置的用户编号。</param>
 		/// <param name="description">要设置的用户描述信息。</param>
 		/// <returns>如果设置成功则返回真(True)，否则返回假(False)。</returns>
-		bool SetDescription(int userId, string description);
+		bool SetDescription(uint userId, string description);
 
 		/// <summary>
 		/// 设置指定编号的用户所对应的主体标识。
@@ -128,7 +128,7 @@ namespace Zongsoft.Security.Membership
 		/// <param name="userId">要设置的用户编号。</param>
 		/// <param name="principalId">要设置的用户主体标识。</param>
 		/// <returns>如果设置成功则返回真(True)，否则返回假(False)。</returns>
-		bool SetPrincipalId(int userId, string principalId);
+		bool SetPrincipalId(uint userId, string principalId);
 
 		/// <summary>
 		/// 设置指定编号的用户状态。
@@ -136,14 +136,14 @@ namespace Zongsoft.Security.Membership
 		/// <param name="userId">要设置的用户编号。</param>
 		/// <param name="status">指定的用户状态。</param>
 		/// <returns>如果设置成功则返回真(True)，否则返回假(False)。</returns>
-		bool SetStatus(int userId, UserStatus status);
+		bool SetStatus(uint userId, UserStatus status);
 
 		/// <summary>
 		/// 删除指定编号集的多个用户。
 		/// </summary>
 		/// <param name="userIds">要删除的用户编号数组。</param>
 		/// <returns>如果删除成功则返回删除的数量，否则返回零。</returns>
-		int DeleteUsers(params int[] userIds);
+		int DeleteUsers(params uint[] userIds);
 
 		/// <summary>
 		/// 创建一个用户，并为其设置密码。
@@ -182,7 +182,7 @@ namespace Zongsoft.Security.Membership
 		/// </summary>
 		/// <param name="userId">指定的用户编号。</param>
 		/// <returns>如果返回真(True)表示指定编号的用户已经设置了密码，否则未设置密码。</returns>
-		bool HasPassword(int userId);
+		bool HasPassword(uint userId);
 
 		/// <summary>
 		/// 判断指定标识的用户是否设置了密码。
@@ -198,7 +198,7 @@ namespace Zongsoft.Security.Membership
 		/// <param name="userId">要修改密码的用户编号。</param>
 		/// <param name="oldPassword">指定的用户的当前密码。</param>
 		/// <param name="newPassword">指定的用户的新密码。</param>
-		bool ChangePassword(int userId, string oldPassword, string newPassword);
+		bool ChangePassword(uint userId, string oldPassword, string newPassword);
 
 		/// <summary>
 		/// 准备重置指定用户的密码。
@@ -208,8 +208,8 @@ namespace Zongsoft.Security.Membership
 		/// <param name="secret">指定的验证码。</param>
 		/// <param name="timeout">指定验证码的有效期，默认为60分钟。</param>
 		/// <exception cref="System.ArgumentNullException"><paramref name="secret"/>参数为空(null)或全空白字符串。</exception>
-		/// <returns>返回<paramref name="identity"/>参数对应的用户编号，如果指定用户标识不存在则返回负数(-1)。</returns>
-		int ForgetPassword(string identity, string @namespace, string secret, TimeSpan? timeout = null);
+		/// <returns>返回<paramref name="identity"/>参数对应的用户编号，如果指定用户标识不存在则返回零。</returns>
+		uint ForgetPassword(string identity, string @namespace, string secret, TimeSpan? timeout = null);
 
 		/// <summary>
 		/// 重置指定用户的密码，以验证码摘要的方式进行密码重置。
@@ -221,7 +221,7 @@ namespace Zongsoft.Security.Membership
 		/// <remarks>
 		///		<para>本重置方法通常由Web请求的方式进行，请求的URL大致如下：<c><![CDATA[http://zongsoft.com/security/user/resetpassword?userId=xxx&secret=xxxxxx]]></c></para>
 		/// </remarks>
-		bool ResetPassword(int userId, string secret, string newPassword = null);
+		bool ResetPassword(uint userId, string secret, string newPassword = null);
 
 		/// <summary>
 		/// 重置指定用户的密码，以验证码的方式进行密码重置。
@@ -248,7 +248,7 @@ namespace Zongsoft.Security.Membership
 		/// </summary>
 		/// <param name="userId">指定的用户编号。</param>
 		/// <returns>返回指定用户的密码问答的题面，即密码问答的提示部分。</returns>
-		string[] GetPasswordQuestions(int userId);
+		string[] GetPasswordQuestions(uint userId);
 
 		/// <summary>
 		/// 获取指定用户的密码问答的题面集。
@@ -266,7 +266,7 @@ namespace Zongsoft.Security.Membership
 		/// <param name="passwordQuestions">当前用户的密码问答的题面集。</param>
 		/// <param name="passwordAnswers">当前用户的密码问答的答案集。</param>
 		/// <returns>如果设置成则返回真(True)，否则返回假(False)。</returns>
-		bool SetPasswordQuestionsAndAnswers(int userId, string password, string[] passwordQuestions, string[] passwordAnswers);
+		bool SetPasswordQuestionsAndAnswers(uint userId, string password, string[] passwordQuestions, string[] passwordAnswers);
 
 		/// <summary>
 		/// 设置指定用户的密码参数选项。
@@ -278,7 +278,7 @@ namespace Zongsoft.Security.Membership
 		/// <param name="passwordAttemptWindow">无效密码被锁定后到下次解锁的间隔分钟数。</param>
 		/// <param name="passwordExpires">密码的过期时间。</param>
 		/// <returns>如果设置成功则返回真(True)，否则返回假(False)。</returns>
-		bool SetPasswordOptions(int userId, bool changePasswordOnFirstTime = false, byte maxInvalidPasswordAttempts = 3, byte minRequiredPasswordLength = 6, TimeSpan? passwordAttemptWindow = null, DateTime? passwordExpires = null);
+		bool SetPasswordOptions(uint userId, bool changePasswordOnFirstTime = false, byte maxInvalidPasswordAttempts = 3, byte minRequiredPasswordLength = 6, TimeSpan? passwordAttemptWindow = null, DateTime? passwordExpires = null);
 		#endregion
 	}
 }

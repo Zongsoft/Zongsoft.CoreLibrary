@@ -100,7 +100,7 @@ namespace Zongsoft.Security
 		/// <param name="userId">指定要获取的安全凭证对应的用户编号。</param>
 		/// <param name="scene">指定要获取的安全凭证对应的应用场景。</param>
 		/// <returns>返回成功的安全凭证对象，如果指定的用户及应用场景不存在对应的安全凭证则返回空(null)。</returns>
-		Credential GetCredential(int userId, string scene);
+		Credential GetCredential(uint userId, string scene);
 
 		/// <summary>
 		/// 获取指定命名空间中的所有<see cref="Credential"/>安全凭证对象集。

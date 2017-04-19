@@ -33,7 +33,7 @@ namespace Zongsoft.Security.Membership
 	public class Permission
 	{
 		#region 成员变量
-		private int _memberId;
+		private uint _memberId;
 		private MemberType _memberType;
 		private string _schemaId;
 		private string _actionId;
@@ -45,7 +45,7 @@ namespace Zongsoft.Security.Membership
 		{
 		}
 
-		public Permission(int memberId, MemberType memberType, string schemaId, string actionId, bool granted)
+		public Permission(uint memberId, MemberType memberType, string schemaId, string actionId, bool granted)
 		{
 			if(string.IsNullOrEmpty(schemaId))
 				throw new ArgumentNullException("schemaId");
@@ -61,7 +61,7 @@ namespace Zongsoft.Security.Membership
 		#endregion
 
 		#region 公共属性
-		public int MemberId
+		public uint MemberId
 		{
 			get
 			{

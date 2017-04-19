@@ -34,14 +34,14 @@ namespace Zongsoft.Security.Membership
 	{
 		#region 成员字段
 		private CredentialPrincipal _principal;
-		private int _userId;
+		private uint _userId;
 		private string _schemaId;
 		private string _actionId;
 		private bool _isAuthorized;
 		#endregion
 
 		#region 构造函数
-		public AuthorizationEventArgs(int userId, string schemaId, string actionId, bool isAuthorized)
+		public AuthorizationEventArgs(uint userId, string schemaId, string actionId, bool isAuthorized)
 		{
 			_userId = userId;
 			_schemaId = schemaId;
@@ -76,7 +76,7 @@ namespace Zongsoft.Security.Membership
 		/// <summary>
 		/// 获取待授权的用户编号。
 		/// </summary>
-		public int UserId
+		public uint UserId
 		{
 			get
 			{
