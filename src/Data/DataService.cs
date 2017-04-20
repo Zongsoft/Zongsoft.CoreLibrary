@@ -55,6 +55,7 @@ namespace Zongsoft.Data
 		private string _name;
 		private IDataAccess _dataAccess;
 		private Zongsoft.Services.IServiceProvider _serviceProvider;
+		private DataSearchAttribute.DataSearchKey[] _keys;
 		#endregion
 
 		#region 构造函数
@@ -65,6 +66,9 @@ namespace Zongsoft.Data
 
 			_serviceProvider = serviceProvider;
 			_dataAccess = serviceProvider.ResolveRequired<IDataAccess>();
+
+			//获取当前数据搜索键
+			_keys = ((DataSearchAttribute)Attribute.GetCustomAttribute(this.GetType(), typeof(DataSearchAttribute), true))?.Keys;
 
 			//注册数据递增键序列号
 			DataSequence.Register(this);
@@ -80,6 +84,9 @@ namespace Zongsoft.Data
 			_name = name.Trim();
 			_serviceProvider = serviceProvider;
 			_dataAccess = serviceProvider.ResolveRequired<IDataAccess>();
+
+			//获取当前数据搜索键
+			_keys = ((DataSearchAttribute)Attribute.GetCustomAttribute(this.GetType(), typeof(DataSearchAttribute), true))?.Keys;
 
 			//注册数据递增键序列号
 			DataSequence.Register(this);
@@ -813,6 +820,16 @@ namespace Zongsoft.Data
 			if(values == null || values.Length == 0)
 				return null;
 
+			//如果查询参数只有一个，并且当前数据服务启用了数据搜索特性
+			if(values.Length == 1 && _keys != null && _keys.Length > 0)
+			{
+				//根据查询参数获取对应的搜索条件
+				var condition = this.GetSearchCondition(values[0] as string);
+
+				if(condition != null)
+					return condition;
+			}
+
 			var primaryKey = this.DataAccess.GetKey(this.Name);
 
 			if(primaryKey == null || primaryKey.Length == 0)
@@ -845,6 +862,43 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 私有方法
+		private ICondition GetSearchCondition(string argument)
+		{
+			if(_keys == null || _keys.Length == 0)
+				return null;
+
+			if(string.IsNullOrWhiteSpace(argument))
+				return null;
+
+			var index = argument.IndexOf(':', '=');
+
+			if(index < 1)
+				return null;
+
+			var tag = argument.Substring(0, index);
+			var value = index < argument.Length - 1 ? argument.Substring(index + 1) : null;
+
+			foreach(var key in _keys)
+			{
+				if(key.Tags.Contains(tag, StringComparer.OrdinalIgnoreCase))
+				{
+					var conditions = new ConditionCollection(ConditionCombination.Or);
+
+					foreach(var field in key.Fields)
+					{
+						conditions.Add(new Condition(field, value));
+					}
+
+					if(conditions.Count == 1)
+						return conditions[0];
+					else
+						return conditions;
+				}
+			}
+
+			return null;
+		}
+
 		private ICondition EnsureInquiryKey(object[] values)
 		{
 			if(values != null && values.Length > 3)
@@ -912,6 +966,10 @@ namespace Zongsoft.Data
 
 			string[] keys = null;
 
+			if(inquiryKey is Condition)
+				keys = new string[] { ((Condition)inquiryKey).Name };
+			else if(inquiryKey is IEnumerable<ICondition>)
+				keys = ((IEnumerable<ICondition>)inquiryKey).Where(p => p is Condition).Select(p => ((Condition)p).Name).ToArray();
 			if(inquiryKey is IEnumerable<KeyValuePair<string, object>>)
 				keys = ((IEnumerable<KeyValuePair<string, object>>)inquiryKey).Select(p => p.Key).ToArray();
 			else if(inquiryKey is IEnumerable<object>)
