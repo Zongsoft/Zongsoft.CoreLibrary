@@ -188,7 +188,17 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return this.GetPropertyValue(() => this.Avatar);
+				var avatar = this.GetPropertyValue(() => this.Avatar);
+
+				if(!string.IsNullOrWhiteSpace(avatar))
+				{
+					Zongsoft.IO.Path path;
+
+					if(Zongsoft.IO.Path.TryParse(avatar, out path))
+						return Zongsoft.IO.FileSystem.GetUrl(path.Url);
+				}
+
+				return avatar;
 			}
 			set
 			{
