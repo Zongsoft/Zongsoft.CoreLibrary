@@ -870,7 +870,7 @@ namespace Zongsoft.Data
 			if(string.IsNullOrWhiteSpace(argument))
 				return null;
 
-			var index = argument.IndexOf(':', '=');
+			var index = argument.IndexOf(':');
 
 			if(index < 1)
 				return null;
