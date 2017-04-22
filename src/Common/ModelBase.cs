@@ -249,6 +249,18 @@ namespace Zongsoft.Common
 		#endregion
 
 		#region 公共方法
+		/// <summary>
+		/// 返回当前对象是否有属性值被改变过。
+		/// </summary>
+		public bool HasChanges()
+		{
+			return _changedProperties != null && _changedProperties.Count > 0;
+		}
+
+		/// <summary>
+		/// 获取当前对象中被改变过的属性集。
+		/// </summary>
+		/// <returns></returns>
 		public IDictionary<string, object> GetChangedProperties()
 		{
 			if(_changedProperties == null)
