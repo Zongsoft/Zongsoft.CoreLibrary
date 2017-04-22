@@ -131,6 +131,12 @@ namespace Zongsoft.Data
 		#region 保护方法
 		protected bool IsIgnorable(ConditionalConverterContext context)
 		{
+			if((context.Behaviors & ConditionalBehaviors.IgnoreNull) == ConditionalBehaviors.IgnoreNull && context.Value == null)
+				return true;
+
+			if((context.Behaviors & ConditionalBehaviors.IgnoreEmpty) == ConditionalBehaviors.IgnoreEmpty && context.Type == typeof(string) && string.IsNullOrWhiteSpace((string)context.Value))
+				return true;
+
 			if(Zongsoft.Common.TypeExtension.IsAssignableFrom(typeof(ConditionalRange), context.Type))
 				return ConditionalRange.IsEmpty((ConditionalRange)context.Value);
 

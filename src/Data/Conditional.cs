@@ -165,7 +165,7 @@ namespace Zongsoft.Data
 			var names = this.GetConditionNames(property);
 
 			//创建转换器上下文
-			var context = new ConditionalConverterContext(this, names, property.PropertyType, property.GetValue(this), property.Operator);
+			var context = new ConditionalConverterContext(this, property.Behaviors, names, property.PropertyType, property.GetValue(this), property.Operator);
 
 			//如果当前属性指定了特定的转换器，则使用该转换器来处理
 			if(property.Converter != null)
@@ -229,6 +229,14 @@ namespace Zongsoft.Data
 
 				if(attribute != null && attribute.ConverterType != null)
 					this.Converter = Activator.CreateInstance(attribute.ConverterType) as IConditionalConverter;
+			}
+
+			public ConditionalBehaviors Behaviors
+			{
+				get
+				{
+					return this.Attribute == null ? ConditionalBehaviors.None : this.Attribute.Behaviors;
+				}
 			}
 
 			public ConditionOperator? Operator

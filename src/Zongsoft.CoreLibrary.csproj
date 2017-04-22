@@ -121,6 +121,7 @@
     <Compile Include="Communication\PackageSerializer.cs" />
     <Compile Include="Communication\PacketizerFactory.cs" />
     <Compile Include="Communication\ChannelPipelineContext.cs" />
+    <Compile Include="Data\ConditionalBehaviors.cs" />
     <Compile Include="Data\DataAccessException.cs" />
     <Compile Include="Data\DataAccessMapper.cs" />
     <Compile Include="Data\DataSearchAttribute.cs" />

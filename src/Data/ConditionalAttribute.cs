@@ -38,6 +38,7 @@ namespace Zongsoft.Data
 		#region 成员字段
 		private string[] _names;
 		private bool _ignored;
+		private ConditionalBehaviors _behaviors;
 		private ConditionOperator? _operator;
 		private Type _converterType;
 		#endregion
@@ -46,26 +47,51 @@ namespace Zongsoft.Data
 		public ConditionalAttribute(bool ignored)
 		{
 			_ignored = ignored;
+			_behaviors = ConditionalBehaviors.IgnoreNullOrEmpty;
 		}
 
 		public ConditionalAttribute(params string[] names)
 		{
 			_names = EnsureNames(names);
+			_behaviors = ConditionalBehaviors.IgnoreNullOrEmpty;
 		}
 
-		public ConditionalAttribute(ConditionOperator? @operator, params string[] names)
+		public ConditionalAttribute(ConditionOperator @operator, params string[] names) : this(ConditionalBehaviors.IgnoreNullOrEmpty, @operator, names)
 		{
+		}
+
+		public ConditionalAttribute(ConditionalBehaviors behaviors, params string[] names)
+		{
+			_behaviors = behaviors;
+			_names = EnsureNames(names);
+		}
+
+		public ConditionalAttribute(ConditionalBehaviors behaviors, ConditionOperator @operator, params string[] names)
+		{
+			_behaviors = behaviors;
 			_operator = @operator;
 			_names = EnsureNames(names);
 		}
 
-		public ConditionalAttribute(Type converterType, params string[] names) : this(converterType, null, names)
+		public ConditionalAttribute(Type converterType, params string[] names) : this(converterType, ConditionalBehaviors.IgnoreNullOrEmpty, names)
 		{
 		}
 
-		public ConditionalAttribute(Type converterType, ConditionOperator? @operator, params string[] names)
+		public ConditionalAttribute(Type converterType, ConditionOperator @operator, params string[] names) : this(converterType, ConditionalBehaviors.IgnoreNullOrEmpty, @operator, names)
+		{
+		}
+
+		public ConditionalAttribute(Type converterType, ConditionalBehaviors behaviors, params string[] names)
 		{
 			this.ConverterType = converterType;
+			_behaviors = behaviors;
+			_names = EnsureNames(names);
+		}
+
+		public ConditionalAttribute(Type converterType, ConditionalBehaviors behaviors, ConditionOperator @operator, params string[] names)
+		{
+			this.ConverterType = converterType;
+			_behaviors = behaviors;
 			_operator = @operator;
 			_names = EnsureNames(names);
 		}
@@ -99,6 +125,21 @@ namespace Zongsoft.Data
 			set
 			{
 				_ignored = value;
+			}
+		}
+
+		/// <summary>
+		/// 获取或设置查询条件的行为。
+		/// </summary>
+		public ConditionalBehaviors Behaviors
+		{
+			get
+			{
+				return _behaviors;
+			}
+			set
+			{
+				_behaviors = value;
 			}
 		}
 
