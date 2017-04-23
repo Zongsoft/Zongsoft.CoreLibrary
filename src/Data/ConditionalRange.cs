@@ -131,7 +131,8 @@ namespace Zongsoft.Data
 				result.To = to;
 			}
 
-			return result != null && (!ConditionalRange.IsEmpty(result));
+			//最后返回真（即使输出参数为空）
+			return true;
 		}
 		#endregion
 
