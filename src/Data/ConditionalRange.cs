@@ -25,6 +25,7 @@
  */
 
 using System;
+using System.Linq;
 using System.Collections;
 
 namespace Zongsoft.Data
@@ -88,6 +89,69 @@ namespace Zongsoft.Data
 		public static bool IsEmpty(ConditionalRange value)
 		{
 			return value == null || (value.From == null && value.To == null);
+		}
+
+		public static bool TryParse<T>(string text, out ConditionalRange result) where T : IComparable
+		{
+			result = null;
+
+			if(string.IsNullOrWhiteSpace(text))
+				return false;
+
+			text = text.Trim().Trim('(', ')');
+
+			if(string.IsNullOrWhiteSpace(text))
+				return false;
+
+			var parts = text.Split('~').Select(p => p.Trim().Trim('?', '*')).ToArray();
+
+			if(!string.IsNullOrWhiteSpace(parts[0]))
+			{
+				T from;
+
+				if(!Zongsoft.Common.Convert.TryConvertValue(parts[0], out from))
+					return false;
+
+				if(result == null)
+					result = new ConditionalRange();
+
+				result.From = from;
+			}
+
+			if(parts.Length > 1 && !string.IsNullOrWhiteSpace(parts[1]))
+			{
+				T to;
+
+				if(!Zongsoft.Common.Convert.TryConvertValue(parts[1], out to))
+					return false;
+
+				if(result == null)
+					result = new ConditionalRange();
+
+				result.To = to;
+			}
+
+			return result != null && (!ConditionalRange.IsEmpty(result));
+		}
+		#endregion
+
+		#region 重写方法
+		public override string ToString()
+		{
+			if(_from == null)
+			{
+				if(_to == null)
+					return string.Empty;
+				else
+					return $"(~{_to.ToString()})";
+			}
+			else
+			{
+				if(_to == null)
+					return $"({_from.ToString()})";
+				else
+					return $"({_from.ToString()}~{_to.ToString()})";
+			}
 		}
 		#endregion
 
