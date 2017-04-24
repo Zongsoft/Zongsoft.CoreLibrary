@@ -44,6 +44,12 @@ namespace Zongsoft.Data
 		event EventHandler<DataCountingEventArgs> Counting;
 		event EventHandler<DataExecutedEventArgs> Executed;
 		event EventHandler<DataExecutingEventArgs> Executing;
+		event EventHandler<DataExistedEventArgs> Existed;
+		event EventHandler<DataExistingEventArgs> Existing;
+		event EventHandler<DataIncrementedEventArgs> Incremented;
+		event EventHandler<DataIncrementingEventArgs> Incrementing;
+		event EventHandler<DataDecrementedEventArgs> Decremented;
+		event EventHandler<DataDecrementingEventArgs> Decrementing;
 		event EventHandler<DataSelectedEventArgs> Selected;
 		event EventHandler<DataSelectingEventArgs> Selecting;
 		event EventHandler<DataDeletedEventArgs> Deleted;
@@ -56,6 +62,11 @@ namespace Zongsoft.Data
 
 		#region 属性声明
 		IDataAccessMapper Mapper
+		{
+			get;
+		}
+
+		ICollection<IDataAccessFilter> Filters
 		{
 			get;
 		}

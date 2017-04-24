@@ -32,22 +32,17 @@ namespace Zongsoft.Data
 	/// <summary>
 	/// 为数据访问的删除事件提供数据。
 	/// </summary>
-	public class DataDeletedEventArgs : EventArgs
+	public class DataDeletedEventArgs : DataAccessEventArgs
 	{
 		#region 成员字段
-		private string _name;
 		private int _result;
 		private ICondition _condition;
 		private string[] _cascades;
 		#endregion
 
 		#region 构造函数
-		public DataDeletedEventArgs(string name, ICondition condition, string[] cascades, int result)
+		public DataDeletedEventArgs(string name, ICondition condition, string[] cascades, int result) : base(name)
 		{
-			if(string.IsNullOrWhiteSpace(name))
-				throw new ArgumentNullException("name");
-
-			_name = name.Trim();
 			_condition = condition;
 			_cascades = cascades;
 			_result = result;
@@ -55,17 +50,6 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 公共属性
-		/// <summary>
-		/// 获取数据访问的名称。
-		/// </summary>
-		public string Name
-		{
-			get
-			{
-				return _name;
-			}
-		}
-
 		/// <summary>
 		/// 获取或设置删除操作的结果。
 		/// </summary>

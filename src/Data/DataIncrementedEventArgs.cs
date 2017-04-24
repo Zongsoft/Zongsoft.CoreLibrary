@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2016 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2017 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,49 +25,63 @@
  */
 
 using System;
-using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
-	/// <summary>
-	/// 为数据访问的计数事件提供数据。
-	/// </summary>
-	public class DataCountedEventArgs : DataAccessEventArgs
+	public class DataIncrementedEventArgs : DataAccessEventArgs
 	{
 		#region 成员字段
-		private int _result;
+		private string _member;
 		private ICondition _condition;
-		private string _includes;
+		private int _interval;
+		private long _result;
 		#endregion
 
 		#region 构造函数
-		public DataCountedEventArgs(string name, ICondition condition, string includes, int result) : base(name)
+		public DataIncrementedEventArgs(string name, string member, ICondition condition, int interval = 1) : base(name)
 		{
+			if(string.IsNullOrWhiteSpace(member))
+				throw new ArgumentNullException(nameof(member));
+
+			if(condition == null)
+				throw new ArgumentNullException(nameof(condition));
+
+			_member = member;
 			_condition = condition;
-			_includes = includes;
+			_interval = interval;
+		}
+
+		public DataIncrementedEventArgs(string name, string member, ICondition condition, int interval, long result) : base(name)
+		{
+			if(string.IsNullOrWhiteSpace(member))
+				throw new ArgumentNullException(nameof(member));
+
+			if(condition == null)
+				throw new ArgumentNullException(nameof(condition));
+
+			_member = member;
+			_condition = condition;
+			_interval = interval;
 			_result = result;
 		}
 		#endregion
 
 		#region 公共属性
-		/// <summary>
-		/// 获取或设置计数操作的结果。
-		/// </summary>
-		public int Result
+		public string Member
 		{
 			get
 			{
-				return _result;
+				return _member;
 			}
 			set
 			{
-				_result = value;
+				if(string.IsNullOrWhiteSpace(value))
+					throw new ArgumentNullException();
+
+				_member = value;
 			}
 		}
 
-		/// <summary>
-		/// 获取或设置计数操作的条件。
-		/// </summary>
 		public ICondition Condition
 		{
 			get
@@ -76,22 +90,34 @@ namespace Zongsoft.Data
 			}
 			set
 			{
+				if(value == null)
+					throw new ArgumentNullException();
+
 				_condition = value;
 			}
 		}
 
-		/// <summary>
-		/// 获取或设置计数操作的包含成员。
-		/// </summary>
-		public string Includes
+		public int Interval
 		{
 			get
 			{
-				return _includes;
+				return _interval;
 			}
 			set
 			{
-				_includes = value;
+				_interval = value;
+			}
+		}
+
+		public long Result
+		{
+			get
+			{
+				return _result;
+			}
+			set
+			{
+				_result = value;
 			}
 		}
 		#endregion

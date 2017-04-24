@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2016 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2017 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -29,69 +29,86 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
-	/// <summary>
-	/// 为数据访问的计数事件提供数据。
-	/// </summary>
-	public class DataCountedEventArgs : DataAccessEventArgs
+	public class DataAccessFilterContext : MarshalByRefObject
 	{
 		#region 成员字段
-		private int _result;
-		private ICondition _condition;
-		private string _includes;
+		private IDataAccess _dataAccess;
+		private DataAccessMethod _method;
+		private DataAccessEventArgs _arguments;
+		private IDictionary<string, object> _states;
 		#endregion
 
 		#region 构造函数
-		public DataCountedEventArgs(string name, ICondition condition, string includes, int result) : base(name)
+		public DataAccessFilterContext(IDataAccess dataAccess, DataAccessMethod method, DataAccessEventArgs arguments)
 		{
-			_condition = condition;
-			_includes = includes;
-			_result = result;
+			if(dataAccess == null)
+				throw new ArgumentNullException(nameof(dataAccess));
+			if(arguments == null)
+				throw new ArgumentNullException(nameof(arguments));
+
+			_method = method;
+			_dataAccess = dataAccess;
+			_arguments = arguments;
 		}
 		#endregion
 
 		#region 公共属性
-		/// <summary>
-		/// 获取或设置计数操作的结果。
-		/// </summary>
-		public int Result
+		public string Name
 		{
 			get
 			{
-				return _result;
-			}
-			set
-			{
-				_result = value;
+				return _arguments.Name;
 			}
 		}
 
-		/// <summary>
-		/// 获取或设置计数操作的条件。
-		/// </summary>
-		public ICondition Condition
+		public IDataAccess DataAccess
 		{
 			get
 			{
-				return _condition;
-			}
-			set
-			{
-				_condition = value;
+				return _dataAccess;
 			}
 		}
 
-		/// <summary>
-		/// 获取或设置计数操作的包含成员。
-		/// </summary>
-		public string Includes
+		public IDataAccessMapper Mapper
 		{
 			get
 			{
-				return _includes;
+				return _dataAccess.Mapper;
 			}
-			set
+		}
+
+		public DataAccessMethod Method
+		{
+			get
 			{
-				_includes = value;
+				return _method;
+			}
+		}
+
+		public DataAccessEventArgs Arguments
+		{
+			get
+			{
+				return _arguments;
+			}
+		}
+
+		public bool HasStates
+		{
+			get
+			{
+				return _states != null && _states.Count > 0;
+			}
+		}
+
+		public IDictionary<string, object> States
+		{
+			get
+			{
+				if(_states == null)
+					System.Threading.Interlocked.CompareExchange(ref _states, new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase), null);
+
+				return _states;
 			}
 		}
 		#endregion

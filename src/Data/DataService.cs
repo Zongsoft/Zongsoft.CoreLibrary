@@ -39,6 +39,12 @@ namespace Zongsoft.Data
 		public event EventHandler<DataCountingEventArgs> Counting;
 		public event EventHandler<DataExecutedEventArgs> Executed;
 		public event EventHandler<DataExecutingEventArgs> Executing;
+		public event EventHandler<DataExistedEventArgs> Existed;
+		public event EventHandler<DataExistingEventArgs> Existing;
+		public event EventHandler<DataIncrementedEventArgs> Incremented;
+		public event EventHandler<DataIncrementingEventArgs> Incrementing;
+		public event EventHandler<DataDecrementedEventArgs> Decremented;
+		public event EventHandler<DataDecrementingEventArgs> Decrementing;
 		public event EventHandler<DataGettedEventArgs> Getted;
 		public event EventHandler<DataGettingEventArgs> Getting;
 		public event EventHandler<DataSelectedEventArgs> Selected;
@@ -205,7 +211,17 @@ namespace Zongsoft.Data
 		#region 存在方法
 		public virtual bool Exists(ICondition condition)
 		{
-			return this.DataAccess.Exists(this.Name, condition);
+			//激发“Existing”事件
+			var args = this.OnExisting(condition);
+
+			if(args.Cancel)
+				return args.Result;
+
+			//执行存在操作方法
+			args.Result = this.DataAccess.Exists(this.Name, condition);
+
+			//激发“Existed”事件
+			return this.OnExisted(args.Condition, args.Result);
 		}
 
 		public virtual bool Exists<TKey>(TKey key)
@@ -242,17 +258,40 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 递增方法
-		public virtual long Increment(string name, ICondition condition, int interval = 1)
+		public virtual long Increment(string member, ICondition condition, int interval = 1)
 		{
-			if(string.IsNullOrWhiteSpace(name))
-				throw new ArgumentNullException("name");
+			if(string.IsNullOrWhiteSpace(member))
+				throw new ArgumentNullException(nameof(member));
 
-			return this.DataAccess.Increment(this.Name, name, condition, interval);
+			//激发“Incrementing”事件
+			var args = this.OnIncrementing(member, condition, interval);
+
+			if(args.Cancel)
+				return args.Result;
+
+			//执行递增操作方法
+			args.Result = this.DataAccess.Increment(this.Name, member, condition, interval);
+
+			//激发“Incremented”事件
+			return this.OnIncremented(args.Member, args.Condition, args.Interval, args.Result);
 		}
 
-		public long Decrement(string name, ICondition condition, int interval = 1)
+		public long Decrement(string member, ICondition condition, int interval = 1)
 		{
-			return this.Increment(name, condition, -interval);
+			if(string.IsNullOrWhiteSpace(member))
+				throw new ArgumentNullException(nameof(member));
+
+			//激发“Decrementing”事件
+			var args = this.OnDecrementing(member, condition, interval);
+
+			if(args.Cancel)
+				return args.Result;
+
+			//执行递减操作方法
+			args.Result = this.DataAccess.Decrement(this.Name, member, condition, interval);
+
+			//激发“Decremented”事件
+			return this.OnDecremented(args.Member, args.Condition, args.Interval, args.Result);
 		}
 		#endregion
 
@@ -622,6 +661,48 @@ namespace Zongsoft.Data
 			return args;
 		}
 
+		protected bool OnExisted(ICondition condition, bool result)
+		{
+			var args = new DataExistedEventArgs(this.Name, condition, result);
+			this.OnExisted(args);
+			return args.Result;
+		}
+
+		protected DataExistingEventArgs OnExisting(ICondition condition, bool cancel = false)
+		{
+			var args = new DataExistingEventArgs(this.Name, condition, cancel);
+			this.OnExisting(args);
+			return args;
+		}
+
+		protected long OnIncremented(string member, ICondition condition, int interval, long result)
+		{
+			var args = new DataIncrementedEventArgs(this.Name, member, condition, interval, result);
+			this.OnIncremented(args);
+			return args.Result;
+		}
+
+		protected DataIncrementingEventArgs OnIncrementing(string member, ICondition condition, int interval = 1, bool cancel = false)
+		{
+			var args = new DataIncrementingEventArgs(this.Name, member, condition, interval, cancel);
+			this.OnIncrementing(args);
+			return args;
+		}
+
+		protected long OnDecremented(string member, ICondition condition, int interval, long result)
+		{
+			var args = new DataDecrementedEventArgs(this.Name, member, condition, interval, result);
+			this.OnDecremented(args);
+			return args.Result;
+		}
+
+		protected DataDecrementingEventArgs OnDecrementing(string member, ICondition condition, int interval = 1, bool cancel = false)
+		{
+			var args = new DataDecrementingEventArgs(this.Name, member, condition, interval, cancel);
+			this.OnDecrementing(args);
+			return args;
+		}
+
 		protected object OnGetted(ICondition condition, string scope, Paging paging, Sorting[] sortings, object result)
 		{
 			var args = new DataGettedEventArgs(this.Name, condition, scope, paging, sortings, result);
@@ -719,6 +800,54 @@ namespace Zongsoft.Data
 		protected virtual void OnExecuting(DataExecutingEventArgs args)
 		{
 			var e = this.Executing;
+
+			if(e != null)
+				e(this, args);
+		}
+
+		protected virtual void OnExisted(DataExistedEventArgs args)
+		{
+			var e = this.Existed;
+
+			if(e != null)
+				e(this, args);
+		}
+
+		protected virtual void OnExisting(DataExistingEventArgs args)
+		{
+			var e = this.Existing;
+
+			if(e != null)
+				e(this, args);
+		}
+
+		protected virtual void OnIncremented(DataIncrementedEventArgs args)
+		{
+			var e = this.Incremented;
+
+			if(e != null)
+				e(this, args);
+		}
+
+		protected virtual void OnIncrementing(DataIncrementingEventArgs args)
+		{
+			var e = this.Incrementing;
+
+			if(e != null)
+				e(this, args);
+		}
+
+		protected virtual void OnDecremented(DataDecrementedEventArgs args)
+		{
+			var e = this.Decremented;
+
+			if(e != null)
+				e(this, args);
+		}
+
+		protected virtual void OnDecrementing(DataDecrementingEventArgs args)
+		{
+			var e = this.Decrementing;
 
 			if(e != null)
 				e(this, args);

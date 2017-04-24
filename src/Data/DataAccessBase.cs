@@ -25,8 +25,10 @@
  */
 
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 
 namespace Zongsoft.Data
 {
@@ -40,6 +42,12 @@ namespace Zongsoft.Data
 		public event EventHandler<DataCountingEventArgs> Counting;
 		public event EventHandler<DataExecutedEventArgs> Executed;
 		public event EventHandler<DataExecutingEventArgs> Executing;
+		public event EventHandler<DataExistedEventArgs> Existed;
+		public event EventHandler<DataExistingEventArgs> Existing;
+		public event EventHandler<DataIncrementedEventArgs> Incremented;
+		public event EventHandler<DataIncrementingEventArgs> Incrementing;
+		public event EventHandler<DataDecrementedEventArgs> Decremented;
+		public event EventHandler<DataDecrementingEventArgs> Decrementing;
 		public event EventHandler<DataSelectedEventArgs> Selected;
 		public event EventHandler<DataSelectingEventArgs> Selecting;
 		public event EventHandler<DataDeletedEventArgs> Deleted;
@@ -52,12 +60,14 @@ namespace Zongsoft.Data
 
 		#region 成员字段
 		private IDataAccessMapper _mapper;
+		private ICollection<IDataAccessFilter> _filters;
 		#endregion
 
 		#region 构造函数
 		protected DataAccessBase()
 		{
 			_mapper = new DataAccessMapper();
+			_filters = new List<IDataAccessFilter>();
 		}
 
 		protected DataAccessBase(IDataAccessMapper mapper)
@@ -66,6 +76,7 @@ namespace Zongsoft.Data
 				throw new ArgumentNullException(nameof(mapper));
 
 			_mapper = mapper;
+			_filters = new List<IDataAccessFilter>();
 		}
 		#endregion
 
@@ -78,6 +89,17 @@ namespace Zongsoft.Data
 			get
 			{
 				return _mapper;
+			}
+		}
+
+		/// <summary>
+		/// 获取数据访问过滤器集合。
+		/// </summary>
+		public ICollection<IDataAccessFilter> Filters
+		{
+			get
+			{
+				return _filters;
 			}
 		}
 		#endregion
@@ -109,8 +131,17 @@ namespace Zongsoft.Data
 			if(args.Cancel)
 				return args.Result as IEnumerable<T>;
 
+			//定义数据访问过滤器上下文
+			var filterContext = new DataAccessFilterContext(this, DataAccessMethod.Execute, args);
+
+			//调用数据访问过滤器前事件
+			this.InvokeFilters(filterContext, (filter, ctx) => filter.OnExecuting(ctx));
+
 			//执行数据操作方法
 			args.Result = this.OnExecute<T>(name, inParameters, out outParameters);
+
+			//调用数据访问过滤器后事件
+			this.InvokeFilters(filterContext, (filter, ctx) => filter.OnExecuted(ctx));
 
 			//激发“Executed”事件
 			return this.OnExecuted(name, typeof(T), args.InParameters, ref outParameters, args.Result) as IEnumerable<T>;
@@ -135,8 +166,17 @@ namespace Zongsoft.Data
 			if(args.Cancel)
 				return args.Result;
 
+			//定义数据访问过滤器上下文
+			var filterContext = new DataAccessFilterContext(this, DataAccessMethod.ExecuteScalar, args);
+
+			//调用数据访问过滤器前事件
+			this.InvokeFilters(filterContext, (filter, ctx) => filter.OnExecuting(ctx));
+
 			//执行数据操作方法
 			args.Result = this.OnExecuteScalar(name, inParameters, out outParameters);
+
+			//调用数据访问过滤器后事件
+			this.InvokeFilters(filterContext, (filter, ctx) => filter.OnExecuted(ctx));
 
 			//激发“Executed”事件
 			return this.OnExecuted(name, typeof(object), args.InParameters, ref outParameters, args.Result);
@@ -151,7 +191,34 @@ namespace Zongsoft.Data
 			return this.Exists(this.GetName<T>(), condition);
 		}
 
-		public abstract bool Exists(string name, ICondition condition);
+		public bool Exists(string name, ICondition condition)
+		{
+			if(string.IsNullOrWhiteSpace(name))
+				throw new ArgumentNullException(nameof(name));
+
+			//激发“Existing”事件
+			var args = this.OnExisting(name, condition, false);
+
+			if(args.Cancel)
+				return args.Result;
+
+			//定义数据访问过滤器上下文
+			var filterContext = new DataAccessFilterContext(this, DataAccessMethod.Exists, args);
+
+			//调用数据访问过滤器前事件
+			this.InvokeFilters(filterContext, (filter, ctx) => filter.OnExecuting(ctx));
+
+			//执行存在操作方法
+			args.Result = this.OnExists(name, condition);
+
+			//调用数据访问过滤器后事件
+			this.InvokeFilters(filterContext, (filter, ctx) => filter.OnExecuted(ctx));
+
+			//激发“Existed”事件
+			return this.OnExisted(name, args.Condition, args.Result);
+		}
+
+		protected abstract bool OnExists(string name, ICondition condition);
 		#endregion
 
 		#region 计数方法
@@ -171,8 +238,17 @@ namespace Zongsoft.Data
 			if(args.Cancel)
 				return args.Result;
 
+			//定义数据访问过滤器上下文
+			var filterContext = new DataAccessFilterContext(this, DataAccessMethod.Count, args);
+
+			//调用数据访问过滤器前事件
+			this.InvokeFilters(filterContext, (filter, ctx) => filter.OnExecuting(ctx));
+
 			//执行计数操作方法
 			args.Result = this.OnCount(name, condition, string.IsNullOrWhiteSpace(includes) ? (string[])null : includes.Split(',', ';'));
+
+			//调用数据访问过滤器后事件
+			this.InvokeFilters(filterContext, (filter, ctx) => filter.OnExecuted(ctx));
 
 			//激发“Counted”事件
 			return this.OnCounted(name, args.Condition, args.Includes, args.Result);
@@ -276,10 +352,19 @@ namespace Zongsoft.Data
 			var args = this.OnSelecting(name, typeof(T), condition, grouping, scope, paging, sortings);
 
 			if(args.Cancel)
-				return args.Result as IEnumerable<T>;
+				return (args.Result as IEnumerable<T>) ?? Enumerable.Empty<T>();
+
+			//定义数据访问过滤器上下文
+			var filterContext = new DataAccessFilterContext(this, DataAccessMethod.Select, args);
+
+			//调用数据访问过滤器前事件
+			this.InvokeFilters(filterContext, (filter, ctx) => filter.OnExecuting(ctx));
 
 			//执行数据查询操作
 			args.Result = this.OnSelect<T>(name, condition, grouping, scope, paging, sortings);
+
+			//调用数据访问过滤器后事件
+			this.InvokeFilters(filterContext, (filter, ctx) => filter.OnExecuted(ctx));
 
 			//激发“Selected”事件
 			return this.OnSelected(name, typeof(T), args.Condition, args.Grouping, args.Scope, args.Paging, args.Sortings, (IEnumerable<T>)args.Result);
@@ -323,8 +408,17 @@ namespace Zongsoft.Data
 			if(args.Cancel)
 				return args.Result;
 
+			//定义数据访问过滤器上下文
+			var filterContext = new DataAccessFilterContext(this, DataAccessMethod.Delete, args);
+
+			//调用数据访问过滤器前事件
+			this.InvokeFilters(filterContext, (filter, ctx) => filter.OnExecuting(ctx));
+
 			//执行数据删除操作
 			args.Result = this.OnDelete(name, condition, cascades);
+
+			//调用数据访问过滤器后事件
+			this.InvokeFilters(filterContext, (filter, ctx) => filter.OnExecuted(ctx));
 
 			//激发“Deleted”事件
 			return this.OnDeleted(name, args.Condition, args.Cascades, args.Result);
@@ -353,8 +447,17 @@ namespace Zongsoft.Data
 			if(args.Cancel)
 				return args.Result;
 
+			//定义数据访问过滤器上下文
+			var filterContext = new DataAccessFilterContext(this, DataAccessMethod.Insert, args);
+
+			//调用数据访问过滤器前事件
+			this.InvokeFilters(filterContext, (filter, ctx) => filter.OnExecuting(ctx));
+
 			//执行数据插入操作
 			args.Result = this.OnInsert(name, GetDataDictionary(args.Data), scope);
+
+			//调用数据访问过滤器后事件
+			this.InvokeFilters(filterContext, (filter, ctx) => filter.OnExecuted(ctx));
 
 			//激发“Inserted”事件
 			return this.OnInserted(name, args.Data, args.Scope, args.Result);
@@ -384,8 +487,17 @@ namespace Zongsoft.Data
 			if(args.Cancel)
 				return args.Result;
 
+			//定义数据访问过滤器上下文
+			var filterContext = new DataAccessFilterContext(this, DataAccessMethod.InsertMany, args);
+
+			//调用数据访问过滤器前事件
+			this.InvokeFilters(filterContext, (filter, ctx) => filter.OnExecuting(ctx));
+
 			//执行数据插入操作
 			args.Result = this.OnInsertMany(name, GetDataDictionaries(args.Data), scope);
+
+			//调用数据访问过滤器后事件
+			this.InvokeFilters(filterContext, (filter, ctx) => filter.OnExecuted(ctx));
 
 			//激发“Inserted”事件
 			return this.OnInserted(name, args.Data, args.Scope, args.Result);
@@ -427,8 +539,17 @@ namespace Zongsoft.Data
 			if(args.Cancel)
 				return args.Result;
 
+			//定义数据访问过滤器上下文
+			var filterContext = new DataAccessFilterContext(this, DataAccessMethod.Update, args);
+
+			//调用数据访问过滤器前事件
+			this.InvokeFilters(filterContext, (filter, ctx) => filter.OnExecuting(ctx));
+
 			//执行数据更新操作
 			args.Result = this.OnUpdate(name, GetDataDictionary(args.Data), condition, scope);
+
+			//调用数据访问过滤器后事件
+			this.InvokeFilters(filterContext, (filter, ctx) => filter.OnExecuted(ctx));
 
 			//激发“Updated”事件
 			return this.OnUpdated(name, args.Data, args.Condition, args.Scope, args.Result);
@@ -479,8 +600,17 @@ namespace Zongsoft.Data
 			if(args.Cancel)
 				return args.Result;
 
+			//定义数据访问过滤器上下文
+			var filterContext = new DataAccessFilterContext(this, DataAccessMethod.UpdateMany, args);
+
+			//调用数据访问过滤器前事件
+			this.InvokeFilters(filterContext, (filter, ctx) => filter.OnExecuting(ctx));
+
 			//执行数据更新操作
 			args.Result = this.OnUpdateMany(name, GetDataDictionaries(args.Data), condition, scope);
+
+			//调用数据访问过滤器后事件
+			this.InvokeFilters(filterContext, (filter, ctx) => filter.OnExecuted(ctx));
 
 			//激发“Updated”事件
 			return this.OnUpdated(name, args.Data, args.Condition, args.Scope, args.Result);
@@ -500,16 +630,74 @@ namespace Zongsoft.Data
 			return this.Increment(this.GetName<T>(), member, condition, interval);
 		}
 
-		public abstract long Increment(string name, string member, ICondition condition, int interval = 1);
+		public long Increment(string name, string member, ICondition condition, int interval = 1)
+		{
+			if(string.IsNullOrWhiteSpace(name))
+				throw new ArgumentNullException(nameof(name));
+			if(string.IsNullOrWhiteSpace(member))
+				throw new ArgumentNullException(nameof(member));
+
+			//激发“Incrementing”事件
+			var args = this.OnIncrementing(name, member, condition, interval);
+
+			if(args.Cancel)
+				return args.Result;
+
+			//定义数据访问过滤器上下文
+			var filterContext = new DataAccessFilterContext(this, DataAccessMethod.Increment, args);
+
+			//调用数据访问过滤器前事件
+			this.InvokeFilters(filterContext, (filter, ctx) => filter.OnExecuting(ctx));
+
+			//执行递增操作方法
+			args.Result = this.OnIncrement(name, member, condition, interval);
+
+			//调用数据访问过滤器后事件
+			this.InvokeFilters(filterContext, (filter, ctx) => filter.OnExecuted(ctx));
+
+			//激发“Incremented”事件
+			return this.OnIncremented(name, args.Member, args.Condition, args.Interval, args.Result);
+		}
+
+		protected abstract long OnIncrement(string name, string member, ICondition condition, int interval);
 
 		public long Decrement<T>(string member, ICondition condition, int interval = 1)
 		{
-			return this.Increment(this.GetName<T>(), member, condition, -interval);
+			return this.Decrement(this.GetName<T>(), member, condition, interval);
 		}
 
 		public long Decrement(string name, string member, ICondition condition, int interval = 1)
 		{
-			return this.Increment(name, member, condition, -interval);
+			if(string.IsNullOrWhiteSpace(name))
+				throw new ArgumentNullException(nameof(name));
+			if(string.IsNullOrWhiteSpace(member))
+				throw new ArgumentNullException(nameof(member));
+
+			//激发“Decrementing”事件
+			var args = this.OnDecrementing(name, member, condition, interval);
+
+			if(args.Cancel)
+				return args.Result;
+
+			//定义数据访问过滤器上下文
+			var filterContext = new DataAccessFilterContext(this, DataAccessMethod.Decrement, args);
+
+			//调用数据访问过滤器前事件
+			this.InvokeFilters(filterContext, (filter, ctx) => filter.OnExecuting(ctx));
+
+			//执行递减操作方法
+			args.Result = this.OnDecrement(name, member, condition, interval);
+
+			//调用数据访问过滤器后事件
+			this.InvokeFilters(filterContext, (filter, ctx) => filter.OnExecuted(ctx));
+
+			//激发“Decremented”事件
+			return this.OnIncremented(name, args.Member, args.Condition, args.Interval, args.Result);
+		}
+
+		protected virtual long OnDecrement(string name, string member, ICondition condition, int interval)
+		{
+			return this.OnIncrement(name, member, condition, -interval);
 		}
 		#endregion
 
@@ -553,6 +741,48 @@ namespace Zongsoft.Data
 			var args = new DataExecutingEventArgs(name, resultType, inParameters);
 			this.OnExecuting(args);
 			outParameters = args.OutParameters;
+			return args;
+		}
+
+		protected bool OnExisted(string name, ICondition condition, bool result)
+		{
+			var args = new DataExistedEventArgs(name, condition, result);
+			this.OnExisted(args);
+			return args.Result;
+		}
+
+		protected DataExistingEventArgs OnExisting(string name, ICondition condition, bool cancel)
+		{
+			var args = new DataExistingEventArgs(name, condition, cancel);
+			this.OnExisting(args);
+			return args;
+		}
+
+		protected long OnIncremented(string name, string member, ICondition condition, int interval, long result)
+		{
+			var args = new DataIncrementedEventArgs(name, member, condition, interval, result);
+			this.OnIncremented(args);
+			return args.Result;
+		}
+
+		protected DataIncrementingEventArgs OnIncrementing(string name, string member, ICondition condition, int interval = 1, bool cancel = false)
+		{
+			var args = new DataIncrementingEventArgs(name, member, condition, interval, cancel);
+			this.OnIncrementing(args);
+			return args;
+		}
+
+		protected long OnDecremented(string name, string member, ICondition condition, int interval, long result)
+		{
+			var args = new DataDecrementedEventArgs(name, member, condition, interval, result);
+			this.OnDecremented(args);
+			return args.Result;
+		}
+
+		protected DataDecrementingEventArgs OnDecrementing(string name, string member, ICondition condition, int interval = 1, bool cancel = false)
+		{
+			var args = new DataDecrementingEventArgs(name, member, condition, interval, cancel);
+			this.OnDecrementing(args);
 			return args;
 		}
 
@@ -644,6 +874,54 @@ namespace Zongsoft.Data
 				e(this, args);
 		}
 
+		protected virtual void OnExisted(DataExistedEventArgs args)
+		{
+			var e = this.Existed;
+
+			if(e != null)
+				e(this, args);
+		}
+
+		protected virtual void OnExisting(DataExistingEventArgs args)
+		{
+			var e = this.Existing;
+
+			if(e != null)
+				e(this, args);
+		}
+
+		protected virtual void OnIncremented(DataIncrementedEventArgs args)
+		{
+			var e = this.Incremented;
+
+			if(e != null)
+				e(this, args);
+		}
+
+		protected virtual void OnIncrementing(DataIncrementingEventArgs args)
+		{
+			var e = this.Incrementing;
+
+			if(e != null)
+				e(this, args);
+		}
+
+		protected virtual void OnDecremented(DataDecrementedEventArgs args)
+		{
+			var e = this.Decremented;
+
+			if(e != null)
+				e(this, args);
+		}
+
+		protected virtual void OnDecrementing(DataDecrementingEventArgs args)
+		{
+			var e = this.Decrementing;
+
+			if(e != null)
+				e(this, args);
+		}
+
 		protected virtual void OnSelected(DataSelectedEventArgs args)
 		{
 			var e = this.Selected;
@@ -713,6 +991,23 @@ namespace Zongsoft.Data
 		private string GetName<T>()
 		{
 			return this.GetName(typeof(T));
+		}
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
+		private void InvokeFilters(DataAccessFilterContext context, Action<IDataAccessFilter, DataAccessFilterContext> invoke)
+		{
+			foreach(var filter in _filters)
+			{
+				if(filter == null)
+					continue;
+
+				var predication = filter as Zongsoft.Services.IPredication;
+
+				if(predication == null || predication.Predicate(context))
+				{
+					invoke(filter, context);
+				}
+			}
 		}
 
 		private static DataDictionary GetDataDictionary(object data)

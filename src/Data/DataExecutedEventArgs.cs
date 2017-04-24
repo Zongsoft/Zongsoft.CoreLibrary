@@ -32,10 +32,9 @@ namespace Zongsoft.Data
 	/// <summary>
 	/// 为数据访问的执行事件提供数据。
 	/// </summary>
-	public class DataExecutedEventArgs : EventArgs
+	public class DataExecutedEventArgs : DataAccessEventArgs
 	{
 		#region 成员字段
-		private string _name;
 		private object _result;
 		private Type _resultType;
 		private IDictionary<string, object> _inParameters;
@@ -43,15 +42,11 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataExecutedEventArgs(string name, Type resultType, IDictionary<string, object> inParameters, IDictionary<string, object> outParameters, object result)
+		public DataExecutedEventArgs(string name, Type resultType, IDictionary<string, object> inParameters, IDictionary<string, object> outParameters, object result) : base(name)
 		{
-			if(string.IsNullOrWhiteSpace(name))
-				throw new ArgumentNullException("name");
-
 			if(resultType == null)
 				throw new ArgumentNullException("resultType");
 
-			_name = name.Trim();
 			_result = result;
 			_resultType = resultType;
 			_inParameters = inParameters;
@@ -60,17 +55,6 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 公共属性
-		/// <summary>
-		/// 获取数据访问的名称。
-		/// </summary>
-		public string Name
-		{
-			get
-			{
-				return _name;
-			}
-		}
-
 		/// <summary>
 		/// 获取一个值，指示当前是否为单值执行方法。
 		/// </summary>

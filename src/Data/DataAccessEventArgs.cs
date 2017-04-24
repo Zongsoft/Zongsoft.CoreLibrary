@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2016 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2017 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,73 +25,38 @@
  */
 
 using System;
-using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
-	/// <summary>
-	/// 为数据访问的计数事件提供数据。
-	/// </summary>
-	public class DataCountedEventArgs : DataAccessEventArgs
+	public class DataAccessEventArgs : EventArgs
 	{
 		#region 成员字段
-		private int _result;
-		private ICondition _condition;
-		private string _includes;
+		private string _name;
 		#endregion
 
 		#region 构造函数
-		public DataCountedEventArgs(string name, ICondition condition, string includes, int result) : base(name)
+		protected DataAccessEventArgs(string name)
 		{
-			_condition = condition;
-			_includes = includes;
-			_result = result;
+			if(string.IsNullOrWhiteSpace(name))
+				throw new ArgumentNullException(nameof(name));
+
+			_name = name;
 		}
 		#endregion
 
 		#region 公共属性
-		/// <summary>
-		/// 获取或设置计数操作的结果。
-		/// </summary>
-		public int Result
+		public string Name
 		{
 			get
 			{
-				return _result;
+				return _name;
 			}
-			set
+			protected set
 			{
-				_result = value;
-			}
-		}
+				if(string.IsNullOrWhiteSpace(value))
+					throw new ArgumentNullException();
 
-		/// <summary>
-		/// 获取或设置计数操作的条件。
-		/// </summary>
-		public ICondition Condition
-		{
-			get
-			{
-				return _condition;
-			}
-			set
-			{
-				_condition = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置计数操作的包含成员。
-		/// </summary>
-		public string Includes
-		{
-			get
-			{
-				return _includes;
-			}
-			set
-			{
-				_includes = value;
+				_name = value;
 			}
 		}
 		#endregion

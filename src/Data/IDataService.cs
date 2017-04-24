@@ -41,6 +41,12 @@ namespace Zongsoft.Data
 		event EventHandler<DataCountingEventArgs> Counting;
 		event EventHandler<DataExecutedEventArgs> Executed;
 		event EventHandler<DataExecutingEventArgs> Executing;
+		event EventHandler<DataExistedEventArgs> Existed;
+		event EventHandler<DataExistingEventArgs> Existing;
+		event EventHandler<DataIncrementedEventArgs> Incremented;
+		event EventHandler<DataIncrementingEventArgs> Incrementing;
+		event EventHandler<DataDecrementedEventArgs> Decremented;
+		event EventHandler<DataDecrementingEventArgs> Decrementing;
 		event EventHandler<DataGettedEventArgs> Getted;
 		event EventHandler<DataGettingEventArgs> Getting;
 		event EventHandler<DataSelectedEventArgs> Selected;
@@ -91,8 +97,8 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 递增方法
-		long Increment(string name, ICondition condition, int interval = 1);
-		long Decrement(string name, ICondition condition, int interval = 1);
+		long Increment(string member, ICondition condition, int interval = 1);
+		long Decrement(string member, ICondition condition, int interval = 1);
 		#endregion
 
 		#region 查询方法

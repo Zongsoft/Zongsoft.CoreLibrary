@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2016 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2017 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,75 +25,26 @@
  */
 
 using System;
-using System.Collections;
+using System.ComponentModel;
 
 namespace Zongsoft.Data
 {
 	/// <summary>
-	/// 为数据访问的插入事件提供数据。
+	/// 表示数据访问的方法名的枚举。
 	/// </summary>
-	public class DataInsertedEventArgs : DataAccessEventArgs
+	public enum DataAccessMethod
 	{
-		#region 成员字段
-		private int _result;
-		private object _data;
-		private string _scope;
-		#endregion
-
-		#region 构造函数
-		public DataInsertedEventArgs(string name, object data, string scope, int result) : base(name)
-		{
-			_data = data;
-			_scope = scope;
-			_result = result;
-		}
-		#endregion
-
-		#region 公共属性
-		/// <summary>
-		/// 获取或设置插入操作的结果。
-		/// </summary>
-		public int Result
-		{
-			get
-			{
-				return _result;
-			}
-			set
-			{
-				_result = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置插入操作的数据。
-		/// </summary>
-		public object Data
-		{
-			get
-			{
-				return _data;
-			}
-			set
-			{
-				_data = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置插入操作的包含成员。
-		/// </summary>
-		public string Scope
-		{
-			get
-			{
-				return _scope;
-			}
-			set
-			{
-				_scope = value;
-			}
-		}
-		#endregion
+		Count = 1,
+		Exists,
+		Execute,
+		ExecuteScalar,
+		Increment,
+		Decrement,
+		Select,
+		Delete,
+		Insert,
+		InsertMany,
+		Update,
+		UpdateMany,
 	}
 }

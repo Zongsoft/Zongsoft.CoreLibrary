@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2016 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2017 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,49 +25,30 @@
  */
 
 using System;
-using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
-	/// <summary>
-	/// 为数据访问的计数事件提供数据。
-	/// </summary>
-	public class DataCountedEventArgs : DataAccessEventArgs
+	public class DataExistedEventArgs : DataAccessEventArgs
 	{
 		#region 成员字段
-		private int _result;
 		private ICondition _condition;
-		private string _includes;
+		private bool _result;
 		#endregion
 
 		#region 构造函数
-		public DataCountedEventArgs(string name, ICondition condition, string includes, int result) : base(name)
+		public DataExistedEventArgs(string name, ICondition condition) : base(name)
 		{
 			_condition = condition;
-			_includes = includes;
+		}
+
+		public DataExistedEventArgs(string name, ICondition condition, bool result) : base(name)
+		{
+			_condition = condition;
 			_result = result;
 		}
 		#endregion
 
 		#region 公共属性
-		/// <summary>
-		/// 获取或设置计数操作的结果。
-		/// </summary>
-		public int Result
-		{
-			get
-			{
-				return _result;
-			}
-			set
-			{
-				_result = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置计数操作的条件。
-		/// </summary>
 		public ICondition Condition
 		{
 			get
@@ -80,18 +61,15 @@ namespace Zongsoft.Data
 			}
 		}
 
-		/// <summary>
-		/// 获取或设置计数操作的包含成员。
-		/// </summary>
-		public string Includes
+		public bool Result
 		{
 			get
 			{
-				return _includes;
+				return _result;
 			}
 			set
 			{
-				_includes = value;
+				_result = value;
 			}
 		}
 		#endregion

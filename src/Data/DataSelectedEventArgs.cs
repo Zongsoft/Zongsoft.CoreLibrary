@@ -33,10 +33,9 @@ namespace Zongsoft.Data
 	/// <summary>
 	/// 为数据访问的查询事件提供数据。
 	/// </summary>
-	public class DataSelectedEventArgs : EventArgs
+	public class DataSelectedEventArgs : DataAccessEventArgs
 	{
 		#region 成员字段
-		private string _name;
 		private Type _entityType;
 		private IEnumerable _result;
 		private ICondition _condition;
@@ -47,15 +46,11 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataSelectedEventArgs(string name, Type entityType, ICondition condition, Grouping grouping, string scope, Paging paging, Sorting[] sortings, IEnumerable result)
+		public DataSelectedEventArgs(string name, Type entityType, ICondition condition, Grouping grouping, string scope, Paging paging, Sorting[] sortings, IEnumerable result) : base(name)
 		{
-			if(string.IsNullOrWhiteSpace(name))
-				throw new ArgumentNullException("name");
-
 			if(entityType == null)
 				throw new ArgumentNullException("entityType");
 
-			_name = name.Trim();
 			_entityType = entityType;
 			_condition = condition;
 			_grouping = grouping;
@@ -67,17 +62,6 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 公共属性
-		/// <summary>
-		/// 获取数据访问的名称。
-		/// </summary>
-		public string Name
-		{
-			get
-			{
-				return _name;
-			}
-		}
-
 		/// <summary>
 		/// 获取或设置查询结果集的实体类型。
 		/// </summary>

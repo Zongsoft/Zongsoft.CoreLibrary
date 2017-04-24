@@ -32,10 +32,9 @@ namespace Zongsoft.Data
 	/// <summary>
 	/// 为数据访问的更新事件提供数据。
 	/// </summary>
-	public class DataUpdatedEventArgs : EventArgs
+	public class DataUpdatedEventArgs : DataAccessEventArgs
 	{
 		#region 成员字段
-		private string _name;
 		private int _result;
 		private object _data;
 		private ICondition _condition;
@@ -43,12 +42,8 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataUpdatedEventArgs(string name, object data, ICondition condition, string scope, int result)
+		public DataUpdatedEventArgs(string name, object data, ICondition condition, string scope, int result) : base(name)
 		{
-			if(string.IsNullOrWhiteSpace(name))
-				throw new ArgumentNullException("name");
-
-			_name = name.Trim();
 			_data = data;
 			_condition = condition;
 			_scope = scope;
@@ -57,17 +52,6 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 公共属性
-		/// <summary>
-		/// 获取数据访问的名称。
-		/// </summary>
-		public string Name
-		{
-			get
-			{
-				return _name;
-			}
-		}
-
 		/// <summary>
 		/// 获取或设置更新操作的结果。
 		/// </summary>
