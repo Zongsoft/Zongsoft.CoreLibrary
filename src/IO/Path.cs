@@ -132,6 +132,17 @@ namespace Zongsoft.IO
 			}
 		}
 
+		public string DirectoryUrl
+		{
+			get
+			{
+				if(string.IsNullOrWhiteSpace(_scheme))
+					return _directoryName;
+				else
+					return _scheme + ":" + _directoryName;
+			}
+		}
+
 		public string Url
 		{
 			get
