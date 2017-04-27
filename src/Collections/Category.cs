@@ -1,6 +1,6 @@
-/*
+ï»¿/*
  * Authors:
- *   ÖÓ·å(Popeye Zhong) <zongsoft@gmail.com>
+ *   é’Ÿå³°(Popeye Zhong) <zongsoft@gmail.com>
  *
  * Copyright (C) 2010-2013 Zongsoft Corporation <http://www.zongsoft.com>
  *
@@ -25,20 +25,20 @@
  */
 
 using System;
-using System.ComponentModel;
-using System.Collections;
 using System.Collections.Generic;
+
+using Zongsoft.Runtime.Serialization;
 
 namespace Zongsoft.Collections
 {
 	[Serializable]
 	public class Category : CategoryBase
 	{
-		#region ³ÉÔ±×Ö¶Î
+		#region æˆå‘˜å­—æ®µ
 		private CategoryCollection _children;
 		#endregion
 
-		#region ¹¹Ôìº¯Êı
+		#region æ„é€ å‡½æ•°
 		public Category()
 		{
 		}
@@ -56,7 +56,8 @@ namespace Zongsoft.Collections
 		}
 		#endregion
 
-		#region ¹«¹²ÊôĞÔ
+		#region å…¬å…±å±æ€§
+		[SerializationMember(SerializationMemberBehavior.Ignored)]
 		public Category Parent
 		{
 			get
@@ -77,7 +78,7 @@ namespace Zongsoft.Collections
 		}
 		#endregion
 
-		#region ¹«¹²·½·¨
+		#region å…¬å…±æ–¹æ³•
 		public Category Find(string path)
 		{
 			return (Category)base.FindNode(path);
@@ -107,7 +108,7 @@ namespace Zongsoft.Collections
 		}
 		#endregion
 
-		#region ÖØĞ´·½·¨
+		#region é‡å†™æ–¹æ³•
 		protected override HierarchicalNode GetChild(string name)
 		{
 			var children = _children;

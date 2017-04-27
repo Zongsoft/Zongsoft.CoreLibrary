@@ -132,12 +132,13 @@
     <Compile Include="Data\DataExistingEventArgs.cs" />
     <Compile Include="Data\DataDecrementedEventArgs.cs" />
     <Compile Include="Data\DataDecrementingEventArgs.cs" />
-    <Compile Include="Data\DataSearchAttribute.cs" />
+    <Compile Include="Data\DataSearchKeyAttribute.cs" />
     <Compile Include="Data\DataSequenceAttribute.cs" />
     <Compile Include="Data\IDataAccessFilter.cs" />
     <Compile Include="Data\IDataAccessMapper.cs" />
     <Compile Include="Data\DataIncrementedEventArgs.cs" />
     <Compile Include="Data\DataIncrementingEventArgs.cs" />
+    <Compile Include="Data\IDataSearchKey.cs" />
     <Compile Include="Expressions\ITokenizer.cs" />
     <Compile Include="Expressions\Lexer.cs" />
     <Compile Include="Expressions\SymbolToken.cs" />

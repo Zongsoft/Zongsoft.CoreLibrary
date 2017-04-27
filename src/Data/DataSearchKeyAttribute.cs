@@ -31,14 +31,14 @@ using System.Collections.Generic;
 namespace Zongsoft.Data
 {
 	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
-	public class DataSearchAttribute : Attribute
+	public class DataSearchKeyAttribute : Attribute, IDataSearchKey
 	{
 		#region 成员字段
 		private DataSearchKey[] _keys;
 		#endregion
 
 		#region 构造函数
-		public DataSearchAttribute(params string[] keys)
+		public DataSearchKeyAttribute(params string[] keys)
 		{
 			if(keys == null || keys.Length == 0)
 				throw new ArgumentNullException(nameof(keys));
@@ -71,6 +71,54 @@ namespace Zongsoft.Data
 		}
 		#endregion
 
+		#region 公共方法
+		public ICondition GetSearchKey(string keyword, params string[] tags)
+		{
+			ICollection<DataSearchKey> keys;
+
+			if(tags == null || tags.Length == 0)
+				keys = this.FindSearchKeys(new string[] { "Key" });
+			else
+				keys = this.FindSearchKeys(tags);
+
+			if(keys == null || keys.Count == 0)
+				return null;
+
+			var conditions = new ConditionCollection(ConditionCombination.Or);
+
+			foreach(var key in keys)
+			{
+				conditions.Add(key.ToCondition(keyword));
+			}
+
+			return conditions;
+		}
+		#endregion
+
+		#region 私有方法
+		private ICollection<DataSearchKey> FindSearchKeys(string[] tags)
+		{
+			if(tags == null || tags.Length == 0)
+				return null;
+
+			var result = new List<DataSearchKey>();
+
+			foreach(var key in this.Keys)
+			{
+				foreach(var tag in tags)
+				{
+					if(key.Tags.Contains(tag, StringComparer.OrdinalIgnoreCase))
+					{
+						result.Add(key);
+						break;
+					}
+				}
+			}
+
+			return result;
+		}
+		#endregion
+
 		#region 嵌套子类
 		public class DataSearchKey
 		{
@@ -86,6 +134,21 @@ namespace Zongsoft.Data
 
 				this.Tags = tags;
 				this.Fields = fields;
+			}
+
+			internal ICondition ToCondition(string keyword)
+			{
+				var conditions = new ConditionCollection(ConditionCombination.Or);
+
+				foreach(var field in this.Fields)
+				{
+					conditions.Add(new Condition(field, keyword));
+				}
+
+				if(conditions.Count == 1)
+					return conditions[0];
+				else
+					return conditions;
 			}
 		}
 		#endregion

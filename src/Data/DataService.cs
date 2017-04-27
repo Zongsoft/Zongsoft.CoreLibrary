@@ -61,7 +61,7 @@ namespace Zongsoft.Data
 		private string _name;
 		private IDataAccess _dataAccess;
 		private Zongsoft.Services.IServiceProvider _serviceProvider;
-		private DataSearchAttribute.DataSearchKey[] _keys;
+		private DataSearchKeyAttribute _searchKey;
 		#endregion
 
 		#region 构造函数
@@ -74,7 +74,7 @@ namespace Zongsoft.Data
 			_dataAccess = serviceProvider.ResolveRequired<IDataAccess>();
 
 			//获取当前数据搜索键
-			_keys = ((DataSearchAttribute)Attribute.GetCustomAttribute(this.GetType(), typeof(DataSearchAttribute), true))?.Keys;
+			_searchKey = (DataSearchKeyAttribute)Attribute.GetCustomAttribute(this.GetType(), typeof(DataSearchKeyAttribute), true);
 
 			//注册数据递增键序列号
 			DataSequence.Register(this);
@@ -92,7 +92,7 @@ namespace Zongsoft.Data
 			_dataAccess = serviceProvider.ResolveRequired<IDataAccess>();
 
 			//获取当前数据搜索键
-			_keys = ((DataSearchAttribute)Attribute.GetCustomAttribute(this.GetType(), typeof(DataSearchAttribute), true))?.Keys;
+			_searchKey = (DataSearchKeyAttribute)Attribute.GetCustomAttribute(this.GetType(), typeof(DataSearchKeyAttribute), true);
 
 			//注册数据递增键序列号
 			DataSequence.Register(this);
@@ -950,7 +950,7 @@ namespace Zongsoft.Data
 				return null;
 
 			//如果查询参数只有一个，并且当前数据服务启用了数据搜索特性
-			if(values.Length == 1 && _keys != null && _keys.Length > 0)
+			if(values.Length == 1 && _searchKey != null)
 			{
 				//根据查询参数获取对应的搜索条件
 				var condition = this.GetSearchCondition(values[0] as string);
@@ -993,10 +993,7 @@ namespace Zongsoft.Data
 		#region 私有方法
 		private ICondition GetSearchCondition(string argument)
 		{
-			if(_keys == null || _keys.Length == 0)
-				return null;
-
-			if(string.IsNullOrWhiteSpace(argument))
+			if(_searchKey == null || string.IsNullOrWhiteSpace(argument))
 				return null;
 
 			var index = argument.IndexOf(':');
@@ -1007,25 +1004,7 @@ namespace Zongsoft.Data
 			var tag = argument.Substring(0, index);
 			var value = index < argument.Length - 1 ? argument.Substring(index + 1) : null;
 
-			foreach(var key in _keys)
-			{
-				if(key.Tags.Contains(tag, StringComparer.OrdinalIgnoreCase))
-				{
-					var conditions = new ConditionCollection(ConditionCombination.Or);
-
-					foreach(var field in key.Fields)
-					{
-						conditions.Add(new Condition(field, value));
-					}
-
-					if(conditions.Count == 1)
-						return conditions[0];
-					else
-						return conditions;
-				}
-			}
-
-			return null;
+			return _searchKey.GetSearchKey(value, tag);
 		}
 
 		private ICondition EnsureInquiryKey(object[] values)

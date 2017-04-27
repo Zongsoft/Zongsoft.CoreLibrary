@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2016-2017 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -26,28 +26,19 @@
 
 using System;
 
-namespace Zongsoft.Collections
+namespace Zongsoft.Data
 {
-	[Serializable]
-	public class CategoryCollection : HierarchicalNodeCollection<Category>
+	/// <summary>
+	/// 表示数据搜索键的提供接口。
+	/// </summary>
+	public interface IDataSearchKey
 	{
-		#region 构造函数
-		public CategoryCollection() : base(null)
-		{
-		}
-
-		public CategoryCollection(Category owner) : base(owner)
-		{
-		}
-		#endregion
-
-		#region 公共方法
-		public Category Add(string name, string title, string description)
-		{
-			var category = new Category(name, title, description);
-			this.Add(category);
-			return category;
-		}
-		#endregion
+		/// <summary>
+		/// 获取指定搜索关键字的搜索条件。
+		/// </summary>
+		/// <param name="keyword">指定的搜索关键字。</param>
+		/// <param name="tags">指定的搜索标签集。</param>
+		/// <returns>返回的搜索关键字及标签对应的查询条件。</returns>
+		ICondition GetSearchKey(string keyword, params string[] tags);
 	}
 }
