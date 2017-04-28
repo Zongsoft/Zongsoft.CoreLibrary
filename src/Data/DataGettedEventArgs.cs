@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2016 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2016-2017 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,36 +25,40 @@
  */
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
 	/// <summary>
 	/// 为数据服务的获取事件提供数据。
 	/// </summary>
-	public class DataGettedEventArgs : EventArgs
+	public class DataGettedEventArgs<T> : EventArgs
 	{
 		#region 成员字段
 		private string _name;
-		private object _result;
-		private ICondition _condition;
+		private T _result;
 		private string _scope;
-		private Paging _paging;
-		private Sorting[] _sortings;
+		private ICondition _condition;
 		#endregion
 
 		#region 构造函数
-		public DataGettedEventArgs(string name, ICondition condition, string scope, Paging paging, Sorting[] sortings, object result)
+		public DataGettedEventArgs(string name, ICondition condition, string scope)
 		{
 			if(string.IsNullOrWhiteSpace(name))
-				throw new ArgumentNullException("name");
+				throw new ArgumentNullException(nameof(name));
 
-			_name = name.Trim();
+			_name = name;
 			_condition = condition;
 			_scope = scope;
-			_paging = paging;
-			_sortings = sortings;
+		}
+
+		public DataGettedEventArgs(string name, ICondition condition, string scope, T result)
+		{
+			if(string.IsNullOrWhiteSpace(name))
+				throw new ArgumentNullException(nameof(name));
+
+			_name = name;
+			_condition = condition;
+			_scope = scope;
 			_result = result;
 		}
 		#endregion
@@ -74,7 +78,7 @@ namespace Zongsoft.Data
 		/// <summary>
 		/// 获取或设置查询操作的结果。
 		/// </summary>
-		public object Result
+		public T Result
 		{
 			get
 			{
@@ -102,21 +106,6 @@ namespace Zongsoft.Data
 		}
 
 		/// <summary>
-		/// 获取或设置查询操作的分页设置。
-		/// </summary>
-		public Paging Paging
-		{
-			get
-			{
-				return _paging;
-			}
-			set
-			{
-				_paging = value;
-			}
-		}
-
-		/// <summary>
 		/// 获取或设置查询操作的包含成员。
 		/// </summary>
 		public string Scope
@@ -128,21 +117,6 @@ namespace Zongsoft.Data
 			set
 			{
 				_scope = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置查询操作的排序设置。
-		/// </summary>
-		public Sorting[] Sortings
-		{
-			get
-			{
-				return _sortings;
-			}
-			set
-			{
-				_sortings = value;
 			}
 		}
 		#endregion

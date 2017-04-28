@@ -45,8 +45,8 @@ namespace Zongsoft.Data
 		public event EventHandler<DataIncrementingEventArgs> Incrementing;
 		public event EventHandler<DataDecrementedEventArgs> Decremented;
 		public event EventHandler<DataDecrementingEventArgs> Decrementing;
-		public event EventHandler<DataGettedEventArgs> Getted;
-		public event EventHandler<DataGettingEventArgs> Getting;
+		public event EventHandler<DataGettedEventArgs<TEntity>> Getted;
+		public event EventHandler<DataGettingEventArgs<TEntity>> Getting;
 		public event EventHandler<DataSelectedEventArgs> Selected;
 		public event EventHandler<DataSelectingEventArgs> Selecting;
 		public event EventHandler<DataDeletedEventArgs> Deleted;
@@ -296,72 +296,65 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 查询方法
-		public object Get<TKey>(TKey key, params Sorting[] sortings)
+		public object Search(string keyword, params Sorting[] sortings)
 		{
-			return this.Get<TKey>(key, string.Empty, null, sortings);
+			return this.Search(keyword, string.Empty, null, sortings);
 		}
 
-		public virtual object Get<TKey>(TKey key, string scope, Paging paging = null, params Sorting[] sortings)
+		public virtual object Search(string keyword, string scope, Paging paging = null, params Sorting[] sortings)
 		{
-			return this.Get(this.ConvertKey(key), scope, paging, sortings, items => this.GetResult(items, new object[] { key }));
+			bool singleton;
+
+			//获取搜索条件和搜索结果是否为单条数据
+			var condition = this.GetSearchKey(keyword, out singleton);
+
+			if(condition == null)
+				throw new ArgumentException($"The {this.Name} service does not supportd search operation or specified search key is invalid.");
+
+			if(singleton)
+				return this.Get(condition, scope);
+			else
+				return this.Select(condition, scope, paging, sortings);
 		}
 
-		public object Get<TKey>(TKey key, Paging paging, string scope = null, params Sorting[] sortings)
+		public object Search(string keyword, Paging paging, string scope = null, params Sorting[] sortings)
 		{
-			return this.Get<TKey>(key, scope, paging, sortings);
+			return this.Search(keyword, scope, paging, sortings);
 		}
 
-		public object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, params Sorting[] sortings)
+		public virtual TEntity Get<TKey>(TKey key, string scope = null)
 		{
-			return this.Get<TKey1, TKey2>(key1, key2, string.Empty, null, sortings);
+			return this.Get(this.ConvertKey(key), scope);
 		}
 
-		public virtual object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string scope, Paging paging = null, params Sorting[] sortings)
+		public virtual TEntity Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string scope = null)
 		{
-			return this.Get(this.ConvertKey(key1, key2), scope, paging, sortings, items => this.GetResult(items, new object[] { key1, key2 }));
+			return this.Get(this.ConvertKey(key1, key2), scope);
 		}
 
-		public object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, Paging paging, string scope = null, params Sorting[] sortings)
+		public virtual TEntity Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string scope = null)
 		{
-			return this.Get<TKey1, TKey2>(key1, key2, scope, paging, sortings);
+			return this.Get(this.ConvertKey(key1, key2, key3), scope);
 		}
 
-		public object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, params Sorting[] sortings)
-		{
-			return this.Get<TKey1, TKey2, TKey3>(key1, key2, key3, string.Empty, null, sortings);
-		}
-
-		public virtual object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string scope, Paging paging = null, params Sorting[] sortings)
-		{
-			return this.Get(this.ConvertKey(key1, key2, key3), scope, paging, sortings, items => this.GetResult(items, new object[] { key1, key2, key3 }));
-		}
-
-		public object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, Paging paging, string scope = null, params Sorting[] sortings)
-		{
-			return this.Get<TKey1, TKey2, TKey3>(key1, key2, key3, scope, paging, sortings);
-		}
-
-		private object Get(ICondition condition, string scope, Paging paging, Sorting[] sortings, Func<IEnumerable<TEntity>, object> resultThunk)
+		private TEntity Get(ICondition condition, string scope)
 		{
 			//激发“Getting”事件
-			var args = this.OnGetting(condition, scope, paging, sortings);
+			var args = this.OnGetting(condition, scope);
 
 			if(args.Cancel)
 				return args.Result;
 
 			//执行数据获取操作方法
-			var items = this.OnGet(args.Condition, args.Scope, args.Paging, args.Sortings);
-
-			//进一步处理数据结果
-			args.Result = resultThunk != null ? resultThunk(items) : items;
+			args.Result = this.OnGet(args.Condition, args.Scope);
 
 			//激发“Getted”事件
-			return this.OnGetted(args.Condition, args.Scope, args.Paging, args.Sortings, args.Result);
+			return this.OnGetted(args.Condition, args.Scope, args.Result);
 		}
 
-		protected virtual IEnumerable<TEntity> OnGet(ICondition condition, string scope, Paging paging, params Sorting[] sortings)
+		protected virtual TEntity OnGet(ICondition condition, string scope)
 		{
-			return this.DataAccess.Select<TEntity>(this.Name, condition, scope, paging, sortings);
+			return this.DataAccess.Select<TEntity>(this.Name, condition, scope).FirstOrDefault();
 		}
 
 		public IEnumerable<TEntity> Select(ICondition condition = null, params Sorting[] sortings)
@@ -703,16 +696,16 @@ namespace Zongsoft.Data
 			return args;
 		}
 
-		protected object OnGetted(ICondition condition, string scope, Paging paging, Sorting[] sortings, object result)
+		protected TEntity OnGetted(ICondition condition, string scope, TEntity result)
 		{
-			var args = new DataGettedEventArgs(this.Name, condition, scope, paging, sortings, result);
+			var args = new DataGettedEventArgs<TEntity>(this.Name, condition, scope, result);
 			this.OnGetted(args);
 			return args.Result;
 		}
 
-		protected DataGettingEventArgs OnGetting(ICondition condition, string scope, Paging paging, Sorting[] sortings)
+		protected DataGettingEventArgs<TEntity> OnGetting(ICondition condition, string scope)
 		{
-			var args = new DataGettingEventArgs(this.Name, condition, scope, paging, sortings);
+			var args = new DataGettingEventArgs<TEntity>(this.Name, condition, scope);
 			this.OnGetting(args);
 			return args;
 		}
@@ -853,7 +846,7 @@ namespace Zongsoft.Data
 				e(this, args);
 		}
 
-		protected virtual void OnGetted(DataGettedEventArgs args)
+		protected virtual void OnGetted(DataGettedEventArgs<TEntity> args)
 		{
 			var e = this.Getted;
 
@@ -861,7 +854,7 @@ namespace Zongsoft.Data
 				e(this, args);
 		}
 
-		protected virtual void OnGetting(DataGettingEventArgs args)
+		protected virtual void OnGetting(DataGettingEventArgs<TEntity> args)
 		{
 			var e = this.Getting;
 
@@ -935,6 +928,24 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 键值操作
+		protected virtual ICondition GetSearchKey(string keyword, out bool singleton)
+		{
+			singleton = false;
+
+			if(_searchKey == null || string.IsNullOrWhiteSpace(keyword))
+				return null;
+
+			var index = keyword.IndexOf(':');
+
+			if(index < 1 || index >= keyword.Length - 1)
+				return null;
+
+			var tag = keyword.Substring(0, index);
+			var value = index < keyword.Length - 1 ? keyword.Substring(index + 1) : null;
+
+			return _searchKey.GetSearchKey(keyword, tag);
+		}
+
 		/// <summary>
 		/// 根据指定的查询参数值获取对应的查询键值对数组或<see cref="ICondition"/>条件。
 		/// </summary>
@@ -949,19 +960,11 @@ namespace Zongsoft.Data
 			if(values == null || values.Length == 0)
 				return null;
 
-			//如果查询参数只有一个，并且当前数据服务启用了数据搜索特性
-			if(values.Length == 1 && _searchKey != null)
-			{
-				//根据查询参数获取对应的搜索条件
-				var condition = this.GetSearchCondition(values[0] as string);
-
-				if(condition != null)
-					return condition;
-			}
-
+			//获取当前数据服务对应的主键
 			var primaryKey = this.DataAccess.GetKey(this.Name);
 
-			if(primaryKey == null || primaryKey.Length == 0)
+			//如果主键获取失败或主键未定义或主键项数量不等于传入的数组元素个数则返回空
+			if(primaryKey == null || primaryKey.Length == 0 || primaryKey.Length != values.Length)
 				return null;
 
 			var result = new object[Math.Min(primaryKey.Length, values.Length)];
@@ -991,22 +994,6 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 私有方法
-		private ICondition GetSearchCondition(string argument)
-		{
-			if(_searchKey == null || string.IsNullOrWhiteSpace(argument))
-				return null;
-
-			var index = argument.IndexOf(':');
-
-			if(index < 1)
-				return null;
-
-			var tag = argument.Substring(0, index);
-			var value = index < argument.Length - 1 ? argument.Substring(index + 1) : null;
-
-			return _searchKey.GetSearchKey(value, tag);
-		}
-
 		private ICondition EnsureInquiryKey(object[] values)
 		{
 			if(values != null && values.Length > 3)
@@ -1059,54 +1046,6 @@ namespace Zongsoft.Data
 				return Condition.Equal(((KeyValuePair<string, object>)item).Key, ((KeyValuePair<string, object>)item).Value);
 
 			return null;
-		}
-
-		private object GetResult(IEnumerable<TEntity> result, object[] values)
-		{
-			//获取当前数据服务对应的主键
-			var primaryKey = this.DataAccess.GetKey(this.Name);
-
-			//获取当前查询对应的查询键名称数组
-			var inquiryKey = this.GetKey(values);
-
-			if(inquiryKey == null)
-				return result;
-
-			string[] keys = null;
-
-			if(inquiryKey is Condition)
-				keys = new string[] { ((Condition)inquiryKey).Name };
-			else if(inquiryKey is IEnumerable<ICondition>)
-				keys = ((IEnumerable<ICondition>)inquiryKey).Where(p => p is Condition).Select(p => ((Condition)p).Name).ToArray();
-			if(inquiryKey is IEnumerable<KeyValuePair<string, object>>)
-				keys = ((IEnumerable<KeyValuePair<string, object>>)inquiryKey).Select(p => p.Key).ToArray();
-			else if(inquiryKey is IEnumerable<object>)
-				keys = ((IEnumerable<object>)inquiryKey).Where(p => p is KeyValuePair<string, object>).Select(p => ((KeyValuePair<string, object>)p).Key).ToArray();
-			else if(inquiryKey is KeyValuePair<string, object>)
-				keys = new string[] { ((KeyValuePair<string, object>)inquiryKey).Key };
-
-			//如果查询键与主键完全一致，则返回单数据（主键查询）
-			if(primaryKey != null && keys != null && this.CompareStringArray(primaryKey, keys))
-				return result.FirstOrDefault();
-
-			return result;
-		}
-
-		private bool CompareStringArray(string[] a, string[] b)
-		{
-			if((a == null || a.Length == 0) && (b == null || b.Length == 0))
-				return true;
-
-			if((a == null && b != null) || (a != null && b == null) || a.Length != b.Length)
-				return false;
-
-			for(int i = 0; i < a.Length; i++)
-			{
-				if(!Array.Exists(b, item => string.Equals(a[i], item, StringComparison.OrdinalIgnoreCase)))
-					return false;
-			}
-
-			return true;
 		}
 		#endregion
 

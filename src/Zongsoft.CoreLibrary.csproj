@@ -138,7 +138,6 @@
     <Compile Include="Data\IDataAccessMapper.cs" />
     <Compile Include="Data\DataIncrementedEventArgs.cs" />
     <Compile Include="Data\DataIncrementingEventArgs.cs" />
-    <Compile Include="Data\IDataSearchKey.cs" />
     <Compile Include="Expressions\ITokenizer.cs" />
     <Compile Include="Expressions\Lexer.cs" />
     <Compile Include="Expressions\SymbolToken.cs" />

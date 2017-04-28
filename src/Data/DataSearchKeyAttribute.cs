@@ -31,7 +31,7 @@ using System.Collections.Generic;
 namespace Zongsoft.Data
 {
 	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
-	public class DataSearchKeyAttribute : Attribute, IDataSearchKey
+	public class DataSearchKeyAttribute : Attribute
 	{
 		#region 成员字段
 		private DataSearchKey[] _keys;
@@ -84,14 +84,14 @@ namespace Zongsoft.Data
 			if(keys == null || keys.Count == 0)
 				return null;
 
-			var conditions = new ConditionCollection(ConditionCombination.Or);
+			var conditions = ConditionCollection.Or();
 
 			foreach(var key in keys)
 			{
 				conditions.Add(key.ToCondition(keyword));
 			}
 
-			return conditions;
+			return conditions.Count == 1 ? conditions[0] : conditions;
 		}
 		#endregion
 
@@ -122,6 +122,7 @@ namespace Zongsoft.Data
 		#region 嵌套子类
 		public class DataSearchKey
 		{
+			public readonly bool Singleton;
 			public readonly string[] Tags;
 			public readonly string[] Fields;
 
@@ -132,7 +133,26 @@ namespace Zongsoft.Data
 				if(fields == null || fields.Length == 0)
 					throw new ArgumentNullException(nameof(fields));
 
-				this.Tags = tags;
+				var hashset = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+				foreach(var tag in tags)
+				{
+					if(string.IsNullOrWhiteSpace(tag))
+						continue;
+
+					var trimmed = tag.Trim();
+					this.Singleton = trimmed[0] == '#';
+
+					if(!this.Singleton)
+						hashset.Add(trimmed);
+					else if(trimmed.Length > 1)
+						hashset.Add(trimmed.Substring(1));
+				}
+
+				if(hashset == null)
+					throw new ArgumentException(nameof(tags));
+
+				this.Tags = hashset.ToArray();
 				this.Fields = fields;
 			}
 

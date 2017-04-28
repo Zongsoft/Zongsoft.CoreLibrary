@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2016 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2016-2017 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -33,14 +33,14 @@ namespace Zongsoft.Data
 	/// <summary>
 	/// 为数据服务的获取事件提供数据。
 	/// </summary>
-	public class DataGettingEventArgs : DataGettedEventArgs
+	public class DataGettingEventArgs<T> : DataGettedEventArgs<T>
 	{
 		#region 成员字段
 		private bool _cancel;
 		#endregion
 
 		#region 构造函数
-		public DataGettingEventArgs(string name, ICondition condition, string scope, Paging paging, Sorting[] sortings) : base(name, condition, scope, paging, sortings, null)
+		public DataGettingEventArgs(string name, ICondition condition, string scope) : base(name, condition, scope)
 		{
 			_cancel = false;
 		}
