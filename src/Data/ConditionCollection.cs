@@ -199,6 +199,28 @@ namespace Zongsoft.Data
 		}
 		#endregion
 
+		#region 公共静态
+		public static ConditionCollection Or(IEnumerable<ICondition> items)
+		{
+			return new ConditionCollection(ConditionCombination.Or, items);
+		}
+
+		public static ConditionCollection Or(params ICondition[] items)
+		{
+			return new ConditionCollection(ConditionCombination.Or, items);
+		}
+
+		public static ConditionCollection And(IEnumerable<ICondition> items)
+		{
+			return new ConditionCollection(ConditionCombination.And, items);
+		}
+
+		public static ConditionCollection And(params ICondition[] items)
+		{
+			return new ConditionCollection(ConditionCombination.And, items);
+		}
+		#endregion
+
 		#region 公共方法
 		/// <summary>
 		/// 创建一个与当前集合内容相同的新条件集，并将指定的条件项追加到新集中。
