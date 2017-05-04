@@ -72,36 +72,32 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 公共方法
-		public ICondition GetSearchKey(string keyword, params string[] tags)
+		public ICondition GetSearchKey(string keyword, string[] tags, out bool singleton)
 		{
-			ICollection<DataSearchKey> keys;
+			singleton = false;
+
+			DataSearchKey key;
 
 			if(tags == null || tags.Length == 0)
-				keys = this.FindSearchKeys(new string[] { "Key" });
+				key = this.GetSearchKey(new string[] { "Key" });
 			else
-				keys = this.FindSearchKeys(tags);
+				key = this.GetSearchKey(tags);
 
-			if(keys == null || keys.Count == 0)
+			if(key == null)
 				return null;
 
-			var conditions = ConditionCollection.Or();
+			singleton = key.Singleton;
 
-			foreach(var key in keys)
-			{
-				conditions.Add(key.ToCondition(keyword));
-			}
-
+			var conditions = ConditionCollection.Or(key.ToCondition(keyword));
 			return conditions.Count == 1 ? conditions[0] : conditions;
 		}
 		#endregion
 
 		#region 私有方法
-		private ICollection<DataSearchKey> FindSearchKeys(string[] tags)
+		private DataSearchKey GetSearchKey(string[] tags)
 		{
 			if(tags == null || tags.Length == 0)
 				return null;
-
-			var result = new List<DataSearchKey>();
 
 			foreach(var key in this.Keys)
 			{
@@ -109,13 +105,12 @@ namespace Zongsoft.Data
 				{
 					if(key.Tags.Contains(tag, StringComparer.OrdinalIgnoreCase))
 					{
-						result.Add(key);
-						break;
+						return key;
 					}
 				}
 			}
 
-			return result;
+			return null;
 		}
 		#endregion
 
@@ -141,9 +136,11 @@ namespace Zongsoft.Data
 						continue;
 
 					var trimmed = tag.Trim();
-					this.Singleton = trimmed[0] == '#';
 
 					if(!this.Singleton)
+						this.Singleton = trimmed[0] == '#';
+
+					if(trimmed[0] != '#')
 						hashset.Add(trimmed);
 					else if(trimmed.Length > 1)
 						hashset.Add(trimmed.Substring(1));
