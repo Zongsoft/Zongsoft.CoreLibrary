@@ -935,15 +935,16 @@ namespace Zongsoft.Data
 			if(_searchKey == null || string.IsNullOrWhiteSpace(keyword))
 				return null;
 
+			bool temp;
 			var index = keyword.IndexOf(':');
 
 			if(index < 1)
-				return _searchKey.GetSearchKey(keyword, null, out var singleton1);
+				return _searchKey.GetSearchKey(keyword, null, out temp);
 
 			var tag = keyword.Substring(0, index);
 			var value = index < keyword.Length - 1 ? keyword.Substring(index + 1) : null;
 
-			return _searchKey.GetSearchKey(value, new string[] { tag }, out var singleton2);
+			return _searchKey.GetSearchKey(value, new string[] { tag }, out temp);
 		}
 
 		/// <summary>
