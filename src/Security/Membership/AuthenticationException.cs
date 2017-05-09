@@ -43,16 +43,19 @@ namespace Zongsoft.Security.Membership
 		#region 构造函数
 		public AuthenticationException()
 		{
+			_reason = AuthenticationReason.Unknown;
 			_message = this.GetMessage(null);
 		}
 
 		public AuthenticationException(string message) : base(message, null)
 		{
+			_reason = AuthenticationReason.Unknown;
 			_message = this.GetMessage(message);
 		}
 
 		public AuthenticationException(string message, Exception innerException) : base(message, innerException)
 		{
+			_reason = AuthenticationReason.Unknown;
 			_message = this.GetMessage(message);
 		}
 

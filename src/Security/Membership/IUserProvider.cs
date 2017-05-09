@@ -99,6 +99,22 @@ namespace Zongsoft.Security.Membership
 		bool SetPhoneNumber(uint userId, string phoneNumber);
 
 		/// <summary>
+		/// 设置指定编号的用户所属命名空间。
+		/// </summary>
+		/// <param name="userId">要设置的用户编号。</param>
+		/// <param name="namespace">要设置的命名空间。</param>
+		/// <returns>如果设置成功则返回真(True)，否则返回假。</returns>
+		bool SetNamespace(uint userId, string @namespace);
+
+		/// <summary>
+		/// 更新指定命名空间下所有用户到新的命名空间。
+		/// </summary>
+		/// <param name="oldNamespace">指定的旧命名空间。</param>
+		/// <param name="newNamespace">指定的新命名空间。</param>
+		/// <returns>返回更新成功的用户数。</returns>
+		int SetNamespaces(string oldNamespace, string newNamespace);
+
+		/// <summary>
 		/// 设置指定编号的用户名称。
 		/// </summary>
 		/// <param name="userId">要设置的用户编号。</param>

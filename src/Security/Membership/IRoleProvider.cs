@@ -74,6 +74,22 @@ namespace Zongsoft.Security.Membership
 		IEnumerable<Role> GetRoles(string @namespace, Zongsoft.Data.Paging paging = null);
 
 		/// <summary>
+		/// 设置指定编号的角色所属命名空间。
+		/// </summary>
+		/// <param name="roleId">要设置的角色编号。</param>
+		/// <param name="namespace">要设置的命名空间。</param>
+		/// <returns>如果设置成功则返回真(True)，否则返回假。</returns>
+		bool SetNamespace(uint roleId, string @namespace);
+
+		/// <summary>
+		/// 更新指定命名空间下所有角色到新的命名空间。
+		/// </summary>
+		/// <param name="oldNamespace">指定的旧命名空间。</param>
+		/// <param name="newNamespace">指定的新命名空间。</param>
+		/// <returns>返回更新成功的角色数。</returns>
+		int SetNamespaces(string oldNamespace, string newNamespace);
+
+		/// <summary>
 		/// 删除指定编号集的多个角色。
 		/// </summary>
 		/// <param name="roleIds">要删除的角色编号集合。</param>
