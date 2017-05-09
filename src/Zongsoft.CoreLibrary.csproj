@@ -284,11 +284,14 @@
     <Compile Include="Runtime\Serialization\DictionarySerializer.cs" />
     <Compile Include="Runtime\Serialization\IDictionarySerializer.cs" />
     <Compile Include="Runtime\Serialization\ISerializable.cs" />
+    <Compile Include="Runtime\Serialization\ISerializationBinder.cs" />
     <Compile Include="Runtime\Serialization\ISerializationWriter.cs" />
     <Compile Include="Runtime\Serialization\ISerializer.cs" />
     <Compile Include="Runtime\Serialization\ITextSerializer.cs" />
     <Compile Include="Runtime\Serialization\JsonSerializationWriter.cs" />
     <Compile Include="Runtime\Serialization\SerializationBehavior.cs" />
+    <Compile Include="Runtime\Serialization\SerializationBinderAttribute.cs" />
+    <Compile Include="Runtime\Serialization\SerializationBinderBase.cs" />
     <Compile Include="Runtime\Serialization\SerializationMemberAttribute.cs" />
     <Compile Include="Runtime\Serialization\SerializationDirection.cs" />
     <Compile Include="Runtime\Serialization\SerializationMemberBehavior.cs" />

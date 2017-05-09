@@ -28,60 +28,34 @@ using System;
 
 namespace Zongsoft.Runtime.Serialization
 {
-	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, Inherited = true)]
-	public class SerializationMemberAttribute : Attribute
+	/// <summary>
+	/// 表示成员的反序列化绑定器。
+	/// </summary>
+	public interface ISerializationBinder
 	{
-		#region 成员字段
-		private string _name;
-		private SerializationMemberBehavior _behavior;
-		#endregion
-
-		#region 构造函数
-		public SerializationMemberAttribute()
-		{
-		}
-
-		public SerializationMemberAttribute(string name)
-		{
-			_name = name == null ? string.Empty : name.Trim();
-		}
-
-		public SerializationMemberAttribute(SerializationMemberBehavior behavior)
-		{
-			_behavior = behavior;
-		}
-		#endregion
-
-		#region 公共属性
 		/// <summary>
-		/// 获取或设置序列化后的成员名称，如果为空(null)或空字符串("")则取对应的成员本身的名称。
+		/// 获取一个值，指示是否使用默认的成员绑定。
 		/// </summary>
-		public string Name
+		bool GetMemberValueSupported
 		{
-			get
-			{
-				return _name;
-			}
-			set
-			{
-				_name = value == null ? string.Empty : value.Trim();
-			}
+			get;
 		}
 
 		/// <summary>
-		/// 获取或设置成员的序列化行为。
+		/// 获取反序列化的成员类型。
 		/// </summary>
-		public SerializationMemberBehavior Behavior
-		{
-			get
-			{
-				return _behavior;
-			}
-			set
-			{
-				_behavior = value;
-			}
-		}
-		#endregion
+		/// <param name="name">反序列化的成员名称。</param>
+		/// <param name="container">反序列的容器对象。</param>
+		/// <returns>返回当前成员的真实类型。</returns>
+		Type GetMemberType(string name, object container);
+
+		/// <summary>
+		/// 获取反序列化的成员值。
+		/// </summary>
+		/// <param name="name">反序列化的成员名称。</param>
+		/// <param name="container">反序列的容器对象。</param>
+		/// <param name="value">待转化的成员值。</param>
+		/// <returns>返回当前成员的最终反序列化值。</returns>
+		object GetMemberValue(string name, object container, object value);
 	}
 }

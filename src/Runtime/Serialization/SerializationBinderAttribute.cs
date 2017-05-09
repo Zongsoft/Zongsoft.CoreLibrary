@@ -29,57 +29,38 @@ using System;
 namespace Zongsoft.Runtime.Serialization
 {
 	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, Inherited = true)]
-	public class SerializationMemberAttribute : Attribute
+	public class SerializationBinderAttribute : Attribute
 	{
 		#region 成员字段
-		private string _name;
-		private SerializationMemberBehavior _behavior;
+		private Type _binderType;
 		#endregion
 
 		#region 构造函数
-		public SerializationMemberAttribute()
+		public SerializationBinderAttribute(Type binderType)
 		{
-		}
+			if(binderType == null)
+				throw new ArgumentNullException(nameof(binderType));
 
-		public SerializationMemberAttribute(string name)
-		{
-			_name = name == null ? string.Empty : name.Trim();
-		}
+			if(!typeof(ISerializationBinder).IsAssignableFrom(binderType))
+				throw new ArgumentException("The binder type no implement ISerializationBinder interface.");
 
-		public SerializationMemberAttribute(SerializationMemberBehavior behavior)
-		{
-			_behavior = behavior;
+			_binderType = binderType;
 		}
 		#endregion
 
 		#region 公共属性
 		/// <summary>
-		/// 获取或设置序列化后的成员名称，如果为空(null)或空字符串("")则取对应的成员本身的名称。
+		/// 获取或设置绑定器的类型。
 		/// </summary>
-		public string Name
+		public Type BinderType
 		{
 			get
 			{
-				return _name;
+				return _binderType;
 			}
 			set
 			{
-				_name = value == null ? string.Empty : value.Trim();
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置成员的序列化行为。
-		/// </summary>
-		public SerializationMemberBehavior Behavior
-		{
-			get
-			{
-				return _behavior;
-			}
-			set
-			{
-				_behavior = value;
+				_binderType = value;
 			}
 		}
 		#endregion
