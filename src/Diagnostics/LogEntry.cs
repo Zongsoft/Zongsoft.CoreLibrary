@@ -57,13 +57,19 @@ namespace Zongsoft.Diagnostics
 
 		public LogEntry(LogLevel level, string source, string message, Exception exception, object data = null)
 		{
+			if(data is Exception && exception == null)
+			{
+				exception = (Exception)data;
+				data = null;
+			}
+
+			_level = level;
 			_toString = null;
 			_stackTrace = string.Empty;
 			_source = string.IsNullOrEmpty(source) ? (exception == null ? string.Empty : exception.Source) : source.Trim();
 			_exception = exception;
 			_message = message ?? (exception == null ? string.Empty : exception.Message);
 			_data = data ?? (exception != null && exception.Data != null && exception.Data.Count > 0 ? exception.Data : null);
-			_level = level;
 			_timestamp = DateTime.Now;
 		}
 		#endregion
