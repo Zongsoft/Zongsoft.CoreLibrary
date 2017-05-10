@@ -106,9 +106,17 @@ namespace Zongsoft.Data
 		object Search(string keyword, string scope, Paging paging = null, params Sorting[] sortings);
 		object Search(string keyword, Paging paging, string scope = null, params Sorting[] sortings);
 
-		TEntity Get<TKey>(TKey key, string scope = null);
-		TEntity Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string scope = null);
-		TEntity Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string scope = null);
+		object Get<TKey>(TKey key, params Sorting[] sortings);
+		object Get<TKey>(TKey key, string scope, Paging paging = null, params Sorting[] sortings);
+		object Get<TKey>(TKey key, Paging paging, string scope = null, params Sorting[] sortings);
+
+		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, params Sorting[] sortings);
+		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string scope, Paging paging = null, params Sorting[] sortings);
+		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, Paging paging, string scope = null, params Sorting[] sortings);
+
+		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, params Sorting[] sortings);
+		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string scope, Paging paging = null, params Sorting[] sortings);
+		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, Paging paging, string scope = null, params Sorting[] sortings);
 
 		IEnumerable<TEntity> Select(ICondition condition = null, params Sorting[] sortings);
 		IEnumerable<TEntity> Select(ICondition condition, string scope, params Sorting[] sortings);

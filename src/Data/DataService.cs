@@ -226,17 +226,20 @@ namespace Zongsoft.Data
 
 		public virtual bool Exists<TKey>(TKey key)
 		{
-			return this.Exists(this.ConvertKey(key));
+			bool singleton;
+			return this.Exists(this.ConvertKey(key, out singleton));
 		}
 
 		public virtual bool Exists<TKey1, TKey2>(TKey1 key1, TKey2 key2)
 		{
-			return this.Exists(this.ConvertKey(key1, key2));
+			bool singleton;
+			return this.Exists(this.ConvertKey(key1, key2, out singleton));
 		}
 
 		public virtual bool Exists<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3)
 		{
-			return this.Exists(this.ConvertKey(key1, key2, key3));
+			bool singleton;
+			return this.Exists(this.ConvertKey(key1, key2, key3, out singleton));
 		}
 		#endregion
 
@@ -306,13 +309,13 @@ namespace Zongsoft.Data
 			bool singleton;
 
 			//获取搜索条件和搜索结果是否为单条数据
-			var condition = this.GetSearchKey(keyword, out singleton);
+			var condition = this.GetKey(keyword, out singleton);
 
 			if(condition == null)
 				throw new ArgumentException($"The {this.Name} service does not supportd search operation or specified search key is invalid.");
 
 			if(singleton)
-				return this.Get(condition, scope);
+				return this.GetSingle(condition, scope);
 			else
 				return this.Select(condition, scope, paging, sortings);
 		}
@@ -322,22 +325,70 @@ namespace Zongsoft.Data
 			return this.Search(keyword, scope, paging, sortings);
 		}
 
-		public virtual TEntity Get<TKey>(TKey key, string scope = null)
+		public object Get<TKey>(TKey key, params Sorting[] sortings)
 		{
-			return this.Get(this.ConvertKey(key), scope);
+			return this.Get(key, string.Empty, null, sortings);
 		}
 
-		public virtual TEntity Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string scope = null)
+		public virtual object Get<TKey>(TKey key, string scope, Paging paging = null, params Sorting[] sortings)
 		{
-			return this.Get(this.ConvertKey(key1, key2), scope);
+			bool singleton;
+			var condition = this.ConvertKey(key, out singleton);
+
+			if(singleton)
+				return this.GetSingle(condition, scope);
+			else
+				return this.Select(condition, scope, paging, sortings);
 		}
 
-		public virtual TEntity Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string scope = null)
+		public object Get<TKey>(TKey key, Paging paging, string scope = null, params Sorting[] sortings)
 		{
-			return this.Get(this.ConvertKey(key1, key2, key3), scope);
+			return this.Get(key, scope, paging, sortings);
 		}
 
-		private TEntity Get(ICondition condition, string scope)
+		public object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, params Sorting[] sortings)
+		{
+			return this.Get(key1, key2, string.Empty, null, sortings);
+		}
+
+		public virtual object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string scope, Paging paging = null, params Sorting[] sortings)
+		{
+			bool singleton;
+			var condition = this.ConvertKey(key1, key2, out singleton);
+
+			if(singleton)
+				return this.GetSingle(condition, scope);
+			else
+				return this.Select(condition, scope, paging, sortings);
+		}
+
+		public object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, Paging paging, string scope = null, params Sorting[] sortings)
+		{
+			return this.Get(key1, key2, scope, paging, sortings);
+		}
+
+		public object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, params Sorting[] sortings)
+		{
+			return this.Get(key1, key2, key3, string.Empty, null, sortings);
+		}
+
+		public virtual object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string scope, Paging paging = null, params Sorting[] sortings)
+		{
+			bool singleton;
+			var condition = this.ConvertKey(key1, key2, key3, out singleton);
+
+			if(singleton)
+				return this.GetSingle(condition, scope);
+			else
+				return this.Select(condition, scope, paging, sortings);
+		}
+
+		public object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, Paging paging, string scope = null, params Sorting[] sortings)
+		{
+			return this.Get(key1, key2, key3, scope, paging, sortings);
+		}
+
+		private TEntity GetSingle(ICondition condition, string scope)
 		{
 			//激发“Getting”事件
 			var args = this.OnGetting(condition, scope);
@@ -426,17 +477,20 @@ namespace Zongsoft.Data
 		#region 删除方法
 		public virtual int Delete<TKey>(TKey key, params string[] cascades)
 		{
-			return this.Delete(this.ConvertKey(key), cascades);
+			bool singleton;
+			return this.Delete(this.ConvertKey(key, out singleton), cascades);
 		}
 
 		public virtual int Delete<TKey1, TKey2>(TKey1 key1, TKey2 key2, params string[] cascades)
 		{
-			return this.Delete(this.ConvertKey(key1, key2), cascades);
+			bool singleton;
+			return this.Delete(this.ConvertKey(key1, key2, out singleton), cascades);
 		}
 
 		public virtual int Delete<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, params string[] cascades)
 		{
-			return this.Delete(this.ConvertKey(key1, key2, key3), cascades);
+			bool singleton;
+			return this.Delete(this.ConvertKey(key1, key2, key3, out singleton), cascades);
 		}
 
 		public int Delete(ICondition condition, params string[] cascades)
@@ -528,32 +582,38 @@ namespace Zongsoft.Data
 		#region 更新方法
 		public virtual int Update<TKey>(object data, TKey key, string scope = null)
 		{
-			return this.Update(data, this.ConvertKey(key), scope);
+			bool singleton;
+			return this.Update(data, this.ConvertKey(key, out singleton), scope);
 		}
 
 		public virtual int Update<TKey1, TKey2>(object data, TKey1 key1, TKey2 key2, string scope = null)
 		{
-			return this.Update(data, this.ConvertKey(key1, key2), scope);
+			bool singleton;
+			return this.Update(data, this.ConvertKey(key1, key2, out singleton), scope);
 		}
 
 		public virtual int Update<TKey1, TKey2, TKey3>(object data, TKey1 key1, TKey2 key2, TKey3 key3, string scope = null)
 		{
-			return this.Update(data, this.ConvertKey(key1, key2, key3), scope);
+			bool singleton;
+			return this.Update(data, this.ConvertKey(key1, key2, key3, out singleton), scope);
 		}
 
 		public virtual int UpdateMany<TKey>(IEnumerable data, TKey key, string scope = null)
 		{
-			return this.UpdateMany(data, this.ConvertKey(key), scope);
+			bool singleton;
+			return this.UpdateMany(data, this.ConvertKey(key, out singleton), scope);
 		}
 
 		public virtual int UpdateMany<TKey1, TKey2>(IEnumerable data, TKey1 key1, TKey2 key2, string scope = null)
 		{
-			return this.UpdateMany(data, this.ConvertKey(key1, key2), scope);
+			bool singleton;
+			return this.UpdateMany(data, this.ConvertKey(key1, key2, out singleton), scope);
 		}
 
 		public virtual int UpdateMany<TKey1, TKey2, TKey3>(IEnumerable data, TKey1 key1, TKey2 key2, TKey3 key3, string scope = null)
 		{
-			return this.UpdateMany(data, this.ConvertKey(key1, key2, key3), scope);
+			bool singleton;
+			return this.UpdateMany(data, this.ConvertKey(key1, key2, key3, out singleton), scope);
 		}
 
 		public int Update(object data, ICondition condition = null, string scope = null)
@@ -928,7 +988,13 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 键值操作
-		protected virtual ICondition GetSearchKey(string keyword, out bool singleton)
+		/// <summary>
+		/// 根据指定的搜索关键字获取对应的<see cref="ICondition"/>条件。
+		/// </summary>
+		/// <param name="keyword">指定的搜索关键字。</param>
+		/// <param name="singleton">输出一个值，指示返回的搜索条件执行后的结果是否为单个对象。</param>
+		/// <returns>返回对应的搜索<see cref="ICondition"/>条件。</returns>
+		protected virtual ICondition GetKey(string keyword, out bool singleton)
 		{
 			singleton = false;
 
@@ -947,16 +1013,19 @@ namespace Zongsoft.Data
 		}
 
 		/// <summary>
-		/// 根据指定的查询参数值获取对应的查询键值对数组或<see cref="ICondition"/>条件。
+		/// 根据指定的查询参数值获取对应的查询<see cref="ICondition"/>条件。
 		/// </summary>
-		/// <param name="values">传入的查询值数组。</param>
-		/// <returns>返回对应的键值对数组或者<see cref="ICondition"/>条件。</returns>
+		/// <param name="values">指定的查询值数组。</param>
+		/// <param name="singleton">输出一个值，指示返回的查询条件执行后的结果是否为单个对象。</param>
+		/// <returns>返回对应的查询<see cref="ICondition"/>条件。</returns>
 		/// <remarks>
 		///		<para>基类的实现始终返回当前数据服务对应的主键的键值对数组。</para>
-		///		<para>对于重载者的提示：如果<paramref name="values"/>参数值为空(null)或空数组(零长度)，则应返回当前实体的主键的键值对数组（调用基类的<see cref="GetKey(object[])"/>即可）。</para>
 		/// </remarks>
-		protected virtual object GetKey(object[] values)
+		protected virtual ICondition GetKey(object[] values, out bool singleton)
 		{
+			//设置输出参数默认值
+			singleton = false;
+
 			if(values == null || values.Length == 0)
 				return null;
 
@@ -967,85 +1036,59 @@ namespace Zongsoft.Data
 			if(primaryKey == null || primaryKey.Length == 0 || primaryKey.Length != values.Length)
 				return null;
 
-			var result = new object[Math.Min(primaryKey.Length, values.Length)];
+			//匹配主键，故输出参数值为真
+			singleton = true;
 
-			for(int i = 0; i < result.Length; i++)
+			//如果主键成员只有一个则返回单个条件
+			if(primaryKey.Length == 1)
+				return Condition.Equal(primaryKey[0], values[0]);
+
+			//创建返回的条件集（AND组合）
+			var conditions = ConditionCollection.And();
+
+			for(int i = 0; i < primaryKey.Length; i++)
 			{
-				result[i] = new KeyValuePair<string, object>(primaryKey[i], values[i]);
+				conditions.Add(Condition.Equal(primaryKey[i], values[i]));
 			}
 
-			return result;
-		}
-
-		protected virtual ICondition ConvertKey<TKey>(TKey key)
-		{
-			return this.EnsureInquiryKey(new object[] { key });
-		}
-
-		protected virtual ICondition ConvertKey<TKey1, TKey2>(TKey1 key1, TKey2 key2)
-		{
-			return this.EnsureInquiryKey(new object[] { key1, key2 });
-		}
-
-		protected virtual ICondition ConvertKey<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3)
-		{
-			return this.EnsureInquiryKey(new object[] { key1, key2, key3 });
+			return conditions;
 		}
 		#endregion
 
 		#region 私有方法
-		private ICondition EnsureInquiryKey(object[] values)
+		private ICondition ConvertKey<TKey>(TKey key, out bool singleton)
+		{
+			return this.EnsureInquiryKey(new object[] { key }, out singleton);
+		}
+
+		private ICondition ConvertKey<TKey1, TKey2>(TKey1 key1, TKey2 key2, out bool singleton)
+		{
+			return this.EnsureInquiryKey(new object[] { key1, key2 }, out singleton);
+		}
+
+		private ICondition ConvertKey<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, out bool singleton)
+		{
+			return this.EnsureInquiryKey(new object[] { key1, key2, key3 }, out singleton);
+		}
+
+		private ICondition EnsureInquiryKey(object[] values, out bool singleton)
 		{
 			if(values != null && values.Length > 3)
 				throw new NotSupportedException("Too many the keys.");
 
 			//获取查询键值对数组
-			var inquiryKey = this.GetKey(values ?? new object[0]);
+			var condition = this.GetKey(values ?? new object[0], out singleton);
 
-			if(inquiryKey == null)
-				return null;
+			if(condition == null)
+				throw new ArgumentException($"The specified key is invalid of the {this.Name} service.");
 
-			//如果查询键可别转换成条件，则直接返回转换后的条件
-			var condition = this.GetCondition(inquiryKey);
-
-			if(condition != null)
-				return condition;
-
-			//如果最后查询键不可遍历，则抛出异常
-			var items = inquiryKey as IEnumerable;
-
-			if(items == null)
-				throw new InvalidOperationException($"Invalid inquiry key: {inquiryKey}");
-
-			var conditions = new ConditionCollection(ConditionCombination.And);
-
-			foreach(var item in items)
+			if(condition != null && condition is ConditionCollection)
 			{
-				condition = this.GetCondition(item);
-
-				if(condition != null)
-					conditions.Add(condition);
+				if(((ConditionCollection)condition).Count == 1)
+					return ((ConditionCollection)condition)[0];
 			}
 
-			if(conditions.Count > 1)
-				return conditions;
-
-			return conditions.FirstOrDefault();
-		}
-
-		private ICondition GetCondition(object item)
-		{
-			var condition = item as ICondition;
-
-			if(condition != null)
-				return condition;
-
-			if(item is DictionaryEntry && ((DictionaryEntry)item).Key != null)
-				return Condition.Equal(((DictionaryEntry)item).Key.ToString(), ((DictionaryEntry)item).Value);
-			if(item is KeyValuePair<string, object> && ((KeyValuePair<string, object>)item).Key != null)
-				return Condition.Equal(((KeyValuePair<string, object>)item).Key, ((KeyValuePair<string, object>)item).Value);
-
-			return null;
+			return condition;
 		}
 		#endregion
 
