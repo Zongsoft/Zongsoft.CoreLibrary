@@ -37,16 +37,19 @@ namespace Zongsoft.Security.Membership
 		private string _namespace;
 		private string _identity;
 		private User _user;
-		private IDictionary<string, object> _extendedProperties;
+		private IDictionary<string, object> _parameters;
 		#endregion
 
 		#region 构造函数
-		public AuthenticatedEventArgs(string identity, string @namespace, bool isAuthenticated, User user = null)
+		public AuthenticatedEventArgs(string identity, string @namespace, bool isAuthenticated, User user = null, IDictionary<string, object> parameters = null)
 		{
 			_identity = identity;
 			_namespace = @namespace;
 			_isAuthenticated = isAuthenticated;
 			_user = user;
+
+			if(parameters != null && parameters.Count > 0)
+				_parameters = new Dictionary<string, object>(parameters);
 		}
 		#endregion
 
@@ -103,27 +106,27 @@ namespace Zongsoft.Security.Membership
 		}
 
 		/// <summary>
-		/// 获取一个值，指示扩展属性集是否有内容。
+		/// 获取一个值，指示扩展参数集是否有内容。
 		/// </summary>
-		public bool HasExtendedProperties
+		public bool HasParameters
 		{
 			get
 			{
-				return _extendedProperties != null && _extendedProperties.Count > 0;
+				return _parameters != null && _parameters.Count > 0;
 			}
 		}
 
 		/// <summary>
-		/// 获取验证结果的扩展属性集。
+		/// 获取验证结果的扩展参数集。
 		/// </summary>
-		public IDictionary<string, object> ExtendedProperties
+		public IDictionary<string, object> Parameters
 		{
 			get
 			{
-				if(_extendedProperties == null)
-					System.Threading.Interlocked.CompareExchange(ref _extendedProperties, new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase), null);
+				if(_parameters == null)
+					System.Threading.Interlocked.CompareExchange(ref _parameters, new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase), null);
 
-				return _extendedProperties;
+				return _parameters;
 			}
 		}
 		#endregion
