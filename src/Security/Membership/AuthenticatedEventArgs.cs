@@ -36,20 +36,34 @@ namespace Zongsoft.Security.Membership
 		private bool _isAuthenticated;
 		private string _namespace;
 		private string _identity;
+		private string _scene;
 		private User _user;
 		private IDictionary<string, object> _parameters;
 		#endregion
 
 		#region 构造函数
-		public AuthenticatedEventArgs(string identity, string @namespace, bool isAuthenticated, User user = null, IDictionary<string, object> parameters = null)
+		public AuthenticatedEventArgs(string identity, string @namespace, User user, string scene, IDictionary<string, object> parameters = null)
 		{
 			_identity = identity;
 			_namespace = @namespace;
-			_isAuthenticated = isAuthenticated;
+			_isAuthenticated = true;
 			_user = user;
+			_scene = scene;
 
 			if(parameters != null && parameters.Count > 0)
-				_parameters = new Dictionary<string, object>(parameters);
+				_parameters = new Dictionary<string, object>(parameters, StringComparer.OrdinalIgnoreCase);
+		}
+
+		public AuthenticatedEventArgs(string identity, string @namespace, string scene, IDictionary<string, object> parameters = null)
+		{
+			_identity = identity;
+			_namespace = @namespace;
+			_isAuthenticated = false;
+			_user = null;
+			_scene = scene;
+
+			if(parameters != null && parameters.Count > 0)
+				_parameters = new Dictionary<string, object>(parameters, StringComparer.OrdinalIgnoreCase);
 		}
 		#endregion
 
@@ -84,6 +98,17 @@ namespace Zongsoft.Security.Membership
 			get
 			{
 				return _namespace;
+			}
+		}
+
+		/// <summary>
+		/// 获取身份验证的应用场景。
+		/// </summary>
+		public string Scene
+		{
+			get
+			{
+				return _scene;
 			}
 		}
 

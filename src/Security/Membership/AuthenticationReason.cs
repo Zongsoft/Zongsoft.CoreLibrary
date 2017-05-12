@@ -37,9 +37,13 @@ namespace Zongsoft.Security.Membership
 		/// <summary>验证成功</summary>
 		[Description("${Text.AuthenticationReason.Succeed}")]
 		Succeed = 0,
+
 		/// <summary>未知的原因</summary>
 		[Description("${Text.AuthenticationReason.Unknown}")]
 		Unknown = -1,
+		/// <summary>禁止验证通过</summary>
+		[Description("${Text.AuthenticationReason.Forbidden}")]
+		Forbidden = -2,
 
 		/// <summary>无效的身份标识</summary>
 		[Description("${Text.AuthenticationReason.InvalidIdentity}")]

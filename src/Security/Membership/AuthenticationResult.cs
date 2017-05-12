@@ -37,20 +37,22 @@ namespace Zongsoft.Security.Membership
 	{
 		#region 成员字段
 		private User _user;
+		private string _scene;
 		private IDictionary<string, object> _parameters;
 		#endregion
 
 		#region 构造函数
-		public AuthenticationResult(User user) : this(user, null)
+		public AuthenticationResult(User user, string scene) : this(user, scene, null)
 		{
 		}
 
-		public AuthenticationResult(User user, IDictionary<string, object> parameters)
+		public AuthenticationResult(User user, string scene, IDictionary<string, object> parameters)
 		{
 			if(user == null)
 				throw new ArgumentNullException("user");
 
 			_user = user;
+			_scene = scene;
 
 			if(parameters != null && parameters.Count > 0)
 				_parameters = new Dictionary<string, object>(parameters, StringComparer.OrdinalIgnoreCase);
@@ -66,6 +68,17 @@ namespace Zongsoft.Security.Membership
 			get
 			{
 				return _user;
+			}
+		}
+
+		/// <summary>
+		/// 获取身份验证的应用场景。
+		/// </summary>
+		public string Scene
+		{
+			get
+			{
+				return _scene;
 			}
 		}
 
