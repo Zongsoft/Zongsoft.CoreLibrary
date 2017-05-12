@@ -226,25 +226,21 @@ namespace Zongsoft.Common
 			if(property == null)
 				throw new ArgumentNullException(nameof(property));
 
-			var changed = true;
-			var properties = this.Properties;
 			PropertyToken token;
+			var properties = this.Properties;
 
-			//如果指定的属性没有被缓存
+			//判断指定的属性是否已被缓存
 			if(!properties.TryGetValue(property.Name, out token))
+			{
 				token = this.CreatePropertyToken(property.Name, property.PropertyType, null);
+				properties.TryAdd(property.Name, token);
+			}
 
 			//调用属性设置通知
 			token.Value = this.OnPropertySet(property.Name, token.Type, token.Value, value);
 
-			//设置属性值
-			properties.AddOrUpdate(property.Name, token, (_, original) => {
-				changed = !object.Equals(token.Value, original.Value);
-				return token;
-			});
-
-			if(changed)
-				this.RaisePropertyChanged(property.Name, token.Value);
+			//激发“PropertyChanged”事件，并将当前属性加入到更改集中
+			this.RaisePropertyChanged(property.Name, token.Value);
 		}
 		#endregion
 
