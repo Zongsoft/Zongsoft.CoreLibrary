@@ -159,7 +159,10 @@ namespace Zongsoft.Data
 
 				foreach(var field in this.Fields)
 				{
-					conditions.Add(new Condition(field, keyword));
+					if(this.Singleton)
+						conditions.Add(Condition.Equal(field, keyword));
+					else
+						conditions.Add(Condition.Like(field, keyword + '%'));
 				}
 
 				if(conditions.Count == 1)
