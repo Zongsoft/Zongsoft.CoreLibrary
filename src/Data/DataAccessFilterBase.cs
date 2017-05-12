@@ -58,6 +58,16 @@ namespace Zongsoft.Data
 		}
 		#endregion
 
+		#region 保护属性
+		protected virtual Zongsoft.Security.CredentialPrincipal Principal
+		{
+			get
+			{
+				return Zongsoft.ComponentModel.ApplicationContextBase.Current.Principal as Zongsoft.Security.CredentialPrincipal;
+			}
+		}
+		#endregion
+
 		#region 抽象方法
 		public abstract void OnExecuted(DataAccessFilterContext context);
 		public abstract void OnExecuting(DataAccessFilterContext context);
