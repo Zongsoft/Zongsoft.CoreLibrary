@@ -1145,7 +1145,7 @@ namespace Zongsoft.Data
 					{
 						var sequenceKey = GetSequenceKey(data, token.Attribute);
 
-						if(token.Attribute.Keys.Length == 1)
+						if(sequenceKey != null && sequenceKey.Length > 0)
 							data.Set(token.Attribute.Keys[0], () => token.Sequence.Increment(sequenceKey, 1, token.Attribute.Seed), value => value == null || (long)System.Convert.ChangeType(value, typeof(long)) == 0);
 					}
 				}
