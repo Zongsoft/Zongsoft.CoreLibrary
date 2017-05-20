@@ -430,7 +430,10 @@ namespace Zongsoft.Data
 		#region 插入方法
 		public int Insert<T>(T data, string scope = null)
 		{
-			return this.Insert(this.GetName<T>(), data, scope);
+			if(data == null)
+				throw new ArgumentNullException(nameof(data));
+
+			return this.Insert(this.GetName(data.GetType()), data, scope);
 		}
 
 		public int Insert(string name, object data, string scope = null)
@@ -509,12 +512,18 @@ namespace Zongsoft.Data
 		#region 更新方法
 		public int Update<T>(T data, ICondition condition = null, string scope = null)
 		{
-			return this.Update(this.GetName<T>(), data, condition, scope);
+			if(data == null)
+				throw new ArgumentNullException(nameof(data));
+
+			return this.Update(this.GetName(data.GetType()), data, condition, scope);
 		}
 
 		public int Update<T>(T data, string scope, ICondition condition = null)
 		{
-			return this.Update(this.GetName<T>(), data, condition, scope);
+			if(data == null)
+				throw new ArgumentNullException(nameof(data));
+
+			return this.Update(this.GetName(data.GetType()), data, condition, scope);
 		}
 
 		/// <summary>
