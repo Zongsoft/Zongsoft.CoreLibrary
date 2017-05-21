@@ -43,11 +43,19 @@ namespace Zongsoft.Data
 
 		#region 成员字段
 		private ConditionCombination _conditionCombination;
+		private ConditionalBehaviors _defaultBehaviors;
 		#endregion
 
 		#region 构造函数
 		protected Conditional()
 		{
+			_defaultBehaviors = ConditionalBehaviors.None;
+			_conditionCombination = ConditionCombination.And;
+		}
+
+		protected Conditional(ConditionalBehaviors defaultBehaviors)
+		{
+			_defaultBehaviors = defaultBehaviors;
 			_conditionCombination = ConditionCombination.And;
 		}
 		#endregion
@@ -62,6 +70,18 @@ namespace Zongsoft.Data
 			set
 			{
 				_conditionCombination = value;
+			}
+		}
+
+		protected ConditionalBehaviors DefaultBehaviors
+		{
+			get
+			{
+				return _defaultBehaviors;
+			}
+			set
+			{
+				_defaultBehaviors = value;
 			}
 		}
 		#endregion
@@ -137,7 +157,7 @@ namespace Zongsoft.Data
 			var descriptor = _cache.GetOrAdd(this.GetType(), type => new ConditionalDescriptor(type));
 
 			//只遍历基类属性字典中的属性（即显式设置过的属性）
-			foreach(var property in this.Properties)
+			foreach(var property in this.GetChangedProperties())
 			{
 				var condition = this.GenerateCondition(descriptor.Properties[property.Key]);
 
@@ -165,7 +185,7 @@ namespace Zongsoft.Data
 			var names = this.GetConditionNames(property);
 
 			//创建转换器上下文
-			var context = new ConditionalConverterContext(this, property.Behaviors, names, property.PropertyType, property.GetValue(this), property.Operator);
+			var context = new ConditionalConverterContext(this, property.Attribute == null ? _defaultBehaviors : property.Attribute.Behaviors, names, property.PropertyType, property.GetValue(this), property.Operator);
 
 			//如果当前属性指定了特定的转换器，则使用该转换器来处理
 			if(property.Converter != null)
@@ -229,14 +249,6 @@ namespace Zongsoft.Data
 
 				if(attribute != null && attribute.ConverterType != null)
 					this.Converter = Activator.CreateInstance(attribute.ConverterType) as IConditionalConverter;
-			}
-
-			public ConditionalBehaviors Behaviors
-			{
-				get
-				{
-					return this.Attribute == null ? ConditionalBehaviors.None : this.Attribute.Behaviors;
-				}
 			}
 
 			public ConditionOperator? Operator
