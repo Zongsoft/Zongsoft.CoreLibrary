@@ -165,46 +165,46 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 执行方法
-		public IEnumerable<T> Execute<T>(IDictionary<string, object> inParameters)
+		public IEnumerable<T> Execute<T>(string name, IDictionary<string, object> inParameters)
 		{
 			IDictionary<string, object> outParameters;
-			return this.Execute<T>(inParameters, out outParameters);
+			return this.Execute<T>(name, inParameters, out outParameters);
 		}
 
-		public virtual IEnumerable<T> Execute<T>(IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters)
+		public virtual IEnumerable<T> Execute<T>(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters)
 		{
 			//激发“Executing”事件
-			var args = this.OnExecuting(typeof(T), inParameters, out outParameters);
+			var args = this.OnExecuting(name, typeof(T), inParameters, out outParameters);
 
 			if(args.Cancel)
 				return args.Result as IEnumerable<T>;
 
 			//执行数据操作方法
-			args.Result = this.DataAccess.Execute<T>(this.Name, args.InParameters, out outParameters);
+			args.Result = this.DataAccess.Execute<T>(name, args.InParameters, out outParameters);
 
 			//激发“Executed”事件
-			return this.OnExecuted(typeof(T), args.InParameters, ref outParameters, args.Result) as IEnumerable<T>;
+			return this.OnExecuted(name, typeof(T), args.InParameters, ref outParameters, args.Result) as IEnumerable<T>;
 		}
 
-		public object ExecuteScalar(IDictionary<string, object> inParameters)
+		public object ExecuteScalar(string name, IDictionary<string, object> inParameters)
 		{
 			IDictionary<string, object> outParameters;
-			return this.ExecuteScalar(inParameters, out outParameters);
+			return this.ExecuteScalar(name, inParameters, out outParameters);
 		}
 
-		public virtual object ExecuteScalar(IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters)
+		public virtual object ExecuteScalar(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters)
 		{
 			//激发“Executing”事件
-			var args = this.OnExecuting(typeof(object), inParameters, out outParameters);
+			var args = this.OnExecuting(name, typeof(object), inParameters, out outParameters);
 
 			if(args.Cancel)
 				return args.Result;
 
 			//执行数据操作方法
-			args.Result = this.DataAccess.ExecuteScalar(this.Name, args.InParameters, out outParameters);
+			args.Result = this.DataAccess.ExecuteScalar(name, args.InParameters, out outParameters);
 
 			//激发“Executed”事件
-			return this.OnExecuted(typeof(object), args.InParameters, ref outParameters, args.Result);
+			return this.OnExecuted(name, typeof(object), args.InParameters, ref outParameters, args.Result);
 		}
 		#endregion
 
@@ -698,17 +698,17 @@ namespace Zongsoft.Data
 			return args;
 		}
 
-		protected object OnExecuted(Type resultType, IDictionary<string, object> inParameters, ref IDictionary<string, object> outParameters, object result)
+		protected object OnExecuted(string name, Type resultType, IDictionary<string, object> inParameters, ref IDictionary<string, object> outParameters, object result)
 		{
-			var args = new DataExecutedEventArgs(this.Name, resultType, inParameters, null, result);
+			var args = new DataExecutedEventArgs(name, resultType, inParameters, null, result);
 			this.OnExecuted(args);
 			outParameters = args.OutParameters;
 			return args.Result;
 		}
 
-		protected DataExecutingEventArgs OnExecuting(Type resultType, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters)
+		protected DataExecutingEventArgs OnExecuting(string name, Type resultType, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters)
 		{
-			var args = new DataExecutingEventArgs(this.Name, resultType, inParameters);
+			var args = new DataExecutingEventArgs(name, resultType, inParameters);
 			this.OnExecuting(args);
 			outParameters = args.OutParameters;
 			return args;
@@ -1146,7 +1146,7 @@ namespace Zongsoft.Data
 						var sequenceKey = GetSequenceKey(data, token.Attribute);
 
 						if(sequenceKey != null && sequenceKey.Length > 0)
-							data.Set(token.Attribute.Keys[0], () => token.Sequence.Increment(sequenceKey, 1, token.Attribute.Seed), value => value == null || (long)System.Convert.ChangeType(value, typeof(long)) == 0);
+							data.Set(token.Attribute.Keys[token.Attribute.Keys.Length - 1], () => token.Sequence.Increment(sequenceKey, 1, token.Attribute.Seed), value => value == null || (long)System.Convert.ChangeType(value, typeof(long)) == 0);
 					}
 				}
 			}
@@ -1156,6 +1156,9 @@ namespace Zongsoft.Data
 			private static string GetSequenceKey(DataDictionary<TEntity> data, DataSequenceAttribute attribute)
 			{
 				var result = SEQUENCE_KEY_PREFIX;
+
+				if(!string.IsNullOrWhiteSpace(attribute.Prefix))
+					result += ":" + attribute.Prefix;
 
 				for(int i = 0; i < attribute.Keys.Length - 1; i++)
 				{
