@@ -52,6 +52,19 @@ namespace Zongsoft.Common
 		protected ModelBase()
 		{
 		}
+
+		protected ModelBase(ModelBase model)
+		{
+			if(model == null)
+				return;
+
+			var properties = model.GetChangedProperties();
+
+			foreach(var property in properties)
+			{
+				this.SetPropertyValue(property.Key, property.Value);
+			}
+		}
 		#endregion
 
 		#region 保护属性
