@@ -64,7 +64,7 @@ namespace Zongsoft.Data
 			if(string.IsNullOrWhiteSpace(keys))
 				throw new ArgumentNullException(nameof(keys));
 
-			var index = keys.IndexOf(':');
+			var index = keys.LastIndexOf(':');
 
 			if(index >= 0)
 			{
