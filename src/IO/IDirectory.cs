@@ -43,8 +43,8 @@ namespace Zongsoft.IO
 		DirectoryInfo GetInfo(string path);
 		Task<DirectoryInfo> GetInfoAsync(string path);
 
-		bool SetInfo(string path, IDictionary<string, string> properties);
-		Task<bool> SetInfoAsync(string path, IDictionary<string, string> properties);
+		bool SetInfo(string path, IDictionary<string, object> properties);
+		Task<bool> SetInfoAsync(string path, IDictionary<string, object> properties);
 
 		/// <summary>
 		/// 创建一个指定路径的目录。
@@ -55,8 +55,8 @@ namespace Zongsoft.IO
 		/// <remarks>
 		///		<para>如果<paramref name="path"/>参数指定的路径不存在并且创建成功则返回真；如果指定的路径已存在则返回假。</para>
 		/// </remarks>
-		bool Create(string path, IDictionary<string, string> properties = null);
-		Task<bool> CreateAsync(string path, IDictionary<string, string> properties = null);
+		bool Create(string path, IDictionary<string, object> properties = null);
+		Task<bool> CreateAsync(string path, IDictionary<string, object> properties = null);
 
 		bool Delete(string path, bool recursive = false);
 		Task<bool> DeleteAsync(string path, bool recursive = false);

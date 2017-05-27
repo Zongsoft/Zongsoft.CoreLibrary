@@ -37,7 +37,7 @@ namespace Zongsoft.IO
 		private string _url;
 		private DateTime _createdTime;
 		private DateTime _modifiedTime;
-		private Dictionary<string, string> _properties;
+		private Dictionary<string, object> _properties;
 		#endregion
 
 		#region 构造函数
@@ -218,12 +218,12 @@ namespace Zongsoft.IO
 			}
 		}
 
-		public IDictionary<string, string> Properties
+		public IDictionary<string, object> Properties
 		{
 			get
 			{
 				if(_properties == null)
-					System.Threading.Interlocked.CompareExchange(ref _properties, new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase), null);
+					System.Threading.Interlocked.CompareExchange(ref _properties, new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase), null);
 
 				return _properties;
 			}

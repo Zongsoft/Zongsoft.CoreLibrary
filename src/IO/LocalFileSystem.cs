@@ -167,7 +167,7 @@ namespace Zongsoft.IO
 			#endregion
 
 			#region 公共方法
-			public bool Create(string path, IDictionary<string, string> properties = null)
+			public bool Create(string path, IDictionary<string, object> properties = null)
 			{
 				var fullPath = GetLocalPath(path);
 
@@ -177,7 +177,7 @@ namespace Zongsoft.IO
 				return System.IO.Directory.CreateDirectory(fullPath) != null;
 			}
 
-			public async Task<bool> CreateAsync(string path, IDictionary<string, string> properties = null)
+			public async Task<bool> CreateAsync(string path, IDictionary<string, object> properties = null)
 			{
 				var fullPath = GetLocalPath(path);
 
@@ -269,12 +269,12 @@ namespace Zongsoft.IO
 				return new DirectoryInfo(info.FullName, info.CreationTime, info.LastWriteTime, LocalFileSystem.Instance.GetUrl(path));
 			}
 
-			public bool SetInfo(string path, IDictionary<string, string> properties)
+			public bool SetInfo(string path, IDictionary<string, object> properties)
 			{
 				throw new NotSupportedException();
 			}
 
-			public Task<bool> SetInfoAsync(string path, IDictionary<string, string> properties)
+			public Task<bool> SetInfoAsync(string path, IDictionary<string, object> properties)
 			{
 				throw new NotSupportedException();
 			}
@@ -781,35 +781,35 @@ namespace Zongsoft.IO
 				return new FileInfo(info.FullName, info.Length, info.CreationTime, info.LastWriteTime, LocalFileSystem.Instance.GetUrl(path));
 			}
 
-			public bool SetInfo(string path, IDictionary<string, string> properties)
+			public bool SetInfo(string path, IDictionary<string, object> properties)
 			{
 				throw new NotSupportedException();
 			}
 
-			public Task<bool> SetInfoAsync(string path, IDictionary<string, string> properties)
+			public Task<bool> SetInfoAsync(string path, IDictionary<string, object> properties)
 			{
 				throw new NotSupportedException();
 			}
 
-			public Stream Open(string path, IDictionary<string, string> properties = null)
+			public Stream Open(string path, IDictionary<string, object> properties = null)
 			{
 				var fullPath = GetLocalPath(path);
 				return System.IO.File.Open(fullPath, FileMode.Open);
 			}
 
-			public Stream Open(string path, FileMode mode, IDictionary<string, string> properties = null)
+			public Stream Open(string path, FileMode mode, IDictionary<string, object> properties = null)
 			{
 				var fullPath = GetLocalPath(path);
 				return System.IO.File.Open(fullPath, mode);
 			}
 
-			public Stream Open(string path, FileMode mode, FileAccess access, IDictionary<string, string> properties = null)
+			public Stream Open(string path, FileMode mode, FileAccess access, IDictionary<string, object> properties = null)
 			{
 				var fullPath = GetLocalPath(path);
 				return System.IO.File.Open(fullPath, mode, access);
 			}
 
-			public Stream Open(string path, FileMode mode, FileAccess access, FileShare share, IDictionary<string, string> properties = null)
+			public Stream Open(string path, FileMode mode, FileAccess access, FileShare share, IDictionary<string, object> properties = null)
 			{
 				var fullPath = GetLocalPath(path);
 				return System.IO.File.Open(fullPath, mode, access, share);

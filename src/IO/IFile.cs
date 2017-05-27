@@ -44,8 +44,8 @@ namespace Zongsoft.IO
 		FileInfo GetInfo(string path);
 		Task<FileInfo> GetInfoAsync(string path);
 
-		bool SetInfo(string path, IDictionary<string, string> properties);
-		Task<bool> SetInfoAsync(string path, IDictionary<string, string> properties);
+		bool SetInfo(string path, IDictionary<string, object> properties);
+		Task<bool> SetInfoAsync(string path, IDictionary<string, object> properties);
 
 		bool Delete(string path);
 		Task<bool> DeleteAsync(string path);
@@ -62,9 +62,9 @@ namespace Zongsoft.IO
 		void Move(string source, string destination);
 		Task MoveAsync(string source, string destination);
 
-		Stream Open(string path, IDictionary<string, string> properties = null);
-		Stream Open(string path, FileMode mode, IDictionary<string, string> properties = null);
-		Stream Open(string path, FileMode mode, FileAccess access, IDictionary<string, string> properties = null);
-		Stream Open(string path, FileMode mode, FileAccess access, FileShare share, IDictionary<string, string> properties = null);
+		Stream Open(string path, IDictionary<string, object> properties = null);
+		Stream Open(string path, FileMode mode, IDictionary<string, object> properties = null);
+		Stream Open(string path, FileMode mode, FileAccess access, IDictionary<string, object> properties = null);
+		Stream Open(string path, FileMode mode, FileAccess access, FileShare share, IDictionary<string, object> properties = null);
 	}
 }

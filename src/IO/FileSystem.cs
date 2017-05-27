@@ -226,7 +226,7 @@ namespace Zongsoft.IO
 		#region 嵌套子类
 		private class DirectoryProvider : IDirectory
 		{
-			public bool Create(string virtualPath, IDictionary<string, string> properties = null)
+			public bool Create(string virtualPath, IDictionary<string, object> properties = null)
 			{
 				Path path;
 				var service = FileSystem.GetDirectoryProvider(virtualPath, out path);
@@ -234,7 +234,7 @@ namespace Zongsoft.IO
 				return service.Create(path.FullPath, properties);
 			}
 
-			public Task<bool> CreateAsync(string virtualPath, IDictionary<string, string> properties = null)
+			public Task<bool> CreateAsync(string virtualPath, IDictionary<string, object> properties = null)
 			{
 				Path path;
 				var service = FileSystem.GetDirectoryProvider(virtualPath, out path);
@@ -324,7 +324,7 @@ namespace Zongsoft.IO
 				return service.GetInfoAsync(path.FullPath);
 			}
 
-			public bool SetInfo(string virtualPath, IDictionary<string, string> properties)
+			public bool SetInfo(string virtualPath, IDictionary<string, object> properties)
 			{
 				Path path;
 				var service = FileSystem.GetDirectoryProvider(virtualPath, out path);
@@ -332,7 +332,7 @@ namespace Zongsoft.IO
 				return service.SetInfo(path.FullPath, properties);
 			}
 
-			public Task<bool> SetInfoAsync(string virtualPath, IDictionary<string, string> properties)
+			public Task<bool> SetInfoAsync(string virtualPath, IDictionary<string, object> properties)
 			{
 				Path path;
 				var service = FileSystem.GetDirectoryProvider(virtualPath, out path);
@@ -544,7 +544,7 @@ namespace Zongsoft.IO
 				return service.GetInfoAsync(path.FullPath);
 			}
 
-			public bool SetInfo(string virtualPath, IDictionary<string, string> properties)
+			public bool SetInfo(string virtualPath, IDictionary<string, object> properties)
 			{
 				Path path;
 				var service = FileSystem.GetFileProvider(virtualPath, out path);
@@ -552,7 +552,7 @@ namespace Zongsoft.IO
 				return service.SetInfo(path.FullPath, properties);
 			}
 
-			public Task<bool> SetInfoAsync(string virtualPath, IDictionary<string, string> properties)
+			public Task<bool> SetInfoAsync(string virtualPath, IDictionary<string, object> properties)
 			{
 				Path path;
 				var service = FileSystem.GetFileProvider(virtualPath, out path);
@@ -560,7 +560,7 @@ namespace Zongsoft.IO
 				return service.SetInfoAsync(path.FullPath, properties);
 			}
 
-			public Stream Open(string virtualPath, IDictionary<string, string> properties = null)
+			public Stream Open(string virtualPath, IDictionary<string, object> properties = null)
 			{
 				Path path;
 				var service = FileSystem.GetFileProvider(virtualPath, out path);
@@ -568,7 +568,7 @@ namespace Zongsoft.IO
 				return service.Open(path.FullPath, properties);
 			}
 
-			public Stream Open(string virtualPath, FileMode mode, IDictionary<string, string> properties = null)
+			public Stream Open(string virtualPath, FileMode mode, IDictionary<string, object> properties = null)
 			{
 				Path path;
 				var service = FileSystem.GetFileProvider(virtualPath, out path);
@@ -576,7 +576,7 @@ namespace Zongsoft.IO
 				return service.Open(path.FullPath, mode, properties);
 			}
 
-			public Stream Open(string virtualPath, FileMode mode, FileAccess access, IDictionary<string, string> properties = null)
+			public Stream Open(string virtualPath, FileMode mode, FileAccess access, IDictionary<string, object> properties = null)
 			{
 				Path path;
 				var service = FileSystem.GetFileProvider(virtualPath, out path);
@@ -584,7 +584,7 @@ namespace Zongsoft.IO
 				return service.Open(path.FullPath, mode, access, properties);
 			}
 
-			public Stream Open(string virtualPath, FileMode mode, FileAccess access, System.IO.FileShare share, IDictionary<string, string> properties = null)
+			public Stream Open(string virtualPath, FileMode mode, FileAccess access, System.IO.FileShare share, IDictionary<string, object> properties = null)
 			{
 				Path path;
 				var service = FileSystem.GetFileProvider(virtualPath, out path);
