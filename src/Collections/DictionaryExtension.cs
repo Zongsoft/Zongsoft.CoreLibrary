@@ -64,7 +64,7 @@ namespace Zongsoft.Collections
 		}
 
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
-		public static bool TryGetValue<TValue>(this IDictionary dictionary, object key, out TValue value)
+		public static bool TryGetValue<TValue>(this IDictionary dictionary, object key, out TValue value, Func<object, TValue> converter = null)
 		{
 			value = default(TValue);
 
@@ -74,7 +74,12 @@ namespace Zongsoft.Collections
 			var existed = dictionary.Contains(key);
 
 			if(existed)
-				value = Zongsoft.Common.Convert.ConvertValue<TValue>(dictionary[key]);
+			{
+				if(converter == null)
+					value = Zongsoft.Common.Convert.ConvertValue<TValue>(dictionary[key]);
+				else
+					value = converter(dictionary[key]);
+			}
 
 			return existed;
 		}
@@ -91,6 +96,28 @@ namespace Zongsoft.Collections
 				onGot(Zongsoft.Common.Convert.ConvertValue<TValue>(dictionary[key]));
 
 			return existed;
+		}
+
+		public static bool TryGetValue<TKey, TValue>(this IDictionary<TKey, object> dictionary, TKey key, out TValue value, Func<object, TValue> converter = null)
+		{
+			value = default(TValue);
+
+			if(dictionary == null || dictionary.Count < 1)
+				return false;
+
+			object result;
+
+			if(dictionary.TryGetValue(key, out result))
+			{
+				if(converter == null)
+					value = Zongsoft.Common.Convert.ConvertValue<TValue>(result);
+				else
+					value = converter(result);
+
+				return true;
+			}
+
+			return false;
 		}
 
 		public static bool TryGetValue<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, Action<TValue> onGot)
