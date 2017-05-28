@@ -29,47 +29,84 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
-	public class DataAccessFilterContext : DataAccessContextBase
+	public abstract class DataAccessContextBase : MarshalByRefObject
 	{
 		#region 成员字段
-		private DataAccessMethod _method;
-		private DataAccessEventArgs _arguments;
+		private string _name;
+		private IDataAccess _dataAccess;
+		private IDictionary<string, object> _states;
 		#endregion
 
 		#region 构造函数
-		public DataAccessFilterContext(IDataAccess dataAccess, DataAccessMethod method, DataAccessEventArgs arguments) : base(dataAccess)
+		protected DataAccessContextBase(IDataAccess dataAccess)
 		{
-			if(arguments == null)
-				throw new ArgumentNullException(nameof(arguments));
+			if(dataAccess == null)
+				throw new ArgumentNullException(nameof(dataAccess));
 
-			_method = method;
-			_arguments = arguments;
+			_dataAccess = dataAccess;
+		}
+
+		protected DataAccessContextBase(IDataAccess dataAccess, string name)
+		{
+			if(dataAccess == null)
+				throw new ArgumentNullException(nameof(dataAccess));
+			if(string.IsNullOrWhiteSpace(name))
+				throw new ArgumentNullException(nameof(name));
+
+			_name = name;
+			_dataAccess = dataAccess;
 		}
 		#endregion
 
 		#region 公共属性
-		public override string Name
+		public virtual string Name
 		{
 			get
 			{
-				return _arguments.Name;
+				return _name;
 			}
 		}
 
-		public override DataAccessMethod Method
+		public IDataAccess DataAccess
 		{
 			get
 			{
-				return _method;
+				return _dataAccess;
 			}
 		}
 
-		public DataAccessEventArgs Arguments
+		public IDataAccessMapper Mapper
 		{
 			get
 			{
-				return _arguments;
+				return _dataAccess.Mapper;
 			}
+		}
+
+		public bool HasStates
+		{
+			get
+			{
+				return _states != null && _states.Count > 0;
+			}
+		}
+
+		public IDictionary<string, object> States
+		{
+			get
+			{
+				if(_states == null)
+					System.Threading.Interlocked.CompareExchange(ref _states, new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase), null);
+
+				return _states;
+			}
+		}
+		#endregion
+
+		#region 抽象属性
+		public abstract DataAccessMethod Method
+		{
+			get;
 		}
 		#endregion
 	}
