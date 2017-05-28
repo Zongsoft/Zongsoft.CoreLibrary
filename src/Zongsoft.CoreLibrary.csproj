@@ -122,6 +122,7 @@
     <Compile Include="Communication\PacketizerFactory.cs" />
     <Compile Include="Communication\ChannelPipelineContext.cs" />
     <Compile Include="Data\ConditionalBehaviors.cs" />
+    <Compile Include="Data\ConditionalRangeConverter.cs" />
     <Compile Include="Data\DataAccessFilterBase.cs" />
     <Compile Include="Data\DataAccessMethod.cs" />
     <Compile Include="Data\DataAccessEventArgs.cs" />

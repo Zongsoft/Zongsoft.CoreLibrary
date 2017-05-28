@@ -30,6 +30,7 @@ using System.Collections;
 
 namespace Zongsoft.Data
 {
+	[System.ComponentModel.TypeConverter(typeof(ConditionalRangeConverter))]
 	public class ConditionalRange
 	{
 		#region 成员字段
@@ -89,6 +90,11 @@ namespace Zongsoft.Data
 		public static bool IsEmpty(ConditionalRange value)
 		{
 			return value == null || (value.From == null && value.To == null);
+		}
+
+		public static bool TryParse(string text, out ConditionalRange result)
+		{
+			return TryParse<string>(text, out result);
 		}
 
 		public static bool TryParse<T>(string text, out ConditionalRange result) where T : IComparable
