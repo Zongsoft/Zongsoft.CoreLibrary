@@ -80,6 +80,15 @@ namespace Zongsoft.Services.Tests
 			Assert.Equal("../sms/", expression.Path);
 			Assert.Equal("../sms/send", expression.FullPath);
 			Assert.Equal(PathAnchor.Parent, expression.Anchor);
+
+			expression = CommandExpression.Parse("notification.send -name:Zongsoft.CRM -type:Message -mode:Alias -destination:User.100 -title:'task:create'");
+			Assert.Equal("send", expression.Name);
+			Assert.Equal(5, expression.Options.Count);
+			Assert.Equal("Zongsoft.CRM", expression.Options["name"]);
+			Assert.Equal("Message", expression.Options["type"]);
+			Assert.Equal("Alias", expression.Options["mode"]);
+			Assert.Equal("User.100", expression.Options["destination"]);
+			Assert.Equal("task:create", expression.Options["title"]);
 		}
 
 		[Fact]

@@ -269,7 +269,7 @@ namespace Zongsoft.Services
 				}
 				else if(chr == ':' || chr == '=')
 				{
-					if(state == CommandPairState.Part && !string.IsNullOrEmpty(key))
+					if(state == CommandPairState.Part && !string.IsNullOrEmpty(key) && (quote == '\0' && !isEscaping))
 					{
 						state = CommandPairState.Assign;
 						continue;
