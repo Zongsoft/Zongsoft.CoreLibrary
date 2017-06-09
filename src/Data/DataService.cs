@@ -1146,7 +1146,12 @@ namespace Zongsoft.Data
 						var sequenceKey = GetSequenceKey(data, token.Attribute);
 
 						if(sequenceKey != null && sequenceKey.Length > 0)
-							data.Set(token.Attribute.Keys[token.Attribute.Keys.Length - 1], () => token.Sequence.Increment(sequenceKey, 1, token.Attribute.Seed), value => value == null || (long)System.Convert.ChangeType(value, typeof(long)) == 0);
+						{
+							//确保只有当序号字段未指定值或值为零时，才使用增量的序号值
+							data.Set(token.Attribute.Keys[token.Attribute.Keys.Length - 1],
+									 () => token.Sequence.Increment(sequenceKey, 1, token.Attribute.Seed),
+									 value => value == null || (ulong)System.Convert.ChangeType(value, typeof(ulong)) == 0);
+						}
 					}
 				}
 			}
