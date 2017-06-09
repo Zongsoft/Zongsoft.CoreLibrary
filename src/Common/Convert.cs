@@ -73,7 +73,12 @@ namespace Zongsoft.Common
 				if(conversionType == typeof(DBNull))
 					return DBNull.Value;
 				else
+				{
+					if(conversionType.IsGenericType && conversionType.GetGenericTypeDefinition() == typeof(Nullable<>))
+						return null;
+
 					return conversionType.IsValueType ? defaultValueThunk() : null;
+				}
 			}
 
 			Type type = conversionType;
