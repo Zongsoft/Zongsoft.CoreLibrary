@@ -362,6 +362,7 @@
     <Compile Include="Services\CommandOptionException.cs" />
     <Compile Include="Services\CommandOptionMissingException.cs" />
     <Compile Include="Services\CommandOptionValueException.cs" />
+    <Compile Include="Services\CommandResult.cs" />
     <Compile Include="Services\ICommandCompletion.cs" />
     <Compile Include="Services\ICommandOutlet.cs" />
     <Compile Include="Services\CommandOutletColor.cs" />
@@ -380,6 +381,7 @@
     <Compile Include="Communication\Composition\ExecutionUtility.cs" />
     <Compile Include="Services\ICommandExecutor.cs" />
     <Compile Include="Services\ICommandExpressionParser.cs" />
+    <Compile Include="Services\ICommandResult.cs" />
     <Compile Include="Services\IMatchable`1.cs" />
     <Compile Include="Services\IMatcher.cs" />
     <Compile Include="Services\IMatcher`1.cs" />
