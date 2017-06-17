@@ -29,7 +29,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Runtime.Serialization
 {
-	public class SerializationSettings : Zongsoft.Common.ModelBase
+	public class SerializationSettings
 	{
 		#region 成员变量
 		private int _maximumDepth;
@@ -60,13 +60,7 @@ namespace Zongsoft.Runtime.Serialization
 			}
 			set
 			{
-				var newValue = Math.Max(-1, value);
-				var changed = _maximumDepth != newValue;
-
-				_maximumDepth = newValue;
-
-				if(changed)
-					this.RaisePropertyChanged("MaximumDepth", newValue);
+				_maximumDepth = Math.Max(-1, value);
 			}
 		}
 
@@ -78,7 +72,7 @@ namespace Zongsoft.Runtime.Serialization
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.SerializationBehavior, ref _serializationBehavior, value);
+				_serializationBehavior = value;
 			}
 		}
 
@@ -90,7 +84,7 @@ namespace Zongsoft.Runtime.Serialization
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.SerializationMembers, ref _serializationMembers, value);
+				_serializationMembers = value;
 			}
 		}
 		#endregion

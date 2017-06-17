@@ -32,7 +32,7 @@ namespace Zongsoft.Runtime.Serialization
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.Indented, ref _indented, value);
+				_indented = value;
 			}
 		}
 
@@ -47,7 +47,7 @@ namespace Zongsoft.Runtime.Serialization
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.Typed, ref _typed, value);
+				_typed = value;
 			}
 		}
 
@@ -62,7 +62,7 @@ namespace Zongsoft.Runtime.Serialization
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.NamingConvention, ref _namingConvention, value);
+				_namingConvention = value;
 			}
 		}
 		#endregion
