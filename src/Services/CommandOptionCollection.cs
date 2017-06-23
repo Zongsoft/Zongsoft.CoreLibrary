@@ -77,7 +77,12 @@ namespace Zongsoft.Services
 				if(string.IsNullOrWhiteSpace(key))
 					throw new ArgumentNullException(nameof(key));
 
-				return _items[key];
+				string value;
+
+				if(_items.TryGetValue(key, out value))
+					return value;
+
+				throw new KeyNotFoundException($"The '{key}' command option is undefined.");
 			}
 		}
 
