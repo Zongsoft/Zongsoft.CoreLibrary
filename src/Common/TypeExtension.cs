@@ -222,6 +222,40 @@ namespace Zongsoft.Common
 			return System.Activator.CreateInstance(type);
 		}
 
+		public static string GetTypeAlias<T>()
+		{
+			return GetTypeAlias(typeof(T));
+		}
+
+		public static string GetTypeAlias(this Type type)
+		{
+			if(type == null)
+				return null;
+
+			var elementType = type.IsArray ? type.GetElementType() : type;
+			var code = Type.GetTypeCode(elementType);
+			var alias = string.Empty;
+
+			if(code != TypeCode.Object)
+			{
+				alias = code.ToString().ToLowerInvariant();
+			}
+			else
+			{
+				if(type == typeof(object))
+					alias = "object";
+				else if(type == typeof(Guid))
+					alias = "guid";
+				else
+					return type.AssemblyQualifiedName;
+			}
+
+			if(type.IsArray)
+				alias += "[]";
+
+			return alias;
+		}
+
 		public static Type GetType(string typeName, bool throwOnError = false, bool ignoreCase = true)
 		{
 			if(string.IsNullOrWhiteSpace(typeName))
