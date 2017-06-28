@@ -143,5 +143,17 @@ namespace Zongsoft.Security
 			}
 		}
 		#endregion
+
+		#region 重写方法
+		public override string ToString()
+		{
+			var credential = this.Credential;
+
+			if(credential == null)
+				return "[NoAuthenticated] " + _credentialId;
+			else
+				return "[Authenticated] " + credential.ToString();
+		}
+		#endregion
 	}
 }

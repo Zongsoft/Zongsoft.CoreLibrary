@@ -91,5 +91,17 @@ namespace Zongsoft.Security
 			return false;
 		}
 		#endregion
+
+		#region 重写方法
+		public override string ToString()
+		{
+			var identity = _identity;
+
+			if(identity == null)
+				return this.GetType().Name + ":<Empty>";
+
+			return this.GetType().Name + ":{" + identity.ToString() + "}";
+		}
+		#endregion
 	}
 }
