@@ -91,7 +91,8 @@ namespace Zongsoft.Data
 				return null;
 
 			var opt = context.Operator;
-			var isRange = Zongsoft.Common.TypeExtension.IsAssignableFrom(typeof(ConditionalRange), context.Type);
+			//var isRange = Zongsoft.Common.TypeExtension.IsAssignableFrom(typeof(ConditionalRange), context.Type);
+			var isRange = typeof(IConditionalRange).IsAssignableFrom(context.Type);
 
 			//只有当属性没有指定运算符并且不是区间属性，才需要生成运算符
 			if(opt == null && (!isRange))
@@ -108,7 +109,7 @@ namespace Zongsoft.Data
 			if(context.Names.Length == 1)
 			{
 				if(isRange)
-					return ((ConditionalRange)context.Value).ToCondition(context.Names[0]);
+					return ((IConditionalRange)context.Value).ToCondition(context.Names[0]);
 				else
 					return new Condition(context.Names[0], (opt == ConditionOperator.Like && _wildcard != '\0' ? context.Value.ToString().Trim(_wildcard) + _wildcard : context.Value), opt.Value);
 			}
@@ -119,7 +120,7 @@ namespace Zongsoft.Data
 			foreach(var name in context.Names)
 			{
 				if(isRange)
-					conditions.Add(((ConditionalRange)context.Value).ToCondition(name));
+					conditions.Add(((IConditionalRange)context.Value).ToCondition(name));
 				else
 					conditions.Add(new Condition(name, (opt == ConditionOperator.Like && _wildcard != '\0' ? context.Value.ToString().Trim(_wildcard) + _wildcard : context.Value), opt.Value));
 			}
@@ -137,8 +138,11 @@ namespace Zongsoft.Data
 			if((context.Behaviors & ConditionalBehaviors.IgnoreEmpty) == ConditionalBehaviors.IgnoreEmpty && context.Type == typeof(string) && string.IsNullOrWhiteSpace((string)context.Value))
 				return true;
 
-			if(Zongsoft.Common.TypeExtension.IsAssignableFrom(typeof(ConditionalRange), context.Type))
-				return ConditionalRange.IsEmpty((ConditionalRange)context.Value);
+			if(typeof(IConditionalRange).IsAssignableFrom(context.Type))
+				return context.Value == null || ((IConditionalRange)context).HasValue == false;
+
+			//if(Zongsoft.Common.TypeExtension.IsAssignableFrom(typeof(ConditionalRange), context.Type))
+			//	return ConditionalRange.IsEmpty((ConditionalRange)context.Value);
 
 			return false;
 		}

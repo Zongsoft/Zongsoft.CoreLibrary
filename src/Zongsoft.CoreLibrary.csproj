@@ -122,7 +122,7 @@
     <Compile Include="Communication\PacketizerFactory.cs" />
     <Compile Include="Communication\ChannelPipelineContext.cs" />
     <Compile Include="Data\ConditionalBehaviors.cs" />
-    <Compile Include="Data\ConditionalRangeConverter.cs" />
+    <Compile Include="Data\ConditionalRange`1.cs" />
     <Compile Include="Data\DataAccessFilterBase.cs" />
     <Compile Include="Data\DataAccessContextBase.cs" />
     <Compile Include="Data\DataAccessMethod.cs" />
@@ -136,6 +136,7 @@
     <Compile Include="Data\DataDecrementingEventArgs.cs" />
     <Compile Include="Data\DataSearchKeyAttribute.cs" />
     <Compile Include="Data\DataSequenceAttribute.cs" />
+    <Compile Include="Data\IConditionalRange.cs" />
     <Compile Include="Data\IDataAccessFilter.cs" />
     <Compile Include="Data\IDataAccessMapper.cs" />
     <Compile Include="Data\DataIncrementedEventArgs.cs" />

@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2016 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2016-2017 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -26,16 +26,14 @@
 
 using System;
 using System.Linq;
-using System.Collections;
 
 namespace Zongsoft.Data
 {
-	[Obsolete("Please use ConditionalRange<T> class.")]
-	public class ConditionalRange : IConditionalRange
+	public class ConditionalRange<T> : IConditionalRange where T : struct, IComparable
 	{
 		#region 成员字段
-		private object _from;
-		private object _to;
+		private T? _from;
+		private T? _to;
 		#endregion
 
 		#region 构造函数
@@ -43,7 +41,7 @@ namespace Zongsoft.Data
 		{
 		}
 
-		public ConditionalRange(object from, object to)
+		public ConditionalRange(T? from, T? to)
 		{
 			this.From = from;
 			this.To = to;
@@ -51,7 +49,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 公共属性
-		public object From
+		public T? From
 		{
 			get
 			{
@@ -59,11 +57,12 @@ namespace Zongsoft.Data
 			}
 			set
 			{
-				_from = GetValue(value);
+				//确保设置的范围起始值小于截止值
+				_from = this.EnsureFrom(value);
 			}
 		}
 
-		public object To
+		public T? To
 		{
 			get
 			{
@@ -71,21 +70,31 @@ namespace Zongsoft.Data
 			}
 			set
 			{
-				_to = GetValue(value);
+				//确保设置的范围截止值大于起始值
+				_to = this.EnsureTo(value);
+			}
+		}
+
+		[Runtime.Serialization.SerializationMember(Behavior = Runtime.Serialization.SerializationMemberBehavior.Ignored)]
+		public bool HasValue
+		{
+			get
+			{
+				return _from.HasValue || _to.HasValue;
+			}
+		}
+
+		[Runtime.Serialization.SerializationMember(Behavior = Runtime.Serialization.SerializationMemberBehavior.Ignored)]
+		public bool IsEmpty
+		{
+			get
+			{
+				return _from == null && _to == null;
 			}
 		}
 		#endregion
 
 		#region 公共方法
-		[Zongsoft.Runtime.Serialization.SerializationMember(Behavior = Runtime.Serialization.SerializationMemberBehavior.Ignored)]
-		public bool HasValue
-		{
-			get
-			{
-				return _from != null || _to != null;
-			}
-		}
-
 		public Condition ToCondition(string name)
 		{
 			if(_from == null)
@@ -96,30 +105,17 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 静态方法
-		public static bool IsEmpty(ConditionalRange value)
+		public static ConditionalRange<T> Parse(string text)
 		{
-			return value == null || (value.From == null && value.To == null);
-		}
-
-		public static ConditionalRange Parse(string text)
-		{
-			if(string.IsNullOrWhiteSpace(text))
-				return null;
-
-			ConditionalRange result;
+			ConditionalRange<T> result;
 
 			if(TryParse(text, out result))
 				return result;
 
-			return null;
+			throw new ArgumentException(string.Format("Invalid value '{0}' of the argument.", text));
 		}
 
-		public static bool TryParse(string text, out ConditionalRange result)
-		{
-			return TryParse<string>(text, out result);
-		}
-
-		public static bool TryParse<T>(string text, out ConditionalRange result) where T : IComparable
+		public static bool TryParse(string text, out ConditionalRange<T> result)
 		{
 			result = null;
 
@@ -141,7 +137,7 @@ namespace Zongsoft.Data
 					return false;
 
 				if(result == null)
-					result = new ConditionalRange();
+					result = new ConditionalRange<T>();
 
 				result.From = from;
 			}
@@ -154,13 +150,47 @@ namespace Zongsoft.Data
 					return false;
 
 				if(result == null)
-					result = new ConditionalRange();
+					result = new ConditionalRange<T>();
 
 				result.To = to;
 			}
 
 			//最后返回真（即使输出参数为空）
 			return true;
+		}
+		#endregion
+
+		#region 私有方法
+		private T? EnsureFrom(T? value)
+		{
+			if(value != null)
+			{
+				var to = _to;
+
+				if(to != null && to.Value.CompareTo(value.Value) < 0)
+				{
+					_to = value;
+					return to;
+				}
+			}
+
+			return value;
+		}
+
+		private T? EnsureTo(T? value)
+		{
+			if(value != null)
+			{
+				var from = _from;
+
+				if(from != null && from.Value.CompareTo(value.Value) > 0)
+				{
+					_from = value;
+					return from;
+				}
+			}
+
+			return value;
 		}
 		#endregion
 
@@ -181,40 +211,6 @@ namespace Zongsoft.Data
 				else
 					return string.Format("({0}~{1})", _from.ToString(), _to.ToString());
 			}
-		}
-		#endregion
-
-		#region 私有方法
-		private static object GetValue(object value)
-		{
-			if(value == null || System.Convert.IsDBNull(value))
-				return null;
-
-			if(value is string)
-			{
-				if(string.IsNullOrWhiteSpace((string)value))
-					return null;
-
-				return value;
-			}
-
-			var items = value as IEnumerable;
-
-			if(items != null)
-			{
-				var enumerator = items.GetEnumerator();
-
-				if(enumerator != null && enumerator.MoveNext())
-				{
-					var current = enumerator.Current;
-					enumerator.Reset();
-					return GetValue(current);
-				}
-
-				return null;
-			}
-
-			return value;
 		}
 		#endregion
 	}

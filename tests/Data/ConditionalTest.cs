@@ -65,7 +65,7 @@ namespace Zongsoft.Data
 				}
 			}
 
-			public ConditionalRange CreatedTime
+			public ConditionalRange<DateTime> CreatedTime
 			{
 				get
 				{
