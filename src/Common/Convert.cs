@@ -28,6 +28,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Reflection;
 using System.Text;
 
 namespace Zongsoft.Common
@@ -68,17 +69,16 @@ namespace Zongsoft.Common
 			if(conversionType == null)
 				return value;
 
+			//处理待转换值为空的情况
 			if(value == null || System.Convert.IsDBNull(value))
 			{
 				if(conversionType == typeof(DBNull))
 					return DBNull.Value;
-				else
-				{
-					if(conversionType.IsGenericType && conversionType.GetGenericTypeDefinition() == typeof(Nullable<>))
-						return null;
 
-					return conversionType.IsValueType ? defaultValueThunk() : null;
-				}
+				if(conversionType.IsGenericType && conversionType.GetGenericTypeDefinition() == typeof(Nullable<>))
+					return null;
+
+				return conversionType.IsValueType ? defaultValueThunk() : null;
 			}
 
 			Type type = conversionType;
@@ -94,13 +94,38 @@ namespace Zongsoft.Common
 				//获取目标类型的转换器
 				var converter = GetTypeConverter(type);
 
-				//判断目标类型转换器是否支持从源类型进行转换
-				if(converter != null && converter.CanConvertFrom(value.GetType()))
-					return converter.ConvertFrom(value);
+				if(converter != null)
+				{
+					if(converter.CanConvertFrom(value.GetType())) //尝试从源类型进行转换
+						return converter.ConvertFrom(value);
+					else if(converter.CanConvertTo(type)) //尝试从目标类型进行转换
+						return converter.ConvertTo(value, type);
+				}
+
+				if(value is string)
+				{
+					var method = type.GetMethod("TryParse", new Type[] { typeof(string), type });
+
+					if(method != null && method.IsStatic)
+					{
+						var args = new object[] { value, null };
+						var result = method.Invoke(null, args);
+
+						if(result.GetType() == typeof(bool))
+							return ((bool)result) ? args[1] : defaultValueThunk();
+					}
+					else
+					{
+						method = type.GetMethod("Parse", new Type[] { typeof(string) });
+
+						if(method != null && method.IsStatic)
+							return method.Invoke(null, new object[] { value });
+					}
+				}
 
 				//处理字典序列化的情况
-				if(typeof(IDictionary).IsAssignableFrom(value.GetType()) && !typeof(IDictionary).IsAssignableFrom(conversionType))
-					return Zongsoft.Runtime.Serialization.DictionarySerializer.Default.Deserialize((IDictionary)value, conversionType);
+				if(typeof(IDictionary).IsAssignableFrom(value.GetType()) && !typeof(IDictionary).IsAssignableFrom(type))
+					return Zongsoft.Runtime.Serialization.DictionarySerializer.Default.Deserialize((IDictionary)value, type);
 
 				return System.Convert.ChangeType(value, type);
 			}
