@@ -40,15 +40,10 @@ namespace Zongsoft.Security.Membership
 		public static readonly string Securities = "Securities";
 		#endregion
 
-		#region 成员字段
-		private uint _roleId;
-		private DateTime _createdTime;
-		#endregion
-
 		#region 构造函数
 		public Role()
 		{
-			_createdTime = DateTime.Now;
+			this.CreatedTime = DateTime.Now;
 		}
 
 		public Role(string name, string @namespace) : this(0, name, @namespace)
@@ -64,26 +59,32 @@ namespace Zongsoft.Security.Membership
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException("name");
 
-			_roleId = roleId;
+			this.RoleId = roleId;
 			this.Name = this.FullName = name.Trim();
 			this.Namespace = @namespace;
-			_createdTime = DateTime.Now;
+			this.CreatedTime = DateTime.Now;
 		}
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取或设置角色编号。
+		/// </summary>
 		public uint RoleId
 		{
 			get
 			{
-				return _roleId;
+				return this.GetPropertyValue(() => this.RoleId);
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.RoleId, ref _roleId, value);
+				this.SetPropertyValue(() => this.RoleId, value);
 			}
 		}
 
+		/// <summary>
+		/// 获取或设置角色名。
+		/// </summary>
 		public string Name
 		{
 			get
@@ -113,6 +114,9 @@ namespace Zongsoft.Security.Membership
 			}
 		}
 
+		/// <summary>
+		/// 获取或设置角色的全称。
+		/// </summary>
 		public string FullName
 		{
 			get
@@ -125,6 +129,9 @@ namespace Zongsoft.Security.Membership
 			}
 		}
 
+		/// <summary>
+		/// 获取或设置角色的所属命名空间。
+		/// </summary>
 		public string Namespace
 		{
 			get
@@ -150,6 +157,9 @@ namespace Zongsoft.Security.Membership
 			}
 		}
 
+		/// <summary>
+		/// 获取或设置角色的描述信息。
+		/// </summary>
 		public string Description
 		{
 			get
@@ -162,15 +172,63 @@ namespace Zongsoft.Security.Membership
 			}
 		}
 
+		/// <summary>
+		/// 获取或设置角色的创人编号。
+		/// </summary>
+		public uint CreatorId
+		{
+			get
+			{
+				return this.GetPropertyValue(() => this.CreatorId);
+			}
+			set
+			{
+				this.SetPropertyValue(() => this.CreatorId, value);
+			}
+		}
+
+		/// <summary>
+		/// 获取或设置角色的创建时间。
+		/// </summary>
 		public DateTime CreatedTime
 		{
 			get
 			{
-				return _createdTime;
+				return this.GetPropertyValue(() => this.CreatedTime);
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.CreatedTime, ref _createdTime, value);
+				this.SetPropertyValue(() => this.CreatedTime, value);
+			}
+		}
+
+		/// <summary>
+		/// 获取或设置角色信息的最后修改人编号。
+		/// </summary>
+		public uint? ModifierId
+		{
+			get
+			{
+				return this.GetPropertyValue(() => this.ModifierId);
+			}
+			set
+			{
+				this.SetPropertyValue(() => this.ModifierId, value);
+			}
+		}
+
+		/// <summary>
+		/// 获取或设置角色信息的最后修改时间。
+		/// </summary>
+		public DateTime? ModifiedTime
+		{
+			get
+			{
+				return this.GetPropertyValue(() => this.ModifiedTime);
+			}
+			set
+			{
+				this.SetPropertyValue(() => this.ModifiedTime, value);
 			}
 		}
 		#endregion
@@ -183,20 +241,20 @@ namespace Zongsoft.Security.Membership
 
 			var other = (Role)obj;
 
-			return _roleId == other._roleId && string.Equals(this.Namespace, other.Namespace, StringComparison.OrdinalIgnoreCase);
+			return this.RoleId == other.RoleId && string.Equals(this.Namespace, other.Namespace, StringComparison.OrdinalIgnoreCase);
 		}
 
 		public override int GetHashCode()
 		{
-			return (this.Namespace + ":" + _roleId.ToString()).ToLowerInvariant().GetHashCode();
+			return (this.Namespace + ":" + this.RoleId.ToString()).ToLowerInvariant().GetHashCode();
 		}
 
 		public override string ToString()
 		{
 			if(string.IsNullOrWhiteSpace(this.Namespace))
-				return string.Format("[{0}]{1}", _roleId.ToString(), this.Name);
+				return string.Format("[{0}]{1}", this.RoleId.ToString(), this.Name);
 			else
-				return string.Format("[{0}]{1}@{2}", _roleId.ToString(), this.Name, this.Namespace);
+				return string.Format("[{0}]{1}@{2}", this.RoleId.ToString(), this.Name, this.Namespace);
 		}
 		#endregion
 

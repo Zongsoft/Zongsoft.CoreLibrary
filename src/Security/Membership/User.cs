@@ -40,18 +40,10 @@ namespace Zongsoft.Security.Membership
 		public static readonly string Guest = "Guest";
 		#endregion
 
-		#region 成员字段
-		private uint _userId;
-		private UserStatus _status;
-		private DateTime? _statusTimestamp;
-		private DateTime _createdTime;
-		#endregion
-
 		#region 构造函数
 		public User()
 		{
-			_status = UserStatus.Unapproved;
-			_createdTime = DateTime.Now;
+			this.CreatedTime = DateTime.Now;
 		}
 
 		public User(string name, string @namespace) : this(0, name, @namespace)
@@ -67,11 +59,10 @@ namespace Zongsoft.Security.Membership
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException("name");
 
-			_userId = userId;
+			this.UserId = userId;
 			this.Name = this.FullName = name.Trim();
 			this.Namespace = @namespace;
-			_status = UserStatus.Unapproved;
-			_createdTime = DateTime.Now;
+			this.CreatedTime = DateTime.Now;
 		}
 		#endregion
 
@@ -83,11 +74,11 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return _userId;
+				return this.GetPropertyValue(() => this.UserId);
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.UserId, ref _userId, value);
+				this.SetPropertyValue(() => this.UserId, value);
 			}
 		}
 
@@ -269,17 +260,14 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return _status;
+				return this.GetPropertyValue(() => this.Status);
 			}
 			set
 			{
-				if(value == _status)
-					return;
-
-				this.SetPropertyValue(() => this.Status, ref _status, value);
+				this.SetPropertyValue(() => this.Status, value);
 
 				//同步设置状态更新时间戳
-				_statusTimestamp = DateTime.Now;
+				this.StatusTimestamp = DateTime.Now;
 			}
 		}
 
@@ -290,11 +278,26 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return _statusTimestamp;
+				return this.GetPropertyValue(() => this.StatusTimestamp);
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.StatusTimestamp, ref _statusTimestamp, value);
+				this.SetPropertyValue(() => this.StatusTimestamp, value);
+			}
+		}
+
+		/// <summary>
+		/// 获取或设置当前用户的创建人编号。
+		/// </summary>
+		public uint? CreatorId
+		{
+			get
+			{
+				return this.GetPropertyValue(() => this.CreatorId);
+			}
+			set
+			{
+				this.SetPropertyValue(() => this.CreatorId, value);
 			}
 		}
 
@@ -305,11 +308,41 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return _createdTime;
+				return this.GetPropertyValue(() => this.CreatedTime);
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.CreatedTime, ref _createdTime, value);
+				this.SetPropertyValue(() => this.CreatedTime, value);
+			}
+		}
+
+		/// <summary>
+		/// 获取或设置用户信息的最后修改人编号。
+		/// </summary>
+		public uint? ModifierId
+		{
+			get
+			{
+				return this.GetPropertyValue(() => this.ModifierId);
+			}
+			set
+			{
+				this.SetPropertyValue(() => this.ModifierId, value);
+			}
+		}
+
+		/// <summary>
+		/// 获取或设置用户信息的最后修改时间。
+		/// </summary>
+		public DateTime? ModifiedTime
+		{
+			get
+			{
+				return this.GetPropertyValue(() => this.ModifiedTime);
+			}
+			set
+			{
+				this.SetPropertyValue(() => this.ModifiedTime, value);
 			}
 		}
 		#endregion
@@ -322,20 +355,20 @@ namespace Zongsoft.Security.Membership
 
 			var other = (User)obj;
 
-			return _userId == other._userId && string.Equals(this.Namespace, other.Namespace, StringComparison.OrdinalIgnoreCase);
+			return this.UserId == other.UserId && string.Equals(this.Namespace, other.Namespace, StringComparison.OrdinalIgnoreCase);
 		}
 
 		public override int GetHashCode()
 		{
-			return (this.Namespace + ":" + _userId.ToString()).ToLowerInvariant().GetHashCode();
+			return (this.Namespace + ":" + this.UserId.ToString()).ToLowerInvariant().GetHashCode();
 		}
 
 		public override string ToString()
 		{
 			if(string.IsNullOrWhiteSpace(this.Namespace))
-				return string.Format("[{0}]{1}", _userId.ToString(), this.Name);
+				return string.Format("[{0}]{1}", this.UserId.ToString(), this.Name);
 			else
-				return string.Format("[{0}]{1}@{2}", _userId.ToString(), this.Name, this.Namespace);
+				return string.Format("[{0}]{1}@{2}", this.UserId.ToString(), this.Name, this.Namespace);
 		}
 		#endregion
 
