@@ -139,10 +139,7 @@ namespace Zongsoft.Data
 				return true;
 
 			if(typeof(IConditionalRange).IsAssignableFrom(context.Type))
-				return context.Value == null || ((IConditionalRange)context).HasValue == false;
-
-			//if(Zongsoft.Common.TypeExtension.IsAssignableFrom(typeof(ConditionalRange), context.Type))
-			//	return ConditionalRange.IsEmpty((ConditionalRange)context.Value);
+				return context.Value == null || ((IConditionalRange)context.Value).HasValue == false;
 
 			return false;
 		}
