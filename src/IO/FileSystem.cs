@@ -119,22 +119,35 @@ namespace Zongsoft.IO
 				return virtualPath;
 
 			Path path;
-			var fs = GetFileSystem(virtualPath, out path);
+			var fs = GetFileSystem(virtualPath, false, out path);
 
-			return fs == null ? virtualPath : fs.GetUrl(path.FullPath);
+			return fs == null ? null : fs.GetUrl(path.FullPath);
 		}
 		#endregion
 
 		#region 私有方法
-		private static IFileSystem GetFileSystem(string text, out Path path)
+		private static IFileSystem GetFileSystem(string text, bool throwException, out Path path)
 		{
+			//设置输出参数的默认值
+			path = null;
+
+			if(string.IsNullOrWhiteSpace(text))
+			{
+				if(throwException)
+					throw new ArgumentNullException("text");
+
+				return null;
+			}
+
 			var providers = _providers;
 
 			if(providers == null)
-				throw new InvalidOperationException("The value of 'Providers' property is null.");
+			{
+				if(throwException)
+					throw new InvalidOperationException("The value of 'Providers' property is null.");
 
-			if(string.IsNullOrWhiteSpace(text))
-				throw new ArgumentNullException("text");
+				return null;
+			}
 
 			//如果路径解析失败则返回空
 			if(!Path.TryParse(text, out path))
@@ -156,20 +169,25 @@ namespace Zongsoft.IO
 			var fileSystem = providers.Resolve<IFileSystem>(scheme);
 
 			if(fileSystem == null)
-				throw new InvalidOperationException(string.Format("Can not obtain the File or Directory provider by the '{0}'.", text));
+			{
+				if(throwException)
+					throw new InvalidOperationException(string.Format("Can not obtain the File or Directory provider by the '{0}'.", text));
+
+				return null;
+			}
 
 			return fileSystem;
 		}
 
 		private static IFile GetFileProvider(string text, out Path path)
 		{
-			var fileSystem = GetFileSystem(text, out path);
+			var fileSystem = GetFileSystem(text, true, out path);
 			return fileSystem == null ? null : fileSystem.File;
 		}
 
 		private static IDirectory GetDirectoryProvider(string text, out Path path)
 		{
-			var fileSystem = GetFileSystem(text, out path);
+			var fileSystem = GetFileSystem(text, true, out path);
 			return fileSystem == null ? null : fileSystem.Directory;
 		}
 
