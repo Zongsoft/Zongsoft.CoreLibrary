@@ -183,6 +183,20 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
+				if(!string.IsNullOrWhiteSpace(value))
+				{
+					try
+					{
+						//获取头像值对应的访问地址
+						var url = Zongsoft.IO.FileSystem.GetUrl(value);
+
+						//如果头像访问地址不为空则将它设置为该地址
+						if(url != null && url.Length > 0 && !string.Equals(value, url))
+							value = url;
+					}
+					catch { }
+				}
+
 				this.SetPropertyValue(() => this.Avatar, value);
 			}
 		}
