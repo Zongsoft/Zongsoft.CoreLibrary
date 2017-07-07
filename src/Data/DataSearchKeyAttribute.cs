@@ -162,7 +162,7 @@ namespace Zongsoft.Data
 					if(this.Singleton)
 						conditions.Add(Condition.Equal(field, keyword));
 					else
-						conditions.Add(Condition.Like(field, keyword + '%'));
+						conditions.Add(Condition.Like(field, '%' + keyword + '%'));
 				}
 
 				if(conditions.Count == 1)

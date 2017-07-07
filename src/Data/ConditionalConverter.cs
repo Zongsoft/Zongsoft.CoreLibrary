@@ -91,7 +91,6 @@ namespace Zongsoft.Data
 				return null;
 
 			var opt = context.Operator;
-			//var isRange = Zongsoft.Common.TypeExtension.IsAssignableFrom(typeof(ConditionalRange), context.Type);
 			var isRange = typeof(IConditionalRange).IsAssignableFrom(context.Type);
 
 			//只有当属性没有指定运算符并且不是区间属性，才需要生成运算符
@@ -111,7 +110,7 @@ namespace Zongsoft.Data
 				if(isRange)
 					return ((IConditionalRange)context.Value).ToCondition(context.Names[0]);
 				else
-					return new Condition(context.Names[0], (opt == ConditionOperator.Like && _wildcard != '\0' ? context.Value.ToString().Trim(_wildcard) + _wildcard : context.Value), opt.Value);
+					return new Condition(context.Names[0], this.GetValue(opt, context.Value), opt.Value);
 			}
 
 			//当一个属性对应多个条件，则这些条件之间以“或”关系进行组合
@@ -122,7 +121,7 @@ namespace Zongsoft.Data
 				if(isRange)
 					conditions.Add(((IConditionalRange)context.Value).ToCondition(name));
 				else
-					conditions.Add(new Condition(name, (opt == ConditionOperator.Like && _wildcard != '\0' ? context.Value.ToString().Trim(_wildcard) + _wildcard : context.Value), opt.Value));
+					conditions.Add(new Condition(name, this.GetValue(opt, context.Value), opt.Value));
 			}
 
 			return conditions;
@@ -142,6 +141,19 @@ namespace Zongsoft.Data
 				return context.Value == null || ((IConditionalRange)context.Value).HasValue == false;
 
 			return false;
+		}
+		#endregion
+
+		#region 私有方法
+		private object GetValue(ConditionOperator? @operator, object value)
+		{
+			if(value == null || System.Convert.IsDBNull(value))
+				return value;
+
+			if(@operator == ConditionOperator.Like && _wildcard != '\0')
+				return _wildcard + value.ToString().Trim(_wildcard) + _wildcard;
+
+			return value;
 		}
 		#endregion
 	}
