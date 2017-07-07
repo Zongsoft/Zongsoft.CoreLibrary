@@ -271,6 +271,7 @@ namespace Zongsoft.Options
 				this.Invoke(child, method);
 		}
 
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
 		private bool EnsureLoadProviders()
 		{
 			if(_unloadedProviders == null || _unloadedProviders.Count < 1)
