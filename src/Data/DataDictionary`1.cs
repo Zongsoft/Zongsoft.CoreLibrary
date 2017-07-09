@@ -54,8 +54,8 @@ namespace Zongsoft.Data
 			if(member == null)
 				throw new ArgumentNullException("member");
 
-			var tuple = Common.ExpressionUtility.GetMember(member);
-			return (TMember)Zongsoft.Common.Convert.ConvertValue(this.Get(tuple.Item1), tuple.Item2);
+			var token = Common.ExpressionUtility.GetMember(member);
+			return (TMember)Zongsoft.Common.Convert.ConvertValue(this.Get(token.Name), token.MemberType);
 		}
 
 		public TMember Get<TMember>(Expression<Func<T, TMember>> member, TMember defaultValue)
@@ -126,9 +126,9 @@ namespace Zongsoft.Data
 			if(!this.TrySet(member, valueThunk, predicateProxy) && requiredThorws)
 			{
 				//获取指定的成员信息
-				var tuple = Common.ExpressionUtility.GetMember(member);
+				var token = Common.ExpressionUtility.GetMember(member);
 
-				throw new KeyNotFoundException(string.Format("The '{0}' property is not existed.", tuple.Item1));
+				throw new KeyNotFoundException(string.Format("The '{0}' property is not existed.", token.Name));
 			}
 		}
 
@@ -145,12 +145,12 @@ namespace Zongsoft.Data
 				throw new ArgumentNullException("valueThunk");
 
 			//获取指定的成员信息
-			var tuple = Common.ExpressionUtility.GetMember(member);
+			var token = Common.ExpressionUtility.GetMember(member);
 
 			if(predicate == null)
-				return this.TrySet(tuple.Item1, () => valueThunk(tuple.Item1), null);
+				return this.TrySet(token.Name, () => valueThunk(token.Name), null);
 			else
-				return this.TrySet(tuple.Item1, () => valueThunk(tuple.Item1), original => predicate((TMember)Zongsoft.Common.Convert.ConvertValue(original, tuple.Item2)));
+				return this.TrySet(token.Name, () => valueThunk(token.Name), original => predicate((TMember)Zongsoft.Common.Convert.ConvertValue(original, token.MemberType)));
 		}
 		#endregion
 

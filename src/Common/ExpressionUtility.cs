@@ -35,28 +35,20 @@ namespace Zongsoft.Common
 	{
 		internal static string GetMemberName(Expression expression)
 		{
-			return GetMember(expression).Item1;
+			return GetMember(expression).Name;
 		}
 
-		internal static Tuple<string, Type> GetMember(Expression expression)
+		internal static MemberToken GetMember(Expression expression)
 		{
-			var tuple = ResolveMemberExpression(expression, new Stack<MemberInfo>());
+			var token = ResolveMemberExpression(expression, new Stack<MemberInfo>());
 
-			if(tuple == null)
+			if(token == null)
 				throw new ArgumentException("Invalid member expression.");
 
-			switch(tuple.Item2.MemberType)
-			{
-				case MemberTypes.Property:
-					return new Tuple<string, Type>(tuple.Item1, ((PropertyInfo)tuple.Item2).PropertyType);
-				case MemberTypes.Field:
-					return new Tuple<string, Type>(tuple.Item1, ((FieldInfo)tuple.Item2).FieldType);
-				default:
-					throw new InvalidOperationException("Invalid expression.");
-			}
+			return token.Value;
 		}
 
-		private static Tuple<string, MemberInfo> ResolveMemberExpression(Expression expression, Stack<MemberInfo> stack)
+		private static MemberToken? ResolveMemberExpression(Expression expression, Stack<MemberInfo> stack)
 		{
 			if(expression.NodeType == ExpressionType.Lambda)
 				return ResolveMemberExpression(((LambdaExpression)expression).Body, stack);
@@ -92,7 +84,35 @@ namespace Zongsoft.Common
 				path += member.Name;
 			}
 
-			return new Tuple<string, MemberInfo>(path, member);
+			return new MemberToken(path, member);
+		}
+
+		internal struct MemberToken
+		{
+			public string Name;
+			public MemberInfo Member;
+
+			public MemberToken(string name, MemberInfo member)
+			{
+				this.Name = name;
+				this.Member = member;
+			}
+
+			public Type MemberType
+			{
+				get
+				{
+					switch(this.Member.MemberType)
+					{
+						case MemberTypes.Property:
+							return ((PropertyInfo)this.Member).PropertyType;
+						case MemberTypes.Field:
+							return ((FieldInfo)this.Member).FieldType;
+						default:
+							return null;
+					}
+				}
+			}
 		}
 	}
 }
