@@ -302,6 +302,34 @@ namespace Zongsoft.Common
 		}
 
 		/// <summary>
+		/// 返回指定名称的属性是否被改变过。
+		/// </summary>
+		/// <param name="names">指定要判断的属性名数组。</param>
+		/// <returns>返回一个值，指示指定的属性是否发生过改变。</returns>
+		/// <remarks>
+		///		<para>如果指定了多个属性名，则其中任意一个属性值发生过改变，返回值即为真(True)。</para>
+		///		<para>如果没有指定属性名（即<paramref name="names"/>参数为空(null)或零个成员）则该实例中只要有任何属性发生过改变都返回真(True)。</para>
+		/// </remarks>
+		public bool HasChanges(params string[] names)
+		{
+			var isChanged = _changedProperties != null && _changedProperties.Count > 0;
+
+			if(names == null || names.Length == 0)
+				return isChanged;
+
+			if(isChanged)
+			{
+				foreach(var name in names)
+				{
+					if(_changedProperties.ContainsKey(name))
+						return true;
+				}
+			}
+
+			return false;
+		}
+
+		/// <summary>
 		/// 获取当前对象中被改变过的属性集。
 		/// </summary>
 		/// <returns></returns>
@@ -311,6 +339,31 @@ namespace Zongsoft.Common
 				System.Threading.Interlocked.CompareExchange(ref _changedProperties, new ConcurrentDictionary<string, object>(), null);
 
 			return _changedProperties;
+		}
+
+		/// <summary>
+		/// 更新当前对象的属性值。
+		/// </summary>
+		/// <param name="properties">指定要更新的属性集。</param>
+		public void Update(IDictionary<string, object> properties)
+		{
+			if(properties == null)
+				return;
+
+			foreach(var property in properties)
+			{
+				this.SetPropertyValue(property.Key, property.Value);
+			}
+		}
+
+		/// <summary>
+		/// 更新当前对象的属性值。
+		/// </summary>
+		/// <param name="model">指定要更新的模型对象。</param>
+		public void Update(ModelBase model)
+		{
+			if(model != null)
+				this.Update(model.GetChangedProperties());
 		}
 		#endregion
 
