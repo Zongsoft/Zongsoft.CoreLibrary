@@ -425,7 +425,7 @@ namespace Zongsoft.Data
 
 		public IEnumerable<TEntity> Select(ICondition condition, Paging paging, params Sorting[] sortings)
 		{
-			return this.Select(condition, null, null, paging, sortings);
+			return this.Select(condition, null, string.Empty, paging, sortings);
 		}
 
 		public IEnumerable<TEntity> Select(ICondition condition, Paging paging, string scope, params Sorting[] sortings)
@@ -455,12 +455,12 @@ namespace Zongsoft.Data
 			args.Result = this.OnSelect(args.Condition, args.Grouping, args.Scope, args.Paging, args.Sortings);
 
 			//激发“Selected”事件
-			return this.OnSelected(typeof(TEntity), args.Condition, args.Grouping, args.Scope, args.Paging, args.Sortings, (IEnumerable<TEntity>)args.Result);
+			return this.OnSelected(args.Condition, args.Grouping, args.Scope, args.Paging, args.Sortings, (IEnumerable<TEntity>)args.Result);
 		}
 
 		public IEnumerable<TEntity> Select(ICondition condition, Grouping grouping, Paging paging, params Sorting[] sortings)
 		{
-			return this.Select(condition, grouping, null, paging, sortings);
+			return this.Select(condition, grouping, string.Empty, paging, sortings);
 		}
 
 		public IEnumerable<TEntity> Select(ICondition condition, Grouping grouping, Paging paging, string scope, params Sorting[] sortings)
@@ -770,11 +770,11 @@ namespace Zongsoft.Data
 			return args;
 		}
 
-		protected IEnumerable<TEntity> OnSelected(Type entityType, ICondition condition, Grouping grouping, string scope, Paging paging, Sorting[] sortings, IEnumerable<TEntity> result)
+		protected IEnumerable<T> OnSelected<T>(ICondition condition, Grouping grouping, string scope, Paging paging, Sorting[] sortings, IEnumerable<T> result)
 		{
-			var args = new DataSelectedEventArgs(this.Name, entityType, condition, grouping, scope, paging, sortings, result);
+			var args = new DataSelectedEventArgs(this.Name, typeof(T), condition, grouping, scope, paging, sortings, result);
 			this.OnSelected(args);
-			return args.Result as IEnumerable<TEntity>;
+			return args.Result as IEnumerable<T>;
 		}
 
 		protected DataSelectingEventArgs OnSelecting(Type entityType, ICondition condition, Grouping grouping, string scope, Paging paging, Sorting[] sortings)

@@ -23,6 +23,8 @@ namespace Zongsoft.Common.Tests
 
 			Assert.True(Zongsoft.Common.TypeExtension.IsAssignableFrom(baseType, instanceType));
 			Assert.False(baseType.IsAssignableFrom(instanceType));
+
+			Assert.True(TypeExtension.IsAssignableFrom(typeof(PersonServiceBase<>), typeof(EmployeeService)));
 		}
 
 		[Fact]
@@ -69,5 +71,23 @@ namespace Zongsoft.Common.Tests
 			Assert.Null(TypeExtension.GetDefaultValue(typeof(int?)));
 			Assert.Null(TypeExtension.GetDefaultValue(typeof(string)));
 		}
+
+		#region 嵌套子类
+		public class PersonServiceBase<T> where T : Person
+		{
+			public virtual T GetPerson(int id)
+			{
+				throw new NotImplementedException();
+			}
+		}
+
+		public class EmployeeService : PersonServiceBase<Employee>
+		{
+			public override Employee GetPerson(int id)
+			{
+				throw new NotImplementedException();
+			}
+		}
+		#endregion
 	}
 }

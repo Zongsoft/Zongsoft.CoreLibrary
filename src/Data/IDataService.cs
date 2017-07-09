@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2016 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2017 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -33,8 +33,7 @@ namespace Zongsoft.Data
 	/// <summary>
 	/// 表示数据服务的接口。
 	/// </summary>
-	/// <typeparam name="TEntity">关于本服务对应的数据实体类型。</typeparam>
-	public interface IDataService<TEntity>
+	public interface IDataService
 	{
 		#region 事件定义
 		event EventHandler<DataCountedEventArgs> Counted;
@@ -47,8 +46,6 @@ namespace Zongsoft.Data
 		event EventHandler<DataIncrementingEventArgs> Incrementing;
 		event EventHandler<DataDecrementedEventArgs> Decremented;
 		event EventHandler<DataDecrementingEventArgs> Decrementing;
-		event EventHandler<DataGettedEventArgs<TEntity>> Getted;
-		event EventHandler<DataGettingEventArgs<TEntity>> Getting;
 		event EventHandler<DataSelectedEventArgs> Selected;
 		event EventHandler<DataSelectingEventArgs> Selecting;
 		event EventHandler<DataDeletedEventArgs> Deleted;
@@ -117,17 +114,6 @@ namespace Zongsoft.Data
 		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, params Sorting[] sortings);
 		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string scope, Paging paging = null, params Sorting[] sortings);
 		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, Paging paging, string scope = null, params Sorting[] sortings);
-
-		IEnumerable<TEntity> Select(ICondition condition = null, params Sorting[] sortings);
-		IEnumerable<TEntity> Select(ICondition condition, string scope, params Sorting[] sortings);
-		IEnumerable<TEntity> Select(ICondition condition, string scope, Paging paging, params Sorting[] sortings);
-		IEnumerable<TEntity> Select(ICondition condition, Paging paging, params Sorting[] sortings);
-		IEnumerable<TEntity> Select(ICondition condition, Paging paging, string scope, params Sorting[] sortings);
-		IEnumerable<TEntity> Select(ICondition condition, Grouping grouping, params Sorting[] sortings);
-		IEnumerable<TEntity> Select(ICondition condition, Grouping grouping, string scope, params Sorting[] sortings);
-		IEnumerable<TEntity> Select(ICondition condition, Grouping grouping, string scope, Paging paging, params Sorting[] sortings);
-		IEnumerable<TEntity> Select(ICondition condition, Grouping grouping, Paging paging, params Sorting[] sortings);
-		IEnumerable<TEntity> Select(ICondition condition, Grouping grouping, Paging paging, string scope, params Sorting[] sortings);
 		#endregion
 
 		#region 删除方法
