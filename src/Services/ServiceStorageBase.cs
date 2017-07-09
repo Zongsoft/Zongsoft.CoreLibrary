@@ -231,7 +231,7 @@ namespace Zongsoft.Services
 						{
 							foreach(var contract in entry.ContractTypes)
 							{
-								if(type.IsAssignableFrom(contract) && this.OnMatch(entry, parameter))
+								if(Common.TypeExtension.IsAssignableFrom(type, contract) && this.OnMatch(entry, parameter))
 									weakly.Add(entry);
 							}
 						}
@@ -248,7 +248,7 @@ namespace Zongsoft.Services
 						}
 						else //服务类型的弱匹配
 						{
-							if(type.IsAssignableFrom(entry.ServiceType) && this.OnMatch(entry, parameter))
+							if(Common.TypeExtension.IsAssignableFrom(type, entry.ServiceType) && this.OnMatch(entry, parameter))
 								weakly.Add(entry);
 						}
 					}
