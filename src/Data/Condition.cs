@@ -135,6 +135,13 @@ namespace Zongsoft.Data
 		}
 		#endregion
 
+		#region 显式实现
+		bool ICondition.Contains(string name)
+		{
+			return string.Equals(name, _name, StringComparison.OrdinalIgnoreCase);
+		}
+		#endregion
+
 		#region 静态方法
 		public static Condition Equal(string name, object value)
 		{

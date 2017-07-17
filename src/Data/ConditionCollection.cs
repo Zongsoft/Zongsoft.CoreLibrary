@@ -71,6 +71,13 @@ namespace Zongsoft.Data
 		}
 		#endregion
 
+		#region 公共方法
+		public bool Contains(string name)
+		{
+			return this.Contains(this, name);
+		}
+		#endregion
+
 		#region 符号重写
 		public static ConditionCollection operator +(Condition condition, ConditionCollection conditions)
 		{
@@ -294,6 +301,22 @@ namespace Zongsoft.Data
 					}
 				}
 			}
+		}
+		#endregion
+
+		#region 私有方法
+		private bool Contains(IEnumerable<ICondition> conditions, string name)
+		{
+			if(conditions == null || string.IsNullOrWhiteSpace(name))
+				return false;
+
+			foreach(var condition in conditions)
+			{
+				if(condition != null && condition.Contains(name))
+					return true;
+			}
+
+			return false;
 		}
 		#endregion
 	}

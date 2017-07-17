@@ -151,6 +151,11 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 公共方法
+		public bool Contains(string name)
+		{
+			return this.HasChanges(name);
+		}
+
 		public virtual ConditionCollection ToConditions()
 		{
 			ConditionCollection conditions = null;
@@ -171,6 +176,18 @@ namespace Zongsoft.Data
 			}
 
 			return conditions;
+		}
+		#endregion
+
+		#region 重写方法
+		public override string ToString()
+		{
+			var conditions = this.ToConditions();
+
+			if(conditions == null || conditions.Count == 0)
+				return string.Empty;
+
+			return conditions.ToString();
 		}
 		#endregion
 

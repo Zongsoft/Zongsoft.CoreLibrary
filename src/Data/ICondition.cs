@@ -33,5 +33,11 @@ namespace Zongsoft.Data
 	/// </summary>
 	public interface ICondition
 	{
+		/// <summary>
+		/// 判断是否包含某个名称的成员。
+		/// </summary>
+		/// <param name="name">指定的成员名称。</param>
+		/// <returns>如果包含指定名称的成员则返回真(True)，否则返回假(False)。</returns>
+		bool Contains(string name);
 	}
 }
