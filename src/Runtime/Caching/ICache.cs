@@ -79,14 +79,12 @@ namespace Zongsoft.Runtime.Caching
 		/// 从缓存字典中获取指定键的缓存值。
 		/// </summary>
 		/// <param name="key">指定要获取的键。</param>
-		/// <returns>如果指定的键存在则返回对应的值，如果不存在则通过<seealso cref="Creator"/>属性指定的创建器去创建一个缓存项，并将该新建的缓存项保存并返回；如果<seealso cref="Creator"/>属性值为空，则返回<typeparam name="T" />泛型的默认值。</returns>
 		T GetValue<T>(string key);
 
 		/// <summary>
 		/// 从缓存字典中获取指定键的缓存值。
 		/// </summary>
 		/// <param name="key">指定要获取的键。</param>
-		/// <returns>如果指定的键存在则返回对应的值，如果不存在则通过<seealso cref="Creator"/>属性指定的创建器去创建一个缓存项，并将该新建的缓存项保存并返回；如果<seealso cref="Creator"/>属性值为空，则返回空(null)。</returns>
 		object GetValue(string key);
 
 		/// <summary>
