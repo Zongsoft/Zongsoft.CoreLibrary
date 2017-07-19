@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2016 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2016-2017 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,21 +25,21 @@
  */
 
 using System;
-using System.Collections;
+using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
 	/// <summary>
 	/// 为数据访问的更新事件提供数据。
 	/// </summary>
-	public class DataUpdatingEventArgs : DataUpdatedEventArgs
+	public class DataManyUpdatingEventArgs : DataManyUpdatedEventArgs
 	{
 		#region 成员字段
 		private bool _cancel;
 		#endregion
 
 		#region 构造函数
-		public DataUpdatingEventArgs(string name, DataDictionary data, ICondition condition, string scope) : base(name, data, condition, scope, 0)
+		public DataManyUpdatingEventArgs(string name, IEnumerable<DataDictionary> data, ICondition condition, string scope) : base(name, data, condition, scope, 0)
 		{
 		}
 		#endregion

@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2016 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2017 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -28,7 +28,6 @@ using System;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Concurrent;
 
 namespace Zongsoft.Data
 {
@@ -54,8 +53,12 @@ namespace Zongsoft.Data
 		public event EventHandler<DataDeletingEventArgs> Deleting;
 		public event EventHandler<DataInsertedEventArgs> Inserted;
 		public event EventHandler<DataInsertingEventArgs> Inserting;
+		public event EventHandler<DataManyInsertedEventArgs> ManyInserted;
+		public event EventHandler<DataManyInsertingEventArgs> ManyInserting;
 		public event EventHandler<DataUpdatedEventArgs> Updated;
 		public event EventHandler<DataUpdatingEventArgs> Updating;
+		public event EventHandler<DataManyUpdatedEventArgs> ManyUpdated;
+		public event EventHandler<DataManyUpdatingEventArgs> ManyUpdating;
 		#endregion
 
 		#region 成员字段
@@ -406,7 +409,7 @@ namespace Zongsoft.Data
 			var args = this.OnDeleting(name, condition, cascades);
 
 			if(args.Cancel)
-				return args.Result;
+				return args.Count;
 
 			//定义数据访问过滤器上下文
 			var filterContext = new DataAccessFilterContext(this, DataAccessMethod.Delete, args);
@@ -415,13 +418,13 @@ namespace Zongsoft.Data
 			this.InvokeFilters(filterContext, (filter, ctx) => filter.OnExecuting(ctx));
 
 			//执行数据删除操作
-			args.Result = this.OnDelete(name, condition, cascades);
+			args.Count = this.OnDelete(name, condition, cascades);
 
 			//调用数据访问过滤器后事件
 			this.InvokeFilters(filterContext, (filter, ctx) => filter.OnExecuted(ctx));
 
 			//激发“Deleted”事件
-			return this.OnDeleted(name, args.Condition, args.Cascades, args.Result);
+			return this.OnDeleted(name, args.Condition, args.Cascades, args.Count);
 		}
 
 		protected abstract int OnDelete(string name, ICondition condition, string[] cascades);
@@ -431,7 +434,7 @@ namespace Zongsoft.Data
 		public int Insert<T>(T data, string scope = null)
 		{
 			if(data == null)
-				throw new ArgumentNullException(nameof(data));
+				return 0;
 
 			return this.Insert(this.GetName(data.GetType()), data, scope);
 		}
@@ -448,7 +451,7 @@ namespace Zongsoft.Data
 			var args = this.OnInserting(name, data, scope);
 
 			if(args.Cancel)
-				return args.Result;
+				return args.Count;
 
 			//定义数据访问过滤器上下文
 			var filterContext = new DataAccessFilterContext(this, DataAccessMethod.Insert, args);
@@ -457,13 +460,13 @@ namespace Zongsoft.Data
 			this.InvokeFilters(filterContext, (filter, ctx) => filter.OnExecuting(ctx));
 
 			//执行数据插入操作
-			args.Result = this.OnInsert(name, GetDataDictionary(args.Data), scope);
+			args.Count = this.OnInsert(name, args.Data, scope);
 
 			//调用数据访问过滤器后事件
 			this.InvokeFilters(filterContext, (filter, ctx) => filter.OnExecuted(ctx));
 
 			//激发“Inserted”事件
-			return this.OnInserted(name, args.Data, args.Scope, args.Result);
+			return this.OnInserted(name, args.Data, args.Scope, args.Count);
 		}
 
 		protected virtual int OnInsert(string name, DataDictionary data, string scope)
@@ -484,11 +487,11 @@ namespace Zongsoft.Data
 			if(items == null)
 				return 0;
 
-			//激发“Inserting”事件
-			var args = this.OnInserting(name, items, scope);
+			//激发“ManyInserting”事件
+			var args = this.OnManyInserting(name, items, scope);
 
 			if(args.Cancel)
-				return args.Result;
+				return args.Count;
 
 			//定义数据访问过滤器上下文
 			var filterContext = new DataAccessFilterContext(this, DataAccessMethod.InsertMany, args);
@@ -497,13 +500,13 @@ namespace Zongsoft.Data
 			this.InvokeFilters(filterContext, (filter, ctx) => filter.OnExecuting(ctx));
 
 			//执行数据插入操作
-			args.Result = this.OnInsertMany(name, GetDataDictionaries(args.Data), scope);
+			args.Count = this.OnInsertMany(name, args.Data, scope);
 
 			//调用数据访问过滤器后事件
 			this.InvokeFilters(filterContext, (filter, ctx) => filter.OnExecuted(ctx));
 
-			//激发“Inserted”事件
-			return this.OnInserted(name, args.Data, args.Scope, args.Result);
+			//激发“ManyInserted”事件
+			return this.OnManyInserted(name, args.Data, args.Scope, args.Count);
 		}
 
 		protected abstract int OnInsertMany(string name, IEnumerable<DataDictionary> items, string scope);
@@ -513,7 +516,7 @@ namespace Zongsoft.Data
 		public int Update<T>(T data, ICondition condition = null, string scope = null)
 		{
 			if(data == null)
-				throw new ArgumentNullException(nameof(data));
+				return 0;
 
 			return this.Update(this.GetName(data.GetType()), data, condition, scope);
 		}
@@ -521,7 +524,7 @@ namespace Zongsoft.Data
 		public int Update<T>(T data, string scope, ICondition condition = null)
 		{
 			if(data == null)
-				throw new ArgumentNullException(nameof(data));
+				return 0;
 
 			return this.Update(this.GetName(data.GetType()), data, condition, scope);
 		}
@@ -546,7 +549,7 @@ namespace Zongsoft.Data
 			var args = this.OnUpdating(name, data, condition, scope);
 
 			if(args.Cancel)
-				return args.Result;
+				return args.Count;
 
 			//定义数据访问过滤器上下文
 			var filterContext = new DataAccessFilterContext(this, DataAccessMethod.Update, args);
@@ -555,13 +558,13 @@ namespace Zongsoft.Data
 			this.InvokeFilters(filterContext, (filter, ctx) => filter.OnExecuting(ctx));
 
 			//执行数据更新操作
-			args.Result = this.OnUpdate(name, GetDataDictionary(args.Data), condition, scope);
+			args.Count = this.OnUpdate(name, args.Data, condition, scope);
 
 			//调用数据访问过滤器后事件
 			this.InvokeFilters(filterContext, (filter, ctx) => filter.OnExecuted(ctx));
 
 			//激发“Updated”事件
-			return this.OnUpdated(name, args.Data, args.Condition, args.Scope, args.Result);
+			return this.OnUpdated(name, args.Data, args.Condition, args.Scope, args.Count);
 		}
 
 		public int Update(string name, object data, string scope, ICondition condition = null)
@@ -603,11 +606,11 @@ namespace Zongsoft.Data
 			if(items == null)
 				return 0;
 
-			//激发“Updating”事件
-			var args = this.OnUpdating(name, items, condition, scope);
+			//激发“ManyUpdating”事件
+			var args = this.OnManyUpdating(name, items, condition, scope);
 
 			if(args.Cancel)
-				return args.Result;
+				return args.Count;
 
 			//定义数据访问过滤器上下文
 			var filterContext = new DataAccessFilterContext(this, DataAccessMethod.UpdateMany, args);
@@ -616,13 +619,13 @@ namespace Zongsoft.Data
 			this.InvokeFilters(filterContext, (filter, ctx) => filter.OnExecuting(ctx));
 
 			//执行数据更新操作
-			args.Result = this.OnUpdateMany(name, GetDataDictionaries(args.Data), condition, scope);
+			args.Count = this.OnUpdateMany(name, args.Data, condition, scope);
 
 			//调用数据访问过滤器后事件
 			this.InvokeFilters(filterContext, (filter, ctx) => filter.OnExecuted(ctx));
 
-			//激发“Updated”事件
-			return this.OnUpdated(name, args.Data, args.Condition, args.Scope, args.Result);
+			//激发“ManyUpdated”事件
+			return this.OnManyUpdated(name, args.Data, args.Condition, args.Scope, args.Count);
 		}
 
 		public int UpdateMany(string name, IEnumerable items, string scope, ICondition condition = null)
@@ -813,7 +816,7 @@ namespace Zongsoft.Data
 		{
 			var args = new DataDeletedEventArgs(name, condition, cascades, result);
 			this.OnDeleted(args);
-			return args.Result;
+			return args.Count;
 		}
 
 		protected DataDeletingEventArgs OnDeleting(string name, ICondition condition, string[] cascades)
@@ -823,31 +826,59 @@ namespace Zongsoft.Data
 			return args;
 		}
 
-		protected int OnInserted(string name, object data, string scope, int result)
+		protected int OnInserted(string name, DataDictionary data, string scope, int result)
 		{
 			var args = new DataInsertedEventArgs(name, data, scope, result);
 			this.OnInserted(args);
-			return args.Result;
+			return args.Count;
 		}
 
 		protected DataInsertingEventArgs OnInserting(string name, object data, string scope)
 		{
-			var args = new DataInsertingEventArgs(name, data, scope);
+			var args = new DataInsertingEventArgs(name, GetDataDictionary(data), scope);
 			this.OnInserting(args);
 			return args;
 		}
 
-		protected int OnUpdated(string name, object data, ICondition condition, string scope, int result)
+		protected int OnManyInserted(string name, IEnumerable<DataDictionary> data, string scope, int result)
+		{
+			var args = new DataManyInsertedEventArgs(name, data, scope, result);
+			this.OnManyInserted(args);
+			return args.Count;
+		}
+
+		protected DataManyInsertingEventArgs OnManyInserting(string name, object data, string scope)
+		{
+			var args = new DataManyInsertingEventArgs(name, GetDataDictionaries(data), scope);
+			this.OnManyInserting(args);
+			return args;
+		}
+
+		protected int OnUpdated(string name, DataDictionary data, ICondition condition, string scope, int result)
 		{
 			var args = new DataUpdatedEventArgs(name, data, condition, scope, result);
 			this.OnUpdated(args);
-			return args.Result;
+			return args.Count;
 		}
 
 		protected DataUpdatingEventArgs OnUpdating(string name, object data, ICondition condition, string scope)
 		{
-			var args = new DataUpdatingEventArgs(name, data, condition, scope);
+			var args = new DataUpdatingEventArgs(name, GetDataDictionary(data), condition, scope);
 			this.OnUpdating(args);
+			return args;
+		}
+
+		protected int OnManyUpdated(string name, IEnumerable<DataDictionary> data, ICondition condition, string scope, int result)
+		{
+			var args = new DataManyUpdatedEventArgs(name, data, condition, scope, result);
+			this.OnManyUpdated(args);
+			return args.Count;
+		}
+
+		protected DataManyUpdatingEventArgs OnManyUpdating(string name, object data, ICondition condition, string scope)
+		{
+			var args = new DataManyUpdatingEventArgs(name, GetDataDictionaries(data), condition, scope);
+			this.OnManyUpdating(args);
 			return args;
 		}
 
@@ -979,6 +1010,22 @@ namespace Zongsoft.Data
 				e(this, args);
 		}
 
+		protected virtual void OnManyInserted(DataManyInsertedEventArgs args)
+		{
+			var e = this.ManyInserted;
+
+			if(e != null)
+				e(this, args);
+		}
+
+		protected virtual void OnManyInserting(DataManyInsertingEventArgs args)
+		{
+			var e = this.ManyInserting;
+
+			if(e != null)
+				e(this, args);
+		}
+
 		protected virtual void OnUpdated(DataUpdatedEventArgs args)
 		{
 			var e = this.Updated;
@@ -990,6 +1037,22 @@ namespace Zongsoft.Data
 		protected virtual void OnUpdating(DataUpdatingEventArgs args)
 		{
 			var e = this.Updating;
+
+			if(e != null)
+				e(this, args);
+		}
+
+		protected virtual void OnManyUpdated(DataManyUpdatedEventArgs args)
+		{
+			var e = this.ManyUpdated;
+
+			if(e != null)
+				e(this, args);
+		}
+
+		protected virtual void OnManyUpdating(DataManyUpdatingEventArgs args)
+		{
+			var e = this.ManyUpdating;
 
 			if(e != null)
 				e(this, args);

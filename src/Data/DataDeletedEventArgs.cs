@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2016 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2016-2017 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -35,33 +35,33 @@ namespace Zongsoft.Data
 	public class DataDeletedEventArgs : DataAccessEventArgs
 	{
 		#region 成员字段
-		private int _result;
+		private int _count;
 		private ICondition _condition;
 		private string[] _cascades;
 		#endregion
 
 		#region 构造函数
-		public DataDeletedEventArgs(string name, ICondition condition, string[] cascades, int result) : base(name)
+		public DataDeletedEventArgs(string name, ICondition condition, string[] cascades, int count) : base(name)
 		{
 			_condition = condition;
 			_cascades = cascades;
-			_result = result;
+			_count = count;
 		}
 		#endregion
 
 		#region 公共属性
 		/// <summary>
-		/// 获取或设置删除操作的结果。
+		/// 获取或设置删除操作的受影响记录数。
 		/// </summary>
-		public int Result
+		public int Count
 		{
 			get
 			{
-				return _result;
+				return _count;
 			}
 			set
 			{
-				_result = value;
+				_count = value;
 			}
 		}
 

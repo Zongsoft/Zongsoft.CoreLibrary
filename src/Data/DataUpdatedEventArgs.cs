@@ -35,42 +35,42 @@ namespace Zongsoft.Data
 	public class DataUpdatedEventArgs : DataAccessEventArgs
 	{
 		#region 成员字段
-		private int _result;
-		private object _data;
+		private int _count;
+		private DataDictionary _data;
 		private ICondition _condition;
 		private string _scope;
 		#endregion
 
 		#region 构造函数
-		public DataUpdatedEventArgs(string name, object data, ICondition condition, string scope, int result) : base(name)
+		public DataUpdatedEventArgs(string name, DataDictionary data, ICondition condition, string scope, int count) : base(name)
 		{
 			_data = data;
 			_condition = condition;
 			_scope = scope;
-			_result = result;
+			_count = count;
 		}
 		#endregion
 
 		#region 公共属性
 		/// <summary>
-		/// 获取或设置更新操作的结果。
+		/// 获取或设置更新操作的受影响记录数。
 		/// </summary>
-		public int Result
+		public int Count
 		{
 			get
 			{
-				return _result;
+				return _count;
 			}
 			set
 			{
-				_result = value;
+				_count = value;
 			}
 		}
 
 		/// <summary>
 		/// 获取或设置更新操作的数据。
 		/// </summary>
-		public object Data
+		public DataDictionary Data
 		{
 			get
 			{

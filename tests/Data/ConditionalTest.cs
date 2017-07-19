@@ -11,7 +11,6 @@ namespace Zongsoft.Data
 		public void Test()
 		{
 			var conditional = new DummyConditional();
-			ConditionCollection conditions = null;
 
 			Assert.Null(conditional.CorporationId);
 			Assert.Null(conditional.DepartmentId);

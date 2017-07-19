@@ -53,8 +53,12 @@ namespace Zongsoft.Data
 		public event EventHandler<DataDeletingEventArgs> Deleting;
 		public event EventHandler<DataInsertedEventArgs> Inserted;
 		public event EventHandler<DataInsertingEventArgs> Inserting;
+		public event EventHandler<DataManyInsertedEventArgs> ManyInserted;
+		public event EventHandler<DataManyInsertingEventArgs> ManyInserting;
 		public event EventHandler<DataUpdatedEventArgs> Updated;
 		public event EventHandler<DataUpdatingEventArgs> Updating;
+		public event EventHandler<DataManyUpdatedEventArgs> ManyUpdated;
+		public event EventHandler<DataManyUpdatingEventArgs> ManyUpdating;
 		#endregion
 
 		#region 成员字段
@@ -499,13 +503,13 @@ namespace Zongsoft.Data
 			var args = this.OnDeleting(condition, cascades);
 
 			if(args.Cancel)
-				return args.Result;
+				return args.Count;
 
 			//执行数据删除操作
-			args.Result = this.OnDelete(args.Condition, args.Cascades);
+			args.Count = this.OnDelete(args.Condition, args.Cascades);
 
 			//激发“Deleted”事件
-			return this.OnDeleted(args.Condition, args.Cascades, args.Result);
+			return this.OnDeleted(args.Condition, args.Cascades, args.Count);
 		}
 
 		protected virtual int OnDelete(ICondition condition, string[] cascades)
@@ -520,41 +524,44 @@ namespace Zongsoft.Data
 		#region 插入方法
 		public int Insert(object data, string scope = null)
 		{
+			if(data == null)
+				return 0;
+
 			//激发“Inserting”事件
 			var args = this.OnInserting(data, scope);
 
 			if(args.Cancel)
-				return args.Result;
+				return args.Count;
 
 			//执行数据插入操作
-			args.Result = this.OnInsert(DataDictionary<TEntity>.GetDataDictionary(args.Data), args.Scope);
+			args.Count = this.OnInsert((DataDictionary<TEntity>)args.Data, args.Scope);
 
 			//激发“Inserted”事件
-			return this.OnInserted(args.Data, args.Scope, args.Result);
+			return this.OnInserted(args.Data, args.Scope, args.Count);
 		}
 
 		public int InsertMany(IEnumerable data, string scope = null)
 		{
-			//激发“Inserting”事件
-			var args = this.OnInserting(data, scope);
+			if(data == null)
+				return 0;
+
+			//激发“ManyInserting”事件
+			var args = this.OnManyInserting(data, scope);
 
 			if(args.Cancel)
-				return args.Result;
+				return args.Count;
 
 			//执行数据插入操作
-			args.Result = this.OnInsertMany(DataDictionary<TEntity>.GetDataDictionaries(args.Data), args.Scope);
+			args.Count = this.OnInsertMany((IEnumerable<DataDictionary<TEntity>>)args.Data, args.Scope);
 
-			//激发“Inserted”事件
-			return this.OnInserted(args.Data, args.Scope, args.Result);
+			//激发“ManyInserted”事件
+			return this.OnManyInserted(args.Data, args.Scope, args.Count);
 		}
 
 		protected virtual int OnInsert(DataDictionary<TEntity> data, string scope)
 		{
 			if(data == null || data.Data == null)
 				return 0;
-
-			//尝试递增注册的递增键值
-			DataSequence.Increments(this, data);
 
 			//执行数据引擎的插入操作
 			return this.DataAccess.Insert(this.Name, data, scope);
@@ -618,17 +625,20 @@ namespace Zongsoft.Data
 
 		public int Update(object data, ICondition condition = null, string scope = null)
 		{
+			if(data == null)
+				return 0;
+
 			//激发“Updating”事件
 			var args = this.OnUpdating(data, condition, scope);
 
 			if(args.Cancel)
-				return args.Result;
+				return args.Count;
 
 			//执行数据更新操作
-			args.Result = this.OnUpdate(DataDictionary<TEntity>.GetDataDictionary(args.Data), args.Condition, args.Scope);
+			args.Count = this.OnUpdate((DataDictionary<TEntity>)args.Data, args.Condition, args.Scope);
 
 			//激发“Updated”事件
-			return this.OnUpdated(args.Data, args.Condition, args.Scope, args.Result);
+			return this.OnUpdated(args.Data, args.Condition, args.Scope, args.Count);
 		}
 
 		public int Update(object data, string scope, ICondition condition = null)
@@ -638,17 +648,20 @@ namespace Zongsoft.Data
 
 		public int UpdateMany(IEnumerable data, ICondition condition = null, string scope = null)
 		{
-			//激发“Updating”事件
-			var args = this.OnUpdating(data, condition, scope);
+			if(data == null)
+				return 0;
+
+			//激发“ManyUpdating”事件
+			var args = this.OnManyUpdating(data, condition, scope);
 
 			if(args.Cancel)
-				return args.Result;
+				return args.Count;
 
 			//执行数据更新操作
-			args.Result = this.OnUpdateMany(DataDictionary<TEntity>.GetDataDictionaries(args.Data), args.Condition, args.Scope);
+			args.Count = this.OnUpdateMany((IEnumerable<DataDictionary<TEntity>>)args.Data, args.Condition, args.Scope);
 
-			//激发“Updated”事件
-			return this.OnUpdated(args.Data, args.Condition, args.Scope, args.Result);
+			//激发“ManyUpdated”事件
+			return this.OnManyUpdated(args.Data, args.Condition, args.Scope, args.Count);
 		}
 
 		public int UpdateMany(IEnumerable data, string scope, ICondition condition = null)
@@ -788,7 +801,7 @@ namespace Zongsoft.Data
 		{
 			var args = new DataDeletedEventArgs(this.Name, condition, cascades, result);
 			this.OnDeleted(args);
-			return args.Result;
+			return args.Count;
 		}
 
 		protected DataDeletingEventArgs OnDeleting(ICondition condition, string[] cascades)
@@ -798,31 +811,63 @@ namespace Zongsoft.Data
 			return args;
 		}
 
-		protected int OnInserted(object data, string scope, int result)
+		protected int OnInserted(DataDictionary data, string scope, int result)
 		{
 			var args = new DataInsertedEventArgs(this.Name, data, scope, result);
 			this.OnInserted(args);
-			return args.Result;
+			return args.Count;
 		}
 
 		protected DataInsertingEventArgs OnInserting(object data, string scope)
 		{
-			var args = new DataInsertingEventArgs(this.Name, data, scope);
+			var args = new DataInsertingEventArgs(this.Name, DataDictionary<TEntity>.GetDataDictionary(data), scope);
+
+			//尝试递增注册的递增键值
+			DataSequence.Increments(this, (DataDictionary<TEntity>)args.Data);
+
 			this.OnInserting(args);
 			return args;
 		}
 
-		protected int OnUpdated(object data, ICondition condition, string scope, int result)
+		protected int OnManyInserted(IEnumerable<DataDictionary> data, string scope, int result)
+		{
+			var args = new DataManyInsertedEventArgs(this.Name, data, scope, result);
+			this.OnManyInserted(args);
+			return args.Count;
+		}
+
+		protected DataManyInsertingEventArgs OnManyInserting(object data, string scope)
+		{
+			var args = new DataManyInsertingEventArgs(this.Name, DataDictionary<TEntity>.GetDataDictionaries(data), scope);
+			this.OnManyInserting(args);
+			return args;
+		}
+
+		protected int OnUpdated(DataDictionary data, ICondition condition, string scope, int result)
 		{
 			var args = new DataUpdatedEventArgs(this.Name, data, condition, scope, result);
 			this.OnUpdated(args);
-			return args.Result;
+			return args.Count;
 		}
 
 		protected DataUpdatingEventArgs OnUpdating(object data, ICondition condition, string scope)
 		{
-			var args = new DataUpdatingEventArgs(this.Name, data, condition, scope);
+			var args = new DataUpdatingEventArgs(this.Name, DataDictionary<TEntity>.GetDataDictionary(data), condition, scope);
 			this.OnUpdating(args);
+			return args;
+		}
+
+		protected int OnManyUpdated(IEnumerable<DataDictionary> data, ICondition condition, string scope, int result)
+		{
+			var args = new DataManyUpdatedEventArgs(this.Name, data, condition, scope, result);
+			this.OnManyUpdated(args);
+			return args.Count;
+		}
+
+		protected DataManyUpdatingEventArgs OnManyUpdating(object data, ICondition condition, string scope)
+		{
+			var args = new DataManyUpdatingEventArgs(this.Name, DataDictionary<TEntity>.GetDataDictionaries(data), condition, scope);
+			this.OnManyUpdating(args);
 			return args;
 		}
 
@@ -970,6 +1015,22 @@ namespace Zongsoft.Data
 				e(this, args);
 		}
 
+		protected virtual void OnManyInserted(DataManyInsertedEventArgs args)
+		{
+			var e = this.ManyInserted;
+
+			if(e != null)
+				e(this, args);
+		}
+
+		protected virtual void OnManyInserting(DataManyInsertingEventArgs args)
+		{
+			var e = this.ManyInserting;
+
+			if(e != null)
+				e(this, args);
+		}
+
 		protected virtual void OnUpdated(DataUpdatedEventArgs args)
 		{
 			var e = this.Updated;
@@ -981,6 +1042,22 @@ namespace Zongsoft.Data
 		protected virtual void OnUpdating(DataUpdatingEventArgs args)
 		{
 			var e = this.Updating;
+
+			if(e != null)
+				e(this, args);
+		}
+
+		protected virtual void OnManyUpdated(DataManyUpdatedEventArgs args)
+		{
+			var e = this.ManyUpdated;
+
+			if(e != null)
+				e(this, args);
+		}
+
+		protected virtual void OnManyUpdating(DataManyUpdatingEventArgs args)
+		{
+			var e = this.ManyUpdating;
 
 			if(e != null)
 				e(this, args);

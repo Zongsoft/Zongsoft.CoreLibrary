@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2016 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2016-2017 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,38 +25,73 @@
  */
 
 using System;
-using System.Collections;
+using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
 	/// <summary>
-	/// 为数据访问的更新事件提供数据。
+	/// 为数据访问的插入事件提供数据。
 	/// </summary>
-	public class DataUpdatingEventArgs : DataUpdatedEventArgs
+	public class DataManyInsertedEventArgs : DataAccessEventArgs
 	{
 		#region 成员字段
-		private bool _cancel;
+		private int _count;
+		private IEnumerable<DataDictionary> _data;
+		private string _scope;
 		#endregion
 
 		#region 构造函数
-		public DataUpdatingEventArgs(string name, DataDictionary data, ICondition condition, string scope) : base(name, data, condition, scope, 0)
+		public DataManyInsertedEventArgs(string name, IEnumerable<DataDictionary> data, string scope, int count) : base(name)
 		{
+			_data = data;
+			_scope = scope;
+			_count = count;
 		}
 		#endregion
 
 		#region 公共属性
 		/// <summary>
-		/// 获取或设置一个值，表示是否取消当前操作。
+		/// 获取或设置插入操作的受影响记录数。
 		/// </summary>
-		public bool Cancel
+		public int Count
 		{
 			get
 			{
-				return _cancel;
+				return _count;
 			}
 			set
 			{
-				_cancel = value;
+				_count = value;
+			}
+		}
+
+		/// <summary>
+		/// 获取或设置插入操作的数据。
+		/// </summary>
+		public IEnumerable<DataDictionary> Data
+		{
+			get
+			{
+				return _data;
+			}
+			set
+			{
+				_data = value;
+			}
+		}
+
+		/// <summary>
+		/// 获取或设置插入操作的包含成员。
+		/// </summary>
+		public string Scope
+		{
+			get
+			{
+				return _scope;
+			}
+			set
+			{
+				_scope = value;
 			}
 		}
 		#endregion

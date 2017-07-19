@@ -56,8 +56,12 @@ namespace Zongsoft.Data
 		event EventHandler<DataDeletingEventArgs> Deleting;
 		event EventHandler<DataInsertedEventArgs> Inserted;
 		event EventHandler<DataInsertingEventArgs> Inserting;
+		event EventHandler<DataManyInsertedEventArgs> ManyInserted;
+		event EventHandler<DataManyInsertingEventArgs> ManyInserting;
 		event EventHandler<DataUpdatedEventArgs> Updated;
 		event EventHandler<DataUpdatingEventArgs> Updating;
+		event EventHandler<DataManyUpdatedEventArgs> ManyUpdated;
+		event EventHandler<DataManyUpdatingEventArgs> ManyUpdating;
 		#endregion
 
 		#region 属性声明
