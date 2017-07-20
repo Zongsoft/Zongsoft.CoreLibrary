@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015-2016 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2017 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -34,6 +34,7 @@ namespace Zongsoft.Services
 	{
 		#region 成员字段
 		private string _name;
+		private string _provider;
 		private Type _contract;
 		#endregion
 
@@ -42,14 +43,16 @@ namespace Zongsoft.Services
 		{
 		}
 
-		public ServiceDependencyAttribute(string name)
+		public ServiceDependencyAttribute(string name, string provider = null)
 		{
 			this.Name = name;
+			this.Provider = provider;
 		}
 
-		public ServiceDependencyAttribute(Type contract)
+		public ServiceDependencyAttribute(Type contract, string provider = null)
 		{
 			this.Contract = contract;
+			this.Provider = provider;
 		}
 		#endregion
 
@@ -66,6 +69,21 @@ namespace Zongsoft.Services
 			set
 			{
 				_name = string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+			}
+		}
+
+		/// <summary>
+		/// 获取或设置服务提供程序的名称。
+		/// </summary>
+		public string Provider
+		{
+			get
+			{
+				return _provider;
+			}
+			set
+			{
+				_provider = string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 			}
 		}
 
