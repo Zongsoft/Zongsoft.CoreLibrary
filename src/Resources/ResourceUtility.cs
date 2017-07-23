@@ -225,6 +225,28 @@ namespace Zongsoft.Resources
 			return result;
 		}
 
+		public static bool TryGetString(string key, out string result)
+		{
+			return TryGetString(key, Assembly.GetCallingAssembly(), out result);
+		}
+
+		public static bool TryGetString(string key, Assembly assembly, out string result)
+		{
+			result = null;
+
+			if(string.IsNullOrWhiteSpace(key))
+				return false;
+
+			string name, baseName;
+
+			if(TryParseResourceText(key, out name, out baseName))
+				result = (string)GetResourceValue(name, baseName, assembly, resourceManager => resourceManager.GetString(name));
+			else
+				result = (string)GetResourceValue(key, baseName, assembly, resourceManager => resourceManager.GetString(key));
+
+			return result != null;
+		}
+
 		public static object GetObject(string text)
 		{
 			return GetObject(text, Assembly.GetCallingAssembly());
