@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2017 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -26,25 +26,54 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
+using System.Collections.Specialized;
 
 namespace Zongsoft.ComponentModel
 {
-	[Obsolete]
-	public class ActionCollection : Zongsoft.Collections.NamedCollectionBase<Action>
+	public class SchemaActionCollection : Zongsoft.Collections.NamedCollectionBase<SchemaAction>
 	{
+		#region 成员字段
+		private Schema _schema;
+		#endregion
+
 		#region 构造函数
-		public ActionCollection() : base(StringComparer.OrdinalIgnoreCase)
+		public SchemaActionCollection(Schema schema) : base(StringComparer.OrdinalIgnoreCase)
 		{
+			if(schema == null)
+				throw new ArgumentNullException(nameof(schema));
+
+			_schema = schema;
 		}
 		#endregion
 
 		#region 重写方法
-		protected override string GetKeyForItem(Action item)
+		protected override string GetKeyForItem(SchemaAction item)
 		{
 			return item.Name;
+		}
+
+		protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs args)
+		{
+			//调用基类同名方法
+			base.OnCollectionChanged(args);
+
+			if(args.OldItems != null)
+			{
+				foreach(var item in args.OldItems)
+				{
+					if(item != null)
+						((SchemaAction)item).Schema = null;
+				}
+			}
+
+			if(args.NewItems != null)
+			{
+				foreach(var item in args.NewItems)
+				{
+					if(item != null)
+						((SchemaAction)item).Schema = _schema;
+				}
+			}
 		}
 		#endregion
 	}

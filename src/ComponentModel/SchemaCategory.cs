@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2013-2017 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -30,7 +30,6 @@ using System.Threading;
 
 namespace Zongsoft.ComponentModel
 {
-	[Obsolete]
 	public class SchemaCategory : Zongsoft.Collections.CategoryBase
 	{
 		#region 成员字段

@@ -1,8 +1,8 @@
-/*
+ï»¿/*
  * Authors:
- *   ÖÓ·å(Popeye Zhong) <zongsoft@gmail.com>
+ *   é’Ÿå³°(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2017 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -29,26 +29,25 @@ using System.Collections.Generic;
 
 namespace Zongsoft.ComponentModel
 {
-	[Obsolete]
-	[Serializable]
-	public class Action
+	public class SchemaAction
 	{
-		#region ³ÉÔ±±äÁ¿
+		#region æˆå‘˜å˜é‡
 		private string _name;
 		private string _title;
 		private string _description;
+		private Schema _schema;
 		#endregion
 
-		#region ¹¹Ôìº¯Êı
-		public Action()
+		#region æ„é€ å‡½æ•°
+		public SchemaAction()
 		{
 		}
 
-		public Action(string name, string title) : this(name, title, null)
+		public SchemaAction(string name, string title) : this(name, title, null)
 		{
 		}
 
-		public Action(string name, string title, string description)
+		public SchemaAction(string name, string title, string description)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException("name");
@@ -59,10 +58,24 @@ namespace Zongsoft.ComponentModel
 		}
 		#endregion
 
-		#region ÖØĞ´·½·¨
+		#region å…¬å…±å±æ€§
+		public Schema Schema
+		{
+			get
+			{
+				return _schema;
+			}
+			internal protected set
+			{
+				_schema = value;
+			}
+		}
+		#endregion
+
+		#region é‡å†™æ–¹æ³•
 		public override bool Equals(object obj)
 		{
-			Action target = obj as Action;
+			SchemaAction target = obj as SchemaAction;
 
 			if((target == null) && (this != null))
 				return false;
@@ -87,7 +100,7 @@ namespace Zongsoft.ComponentModel
 		}
 		#endregion
 
-		#region ¹«¹²ÊôĞÔ
+		#region å…¬å…±å±æ€§
 		public string Name
 		{
 			get
@@ -124,20 +137,6 @@ namespace Zongsoft.ComponentModel
 			set
 			{
 				_description = value;
-			}
-		}
-		#endregion
-
-		#region ¾²Ì¬ÊôĞÔ
-		private static ActionCollection _defaults;
-		public static ActionCollection Defaults
-		{
-			get
-			{
-				if(_defaults == null)
-					System.Threading.Interlocked.CompareExchange(ref _defaults, new ActionCollection(), null);
-
-				return _defaults;
 			}
 		}
 		#endregion

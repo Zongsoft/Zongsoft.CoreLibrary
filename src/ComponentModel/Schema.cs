@@ -1,8 +1,8 @@
-/*
+ï»¿/*
  * Authors:
- *   ÖÓ·å(Popeye Zhong) <zongsoft@gmail.com>
+ *   é’Ÿå³°(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2008-2012 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2008-2017 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -29,49 +29,57 @@ using System.Collections.Generic;
 
 namespace Zongsoft.ComponentModel
 {
-	[Obsolete]
-	[Serializable]
 	public class Schema
 	{
-		#region ³ÉÔ±±äÁ¿
+		#region é™æ€å­—æ®µ
+		public static readonly SchemaCollection Schemas = new SchemaCollection();
+		#endregion
+
+		#region æˆå‘˜å˜é‡
 		private string _name;
 		private string _title;
 		private string _description;
-		private bool _visible;
-		private ActionCollection _actions;
+		private bool? _visible;
+		private SchemaActionCollection _actions;
 		#endregion
 
-		#region ¹¹Ôìº¯Êý
+		#region æž„é€ å‡½æ•°
 		public Schema()
 		{
-			_visible = true;
 		}
 
-		public Schema(string name) : this(name, name, string.Empty, true)
+		public Schema(string name) : this(name, name, string.Empty)
 		{
 		}
 
-		public Schema(string name, string title) : this(name, title, string.Empty, true)
+		public Schema(string name, string title) : this(name, title, string.Empty)
 		{
 		}
 
-		public Schema(string name, string title, string description) : this(name, title, description, true)
+		public Schema(string name, string title, string description)
 		{
+			if(string.IsNullOrWhiteSpace(name))
+				throw new ArgumentNullException("name");
+
+			_name = name.Replace('-', '.');
+			_title = string.IsNullOrEmpty(title) ? _name : title;
+			_description = description;
+			_visible = null;
 		}
 
 		public Schema(string name, string title, string description, bool visible)
 		{
-			if(string.IsNullOrEmpty(name))
+			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException("name");
 
-			_name = name;
-			_title = string.IsNullOrEmpty(title) ? name : title;
+			_name = name.Replace('-', '.');
+			_title = string.IsNullOrEmpty(title) ? _name : title;
 			_description = description;
 			_visible = visible;
 		}
 		#endregion
 
-		#region ÖØÐ´·½·¨
+		#region é‡å†™æ–¹æ³•
 		public override bool Equals(object obj)
 		{
 			Schema target = obj as Schema;
@@ -99,7 +107,7 @@ namespace Zongsoft.ComponentModel
 		}
 		#endregion
 
-		#region ¹«¹²ÊôÐÔ
+		#region å…¬å…±å±žæ€§
 		public string Name
 		{
 			get
@@ -111,7 +119,7 @@ namespace Zongsoft.ComponentModel
 				if(string.IsNullOrWhiteSpace(value))
 					throw new ArgumentNullException();
 
-				_name = value;
+				_name = value.Replace('-', '.');
 			}
 		}
 
@@ -140,12 +148,14 @@ namespace Zongsoft.ComponentModel
 			}
 		}
 
-		[System.ComponentModel.DefaultValue(true)]
 		public bool Visible
 		{
 			get
 			{
-				return _visible;
+				if(_visible.HasValue)
+					return _visible.Value;
+
+				return this.HasActions;
 			}
 			set
 			{
@@ -153,12 +163,20 @@ namespace Zongsoft.ComponentModel
 			}
 		}
 
-		public ActionCollection Actions
+		public bool HasActions
+		{
+			get
+			{
+				return _actions != null && _actions.Count > 0;
+			}
+		}
+
+		public SchemaActionCollection Actions
 		{
 			get
 			{
 				if(_actions == null)
-					System.Threading.Interlocked.CompareExchange(ref _actions, new ActionCollection(), null);
+					System.Threading.Interlocked.CompareExchange(ref _actions, new SchemaActionCollection(this), null);
 
 				return _actions;
 			}

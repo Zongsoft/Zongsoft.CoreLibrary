@@ -121,6 +121,10 @@
     <Compile Include="Communication\PackageSerializer.cs" />
     <Compile Include="Communication\PacketizerFactory.cs" />
     <Compile Include="Communication\ChannelPipelineContext.cs" />
+    <Compile Include="ComponentModel\SchemaAction.cs" />
+    <Compile Include="ComponentModel\SchemaActionCollection.cs" />
+    <Compile Include="ComponentModel\Schema.cs" />
+    <Compile Include="ComponentModel\SchemaCollection.cs" />
     <Compile Include="Data\ConditionalBehaviors.cs" />
     <Compile Include="Data\ConditionalRange`1.cs" />
     <Compile Include="Data\DataAccessFilterBase.cs" />
