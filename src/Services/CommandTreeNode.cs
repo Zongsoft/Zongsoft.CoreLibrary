@@ -48,7 +48,12 @@ namespace Zongsoft.Services
 			_children = new CommandTreeNodeCollection(this);
 		}
 
-		public CommandTreeNode(string name, CommandTreeNode parent = null) : base(name, parent)
+		public CommandTreeNode(string name) : base(name)
+		{
+			_children = new CommandTreeNodeCollection(this);
+		}
+
+		public CommandTreeNode(string name, CommandTreeNode parent) : base(name, parent)
 		{
 			_children = new CommandTreeNodeCollection(this);
 		}
