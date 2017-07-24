@@ -37,6 +37,10 @@ namespace Zongsoft.ComponentModel
 		#endregion
 
 		#region 构造函数
+		public SchemaActionCollection() : base(StringComparer.OrdinalIgnoreCase)
+		{
+		}
+
 		public SchemaActionCollection(Schema schema) : base(StringComparer.OrdinalIgnoreCase)
 		{
 			if(schema == null)

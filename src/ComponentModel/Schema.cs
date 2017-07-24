@@ -29,6 +29,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.ComponentModel
 {
+	[System.ComponentModel.DefaultProperty("Actions")]
 	public class Schema
 	{
 		#region 静态字段
@@ -76,34 +77,6 @@ namespace Zongsoft.ComponentModel
 			_title = string.IsNullOrEmpty(title) ? _name : title;
 			_description = description;
 			_visible = visible;
-		}
-		#endregion
-
-		#region 重写方法
-		public override bool Equals(object obj)
-		{
-			Schema target = obj as Schema;
-
-			if((target == null) && (this != null))
-				return false;
-
-			return string.Equals(_name, target.Name, StringComparison.OrdinalIgnoreCase);
-		}
-
-		public override int GetHashCode()
-		{
-			if(_name == null)
-				return base.GetHashCode();
-
-			return _name.ToLowerInvariant().GetHashCode();
-		}
-
-		public override string ToString()
-		{
-			if(_name == null)
-				return string.Empty;
-
-			return _name;
 		}
 		#endregion
 
@@ -180,6 +153,34 @@ namespace Zongsoft.ComponentModel
 
 				return _actions;
 			}
+		}
+		#endregion
+
+		#region 重写方法
+		public override bool Equals(object obj)
+		{
+			Schema target = obj as Schema;
+
+			if((target == null) && (this != null))
+				return false;
+
+			return string.Equals(_name, target.Name, StringComparison.OrdinalIgnoreCase);
+		}
+
+		public override int GetHashCode()
+		{
+			if(_name == null)
+				return base.GetHashCode();
+
+			return _name.ToLowerInvariant().GetHashCode();
+		}
+
+		public override string ToString()
+		{
+			if(_name == null)
+				return string.Empty;
+
+			return _name;
 		}
 		#endregion
 	}

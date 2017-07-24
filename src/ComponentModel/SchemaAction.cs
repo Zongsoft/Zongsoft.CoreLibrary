@@ -35,11 +35,12 @@ namespace Zongsoft.ComponentModel
 		private string _name;
 		private string _title;
 		private string _description;
+		private bool _visible;
 		private Schema _schema;
 		#endregion
 
 		#region 构造函数
-		public SchemaAction()
+		public SchemaAction(string name) : this(name, null, null)
 		{
 		}
 
@@ -49,16 +50,18 @@ namespace Zongsoft.ComponentModel
 
 		public SchemaAction(string name, string title, string description)
 		{
-			if(string.IsNullOrEmpty(name))
+			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException("name");
 
-			_name = name;
-			_title = title;
+			_name = name.Trim();
+			_title = string.IsNullOrWhiteSpace(title) ? _name : title;
 			_description = description;
+			_visible = true;
 		}
 		#endregion
 
 		#region 公共属性
+		[Runtime.Serialization.SerializationMember(Runtime.Serialization.SerializationMemberBehavior.Ignored)]
 		public Schema Schema
 		{
 			get
@@ -68,6 +71,57 @@ namespace Zongsoft.ComponentModel
 			internal protected set
 			{
 				_schema = value;
+			}
+		}
+
+		public string Name
+		{
+			get
+			{
+				return _name;
+			}
+			set
+			{
+				if(string.IsNullOrWhiteSpace(value))
+					throw new ArgumentNullException();
+
+				_name = value.Trim();
+			}
+		}
+
+		public string Title
+		{
+			get
+			{
+				return _title;
+			}
+			set
+			{
+				_title = value;
+			}
+		}
+
+		public string Description
+		{
+			get
+			{
+				return _description;
+			}
+			set
+			{
+				_description = value;
+			}
+		}
+
+		public bool Visible
+		{
+			get
+			{
+				return _visible;
+			}
+			set
+			{
+				_visible = value;
 			}
 		}
 		#endregion
@@ -97,47 +151,6 @@ namespace Zongsoft.ComponentModel
 				return string.Empty;
 
 			return _name;
-		}
-		#endregion
-
-		#region 公共属性
-		public string Name
-		{
-			get
-			{
-				return _name;
-			}
-			set
-			{
-				if(string.IsNullOrEmpty(value))
-					throw new ArgumentNullException();
-
-				_name = value;
-			}
-		}
-
-		public string Title
-		{
-			get
-			{
-				return _title;
-			}
-			set
-			{
-				_title = value;
-			}
-		}
-
-		public string Description
-		{
-			get
-			{
-				return _description;
-			}
-			set
-			{
-				_description = value;
-			}
 		}
 		#endregion
 	}
