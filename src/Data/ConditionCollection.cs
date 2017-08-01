@@ -71,13 +71,6 @@ namespace Zongsoft.Data
 		}
 		#endregion
 
-		#region 公共方法
-		public bool Contains(string name)
-		{
-			return this.Contains(this, name);
-		}
-		#endregion
-
 		#region 符号重写
 		public static ConditionCollection operator +(Condition condition, ConditionCollection conditions)
 		{
@@ -229,6 +222,29 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 公共方法
+		public bool Contains(string name)
+		{
+			return this.Contains(this, name);
+		}
+
+		public ICondition[] Find(string name)
+		{
+			if(string.IsNullOrWhiteSpace(name))
+				return null;
+
+			var list = new List<ICondition>();
+
+			foreach(var item in this.Items)
+			{
+				var array = item.Find(name);
+
+				if(array != null && array.Length > 0)
+					list.AddRange(array);
+			}
+
+			return list.ToArray();
+		}
+
 		/// <summary>
 		/// 创建一个与当前集合内容相同的新条件集，并将指定的条件项追加到新集中。
 		/// </summary>

@@ -156,6 +156,19 @@ namespace Zongsoft.Data
 			return this.HasChanges(name);
 		}
 
+		public ICondition[] Find(string name)
+		{
+			if(string.IsNullOrWhiteSpace(name))
+				return null;
+
+			var conditions = this.ToConditions();
+
+			if(conditions != null && conditions.Count > 0)
+				return conditions.Find(name);
+
+			return null;
+		}
+
 		public virtual ConditionCollection ToConditions()
 		{
 			ConditionCollection conditions = null;

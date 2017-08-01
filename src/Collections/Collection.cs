@@ -28,6 +28,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Linq;
 
 namespace Zongsoft.Collections
 {
@@ -53,7 +54,7 @@ namespace Zongsoft.Collections
 			if(items == null)
 				_items = new List<T>();
 			else
-				_items = new List<T>(items);
+				_items = new List<T>(items.Where(p => p != null));
 		}
 		#endregion
 

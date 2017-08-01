@@ -140,6 +140,14 @@ namespace Zongsoft.Data
 		{
 			return string.Equals(name, _name, StringComparison.OrdinalIgnoreCase);
 		}
+
+		ICondition[] ICondition.Find(string name)
+		{
+			if(string.Equals(name, _name, StringComparison.OrdinalIgnoreCase))
+				return new ICondition[] { this };
+
+			return null;
+		}
 		#endregion
 
 		#region 静态方法

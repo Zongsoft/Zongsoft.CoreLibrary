@@ -25,6 +25,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
@@ -39,5 +40,12 @@ namespace Zongsoft.Data
 		/// <param name="name">指定的成员名称。</param>
 		/// <returns>如果包含指定名称的成员则返回真(True)，否则返回假(False)。</returns>
 		bool Contains(string name);
+
+		/// <summary>
+		/// 查找指定名称的所有成员。
+		/// </summary>
+		/// <param name="name">指定的成员名称。</param>
+		/// <returns>返回指定名称的成员数组。</returns>
+		ICondition[] Find(string name);
 	}
 }
