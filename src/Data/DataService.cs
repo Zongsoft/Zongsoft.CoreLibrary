@@ -580,6 +580,9 @@ namespace Zongsoft.Data
 				{
 					count += this.OnInsert(item, scope);
 				}
+
+				//提交事务
+				transaction.Commit();
 			}
 
 			return count;
@@ -690,6 +693,9 @@ namespace Zongsoft.Data
 				{
 					count += this.OnUpdate(item, condition, scope);
 				}
+
+				//提交事务
+				transaction.Commit();
 			}
 
 			return count;
@@ -838,7 +844,15 @@ namespace Zongsoft.Data
 
 		protected DataManyInsertingEventArgs OnManyInserting(object data, string scope)
 		{
-			var args = new DataManyInsertingEventArgs(this.Name, DataDictionary<TEntity>.GetDataDictionaries(data), scope);
+			var dictionaries = DataDictionary<TEntity>.GetDataDictionaries(data);
+			var args = new DataManyInsertingEventArgs(this.Name, dictionaries, scope);
+
+			foreach(var dictionary in dictionaries)
+			{
+				//尝试递增注册的递增键值
+				DataSequence.Increments(this, dictionary);
+			}
+
 			this.OnManyInserting(args);
 			return args;
 		}
