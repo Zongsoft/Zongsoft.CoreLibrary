@@ -476,6 +476,59 @@ namespace Zongsoft.Data
 		{
 			return this.DataAccess.Select<TEntity>(this.Name, condition, grouping, scope, paging, sortings);
 		}
+
+		#region 显式实现
+		IEnumerable IDataService.Select(ICondition condition, params Sorting[] sortings)
+		{
+			return this.Select(condition, sortings);
+		}
+
+		IEnumerable IDataService.Select(ICondition condition, string scope, params Sorting[] sortings)
+		{
+			return this.Select(condition, scope, sortings);
+		}
+
+		IEnumerable IDataService.Select(ICondition condition, string scope, Paging paging, params Sorting[] sortings)
+		{
+			return this.Select(condition, scope, paging, sortings);
+		}
+
+		IEnumerable IDataService.Select(ICondition condition, Paging paging, params Sorting[] sortings)
+		{
+			return this.Select(condition, paging, sortings);
+		}
+
+		IEnumerable IDataService.Select(ICondition condition, Paging paging, string scope, params Sorting[] sortings)
+		{
+			return this.Select(condition, paging, scope, sortings);
+		}
+
+		IEnumerable IDataService.Select(ICondition condition, Grouping grouping, params Sorting[] sortings)
+		{
+			return this.Select(condition, grouping, sortings);
+		}
+
+		IEnumerable IDataService.Select(ICondition condition, Grouping grouping, string scope, params Sorting[] sortings)
+		{
+			return this.Select(condition, grouping, scope, sortings);
+		}
+
+		IEnumerable IDataService.Select(ICondition condition, Grouping grouping, string scope, Paging paging, params Sorting[] sortings)
+		{
+			return this.Select(condition, grouping, scope, paging, sortings);
+		}
+
+		IEnumerable IDataService.Select(ICondition condition, Grouping grouping, Paging paging, params Sorting[] sortings)
+		{
+			return this.Select(condition, grouping, paging, sortings);
+		}
+
+		IEnumerable IDataService.Select(ICondition condition, Grouping grouping, Paging paging, string scope, params Sorting[] sortings)
+		{
+			return this.Select(condition, grouping, paging, scope, sortings);
+		}
+		#endregion
+
 		#endregion
 
 		#region 删除方法
