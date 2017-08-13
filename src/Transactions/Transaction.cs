@@ -191,6 +191,28 @@ namespace Zongsoft.Transactions
 		}
 		#endregion
 
+		#region 静态方法
+		public static Transaction ReadUncommitted(TransactionBehavior behavior = TransactionBehavior.Followed)
+		{
+			return new Transaction(behavior, IsolationLevel.ReadUncommitted);
+		}
+
+		public static Transaction ReadCommitted(TransactionBehavior behavior = TransactionBehavior.Followed)
+		{
+			return new Transaction(behavior, IsolationLevel.ReadCommitted);
+		}
+
+		public static Transaction RepeatableRead(TransactionBehavior behavior = TransactionBehavior.Followed)
+		{
+			return new Transaction(behavior, IsolationLevel.RepeatableRead);
+		}
+
+		public static Transaction Serializable(TransactionBehavior behavior = TransactionBehavior.Followed)
+		{
+			return new Transaction(behavior, IsolationLevel.Serializable);
+		}
+		#endregion
+
 		#region 公共方法
 		/// <summary>
 		/// 向当前事务登记一个事务处理过程的回调。
