@@ -159,12 +159,12 @@ namespace Zongsoft.Data
 		/// <param name="key">指定的键。</param>
 		/// <param name="defaultValue">指定的默认值，当键不存在则返回该参数值。</param>
 		/// <returns>返回获取的值或默认值。</returns>
-		public object Get(string key, object defaultValue)
+		public T Get<T>(string key, T defaultValue)
 		{
 			object result;
 
 			if(this.TryGet(key, out result))
-				return result;
+				return Zongsoft.Common.Convert.ConvertValue(result, defaultValue);
 
 			return defaultValue;
 		}
