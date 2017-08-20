@@ -218,20 +218,24 @@ namespace Zongsoft.Transactions
 		/// 向当前事务登记一个事务处理过程的回调。
 		/// </summary>
 		/// <param name="enlistment">指定的事务处理过程的回调接口。</param>
-		public void Enlist(IEnlistment enlistment)
+		/// <returns>如果注册成功则返回真(True)，否则返回假(False)。</returns>
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
+		public bool Enlist(IEnlistment enlistment)
 		{
 			if(enlistment == null)
 				throw new ArgumentNullException("enlistment");
 
 			//如果指定的事务处理程序已经被登记过则返回
 			if(_enlistments.Contains(enlistment))
-				return;
+				return false;
 
 			//将指定的事务处理程序加入到列表中
 			_enlistments.Enqueue(enlistment);
 
 			//通知事务处理程序进入事务准备阶段
 			//enlistment.OnEnlist(new EnlistmentContext(this, EnlistmentPhase.Prepare));
+
+			return true;
 		}
 
 		/// <summary>
