@@ -39,6 +39,8 @@ namespace Zongsoft.Data
 		private readonly object _data;
 		private readonly PropertyDescriptorCollection _properties;
 		private readonly ConcurrentDictionary<string, object> _values;
+
+		private IDictionary<string, object> _extendedProperties;
 		#endregion
 
 		#region 构造函数
@@ -126,6 +128,34 @@ namespace Zongsoft.Data
 			set
 			{
 				this.Set(key, value);
+			}
+		}
+
+		/// <summary>
+		/// 获取一个值，指示当前数据字典中是否含有扩展属性。
+		/// </summary>
+		public bool HasExtendedProperties
+		{
+			get
+			{
+				return _extendedProperties != null && _extendedProperties.Count > 0;
+			}
+		}
+
+		/// <summary>
+		/// 获取扩展属性集。
+		/// </summary>
+		/// <remarks>
+		///		<para>注：扩展属性与<see cref="Data"/>属性值（即数据字典映射的内部数据）无关。</para>
+		/// </remarks>
+		public IDictionary<string, object> ExtendedProperties
+		{
+			get
+			{
+				if(_extendedProperties == null)
+					System.Threading.Interlocked.CompareExchange(ref _extendedProperties, new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase), null);
+
+				return _extendedProperties;
 			}
 		}
 		#endregion
