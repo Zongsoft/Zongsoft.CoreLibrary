@@ -266,15 +266,15 @@ namespace Zongsoft.Transactions
 			//如果当前事务是跟随模式，并且具有父事务则当前事务不用通知投票者(订阅者)，而是交由父事务处理
 			if(_behavior == TransactionBehavior.Followed && _parent != null)
 			{
-				switch(phase)
-				{
-					case EnlistmentPhase.Abort:
-						_parent._operation = OPERATION_ABORT;
-						break;
-					case EnlistmentPhase.Rollback:
-						_parent._operation = OPERATION_ROLLBACK;
-						break;
-				}
+				//switch(phase)
+				//{
+				//	case EnlistmentPhase.Abort:
+				//		_parent._operation = OPERATION_ABORT;
+				//		break;
+				//	case EnlistmentPhase.Rollback:
+				//		_parent._operation = OPERATION_ROLLBACK;
+				//		break;
+				//}
 
 				//更新当前事务的状态
 				this.UpdateStatus(phase);
