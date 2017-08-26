@@ -526,6 +526,15 @@
     <Compile Include="Transactions\TransactionBehavior.cs" />
     <Compile Include="Transactions\TransactionInformation.cs" />
     <Compile Include="Transactions\TransactionStatus.cs" />
+    <Compile Include="Transitions\IStateDiagramProvider.cs" />
+    <Compile Include="Transitions\IStateTransfer.cs" />
+    <Compile Include="Transitions\IStateTrigger.cs" />
+    <Compile Include="Transitions\State.cs" />
+    <Compile Include="Transitions\StateDiagramBase.cs" />
+    <Compile Include="Transitions\StateDiagramProvider.cs" />
+    <Compile Include="Transitions\StateMachine.cs" />
+    <Compile Include="Transitions\StateMachineOptions.cs" />
+    <Compile Include="Transitions\StateVector.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Options\Option.option">
