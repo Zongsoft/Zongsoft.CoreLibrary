@@ -32,7 +32,7 @@ namespace Zongsoft.Transitions
 	public abstract class StateDiagramBase<T> where T : struct
 	{
 		#region 成员字段
-		private ICollection<StateVector<T>> _vectors;
+		private ISet<StateVector<T>> _vectors;
 		private ICollection<IStateTrigger<T>> _triggers;
 		private ICollection<IStateTransfer<T>> _transfers;
 		#endregion
@@ -44,12 +44,12 @@ namespace Zongsoft.Transitions
 		#endregion
 
 		#region 公共属性
-		public ICollection<StateVector<T>> Vectors
+		public ISet<StateVector<T>> Vectors
 		{
 			get
 			{
 				if(_vectors == null)
-					System.Threading.Interlocked.CompareExchange(ref _vectors, new List<StateVector<T>>(), null);
+					System.Threading.Interlocked.CompareExchange(ref _vectors, new HashSet<StateVector<T>>(), null);
 
 				return _vectors;
 			}
@@ -94,10 +94,47 @@ namespace Zongsoft.Transitions
 
 			return null;
 		}
+
+		public bool CanVectoring(T origin, T destination)
+		{
+			var vectors = _vectors;
+
+			if(vectors == null || vectors.Count == 0)
+				return false;
+
+			foreach(var vector in vectors)
+			{
+				if(vector.Origin.Equals(origin) && vector.Destination.Equals(destination))
+					return true;
+			}
+
+			return false;
+		}
+		#endregion
+
+		#region 保护方法
+		protected int Map(T origin, params T[] destinations)
+		{
+			if(destinations == null || destinations.Length == 0)
+				return 0;
+
+			var count = 0;
+
+			foreach(var destination in destinations)
+			{
+				var vector = new StateVector<T>(origin, destination);
+
+				if(this.Vectors.Add(vector))
+					count += 1;
+			}
+
+			return count;
+		}
 		#endregion
 
 		#region 抽象方法
-		internal protected abstract State<TKey, T> GetState<TKey>(TKey key) where TKey : struct;
+		internal protected abstract State<T> GetState(State<T> state);
+		internal protected abstract bool SetState(State<T> state, IDictionary<string, object> parameters = null);
 		#endregion
 	}
 }

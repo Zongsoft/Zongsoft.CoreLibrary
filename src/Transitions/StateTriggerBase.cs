@@ -25,44 +25,39 @@
  */
 
 using System;
+using System.Collections.Generic;
 
 namespace Zongsoft.Transitions
 {
-	public struct StateVector<T> where T : struct
+	public abstract class StateTriggerBase<T> : IStateTrigger<T> where T : struct
 	{
+		#region 成员字段
+		private bool _enabled;
+		#endregion
+
 		#region 构造函数
-		public StateVector(T origin, T destination)
+		protected StateTriggerBase()
 		{
-			this.Origin = origin;
-			this.Destination = destination;
+			_enabled = true;
 		}
 		#endregion
 
-		#region 公共字段
-		public readonly T Origin;
-		public readonly T Destination;
+		#region 公共属性
+		public bool Enabled
+		{
+			get
+			{
+				return _enabled;
+			}
+			set
+			{
+				_enabled = value;
+			}
+		}
 		#endregion
 
-		#region 重写方法
-		public override string ToString()
-		{
-			return this.Origin.ToString() + "->" + this.Destination.ToString();
-		}
-
-		public override bool Equals(object obj)
-		{
-			if(obj == null || obj.GetType() != this.GetType())
-				return false;
-
-			var vector = (StateVector<T>)obj;
-
-			return this.Origin.Equals(vector.Origin) && this.Destination.Equals(vector.Destination);
-		}
-
-		public override int GetHashCode()
-		{
-			return this.Origin.GetHashCode() ^ this.Destination.GetHashCode();
-		}
+		#region 抽象方法
+		public abstract void OnTrigger(StateContext<T> context);
 		#endregion
 	}
 }

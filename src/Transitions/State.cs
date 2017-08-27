@@ -28,28 +28,32 @@ using System;
 
 namespace Zongsoft.Transitions
 {
-	public struct State<TKey, TValue> where TKey : struct where TValue : struct
+	public abstract class State<T> where T : struct
 	{
+		#region 成员字段
+		private T _value;
+		private DateTime? _timestamp;
+		private string _description;
+		private StateDiagramBase<T> _diagram;
+		#endregion
+
 		#region 构造函数
-		public State(TKey key, TValue value)
+		public State(T value)
 		{
-			this.Key = key;
 			this.Value = value;
 			this.Timestamp = DateTime.Now;
 			this.Description = null;
 		}
 
-		public State(TKey key, TValue value, string description)
+		public State(T value, string description)
 		{
-			this.Key = key;
 			this.Value = value;
 			this.Timestamp = DateTime.Now;
 			this.Description = description;
 		}
 
-		public State(TKey key, TValue value, DateTime timestamp, string description)
+		public State(T value, DateTime? timestamp, string description = null)
 		{
-			this.Key = key;
 			this.Value = value;
 			this.Timestamp = timestamp;
 			this.Description = description;
@@ -57,10 +61,90 @@ namespace Zongsoft.Transitions
 		#endregion
 
 		#region 公共属性
-		public TKey Key;
-		public TValue Value;
-		public DateTime Timestamp;
-		public string Description;
+		public T Value
+		{
+			get
+			{
+				return _value;
+			}
+			set
+			{
+				_value = value;
+			}
+		}
+
+		public DateTime? Timestamp
+		{
+			get
+			{
+				return _timestamp;
+			}
+			set
+			{
+				_timestamp = value;
+			}
+		}
+
+		public string Description
+		{
+			get
+			{
+				return _description;
+			}
+			set
+			{
+				_description = string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+			}
+		}
+
+		public StateDiagramBase<T> Diagram
+		{
+			get
+			{
+				return _diagram;
+			}
+			internal set
+			{
+				_diagram = value;
+			}
+		}
+		#endregion
+
+		#region 重写方法
+		public override string ToString()
+		{
+			if(string.IsNullOrWhiteSpace(_description))
+			{
+				if(_timestamp.HasValue)
+					return string.Format("{0}@{1}", _value.ToString(), _timestamp.ToString());
+				else
+					return _value.ToString();
+			}
+			else
+			{
+				if(_timestamp.HasValue)
+					return string.Format("{0}@{1} \"{2}\"", _value.ToString(), _timestamp.ToString(), _description);
+				else
+					return string.Format("{0} \"{1}\"", _value.ToString(), _description);
+			}
+		}
+
+		public override bool Equals(object obj)
+		{
+			if(obj.GetType() != this.GetType())
+				return false;
+
+			return _value.Equals(((State<T>)obj).Value);
+		}
+
+		public override int GetHashCode()
+		{
+			return _value.GetHashCode();
+		}
+		#endregion
+
+		#region 抽象方法
+		internal protected abstract bool Match(State<T> state);
 		#endregion
 	}
 }

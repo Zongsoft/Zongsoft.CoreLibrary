@@ -530,10 +530,13 @@
     <Compile Include="Transitions\IStateTransfer.cs" />
     <Compile Include="Transitions\IStateTrigger.cs" />
     <Compile Include="Transitions\State.cs" />
+    <Compile Include="Transitions\StateContext.cs" />
     <Compile Include="Transitions\StateDiagramBase.cs" />
     <Compile Include="Transitions\StateDiagramProvider.cs" />
     <Compile Include="Transitions\StateMachine.cs" />
     <Compile Include="Transitions\StateMachineOptions.cs" />
+    <Compile Include="Transitions\StateTriggerBase.cs" />
+    <Compile Include="Transitions\StateTransferBase.cs" />
     <Compile Include="Transitions\StateVector.cs" />
   </ItemGroup>
   <ItemGroup>

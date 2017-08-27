@@ -25,43 +25,67 @@
  */
 
 using System;
+using System.Collections.Generic;
 
 namespace Zongsoft.Transitions
 {
-	public struct StateVector<T> where T : struct
+	public class StateContext<T> where T : struct
 	{
+		#region 成员字段
+		private StateMachine _machine;
+		private State<T> _state;
+		private IDictionary<string, object> _parameters;
+		#endregion
+
 		#region 构造函数
-		public StateVector(T origin, T destination)
+		public StateContext(StateMachine machine, State<T> state, IDictionary<string, object> parameters = null)
 		{
-			this.Origin = origin;
-			this.Destination = destination;
+			if(machine == null)
+				throw new ArgumentNullException(nameof(machine));
+
+			if(state == null)
+				throw new ArgumentNullException(nameof(state));
+
+			_machine = machine;
+			_state = state;
+			_parameters = parameters;
 		}
 		#endregion
 
-		#region 公共字段
-		public readonly T Origin;
-		public readonly T Destination;
-		#endregion
-
-		#region 重写方法
-		public override string ToString()
+		#region 公共属性
+		public StateMachine Machine
 		{
-			return this.Origin.ToString() + "->" + this.Destination.ToString();
+			get
+			{
+				return _machine;
+			}
 		}
 
-		public override bool Equals(object obj)
+		public State<T> State
 		{
-			if(obj == null || obj.GetType() != this.GetType())
-				return false;
-
-			var vector = (StateVector<T>)obj;
-
-			return this.Origin.Equals(vector.Origin) && this.Destination.Equals(vector.Destination);
+			get
+			{
+				return _state;
+			}
 		}
 
-		public override int GetHashCode()
+		public bool HasParameters
 		{
-			return this.Origin.GetHashCode() ^ this.Destination.GetHashCode();
+			get
+			{
+				return _parameters != null && _parameters.Count > 0;
+			}
+		}
+
+		public IDictionary<string, object> Parameters
+		{
+			get
+			{
+				if(_parameters == null)
+					System.Threading.Interlocked.CompareExchange(ref _parameters, new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase), null);
+
+				return _parameters;
+			}
 		}
 		#endregion
 	}

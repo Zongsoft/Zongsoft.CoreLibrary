@@ -35,6 +35,6 @@ namespace Zongsoft.Transitions
 			get;
 		}
 
-		void OnTrigger(StateVector<T> vector);
+		void OnTrigger(StateContext<T> context);
 	}
 }

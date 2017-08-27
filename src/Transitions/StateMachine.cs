@@ -36,16 +36,13 @@ namespace Zongsoft.Transitions
 		#endregion
 
 		#region 私有变量
-		private readonly object _syncRoot;
-
-		private int _initialized;
-		private Stack<object> _stack;
+		private readonly Stack<object> _stack;
 		#endregion
 
 		#region 构造函数
 		public StateMachine()
 		{
-			_syncRoot = new object();
+			_stack = new Stack<object>();
 		}
 		#endregion
 
@@ -56,7 +53,7 @@ namespace Zongsoft.Transitions
 			{
 				if(_diagrams == null)
 				{
-					lock(_syncRoot)
+					lock(_stack)
 					{
 						if(_diagrams == null)
 							_diagrams = this.CreateDiagrams();
@@ -69,17 +66,55 @@ namespace Zongsoft.Transitions
 		#endregion
 
 		#region 公共方法
-		public StateMachine Run<TKey, TValue>(State<TKey, TValue> destination, StateMachineOptions options = null) where TKey : struct where TValue : struct
+		public StateMachine Run<T>(State<T> destination, IDictionary<string, object> parameters = null) where T : struct
 		{
-			//确认运行参数设置
-			if(options == null)
-				options = StateMachineOptions.Default;
-
-			//首先初始化运行环境
-			this.Initialize();
+			if(destination == null)
+				throw new ArgumentNullException(nameof(destination));
 
 			//获取指定状态实例的当前状态
-			var initialState = this.GetState<TKey, TValue>(destination.Key);
+			var current = this.GetState(destination, out var isTransfered);
+
+			//如果指定状态实例已经被处理过，则不能再次转换
+			if(isTransfered)
+				return this;
+
+			//获取指定状态实例所属的状态图
+			var diagram = this.GetDiagram<T>();
+
+			//设置目标状态实例所属的状态图
+			destination.Diagram = diagram;
+
+			//如果流程图未定义当前的流转向量，则退出或抛出异常
+			if(!diagram.CanVectoring(current.Value, destination.Value))
+			{
+				//如果流转栈为空，则表示首次操作即抛出异常
+				if(_stack == null || _stack.Count == 0)
+					throw new InvalidOperationException("Not supported state transfer.");
+
+				//退出方法
+				return this;
+			}
+
+			var context = new StateContext<T>(this, destination, parameters);
+
+			//遍历状态图中的转换器，依次进行状态转换处理
+			foreach(var transfer in diagram.Transfers)
+			{
+				//调用状态转换器进行状态转换
+				if(transfer.CanTransfer(context) && transfer.Transfer(context))
+				{
+					//将转换成功的状态压入状态栈
+					_stack.Push(destination);
+
+					//遍历状态图中的所有触发器
+					foreach(var trigger in diagram.Triggers)
+					{
+						//如果触发器可用，则激发触发器
+						if(trigger.Enabled)
+							trigger.OnTrigger(context);
+					}
+				}
+			}
 
 			//始终返回当前状态机
 			return this;
@@ -91,30 +126,9 @@ namespace Zongsoft.Transitions
 		{
 			return StateDiagramProvider.Default;
 		}
-
-		protected virtual State<TKey, TValue> GetState<TKey, TValue>(TKey key) where TKey : struct where TValue : struct
-		{
-			if(_stack != null)
-			{
-			}
-
-			return this.GetDiagram<TValue>().GetState(key);
-		}
 		#endregion
 
 		#region 私有方法
-		private bool Initialize()
-		{
-			//如果已经初始化过，则返回失败
-			if(System.Threading.Interlocked.CompareExchange(ref _initialized, 1, 0) != 0)
-				return false;
-
-			_stack = new Stack<object>();
-
-			//返回初始化成功
-			return true;
-		}
-
 		private StateDiagramBase<T> GetDiagram<T>() where T : struct
 		{
 			var diagrams = this.Diagrams;
@@ -125,9 +139,27 @@ namespace Zongsoft.Transitions
 			var diagram = diagrams.GetDiagram<T>();
 
 			if(diagram == null)
-				throw new InvalidOperationException(string.Format("Not found the state diagram of '{0}' type.", typeof(T).FullName));
+				throw new InvalidOperationException(string.Format("Not found the state diagram with '{0}' type.", typeof(T).FullName));
 
 			return diagram;
+		}
+
+		private State<T> GetState<T>(State<T> state, out bool isTransfered) where T : struct
+		{
+			isTransfered = false;
+
+			if(_stack != null)
+			{
+				foreach(var frame in _stack)
+				{
+					isTransfered = frame.GetType() == typeof(State<T>) && ((State<T>)frame).Match(state);
+
+					if(isTransfered)
+						return (State<T>)frame;
+				}
+			}
+
+			return this.GetDiagram<T>().GetState(state);
 		}
 		#endregion
 	}

@@ -35,7 +35,7 @@ namespace Zongsoft.Transitions
 			get;
 		}
 
-		bool CanTransfer(StateVector<T> vector);
-		bool Transfer(StateVector<T> vector);
+		bool CanTransfer(StateContext<T> context);
+		bool Transfer(StateContext<T> context);
 	}
 }
