@@ -29,63 +29,41 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Transitions
 {
-	public class StateContext<T> where T : struct
+	public class StateContext<TState> : StateContextBase where TState : State
 	{
-		#region 成员字段
-		private StateMachine _machine;
-		private State<T> _state;
-		private IDictionary<string, object> _parameters;
-		#endregion
-
 		#region 构造函数
-		public StateContext(StateMachine machine, State<T> state, IDictionary<string, object> parameters = null)
+		public StateContext(StateMachine machine, bool isFirst, TState origin, TState destination, StateMachineOptions options, IDictionary<string, object> parameters = null) : base(machine, isFirst, origin, destination, options, parameters)
 		{
-			if(machine == null)
-				throw new ArgumentNullException(nameof(machine));
-
-			if(state == null)
-				throw new ArgumentNullException(nameof(state));
-
-			_machine = machine;
-			_state = state;
-			_parameters = parameters;
 		}
 		#endregion
 
 		#region 公共属性
-		public StateMachine Machine
+		public TState Origin
 		{
 			get
 			{
-				return _machine;
+				return (TState)base.InnerOrigin;
 			}
 		}
 
-		public State<T> State
+		public TState Destination
 		{
 			get
 			{
-				return _state;
+				return (TState)base.InnerDestination;
 			}
 		}
+		#endregion
 
-		public bool HasParameters
+		#region 公共方法
+		public TDiagram GetDiagram<TDiagram>() where TDiagram : StateDiagramBase<TState>
 		{
-			get
-			{
-				return _parameters != null && _parameters.Count > 0;
-			}
+			return this.Destination.Diagram as TDiagram;
 		}
 
-		public IDictionary<string, object> Parameters
+		public void OnStop(Action<StateContext<TState>, StateStopReason> thunk)
 		{
-			get
-			{
-				if(_parameters == null)
-					System.Threading.Interlocked.CompareExchange(ref _parameters, new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase), null);
-
-				return _parameters;
-			}
+			this.OnStopInner = thunk;
 		}
 		#endregion
 	}

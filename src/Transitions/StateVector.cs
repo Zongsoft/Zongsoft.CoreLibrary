@@ -28,6 +28,7 @@ using System;
 
 namespace Zongsoft.Transitions
 {
+	[Obsolete]
 	public struct StateVector<T> where T : struct
 	{
 		#region 构造函数

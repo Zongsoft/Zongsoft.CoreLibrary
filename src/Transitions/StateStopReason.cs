@@ -25,58 +25,19 @@
  */
 
 using System;
-using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Zongsoft.Transitions
 {
-	public class StateDiagramProvider : IStateDiagramProvider
+	public enum StateStopReason : byte
 	{
-		#region 单例字段
-		public static readonly StateDiagramProvider Default = new StateDiagramProvider();
-		#endregion
+		/// <summary>正常终止</summary>
+		Normal,
 
-		#region 成员字段
-		private Zongsoft.Services.IServiceProvider _serviceProvider;
-		#endregion
+		/// <summary>手动终止</summary>
+		Abortion,
 
-		#region 构造函数
-		public StateDiagramProvider()
-		{
-		}
-
-		public StateDiagramProvider(Zongsoft.Services.IServiceProvider serviceProvider)
-		{
-			if(serviceProvider == null)
-				throw new ArgumentNullException(nameof(serviceProvider));
-
-			_serviceProvider = serviceProvider;
-		}
-		#endregion
-
-		#region 公共属性
-		public Zongsoft.Services.IServiceProvider ServiceProvider
-		{
-			get
-			{
-				return _serviceProvider;
-			}
-			set
-			{
-				_serviceProvider = value;
-			}
-		}
-		#endregion
-
-		#region 公共方法
-		public StateDiagramBase<T> GetDiagram<T>() where T : struct
-		{
-			var serviceProvider = _serviceProvider ?? Zongsoft.Services.ServiceProviderFactory.Instance.Default;
-
-			if(serviceProvider == null)
-				return null;
-
-			return serviceProvider.Resolve<StateDiagramBase<T>>();
-		}
-		#endregion
+		/// <summary>超时终止</summary>
+		Expired,
 	}
 }

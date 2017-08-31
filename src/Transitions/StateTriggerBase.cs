@@ -29,7 +29,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Transitions
 {
-	public abstract class StateTriggerBase<T> : IStateTrigger<T> where T : struct
+	public abstract class StateTriggerBase<TState> : IStateTrigger where TState : State
 	{
 		#region 成员字段
 		private bool _enabled;
@@ -56,8 +56,15 @@ namespace Zongsoft.Transitions
 		}
 		#endregion
 
+		#region 显式实现
+		void IStateTrigger.OnTrigger(StateContextBase context)
+		{
+			this.OnTrigger(context as StateContext<TState>);
+		}
+		#endregion
+
 		#region 抽象方法
-		public abstract void OnTrigger(StateContext<T> context);
+		public abstract void OnTrigger(StateContext<TState> context);
 		#endregion
 	}
 }

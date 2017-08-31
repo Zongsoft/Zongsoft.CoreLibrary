@@ -29,85 +29,110 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Transitions
 {
-	public class StateMachine
+	public class StateMachine : IDisposable
 	{
+		#region 事件声明
+		public event EventHandler<StateStepEventArgs> Stepping;
+		public event EventHandler<StateStepEventArgs> Stepped;
+		public event EventHandler<StateStopEventArgs> Stopping;
+		public event EventHandler<StateStopEventArgs> Stopped;
+		#endregion
+
 		#region 成员字段
-		private IStateDiagramProvider _diagrams;
+		private StateMachineOptions _options;
 		#endregion
 
 		#region 私有变量
-		private readonly Stack<object> _stack;
+		private int _isDisposed = 0;
+		private int _isAborted = 0;
+		private Stack<StateContextBase> _stack;
 		#endregion
 
 		#region 构造函数
 		public StateMachine()
 		{
-			_stack = new Stack<object>();
+			_options = new StateMachineOptions();
+		}
+
+		public StateMachine(StateMachineOptions options)
+		{
+			_options = options ?? new StateMachineOptions();
 		}
 		#endregion
 
 		#region 公共属性
-		public IStateDiagramProvider Diagrams
+		public StateMachineOptions Options
 		{
 			get
 			{
-				if(_diagrams == null)
-				{
-					lock(_stack)
-					{
-						if(_diagrams == null)
-							_diagrams = this.CreateDiagrams();
-					}
-				}
+				return _options;
+			}
+			set
+			{
+				if(value == null)
+					throw new ArgumentNullException();
 
-				return _diagrams;
+				_options = value;
 			}
 		}
 		#endregion
 
 		#region 公共方法
-		public StateMachine Run<T>(State<T> destination, IDictionary<string, object> parameters = null) where T : struct
+		public void Abort()
 		{
+			//确认是否当前对象是否已被释放
+			this.EnsureDisposed();
+
+			//设置终止标记
+			_isAborted = 1;
+
+			var transaction = Zongsoft.Transactions.Transaction.Current;
+
+			if(transaction != null)
+				transaction.Rollback();
+		}
+
+		public StateMachine Run<TState>(TState destination, IDictionary<string, object> parameters = null) where TState : State
+		{
+			return this.Run(destination, _options, parameters);
+		}
+
+		public StateMachine Run<TState>(TState destination, StateMachineOptions options, IDictionary<string, object> parameters = null) where TState : State
+		{
+			//确认是否当前对象是否已被释放
+			this.EnsureDisposed();
+
+			//如果当前状态机已经被终止则返回
+			if(_isAborted != 0)
+				return this;
+
+			//参数有效性检测
 			if(destination == null)
 				throw new ArgumentNullException(nameof(destination));
 
-			//获取指定状态实例的当前状态
-			var current = this.GetState(destination, out var isTransfered);
+			//根据参数获取上下文对象
+			var context = this.GetContext(destination, options ?? _options, parameters);
 
-			//如果指定状态实例已经被处理过，则不能再次转换
-			if(isTransfered)
+			//上下文获取失败则返回
+			if(context == null)
 				return this;
 
-			//获取指定状态实例所属的状态图
-			var diagram = this.GetDiagram<T>();
-
-			//设置目标状态实例所属的状态图
-			destination.Diagram = diagram;
-
-			//如果流程图未定义当前的流转向量，则退出或抛出异常
-			if(!diagram.CanVectoring(current.Value, destination.Value))
-			{
-				//如果流转栈为空，则表示首次操作即抛出异常
-				if(_stack == null || _stack.Count == 0)
-					throw new InvalidOperationException("Not supported state transfer.");
-
-				//退出方法
-				return this;
-			}
-
-			var context = new StateContext<T>(this, destination, parameters);
+			//激发“Stepping”事件
+			this.OnStepping(new StateStepEventArgs(context));
 
 			//遍历状态图中的转换器，依次进行状态转换处理
-			foreach(var transfer in diagram.Transfers)
+			foreach(var transfer in destination.Diagram.Transfers)
 			{
-				//调用状态转换器进行状态转换
-				if(transfer.CanTransfer(context) && transfer.Transfer(context))
+				if(transfer.CanTransfer(context))
 				{
+					//调用状态转换器进行状态转换
+					transfer.Transfer(context);
+
 					//将转换成功的状态压入状态栈
-					_stack.Push(destination);
+					_stack.Push(context);
 
 					//遍历状态图中的所有触发器
-					foreach(var trigger in diagram.Triggers)
+					foreach(var trigger in destination.Diagram.Triggers)
 					{
 						//如果触发器可用，则激发触发器
 						if(trigger.Enabled)
@@ -116,35 +141,89 @@ namespace Zongsoft.Transitions
 				}
 			}
 
+			//激发“Stepped”事件
+			this.OnStepped(new StateStepEventArgs(context));
+
 			//始终返回当前状态机
 			return this;
 		}
 		#endregion
 
-		#region 虚拟方法
-		protected virtual IStateDiagramProvider CreateDiagrams()
+		#region 激发事件
+		protected void OnStop()
 		{
-			return StateDiagramProvider.Default;
+			var stack = _stack;
+
+			if(stack == null || stack.Count == 0)
+				return;
+
+			var reason = _isAborted != 0 ? StateStopReason.Abortion : StateStopReason.Normal;
+
+			//激发“Stopping”事件
+			this.OnStopping(new StateStopEventArgs(reason));
+
+			foreach(var frame in stack)
+			{
+				IDictionary<string, object> parameters = null;
+
+				if(frame.HasParameters)
+					parameters = frame.Parameters;
+
+				frame.InnerDestination.Diagram.SetState(frame.InnerDestination, parameters);
+
+				if(frame.OnStopInner != null)
+				{
+					frame.OnStopInner.DynamicInvoke(frame, reason);
+				}
+			}
+
+			if(reason == StateStopReason.Normal)
+			{
+				var transaction = Zongsoft.Transactions.Transaction.Current;
+
+				if(transaction != null)
+					transaction.Commit();
+			}
+
+			//激发“Stopped”事件
+			this.OnStopped(new StateStopEventArgs(reason));
+		}
+
+		protected virtual void OnStepping(StateStepEventArgs args)
+		{
+			var e = this.Stepping;
+
+			if(e != null)
+				e.Invoke(this, args);
+		}
+
+		protected virtual void OnStepped(StateStepEventArgs args)
+		{
+			var e = this.Stepped;
+
+			if(e != null)
+				e.Invoke(this, args);
+		}
+
+		protected virtual void OnStopping(StateStopEventArgs args)
+		{
+			var e = this.Stopping;
+
+			if(e != null)
+				e.Invoke(this, args);
+		}
+
+		protected virtual void OnStopped(StateStopEventArgs args)
+		{
+			var e = this.Stopped;
+
+			if(e != null)
+				e.Invoke(this, args);
 		}
 		#endregion
 
 		#region 私有方法
-		private StateDiagramBase<T> GetDiagram<T>() where T : struct
-		{
-			var diagrams = this.Diagrams;
-
-			if(diagrams == null)
-				throw new InvalidOperationException("Missing the state didgram provider.");
-
-			var diagram = diagrams.GetDiagram<T>();
-
-			if(diagram == null)
-				throw new InvalidOperationException(string.Format("Not found the state diagram with '{0}' type.", typeof(T).FullName));
-
-			return diagram;
-		}
-
-		private State<T> GetState<T>(State<T> state, out bool isTransfered) where T : struct
+		private State GetState(State state, out bool isTransfered)
 		{
 			isTransfered = false;
 
@@ -152,14 +231,74 @@ namespace Zongsoft.Transitions
 			{
 				foreach(var frame in _stack)
 				{
-					isTransfered = frame.GetType() == typeof(State<T>) && ((State<T>)frame).Match(state);
+					isTransfered = frame.InnerDestination.GetType() == state.GetType() && frame.InnerDestination.Match(state);
 
 					if(isTransfered)
-						return (State<T>)frame;
+						return frame.InnerDestination;
 				}
 			}
 
-			return this.GetDiagram<T>().GetState(state);
+			return state.Diagram.GetState(state);
+		}
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
+		private StateContextBase GetContext(State destination, StateMachineOptions options, IDictionary<string, object> parameters)
+		{
+			var isFirstStep = _stack == null;
+
+			if(isFirstStep)
+				_stack = new Stack<StateContextBase>();
+
+			//获取指定状态实例的当前状态
+			var origin = this.GetState(destination, out var isTransfered);
+
+			//如果指定状态实例已经被处理过，则不能再次转换
+			if(isTransfered)
+				return null;
+
+			//如果流程图未定义当前的流转向量，则退出或抛出异常
+			if(!destination.Diagram.CanVectoring(origin, destination))
+			{
+				//如果是首次操作则抛出异常
+				if(isFirstStep)
+					throw new InvalidOperationException("Not supported state transfer.");
+
+				//退出方法
+				return null;
+			}
+
+			var contextType = typeof(StateContext<>).MakeGenericType(destination.GetType());
+			return (StateContextBase)Activator.CreateInstance(contextType, new object[] { this, isFirstStep, origin, destination, options, parameters });
+		}
+		#endregion
+
+		#region 处置方法
+		private void EnsureDisposed()
+		{
+			if(_isDisposed != 0)
+				throw new ObjectDisposedException(this.GetType().Name);
+		}
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if(System.Threading.Interlocked.CompareExchange(ref _isDisposed, 1, 0) == 0)
+				return;
+
+			if(disposing)
+			{
+				//激发完成事件
+				this.OnStop();
+
+				if(_stack != null)
+					_stack.Clear();
+			}
+
+			_stack = null;
+		}
+
+		void IDisposable.Dispose()
+		{
+			this.Dispose(true);
 		}
 		#endregion
 	}

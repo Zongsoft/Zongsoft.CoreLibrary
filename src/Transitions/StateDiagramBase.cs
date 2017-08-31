@@ -29,12 +29,11 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Transitions
 {
-	public abstract class StateDiagramBase<T> where T : struct
+	public abstract class StateDiagramBase<TState> : IStateDiagram where TState : State
 	{
 		#region 成员字段
-		private ISet<StateVector<T>> _vectors;
-		private ICollection<IStateTrigger<T>> _triggers;
-		private ICollection<IStateTransfer<T>> _transfers;
+		private ICollection<IStateTrigger> _triggers;
+		private ICollection<IStateTransfer> _transfers;
 		#endregion
 
 		#region 构造函数
@@ -44,97 +43,51 @@ namespace Zongsoft.Transitions
 		#endregion
 
 		#region 公共属性
-		public ISet<StateVector<T>> Vectors
-		{
-			get
-			{
-				if(_vectors == null)
-					System.Threading.Interlocked.CompareExchange(ref _vectors, new HashSet<StateVector<T>>(), null);
-
-				return _vectors;
-			}
-		}
-
-		public ICollection<IStateTrigger<T>> Triggers
+		public ICollection<IStateTrigger> Triggers
 		{
 			get
 			{
 				if(_triggers == null)
-					System.Threading.Interlocked.CompareExchange(ref _triggers, new List<IStateTrigger<T>>(), null);
+					System.Threading.Interlocked.CompareExchange(ref _triggers, new List<IStateTrigger>(), null);
 
 				return _triggers;
 			}
 		}
 
-		public ICollection<IStateTransfer<T>> Transfers
+		public ICollection<IStateTransfer> Transfers
 		{
 			get
 			{
 				if(_transfers == null)
-					System.Threading.Interlocked.CompareExchange(ref _transfers, new List<IStateTransfer<T>>(), null);
+					System.Threading.Interlocked.CompareExchange(ref _transfers, new List<IStateTransfer>(), null);
 
 				return _transfers;
 			}
 		}
 		#endregion
 
-		#region 公共方法
-		public StateVector<T>? GetVector(T origin, T destination)
+		#region 显式实现
+		bool IStateDiagram.CanVectoring(State origin, State destination)
 		{
-			var vectors = _vectors;
-
-			if(vectors == null || vectors.Count == 0)
-				return null;
-
-			foreach(var vector in vectors)
-			{
-				if(vector.Origin.Equals(origin) && vector.Destination.Equals(destination))
-					return vector;
-			}
-
-			return null;
+			return this.CanVectoring(origin as TState, destination as TState);
 		}
 
-		public bool CanVectoring(T origin, T destination)
+		State IStateDiagram.GetState(State state)
 		{
-			var vectors = _vectors;
-
-			if(vectors == null || vectors.Count == 0)
-				return false;
-
-			foreach(var vector in vectors)
-			{
-				if(vector.Origin.Equals(origin) && vector.Destination.Equals(destination))
-					return true;
-			}
-
-			return false;
+			return this.GetState(state as TState);
 		}
-		#endregion
 
-		#region 保护方法
-		protected int Map(T origin, params T[] destinations)
+		bool IStateDiagram.SetState(State state, IDictionary<string, object> parameters)
 		{
-			if(destinations == null || destinations.Length == 0)
-				return 0;
-
-			var count = 0;
-
-			foreach(var destination in destinations)
-			{
-				var vector = new StateVector<T>(origin, destination);
-
-				if(this.Vectors.Add(vector))
-					count += 1;
-			}
-
-			return count;
+			return this.SetState(state as TState, parameters);
 		}
 		#endregion
 
 		#region 抽象方法
-		internal protected abstract State<T> GetState(State<T> state);
-		internal protected abstract bool SetState(State<T> state, IDictionary<string, object> parameters = null);
+		protected abstract bool CanVectoring(TState origin, TState destination);
+
+		protected abstract TState GetState(TState state);
+		protected abstract bool SetState(TState state, IDictionary<string, object> parameters);
 		#endregion
 	}
 }

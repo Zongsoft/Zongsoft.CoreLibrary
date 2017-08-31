@@ -28,13 +28,13 @@ using System;
 
 namespace Zongsoft.Transitions
 {
-	public interface IStateTrigger<T> where T : struct
+	public interface IStateTrigger
 	{
 		bool Enabled
 		{
 			get;
 		}
 
-		void OnTrigger(StateContext<T> context);
+		void OnTrigger(StateContextBase context);
 	}
 }

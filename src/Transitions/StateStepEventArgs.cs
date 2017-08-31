@@ -29,60 +29,27 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Transitions
 {
-	public abstract class StateTransferBase<TState> : IStateTransfer where TState : State
+	public class StateStepEventArgs : EventArgs
 	{
 		#region 成员字段
-		private bool _enabled;
+		private StateContextBase _context;
 		#endregion
 
 		#region 构造函数
-		protected StateTransferBase()
+		public StateStepEventArgs(StateContextBase context)
 		{
-			_enabled = true;
+			_context = context;
 		}
 		#endregion
 
 		#region 公共属性
-		public bool Enabled
+		public StateContextBase Context
 		{
 			get
 			{
-				return _enabled;
-			}
-			set
-			{
-				_enabled = value;
+				return _context;
 			}
 		}
-		#endregion
-
-		#region 公共方法
-		public virtual bool CanTransfer(StateContext<TState> context)
-		{
-			return this.Enabled && context != null && (!context.Origin.Equals(context.Destination));
-		}
-
-		public virtual void Transfer(StateContext<TState> context)
-		{
-			if(this.CanTransfer(context))
-				this.OnTransfer(context);
-		}
-		#endregion
-
-		#region 显式实现
-		bool IStateTransfer.CanTransfer(StateContextBase context)
-		{
-			return this.CanTransfer(context as StateContext<TState>);
-		}
-
-		void IStateTransfer.Transfer(StateContextBase context)
-		{
-			this.Transfer(context as StateContext<TState>);
-		}
-		#endregion
-
-		#region 抽象方法
-		protected abstract void OnTransfer(StateContext<TState> context);
 		#endregion
 	}
 }

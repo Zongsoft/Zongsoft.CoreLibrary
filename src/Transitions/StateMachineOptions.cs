@@ -34,19 +34,25 @@ namespace Zongsoft.Transitions
 	/// </summary>
 	public class StateMachineOptions
 	{
-		#region 单例字段
-		public static readonly StateMachineOptions Default = new StateMachineOptions();
-		#endregion
-
 		#region 构造函数
 		public StateMachineOptions()
 		{
+			this.AssociateTransactionEnabled = true;
 			this.OverwriteDestinationStateEnabled = false;
 			this.OverwriteIntermediateStateEnabled = true;
 		}
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 是否关联上下文事务。
+		/// </summary>
+		public bool AssociateTransactionEnabled
+		{
+			get;
+			set;
+		}
+
 		/// <summary>
 		/// 是否允许覆盖前趋状态机的目标状态。
 		/// </summary>

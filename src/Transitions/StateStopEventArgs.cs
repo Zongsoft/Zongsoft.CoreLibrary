@@ -25,11 +25,38 @@
  */
 
 using System;
+using System.Collections.Generic;
 
 namespace Zongsoft.Transitions
 {
-	public interface IStateDiagramProvider
+	public class StateStopEventArgs : EventArgs
 	{
-		StateDiagramBase<T> GetDiagram<T>() where T : struct;
+		#region 成员字段
+		private StateStopReason _reason;
+		#endregion
+
+		#region 构造函数
+		public StateStopEventArgs(StateStopReason reason)
+		{
+			_reason = reason;
+		}
+		#endregion
+
+		#region 公共属性
+		public StateStopReason Reason
+		{
+			get
+			{
+				return _reason;
+			}
+		}
+		#endregion
+
+		#region 重写方法
+		public override string ToString()
+		{
+			return _reason.ToString();
+		}
+		#endregion
 	}
 }

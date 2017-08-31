@@ -28,48 +28,59 @@ using System;
 
 namespace Zongsoft.Transitions
 {
-	public abstract class State<T> where T : struct
+	public abstract class State
 	{
 		#region 成员字段
-		private T _value;
 		private DateTime? _timestamp;
 		private string _description;
-		private StateDiagramBase<T> _diagram;
+		private IStateDiagram _diagram;
 		#endregion
 
 		#region 构造函数
-		public State(T value)
+		protected State(IStateDiagram diagram)
 		{
-			this.Value = value;
-			this.Timestamp = DateTime.Now;
-			this.Description = null;
+			if(diagram == null)
+				throw new ArgumentNullException(nameof(diagram));
+
+			_diagram = diagram;
+			_timestamp = DateTime.Now;
+			_description = null;
 		}
 
-		public State(T value, string description)
+		protected State(IStateDiagram diagram, string description)
 		{
-			this.Value = value;
-			this.Timestamp = DateTime.Now;
-			this.Description = description;
+			if(diagram == null)
+				throw new ArgumentNullException(nameof(diagram));
+
+			_diagram = diagram;
+			_timestamp = DateTime.Now;
+			_description = description;
 		}
 
-		public State(T value, DateTime? timestamp, string description = null)
+		protected State(IStateDiagram diagram, DateTime? timestamp, string description = null)
 		{
-			this.Value = value;
-			this.Timestamp = timestamp;
-			this.Description = description;
+			if(diagram == null)
+				throw new ArgumentNullException(nameof(diagram));
+
+			_diagram = diagram;
+			_timestamp = timestamp;
+			_description = description;
 		}
 		#endregion
 
 		#region 公共属性
-		public T Value
+		public IStateDiagram Diagram
 		{
 			get
 			{
-				return _value;
+				return _diagram;
 			}
-			set
+			protected set
 			{
-				_value = value;
+				if(value == null)
+					throw new ArgumentNullException();
+
+				_diagram = value;
 			}
 		}
 
@@ -96,55 +107,10 @@ namespace Zongsoft.Transitions
 				_description = string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 			}
 		}
-
-		public StateDiagramBase<T> Diagram
-		{
-			get
-			{
-				return _diagram;
-			}
-			internal set
-			{
-				_diagram = value;
-			}
-		}
 		#endregion
 
-		#region 重写方法
-		public override string ToString()
-		{
-			if(string.IsNullOrWhiteSpace(_description))
-			{
-				if(_timestamp.HasValue)
-					return string.Format("{0}@{1}", _value.ToString(), _timestamp.ToString());
-				else
-					return _value.ToString();
-			}
-			else
-			{
-				if(_timestamp.HasValue)
-					return string.Format("{0}@{1} \"{2}\"", _value.ToString(), _timestamp.ToString(), _description);
-				else
-					return string.Format("{0} \"{1}\"", _value.ToString(), _description);
-			}
-		}
-
-		public override bool Equals(object obj)
-		{
-			if(obj.GetType() != this.GetType())
-				return false;
-
-			return _value.Equals(((State<T>)obj).Value);
-		}
-
-		public override int GetHashCode()
-		{
-			return _value.GetHashCode();
-		}
-		#endregion
-
-		#region 抽象方法
-		internal protected abstract bool Match(State<T> state);
+		#region 抽象成员
+		internal protected abstract bool Match(State state);
 		#endregion
 	}
 }

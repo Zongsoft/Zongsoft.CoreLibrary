@@ -28,14 +28,14 @@ using System;
 
 namespace Zongsoft.Transitions
 {
-	public interface IStateTransfer<T> where T : struct
+	public interface IStateTransfer
 	{
 		bool Enabled
 		{
 			get;
 		}
 
-		bool CanTransfer(StateContext<T> context);
-		bool Transfer(StateContext<T> context);
+		bool CanTransfer(StateContextBase context);
+		void Transfer(StateContextBase context);
 	}
 }
