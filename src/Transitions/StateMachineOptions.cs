@@ -37,7 +37,8 @@ namespace Zongsoft.Transitions
 		#region 构造函数
 		public StateMachineOptions()
 		{
-			this.AssociateTransactionEnabled = true;
+			this.AffiliateTransactionEnabled = true;
+
 			this.OverwriteDestinationStateEnabled = false;
 			this.OverwriteIntermediateStateEnabled = true;
 		}
@@ -45,9 +46,12 @@ namespace Zongsoft.Transitions
 
 		#region 公共属性
 		/// <summary>
-		/// 是否关联上下文事务。
+		/// 是否关联上下文事务，默认值为真。
 		/// </summary>
-		public bool AssociateTransactionEnabled
+		/// <remarks>
+		///		<para>启用该特性表示当状态机即将完成时会自动创建或关联到上下文事务，并在完成所有状态点的更新后提交当前上下文事务。</para>
+		/// </remarks>
+		public bool AffiliateTransactionEnabled
 		{
 			get;
 			set;

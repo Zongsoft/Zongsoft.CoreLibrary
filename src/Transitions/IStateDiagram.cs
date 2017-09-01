@@ -35,12 +35,9 @@ namespace Zongsoft.Transitions
 		{
 			get;
 		}
-		ICollection<IStateTransfer> Transfers
-		{
-			get;
-		}
 
 		bool CanVectoring(State origin, State destination);
+		bool Transfer(StateContextBase context);
 
 		State GetState(State state);
 		bool SetState(State state, IDictionary<string, object> parameters);

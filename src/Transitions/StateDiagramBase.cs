@@ -33,12 +33,12 @@ namespace Zongsoft.Transitions
 	{
 		#region 成员字段
 		private ICollection<IStateTrigger> _triggers;
-		private ICollection<IStateTransfer> _transfers;
 		#endregion
 
 		#region 构造函数
 		protected StateDiagramBase()
 		{
+			_triggers = new List<IStateTrigger>();
 		}
 		#endregion
 
@@ -47,22 +47,15 @@ namespace Zongsoft.Transitions
 		{
 			get
 			{
-				if(_triggers == null)
-					System.Threading.Interlocked.CompareExchange(ref _triggers, new List<IStateTrigger>(), null);
-
 				return _triggers;
 			}
 		}
+		#endregion
 
-		public ICollection<IStateTransfer> Transfers
+		#region 公共方法
+		public bool Transfer(StateContextBase context)
 		{
-			get
-			{
-				if(_transfers == null)
-					System.Threading.Interlocked.CompareExchange(ref _transfers, new List<IStateTransfer>(), null);
-
-				return _transfers;
-			}
+			return this.OnTransfer(context as StateContext<TState>);
 		}
 		#endregion
 
@@ -80,6 +73,13 @@ namespace Zongsoft.Transitions
 		bool IStateDiagram.SetState(State state, IDictionary<string, object> parameters)
 		{
 			return this.SetState(state as TState, parameters);
+		}
+		#endregion
+
+		#region 虚拟方法
+		protected virtual bool OnTransfer(StateContext<TState> context)
+		{
+			return true;
 		}
 		#endregion
 

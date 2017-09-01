@@ -32,7 +32,7 @@ namespace Zongsoft.Transitions
 	public class StateContext<TState> : StateContextBase where TState : State
 	{
 		#region 构造函数
-		public StateContext(StateMachine machine, bool isFirst, TState origin, TState destination, StateMachineOptions options, IDictionary<string, object> parameters = null) : base(machine, isFirst, origin, destination, options, parameters)
+		public StateContext(StateMachine machine, bool isFirst, TState origin, TState destination, IDictionary<string, object> parameters = null) : base(machine, isFirst, origin, destination, parameters)
 		{
 		}
 		#endregion

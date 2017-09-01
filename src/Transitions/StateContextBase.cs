@@ -37,12 +37,11 @@ namespace Zongsoft.Transitions
 		private State _origin;
 		private State _destination;
 		private Delegate _onStop;
-		private StateMachineOptions _options;
 		private IDictionary<string, object> _parameters;
 		#endregion
 
 		#region 构造函数
-		protected StateContextBase(StateMachine machine, bool isFirst, State origin, State destination, StateMachineOptions options, IDictionary<string, object> parameters = null)
+		protected StateContextBase(StateMachine machine, bool isFirst, State origin, State destination, IDictionary<string, object> parameters = null)
 		{
 			if(machine == null)
 				throw new ArgumentNullException(nameof(machine));
@@ -55,7 +54,6 @@ namespace Zongsoft.Transitions
 			_isFirstStep = isFirst;
 			_origin = origin;
 			_destination = destination;
-			_options = options;
 			_parameters = parameters;
 		}
 		#endregion
@@ -82,14 +80,6 @@ namespace Zongsoft.Transitions
 			get
 			{
 				return _parameters != null && _parameters.Count > 0;
-			}
-		}
-
-		public StateMachineOptions Options
-		{
-			get
-			{
-				return _options;
 			}
 		}
 

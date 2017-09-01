@@ -85,19 +85,9 @@ namespace Zongsoft.Transitions
 
 			//设置终止标记
 			_isAborted = 1;
-
-			var transaction = Zongsoft.Transactions.Transaction.Current;
-
-			if(transaction != null)
-				transaction.Rollback();
 		}
 
 		public StateMachine Run<TState>(TState destination, IDictionary<string, object> parameters = null) where TState : State
-		{
-			return this.Run(destination, _options, parameters);
-		}
-
-		public StateMachine Run<TState>(TState destination, StateMachineOptions options, IDictionary<string, object> parameters = null) where TState : State
 		{
 			//确认是否当前对象是否已被释放
 			this.EnsureDisposed();
@@ -111,7 +101,7 @@ namespace Zongsoft.Transitions
 				throw new ArgumentNullException(nameof(destination));
 
 			//根据参数获取上下文对象
-			var context = this.GetContext(destination, options ?? _options, parameters);
+			var context = this.GetContext(destination, parameters);
 
 			//上下文获取失败则返回
 			if(context == null)
@@ -120,25 +110,19 @@ namespace Zongsoft.Transitions
 			//激发“Stepping”事件
 			this.OnStepping(new StateStepEventArgs(context));
 
-			//遍历状态图中的转换器，依次进行状态转换处理
-			foreach(var transfer in destination.Diagram.Transfers)
+			//如果状态转换失败则取消后续动作
+			if(!destination.Diagram.Transfer(context))
+				return this;
+
+			//将转换成功的上下文压入执行栈
+			_stack.Push(context);
+
+			//遍历状态图中的所有触发器
+			foreach(var trigger in destination.Diagram.Triggers)
 			{
-				if(transfer.CanTransfer(context))
-				{
-					//调用状态转换器进行状态转换
-					transfer.Transfer(context);
-
-					//将转换成功的状态压入状态栈
-					_stack.Push(context);
-
-					//遍历状态图中的所有触发器
-					foreach(var trigger in destination.Diagram.Triggers)
-					{
-						//如果触发器可用，则激发触发器
-						if(trigger.Enabled)
-							trigger.OnTrigger(context);
-					}
-				}
+				//如果触发器可用，则激发触发器
+				if(trigger.Enabled)
+					trigger.OnTrigger(context);
 			}
 
 			//激发“Stepped”事件
@@ -162,27 +146,43 @@ namespace Zongsoft.Transitions
 			//激发“Stopping”事件
 			this.OnStopping(new StateStopEventArgs(reason));
 
-			foreach(var frame in stack)
+			Transactions.Transaction transaction = null;
+
+			try
 			{
-				IDictionary<string, object> parameters = null;
-
-				if(frame.HasParameters)
-					parameters = frame.Parameters;
-
-				frame.InnerDestination.Diagram.SetState(frame.InnerDestination, parameters);
-
-				if(frame.OnStopInner != null)
+				if(reason == StateStopReason.Normal && _options.AffiliateTransactionEnabled)
 				{
-					frame.OnStopInner.DynamicInvoke(frame, reason);
+					transaction = Transactions.Transaction.Current;
+
+					if(transaction == null)
+						transaction = new Transactions.Transaction();
+				}
+
+				foreach(var frame in stack)
+				{
+					IDictionary<string, object> parameters = null;
+
+					if(frame.HasParameters)
+						parameters = frame.Parameters;
+
+					frame.InnerDestination.Diagram.SetState(frame.InnerDestination, parameters);
+
+					if(frame.OnStopInner != null)
+					{
+						frame.OnStopInner.DynamicInvoke(frame, reason);
+					}
+				}
+
+				if(reason == StateStopReason.Normal && _options.AffiliateTransactionEnabled)
+				{
+					if(transaction != null)
+						transaction.Commit();
 				}
 			}
-
-			if(reason == StateStopReason.Normal)
+			finally
 			{
-				var transaction = Zongsoft.Transactions.Transaction.Current;
-
 				if(transaction != null)
-					transaction.Commit();
+					transaction.Dispose();
 			}
 
 			//激发“Stopped”事件
@@ -242,7 +242,7 @@ namespace Zongsoft.Transitions
 		}
 
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
-		private StateContextBase GetContext(State destination, StateMachineOptions options, IDictionary<string, object> parameters)
+		private StateContextBase GetContext(State destination, IDictionary<string, object> parameters)
 		{
 			var isFirstStep = _stack == null;
 
@@ -268,7 +268,7 @@ namespace Zongsoft.Transitions
 			}
 
 			var contextType = typeof(StateContext<>).MakeGenericType(destination.GetType());
-			return (StateContextBase)Activator.CreateInstance(contextType, new object[] { this, isFirstStep, origin, destination, options, parameters });
+			return (StateContextBase)Activator.CreateInstance(contextType, new object[] { this, isFirstStep, origin, destination, parameters });
 		}
 		#endregion
 
@@ -281,7 +281,7 @@ namespace Zongsoft.Transitions
 
 		protected virtual void Dispose(bool disposing)
 		{
-			if(System.Threading.Interlocked.CompareExchange(ref _isDisposed, 1, 0) == 0)
+			if(System.Threading.Interlocked.CompareExchange(ref _isDisposed, 1, 0) != 0)
 				return;
 
 			if(disposing)
