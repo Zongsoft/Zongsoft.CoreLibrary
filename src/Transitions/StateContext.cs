@@ -61,9 +61,14 @@ namespace Zongsoft.Transitions
 			return this.Destination.Diagram as TDiagram;
 		}
 
-		public void OnStop(Action<StateContext<TState>, StateStopReason> thunk)
+		public void OnStopped(Action<StateContext<TState>, StateStopReason> thunk)
 		{
-			this.OnStopInner = thunk;
+			this.StoppedThunk = thunk;
+		}
+
+		public void OnStopping(Func<StateContext<TState>, StateStopReason, bool> thunk)
+		{
+			this.StoppingThunk = thunk;
 		}
 		#endregion
 	}

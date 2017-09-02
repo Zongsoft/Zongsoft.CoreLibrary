@@ -36,8 +36,9 @@ namespace Zongsoft.Transitions
 		private bool _isFirstStep;
 		private State _origin;
 		private State _destination;
-		private Delegate _onStop;
 		private IDictionary<string, object> _parameters;
+		private Delegate _stoppedThunk;
+		private Delegate _stoppingThunk;
 		#endregion
 
 		#region 构造函数
@@ -96,15 +97,27 @@ namespace Zongsoft.Transitions
 		#endregion
 
 		#region 内部属性
-		internal Delegate OnStopInner
+		internal Delegate StoppedThunk
 		{
 			get
 			{
-				return _onStop;
+				return _stoppedThunk;
 			}
 			set
 			{
-				_onStop = value;
+				_stoppedThunk = value;
+			}
+		}
+
+		internal Delegate StoppingThunk
+		{
+			get
+			{
+				return _stoppingThunk;
+			}
+			set
+			{
+				_stoppingThunk = value;
 			}
 		}
 

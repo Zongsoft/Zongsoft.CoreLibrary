@@ -158,19 +158,32 @@ namespace Zongsoft.Transitions
 						transaction = new Transactions.Transaction();
 				}
 
-				foreach(var frame in stack)
+				//将执行栈转换为数组
+				var frames = stack.ToArray();
+
+				for(var index = frames.Length - 1; index >= 0; index--)
 				{
+					var frame = frames[index];
 					IDictionary<string, object> parameters = null;
 
 					if(frame.HasParameters)
 						parameters = frame.Parameters;
 
+					//如果上下文绑定了回调委托则调用该回调方法
+					if(frame.StoppingThunk != null)
+					{
+						var result = frame.StoppingThunk.DynamicInvoke(frame, reason);
+
+						if(result != null && result.GetType() == typeof(bool) && (bool)result)
+							continue;
+					}
+
+					//将目标状态持久化
 					frame.InnerDestination.Diagram.SetState(frame.InnerDestination, parameters);
 
-					if(frame.OnStopInner != null)
-					{
-						frame.OnStopInner.DynamicInvoke(frame, reason);
-					}
+					//如果上下文绑定了回调委托则调用该回调方法
+					if(frame.StoppedThunk != null)
+						frame.StoppedThunk.DynamicInvoke(frame, reason);
 				}
 
 				if(reason == StateStopReason.Normal && _options.AffiliateTransactionEnabled)
@@ -252,8 +265,8 @@ namespace Zongsoft.Transitions
 			//获取指定状态实例的当前状态
 			var origin = this.GetState(destination, out var isTransfered);
 
-			//如果指定状态实例已经被处理过，则不能再次转换
-			if(isTransfered)
+			//如果指定状态实例已经被处理过或当前状态等于目标状态，则不能再次转换
+			if(isTransfered || origin.Equals(destination))
 				return null;
 
 			//如果流程图未定义当前的流转向量，则退出或抛出异常
