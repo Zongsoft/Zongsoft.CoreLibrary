@@ -265,8 +265,11 @@ namespace Zongsoft.Transitions
 			//获取指定状态实例的当前状态
 			var origin = this.GetState(destination, out var isTransfered);
 
+			if(origin == null)
+				throw new InvalidOperationException(string.Format("The '{0}' state is not existed.", destination));
+
 			//如果指定状态实例已经被处理过或当前状态等于目标状态，则不能再次转换
-			if(isTransfered || origin == null || origin.Equals(destination))
+			if(isTransfered || origin.Equals(destination))
 				return null;
 
 			//如果流程图未定义当前的流转向量，则退出或抛出异常
