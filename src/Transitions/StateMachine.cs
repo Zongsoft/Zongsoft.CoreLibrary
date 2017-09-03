@@ -266,7 +266,7 @@ namespace Zongsoft.Transitions
 			var origin = this.GetState(destination, out var isTransfered);
 
 			//如果指定状态实例已经被处理过或当前状态等于目标状态，则不能再次转换
-			if(isTransfered || origin.Equals(destination))
+			if(isTransfered || origin == null || origin.Equals(destination))
 				return null;
 
 			//如果流程图未定义当前的流转向量，则退出或抛出异常
