@@ -742,9 +742,8 @@ namespace Zongsoft.Data
 
 		protected object OnExecuted(string name, Type resultType, IDictionary<string, object> inParameters, ref IDictionary<string, object> outParameters, object result)
 		{
-			var args = new DataExecutedEventArgs(name, resultType, inParameters, null, result);
+			var args = new DataExecutedEventArgs(name, resultType, inParameters, outParameters, result);
 			this.OnExecuted(args);
-			outParameters = args.OutParameters;
 			return args.Result;
 		}
 
