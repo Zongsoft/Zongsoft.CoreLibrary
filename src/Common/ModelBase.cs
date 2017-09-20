@@ -91,7 +91,7 @@ namespace Zongsoft.Common
 		#region 保护方法
 		protected T GetPropertyValue<T>(string propertyName, T defaultValue = default(T))
 		{
-			if(string.IsNullOrWhiteSpace(propertyName))
+			if(string.IsNullOrEmpty(propertyName))
 				throw new ArgumentNullException(nameof(propertyName));
 
 			PropertyToken token;
@@ -111,7 +111,7 @@ namespace Zongsoft.Common
 
 		protected T GetPropertyValue<T>(string propertyName, Func<T> valueFactory)
 		{
-			if(string.IsNullOrWhiteSpace(propertyName))
+			if(string.IsNullOrEmpty(propertyName))
 				throw new ArgumentNullException(nameof(propertyName));
 			if(valueFactory == null)
 				throw new ArgumentNullException(nameof(valueFactory));
@@ -164,7 +164,7 @@ namespace Zongsoft.Common
 
 		protected void SetPropertyValue<T>(string propertyName, ref T target, T value)
 		{
-			if(string.IsNullOrWhiteSpace(propertyName))
+			if(string.IsNullOrEmpty(propertyName))
 				throw new ArgumentNullException(nameof(propertyName));
 
 			//更新目标值
@@ -189,9 +189,9 @@ namespace Zongsoft.Common
 			this.RaisePropertyChanged(property.Name, value);
 		}
 
-		protected void SetPropertyValue(string propertyName, object value, Action<object, object> onChanged = null)
+		protected void SetPropertyValue<T>(string propertyName, T value, Action<T, T> onChanged = null)
 		{
-			if(string.IsNullOrWhiteSpace(propertyName))
+			if(string.IsNullOrEmpty(propertyName))
 				throw new ArgumentNullException(nameof(propertyName));
 
 			var changed = true;
@@ -201,6 +201,8 @@ namespace Zongsoft.Common
 			properties.AddOrUpdate(propertyName,
 				key =>
 				{
+					return this.CreatePropertyToken(propertyName, typeof(T), value);
+
 					var property = this.GetType().GetProperty(key, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
 					if(property == null)
@@ -228,7 +230,7 @@ namespace Zongsoft.Common
 				var newValue = properties[propertyName].Value;
 
 				if(onChanged != null)
-					onChanged(originalValue, newValue);
+					onChanged((T)originalValue, (T)newValue);
 
 				//激发“PropertyChanged”事件，并将当前属性加入到更改集中
 				this.RaisePropertyChanged(propertyName, newValue);
@@ -401,9 +403,6 @@ namespace Zongsoft.Common
 		#region 私有方法
 		private void SetChangedProperty(string name, object value)
 		{
-			if(string.IsNullOrWhiteSpace(name))
-				throw new ArgumentNullException(nameof(name));
-
 			if(_changedProperties == null)
 				System.Threading.Interlocked.CompareExchange(ref _changedProperties, new ConcurrentDictionary<string, object>(), null);
 
@@ -465,7 +464,7 @@ namespace Zongsoft.Common
 			#region 构造函数
 			public PropertyToken(string name, Type type, object value)
 			{
-				if(string.IsNullOrWhiteSpace((name)))
+				if(string.IsNullOrEmpty((name)))
 					throw new ArgumentNullException(nameof(name));
 				if(type == null)
 					throw new ArgumentNullException(nameof(type));
