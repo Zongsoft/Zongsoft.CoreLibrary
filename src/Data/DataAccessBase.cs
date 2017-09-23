@@ -34,7 +34,7 @@ namespace Zongsoft.Data
 	/// <summary>
 	/// 表示数据访问的抽象基类。
 	/// </summary>
-	public abstract class DataAccessBase : MarshalByRefObject, IDataAccess
+	public abstract class DataAccessBase : IDataAccess
 	{
 		#region 事件定义
 		public event EventHandler<DataCountedEventArgs> Counted;
@@ -69,7 +69,7 @@ namespace Zongsoft.Data
 		#region 构造函数
 		protected DataAccessBase()
 		{
-			_naming = new DataAccessMapper();
+			_naming = new DataAccessNaming();
 			_filters = new List<IDataAccessFilter>();
 		}
 

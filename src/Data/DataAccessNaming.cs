@@ -25,23 +25,23 @@
  */
 
 using System;
-using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
 	/// <summary>
 	/// 提供数据访问名映射功能的类。
 	/// </summary>
-	public class DataAccessMapper : IDataAccessNaming
+	public class DataAccessNaming : IDataAccessNaming
 	{
 		#region 成员字段
-		private ConcurrentDictionary<Type, string> _mapping;
+		private IDictionary<Type, string> _mapping;
 		#endregion
 
 		#region 构造函数
-		public DataAccessMapper()
+		public DataAccessNaming()
 		{
-			_mapping = new ConcurrentDictionary<Type, string>();
+			_mapping = new Dictionary<Type, string>();
 		}
 		#endregion
 

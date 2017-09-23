@@ -29,6 +29,9 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
+	/// <summary>
+	/// 表示数据访问的上下文基类。
+	/// </summary>
 	public abstract class DataAccessContextBase : MarshalByRefObject
 	{
 		#region 成员字段
@@ -74,14 +77,6 @@ namespace Zongsoft.Data
 			get
 			{
 				return _dataAccess;
-			}
-		}
-
-		public IDataAccessNaming Mapper
-		{
-			get
-			{
-				return _dataAccess.Naming;
 			}
 		}
 
