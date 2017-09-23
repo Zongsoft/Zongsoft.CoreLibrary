@@ -112,8 +112,8 @@ namespace Zongsoft.Data
 				{
 					var dataAccess = this.DataAccess;
 
-					if(dataAccess != null && dataAccess.Mapper != null)
-						_name = dataAccess.Mapper.Get<TEntity>();
+					if(dataAccess != null && dataAccess.Naming != null)
+						_name = dataAccess.Naming.Get<TEntity>();
 				}
 
 				return _name;

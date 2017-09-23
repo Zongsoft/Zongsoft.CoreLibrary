@@ -65,7 +65,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 属性声明
-		IDataAccessMapper Mapper
+		IDataAccessNaming Naming
 		{
 			get;
 		}

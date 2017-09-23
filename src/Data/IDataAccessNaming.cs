@@ -31,7 +31,7 @@ namespace Zongsoft.Data
 	/// <summary>
 	/// 提供数据访问名映射的接口。
 	/// </summary>
-	public interface IDataAccessMapper
+	public interface IDataAccessNaming
 	{
 		void Map(Type type, string name = null);
 		void Map<T>(string name = null);

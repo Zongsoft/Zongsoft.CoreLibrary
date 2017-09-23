@@ -138,6 +138,7 @@
     <Compile Include="Data\DataExistingEventArgs.cs" />
     <Compile Include="Data\DataDecrementedEventArgs.cs" />
     <Compile Include="Data\DataDecrementingEventArgs.cs" />
+    <Compile Include="Data\DataExtensions.cs" />
     <Compile Include="Data\DataManyInsertedEventArgs.cs" />
     <Compile Include="Data\DataManyInsertingEventArgs.cs" />
     <Compile Include="Data\DataSearchKeyAttribute.cs" />
@@ -146,7 +147,7 @@
     <Compile Include="Data\DataManyUpdatingEventArgs.cs" />
     <Compile Include="Data\IConditionalRange.cs" />
     <Compile Include="Data\IDataAccessFilter.cs" />
-    <Compile Include="Data\IDataAccessMapper.cs" />
+    <Compile Include="Data\IDataAccessNaming.cs" />
     <Compile Include="Data\DataIncrementedEventArgs.cs" />
     <Compile Include="Data\DataIncrementingEventArgs.cs" />
     <Compile Include="Data\IDataService`1.cs" />

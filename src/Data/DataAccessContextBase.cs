@@ -33,20 +33,13 @@ namespace Zongsoft.Data
 	{
 		#region 成员字段
 		private string _name;
+		private DataAccessMethod _method;
 		private IDataAccess _dataAccess;
 		private IDictionary<string, object> _states;
 		#endregion
 
 		#region 构造函数
-		protected DataAccessContextBase(IDataAccess dataAccess)
-		{
-			if(dataAccess == null)
-				throw new ArgumentNullException(nameof(dataAccess));
-
-			_dataAccess = dataAccess;
-		}
-
-		protected DataAccessContextBase(IDataAccess dataAccess, string name)
+		protected DataAccessContextBase(IDataAccess dataAccess, string name, DataAccessMethod method)
 		{
 			if(dataAccess == null)
 				throw new ArgumentNullException(nameof(dataAccess));
@@ -54,16 +47,25 @@ namespace Zongsoft.Data
 				throw new ArgumentNullException(nameof(name));
 
 			_name = name;
+			_method = method;
 			_dataAccess = dataAccess;
 		}
 		#endregion
 
 		#region 公共属性
-		public virtual string Name
+		public string Name
 		{
 			get
 			{
 				return _name;
+			}
+		}
+
+		public DataAccessMethod Method
+		{
+			get
+			{
+				return _method;
 			}
 		}
 
@@ -75,11 +77,11 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public IDataAccessMapper Mapper
+		public IDataAccessNaming Mapper
 		{
 			get
 			{
-				return _dataAccess.Mapper;
+				return _dataAccess.Naming;
 			}
 		}
 
@@ -100,13 +102,6 @@ namespace Zongsoft.Data
 
 				return _states;
 			}
-		}
-		#endregion
-
-		#region 抽象属性
-		public abstract DataAccessMethod Method
-		{
-			get;
 		}
 		#endregion
 	}

@@ -62,36 +62,36 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 成员字段
-		private IDataAccessMapper _mapper;
+		private IDataAccessNaming _naming;
 		private ICollection<IDataAccessFilter> _filters;
 		#endregion
 
 		#region 构造函数
 		protected DataAccessBase()
 		{
-			_mapper = new DataAccessMapper();
+			_naming = new DataAccessMapper();
 			_filters = new List<IDataAccessFilter>();
 		}
 
-		protected DataAccessBase(IDataAccessMapper mapper)
+		protected DataAccessBase(IDataAccessNaming naming)
 		{
-			if(mapper == null)
-				throw new ArgumentNullException(nameof(mapper));
+			if(naming == null)
+				throw new ArgumentNullException(nameof(naming));
 
-			_mapper = mapper;
+			_naming = naming;
 			_filters = new List<IDataAccessFilter>();
 		}
 		#endregion
 
 		#region 公共属性
 		/// <summary>
-		/// 获取数据访问映射器。
+		/// 获取数据访问名称映射器。
 		/// </summary>
-		public IDataAccessMapper Mapper
+		public IDataAccessNaming Naming
 		{
 			get
 			{
-				return _mapper;
+				return _naming;
 			}
 		}
 
@@ -716,7 +716,7 @@ namespace Zongsoft.Data
 		#region 虚拟方法
 		protected virtual string GetName(Type type)
 		{
-			var name = _mapper.Get(type);
+			var name = _naming.Get(type);
 
 			if(string.IsNullOrEmpty(name))
 				throw new InvalidOperationException($"Missing data access name mapping of the '{type.FullName}' type.");

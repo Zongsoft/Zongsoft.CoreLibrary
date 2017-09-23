@@ -32,38 +32,20 @@ namespace Zongsoft.Data
 	public class DataAccessFilterContext : DataAccessContextBase
 	{
 		#region 成员字段
-		private DataAccessMethod _method;
 		private DataAccessEventArgs _arguments;
 		#endregion
 
 		#region 构造函数
-		public DataAccessFilterContext(IDataAccess dataAccess, DataAccessMethod method, DataAccessEventArgs arguments) : base(dataAccess)
+		public DataAccessFilterContext(IDataAccess dataAccess, DataAccessMethod method, DataAccessEventArgs arguments) : base(dataAccess, arguments.Name, method)
 		{
 			if(arguments == null)
 				throw new ArgumentNullException(nameof(arguments));
 
-			_method = method;
 			_arguments = arguments;
 		}
 		#endregion
 
 		#region 公共属性
-		public override string Name
-		{
-			get
-			{
-				return _arguments.Name;
-			}
-		}
-
-		public override DataAccessMethod Method
-		{
-			get
-			{
-				return _method;
-			}
-		}
-
 		public DataAccessEventArgs Arguments
 		{
 			get

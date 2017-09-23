@@ -32,7 +32,7 @@ namespace Zongsoft.Data
 	/// <summary>
 	/// 提供数据访问名映射功能的类。
 	/// </summary>
-	public class DataAccessMapper : IDataAccessMapper
+	public class DataAccessMapper : IDataAccessNaming
 	{
 		#region 成员字段
 		private ConcurrentDictionary<Type, string> _mapping;
