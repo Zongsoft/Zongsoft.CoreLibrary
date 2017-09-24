@@ -39,7 +39,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataSelectingEventArgs(string name, Type entityType, ICondition condition, Grouping grouping, string scope, Paging paging, Sorting[] sortings) : base(name, entityType, condition, grouping, scope, paging, sortings, null)
+		public DataSelectingEventArgs(DataSelectionContext context) : base(context)
 		{
 			_cancel = false;
 		}

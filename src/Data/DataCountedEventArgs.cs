@@ -32,67 +32,11 @@ namespace Zongsoft.Data
 	/// <summary>
 	/// 为数据访问的计数事件提供数据。
 	/// </summary>
-	public class DataCountedEventArgs : DataAccessEventArgs
+	public class DataCountedEventArgs : DataAccessEventArgs<DataCountContext>
 	{
-		#region 成员字段
-		private int _result;
-		private ICondition _condition;
-		private string _includes;
-		#endregion
-
 		#region 构造函数
-		public DataCountedEventArgs(string name, ICondition condition, string includes, int result) : base(name)
+		public DataCountedEventArgs(DataCountContext context) : base(context)
 		{
-			_condition = condition;
-			_includes = includes;
-			_result = result;
-		}
-		#endregion
-
-		#region 公共属性
-		/// <summary>
-		/// 获取或设置计数操作的结果。
-		/// </summary>
-		public int Result
-		{
-			get
-			{
-				return _result;
-			}
-			set
-			{
-				_result = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置计数操作的条件。
-		/// </summary>
-		public ICondition Condition
-		{
-			get
-			{
-				return _condition;
-			}
-			set
-			{
-				_condition = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置计数操作的包含成员。
-		/// </summary>
-		public string Includes
-		{
-			get
-			{
-				return _includes;
-			}
-			set
-			{
-				_includes = value;
-			}
 		}
 		#endregion
 	}

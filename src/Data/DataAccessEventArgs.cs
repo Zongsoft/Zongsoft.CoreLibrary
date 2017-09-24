@@ -28,35 +28,28 @@ using System;
 
 namespace Zongsoft.Data
 {
-	public class DataAccessEventArgs : EventArgs
+	public class DataAccessEventArgs<TContext> : EventArgs where TContext : DataAccessContextBase
 	{
 		#region 成员字段
-		private string _name;
+		private TContext _context;
 		#endregion
 
 		#region 构造函数
-		protected DataAccessEventArgs(string name)
+		protected DataAccessEventArgs(TContext context)
 		{
-			if(string.IsNullOrWhiteSpace(name))
-				throw new ArgumentNullException(nameof(name));
+			if(context == null)
+				throw new ArgumentNullException(nameof(context));
 
-			_name = name;
+			_context = context;
 		}
 		#endregion
 
 		#region 公共属性
-		public string Name
+		public TContext Context
 		{
 			get
 			{
-				return _name;
-			}
-			protected set
-			{
-				if(string.IsNullOrWhiteSpace(value))
-					throw new ArgumentNullException();
-
-				_name = value;
+				return _context;
 			}
 		}
 		#endregion

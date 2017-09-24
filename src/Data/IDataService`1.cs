@@ -48,10 +48,10 @@ namespace Zongsoft.Data
 		IEnumerable<TEntity> Select(ICondition condition, Paging paging, params Sorting[] sortings);
 		IEnumerable<TEntity> Select(ICondition condition, Paging paging, string scope, params Sorting[] sortings);
 		IEnumerable<TEntity> Select(ICondition condition, Grouping grouping, params Sorting[] sortings);
-		IEnumerable<TEntity> Select(ICondition condition, Grouping grouping, string scope, params Sorting[] sortings);
-		IEnumerable<TEntity> Select(ICondition condition, Grouping grouping, string scope, Paging paging, params Sorting[] sortings);
 		IEnumerable<TEntity> Select(ICondition condition, Grouping grouping, Paging paging, params Sorting[] sortings);
 		IEnumerable<TEntity> Select(ICondition condition, Grouping grouping, Paging paging, string scope, params Sorting[] sortings);
+		IEnumerable<TEntity> Select(ICondition condition, Grouping grouping, string scope, params Sorting[] sortings);
+		IEnumerable<TEntity> Select(ICondition condition, Grouping grouping, string scope, Paging paging, params Sorting[] sortings);
 		#endregion
 	}
 }

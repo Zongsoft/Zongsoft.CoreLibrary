@@ -26,7 +26,6 @@
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
@@ -40,7 +39,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataGettingEventArgs(string name, ICondition condition, string scope) : base(name, condition, scope)
+		public DataGettingEventArgs(DataSelectionContext context) : base(context)
 		{
 			_cancel = false;
 		}

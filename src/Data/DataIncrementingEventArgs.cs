@@ -35,9 +35,9 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataIncrementingEventArgs(string name, string member, ICondition condition, int interval = 1, bool cancel = false) : base(name, member, condition, interval)
+		public DataIncrementingEventArgs(DataIncrementContext context) : base(context)
 		{
-			_cancel = cancel;
+			_cancel = false;
 		}
 		#endregion
 

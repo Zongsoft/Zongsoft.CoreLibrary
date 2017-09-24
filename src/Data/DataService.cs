@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2016 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2016-2017 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,16 +25,19 @@
  */
 
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
-using System.Linq;
 
 namespace Zongsoft.Data
 {
 	public class DataService<TEntity> : IDataService<TEntity>
 	{
 		#region 事件定义
+		public event EventHandler<DataGettedEventArgs<TEntity>> Getted;
+		public event EventHandler<DataGettingEventArgs<TEntity>> Getting;
+
 		public event EventHandler<DataCountedEventArgs> Counted;
 		public event EventHandler<DataCountingEventArgs> Counting;
 		public event EventHandler<DataExecutedEventArgs> Executed;
@@ -43,22 +46,14 @@ namespace Zongsoft.Data
 		public event EventHandler<DataExistingEventArgs> Existing;
 		public event EventHandler<DataIncrementedEventArgs> Incremented;
 		public event EventHandler<DataIncrementingEventArgs> Incrementing;
-		public event EventHandler<DataDecrementedEventArgs> Decremented;
-		public event EventHandler<DataDecrementingEventArgs> Decrementing;
-		public event EventHandler<DataGettedEventArgs<TEntity>> Getted;
-		public event EventHandler<DataGettingEventArgs<TEntity>> Getting;
-		public event EventHandler<DataSelectedEventArgs> Selected;
-		public event EventHandler<DataSelectingEventArgs> Selecting;
 		public event EventHandler<DataDeletedEventArgs> Deleted;
 		public event EventHandler<DataDeletingEventArgs> Deleting;
 		public event EventHandler<DataInsertedEventArgs> Inserted;
 		public event EventHandler<DataInsertingEventArgs> Inserting;
-		public event EventHandler<DataManyInsertedEventArgs> ManyInserted;
-		public event EventHandler<DataManyInsertingEventArgs> ManyInserting;
 		public event EventHandler<DataUpdatedEventArgs> Updated;
 		public event EventHandler<DataUpdatingEventArgs> Updating;
-		public event EventHandler<DataManyUpdatedEventArgs> ManyUpdated;
-		public event EventHandler<DataManyUpdatingEventArgs> ManyUpdating;
+		public event EventHandler<DataSelectedEventArgs> Selected;
+		public event EventHandler<DataSelectingEventArgs> Selecting;
 		#endregion
 
 		#region 成员字段
@@ -177,17 +172,7 @@ namespace Zongsoft.Data
 
 		public virtual IEnumerable<T> Execute<T>(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters)
 		{
-			//激发“Executing”事件
-			var args = this.OnExecuting(name, typeof(T), inParameters, out outParameters);
-
-			if(args.Cancel)
-				return args.Result as IEnumerable<T>;
-
-			//执行数据操作方法
-			args.Result = this.DataAccess.Execute<T>(name, args.InParameters, out outParameters);
-
-			//激发“Executed”事件
-			return this.OnExecuted(name, typeof(T), args.InParameters, ref outParameters, args.Result) as IEnumerable<T>;
+			return this.DataAccess.Execute<T>(name, inParameters, out outParameters, ctx => this.OnExecuting(ctx), ctx => this.OnExecuted(ctx));
 		}
 
 		public object ExecuteScalar(string name, IDictionary<string, object> inParameters)
@@ -198,34 +183,14 @@ namespace Zongsoft.Data
 
 		public virtual object ExecuteScalar(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters)
 		{
-			//激发“Executing”事件
-			var args = this.OnExecuting(name, typeof(object), inParameters, out outParameters);
-
-			if(args.Cancel)
-				return args.Result;
-
-			//执行数据操作方法
-			args.Result = this.DataAccess.ExecuteScalar(name, args.InParameters, out outParameters);
-
-			//激发“Executed”事件
-			return this.OnExecuted(name, typeof(object), args.InParameters, ref outParameters, args.Result);
+			return this.DataAccess.ExecuteScalar(name, inParameters, out outParameters, ctx => this.OnExecuting(ctx), ctx => this.OnExecuted(ctx));
 		}
 		#endregion
 
 		#region 存在方法
 		public virtual bool Exists(ICondition condition)
 		{
-			//激发“Existing”事件
-			var args = this.OnExisting(condition);
-
-			if(args.Cancel)
-				return args.Result;
-
-			//执行存在操作方法
-			args.Result = this.DataAccess.Exists(this.Name, condition);
-
-			//激发“Existed”事件
-			return this.OnExisted(args.Condition, args.Result);
+			return this.DataAccess.Exists(this.Name, condition, ctx => this.OnExisting(ctx), ctx => this.OnExisted(ctx));
 		}
 
 		public virtual bool Exists<TKey>(TKey key)
@@ -250,55 +215,168 @@ namespace Zongsoft.Data
 		#region 计数方法
 		public virtual int Count(ICondition condition, string includes = null)
 		{
-			//激发“Counting”事件
-			var args = this.OnCounting(condition, includes);
-
-			if(args.Cancel)
-				return args.Result;
-
-			//执行数据计数操作方法
-			args.Result = this.DataAccess.Count(this.Name, args.Condition, args.Includes);
-
-			//激发“Counted”事件
-			return this.OnCounted(args.Condition, args.Includes, args.Result);
+			return this.DataAccess.Count(this.Name, condition, includes, ctx => this.OnCounting(ctx), ctx => this.OnCounted(ctx));
 		}
 		#endregion
 
 		#region 递增方法
 		public virtual long Increment(string member, ICondition condition, int interval = 1)
 		{
-			if(string.IsNullOrWhiteSpace(member))
-				throw new ArgumentNullException(nameof(member));
-
-			//激发“Incrementing”事件
-			var args = this.OnIncrementing(member, condition, interval);
-
-			if(args.Cancel)
-				return args.Result;
-
-			//执行递增操作方法
-			args.Result = this.DataAccess.Increment(this.Name, member, condition, interval);
-
-			//激发“Incremented”事件
-			return this.OnIncremented(args.Member, args.Condition, args.Interval, args.Result);
+			return this.DataAccess.Increment(this.Name, member, condition, interval, ctx => this.OnIncrementing(ctx), ctx => this.OnIncremented(ctx));
 		}
 
 		public long Decrement(string member, ICondition condition, int interval = 1)
 		{
-			if(string.IsNullOrWhiteSpace(member))
-				throw new ArgumentNullException(nameof(member));
+			return this.DataAccess.Decrement(this.Name, member, condition, interval, ctx => this.OnIncrementing(ctx), ctx => this.OnIncremented(ctx));
+		}
+		#endregion
 
-			//激发“Decrementing”事件
-			var args = this.OnDecrementing(member, condition, interval);
+		#region 删除方法
+		public virtual int Delete<TKey>(TKey key, params string[] cascades)
+		{
+			bool singleton;
+			return this.Delete(this.ConvertKey(key, out singleton), cascades);
+		}
 
-			if(args.Cancel)
-				return args.Result;
+		public virtual int Delete<TKey1, TKey2>(TKey1 key1, TKey2 key2, params string[] cascades)
+		{
+			bool singleton;
+			return this.Delete(this.ConvertKey(key1, key2, out singleton), cascades);
+		}
 
-			//执行递减操作方法
-			args.Result = this.DataAccess.Decrement(this.Name, member, condition, interval);
+		public virtual int Delete<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, params string[] cascades)
+		{
+			bool singleton;
+			return this.Delete(this.ConvertKey(key1, key2, key3, out singleton), cascades);
+		}
 
-			//激发“Decremented”事件
-			return this.OnDecremented(args.Member, args.Condition, args.Interval, args.Result);
+		public int Delete(ICondition condition, params string[] cascades)
+		{
+			return this.OnDelete(condition, cascades);
+		}
+
+		protected virtual int OnDelete(ICondition condition, string[] cascades)
+		{
+			if(condition == null)
+				throw new NotSupportedException("The condition cann't is null on delete operation.");
+
+			return this.DataAccess.Delete(this.Name, condition, cascades, ctx => this.OnDeleting(ctx), ctx => this.OnDeleted(ctx));
+		}
+		#endregion
+
+		#region 插入方法
+		public int Insert(object data, string scope = null)
+		{
+			if(data == null)
+				return 0;
+
+			return this.OnInsert(DataDictionary<TEntity>.GetDataDictionary(data), scope);
+		}
+
+		public int InsertMany(IEnumerable data, string scope = null)
+		{
+			if(data == null)
+				return 0;
+
+			return this.OnInsertMany(DataDictionary<TEntity>.GetDataDictionaries(data), scope);
+		}
+
+		protected virtual int OnInsert(DataDictionary<TEntity> data, string scope)
+		{
+			if(data == null || data.Data == null)
+				return 0;
+
+			//执行数据引擎的插入操作
+			return this.DataAccess.Insert(this.Name, data, scope, ctx => this.OnInserting(ctx), ctx => this.OnInserted(ctx));
+		}
+
+		protected virtual int OnInsertMany(IEnumerable<DataDictionary<TEntity>> items, string scope)
+		{
+			if(items == null)
+				return 0;
+
+			//执行数据引擎的插入操作
+			return this.DataAccess.InsertMany(this.Name, items, scope, ctx => this.OnInserting(ctx), ctx => this.OnInserted(ctx));
+		}
+		#endregion
+
+		#region 更新方法
+		public virtual int Update<TKey>(object data, TKey key, string scope = null)
+		{
+			bool singleton;
+			return this.Update(data, this.ConvertKey(key, out singleton), scope);
+		}
+
+		public virtual int Update<TKey1, TKey2>(object data, TKey1 key1, TKey2 key2, string scope = null)
+		{
+			bool singleton;
+			return this.Update(data, this.ConvertKey(key1, key2, out singleton), scope);
+		}
+
+		public virtual int Update<TKey1, TKey2, TKey3>(object data, TKey1 key1, TKey2 key2, TKey3 key3, string scope = null)
+		{
+			bool singleton;
+			return this.Update(data, this.ConvertKey(key1, key2, key3, out singleton), scope);
+		}
+
+		public virtual int UpdateMany<TKey>(IEnumerable data, TKey key, string scope = null)
+		{
+			bool singleton;
+			return this.UpdateMany(data, this.ConvertKey(key, out singleton), scope);
+		}
+
+		public virtual int UpdateMany<TKey1, TKey2>(IEnumerable data, TKey1 key1, TKey2 key2, string scope = null)
+		{
+			bool singleton;
+			return this.UpdateMany(data, this.ConvertKey(key1, key2, out singleton), scope);
+		}
+
+		public virtual int UpdateMany<TKey1, TKey2, TKey3>(IEnumerable data, TKey1 key1, TKey2 key2, TKey3 key3, string scope = null)
+		{
+			bool singleton;
+			return this.UpdateMany(data, this.ConvertKey(key1, key2, key3, out singleton), scope);
+		}
+
+		public int Update(object data, ICondition condition = null, string scope = null)
+		{
+			if(data == null)
+				return 0;
+
+			return this.OnUpdate(DataDictionary<TEntity>.GetDataDictionary(data), condition, scope);
+		}
+
+		public int Update(object data, string scope, ICondition condition = null)
+		{
+			return this.Update(data, condition, scope);
+		}
+
+		public int UpdateMany(IEnumerable data, ICondition condition = null, string scope = null)
+		{
+			if(data == null)
+				return 0;
+
+			return this.OnUpdateMany(DataDictionary<TEntity>.GetDataDictionaries(data), condition, scope);
+		}
+
+		public int UpdateMany(IEnumerable data, string scope, ICondition condition = null)
+		{
+			return this.UpdateMany(data, condition, scope);
+		}
+
+		protected virtual int OnUpdate(DataDictionary<TEntity> data, ICondition condition, string scope)
+		{
+			if(data == null || data.Data == null)
+				return 0;
+
+			return this.DataAccess.Update(this.Name, data, condition, scope, ctx => this.OnUpdating(ctx), ctx => this.OnUpdated(ctx));
+		}
+
+		protected virtual int OnUpdateMany(IEnumerable<DataDictionary<TEntity>> items, ICondition condition, string scope)
+		{
+			if(items == null)
+				return 0;
+
+			return this.DataAccess.UpdateMany(this.Name, items, condition, scope, ctx => this.OnUpdating(ctx), ctx => this.OnUpdated(ctx));
 		}
 		#endregion
 
@@ -394,37 +472,17 @@ namespace Zongsoft.Data
 
 		private TEntity GetSingle(ICondition condition, string scope)
 		{
-			//激发“Getting”事件
-			var args = this.OnGetting(condition, scope);
-
-			if(args.Cancel)
-				return args.Result;
-
-			//执行数据获取操作方法
-			args.Result = this.OnGet(args.Condition, args.Scope);
-
-			//激发“Getted”事件
-			return this.OnGetted(args.Condition, args.Scope, args.Result);
+			return this.OnGet(condition, scope);
 		}
 
 		protected virtual TEntity OnGet(ICondition condition, string scope)
 		{
-			return this.DataAccess.Select<TEntity>(this.Name, condition, scope).FirstOrDefault();
+			return this.DataAccess.Select<TEntity>(this.Name, condition, null, scope, null, null, ctx => this.OnGetting(ctx), ctx => this.OnGetted(ctx)).FirstOrDefault();
 		}
 
 		public IEnumerable<TEntity> Select(ICondition condition = null, params Sorting[] sortings)
 		{
 			return this.Select(condition, null, string.Empty, null, sortings);
-		}
-
-		public IEnumerable<TEntity> Select(ICondition condition, string scope, params Sorting[] sortings)
-		{
-			return this.Select(condition, null, scope, null, sortings);
-		}
-
-		public IEnumerable<TEntity> Select(ICondition condition, string scope, Paging paging, params Sorting[] sortings)
-		{
-			return this.Select(condition, null, scope, paging, sortings);
 		}
 
 		public IEnumerable<TEntity> Select(ICondition condition, Paging paging, params Sorting[] sortings)
@@ -437,29 +495,19 @@ namespace Zongsoft.Data
 			return this.Select(condition, null, scope, paging, sortings);
 		}
 
+		public IEnumerable<TEntity> Select(ICondition condition, string scope, params Sorting[] sortings)
+		{
+			return this.Select(condition, null, scope, null, sortings);
+		}
+
+		public IEnumerable<TEntity> Select(ICondition condition, string scope, Paging paging, params Sorting[] sortings)
+		{
+			return this.Select(condition, null, scope, paging, sortings);
+		}
+
 		public IEnumerable<TEntity> Select(ICondition condition, Grouping grouping, params Sorting[] sortings)
 		{
 			return this.Select(condition, grouping, string.Empty, null, sortings);
-		}
-
-		public IEnumerable<TEntity> Select(ICondition condition, Grouping grouping, string scope, params Sorting[] sortings)
-		{
-			return this.Select(condition, grouping, scope, null, sortings);
-		}
-
-		public IEnumerable<TEntity> Select(ICondition condition, Grouping grouping, string scope, Paging paging, params Sorting[] sortings)
-		{
-			//激发“Selecting”事件
-			var args = this.OnSelecting(typeof(TEntity), condition, grouping, scope, paging, sortings);
-
-			if(args.Cancel)
-				return args.Result as IEnumerable<TEntity>;
-
-			//执行数据查询操作
-			args.Result = this.OnSelect(args.Condition, args.Grouping, args.Scope, args.Paging, args.Sortings);
-
-			//激发“Selected”事件
-			return this.OnSelected(args.Condition, args.Grouping, args.Scope, args.Paging, args.Sortings, (IEnumerable<TEntity>)args.Result);
 		}
 
 		public IEnumerable<TEntity> Select(ICondition condition, Grouping grouping, Paging paging, params Sorting[] sortings)
@@ -472,9 +520,19 @@ namespace Zongsoft.Data
 			return this.Select(condition, grouping, scope, paging, sortings);
 		}
 
+		public IEnumerable<TEntity> Select(ICondition condition, Grouping grouping, string scope, params Sorting[] sortings)
+		{
+			return this.Select(condition, grouping, scope, null, sortings);
+		}
+
+		public IEnumerable<TEntity> Select(ICondition condition, Grouping grouping, string scope, Paging paging, params Sorting[] sortings)
+		{
+			return this.OnSelect(condition, grouping, scope, paging, sortings);
+		}
+
 		protected virtual IEnumerable<TEntity> OnSelect(ICondition condition, Grouping grouping, string scope, Paging paging, params Sorting[] sortings)
 		{
-			return this.DataAccess.Select<TEntity>(this.Name, condition, grouping, scope, paging, sortings);
+			return this.DataAccess.Select<TEntity>(this.Name, condition, grouping, scope, paging, sortings, ctx => this.OnSelecting(ctx), ctx => this.OnSelected(ctx));
 		}
 
 		#region 显式实现
@@ -531,603 +589,185 @@ namespace Zongsoft.Data
 
 		#endregion
 
-		#region 删除方法
-		public virtual int Delete<TKey>(TKey key, params string[] cascades)
-		{
-			bool singleton;
-			return this.Delete(this.ConvertKey(key, out singleton), cascades);
-		}
-
-		public virtual int Delete<TKey1, TKey2>(TKey1 key1, TKey2 key2, params string[] cascades)
-		{
-			bool singleton;
-			return this.Delete(this.ConvertKey(key1, key2, out singleton), cascades);
-		}
-
-		public virtual int Delete<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, params string[] cascades)
-		{
-			bool singleton;
-			return this.Delete(this.ConvertKey(key1, key2, key3, out singleton), cascades);
-		}
-
-		public int Delete(ICondition condition, params string[] cascades)
-		{
-			//激发“Deleting”事件
-			var args = this.OnDeleting(condition, cascades);
-
-			if(args.Cancel)
-				return args.Count;
-
-			//执行数据删除操作
-			args.Count = this.OnDelete(args.Condition, args.Cascades);
-
-			//激发“Deleted”事件
-			return this.OnDeleted(args.Condition, args.Cascades, args.Count);
-		}
-
-		protected virtual int OnDelete(ICondition condition, string[] cascades)
-		{
-			if(condition == null)
-				throw new NotSupportedException("The condition cann't is null on delete operation.");
-
-			return this.DataAccess.Delete(this.Name, condition, cascades);
-		}
-		#endregion
-
-		#region 插入方法
-		public int Insert(object data, string scope = null)
-		{
-			if(data == null)
-				return 0;
-
-			//激发“Inserting”事件
-			var args = this.OnInserting(data, scope);
-
-			if(args.Cancel)
-				return args.Count;
-
-			//执行数据插入操作
-			args.Count = this.OnInsert((DataDictionary<TEntity>)args.Data, args.Scope);
-
-			//激发“Inserted”事件
-			return this.OnInserted(args.Data, args.Scope, args.Count);
-		}
-
-		public int InsertMany(IEnumerable data, string scope = null)
-		{
-			if(data == null)
-				return 0;
-
-			//激发“ManyInserting”事件
-			var args = this.OnManyInserting(data, scope);
-
-			if(args.Cancel)
-				return args.Count;
-
-			//执行数据插入操作
-			args.Count = this.OnInsertMany((IEnumerable<DataDictionary<TEntity>>)args.Data, args.Scope);
-
-			//激发“ManyInserted”事件
-			return this.OnManyInserted(args.Data, args.Scope, args.Count);
-		}
-
-		protected virtual int OnInsert(DataDictionary<TEntity> data, string scope)
-		{
-			if(data == null || data.Data == null)
-				return 0;
-
-			//执行数据引擎的插入操作
-			return this.DataAccess.Insert(this.Name, data, scope);
-		}
-
-		protected virtual int OnInsertMany(IEnumerable<DataDictionary<TEntity>> items, string scope)
-		{
-			if(items == null)
-				return 0;
-
-			int count = 0;
-
-			using(var transaction = new Zongsoft.Transactions.Transaction())
-			{
-				foreach(var item in items)
-				{
-					count += this.OnInsert(item, scope);
-				}
-
-				//提交事务
-				transaction.Commit();
-			}
-
-			return count;
-		}
-		#endregion
-
-		#region 更新方法
-		public virtual int Update<TKey>(object data, TKey key, string scope = null)
-		{
-			bool singleton;
-			return this.Update(data, this.ConvertKey(key, out singleton), scope);
-		}
-
-		public virtual int Update<TKey1, TKey2>(object data, TKey1 key1, TKey2 key2, string scope = null)
-		{
-			bool singleton;
-			return this.Update(data, this.ConvertKey(key1, key2, out singleton), scope);
-		}
-
-		public virtual int Update<TKey1, TKey2, TKey3>(object data, TKey1 key1, TKey2 key2, TKey3 key3, string scope = null)
-		{
-			bool singleton;
-			return this.Update(data, this.ConvertKey(key1, key2, key3, out singleton), scope);
-		}
-
-		public virtual int UpdateMany<TKey>(IEnumerable data, TKey key, string scope = null)
-		{
-			bool singleton;
-			return this.UpdateMany(data, this.ConvertKey(key, out singleton), scope);
-		}
-
-		public virtual int UpdateMany<TKey1, TKey2>(IEnumerable data, TKey1 key1, TKey2 key2, string scope = null)
-		{
-			bool singleton;
-			return this.UpdateMany(data, this.ConvertKey(key1, key2, out singleton), scope);
-		}
-
-		public virtual int UpdateMany<TKey1, TKey2, TKey3>(IEnumerable data, TKey1 key1, TKey2 key2, TKey3 key3, string scope = null)
-		{
-			bool singleton;
-			return this.UpdateMany(data, this.ConvertKey(key1, key2, key3, out singleton), scope);
-		}
-
-		public int Update(object data, ICondition condition = null, string scope = null)
-		{
-			if(data == null)
-				return 0;
-
-			//激发“Updating”事件
-			var args = this.OnUpdating(data, condition, scope);
-
-			if(args.Cancel)
-				return args.Count;
-
-			//执行数据更新操作
-			args.Count = this.OnUpdate((DataDictionary<TEntity>)args.Data, args.Condition, args.Scope);
-
-			//激发“Updated”事件
-			return this.OnUpdated(args.Data, args.Condition, args.Scope, args.Count);
-		}
-
-		public int Update(object data, string scope, ICondition condition = null)
-		{
-			return this.Update(data, condition, scope);
-		}
-
-		public int UpdateMany(IEnumerable data, ICondition condition = null, string scope = null)
-		{
-			if(data == null)
-				return 0;
-
-			//激发“ManyUpdating”事件
-			var args = this.OnManyUpdating(data, condition, scope);
-
-			if(args.Cancel)
-				return args.Count;
-
-			//执行数据更新操作
-			args.Count = this.OnUpdateMany((IEnumerable<DataDictionary<TEntity>>)args.Data, args.Condition, args.Scope);
-
-			//激发“ManyUpdated”事件
-			return this.OnManyUpdated(args.Data, args.Condition, args.Scope, args.Count);
-		}
-
-		public int UpdateMany(IEnumerable data, string scope, ICondition condition = null)
-		{
-			return this.UpdateMany(data, condition, scope);
-		}
-
-		protected virtual int OnUpdate(DataDictionary<TEntity> data, ICondition condition, string scope)
-		{
-			if(data == null || data.Data == null)
-				return 0;
-
-			return this.DataAccess.Update(this.Name, data, condition, scope);
-		}
-
-		protected virtual int OnUpdateMany(IEnumerable<DataDictionary<TEntity>> items, ICondition condition, string scope)
-		{
-			if(items == null)
-				return 0;
-
-			int count = 0;
-
-			using(var transaction = new Zongsoft.Transactions.Transaction())
-			{
-				foreach(var item in items)
-				{
-					count += this.OnUpdate(item, condition, scope);
-				}
-
-				//提交事务
-				transaction.Commit();
-			}
-
-			return count;
-		}
-		#endregion
-
 		#region 激发事件
-		protected int OnCounted(ICondition condition, string includes, int result)
-		{
-			var args = new DataCountedEventArgs(this.Name, condition, includes, result);
-			this.OnCounted(args);
-			return args.Result;
-		}
-
-		protected DataCountingEventArgs OnCounting(ICondition condition, string includes)
-		{
-			var args = new DataCountingEventArgs(this.Name, condition, includes);
-			this.OnCounting(args);
-			return args;
-		}
-
-		protected object OnExecuted(string name, Type resultType, IDictionary<string, object> inParameters, ref IDictionary<string, object> outParameters, object result)
-		{
-			var args = new DataExecutedEventArgs(name, resultType, inParameters, null, result);
-			this.OnExecuted(args);
-			outParameters = args.OutParameters;
-			return args.Result;
-		}
-
-		protected DataExecutingEventArgs OnExecuting(string name, Type resultType, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters)
-		{
-			var args = new DataExecutingEventArgs(name, resultType, inParameters);
-			this.OnExecuting(args);
-			outParameters = args.OutParameters;
-			return args;
-		}
-
-		protected bool OnExisted(ICondition condition, bool result)
-		{
-			var args = new DataExistedEventArgs(this.Name, condition, result);
-			this.OnExisted(args);
-			return args.Result;
-		}
-
-		protected DataExistingEventArgs OnExisting(ICondition condition, bool cancel = false)
-		{
-			var args = new DataExistingEventArgs(this.Name, condition, cancel);
-			this.OnExisting(args);
-			return args;
-		}
-
-		protected long OnIncremented(string member, ICondition condition, int interval, long result)
-		{
-			var args = new DataIncrementedEventArgs(this.Name, member, condition, interval, result);
-			this.OnIncremented(args);
-			return args.Result;
-		}
-
-		protected DataIncrementingEventArgs OnIncrementing(string member, ICondition condition, int interval = 1, bool cancel = false)
-		{
-			var args = new DataIncrementingEventArgs(this.Name, member, condition, interval, cancel);
-			this.OnIncrementing(args);
-			return args;
-		}
-
-		protected long OnDecremented(string member, ICondition condition, int interval, long result)
-		{
-			var args = new DataDecrementedEventArgs(this.Name, member, condition, interval, result);
-			this.OnDecremented(args);
-			return args.Result;
-		}
-
-		protected DataDecrementingEventArgs OnDecrementing(string member, ICondition condition, int interval = 1, bool cancel = false)
-		{
-			var args = new DataDecrementingEventArgs(this.Name, member, condition, interval, cancel);
-			this.OnDecrementing(args);
-			return args;
-		}
-
-		protected TEntity OnGetted(ICondition condition, string scope, TEntity result)
-		{
-			var args = new DataGettedEventArgs<TEntity>(this.Name, condition, scope, result);
-			this.OnGetted(args);
-			return args.Result;
-		}
-
-		protected DataGettingEventArgs<TEntity> OnGetting(ICondition condition, string scope)
-		{
-			var args = new DataGettingEventArgs<TEntity>(this.Name, condition, scope);
-			this.OnGetting(args);
-			return args;
-		}
-
-		protected IEnumerable<T> OnSelected<T>(ICondition condition, Grouping grouping, string scope, Paging paging, Sorting[] sortings, IEnumerable<T> result)
-		{
-			var args = new DataSelectedEventArgs(this.Name, typeof(T), condition, grouping, scope, paging, sortings, result);
-			this.OnSelected(args);
-			return args.Result as IEnumerable<T>;
-		}
-
-		protected DataSelectingEventArgs OnSelecting(Type entityType, ICondition condition, Grouping grouping, string scope, Paging paging, Sorting[] sortings)
-		{
-			var args = new DataSelectingEventArgs(this.Name, entityType, condition, grouping, scope, paging, sortings);
-			this.OnSelecting(args);
-			return args;
-		}
-
-		protected int OnDeleted(ICondition condition, string[] cascades, int result)
-		{
-			var args = new DataDeletedEventArgs(this.Name, condition, cascades, result);
-			this.OnDeleted(args);
-			return args.Count;
-		}
-
-		protected DataDeletingEventArgs OnDeleting(ICondition condition, string[] cascades)
-		{
-			var args = new DataDeletingEventArgs(this.Name, condition, cascades);
-			this.OnDeleting(args);
-			return args;
-		}
-
-		protected int OnInserted(DataDictionary data, string scope, int result)
-		{
-			var args = new DataInsertedEventArgs(this.Name, data, scope, result);
-			this.OnInserted(args);
-			return args.Count;
-		}
-
-		protected DataInsertingEventArgs OnInserting(object data, string scope)
-		{
-			var args = new DataInsertingEventArgs(this.Name, DataDictionary<TEntity>.GetDataDictionary(data), scope);
-
-			//尝试递增注册的递增键值
-			DataSequence.Increments(this, (DataDictionary<TEntity>)args.Data);
-
-			this.OnInserting(args);
-			return args;
-		}
-
-		protected int OnManyInserted(IEnumerable<DataDictionary> data, string scope, int result)
-		{
-			var args = new DataManyInsertedEventArgs(this.Name, data, scope, result);
-			this.OnManyInserted(args);
-			return args.Count;
-		}
-
-		protected DataManyInsertingEventArgs OnManyInserting(object data, string scope)
-		{
-			var dictionaries = DataDictionary<TEntity>.GetDataDictionaries(data);
-			var args = new DataManyInsertingEventArgs(this.Name, dictionaries, scope);
-
-			foreach(var dictionary in dictionaries)
-			{
-				//尝试递增注册的递增键值
-				DataSequence.Increments(this, dictionary);
-			}
-
-			this.OnManyInserting(args);
-			return args;
-		}
-
-		protected int OnUpdated(DataDictionary data, ICondition condition, string scope, int result)
-		{
-			var args = new DataUpdatedEventArgs(this.Name, data, condition, scope, result);
-			this.OnUpdated(args);
-			return args.Count;
-		}
-
-		protected DataUpdatingEventArgs OnUpdating(object data, ICondition condition, string scope)
-		{
-			var args = new DataUpdatingEventArgs(this.Name, DataDictionary<TEntity>.GetDataDictionary(data), condition, scope);
-			this.OnUpdating(args);
-			return args;
-		}
-
-		protected int OnManyUpdated(IEnumerable<DataDictionary> data, ICondition condition, string scope, int result)
-		{
-			var args = new DataManyUpdatedEventArgs(this.Name, data, condition, scope, result);
-			this.OnManyUpdated(args);
-			return args.Count;
-		}
-
-		protected DataManyUpdatingEventArgs OnManyUpdating(object data, ICondition condition, string scope)
-		{
-			var args = new DataManyUpdatingEventArgs(this.Name, DataDictionary<TEntity>.GetDataDictionaries(data), condition, scope);
-			this.OnManyUpdating(args);
-			return args;
-		}
-
-		protected virtual void OnCounted(DataCountedEventArgs args)
-		{
-			var e = this.Counted;
-
-			if(e != null)
-				e(this, args);
-		}
-
-		protected virtual void OnCounting(DataCountingEventArgs args)
-		{
-			var e = this.Counting;
-
-			if(e != null)
-				e(this, args);
-		}
-
-		protected virtual void OnExecuted(DataExecutedEventArgs args)
-		{
-			var e = this.Executed;
-
-			if(e != null)
-				e(this, args);
-		}
-
-		protected virtual void OnExecuting(DataExecutingEventArgs args)
-		{
-			var e = this.Executing;
-
-			if(e != null)
-				e(this, args);
-		}
-
-		protected virtual void OnExisted(DataExistedEventArgs args)
-		{
-			var e = this.Existed;
-
-			if(e != null)
-				e(this, args);
-		}
-
-		protected virtual void OnExisting(DataExistingEventArgs args)
-		{
-			var e = this.Existing;
-
-			if(e != null)
-				e(this, args);
-		}
-
-		protected virtual void OnIncremented(DataIncrementedEventArgs args)
-		{
-			var e = this.Incremented;
-
-			if(e != null)
-				e(this, args);
-		}
-
-		protected virtual void OnIncrementing(DataIncrementingEventArgs args)
-		{
-			var e = this.Incrementing;
-
-			if(e != null)
-				e(this, args);
-		}
-
-		protected virtual void OnDecremented(DataDecrementedEventArgs args)
-		{
-			var e = this.Decremented;
-
-			if(e != null)
-				e(this, args);
-		}
-
-		protected virtual void OnDecrementing(DataDecrementingEventArgs args)
-		{
-			var e = this.Decrementing;
-
-			if(e != null)
-				e(this, args);
-		}
-
-		protected virtual void OnGetted(DataGettedEventArgs<TEntity> args)
+		protected virtual void OnGetted(DataSelectionContext context)
 		{
 			var e = this.Getted;
 
 			if(e != null)
-				e(this, args);
+				e(this, new DataGettedEventArgs<TEntity>(context));
 		}
 
-		protected virtual void OnGetting(DataGettingEventArgs<TEntity> args)
+		protected virtual bool OnGetting(DataSelectionContext context)
 		{
 			var e = this.Getting;
 
-			if(e != null)
-				e(this, args);
+			if(e == null)
+				return false;
+
+			var args = new DataGettingEventArgs<TEntity>(context);
+			e(this, args);
+			return args.Cancel;
 		}
 
-		protected virtual void OnSelected(DataSelectedEventArgs args)
+		protected virtual void OnCounted(DataCountContext context)
 		{
-			var e = this.Selected;
+			var e = this.Counted;
 
 			if(e != null)
-				e(this, args);
+				e(this, new DataCountedEventArgs(context));
 		}
 
-		protected virtual void OnSelecting(DataSelectingEventArgs args)
+		protected virtual bool OnCounting(DataCountContext context)
 		{
-			var e = this.Selecting;
+			var e = this.Counting;
 
-			if(e != null)
-				e(this, args);
+			if(e == null)
+				return false;
+
+			var args = new DataCountingEventArgs(context);
+			e(this, args);
+			return args.Cancel;
 		}
 
-		protected virtual void OnDeleted(DataDeletedEventArgs args)
+		protected virtual void OnExecuted(DataExecutionContext context)
+		{
+			var e = this.Executed;
+
+			if(e != null)
+				e(this, new DataExecutedEventArgs(context));
+		}
+
+		protected virtual bool OnExecuting(DataExecutionContext context)
+		{
+			var e = this.Executing;
+
+			if(e == null)
+				return false;
+
+			var args = new DataExecutingEventArgs(context);
+			e(this, args);
+			return args.Cancel;
+		}
+
+		protected virtual void OnExisted(DataExistenceContext context)
+		{
+			var e = this.Existed;
+
+			if(e != null)
+				e(this, new DataExistedEventArgs(context));
+		}
+
+		protected virtual bool OnExisting(DataExistenceContext context)
+		{
+			var e = this.Existing;
+
+			if(e == null)
+				return false;
+
+			var args = new DataExistingEventArgs(context);
+			e(this, args);
+			return args.Cancel;
+		}
+
+		protected virtual void OnIncremented(DataIncrementContext context)
+		{
+			var e = this.Incremented;
+
+			if(e != null)
+				e(this, new DataIncrementedEventArgs(context));
+		}
+
+		protected virtual bool OnIncrementing(DataIncrementContext context)
+		{
+			var e = this.Incrementing;
+
+			if(e == null)
+				return false;
+
+			var args = new DataIncrementingEventArgs(context);
+			e(this, args);
+			return args.Cancel;
+		}
+
+		protected virtual void OnDeleted(DataDeletionContext context)
 		{
 			var e = this.Deleted;
 
 			if(e != null)
-				e(this, args);
+				e(this, new DataDeletedEventArgs(context));
 		}
 
-		protected virtual void OnDeleting(DataDeletingEventArgs args)
+		protected virtual bool OnDeleting(DataDeletionContext context)
 		{
 			var e = this.Deleting;
 
-			if(e != null)
-				e(this, args);
+			if(e == null)
+				return false;
+
+			var args = new DataDeletingEventArgs(context);
+			e(this, args);
+			return args.Cancel;
 		}
 
-		protected virtual void OnInserted(DataInsertedEventArgs args)
+		protected virtual void OnInserted(DataInsertionContext context)
 		{
 			var e = this.Inserted;
 
 			if(e != null)
-				e(this, args);
+				e(this, new DataInsertedEventArgs(context));
 		}
 
-		protected virtual void OnInserting(DataInsertingEventArgs args)
+		protected virtual bool OnInserting(DataInsertionContext context)
 		{
 			var e = this.Inserting;
 
-			if(e != null)
-				e(this, args);
+			if(e == null)
+				return false;
+
+			var args = new DataInsertingEventArgs(context);
+			e(this, args);
+			return args.Cancel;
 		}
 
-		protected virtual void OnManyInserted(DataManyInsertedEventArgs args)
-		{
-			var e = this.ManyInserted;
-
-			if(e != null)
-				e(this, args);
-		}
-
-		protected virtual void OnManyInserting(DataManyInsertingEventArgs args)
-		{
-			var e = this.ManyInserting;
-
-			if(e != null)
-				e(this, args);
-		}
-
-		protected virtual void OnUpdated(DataUpdatedEventArgs args)
+		protected virtual void OnUpdated(DataUpdationContext context)
 		{
 			var e = this.Updated;
 
 			if(e != null)
-				e(this, args);
+				e(this, new DataUpdatedEventArgs(context));
 		}
 
-		protected virtual void OnUpdating(DataUpdatingEventArgs args)
+		protected virtual bool OnUpdating(DataUpdationContext context)
 		{
 			var e = this.Updating;
 
-			if(e != null)
-				e(this, args);
+			if(e == null)
+				return false;
+
+			var args = new DataUpdatingEventArgs(context);
+			e(this, args);
+			return args.Cancel;
 		}
 
-		protected virtual void OnManyUpdated(DataManyUpdatedEventArgs args)
+		protected virtual void OnSelected(DataSelectionContext context)
 		{
-			var e = this.ManyUpdated;
+			var e = this.Selected;
 
 			if(e != null)
-				e(this, args);
+				e(this, new DataSelectedEventArgs(context));
 		}
 
-		protected virtual void OnManyUpdating(DataManyUpdatingEventArgs args)
+		protected virtual bool OnSelecting(DataSelectionContext context)
 		{
-			var e = this.ManyUpdating;
+			var e = this.Selecting;
 
-			if(e != null)
-				e(this, args);
+			if(e == null)
+				return false;
+
+			var args = new DataSelectingEventArgs(context);
+			e(this, args);
+			return args.Cancel;
 		}
 		#endregion
 

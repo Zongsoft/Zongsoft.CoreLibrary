@@ -32,67 +32,11 @@ namespace Zongsoft.Data
 	/// <summary>
 	/// 为数据访问的插入事件提供数据。
 	/// </summary>
-	public class DataInsertedEventArgs : DataAccessEventArgs
+	public class DataInsertedEventArgs : DataAccessEventArgs<DataInsertionContext>
 	{
-		#region 成员字段
-		private int _count;
-		private DataDictionary _data;
-		private string _scope;
-		#endregion
-
 		#region 构造函数
-		public DataInsertedEventArgs(string name, DataDictionary data, string scope, int count) : base(name)
+		public DataInsertedEventArgs(DataInsertionContext context) : base(context)
 		{
-			_data = data;
-			_scope = scope;
-			_count = count;
-		}
-		#endregion
-
-		#region 公共属性
-		/// <summary>
-		/// 获取或设置插入操作的受影响记录数。
-		/// </summary>
-		public int Count
-		{
-			get
-			{
-				return _count;
-			}
-			set
-			{
-				_count = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置插入操作的数据。
-		/// </summary>
-		public DataDictionary Data
-		{
-			get
-			{
-				return _data;
-			}
-			set
-			{
-				_data = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置插入操作的包含成员。
-		/// </summary>
-		public string Scope
-		{
-			get
-			{
-				return _scope;
-			}
-			set
-			{
-				_scope = value;
-			}
 		}
 		#endregion
 	}

@@ -26,148 +26,17 @@
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
 	/// <summary>
 	/// 为数据访问的查询事件提供数据。
 	/// </summary>
-	public class DataSelectedEventArgs : DataAccessEventArgs
+	public class DataSelectedEventArgs : DataAccessEventArgs<DataSelectionContext>
 	{
-		#region 成员字段
-		private Type _entityType;
-		private IEnumerable _result;
-		private ICondition _condition;
-		private string _scope;
-		private Paging _paging;
-		private Grouping _grouping;
-		private Sorting[] _sortings;
-		#endregion
-
 		#region 构造函数
-		public DataSelectedEventArgs(string name, Type entityType, ICondition condition, Grouping grouping, string scope, Paging paging, Sorting[] sortings, IEnumerable result) : base(name)
+		public DataSelectedEventArgs(DataSelectionContext context) : base(context)
 		{
-			if(entityType == null)
-				throw new ArgumentNullException("entityType");
-
-			_entityType = entityType;
-			_condition = condition;
-			_grouping = grouping;
-			_scope = scope;
-			_paging = paging;
-			_sortings = sortings;
-			_result = result;
-		}
-		#endregion
-
-		#region 公共属性
-		/// <summary>
-		/// 获取或设置查询结果集的实体类型。
-		/// </summary>
-		public Type EntityType
-		{
-			get
-			{
-				return _entityType;
-			}
-			set
-			{
-				if(value == null)
-					throw new ArgumentNullException();
-
-				_entityType = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置查询操作的结果。
-		/// </summary>
-		public IEnumerable Result
-		{
-			get
-			{
-				return _result;
-			}
-			set
-			{
-				_result = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置查询操作的条件。
-		/// </summary>
-		public ICondition Condition
-		{
-			get
-			{
-				return _condition;
-			}
-			set
-			{
-				_condition = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置查询操作的分组。
-		/// </summary>
-		public Grouping Grouping
-		{
-			get
-			{
-				return _grouping;
-			}
-			set
-			{
-				_grouping = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置查询操作的分页设置。
-		/// </summary>
-		public Paging Paging
-		{
-			get
-			{
-				return _paging;
-			}
-			set
-			{
-				_paging = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置查询操作的包含成员。
-		/// </summary>
-		public string Scope
-		{
-			get
-			{
-				return _scope;
-			}
-			set
-			{
-				_scope = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置查询操作的排序设置。
-		/// </summary>
-		public Sorting[] Sortings
-		{
-			get
-			{
-				return _sortings;
-			}
-			set
-			{
-				_sortings = value;
-			}
 		}
 		#endregion
 	}

@@ -44,20 +44,14 @@ namespace Zongsoft.Data
 		event EventHandler<DataExistingEventArgs> Existing;
 		event EventHandler<DataIncrementedEventArgs> Incremented;
 		event EventHandler<DataIncrementingEventArgs> Incrementing;
-		event EventHandler<DataDecrementedEventArgs> Decremented;
-		event EventHandler<DataDecrementingEventArgs> Decrementing;
-		event EventHandler<DataSelectedEventArgs> Selected;
-		event EventHandler<DataSelectingEventArgs> Selecting;
 		event EventHandler<DataDeletedEventArgs> Deleted;
 		event EventHandler<DataDeletingEventArgs> Deleting;
 		event EventHandler<DataInsertedEventArgs> Inserted;
 		event EventHandler<DataInsertingEventArgs> Inserting;
-		event EventHandler<DataManyInsertedEventArgs> ManyInserted;
-		event EventHandler<DataManyInsertingEventArgs> ManyInserting;
 		event EventHandler<DataUpdatedEventArgs> Updated;
 		event EventHandler<DataUpdatingEventArgs> Updating;
-		event EventHandler<DataManyUpdatedEventArgs> ManyUpdated;
-		event EventHandler<DataManyUpdatingEventArgs> ManyUpdating;
+		event EventHandler<DataSelectedEventArgs> Selected;
+		event EventHandler<DataSelectingEventArgs> Selecting;
 		#endregion
 
 		#region 属性定义
@@ -102,35 +96,6 @@ namespace Zongsoft.Data
 		long Decrement(string member, ICondition condition, int interval = 1);
 		#endregion
 
-		#region 查询方法
-		object Search(string keyword, params Sorting[] sortings);
-		object Search(string keyword, string scope, Paging paging = null, params Sorting[] sortings);
-		object Search(string keyword, Paging paging, string scope = null, params Sorting[] sortings);
-
-		object Get<TKey>(TKey key, params Sorting[] sortings);
-		object Get<TKey>(TKey key, string scope, Paging paging = null, params Sorting[] sortings);
-		object Get<TKey>(TKey key, Paging paging, string scope = null, params Sorting[] sortings);
-
-		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, params Sorting[] sortings);
-		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string scope, Paging paging = null, params Sorting[] sortings);
-		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, Paging paging, string scope = null, params Sorting[] sortings);
-
-		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, params Sorting[] sortings);
-		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string scope, Paging paging = null, params Sorting[] sortings);
-		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, Paging paging, string scope = null, params Sorting[] sortings);
-
-		IEnumerable Select(ICondition condition = null, params Sorting[] sortings);
-		IEnumerable Select(ICondition condition, string scope, params Sorting[] sortings);
-		IEnumerable Select(ICondition condition, string scope, Paging paging, params Sorting[] sortings);
-		IEnumerable Select(ICondition condition, Paging paging, params Sorting[] sortings);
-		IEnumerable Select(ICondition condition, Paging paging, string scope, params Sorting[] sortings);
-		IEnumerable Select(ICondition condition, Grouping grouping, params Sorting[] sortings);
-		IEnumerable Select(ICondition condition, Grouping grouping, string scope, params Sorting[] sortings);
-		IEnumerable Select(ICondition condition, Grouping grouping, string scope, Paging paging, params Sorting[] sortings);
-		IEnumerable Select(ICondition condition, Grouping grouping, Paging paging, params Sorting[] sortings);
-		IEnumerable Select(ICondition condition, Grouping grouping, Paging paging, string scope, params Sorting[] sortings);
-		#endregion
-
 		#region 删除方法
 		int Delete<TKey>(TKey key, params string[] cascades);
 		int Delete<TKey1, TKey2>(TKey1 key1, TKey2 key2, params string[] cascades);
@@ -158,6 +123,35 @@ namespace Zongsoft.Data
 
 		int UpdateMany(IEnumerable items, ICondition condition = null, string scope = null);
 		int UpdateMany(IEnumerable items, string scope, ICondition condition = null);
+		#endregion
+
+		#region 查询方法
+		object Search(string keyword, params Sorting[] sortings);
+		object Search(string keyword, Paging paging, string scope = null, params Sorting[] sortings);
+		object Search(string keyword, string scope, Paging paging = null, params Sorting[] sortings);
+
+		object Get<TKey>(TKey key, params Sorting[] sortings);
+		object Get<TKey>(TKey key, Paging paging, string scope = null, params Sorting[] sortings);
+		object Get<TKey>(TKey key, string scope, Paging paging = null, params Sorting[] sortings);
+
+		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, params Sorting[] sortings);
+		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, Paging paging, string scope = null, params Sorting[] sortings);
+		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string scope, Paging paging = null, params Sorting[] sortings);
+
+		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, params Sorting[] sortings);
+		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, Paging paging, string scope = null, params Sorting[] sortings);
+		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string scope, Paging paging = null, params Sorting[] sortings);
+
+		IEnumerable Select(ICondition condition = null, params Sorting[] sortings);
+		IEnumerable Select(ICondition condition, string scope, params Sorting[] sortings);
+		IEnumerable Select(ICondition condition, string scope, Paging paging, params Sorting[] sortings);
+		IEnumerable Select(ICondition condition, Paging paging, params Sorting[] sortings);
+		IEnumerable Select(ICondition condition, Paging paging, string scope, params Sorting[] sortings);
+		IEnumerable Select(ICondition condition, Grouping grouping, params Sorting[] sortings);
+		IEnumerable Select(ICondition condition, Grouping grouping, Paging paging, params Sorting[] sortings);
+		IEnumerable Select(ICondition condition, Grouping grouping, Paging paging, string scope, params Sorting[] sortings);
+		IEnumerable Select(ICondition condition, Grouping grouping, string scope, params Sorting[] sortings);
+		IEnumerable Select(ICondition condition, Grouping grouping, string scope, Paging paging, params Sorting[] sortings);
 		#endregion
 	}
 }

@@ -39,7 +39,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataExecutingEventArgs(string name, Type resultType, IDictionary<string, object> inParameters, IDictionary<string, object> outParameters = null) : base(name, resultType, inParameters, outParameters, null)
+		public DataExecutingEventArgs(DataExecutionContext context) : base(context)
 		{
 			_cancel = false;
 		}

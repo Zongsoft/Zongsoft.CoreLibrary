@@ -31,92 +31,33 @@ namespace Zongsoft.Data
 	/// <summary>
 	/// 为数据服务的获取事件提供数据。
 	/// </summary>
-	public class DataGettedEventArgs<T> : EventArgs
+	public class DataGettedEventArgs<T> : DataAccessEventArgs<DataSelectionContext>
 	{
-		#region 成员字段
-		private string _name;
-		private T _result;
-		private string _scope;
-		private ICondition _condition;
-		#endregion
-
 		#region 构造函数
-		public DataGettedEventArgs(string name, ICondition condition, string scope)
+		public DataGettedEventArgs(DataSelectionContext context) : base(context)
 		{
-			if(string.IsNullOrWhiteSpace(name))
-				throw new ArgumentNullException(nameof(name));
-
-			_name = name;
-			_condition = condition;
-			_scope = scope;
-		}
-
-		public DataGettedEventArgs(string name, ICondition condition, string scope, T result)
-		{
-			if(string.IsNullOrWhiteSpace(name))
-				throw new ArgumentNullException(nameof(name));
-
-			_name = name;
-			_condition = condition;
-			_scope = scope;
-			_result = result;
 		}
 		#endregion
 
 		#region 公共属性
 		/// <summary>
-		/// 获取数据访问的名称。
-		/// </summary>
-		public string Name
-		{
-			get
-			{
-				return _name;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置查询操作的结果。
+		/// 获取查询操作的首条数据。
 		/// </summary>
 		public T Result
 		{
 			get
 			{
-				return _result;
-			}
-			set
-			{
-				_result = value;
-			}
-		}
+				var items = this.Context.Result;
 
-		/// <summary>
-		/// 获取或设置查询操作的条件。
-		/// </summary>
-		public ICondition Condition
-		{
-			get
-			{
-				return _condition;
-			}
-			set
-			{
-				_condition = value;
-			}
-		}
+				if(items != null)
+				{
+					var iterator = items.GetEnumerator();
 
-		/// <summary>
-		/// 获取或设置查询操作的包含成员。
-		/// </summary>
-		public string Scope
-		{
-			get
-			{
-				return _scope;
-			}
-			set
-			{
-				_scope = value;
+					if(iterator != null && iterator.MoveNext())
+						return (T)iterator.Current;
+				}
+
+				return default(T);
 			}
 		}
 		#endregion

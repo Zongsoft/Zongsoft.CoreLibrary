@@ -30,7 +30,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
-	public abstract class DataAccessFilterBase : IDataAccessFilter, Zongsoft.Services.IPredication<DataAccessFilterContext>
+	public abstract class DataAccessFilterBase : IDataAccessFilter, Zongsoft.Services.IPredication<DataAccessContextBase>
 	{
 		#region 成员字段
 		private string[] _names;
@@ -69,12 +69,12 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 抽象方法
-		public abstract void OnExecuted(DataAccessFilterContext context);
-		public abstract void OnExecuting(DataAccessFilterContext context);
+		public abstract void OnExecuted(DataAccessContextBase context);
+		public abstract void OnExecuting(DataAccessContextBase context);
 		#endregion
 
 		#region 断言方法
-		public virtual bool Predicate(DataAccessFilterContext context)
+		public virtual bool Predicate(DataAccessContextBase context)
 		{
 			var result = true;
 
@@ -89,7 +89,7 @@ namespace Zongsoft.Data
 
 		bool Zongsoft.Services.IPredication.Predicate(object parameter)
 		{
-			var context = parameter as DataAccessFilterContext;
+			var context = parameter as DataAccessContextBase;
 
 			if(context == null)
 				return false;

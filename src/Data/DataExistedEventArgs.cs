@@ -28,49 +28,11 @@ using System;
 
 namespace Zongsoft.Data
 {
-	public class DataExistedEventArgs : DataAccessEventArgs
+	public class DataExistedEventArgs : DataAccessEventArgs<DataExistenceContext>
 	{
-		#region 成员字段
-		private ICondition _condition;
-		private bool _result;
-		#endregion
-
 		#region 构造函数
-		public DataExistedEventArgs(string name, ICondition condition) : base(name)
+		public DataExistedEventArgs(DataExistenceContext context) : base(context)
 		{
-			_condition = condition;
-		}
-
-		public DataExistedEventArgs(string name, ICondition condition, bool result) : base(name)
-		{
-			_condition = condition;
-			_result = result;
-		}
-		#endregion
-
-		#region 公共属性
-		public ICondition Condition
-		{
-			get
-			{
-				return _condition;
-			}
-			set
-			{
-				_condition = value;
-			}
-		}
-
-		public bool Result
-		{
-			get
-			{
-				return _result;
-			}
-			set
-			{
-				_result = value;
-			}
 		}
 		#endregion
 	}

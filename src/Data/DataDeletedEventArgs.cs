@@ -32,67 +32,11 @@ namespace Zongsoft.Data
 	/// <summary>
 	/// 为数据访问的删除事件提供数据。
 	/// </summary>
-	public class DataDeletedEventArgs : DataAccessEventArgs
+	public class DataDeletedEventArgs : DataAccessEventArgs<DataDeletionContext>
 	{
-		#region 成员字段
-		private int _count;
-		private ICondition _condition;
-		private string[] _cascades;
-		#endregion
-
 		#region 构造函数
-		public DataDeletedEventArgs(string name, ICondition condition, string[] cascades, int count) : base(name)
+		public DataDeletedEventArgs(DataDeletionContext context) : base(context)
 		{
-			_condition = condition;
-			_cascades = cascades;
-			_count = count;
-		}
-		#endregion
-
-		#region 公共属性
-		/// <summary>
-		/// 获取或设置删除操作的受影响记录数。
-		/// </summary>
-		public int Count
-		{
-			get
-			{
-				return _count;
-			}
-			set
-			{
-				_count = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置删除操作的条件。
-		/// </summary>
-		public ICondition Condition
-		{
-			get
-			{
-				return _condition;
-			}
-			set
-			{
-				_condition = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置删除操作的关联成员。
-		/// </summary>
-		public string[] Cascades
-		{
-			get
-			{
-				return _cascades;
-			}
-			set
-			{
-				_cascades = value;
-			}
 		}
 		#endregion
 	}

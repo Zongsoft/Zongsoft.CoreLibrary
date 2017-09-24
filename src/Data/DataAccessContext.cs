@@ -147,7 +147,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataExecutionContext(IDataAccess dataAccess, string name, Type resultType, IDictionary<string, object> inParameters, IDictionary<string, object> outParameters, object result = null) : base(dataAccess, name, DataAccessMethod.Execute)
+		public DataExecutionContext(IDataAccess dataAccess, string name, bool isScalar, Type resultType, IDictionary<string, object> inParameters, IDictionary<string, object> outParameters, object result = null) : base(dataAccess, name, (isScalar ? DataAccessMethod.ExecuteScalar : DataAccessMethod.Execute))
 		{
 			if(resultType == null)
 				throw new ArgumentNullException("resultType");
@@ -161,27 +161,13 @@ namespace Zongsoft.Data
 
 		#region 公共属性
 		/// <summary>
-		/// 获取一个值，指示当前是否为单值执行方法。
+		/// 获取一个值，指示是否为返回单值。
 		/// </summary>
 		public bool IsScalar
 		{
 			get
 			{
-				return !(_resultType != null && Zongsoft.Common.TypeExtension.IsAssignableFrom(typeof(IEnumerable<>), _resultType));
-			}
-		}
-
-		/// <summary>
-		/// 获取查询结果集的实体类型，如果是单值执行方法则返回空(null)。
-		/// </summary>
-		public Type EntityType
-		{
-			get
-			{
-				if(_resultType != null && Zongsoft.Common.TypeExtension.IsAssignableFrom(typeof(IEnumerable<>), _resultType))
-					return _resultType.GetGenericArguments()[0];
-
-				return null;
+				return this.Method == DataAccessMethod.ExecuteScalar;
 			}
 		}
 
@@ -230,13 +216,17 @@ namespace Zongsoft.Data
 		}
 
 		/// <summary>
-		/// 获取执行操作的输出参数。
+		/// 获取或设置执行操作的输出参数。
 		/// </summary>
 		public IDictionary<string, object> OutParameters
 		{
 			get
 			{
 				return _outParameters;
+			}
+			set
+			{
+				_outParameters = value;
 			}
 		}
 		#endregion
@@ -324,88 +314,6 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
-	public class DataDecrementContext : DataAccessContextBase
-	{
-		#region 成员字段
-		private string _member;
-		private ICondition _condition;
-		private int _interval;
-		private long _result;
-		#endregion
-
-		#region 构造函数
-		public DataDecrementContext(IDataAccess dataAccess, string name, string member, ICondition condition, int interval = 1, long result = 0) : base(dataAccess, name, DataAccessMethod.Decrement)
-		{
-			if(string.IsNullOrEmpty(member))
-				throw new ArgumentNullException(nameof(member));
-
-			if(condition == null)
-				throw new ArgumentNullException(nameof(condition));
-
-			_member = member;
-			_condition = condition;
-			_interval = interval;
-			_result = result;
-		}
-		#endregion
-
-		#region 公共属性
-		public string Member
-		{
-			get
-			{
-				return _member;
-			}
-			set
-			{
-				if(string.IsNullOrWhiteSpace(value))
-					throw new ArgumentNullException();
-
-				_member = value;
-			}
-		}
-
-		public ICondition Condition
-		{
-			get
-			{
-				return _condition;
-			}
-			set
-			{
-				if(value == null)
-					throw new ArgumentNullException();
-
-				_condition = value;
-			}
-		}
-
-		public int Interval
-		{
-			get
-			{
-				return _interval;
-			}
-			set
-			{
-				_interval = value;
-			}
-		}
-
-		public long Result
-		{
-			get
-			{
-				return _result;
-			}
-			set
-			{
-				_result = value;
-			}
-		}
-		#endregion
-	}
-
 	public class DataSelectionContext : DataAccessContextBase
 	{
 		#region 成员字段
@@ -421,9 +329,6 @@ namespace Zongsoft.Data
 		#region 构造函数
 		public DataSelectionContext(IDataAccess dataAccess, string name, Type entityType, ICondition condition, Grouping grouping, string scope, Paging paging, Sorting[] sortings, IEnumerable result = null) : base(dataAccess, name, DataAccessMethod.Select)
 		{
-			if(entityType == null)
-				throw new ArgumentNullException(nameof(entityType));
-
 			_entityType = entityType;
 			_condition = condition;
 			_grouping = grouping;
@@ -436,20 +341,13 @@ namespace Zongsoft.Data
 
 		#region 公共属性
 		/// <summary>
-		/// 获取或设置查询结果集的实体类型。
+		/// 获取查询要返回的实体类型。
 		/// </summary>
 		public Type EntityType
 		{
 			get
 			{
 				return _entityType;
-			}
-			set
-			{
-				if(value == null)
-					throw new ArgumentNullException();
-
-				_entityType = value;
 			}
 		}
 
@@ -554,7 +452,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataDeletionContext(IDataAccess dataAccess, string name, ICondition condition, string[] cascades, int count) : base(dataAccess, name, DataAccessMethod.Delete)
+		public DataDeletionContext(IDataAccess dataAccess, string name, ICondition condition, string[] cascades, int count = 0) : base(dataAccess, name, DataAccessMethod.Delete)
 		{
 			_condition = condition;
 			_cascades = cascades;
@@ -614,12 +512,12 @@ namespace Zongsoft.Data
 	{
 		#region 成员字段
 		private int _count;
-		private DataDictionary _data;
+		private object _data;
 		private string _scope;
 		#endregion
 
 		#region 构造函数
-		public DataInsertionContext(IDataAccess dataAccess, string name, DataDictionary data, string scope, int count = 0) : base(dataAccess, name, DataAccessMethod.Insert)
+		public DataInsertionContext(IDataAccess dataAccess, string name, bool isMultiple, object data, string scope, int count = 0) : base(dataAccess, name, isMultiple ? DataAccessMethod.InsertMany : DataAccessMethod.Insert)
 		{
 			_data = data;
 			_scope = scope;
@@ -628,6 +526,17 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取一个值，指示是否为批量新增操作。
+		/// </summary>
+		public bool IsMultiple
+		{
+			get
+			{
+				return this.Method == DataAccessMethod.InsertMany;
+			}
+		}
+
 		/// <summary>
 		/// 获取或设置插入操作的受影响记录数。
 		/// </summary>
@@ -646,72 +555,7 @@ namespace Zongsoft.Data
 		/// <summary>
 		/// 获取或设置插入操作的数据。
 		/// </summary>
-		public DataDictionary Data
-		{
-			get
-			{
-				return _data;
-			}
-			set
-			{
-				_data = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置插入操作的包含成员。
-		/// </summary>
-		public string Scope
-		{
-			get
-			{
-				return _scope;
-			}
-			set
-			{
-				_scope = value;
-			}
-		}
-		#endregion
-	}
-
-	public class DataManyInsertionContext : DataAccessContextBase
-	{
-		#region 成员字段
-		private int _count;
-		private IEnumerable<DataDictionary> _data;
-		private string _scope;
-		#endregion
-
-		#region 构造函数
-		public DataManyInsertionContext(IDataAccess dataAccess, string name, IEnumerable<DataDictionary> data, string scope, int count) : base(dataAccess, name, DataAccessMethod.InsertMany)
-		{
-			_data = data;
-			_scope = scope;
-			_count = count;
-		}
-		#endregion
-
-		#region 公共属性
-		/// <summary>
-		/// 获取或设置插入操作的受影响记录数。
-		/// </summary>
-		public int Count
-		{
-			get
-			{
-				return _count;
-			}
-			set
-			{
-				_count = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置插入操作的数据。
-		/// </summary>
-		public IEnumerable<DataDictionary> Data
+		public object Data
 		{
 			get
 			{
@@ -744,13 +588,13 @@ namespace Zongsoft.Data
 	{
 		#region 成员字段
 		private int _count;
-		private DataDictionary _data;
+		private object _data;
 		private ICondition _condition;
 		private string _scope;
 		#endregion
 
 		#region 构造函数
-		public DataUpdationContext(IDataAccess dataAccess, string name, DataDictionary data, ICondition condition, string scope, int count) : base(dataAccess, name, DataAccessMethod.Update)
+		public DataUpdationContext(IDataAccess dataAccess, string name, bool isMultiple, object data, ICondition condition, string scope, int count = 0) : base(dataAccess, name, isMultiple ? DataAccessMethod.UpdateMany : DataAccessMethod.Update)
 		{
 			_data = data;
 			_condition = condition;
@@ -760,6 +604,17 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取一个值，指示是否为批量更新操作。
+		/// </summary>
+		public bool IsMultiple
+		{
+			get
+			{
+				return this.Method == DataAccessMethod.UpdateMany;
+			}
+		}
+
 		/// <summary>
 		/// 获取或设置更新操作的受影响记录数。
 		/// </summary>
@@ -778,89 +633,7 @@ namespace Zongsoft.Data
 		/// <summary>
 		/// 获取或设置更新操作的数据。
 		/// </summary>
-		public DataDictionary Data
-		{
-			get
-			{
-				return _data;
-			}
-			set
-			{
-				_data = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置更新操作的条件。
-		/// </summary>
-		public ICondition Condition
-		{
-			get
-			{
-				return _condition;
-			}
-			set
-			{
-				_condition = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置更新操作的包含成员。
-		/// </summary>
-		public string Scope
-		{
-			get
-			{
-				return _scope;
-			}
-			set
-			{
-				_scope = value;
-			}
-		}
-		#endregion
-	}
-
-	public class DataManyUpdationContext : DataAccessContextBase
-	{
-		#region 成员字段
-		private int _count;
-		private IEnumerable<DataDictionary> _data;
-		private ICondition _condition;
-		private string _scope;
-		#endregion
-
-		#region 构造函数
-		public DataManyUpdationContext(IDataAccess dataAccess, string name, IEnumerable<DataDictionary> data, ICondition condition, string scope, int count) : base(dataAccess, name, DataAccessMethod.UpdateMany)
-		{
-			_data = data;
-			_condition = condition;
-			_scope = scope;
-			_count = count;
-		}
-		#endregion
-
-		#region 公共属性
-		/// <summary>
-		/// 获取或设置更新操作的受影响记录数。
-		/// </summary>
-		public int Count
-		{
-			get
-			{
-				return _count;
-			}
-			set
-			{
-				_count = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置更新操作的数据。
-		/// </summary>
-		public IEnumerable<DataDictionary> Data
+		public object Data
 		{
 			get
 			{
