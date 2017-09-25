@@ -270,7 +270,13 @@ namespace Zongsoft.Data
 			if(data == null)
 				return 0;
 
-			return this.OnInsert(DataDictionary<TEntity>.GetDataDictionary(data), scope);
+			//将当前插入数据实体对象转换成数据字典
+			var dictionary = DataDictionary<TEntity>.GetDataDictionary(data);
+
+			//尝试递增注册的递增键值
+			DataSequence.Increments(this, dictionary);
+
+			return this.OnInsert(dictionary, scope);
 		}
 
 		public int InsertMany(IEnumerable data, string scope = null)
@@ -278,7 +284,16 @@ namespace Zongsoft.Data
 			if(data == null)
 				return 0;
 
-			return this.OnInsertMany(DataDictionary<TEntity>.GetDataDictionaries(data), scope);
+			//将当前插入数据实体集合对象转换成数据字典集合
+			var dictionares = DataDictionary<TEntity>.GetDataDictionaries(data);
+
+			foreach(var dictionary in dictionares)
+			{
+				//尝试递增注册的递增键值
+				DataSequence.Increments(this, dictionary);
+			}
+
+			return this.OnInsertMany(dictionares, scope);
 		}
 
 		protected virtual int OnInsert(DataDictionary<TEntity> data, string scope)
