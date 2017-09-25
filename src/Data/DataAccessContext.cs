@@ -140,6 +140,7 @@ namespace Zongsoft.Data
 	public class DataExecutionContext : DataAccessContextBase
 	{
 		#region 成员字段
+		private bool _isScalar;
 		private object _result;
 		private Type _resultType;
 		private IDictionary<string, object> _inParameters;
@@ -147,11 +148,12 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataExecutionContext(IDataAccess dataAccess, string name, bool isScalar, Type resultType, IDictionary<string, object> inParameters, IDictionary<string, object> outParameters, object result = null) : base(dataAccess, name, (isScalar ? DataAccessMethod.ExecuteScalar : DataAccessMethod.Execute))
+		public DataExecutionContext(IDataAccess dataAccess, string name, bool isScalar, Type resultType, IDictionary<string, object> inParameters, IDictionary<string, object> outParameters, object result = null) : base(dataAccess, name, DataAccessMethod.Execute)
 		{
 			if(resultType == null)
-				throw new ArgumentNullException("resultType");
+				throw new ArgumentNullException(nameof(resultType));
 
+			_isScalar = isScalar;
 			_result = result;
 			_resultType = resultType;
 			_inParameters = inParameters;
@@ -167,7 +169,7 @@ namespace Zongsoft.Data
 		{
 			get
 			{
-				return this.Method == DataAccessMethod.ExecuteScalar;
+				return _isScalar;
 			}
 		}
 
@@ -514,14 +516,16 @@ namespace Zongsoft.Data
 		private int _count;
 		private object _data;
 		private string _scope;
+		private bool _isMultiple;
 		#endregion
 
 		#region 构造函数
-		public DataInsertionContext(IDataAccess dataAccess, string name, bool isMultiple, object data, string scope, int count = 0) : base(dataAccess, name, isMultiple ? DataAccessMethod.InsertMany : DataAccessMethod.Insert)
+		public DataInsertionContext(IDataAccess dataAccess, string name, bool isMultiple, object data, string scope, int count = 0) : base(dataAccess, name, DataAccessMethod.Insert)
 		{
 			_data = data;
 			_scope = scope;
 			_count = count;
+			_isMultiple = isMultiple;
 		}
 		#endregion
 
@@ -533,7 +537,7 @@ namespace Zongsoft.Data
 		{
 			get
 			{
-				return this.Method == DataAccessMethod.InsertMany;
+				return _isMultiple;
 			}
 		}
 
@@ -591,15 +595,17 @@ namespace Zongsoft.Data
 		private object _data;
 		private ICondition _condition;
 		private string _scope;
+		private bool _isMultiple;
 		#endregion
 
 		#region 构造函数
-		public DataUpdationContext(IDataAccess dataAccess, string name, bool isMultiple, object data, ICondition condition, string scope, int count = 0) : base(dataAccess, name, isMultiple ? DataAccessMethod.UpdateMany : DataAccessMethod.Update)
+		public DataUpdationContext(IDataAccess dataAccess, string name, bool isMultiple, object data, ICondition condition, string scope, int count = 0) : base(dataAccess, name, DataAccessMethod.Update)
 		{
 			_data = data;
 			_condition = condition;
 			_scope = scope;
 			_count = count;
+			_isMultiple = isMultiple;
 		}
 		#endregion
 
@@ -611,7 +617,7 @@ namespace Zongsoft.Data
 		{
 			get
 			{
-				return this.Method == DataAccessMethod.UpdateMany;
+				return _isMultiple;
 			}
 		}
 
@@ -662,6 +668,101 @@ namespace Zongsoft.Data
 
 		/// <summary>
 		/// 获取或设置更新操作的包含成员。
+		/// </summary>
+		public string Scope
+		{
+			get
+			{
+				return _scope;
+			}
+			set
+			{
+				_scope = value;
+			}
+		}
+		#endregion
+	}
+
+	public class DataUpsertionContext : DataAccessContextBase
+	{
+		#region 成员字段
+		private int _count;
+		private object _data;
+		private ICondition _condition;
+		private string _scope;
+		private bool _isMultiple;
+		#endregion
+
+		#region 构造函数
+		public DataUpsertionContext(IDataAccess dataAccess, string name, bool isMultiple, object data, ICondition condition, string scope, int count = 0) : base(dataAccess, name, DataAccessMethod.Update)
+		{
+			_data = data;
+			_condition = condition;
+			_scope = scope;
+			_count = count;
+			_isMultiple = isMultiple;
+		}
+		#endregion
+
+		#region 公共属性
+		/// <summary>
+		/// 获取一个值，指示是否为批量操作。
+		/// </summary>
+		public bool IsMultiple
+		{
+			get
+			{
+				return _isMultiple;
+			}
+		}
+
+		/// <summary>
+		/// 获取或设置操作的受影响记录数。
+		/// </summary>
+		public int Count
+		{
+			get
+			{
+				return _count;
+			}
+			set
+			{
+				_count = value;
+			}
+		}
+
+		/// <summary>
+		/// 获取或设置操作的数据。
+		/// </summary>
+		public object Data
+		{
+			get
+			{
+				return _data;
+			}
+			set
+			{
+				_data = value;
+			}
+		}
+
+		/// <summary>
+		/// 获取或设置操作的条件。
+		/// </summary>
+		public ICondition Condition
+		{
+			get
+			{
+				return _condition;
+			}
+			set
+			{
+				_condition = value;
+			}
+		}
+
+		/// <summary>
+		/// 获取或设置操作的包含成员。
 		/// </summary>
 		public string Scope
 		{

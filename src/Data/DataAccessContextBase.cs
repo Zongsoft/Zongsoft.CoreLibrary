@@ -46,7 +46,8 @@ namespace Zongsoft.Data
 		{
 			if(dataAccess == null)
 				throw new ArgumentNullException(nameof(dataAccess));
-			if(string.IsNullOrWhiteSpace(name))
+
+			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
 			_name = name;

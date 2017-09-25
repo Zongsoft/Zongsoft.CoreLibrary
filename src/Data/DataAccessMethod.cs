@@ -37,14 +37,11 @@ namespace Zongsoft.Data
 		Count = 1,
 		Exists,
 		Execute,
-		ExecuteScalar,
 		Increment,
-		Decrement,
 		Select,
 		Delete,
 		Insert,
-		InsertMany,
 		Update,
-		UpdateMany,
+		Upsert,
 	}
 }

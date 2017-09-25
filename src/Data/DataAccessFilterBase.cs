@@ -68,9 +68,158 @@ namespace Zongsoft.Data
 		}
 		#endregion
 
-		#region 抽象方法
-		public abstract void OnExecuted(DataAccessContextBase context);
-		public abstract void OnExecuting(DataAccessContextBase context);
+		#region 过滤方法
+		protected virtual void OnFiltered(DataAccessContextBase context)
+		{
+			switch(context.Method)
+			{
+				case DataAccessMethod.Count:
+					this.OnCounted((DataCountContext)context);
+					break;
+				case DataAccessMethod.Execute:
+					this.OnExecuted((DataExecutionContext)context);
+					break;
+				case DataAccessMethod.Exists:
+					this.OnExisted((DataExistenceContext)context);
+					break;
+				case DataAccessMethod.Increment:
+					this.OnIncremented((DataIncrementContext)context);
+					break;
+				case DataAccessMethod.Select:
+					this.OnSelected((DataSelectionContext)context);
+					break;
+				case DataAccessMethod.Delete:
+					this.OnDeleted((DataDeletionContext)context);
+					break;
+				case DataAccessMethod.Insert:
+					this.OnInserted((DataInsertionContext)context);
+					break;
+				case DataAccessMethod.Update:
+					this.OnUpdated((DataUpdationContext)context);
+					break;
+				case DataAccessMethod.Upsert:
+					this.OnUpserted((DataUpsertionContext)context);
+					break;
+			}
+		}
+
+		protected virtual void OnFiltering(DataAccessContextBase context)
+		{
+			switch(context.Method)
+			{
+				case DataAccessMethod.Count:
+					this.OnCounting((DataCountContext)context);
+					break;
+				case DataAccessMethod.Execute:
+					this.OnExecuting((DataExecutionContext)context);
+					break;
+				case DataAccessMethod.Exists:
+					this.OnExisting((DataExistenceContext)context);
+					break;
+				case DataAccessMethod.Increment:
+					this.OnIncrementing((DataIncrementContext)context);
+					break;
+				case DataAccessMethod.Select:
+					this.OnSelecting((DataSelectionContext)context);
+					break;
+				case DataAccessMethod.Delete:
+					this.OnDeleting((DataDeletionContext)context);
+					break;
+				case DataAccessMethod.Insert:
+					this.OnInserting((DataInsertionContext)context);
+					break;
+				case DataAccessMethod.Update:
+					this.OnUpdating((DataUpdationContext)context);
+					break;
+				case DataAccessMethod.Upsert:
+					this.OnUpserting((DataUpsertionContext)context);
+					break;
+			}
+		}
+
+		void IDataAccessFilter.OnFiltered(DataAccessContextBase context)
+		{
+			this.OnFiltered(context);
+		}
+
+		void IDataAccessFilter.OnFiltering(DataAccessContextBase context)
+		{
+			this.OnFiltering(context);
+		}
+		#endregion
+
+		#region 虚拟方法
+		protected virtual void OnCounting(DataCountContext context)
+		{
+		}
+
+		protected virtual void OnCounted(DataCountContext context)
+		{
+		}
+
+		protected virtual void OnExecuting(DataExecutionContext context)
+		{
+		}
+
+		protected virtual void OnExecuted(DataExecutionContext context)
+		{
+		}
+
+		protected virtual void OnExisting(DataExistenceContext context)
+		{
+		}
+
+		protected virtual void OnExisted(DataExistenceContext context)
+		{
+		}
+
+		protected virtual void OnIncrementing(DataIncrementContext context)
+		{
+		}
+
+		protected virtual void OnIncremented(DataIncrementContext context)
+		{
+		}
+
+		protected virtual void OnSelecting(DataSelectionContext context)
+		{
+		}
+
+		protected virtual void OnSelected(DataSelectionContext context)
+		{
+		}
+
+		protected virtual void OnDeleting(DataDeletionContext context)
+		{
+		}
+
+		protected virtual void OnDeleted(DataDeletionContext context)
+		{
+		}
+
+		protected virtual void OnInserting(DataInsertionContext context)
+		{
+		}
+
+		protected virtual void OnInserted(DataInsertionContext context)
+		{
+		}
+
+		protected virtual void OnUpdating(DataUpdationContext context)
+		{
+		}
+
+		protected virtual void OnUpdated(DataUpdationContext context)
+		{
+		}
+
+		protected virtual void OnUpserting(DataUpsertionContext context)
+		{
+		}
+
+		protected virtual void OnUpserted(DataUpsertionContext context)
+		{
+		}
 		#endregion
 
 		#region 断言方法

@@ -34,7 +34,7 @@ namespace Zongsoft.Data
 	/// </summary>
 	public interface IDataAccessFilter
 	{
-		void OnExecuted(DataAccessContextBase context);
-		void OnExecuting(DataAccessContextBase context);
+		void OnFiltered(DataAccessContextBase context);
+		void OnFiltering(DataAccessContextBase context);
 	}
 }
