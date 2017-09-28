@@ -42,12 +42,14 @@ namespace Zongsoft.Runtime.Serialization
 		{
 			_maximumDepth = -1;
 			_serializationMembers = Serialization.SerializationMembers.All;
+			_serializationBehavior = SerializationBehavior.IgnoreDefaultValue;
 		}
 
 		public SerializationSettings(int maximumDepth, Serialization.SerializationMembers serializationMembers)
 		{
-			this.MaximumDepth = maximumDepth;
-			this.SerializationMembers = serializationMembers;
+			_maximumDepth = Math.Max(-1, maximumDepth);
+			_serializationMembers = serializationMembers;
+			_serializationBehavior = SerializationBehavior.IgnoreDefaultValue;
 		}
 		#endregion
 
