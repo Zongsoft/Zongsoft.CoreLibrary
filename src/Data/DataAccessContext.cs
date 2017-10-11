@@ -329,12 +329,21 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataSelectionContext(IDataAccess dataAccess, string name, Type entityType, ICondition condition, Grouping grouping, string scope, Paging paging, Sorting[] sortings, IEnumerable result = null) : base(dataAccess, name, DataAccessMethod.Select)
+		public DataSelectionContext(IDataAccess dataAccess, string name, Type entityType, ICondition condition, string scope, Paging paging, Sorting[] sortings, IEnumerable result = null) : base(dataAccess, name, DataAccessMethod.Select)
+		{
+			_entityType = entityType;
+			_condition = condition;
+			_scope = scope;
+			_paging = paging;
+			_sortings = sortings;
+			_result = result;
+		}
+
+		public DataSelectionContext(IDataAccess dataAccess, string name, Type entityType, ICondition condition, Grouping grouping, Paging paging, Sorting[] sortings, IEnumerable result = null) : base(dataAccess, name, DataAccessMethod.Select)
 		{
 			_entityType = entityType;
 			_condition = condition;
 			_grouping = grouping;
-			_scope = scope;
 			_paging = paging;
 			_sortings = sortings;
 			_result = result;

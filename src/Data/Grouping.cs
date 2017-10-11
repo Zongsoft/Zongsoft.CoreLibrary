@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2016 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2017 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,7 +25,7 @@
  */
 
 using System;
-using System.ComponentModel;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Zongsoft.Data
@@ -36,80 +36,43 @@ namespace Zongsoft.Data
 	public class Grouping
 	{
 		#region 成员字段
-		private string[] _members;
+		private GroupMember[] _keys;
 		private ICondition _condition;
+		private GroupAggregationCollection _aggregations;
 		#endregion
 
 		#region 构造函数
-		public Grouping()
+		private Grouping(ICondition condition, params GroupMember[] keys)
 		{
-		}
+			if(keys == null || keys.Length == 0)
+				throw new ArgumentNullException(nameof(keys));
 
-		public Grouping(params string[] members) : this(null, members)
-		{
-		}
-
-		public Grouping(ICondition condition, params string[] members)
-		{
-			if(members == null || members.Length == 0)
-				throw new ArgumentNullException("members");
-
-			this.Condition = condition;
-			this.Members = members;
+			_keys = keys;
+			_condition = condition;
+			_aggregations = new GroupAggregationCollection(this);
 		}
 		#endregion
 
 		#region 公共属性
 		/// <summary>
-		/// 获取或设置分组成员的文本，各分组成员以逗号“,”分隔。
+		/// 获取分组键的成员数组。
 		/// </summary>
-		public string MembersText
+		public GroupMember[] Keys
 		{
 			get
 			{
-				if(_members == null || _members.Length < 1)
-					return string.Empty;
-
-				return string.Join(", ", _members);
-			}
-			set
-			{
-				if(string.IsNullOrWhiteSpace(value))
-					throw new ArgumentNullException();
-
-				this.Members = value.Split(',');
+				return _keys;
 			}
 		}
 
 		/// <summary>
-		/// 获取或设置分组的成员数组。
+		/// 获取分组的聚合成员集合。
 		/// </summary>
-		public string[] Members
+		public GroupAggregationCollection Aggregations
 		{
 			get
 			{
-				return _members;
-			}
-			set
-			{
-				if(value == null || value.Length == 0)
-					throw new ArgumentNullException();
-
-				var hashset = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-				foreach(var member in value)
-				{
-					if(!string.IsNullOrWhiteSpace(member))
-						hashset.Add(member.Trim());
-				}
-
-				if(hashset == null)
-					throw new ArgumentException();
-
-				string[] members = new string[hashset.Count];
-				hashset.CopyTo(members);
-
-				_members = members;
+				return _aggregations;
 			}
 		}
 
@@ -131,16 +94,42 @@ namespace Zongsoft.Data
 
 		#region 静态方法
 		/// <summary>
-		/// 创建一个分组。
+		/// 创建一个分组设置。
 		/// </summary>
-		/// <param name="members">分组的成员集。</param>
+		/// <param name="keys">分组键成员数组。</param>
 		/// <returns>返回创建的分组设置。</returns>
-		public static Grouping Group(params string[] members)
+		public static Grouping Group(params string[] keys)
 		{
-			if(members == null || members.Length < 1)
-				throw new ArgumentNullException("members");
+			return Group(null, keys);
+		}
 
-			return new Grouping(members);
+		/// <summary>
+		/// 创建一个分组设置。
+		/// </summary>
+		/// <param name="filter">分组的过滤条件。</param>
+		/// <param name="keys">分组键成员数组。</param>
+		/// <returns>返回创建的分组设置。</returns>
+		public static Grouping Group(ICondition filter, params string[] keys)
+		{
+			if(keys == null || keys.Length < 1)
+				throw new ArgumentNullException(nameof(keys));
+
+			var members = new List<GroupMember>(keys.Length);
+
+			foreach(var key in keys)
+			{
+				if(string.IsNullOrEmpty(key))
+					continue;
+
+				var index = key.IndexOf(':');
+
+				if(index > 0)
+					members.Add(new GroupMember(key.Substring(0, index), key.Substring(index)));
+				else
+					members.Add(new GroupMember(key, null));
+			}
+
+			return new Grouping(filter, members.ToArray());
 		}
 		#endregion
 
@@ -160,7 +149,199 @@ namespace Zongsoft.Data
 		#region 重写方法
 		public override string ToString()
 		{
-			return string.Format("{0} ({1})", this.MembersText, this.Condition);
+			var text = new System.Text.StringBuilder();
+
+			if(_keys != null && _keys.Length > 0)
+			{
+				text.Append("Keys: ");
+
+				foreach(var key in _keys)
+				{
+					text.Append(key.Name);
+
+					if(key.Alias != null && key.Alias.Length > 0)
+						text.Append(" '" + key.Alias + "'");
+				}
+
+				text.AppendLine();
+			}
+
+			if(_aggregations != null)
+			{
+				foreach(var aggregation in _aggregations)
+				{
+					text.Append(aggregation.Method.ToString() + ": " + aggregation.Name);
+
+					if(aggregation.Alias != null && aggregation.Alias.Length > 0)
+						text.Append(" '" + aggregation.Alias + "'");
+
+					text.AppendLine();
+				}
+			}
+
+			if(_condition != null)
+			{
+				text.AppendLine("Filter: " + _condition.ToString());
+			}
+
+			if(text == null)
+				return string.Empty;
+			else
+				return text.ToString();
+		}
+		#endregion
+
+		#region 嵌套结构
+		public struct GroupMember
+		{
+			public string Name;
+			public string Alias;
+
+			public GroupMember(string name, string alias)
+			{
+				this.Name = name;
+				this.Alias = alias;
+			}
+		}
+
+		public struct GroupAggregation
+		{
+			public string Name;
+			public string Alias;
+			public GroupAggregationMethod Method;
+
+			public GroupAggregation(GroupAggregationMethod method, string name, string alias)
+			{
+				this.Method = method;
+				this.Name = name;
+				this.Alias = alias;
+			}
+		}
+
+		public class GroupAggregationCollection : IEnumerable<GroupAggregation>
+		{
+			#region 私有变量
+			private Grouping _grouping;
+			private ICollection<GroupAggregation> _members;
+			#endregion
+
+			#region 私有构造
+			internal GroupAggregationCollection(Grouping grouping)
+			{
+				_grouping = grouping;
+				_members = new List<GroupAggregation>();
+			}
+			#endregion
+
+			#region 公共方法
+			public GroupAggregationCollection Count(string name, string alias = null)
+			{
+				return this.Aggregate(GroupAggregationMethod.Count, name, alias);
+			}
+
+			public GroupAggregationCollection Sum(string name, string alias = null)
+			{
+				return this.Aggregate(GroupAggregationMethod.Sum, name, alias);
+			}
+
+			public GroupAggregationCollection Average(string name, string alias = null)
+			{
+				return this.Aggregate(GroupAggregationMethod.Average, name, alias);
+			}
+
+			public GroupAggregationCollection Median(string name, string alias = null)
+			{
+				return this.Aggregate(GroupAggregationMethod.Median, name, alias);
+			}
+
+			public GroupAggregationCollection Maximum(string name, string alias = null)
+			{
+				return this.Aggregate(GroupAggregationMethod.Maximum, name, alias);
+			}
+
+			public GroupAggregationCollection Minimum(string name, string alias = null)
+			{
+				return this.Aggregate(GroupAggregationMethod.Minimum, name, alias);
+			}
+
+			public GroupAggregationCollection Deviation(string name, string alias = null)
+			{
+				return this.Aggregate(GroupAggregationMethod.Deviation, name, alias);
+			}
+
+			public GroupAggregationCollection DeviationPopulation(string name, string alias = null)
+			{
+				return this.Aggregate(GroupAggregationMethod.DeviationPopulation, name, alias);
+			}
+
+			public GroupAggregationCollection Variance(string name, string alias = null)
+			{
+				return this.Aggregate(GroupAggregationMethod.Variance, name, alias);
+			}
+
+			public GroupAggregationCollection VariancePopulation(string name, string alias = null)
+			{
+				return this.Aggregate(GroupAggregationMethod.VariancePopulation, name, alias);
+			}
+			#endregion
+
+			#region 私有方法
+			private GroupAggregationCollection Aggregate(GroupAggregationMethod method, string name, string alias = null)
+			{
+				if(string.IsNullOrEmpty(name))
+					throw new ArgumentNullException(nameof(name));
+
+				_members.Add(new GroupAggregation(GroupAggregationMethod.Count, name, alias));
+
+				return this;
+			}
+			#endregion
+
+			#region 遍历实现
+			public IEnumerator<GroupAggregation> GetEnumerator()
+			{
+				foreach(var member in _members)
+					yield return member;
+			}
+
+			IEnumerator IEnumerable.GetEnumerator()
+			{
+				return this.GetEnumerator();
+			}
+			#endregion
+		}
+
+		public enum GroupAggregationMethod
+		{
+			/// <summary>数量</summary>
+			Count,
+
+			/// <summary>总和</summary>
+			Sum,
+
+			/// <summary>平均值</summary>
+			Average,
+
+			/// <summary>中间值</summary>
+			Median,
+
+			/// <summary>最大值</summary>
+			Maximum,
+
+			/// <summary>最小值</summary>
+			Minimum,
+
+			/// <summary>标准偏差</summary>
+			Deviation,
+
+			/// <summary>总体标准偏差</summary>
+			DeviationPopulation,
+
+			/// <summary>方差</summary>
+			Variance,
+
+			/// <summary>总体方差</summary>
+			VariancePopulation,
 		}
 		#endregion
 	}

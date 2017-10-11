@@ -492,62 +492,52 @@ namespace Zongsoft.Data
 
 		protected virtual TEntity OnGet(ICondition condition, string scope)
 		{
-			return this.DataAccess.Select<TEntity>(this.Name, condition, null, scope, null, null, ctx => this.OnGetting(ctx), ctx => this.OnGetted(ctx)).FirstOrDefault();
+			return this.DataAccess.Select<TEntity>(this.Name, condition, scope, null, null, ctx => this.OnGetting(ctx), ctx => this.OnGetted(ctx)).FirstOrDefault();
 		}
 
 		public IEnumerable<TEntity> Select(ICondition condition = null, params Sorting[] sortings)
 		{
-			return this.Select(condition, null, string.Empty, null, sortings);
+			return this.Select(condition, string.Empty, null, sortings);
 		}
 
 		public IEnumerable<TEntity> Select(ICondition condition, Paging paging, params Sorting[] sortings)
 		{
-			return this.Select(condition, null, string.Empty, paging, sortings);
+			return this.Select(condition, string.Empty, paging, sortings);
 		}
 
 		public IEnumerable<TEntity> Select(ICondition condition, Paging paging, string scope, params Sorting[] sortings)
 		{
-			return this.Select(condition, null, scope, paging, sortings);
+			return this.Select(condition, scope, paging, sortings);
 		}
 
 		public IEnumerable<TEntity> Select(ICondition condition, string scope, params Sorting[] sortings)
 		{
-			return this.Select(condition, null, scope, null, sortings);
+			return this.Select(condition, scope, null, sortings);
 		}
 
 		public IEnumerable<TEntity> Select(ICondition condition, string scope, Paging paging, params Sorting[] sortings)
 		{
-			return this.Select(condition, null, scope, paging, sortings);
+			return this.OnSelect(condition, scope, paging, sortings);
 		}
 
-		public IEnumerable<TEntity> Select(ICondition condition, Grouping grouping, params Sorting[] sortings)
+		protected virtual IEnumerable<TEntity> OnSelect(ICondition condition, string scope, Paging paging, params Sorting[] sortings)
 		{
-			return this.Select(condition, grouping, string.Empty, null, sortings);
+			return this.DataAccess.Select<TEntity>(this.Name, condition, scope, paging, sortings, ctx => this.OnSelecting(ctx), ctx => this.OnSelected(ctx));
 		}
 
-		public IEnumerable<TEntity> Select(ICondition condition, Grouping grouping, Paging paging, params Sorting[] sortings)
+		public IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, params Sorting[] sortings)
 		{
-			return this.Select(condition, grouping, string.Empty, paging, sortings);
+			return this.OnSelect<T>(grouping, condition, null, sortings);
 		}
 
-		public IEnumerable<TEntity> Select(ICondition condition, Grouping grouping, Paging paging, string scope, params Sorting[] sortings)
+		public IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, Paging paging, params Sorting[] sortings)
 		{
-			return this.Select(condition, grouping, scope, paging, sortings);
+			return this.OnSelect<T>(grouping, condition, paging, sortings);
 		}
 
-		public IEnumerable<TEntity> Select(ICondition condition, Grouping grouping, string scope, params Sorting[] sortings)
+		protected virtual IEnumerable<T> OnSelect<T>(Grouping grouping, ICondition condition, Paging paging, params Sorting[] sortings)
 		{
-			return this.Select(condition, grouping, scope, null, sortings);
-		}
-
-		public IEnumerable<TEntity> Select(ICondition condition, Grouping grouping, string scope, Paging paging, params Sorting[] sortings)
-		{
-			return this.OnSelect(condition, grouping, scope, paging, sortings);
-		}
-
-		protected virtual IEnumerable<TEntity> OnSelect(ICondition condition, Grouping grouping, string scope, Paging paging, params Sorting[] sortings)
-		{
-			return this.DataAccess.Select<TEntity>(this.Name, condition, grouping, scope, paging, sortings, ctx => this.OnSelecting(ctx), ctx => this.OnSelected(ctx));
+			return this.DataAccess.Select<T>(this.Name, grouping, condition, paging, sortings, ctx => this.OnSelecting(ctx), ctx => this.OnSelected(ctx));
 		}
 
 		#region 显式实现
@@ -574,31 +564,6 @@ namespace Zongsoft.Data
 		IEnumerable IDataService.Select(ICondition condition, Paging paging, string scope, params Sorting[] sortings)
 		{
 			return this.Select(condition, paging, scope, sortings);
-		}
-
-		IEnumerable IDataService.Select(ICondition condition, Grouping grouping, params Sorting[] sortings)
-		{
-			return this.Select(condition, grouping, sortings);
-		}
-
-		IEnumerable IDataService.Select(ICondition condition, Grouping grouping, string scope, params Sorting[] sortings)
-		{
-			return this.Select(condition, grouping, scope, sortings);
-		}
-
-		IEnumerable IDataService.Select(ICondition condition, Grouping grouping, string scope, Paging paging, params Sorting[] sortings)
-		{
-			return this.Select(condition, grouping, scope, paging, sortings);
-		}
-
-		IEnumerable IDataService.Select(ICondition condition, Grouping grouping, Paging paging, params Sorting[] sortings)
-		{
-			return this.Select(condition, grouping, paging, sortings);
-		}
-
-		IEnumerable IDataService.Select(ICondition condition, Grouping grouping, Paging paging, string scope, params Sorting[] sortings)
-		{
-			return this.Select(condition, grouping, paging, scope, sortings);
 		}
 		#endregion
 

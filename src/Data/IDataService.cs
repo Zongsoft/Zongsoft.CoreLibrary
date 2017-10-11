@@ -143,15 +143,13 @@ namespace Zongsoft.Data
 		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string scope, Paging paging = null, params Sorting[] sortings);
 
 		IEnumerable Select(ICondition condition = null, params Sorting[] sortings);
-		IEnumerable Select(ICondition condition, string scope, params Sorting[] sortings);
-		IEnumerable Select(ICondition condition, string scope, Paging paging, params Sorting[] sortings);
 		IEnumerable Select(ICondition condition, Paging paging, params Sorting[] sortings);
 		IEnumerable Select(ICondition condition, Paging paging, string scope, params Sorting[] sortings);
-		IEnumerable Select(ICondition condition, Grouping grouping, params Sorting[] sortings);
-		IEnumerable Select(ICondition condition, Grouping grouping, Paging paging, params Sorting[] sortings);
-		IEnumerable Select(ICondition condition, Grouping grouping, Paging paging, string scope, params Sorting[] sortings);
-		IEnumerable Select(ICondition condition, Grouping grouping, string scope, params Sorting[] sortings);
-		IEnumerable Select(ICondition condition, Grouping grouping, string scope, Paging paging, params Sorting[] sortings);
+		IEnumerable Select(ICondition condition, string scope, params Sorting[] sortings);
+		IEnumerable Select(ICondition condition, string scope, Paging paging, params Sorting[] sortings);
+
+		IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, Paging paging, params Sorting[] sortings);
 		#endregion
 	}
 }
