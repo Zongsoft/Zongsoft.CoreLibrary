@@ -30,7 +30,7 @@ using System.Threading.Tasks;
 
 namespace Zongsoft.Messaging
 {
-	public abstract class MessageBase : MarshalByRefObject
+	public abstract class MessageBase
 	{
 		#region 常量定义
 		private static readonly DateTime MINIMUM_DATETIME = new DateTime(1900, 1, 1);

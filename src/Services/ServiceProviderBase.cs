@@ -30,7 +30,7 @@ using System.Linq;
 
 namespace Zongsoft.Services
 {
-	public class ServiceProviderBase : MarshalByRefObject, IServiceProvider, System.IServiceProvider
+	public class ServiceProviderBase : IServiceProvider, System.IServiceProvider
 	{
 		#region 事件声明
 		public event EventHandler<ServiceRegisteredEventArgs> Registered;

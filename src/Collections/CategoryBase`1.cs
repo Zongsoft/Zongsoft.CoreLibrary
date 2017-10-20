@@ -26,12 +26,12 @@
 
 using System;
 using System.ComponentModel;
-using System.Collections.Generic;
+
+using Zongsoft.Runtime.Serialization;
 
 namespace Zongsoft.Collections
 {
-	[Serializable]
-	public class CategoryBase : HierarchicalNode
+	public abstract class CategoryBase<T> : HierarchicalNode where T : HierarchicalNode
 	{
 		#region 成员字段
 		private string _title;
@@ -43,6 +43,8 @@ namespace Zongsoft.Collections
 		#region 构造函数
 		protected CategoryBase()
 		{
+			_title = base.PathSeparatorChar.ToString();
+			_visible = true;
 		}
 
 		protected CategoryBase(string name)
@@ -112,6 +114,27 @@ namespace Zongsoft.Collections
 			{
 				_visible = value;
 			}
+		}
+
+		[SerializationMember(SerializationMemberBehavior.Ignored)]
+		public T Parent
+		{
+			get
+			{
+				return (T)base.InnerParent;
+			}
+		}
+		#endregion
+
+		#region 公共方法
+		public T Find(string path)
+		{
+			return (T)base.FindNode(path);
+		}
+
+		public T Find(string[] parts)
+		{
+			return (T)base.FindNode(parts);
 		}
 		#endregion
 	}

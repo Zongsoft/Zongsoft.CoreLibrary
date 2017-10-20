@@ -29,7 +29,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Communication.Composition
 {
-	public class ExecutionContext : MarshalByRefObject, IExecutionContext
+	public class ExecutionContext : IExecutionContext
 	{
 		#region 成员字段
 		private IExecutor _executor;

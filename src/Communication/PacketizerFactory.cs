@@ -29,7 +29,7 @@ using System.Collections.Concurrent;
 
 namespace Zongsoft.Communication
 {
-	public class PacketizerFactory<TPacketizer> : MarshalByRefObject, IPacketizerFactory, IDisposable where TPacketizer : class, IPacketizer
+	public class PacketizerFactory<TPacketizer> : IPacketizerFactory, IDisposable where TPacketizer : class, IPacketizer
 	{
 		#region 私有变量
 		private Func<IChannel, TPacketizer> _creator;

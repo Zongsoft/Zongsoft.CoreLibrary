@@ -33,7 +33,7 @@ namespace Zongsoft.Security
 	/// <summary>
 	/// 表示带凭证的用户主体类。
 	/// </summary>
-	public class CredentialPrincipal : MarshalByRefObject, IPrincipal
+	public class CredentialPrincipal : IPrincipal
 	{
 		#region 公共字段
 		public static readonly CredentialPrincipal Empty = new CredentialPrincipal(CredentialIdentity.Empty);

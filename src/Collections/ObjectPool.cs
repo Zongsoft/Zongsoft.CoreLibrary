@@ -35,7 +35,7 @@ namespace Zongsoft.Collections
 	/// <summary>
 	/// 提供了一个线程安全的通用对象池的相关功能。
 	/// </summary>
-	public class ObjectPool<T> : MarshalByRefObject, IDisposable where T : class
+	public class ObjectPool<T> : IDisposable where T : class
 	{
 		#region 私有变量
 		private ConcurrentBag<T> _idles;

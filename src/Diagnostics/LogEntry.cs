@@ -30,7 +30,7 @@ using System.Text;
 
 namespace Zongsoft.Diagnostics
 {
-	public class LogEntry : MarshalByRefObject
+	public class LogEntry
 	{
 		#region 私有变量
 		private string _toString;

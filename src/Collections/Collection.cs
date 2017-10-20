@@ -366,7 +366,7 @@ namespace Zongsoft.Collections
 			if(this.TryConvertItem(value, out result))
 				this.Add(result);
 			else
-				throw new InvalidCastException();
+				return -1;
 
 			return this.Count - 1;
 		}

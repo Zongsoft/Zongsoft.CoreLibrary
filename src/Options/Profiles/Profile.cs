@@ -45,7 +45,7 @@ namespace Zongsoft.Options.Profiles
 	///		<para>注意：节是支持嵌套的，如果在中括号里面以空格或制表符(Tab)分隔来表示节的嵌套关系。</para>
 	///		<para>Comment: 在INI文件中注释语句是以分号“;”或者“#”开始的。所有的注释语句不管多长都是独占一行直到结束的，在注释符和行结束符之间的所有内容都是被忽略的。</para>
 	/// </remarks>
-	public class Profile : MarshalByRefObject, IOptionProvider, Zongsoft.Runtime.Serialization.ISerializable
+	public class Profile : IOptionProvider, Zongsoft.Runtime.Serialization.ISerializable
 	{
 		#region 枚举定义
 		private enum LineType

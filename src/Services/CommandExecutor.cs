@@ -32,7 +32,7 @@ using System.Threading.Tasks;
 
 namespace Zongsoft.Services
 {
-	public class CommandExecutor : MarshalByRefObject, ICommandExecutor
+	public class CommandExecutor : ICommandExecutor
 	{
 		#region 声明事件
 		public event EventHandler<CommandExecutorFailureEventArgs> Failed;

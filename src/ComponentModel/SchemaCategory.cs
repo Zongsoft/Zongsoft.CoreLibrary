@@ -26,12 +26,16 @@
 
 using System;
 using System.Collections.Generic;
-using System.Threading;
 
 namespace Zongsoft.ComponentModel
 {
-	public class SchemaCategory : Zongsoft.Collections.CategoryBase
+	[System.ComponentModel.DefaultProperty("Schemas")]
+	public class SchemaCategory : Zongsoft.Collections.CategoryBase<SchemaCategory>
 	{
+		#region 静态字段
+		public static readonly SchemaCategory Default = new SchemaCategory();
+		#endregion
+
 		#region 成员字段
 		private SchemaCollection _schemas;
 		private SchemaCategoryCollection _children;
@@ -40,6 +44,7 @@ namespace Zongsoft.ComponentModel
 		#region 构造函数
 		public SchemaCategory()
 		{
+			_schemas = new SchemaCollection();
 		}
 
 		public SchemaCategory(string name) : this(name, name, string.Empty, true)
@@ -52,39 +57,41 @@ namespace Zongsoft.ComponentModel
 
 		public SchemaCategory(string name, string title, string description, bool visible) : base(name, title, description, visible)
 		{
+			_schemas = new SchemaCollection();
 		}
 		#endregion
 
 		#region 公共属性
-		public SchemaCollection Schemas
-		{
-			get
-			{
-				if(_schemas == null)
-					Interlocked.CompareExchange(ref _schemas, new SchemaCollection(), null);
-
-				return _schemas;
-			}
-		}
-
-		public SchemaCategory Parent
-		{
-			get
-			{
-				return (SchemaCategory)this.InnerParent;
-			}
-		}
-
 		public SchemaCategoryCollection Children
 		{
 			get
 			{
 				if(_children == null)
-					Interlocked.CompareExchange(ref _children, new SchemaCategoryCollection(this), null);
+					System.Threading.Interlocked.CompareExchange(ref _children, new SchemaCategoryCollection(this), null);
 
 				return _children;
 			}
 		}
+
+		public SchemaCollection Schemas
+		{
+			get
+			{
+				return _schemas;
+			}
+		}
+		#endregion
+
+		#region 重写方法
+		protected override Collections.HierarchicalNode GetChild(string name)
+		{
+			var children = _children;
+
+			if(children == null)
+				return null;
+
+			return children[name];
+		}
 		#endregion
 	}
-}
+	}

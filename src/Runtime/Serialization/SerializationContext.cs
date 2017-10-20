@@ -33,7 +33,7 @@ using System.Collections.Concurrent;
 
 namespace Zongsoft.Runtime.Serialization
 {
-	public class SerializationContext : MarshalByRefObject
+	public class SerializationContext
 	{
 		#region 成员字段
 		private ISerializer _serializer;

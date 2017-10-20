@@ -32,7 +32,7 @@ using System.Security.Principal;
 
 namespace Zongsoft.ComponentModel
 {
-	public class ApplicationContextBase : MarshalByRefObject, INotifyPropertyChanged
+	public class ApplicationContextBase : INotifyPropertyChanged
 	{
 		#region 单例字段
 		private volatile static ApplicationContextBase _current;

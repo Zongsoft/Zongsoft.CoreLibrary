@@ -33,7 +33,7 @@ namespace Zongsoft.Security
 	/// <summary>
 	/// 表示带凭证的用户标识类。
 	/// </summary>
-	public class CredentialIdentity : MarshalByRefObject, IIdentity
+	public class CredentialIdentity : IIdentity
 	{
 		#region 公共字段
 		public static readonly CredentialIdentity Empty = new CredentialIdentity();

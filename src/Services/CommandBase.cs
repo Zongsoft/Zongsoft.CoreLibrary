@@ -30,7 +30,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Services
 {
-	public abstract class CommandBase : MarshalByRefObject, ICommand, IPredication, IMatchable, INotifyPropertyChanged
+	public abstract class CommandBase : ICommand, IPredication, IMatchable, INotifyPropertyChanged
 	{
 		#region 事件定义
 		public event EventHandler EnabledChanged;

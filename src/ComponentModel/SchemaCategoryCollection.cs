@@ -32,6 +32,10 @@ namespace Zongsoft.ComponentModel
 	public class SchemaCategoryCollection : Zongsoft.Collections.HierarchicalNodeCollection<SchemaCategory>
 	{
 		#region 构造函数
+		public SchemaCategoryCollection() : base(null)
+		{
+		}
+
 		public SchemaCategoryCollection(SchemaCategory owner) : base(owner)
 		{
 		}

@@ -76,7 +76,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Collections\CategoryBase.cs" />
+    <Compile Include="Collections\CategoryBase`1.cs" />
     <Compile Include="Collections\Collection.cs" />
     <Compile Include="Collections\CollectionRemovedEventArgs.cs" />
     <Compile Include="Collections\CollectionRemovedReason.cs" />
@@ -124,6 +124,8 @@
     <Compile Include="ComponentModel\SchemaAction.cs" />
     <Compile Include="ComponentModel\SchemaActionCollection.cs" />
     <Compile Include="ComponentModel\Schema.cs" />
+    <Compile Include="ComponentModel\SchemaCategory.cs" />
+    <Compile Include="ComponentModel\SchemaCategoryCollection.cs" />
     <Compile Include="ComponentModel\SchemaCollection.cs" />
     <Compile Include="Data\ConditionalBehaviors.cs" />
     <Compile Include="Data\ConditionalRange`1.cs" />

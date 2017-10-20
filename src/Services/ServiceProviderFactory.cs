@@ -32,7 +32,7 @@ using System.Text;
 
 namespace Zongsoft.Services
 {
-	public class ServiceProviderFactory : MarshalByRefObject, IServiceProviderFactory, IEnumerable<KeyValuePair<string, IServiceProvider>>
+	public class ServiceProviderFactory : IServiceProviderFactory, IEnumerable<KeyValuePair<string, IServiceProvider>>
 	{
 		#region 单例字段
 		private static ServiceProviderFactory _instance;

@@ -32,7 +32,7 @@ using Zongsoft.Services;
 
 namespace Zongsoft.Terminals
 {
-	public class ConsoleTerminal : MarshalByRefObject, ITerminal
+	public class ConsoleTerminal : ITerminal
 	{
 		#region 同步变量
 		private readonly object _syncRoot;

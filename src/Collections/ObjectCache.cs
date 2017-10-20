@@ -35,7 +35,7 @@ namespace Zongsoft.Collections
 	/// 提供了一个线程安全的对象缓存的功能。
 	/// </summary>
 	/// <typeparam name="T">缓存的对象类型。</typeparam>
-	public class ObjectCache<T> : MarshalByRefObject, IDisposable, IEnumerable<T> where T : class
+	public class ObjectCache<T> : IDisposable, IEnumerable<T> where T : class
 	{
 		#region 事件定义
 		public event EventHandler<CollectionRemovedEventArgs> Removed;

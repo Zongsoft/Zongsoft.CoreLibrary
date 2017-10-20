@@ -32,7 +32,8 @@ using Zongsoft.Runtime.Serialization;
 namespace Zongsoft.Collections
 {
 	[Serializable]
-	public class Category : CategoryBase
+	[System.ComponentModel.DefaultProperty("Children")]
+	public class Category : CategoryBase<Category>
 	{
 		#region 成员字段
 		private CategoryCollection _children;
@@ -57,15 +58,6 @@ namespace Zongsoft.Collections
 		#endregion
 
 		#region 公共属性
-		[SerializationMember(SerializationMemberBehavior.Ignored)]
-		public Category Parent
-		{
-			get
-			{
-				return (Category)base.InnerParent;
-			}
-		}
-
 		public CategoryCollection Children
 		{
 			get
@@ -79,16 +71,7 @@ namespace Zongsoft.Collections
 		#endregion
 
 		#region 公共方法
-		public Category Find(string path)
-		{
-			return (Category)base.FindNode(path);
-		}
-
-		public Category Find(string[] parts)
-		{
-			return (Category)base.FindNode(parts);
-		}
-
+		[Obsolete]
 		public Category[] GetVisibleChildren()
 		{
 			var children = _children;

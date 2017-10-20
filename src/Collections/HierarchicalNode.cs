@@ -33,7 +33,7 @@ namespace Zongsoft.Collections
 	/// 表示层次结构的节点类。
 	/// </summary>
 	[Serializable]
-	public class HierarchicalNode : MarshalByRefObject
+	public abstract class HierarchicalNode
 	{
 		#region 公共常量
 		public readonly char PathSeparatorChar = '/';
@@ -289,10 +289,7 @@ namespace Zongsoft.Collections
 		/// </summary>
 		/// <param name="name">指定要查找的子节点名称。</param>
 		/// <returns>如果找到指定名称的子节点则返回它，否则返回空(null)。</returns>
-		protected virtual HierarchicalNode GetChild(string name)
-		{
-			return null;
-		}
+		protected abstract HierarchicalNode GetChild(string name);
 		#endregion
 
 		#region 嵌套子类

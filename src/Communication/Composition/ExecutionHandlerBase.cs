@@ -30,7 +30,7 @@ using System.ComponentModel;
 
 namespace Zongsoft.Communication.Composition
 {
-	public abstract class ExecutionHandlerBase : MarshalByRefObject, IExecutionHandler, INotifyPropertyChanged
+	public abstract class ExecutionHandlerBase : IExecutionHandler, INotifyPropertyChanged
 	{
 		#region 事件定义
 		public event EventHandler EnabledChanged;

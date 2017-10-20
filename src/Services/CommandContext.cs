@@ -31,7 +31,7 @@ using System.Collections.Concurrent;
 
 namespace Zongsoft.Services
 {
-	public class CommandContext : MarshalByRefObject
+	public class CommandContext
 	{
 		#region 静态字段
 		private static ConcurrentDictionary<string, object> _states;

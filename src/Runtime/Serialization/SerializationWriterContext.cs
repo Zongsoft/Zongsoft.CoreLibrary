@@ -32,7 +32,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Runtime.Serialization
 {
-	public class SerializationWriterContext : MarshalByRefObject
+	public class SerializationWriterContext
 	{
 		#region 成员字段
 		private SerializationContext _serializationContext;

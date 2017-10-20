@@ -41,7 +41,7 @@ namespace Zongsoft.Communication
 	/// <summary>
 	/// 定义通道基本功能的抽象基类。
 	/// </summary>
-	public abstract class ChannelBase : MarshalByRefObject, IChannel, IDisposable
+	public abstract class ChannelBase : IChannel, IDisposable
 	{
 		#region 事件定义
 		public event EventHandler<ChannelFailureEventArgs> Failed;

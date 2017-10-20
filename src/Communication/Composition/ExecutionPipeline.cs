@@ -29,7 +29,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Communication.Composition
 {
-	public class ExecutionPipeline : MarshalByRefObject
+	public class ExecutionPipeline
 	{
 		#region 成员字段
 		private Services.IPredication _predication;

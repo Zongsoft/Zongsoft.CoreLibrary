@@ -29,7 +29,7 @@ using System.IO;
 
 namespace Zongsoft.Services
 {
-	public class CommandExecutorContext : MarshalByRefObject
+	public class CommandExecutorContext
 	{
 		#region 成员字段
 		private ICommandExecutor _executor;

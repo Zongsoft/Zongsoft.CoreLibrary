@@ -31,7 +31,7 @@ using System.Text;
 
 namespace Zongsoft.Services
 {
-	public abstract class WorkerBase : MarshalByRefObject, IWorker, IDisposable
+	public abstract class WorkerBase : IWorker, IDisposable
 	{
 		#region 事件声明
 		public event EventHandler<WorkerStateChangedEventArgs> StateChanged;

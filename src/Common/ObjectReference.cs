@@ -28,7 +28,7 @@ using System;
 
 namespace Zongsoft.Common
 {
-	public class ObjectReference<T> : MarshalByRefObject, IDisposableObject, IObjectReference<T> where T : class
+	public class ObjectReference<T> : IDisposableObject, IObjectReference<T> where T : class
 	{
 		#region 事件定义
 		public event EventHandler<DisposedEventArgs> Disposed;

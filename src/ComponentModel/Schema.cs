@@ -32,10 +32,6 @@ namespace Zongsoft.ComponentModel
 	[System.ComponentModel.DefaultProperty("Actions")]
 	public class Schema
 	{
-		#region 静态字段
-		public static readonly SchemaCollection Schemas = new SchemaCollection();
-		#endregion
-
 		#region 成员变量
 		private string _name;
 		private string _title;

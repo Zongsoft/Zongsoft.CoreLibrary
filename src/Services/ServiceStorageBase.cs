@@ -31,7 +31,7 @@ using System.Linq;
 
 namespace Zongsoft.Services
 {
-	public abstract class ServiceStorageBase : MarshalByRefObject, IServiceStorage, IEnumerable<ServiceEntry>
+	public abstract class ServiceStorageBase : IServiceStorage, IEnumerable<ServiceEntry>
 	{
 		#region 成员字段
 		private IMatcher _matcher;
