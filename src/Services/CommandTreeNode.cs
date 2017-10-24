@@ -30,6 +30,7 @@ using System.Text.RegularExpressions;
 
 namespace Zongsoft.Services
 {
+	[System.ComponentModel.DefaultProperty("Children")]
 	public class CommandTreeNode : Zongsoft.Collections.HierarchicalNode
 	{
 		#region 私有变量
