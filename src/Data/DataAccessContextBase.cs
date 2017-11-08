@@ -81,6 +81,14 @@ namespace Zongsoft.Data
 			}
 		}
 
+		public Zongsoft.Security.CredentialPrincipal Principal
+		{
+			get
+			{
+				return Zongsoft.ComponentModel.ApplicationContextBase.Current.Principal as Zongsoft.Security.CredentialPrincipal;
+			}
+		}
+
 		public bool HasStates
 		{
 			get
