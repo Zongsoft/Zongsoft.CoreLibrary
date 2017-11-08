@@ -138,7 +138,7 @@
     <Compile Include="Data\DataAccessNaming.cs" />
     <Compile Include="Data\DataExistedEventArgs.cs" />
     <Compile Include="Data\DataExistingEventArgs.cs" />
-    <Compile Include="Data\DataExtensions.cs" />
+    <Compile Include="Data\DataRecordExtension.cs" />
     <Compile Include="Data\DataSearchKeyAttribute.cs" />
     <Compile Include="Data\DataSequenceAttribute.cs" />
     <Compile Include="Data\IConditionalRange.cs" />

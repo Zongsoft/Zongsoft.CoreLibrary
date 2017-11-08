@@ -326,6 +326,7 @@ namespace Zongsoft.Data
 		private Paging _paging;
 		private Grouping _grouping;
 		private Sorting[] _sortings;
+		private Func<DataSelectionContext, object, bool> _resultFilter;
 		#endregion
 
 		#region 构造函数
@@ -369,11 +370,31 @@ namespace Zongsoft.Data
 		{
 			get
 			{
-				return _result;
+				var filter = _resultFilter;
+
+				if(filter == null)
+					return _result;
+
+				return new DataFilterEnumerable<DataSelectionContext>(this, _result, _resultFilter);
 			}
 			set
 			{
 				_result = value;
+			}
+		}
+
+		/// <summary>
+		/// 获取或设置查询结果的过滤器。
+		/// </summary>
+		public Func<DataSelectionContext, object, bool> ResultFilter
+		{
+			get
+			{
+				return _resultFilter;
+			}
+			set
+			{
+				_resultFilter = value;
 			}
 		}
 
@@ -785,5 +806,67 @@ namespace Zongsoft.Data
 			}
 		}
 		#endregion
+	}
+
+	internal class DataFilterEnumerable<TContext> : IEnumerable where TContext : DataAccessContextBase
+	{
+		private TContext _context;
+		private IEnumerable _source;
+		private Func<TContext, object, bool> _filter;
+
+		public DataFilterEnumerable(TContext context, IEnumerable source, Func<TContext, object, bool> filter)
+		{
+			if(context == null)
+				throw new ArgumentNullException(nameof(context));
+			if(source == null)
+				throw new ArgumentNullException(nameof(source));
+
+			_context = context;
+			_source = source;
+			_filter = filter;
+		}
+
+		public IEnumerator GetEnumerator()
+		{
+			return new DataFilterIterator(this);
+		}
+
+		private class DataFilterIterator : IEnumerator
+		{
+			private DataFilterEnumerable<TContext> _owner;
+			private IEnumerator _iterator;
+
+			public DataFilterIterator(DataFilterEnumerable<TContext> owner)
+			{
+				_owner = owner;
+				_iterator = owner._source.GetEnumerator();
+			}
+
+			public object Current
+			{
+				get
+				{
+					return _iterator.Current;
+				}
+			}
+
+			public bool MoveNext()
+			{
+				var filter = _owner._filter;
+
+				while(_iterator.MoveNext())
+				{
+					if(filter == null || filter(_owner._context, _iterator.Current))
+						return true;
+				}
+
+				return false;
+			}
+
+			public void Reset()
+			{
+				_iterator.Reset();
+			}
+		}
 	}
 }
