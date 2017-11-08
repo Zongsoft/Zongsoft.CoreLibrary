@@ -31,12 +31,12 @@ using System.Collections.Generic;
 namespace Zongsoft.Data
 {
 	/// <summary>
-	/// 关于数据访问相关接口的扩展方法类。
+	/// 关于数据记录接口的扩展方法类。
 	/// </summary>
-	public static class DataExtensions
+	public static class DataRecordExtension
 	{
 		#region 静态构造
-		static DataExtensions()
+		static DataRecordExtension()
 		{
 			RecordGetterTemplate<bool>.Get = new Func<IDataRecord, int, bool>((record, ordinal) => record.GetBoolean(ordinal));
 			RecordGetterTemplate<bool?>.Get = new Func<IDataRecord, int, bool?>((record, ordinal) => record.IsDBNull(ordinal) ? null : (bool?)record.GetBoolean(ordinal));
