@@ -187,35 +187,59 @@ namespace Zongsoft.Common
 		/// <summary>
 		/// 将指定的字节数组转换为其用十六进制数字编码的等效字符串表示形式。
 		/// </summary>
-		/// <param name="buffer">一个 8 位无符号字节数组。</param>
+		/// <param name="bytes">一个 8 位无符号字节数组。</param>
 		/// <returns>参数中元素的字符串表示形式，以十六进制文本表示。</returns>
-		public static string ToHexString(byte[] buffer)
+		public static string ToHexString(byte[] bytes)
 		{
-			return ToHexString(buffer, '\0');
+			return ToHexString(bytes, '\0');
+		}
+
+		/// <summary>
+		/// 将指定的字节数组转换为其用十六进制数字编码的等效字符串表示形式。
+		/// </summary>
+		/// <param name="bytes">一个 8 位无符号字节数组。</param>
+		/// <param name="isLower">返回的十六进制字符串中是否使用小写字符，默认为大写。</param>
+		/// <returns>参数中元素的字符串表示形式，以十六进制文本表示。</returns>
+		public static string ToHexString(byte[] bytes, bool isLower)
+		{
+			return ToHexString(bytes, '\0', isLower);
 		}
 
 		/// <summary>
 		/// 将指定的字节数组转换为其用十六进制数字编码的等效字符串表示形式。参数指定是否在返回值中插入分隔符。
 		/// </summary>
-		/// <param name="buffer">一个 8 位无符号字节数组。</param>
+		/// <param name="bytes">一个 8 位无符号字节数组。</param>
 		/// <param name="separator">每字节对应的十六进制文本中间的分隔符。</param>
+		/// <param name="isLower">返回的十六进制字符串中是否使用小写字符，默认为大写。</param>
 		/// <returns>参数中元素的字符串表示形式，以十六进制文本表示。</returns>
-		public static string ToHexString(byte[] buffer, char separator)
+		public static string ToHexString(byte[] bytes, char separator, bool isLower = false)
 		{
-			if(buffer == null || buffer.Length < 1)
+			if(bytes == null || bytes.Length < 1)
 				return string.Empty;
 
-			StringBuilder builder = new StringBuilder(buffer.Length * 2);
+			var alpha = isLower ? 'a' : 'A';
+			var rank = separator == '\0' ? 2 : 3;
+			var characters = new char[bytes.Length * rank - (rank - 2)];
 
-			for(int i = 0; i < buffer.Length; i++)
+			for(int i = 0; i < bytes.Length; i++)
 			{
-				builder.AppendFormat("{0:X2}", buffer[i]);
+				characters[i * rank] = GetDigit((byte)(bytes[i] / 16), alpha);
+				characters[i * rank + 1] = GetDigit((byte)(bytes[i] % 16), alpha);
 
-				if(separator != '\0' && i < buffer.Length - 1)
-					builder.Append(separator);
+				if(rank == 3 && i < bytes.Length - 1)
+					characters[i * rank + 2] = separator;
 			}
 
-			return builder.ToString();
+			return new string(characters);
+		}
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		private static char GetDigit(byte value, char alpha)
+		{
+			if(value < 10)
+				return (char)('0' + value);
+
+			return (char)(alpha + (value - 10));
 		}
 
 		/// <summary>
@@ -257,9 +281,9 @@ namespace Zongsoft.Common
 			if(string.IsNullOrEmpty(text))
 				return new byte[0];
 
-			int index = 0;
-			char[] buffer = new char[2];
-			List<byte> result = new List<byte>();
+			var index = 0;
+			var buffer = new char[2];
+			var result = new List<byte>();
 
 			foreach(char character in text)
 			{
