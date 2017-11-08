@@ -228,6 +228,18 @@ namespace Zongsoft.Security
 		}
 
 		/// <summary>
+		/// 获取一个值，指示当前凭证是否为一个空凭证。
+		/// </summary>
+		[Zongsoft.Runtime.Serialization.SerializationMember(Behavior = Runtime.Serialization.SerializationMemberBehavior.Ignored)]
+		public bool IsEmpty
+		{
+			get
+			{
+				return string.IsNullOrEmpty(this.CredentialId);
+			}
+		}
+
+		/// <summary>
 		/// 获取一个值，指示扩展属性集是否存在并且有值。
 		/// </summary>
 		[Zongsoft.Runtime.Serialization.SerializationMember(Runtime.Serialization.SerializationMemberBehavior.Ignored)]
