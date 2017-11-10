@@ -172,32 +172,8 @@ namespace Zongsoft.Options.Configuration
 
 			OptionConfigurationProperty property;
 
-			if(reader.NodeType == XmlNodeType.Element)
-			{
-				var elementName = reader.Name;
-
-				for(int i = 0; i < reader.AttributeCount; i++)
-				{
-					reader.MoveToAttribute(i);
-
-					//XML特性名中间含点的，并且是以表示是以元素名打头的，则表示为系统内置特性因而无需解析处理
-					if(reader.Name.StartsWith(elementName + "."))
-						continue;
-
-					//获取当前XML元素特性对应的配置属性定义项
-					if(this.Properties.TryGetValue(reader.Name, out property))
-						this.SetPropertyValue(property, reader.Value);
-					else
-					{
-						//执行处理未知的属性反序列化
-						if(!this.OnDeserializeUnrecognizedAttribute(reader.Name, reader.Value))
-							throw new OptionConfigurationException(string.Format("The '{0}' option configuration attribute is unrecognized.", reader.Name));
-					}
-				}
-
-				//将当前读取器移到元素上
-				reader.MoveToElement();
-			}
+			//反序列化当前元素的Attributes到当前元素的属性集
+			this.DeserializeAttributes(reader, this);
 
 			//如果当前XML元素是空元素(即其没有子节点的元素)，则返回
 			if(reader.IsEmptyElement)
@@ -205,6 +181,7 @@ namespace Zongsoft.Options.Configuration
 
 			//定义当前读取器的初始深度
 			int depth = reader.Depth;
+
 			//定义当前待解析子元素的当前配置项元素
 			OptionConfigurationElement element = this;
 
@@ -242,7 +219,13 @@ namespace Zongsoft.Options.Configuration
 				{
 					//如果当前配置项集合不是默认集合(即集合有对应的XML节点)，则将当前读取器移动到其下的子元素的XML节点上
 					if(!property.IsDefaultCollection)
+					{
+						//反序列化当前元素中的Attributes到元素属性集中
+						this.DeserializeAttributes(reader, element);
+
+						//将当前读取器移动到集合成员元素上
 						reader.ReadToDescendant(string.IsNullOrWhiteSpace(property.ElementName) ? collection.ElementName : property.ElementName);
+					}
 				}
 
 				//调用当前配置元素对象的反序列化方法
@@ -312,6 +295,38 @@ namespace Zongsoft.Options.Configuration
 		#endregion
 
 		#region 私有方法
+		private void DeserializeAttributes(XmlReader reader, OptionConfigurationElement element)
+		{
+			OptionConfigurationProperty property;
+
+			if(reader.NodeType != XmlNodeType.Element)
+				return;
+
+			var elementName = reader.Name;
+
+			for(int i = 0; i < reader.AttributeCount; i++)
+			{
+				reader.MoveToAttribute(i);
+
+				//XML特性名中间含点的，并且是以表示是以元素名打头的，则表示为系统内置特性因而无需解析处理
+				if(reader.Name.StartsWith(elementName + "."))
+					continue;
+
+				//获取当前XML元素特性对应的配置属性定义项
+				if(element.Properties.TryGetValue(reader.Name, out property))
+					element.SetPropertyValue(property, reader.Value);
+				else
+				{
+					//执行处理未知的属性反序列化
+					if(!element.OnDeserializeUnrecognizedAttribute(reader.Name, reader.Value))
+						throw new OptionConfigurationException(string.Format("The '{0}' option configuration attribute is unrecognized.", reader.Name));
+				}
+			}
+
+			//将当前读取器移到元素上
+			reader.MoveToElement();
+		}
+
 		private OptionConfigurationElement EnsureElementPropertyValue(OptionConfigurationProperty property)
 		{
 			if(property == null)
