@@ -164,70 +164,70 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 执行方法
-		public IEnumerable<T> Execute<T>(string name, IDictionary<string, object> inParameters)
+		public IEnumerable<T> Execute<T>(string name, IDictionary<string, object> inParameters, IDictionary<string, object> states = null)
 		{
 			IDictionary<string, object> outParameters;
-			return this.Execute<T>(name, inParameters, out outParameters);
+			return this.Execute<T>(name, inParameters, out outParameters, states);
 		}
 
-		public virtual IEnumerable<T> Execute<T>(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters)
+		public virtual IEnumerable<T> Execute<T>(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters, IDictionary<string, object> states = null)
 		{
-			return this.DataAccess.Execute<T>(name, inParameters, out outParameters, ctx => this.OnExecuting(ctx), ctx => this.OnExecuted(ctx));
+			return this.DataAccess.Execute<T>(name, inParameters, out outParameters, states, ctx => this.OnExecuting(ctx), ctx => this.OnExecuted(ctx));
 		}
 
-		public object ExecuteScalar(string name, IDictionary<string, object> inParameters)
+		public object ExecuteScalar(string name, IDictionary<string, object> inParameters, IDictionary<string, object> states = null)
 		{
 			IDictionary<string, object> outParameters;
-			return this.ExecuteScalar(name, inParameters, out outParameters);
+			return this.ExecuteScalar(name, inParameters, out outParameters, states);
 		}
 
-		public virtual object ExecuteScalar(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters)
+		public virtual object ExecuteScalar(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters, IDictionary<string, object> states = null)
 		{
-			return this.DataAccess.ExecuteScalar(name, inParameters, out outParameters, ctx => this.OnExecuting(ctx), ctx => this.OnExecuted(ctx));
+			return this.DataAccess.ExecuteScalar(name, inParameters, out outParameters, states, ctx => this.OnExecuting(ctx), ctx => this.OnExecuted(ctx));
 		}
 		#endregion
 
 		#region 存在方法
-		public virtual bool Exists(ICondition condition)
+		public virtual bool Exists(ICondition condition, IDictionary<string, object> states = null)
 		{
-			return this.DataAccess.Exists(this.Name, condition, ctx => this.OnExisting(ctx), ctx => this.OnExisted(ctx));
+			return this.DataAccess.Exists(this.Name, condition, states, ctx => this.OnExisting(ctx), ctx => this.OnExisted(ctx));
 		}
 
-		public virtual bool Exists<TKey>(TKey key)
+		public virtual bool Exists<TKey>(TKey key, IDictionary<string, object> states = null)
 		{
 			bool singleton;
-			return this.Exists(this.ConvertKey(key, out singleton));
+			return this.Exists(this.ConvertKey(key, out singleton), states);
 		}
 
-		public virtual bool Exists<TKey1, TKey2>(TKey1 key1, TKey2 key2)
+		public virtual bool Exists<TKey1, TKey2>(TKey1 key1, TKey2 key2, IDictionary<string, object> states = null)
 		{
 			bool singleton;
-			return this.Exists(this.ConvertKey(key1, key2, out singleton));
+			return this.Exists(this.ConvertKey(key1, key2, out singleton), states);
 		}
 
-		public virtual bool Exists<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3)
+		public virtual bool Exists<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, IDictionary<string, object> states = null)
 		{
 			bool singleton;
-			return this.Exists(this.ConvertKey(key1, key2, key3, out singleton));
+			return this.Exists(this.ConvertKey(key1, key2, key3, out singleton), states);
 		}
 		#endregion
 
 		#region 计数方法
-		public virtual int Count(ICondition condition, string includes = null)
+		public virtual int Count(ICondition condition, string includes = null, IDictionary<string, object> states = null)
 		{
-			return this.DataAccess.Count(this.Name, condition, includes, ctx => this.OnCounting(ctx), ctx => this.OnCounted(ctx));
+			return this.DataAccess.Count(this.Name, condition, includes, states, ctx => this.OnCounting(ctx), ctx => this.OnCounted(ctx));
 		}
 		#endregion
 
 		#region 递增方法
-		public virtual long Increment(string member, ICondition condition, int interval = 1)
+		public virtual long Increment(string member, ICondition condition, int interval = 1, IDictionary<string, object> states = null)
 		{
-			return this.DataAccess.Increment(this.Name, member, condition, interval, ctx => this.OnIncrementing(ctx), ctx => this.OnIncremented(ctx));
+			return this.DataAccess.Increment(this.Name, member, condition, interval, states, ctx => this.OnIncrementing(ctx), ctx => this.OnIncremented(ctx));
 		}
 
-		public long Decrement(string member, ICondition condition, int interval = 1)
+		public long Decrement(string member, ICondition condition, int interval = 1, IDictionary<string, object> states = null)
 		{
-			return this.DataAccess.Decrement(this.Name, member, condition, interval, ctx => this.OnIncrementing(ctx), ctx => this.OnIncremented(ctx));
+			return this.DataAccess.Decrement(this.Name, member, condition, interval, states, ctx => this.OnIncrementing(ctx), ctx => this.OnIncremented(ctx));
 		}
 		#endregion
 
@@ -235,37 +235,75 @@ namespace Zongsoft.Data
 		public virtual int Delete<TKey>(TKey key, params string[] cascades)
 		{
 			bool singleton;
-			return this.Delete(this.ConvertKey(key, out singleton), cascades);
+			return this.Delete(this.ConvertKey(key, out singleton), null, cascades);
+		}
+
+		public virtual int Delete<TKey>(TKey key, IDictionary<string, object> states, params string[] cascades)
+		{
+			bool singleton;
+			return this.Delete(this.ConvertKey(key, out singleton), states, cascades);
 		}
 
 		public virtual int Delete<TKey1, TKey2>(TKey1 key1, TKey2 key2, params string[] cascades)
 		{
 			bool singleton;
-			return this.Delete(this.ConvertKey(key1, key2, out singleton), cascades);
+			return this.Delete(this.ConvertKey(key1, key2, out singleton), null, cascades);
+		}
+
+		public virtual int Delete<TKey1, TKey2>(TKey1 key1, TKey2 key2, IDictionary<string, object> states, params string[] cascades)
+		{
+			bool singleton;
+			return this.Delete(this.ConvertKey(key1, key2, out singleton), states, cascades);
 		}
 
 		public virtual int Delete<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, params string[] cascades)
 		{
 			bool singleton;
-			return this.Delete(this.ConvertKey(key1, key2, key3, out singleton), cascades);
+			return this.Delete(this.ConvertKey(key1, key2, key3, out singleton), null, cascades);
+		}
+
+		public virtual int Delete<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, IDictionary<string, object> states, params string[] cascades)
+		{
+			bool singleton;
+			return this.Delete(this.ConvertKey(key1, key2, key3, out singleton), states, cascades);
 		}
 
 		public int Delete(ICondition condition, params string[] cascades)
 		{
-			return this.OnDelete(condition, cascades);
+			return this.OnDelete(condition, cascades, null);
 		}
 
-		protected virtual int OnDelete(ICondition condition, string[] cascades)
+		public int Delete(ICondition condition, IDictionary<string, object> states, params string[] cascades)
+		{
+			return this.OnDelete(condition, cascades, states);
+		}
+
+		protected virtual int OnDelete(ICondition condition, string[] cascades, IDictionary<string, object> states)
 		{
 			if(condition == null)
 				throw new NotSupportedException("The condition cann't is null on delete operation.");
 
-			return this.DataAccess.Delete(this.Name, condition, cascades, ctx => this.OnDeleting(ctx), ctx => this.OnDeleted(ctx));
+			return this.DataAccess.Delete(this.Name, condition, states, cascades, ctx => this.OnDeleting(ctx), ctx => this.OnDeleted(ctx));
 		}
 		#endregion
 
 		#region 插入方法
-		public int Insert(object data, string scope = null)
+		public int Insert(object data)
+		{
+			return this.Insert(data, null, null);
+		}
+
+		public int Insert(object data, string scope)
+		{
+			return this.Insert(data, scope, null);
+		}
+
+		public int Insert(object data, IDictionary<string, object> states)
+		{
+			return this.Insert(data, null, states);
+		}
+
+		public int Insert(object data, string scope, IDictionary<string, object> states)
 		{
 			if(data == null)
 				return 0;
@@ -276,10 +314,25 @@ namespace Zongsoft.Data
 			//尝试递增注册的递增键值
 			DataSequence.Increments(this, dictionary);
 
-			return this.OnInsert(dictionary, scope);
+			return this.OnInsert(dictionary, scope, states);
 		}
 
-		public int InsertMany(IEnumerable data, string scope = null)
+		public int InsertMany(IEnumerable data)
+		{
+			return this.InsertMany(data, null, null);
+		}
+
+		public int InsertMany(IEnumerable data, string scope)
+		{
+			return this.InsertMany(data, scope, null);
+		}
+
+		public int InsertMany(IEnumerable data, IDictionary<string, object> states)
+		{
+			return this.InsertMany(data, null, states);
+		}
+
+		public int InsertMany(IEnumerable data, string scope, IDictionary<string, object> states)
 		{
 			if(data == null)
 				return 0;
@@ -293,25 +346,25 @@ namespace Zongsoft.Data
 				DataSequence.Increments(this, dictionary);
 			}
 
-			return this.OnInsertMany(dictionares, scope);
+			return this.OnInsertMany(dictionares, scope, states);
 		}
 
-		protected virtual int OnInsert(DataDictionary<TEntity> data, string scope)
+		protected virtual int OnInsert(DataDictionary<TEntity> data, string scope, IDictionary<string, object> states)
 		{
 			if(data == null || data.Data == null)
 				return 0;
 
 			//执行数据引擎的插入操作
-			return this.DataAccess.Insert(this.Name, data, scope, ctx => this.OnInserting(ctx), ctx => this.OnInserted(ctx));
+			return this.DataAccess.Insert(this.Name, data, scope, states, ctx => this.OnInserting(ctx), ctx => this.OnInserted(ctx));
 		}
 
-		protected virtual int OnInsertMany(IEnumerable<DataDictionary<TEntity>> items, string scope)
+		protected virtual int OnInsertMany(IEnumerable<DataDictionary<TEntity>> items, string scope, IDictionary<string, object> states)
 		{
 			if(items == null)
 				return 0;
 
 			//执行数据引擎的插入操作
-			return this.DataAccess.InsertMany(this.Name, items, scope, ctx => this.OnInserting(ctx), ctx => this.OnInserted(ctx));
+			return this.DataAccess.InsertMany(this.Name, items, scope, states, ctx => this.OnInserting(ctx), ctx => this.OnInserted(ctx));
 		}
 		#endregion
 

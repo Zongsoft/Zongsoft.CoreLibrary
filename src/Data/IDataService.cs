@@ -73,40 +73,51 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 执行方法
-		IEnumerable<T> Execute<T>(string name, IDictionary<string, object> inParameters);
-		IEnumerable<T> Execute<T>(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters);
+		IEnumerable<T> Execute<T>(string name, IDictionary<string, object> inParameters, IDictionary<string, object> states = null);
+		IEnumerable<T> Execute<T>(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters, IDictionary<string, object> states = null);
 
-		object ExecuteScalar(string name, IDictionary<string, object> inParameters);
-		object ExecuteScalar(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters);
+		object ExecuteScalar(string name, IDictionary<string, object> inParameters, IDictionary<string, object> states = null);
+		object ExecuteScalar(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters, IDictionary<string, object> states = null);
 		#endregion
 
 		#region 存在方法
-		bool Exists(ICondition condition);
-		bool Exists<TKey>(TKey key);
-		bool Exists<TKey1, TKey2>(TKey1 key1, TKey2 key2);
-		bool Exists<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3);
+		bool Exists(ICondition condition, IDictionary<string, object> states = null);
+		bool Exists<TKey>(TKey key, IDictionary<string, object> states = null);
+		bool Exists<TKey1, TKey2>(TKey1 key1, TKey2 key2, IDictionary<string, object> states = null);
+		bool Exists<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, IDictionary<string, object> states = null);
 		#endregion
 
 		#region 计数方法
-		int Count(ICondition condition, string includes = null);
+		int Count(ICondition condition, string includes = null, IDictionary<string, object> states = null);
 		#endregion
 
 		#region 递增方法
-		long Increment(string member, ICondition condition, int interval = 1);
-		long Decrement(string member, ICondition condition, int interval = 1);
+		long Increment(string member, ICondition condition, int interval = 1, IDictionary<string, object> states = null);
+		long Decrement(string member, ICondition condition, int interval = 1, IDictionary<string, object> states = null);
 		#endregion
 
 		#region 删除方法
 		int Delete<TKey>(TKey key, params string[] cascades);
+		int Delete<TKey>(TKey key, IDictionary<string, object> states, params string[] cascades);
 		int Delete<TKey1, TKey2>(TKey1 key1, TKey2 key2, params string[] cascades);
+		int Delete<TKey1, TKey2>(TKey1 key1, TKey2 key2, IDictionary<string, object> states, params string[] cascades);
 		int Delete<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, params string[] cascades);
+		int Delete<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, IDictionary<string, object> states, params string[] cascades);
 
 		int Delete(ICondition condition, params string[] cascades);
+		int Delete(ICondition condition, IDictionary<string, object> states, params string[] cascades);
 		#endregion
 
 		#region 插入方法
-		int Insert(object data, string scope = null);
-		int InsertMany(IEnumerable items, string scope = null);
+		int Insert(object data);
+		int Insert(object data, string scope);
+		int Insert(object data, IDictionary<string, object> states);
+		int Insert(object data, string scope, IDictionary<string, object> states);
+
+		int InsertMany(IEnumerable items);
+		int InsertMany(IEnumerable items, string scope);
+		int InsertMany(IEnumerable items, IDictionary<string, object> states);
+		int InsertMany(IEnumerable items, string scope, IDictionary<string, object> states);
 		#endregion
 
 		#region 更新方法

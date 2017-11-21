@@ -42,7 +42,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		protected DataAccessContextBase(IDataAccess dataAccess, string name, DataAccessMethod method)
+		protected DataAccessContextBase(IDataAccess dataAccess, string name, DataAccessMethod method, IDictionary<string, object> states = null)
 		{
 			if(dataAccess == null)
 				throw new ArgumentNullException(nameof(dataAccess));
@@ -53,6 +53,9 @@ namespace Zongsoft.Data
 			_name = name;
 			_method = method;
 			_dataAccess = dataAccess;
+
+			if(states != null && states.Count > 0)
+				_states = new Dictionary<string, object>(states, StringComparer.OrdinalIgnoreCase);
 		}
 		#endregion
 

@@ -39,11 +39,10 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataCountContext(IDataAccess dataAccess, string name, ICondition condition, string includes, int result = 0) : base(dataAccess, name, DataAccessMethod.Count)
+		public DataCountContext(IDataAccess dataAccess, string name, ICondition condition, string includes, IDictionary<string, object> states = null) : base(dataAccess, name, DataAccessMethod.Count, states)
 		{
 			_condition = condition;
 			_includes = includes;
-			_result = result;
 		}
 		#endregion
 
@@ -103,10 +102,9 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataExistenceContext(IDataAccess dataAccess, string name, ICondition condition, bool result = false) : base(dataAccess, name, DataAccessMethod.Exists)
+		public DataExistenceContext(IDataAccess dataAccess, string name, ICondition condition, IDictionary<string, object> states = null) : base(dataAccess, name, DataAccessMethod.Exists, states)
 		{
 			_condition = condition;
-			_result = result;
 		}
 		#endregion
 
@@ -148,13 +146,12 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataExecutionContext(IDataAccess dataAccess, string name, bool isScalar, Type resultType, IDictionary<string, object> inParameters, IDictionary<string, object> outParameters, object result = null) : base(dataAccess, name, DataAccessMethod.Execute)
+		public DataExecutionContext(IDataAccess dataAccess, string name, bool isScalar, Type resultType, IDictionary<string, object> inParameters, IDictionary<string, object> outParameters, IDictionary<string, object> states = null) : base(dataAccess, name, DataAccessMethod.Execute, states)
 		{
 			if(resultType == null)
 				throw new ArgumentNullException(nameof(resultType));
 
 			_isScalar = isScalar;
-			_result = result;
 			_resultType = resultType;
 			_inParameters = inParameters;
 			_outParameters = outParameters;
@@ -244,7 +241,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataIncrementContext(IDataAccess dataAccess, string name, string member, ICondition condition, int interval = 1, long result = 0) : base(dataAccess, name, DataAccessMethod.Increment)
+		public DataIncrementContext(IDataAccess dataAccess, string name, string member, ICondition condition, int interval = 1, IDictionary<string, object> states = null) : base(dataAccess, name, DataAccessMethod.Increment, states)
 		{
 			if(string.IsNullOrEmpty(member))
 				throw new ArgumentNullException(nameof(member));
@@ -255,7 +252,6 @@ namespace Zongsoft.Data
 			_member = member;
 			_condition = condition;
 			_interval = interval;
-			_result = result;
 		}
 		#endregion
 
@@ -484,11 +480,10 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataDeletionContext(IDataAccess dataAccess, string name, ICondition condition, string[] cascades, int count = 0) : base(dataAccess, name, DataAccessMethod.Delete)
+		public DataDeletionContext(IDataAccess dataAccess, string name, ICondition condition, string[] cascades, IDictionary<string, object> states = null) : base(dataAccess, name, DataAccessMethod.Delete, states)
 		{
 			_condition = condition;
 			_cascades = cascades;
-			_count = count;
 		}
 		#endregion
 
@@ -550,11 +545,10 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataInsertionContext(IDataAccess dataAccess, string name, bool isMultiple, object data, string scope, int count = 0) : base(dataAccess, name, DataAccessMethod.Insert)
+		public DataInsertionContext(IDataAccess dataAccess, string name, bool isMultiple, object data, string scope, IDictionary<string, object> states = null) : base(dataAccess, name, DataAccessMethod.Insert, states)
 		{
 			_data = data;
 			_scope = scope;
-			_count = count;
 			_isMultiple = isMultiple;
 		}
 		#endregion
