@@ -124,12 +124,12 @@ namespace Zongsoft.Data
 			return dataAccess.Update(name, data, condition, ResolveScopeExpression(name, includes, excludes, type => IsScalarType(type, dataAccess)));
 		}
 
-		public static int UpdateMany<T>(this IDataAccess dataAccess, string name, IEnumerable<T> data, ICondition condition, Expression<Func<T, object>> includes, Expression<Func<T, object>> excludes = null)
+		public static int UpdateMany<T>(this IDataAccess dataAccess, string name, IEnumerable<T> data, Expression<Func<T, object>> includes, Expression<Func<T, object>> excludes = null)
 		{
 			if(dataAccess == null)
 				throw new ArgumentNullException("dataAccess");
 
-			return dataAccess.UpdateMany(name, data, condition, ResolveScopeExpression(name, includes, excludes, type => IsScalarType(type, dataAccess)));
+			return dataAccess.UpdateMany(name, data, ResolveScopeExpression(name, includes, excludes, type => IsScalarType(type, dataAccess)));
 		}
 
 		public static int Insert<T>(this IDataAccess dataAccess, string name, T data, Expression<Func<T, object>> includes, Expression<Func<T, object>> excludes = null)

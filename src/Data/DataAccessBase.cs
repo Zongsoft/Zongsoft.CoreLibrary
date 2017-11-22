@@ -621,20 +621,51 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 更新方法
-		public int Update<T>(T data, ICondition condition = null, string scope = null, Func<DataUpdationContext, bool> updating = null, Action<DataUpdationContext> updated = null)
+		public int Update<T>(T data, IDictionary<string, object> states = null, Func<DataUpdationContext, bool> updating = null, Action<DataUpdationContext> updated = null)
 		{
 			if(data == null)
 				return 0;
 
-			return this.Update(this.GetName(data.GetType()), data, condition, scope, updating, updated);
+			return this.Update(this.GetName(data.GetType()), data, null, null, states, updating, updated);
 		}
 
-		public int Update<T>(T data, string scope, ICondition condition = null, Func<DataUpdationContext, bool> updating = null, Action<DataUpdationContext> updated = null)
+		public int Update<T>(T data, string scope, IDictionary<string, object> states = null, Func<DataUpdationContext, bool> updating = null, Action<DataUpdationContext> updated = null)
 		{
 			if(data == null)
 				return 0;
 
-			return this.Update(this.GetName(data.GetType()), data, condition, scope, updating, updated);
+			return this.Update(this.GetName(data.GetType()), data, null, scope, states, updating, updated);
+		}
+
+		public int Update<T>(T data, ICondition condition, IDictionary<string, object> states = null, Func<DataUpdationContext, bool> updating = null, Action<DataUpdationContext> updated = null)
+		{
+			if(data == null)
+				return 0;
+
+			return this.Update(this.GetName(data.GetType()), data, condition, null, states, updating, updated);
+		}
+
+		public int Update<T>(T data, ICondition condition, string scope, IDictionary<string, object> states = null, Func<DataUpdationContext, bool> updating = null, Action<DataUpdationContext> updated = null)
+		{
+			if(data == null)
+				return 0;
+
+			return this.Update(this.GetName(data.GetType()), data, condition, scope, states, updating, updated);
+		}
+
+		public int Update(string name, object data, IDictionary<string, object> states = null, Func<DataUpdationContext, bool> updating = null, Action<DataUpdationContext> updated = null)
+		{
+			return this.Update(name, data, null, null, states, updating, updated);
+		}
+
+		public int Update(string name, object data, string scope, IDictionary<string, object> states = null, Func<DataUpdationContext, bool> updating = null, Action<DataUpdationContext> updated = null)
+		{
+			return this.Update(name, data, null, scope, states, updating, updated);
+		}
+
+		public int Update(string name, object data, ICondition condition, IDictionary<string, object> states = null, Func<DataUpdationContext, bool> updating = null, Action<DataUpdationContext> updated = null)
+		{
+			return this.Update(name, data, condition, null, states, updating, updated);
 		}
 
 		/// <summary>
@@ -643,9 +674,12 @@ namespace Zongsoft.Data
 		/// <param name="name">指定的实体映射名。</param>
 		/// <param name="data">要更新的实体对象。</param>
 		/// <param name="condition">要更新的条件子句，如果为空(null)则根据实体的主键进行更新。</param>
-		/// <param name="scope">指定的要更新的和排除更新的属性名列表，如果指定的是多个属性则属性名之间使用逗号(,)分隔；要排除的属性以减号(-)打头，星号(*)表示所有属性，感叹号(!)表示排除所有属性；如果未指定该参数则默认只会更新所有单值属性而不会更新导航属性。</param>
+		/// <param name="scope">指定的要更新的和排除更新的属性名列表，如果指定的是多个属性则属性名之间使用逗号(,)分隔；要排除的属性以感叹号(!)打头，星号(*)表示所有属性，感叹号(!)表示排除所有属性；如果未指定该参数则默认只会更新所有单值属性而不会更新导航属性。</param>
+		/// <param name="states">指定要传入的状态数据。</param>
+		/// <param name="updating">可选的更新前回调委托参数。</param>
+		/// <param name="updated">可选的更新后回调委托参数。</param>
 		/// <returns>返回受影响的记录行数，执行成功返回大于零的整数，失败则返回负数。</returns>
-		public int Update(string name, object data, ICondition condition = null, string scope = null, Func<DataUpdationContext, bool> updating = null, Action<DataUpdationContext> updated = null)
+		public int Update(string name, object data, ICondition condition, string scope, IDictionary<string, object> states = null, Func<DataUpdationContext, bool> updating = null, Action<DataUpdationContext> updated = null)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
@@ -654,7 +688,7 @@ namespace Zongsoft.Data
 				return 0;
 
 			//创建数据访问上下文对象
-			var context = this.CreateUpdationContext(name, false, data, condition, scope);
+			var context = this.CreateUpdationContext(name, false, data, condition, scope, states);
 
 			//处理数据访问操作前的回调
 			if(updating != null && updating(context))
@@ -684,19 +718,19 @@ namespace Zongsoft.Data
 			return context.Count;
 		}
 
-		public int Update(string name, object data, string scope, ICondition condition = null, Func<DataUpdationContext, bool> updating = null, Action<DataUpdationContext> updated = null)
+		public int UpdateMany<T>(IEnumerable<T> items, IDictionary<string, object> states = null, Func < DataUpdationContext, bool> updating = null, Action<DataUpdationContext> updated = null)
 		{
-			return this.Update(name, data, condition, scope, updating, updated);
+			return this.UpdateMany(this.GetName<T>(), items, null, states, updating, updated);
 		}
 
-		public int UpdateMany<T>(IEnumerable<T> items, ICondition condition = null, string scope = null, Func<DataUpdationContext, bool> updating = null, Action<DataUpdationContext> updated = null)
+		public int UpdateMany<T>(IEnumerable<T> items, string scope, IDictionary<string, object> states = null, Func<DataUpdationContext, bool> updating = null, Action<DataUpdationContext> updated = null)
 		{
-			return this.UpdateMany(this.GetName<T>(), items, condition, scope, updating, updated);
+			return this.UpdateMany(this.GetName<T>(), items, scope, states, updating, updated);
 		}
 
-		public int UpdateMany<T>(IEnumerable<T> items, string scope, ICondition condition = null, Func<DataUpdationContext, bool> updating = null, Action<DataUpdationContext> updated = null)
+		public int UpdateMany(string name, IEnumerable items, IDictionary<string, object> states = null, Func<DataUpdationContext, bool> updating = null, Action<DataUpdationContext> updated = null)
 		{
-			return this.UpdateMany(this.GetName<T>(), items, condition, scope, updating, updated);
+			return this.UpdateMany(name, items, null, states, updating, updated);
 		}
 
 		/// <summary>
@@ -704,10 +738,12 @@ namespace Zongsoft.Data
 		/// </summary>
 		/// <param name="name">指定的实体映射名。</param>
 		/// <param name="items">要更新的数据集。</param>
-		/// <param name="condition">要更新的条件子句，如果为空(null)则根据实体的主键进行更新。</param>
-		/// <param name="scope">指定的要更新的和排除更新的属性名列表，如果指定的是多个属性则属性名之间使用逗号(,)分隔；要排除的属性以减号(-)打头，星号(*)表示所有属性，感叹号(!)表示排除所有属性；如果未指定该参数则默认只会更新所有单值属性而不会更新导航属性。</param>
+		/// <param name="scope">指定的要更新的和排除更新的属性名列表，如果指定的是多个属性则属性名之间使用逗号(,)分隔；要排除的属性以感叹号(!)打头，星号(*)表示所有属性，感叹号(!)表示排除所有属性；如果未指定该参数则默认只会更新所有单值属性而不会更新导航属性。</param>
+		/// <param name="states">指定要传入的状态数据。</param>
+		/// <param name="updating">可选的更新前回调委托参数。</param>
+		/// <param name="updated">可选的更新后回调委托参数。</param>
 		/// <returns>返回受影响的记录行数，执行成功返回大于零的整数，失败则返回负数。</returns>
-		public int UpdateMany(string name, IEnumerable items, ICondition condition = null, string scope = null, Func<DataUpdationContext, bool> updating = null, Action<DataUpdationContext> updated = null)
+		public int UpdateMany(string name, IEnumerable items, string scope, IDictionary<string, object> states = null, Func<DataUpdationContext, bool> updating = null, Action<DataUpdationContext> updated = null)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
@@ -716,7 +752,7 @@ namespace Zongsoft.Data
 				return 0;
 
 			//创建数据访问上下文对象
-			var context = this.CreateUpdationContext(name, true, items, condition, scope);
+			var context = this.CreateUpdationContext(name, true, items, null, scope, states);
 
 			//处理数据访问操作前的回调
 			if(updating != null && updating(context))
@@ -746,99 +782,169 @@ namespace Zongsoft.Data
 			return context.Count;
 		}
 
-		public int UpdateMany(string name, IEnumerable items, string scope, ICondition condition = null, Func<DataUpdationContext, bool> updating = null, Action<DataUpdationContext> updated = null)
-		{
-			return this.UpdateMany(name, items, condition, scope, updating, updated);
-		}
-
 		protected abstract void OnUpdate(DataUpdationContext context);
 		#endregion
 
 		#region 查询方法
-		public IEnumerable<T> Select<T>(ICondition condition = null, params Sorting[] sortings)
+		public IEnumerable<T> Select<T>(IDictionary<string, object> states = null, params Sorting[] sortings)
 		{
-			return this.Select<T>(this.GetName<T>(), condition, string.Empty, null, sortings, null, null);
+			return this.Select<T>(this.GetName<T>(), null, string.Empty, null, states, sortings, null, null);
+		}
+
+		public IEnumerable<T> Select<T>(ICondition condition, params Sorting[] sortings)
+		{
+			return this.Select<T>(this.GetName<T>(), condition, string.Empty, null, null, sortings, null, null);
+		}
+
+		public IEnumerable<T> Select<T>(ICondition condition, IDictionary<string, object> states, params Sorting[] sortings)
+		{
+			return this.Select<T>(this.GetName<T>(), condition, string.Empty, null, states, sortings, null, null);
 		}
 
 		public IEnumerable<T> Select<T>(ICondition condition, Paging paging, params Sorting[] sortings)
 		{
-			return this.Select<T>(this.GetName<T>(), condition, null, paging, sortings, null, null);
+			return this.Select<T>(this.GetName<T>(), condition, null, paging, null, sortings, null, null);
+		}
+
+		public IEnumerable<T> Select<T>(ICondition condition, Paging paging, IDictionary<string, object> states, params Sorting[] sortings)
+		{
+			return this.Select<T>(this.GetName<T>(), condition, null, paging, states, sortings, null, null);
 		}
 
 		public IEnumerable<T> Select<T>(ICondition condition, Paging paging, string scope, params Sorting[] sortings)
 		{
-			return this.Select<T>(this.GetName<T>(), condition, scope, paging, sortings, null, null);
+			return this.Select<T>(this.GetName<T>(), condition, scope, paging, null, sortings, null, null);
+		}
+
+		public IEnumerable<T> Select<T>(ICondition condition, Paging paging, string scope, IDictionary<string, object> states, params Sorting[] sortings)
+		{
+			return this.Select<T>(this.GetName<T>(), condition, scope, paging, states, sortings, null, null);
 		}
 
 		public IEnumerable<T> Select<T>(ICondition condition, string scope, params Sorting[] sortings)
 		{
-			return this.Select<T>(this.GetName<T>(), condition, scope, null, sortings, null, null);
+			return this.Select<T>(this.GetName<T>(), condition, scope, null, null, sortings, null, null);
+		}
+
+		public IEnumerable<T> Select<T>(ICondition condition, string scope, IDictionary<string, object> states, params Sorting[] sortings)
+		{
+			return this.Select<T>(this.GetName<T>(), condition, scope, null, states, sortings, null, null);
 		}
 
 		public IEnumerable<T> Select<T>(ICondition condition, string scope, Paging paging, params Sorting[] sortings)
 		{
-			return this.Select<T>(this.GetName<T>(), condition, scope, paging, sortings, null, null);
+			return this.Select<T>(this.GetName<T>(), condition, scope, paging, null, sortings, null, null);
 		}
 
-		public IEnumerable<T> Select<T>(ICondition condition, string scope, Paging paging, Sorting[] sortings, Func<DataSelectionContext, bool> selecting, Action<DataSelectionContext> selected)
+		public IEnumerable<T> Select<T>(ICondition condition, string scope, Paging paging, IDictionary<string, object> states, params Sorting[] sortings)
 		{
-			return this.Select<T>(this.GetName<T>(), condition, scope, paging, sortings, selecting, selected);
+			return this.Select<T>(this.GetName<T>(), condition, scope, paging, states, sortings, null, null);
 		}
 
-		public IEnumerable<T> Select<T>(string name, ICondition condition = null, params Sorting[] sortings)
+		public IEnumerable<T> Select<T>(ICondition condition, string scope, Paging paging, IDictionary<string, object> states, Sorting[] sortings, Func<DataSelectionContext, bool> selecting, Action<DataSelectionContext> selected)
 		{
-			return this.Select<T>(name, condition, string.Empty, null, sortings, null, null);
+			return this.Select<T>(this.GetName<T>(), condition, scope, paging, states, sortings, selecting, selected);
+		}
+
+		public IEnumerable<T> Select<T>(string name, IDictionary<string, object> states = null, params Sorting[] sortings)
+		{
+			return this.Select<T>(name, null, string.Empty, null, states, sortings, null, null);
+		}
+
+		public IEnumerable<T> Select<T>(string name, ICondition condition, params Sorting[] sortings)
+		{
+			return this.Select<T>(name, condition, string.Empty, null, null, sortings, null, null);
+		}
+
+		public IEnumerable<T> Select<T>(string name, ICondition condition, IDictionary<string, object> states, params Sorting[] sortings)
+		{
+			return this.Select<T>(name, condition, string.Empty, null, states, sortings, null, null);
 		}
 
 		public IEnumerable<T> Select<T>(string name, ICondition condition, Paging paging, params Sorting[] sortings)
 		{
-			return this.Select<T>(name, condition, string.Empty, paging, sortings, null, null);
+			return this.Select<T>(name, condition, string.Empty, paging, null, sortings, null, null);
+		}
+
+		public IEnumerable<T> Select<T>(string name, ICondition condition, Paging paging, IDictionary<string, object> states, params Sorting[] sortings)
+		{
+			return this.Select<T>(name, condition, string.Empty, paging, states, sortings, null, null);
 		}
 
 		public IEnumerable<T> Select<T>(string name, ICondition condition, Paging paging, string scope, params Sorting[] sortings)
 		{
-			return this.Select<T>(name, condition, scope, paging, sortings, null, null);
+			return this.Select<T>(name, condition, scope, paging, null, sortings, null, null);
+		}
+
+		public IEnumerable<T> Select<T>(string name, ICondition condition, Paging paging, string scope, IDictionary<string, object> states, params Sorting[] sortings)
+		{
+			return this.Select<T>(name, condition, scope, paging, states, sortings, null, null);
 		}
 
 		public IEnumerable<T> Select<T>(string name, ICondition condition, string scope, params Sorting[] sortings)
 		{
-			return this.Select<T>(name, condition, scope, null, sortings, null, null);
+			return this.Select<T>(name, condition, scope, null, null, sortings, null, null);
+		}
+
+		public IEnumerable<T> Select<T>(string name, ICondition condition, string scope, IDictionary<string, object> states, params Sorting[] sortings)
+		{
+			return this.Select<T>(name, condition, scope, null, states, sortings, null, null);
 		}
 
 		public IEnumerable<T> Select<T>(string name, ICondition condition, string scope, Paging paging, params Sorting[] sortings)
 		{
-			return this.Select<T>(name, condition, scope, paging, sortings, null, null);
+			return this.Select<T>(name, condition, scope, paging, null, sortings, null, null);
 		}
 
-		public IEnumerable<T> Select<T>(string name, ICondition condition, string scope, Paging paging, Sorting[] sortings, Func<DataSelectionContext, bool> selecting, Action<DataSelectionContext> selected)
+		public IEnumerable<T> Select<T>(string name, ICondition condition, string scope, Paging paging, IDictionary<string, object> states, params Sorting[] sortings)
+		{
+			return this.Select<T>(name, condition, scope, paging, states, sortings, null, null);
+		}
+
+		public IEnumerable<T> Select<T>(string name, ICondition condition, string scope, Paging paging, IDictionary<string, object> states, Sorting[] sortings, Func<DataSelectionContext, bool> selecting, Action<DataSelectionContext> selected)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
 			//创建数据访问上下文对象
-			var context = this.CreateSelectionContext(name, typeof(T), condition, null, scope, paging, sortings);
+			var context = this.CreateSelectionContext(name, typeof(T), condition, null, scope, paging, sortings, states);
 
 			//执行查询方法
 			return this.Select<T>(context, selecting, selected);
 		}
 
-		public IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition = null, params Sorting[] sortings)
+		public IEnumerable<T> Select<T>(string name, Grouping grouping, IDictionary<string, object> states = null, params Sorting[] sortings)
 		{
-			return this.Select<T>(name, grouping, condition, null, sortings, null, null);
+			return this.Select<T>(name, grouping, null, null, states, sortings, null, null);
 		}
 
-		public IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition = null, Paging paging = null, params Sorting[] sortings)
+		public IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, params Sorting[] sortings)
 		{
-			return this.Select<T>(name, grouping, condition, paging, sortings, null, null);
+			return this.Select<T>(name, grouping, condition, null, null, sortings, null, null);
 		}
 
-		public IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, Paging paging, Sorting[] sortings, Func<DataSelectionContext, bool> selecting, Action<DataSelectionContext> selected)
+		public IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, IDictionary<string, object> states, params Sorting[] sortings)
+		{
+			return this.Select<T>(name, grouping, condition, null, states, sortings, null, null);
+		}
+
+		public IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, Paging paging, params Sorting[] sortings)
+		{
+			return this.Select<T>(name, grouping, condition, paging, null, sortings, null, null);
+		}
+
+		public IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, Paging paging, IDictionary<string, object> states, params Sorting[] sortings)
+		{
+			return this.Select<T>(name, grouping, condition, paging, states, sortings, null, null);
+		}
+
+		public IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, Paging paging, IDictionary<string, object> states, Sorting[] sortings, Func<DataSelectionContext, bool> selecting, Action<DataSelectionContext> selected)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
 			//创建数据访问上下文对象
-			var context = this.CreateSelectionContext(name, typeof(T), condition, grouping, null, paging, sortings);
+			var context = this.CreateSelectionContext(name, typeof(T), condition, grouping, null, paging, sortings, states);
 
 			//执行查询方法
 			return this.Select<T>(context, selecting, selected);
@@ -923,32 +1029,32 @@ namespace Zongsoft.Data
 			return new DataInsertionContext(this, name, isMultiple, data, scope, states);
 		}
 
-		protected virtual DataUpdationContext CreateUpdationContext(string name, bool isMultiple, object data, ICondition condition, string scope)
+		protected virtual DataUpdationContext CreateUpdationContext(string name, bool isMultiple, object data, ICondition condition, string scope, IDictionary<string, object> states)
 		{
 			if(isMultiple)
 				data = GetDataDictionaries(data);
 			else
 				data = GetDataDictionary(data);
 
-			return new DataUpdationContext(this, name, isMultiple, data, condition, scope);
+			return new DataUpdationContext(this, name, isMultiple, data, condition, scope, states);
 		}
 
-		protected virtual DataUpsertionContext CreateUpsertionContext(string name, bool isMultiple, object data, ICondition condition, string scope)
+		protected virtual DataUpsertionContext CreateUpsertionContext(string name, bool isMultiple, object data, ICondition condition, string scope, IDictionary<string, object> states)
 		{
 			if(isMultiple)
 				data = GetDataDictionaries(data);
 			else
 				data = GetDataDictionary(data);
 
-			return new DataUpsertionContext(this, name, isMultiple, data, condition, scope);
+			return new DataUpsertionContext(this, name, isMultiple, data, condition, scope, states);
 		}
 
-		protected virtual DataSelectionContext CreateSelectionContext(string name, Type entityType, ICondition condition, Grouping grouping, string scope, Paging paging, Sorting[] sortings)
+		protected virtual DataSelectionContext CreateSelectionContext(string name, Type entityType, ICondition condition, Grouping grouping, string scope, Paging paging, Sorting[] sortings, IDictionary<string, object> states)
 		{
 			if(grouping == null || grouping.Keys == null || grouping.Keys.Length == 0)
-				return new DataSelectionContext(this, name, entityType, condition, scope, paging, sortings);
+				return new DataSelectionContext(this, name, entityType, condition, scope, paging, sortings, states);
 			else
-				return new DataSelectionContext(this, name, entityType, condition, grouping, paging, sortings);
+				return new DataSelectionContext(this, name, entityType, condition, grouping, paging, sortings, states);
 		}
 		#endregion
 

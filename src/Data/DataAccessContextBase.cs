@@ -60,6 +60,9 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取数据访问的名称。
+		/// </summary>
 		public string Name
 		{
 			get
@@ -68,6 +71,9 @@ namespace Zongsoft.Data
 			}
 		}
 
+		/// <summary>
+		/// 获取数据访问的方法。
+		/// </summary>
 		public DataAccessMethod Method
 		{
 			get
@@ -76,6 +82,9 @@ namespace Zongsoft.Data
 			}
 		}
 
+		/// <summary>
+		/// 获取当前上下文关联的数据访问器。
+		/// </summary>
 		public IDataAccess DataAccess
 		{
 			get
@@ -84,6 +93,9 @@ namespace Zongsoft.Data
 			}
 		}
 
+		/// <summary>
+		/// 获取当前上下文关联的用户主体。
+		/// </summary>
 		public Zongsoft.Security.CredentialPrincipal Principal
 		{
 			get
@@ -92,6 +104,9 @@ namespace Zongsoft.Data
 			}
 		}
 
+		/// <summary>
+		/// 获取一个值，指示当前上下文是否含有附加的状态数据。
+		/// </summary>
 		public bool HasStates
 		{
 			get
@@ -100,6 +115,9 @@ namespace Zongsoft.Data
 			}
 		}
 
+		/// <summary>
+		/// 获取当前上下文的附加状态数据集。
+		/// </summary>
 		public IDictionary<string, object> States
 		{
 			get

@@ -42,11 +42,17 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 查询方法
-		IEnumerable<TEntity> Select(ICondition condition = null, params Sorting[] sortings);
+		IEnumerable<TEntity> Select(IDictionary<string, object> states = null, params Sorting[] sortings);
+		IEnumerable<TEntity> Select(ICondition condition, params Sorting[] sortings);
+		IEnumerable<TEntity> Select(ICondition condition, IDictionary<string, object> states, params Sorting[] sortings);
 		IEnumerable<TEntity> Select(ICondition condition, Paging paging, params Sorting[] sortings);
+		IEnumerable<TEntity> Select(ICondition condition, Paging paging, IDictionary<string, object> states, params Sorting[] sortings);
 		IEnumerable<TEntity> Select(ICondition condition, Paging paging, string scope, params Sorting[] sortings);
+		IEnumerable<TEntity> Select(ICondition condition, Paging paging, string scope, IDictionary<string, object> states, params Sorting[] sortings);
 		IEnumerable<TEntity> Select(ICondition condition, string scope, params Sorting[] sortings);
+		IEnumerable<TEntity> Select(ICondition condition, string scope, IDictionary<string, object> states, params Sorting[] sortings);
 		IEnumerable<TEntity> Select(ICondition condition, string scope, Paging paging, params Sorting[] sortings);
+		IEnumerable<TEntity> Select(ICondition condition, string scope, Paging paging, IDictionary<string, object> states, params Sorting[] sortings);
 		#endregion
 	}
 }

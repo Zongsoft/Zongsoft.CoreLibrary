@@ -326,24 +326,22 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataSelectionContext(IDataAccess dataAccess, string name, Type entityType, ICondition condition, string scope, Paging paging, Sorting[] sortings, IEnumerable result = null) : base(dataAccess, name, DataAccessMethod.Select)
+		public DataSelectionContext(IDataAccess dataAccess, string name, Type entityType, ICondition condition, string scope, Paging paging, Sorting[] sortings, IDictionary<string, object> states = null) : base(dataAccess, name, DataAccessMethod.Select, states)
 		{
 			_entityType = entityType;
 			_condition = condition;
 			_scope = scope;
 			_paging = paging;
 			_sortings = sortings;
-			_result = result;
 		}
 
-		public DataSelectionContext(IDataAccess dataAccess, string name, Type entityType, ICondition condition, Grouping grouping, Paging paging, Sorting[] sortings, IEnumerable result = null) : base(dataAccess, name, DataAccessMethod.Select)
+		public DataSelectionContext(IDataAccess dataAccess, string name, Type entityType, ICondition condition, Grouping grouping, Paging paging, Sorting[] sortings, IDictionary<string, object> states = null) : base(dataAccess, name, DataAccessMethod.Select, states)
 		{
 			_entityType = entityType;
 			_condition = condition;
 			_grouping = grouping;
 			_paging = paging;
 			_sortings = sortings;
-			_result = result;
 		}
 		#endregion
 
@@ -623,12 +621,11 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataUpdationContext(IDataAccess dataAccess, string name, bool isMultiple, object data, ICondition condition, string scope, int count = 0) : base(dataAccess, name, DataAccessMethod.Update)
+		public DataUpdationContext(IDataAccess dataAccess, string name, bool isMultiple, object data, ICondition condition, string scope, IDictionary<string, object> states = null) : base(dataAccess, name, DataAccessMethod.Update, states)
 		{
 			_data = data;
 			_condition = condition;
 			_scope = scope;
-			_count = count;
 			_isMultiple = isMultiple;
 		}
 		#endregion
@@ -718,12 +715,11 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataUpsertionContext(IDataAccess dataAccess, string name, bool isMultiple, object data, ICondition condition, string scope, int count = 0) : base(dataAccess, name, DataAccessMethod.Update)
+		public DataUpsertionContext(IDataAccess dataAccess, string name, bool isMultiple, object data, ICondition condition, string scope, IDictionary<string, object> states = null) : base(dataAccess, name, DataAccessMethod.Update, states)
 		{
 			_data = data;
 			_condition = condition;
 			_scope = scope;
-			_count = count;
 			_isMultiple = isMultiple;
 		}
 		#endregion

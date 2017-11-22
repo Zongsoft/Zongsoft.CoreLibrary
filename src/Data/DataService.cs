@@ -369,92 +369,135 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 更新方法
-		public virtual int Update<TKey>(object data, TKey key, string scope = null)
+		public int Update<TKey>(object data, TKey key, IDictionary<string, object> states = null)
+		{
+			return this.Update<TKey>(data, key, null, states);
+		}
+
+		public virtual int Update<TKey>(object data, TKey key, string scope, IDictionary<string, object> states = null)
 		{
 			bool singleton;
-			return this.Update(data, this.ConvertKey(key, out singleton), scope);
+			return this.Update(data, this.ConvertKey(key, out singleton), scope, states);
 		}
 
-		public virtual int Update<TKey1, TKey2>(object data, TKey1 key1, TKey2 key2, string scope = null)
+		public int Update<TKey1, TKey2>(object data, TKey1 key1, TKey2 key2, IDictionary<string, object> states = null)
+		{
+			return this.Update<TKey1, TKey2>(data, key1, key2, null, states);
+		}
+
+		public virtual int Update<TKey1, TKey2>(object data, TKey1 key1, TKey2 key2, string scope, IDictionary<string, object> states = null)
 		{
 			bool singleton;
-			return this.Update(data, this.ConvertKey(key1, key2, out singleton), scope);
+			return this.Update(data, this.ConvertKey(key1, key2, out singleton), scope, states);
 		}
 
-		public virtual int Update<TKey1, TKey2, TKey3>(object data, TKey1 key1, TKey2 key2, TKey3 key3, string scope = null)
+		public int Update<TKey1, TKey2, TKey3>(object data, TKey1 key1, TKey2 key2, TKey3 key3, IDictionary<string, object> states = null)
+		{
+			return this.Update<TKey1, TKey2, TKey3>(data, key1, key2, key3, null, states);
+		}
+
+		public virtual int Update<TKey1, TKey2, TKey3>(object data, TKey1 key1, TKey2 key2, TKey3 key3, string scope, IDictionary<string, object> states = null)
 		{
 			bool singleton;
-			return this.Update(data, this.ConvertKey(key1, key2, key3, out singleton), scope);
+			return this.Update(data, this.ConvertKey(key1, key2, key3, out singleton), scope, states);
 		}
 
-		public virtual int UpdateMany<TKey>(IEnumerable data, TKey key, string scope = null)
+		public int Update(object data, IDictionary<string, object> states = null)
 		{
-			bool singleton;
-			return this.UpdateMany(data, this.ConvertKey(key, out singleton), scope);
+			return this.Update(data, null, null, states);
 		}
 
-		public virtual int UpdateMany<TKey1, TKey2>(IEnumerable data, TKey1 key1, TKey2 key2, string scope = null)
+		public int Update(object data, string scope, IDictionary<string, object> states = null)
 		{
-			bool singleton;
-			return this.UpdateMany(data, this.ConvertKey(key1, key2, out singleton), scope);
+			return this.Update(data, null, scope, states);
 		}
 
-		public virtual int UpdateMany<TKey1, TKey2, TKey3>(IEnumerable data, TKey1 key1, TKey2 key2, TKey3 key3, string scope = null)
+		public int Update(object data, ICondition condition, IDictionary<string, object> states = null)
 		{
-			bool singleton;
-			return this.UpdateMany(data, this.ConvertKey(key1, key2, key3, out singleton), scope);
+			return this.Update(data, condition, null, states);
 		}
 
-		public int Update(object data, ICondition condition = null, string scope = null)
+		public int Update(object data, ICondition condition, string scope, IDictionary<string, object> states = null)
 		{
-			if(data == null)
-				return 0;
-
-			return this.OnUpdate(DataDictionary<TEntity>.GetDataDictionary(data), condition, scope);
+			return this.OnUpdate(DataDictionary<TEntity>.GetDataDictionary(data), condition, scope, states);
 		}
 
-		public int Update(object data, string scope, ICondition condition = null)
+		public int UpdateMany(IEnumerable items, IDictionary<string, object> states = null)
 		{
-			return this.Update(data, condition, scope);
+			return this.UpdateMany(items, null, states);
 		}
 
-		public int UpdateMany(IEnumerable data, ICondition condition = null, string scope = null)
+		public int UpdateMany(IEnumerable items, string scope, IDictionary<string, object> states = null)
 		{
-			if(data == null)
-				return 0;
-
-			return this.OnUpdateMany(DataDictionary<TEntity>.GetDataDictionaries(data), condition, scope);
+			return this.OnUpdateMany(DataDictionary<TEntity>.GetDataDictionaries(items), scope, states);
 		}
 
-		public int UpdateMany(IEnumerable data, string scope, ICondition condition = null)
-		{
-			return this.UpdateMany(data, condition, scope);
-		}
-
-		protected virtual int OnUpdate(DataDictionary<TEntity> data, ICondition condition, string scope)
+		protected virtual int OnUpdate(DataDictionary<TEntity> data, ICondition condition, string scope, IDictionary<string, object> states)
 		{
 			if(data == null || data.Data == null)
 				return 0;
 
-			return this.DataAccess.Update(this.Name, data, condition, scope, ctx => this.OnUpdating(ctx), ctx => this.OnUpdated(ctx));
+			return this.DataAccess.Update(this.Name, data, condition, scope, states, ctx => this.OnUpdating(ctx), ctx => this.OnUpdated(ctx));
 		}
 
-		protected virtual int OnUpdateMany(IEnumerable<DataDictionary<TEntity>> items, ICondition condition, string scope)
+		protected virtual int OnUpdateMany(IEnumerable<DataDictionary<TEntity>> items, string scope, IDictionary<string, object> states)
 		{
 			if(items == null)
 				return 0;
 
-			return this.DataAccess.UpdateMany(this.Name, items, condition, scope, ctx => this.OnUpdating(ctx), ctx => this.OnUpdated(ctx));
+			return this.DataAccess.UpdateMany(this.Name, items, scope, states, ctx => this.OnUpdating(ctx), ctx => this.OnUpdated(ctx));
 		}
 		#endregion
 
 		#region 查询方法
+
+		#region 搜索方法
 		public object Search(string keyword, params Sorting[] sortings)
 		{
-			return this.Search(keyword, string.Empty, null, sortings);
+			return this.Search(keyword, string.Empty, null, null, sortings);
 		}
 
-		public virtual object Search(string keyword, string scope, Paging paging = null, params Sorting[] sortings)
+		public object Search(string keyword, IDictionary<string, object> states, params Sorting[] sortings)
+		{
+			return this.Search(keyword, string.Empty, null, states, sortings);
+		}
+
+		public object Search(string keyword, Paging paging, params Sorting[] sortings)
+		{
+			return this.Search(keyword, string.Empty, paging, null, sortings);
+		}
+
+		public object Search(string keyword, Paging paging, IDictionary<string, object> states, params Sorting[] sortings)
+		{
+			return this.Search(keyword, string.Empty, paging, states, sortings);
+		}
+
+		public object Search(string keyword, Paging paging, string scope, params Sorting[] sortings)
+		{
+			return this.Search(keyword, scope, paging, null, sortings);
+		}
+
+		public object Search(string keyword, Paging paging, string scope, IDictionary<string, object> states, params Sorting[] sortings)
+		{
+			return this.Search(keyword, scope, paging, states, sortings);
+		}
+
+		public object Search(string keyword, string scope, params Sorting[] sortings)
+		{
+			return this.Search(keyword, scope, null, null, sortings);
+		}
+
+		public object Search(string keyword, string scope, IDictionary<string, object> states, params Sorting[] sortings)
+		{
+			return this.Search(keyword, scope, null, states, sortings);
+		}
+
+		public object Search(string keyword, string scope, Paging paging, params Sorting[] sortings)
+		{
+			return this.Search(keyword, scope, paging, null, sortings);
+		}
+
+		public virtual object Search(string keyword, string scope, Paging paging, IDictionary<string, object> states, params Sorting[] sortings)
 		{
 			bool singleton;
 
@@ -465,138 +508,297 @@ namespace Zongsoft.Data
 				throw new ArgumentException($"The {this.Name} service does not supportd search operation or specified search key is invalid.");
 
 			if(singleton)
-				return this.GetSingle(condition, scope);
+				return this.OnGet(condition, scope, states);
 			else
-				return this.Select(condition, scope, paging, sortings);
+				return this.Select(condition, scope, paging, states, sortings);
 		}
+		#endregion
 
-		public object Search(string keyword, Paging paging, string scope = null, params Sorting[] sortings)
-		{
-			return this.Search(keyword, scope, paging, sortings);
-		}
-
+		#region 单键查询
 		public object Get<TKey>(TKey key, params Sorting[] sortings)
 		{
-			return this.Get(key, string.Empty, null, sortings);
+			return this.Get<TKey>(key, string.Empty, null, null, sortings);
 		}
 
-		public virtual object Get<TKey>(TKey key, string scope, Paging paging = null, params Sorting[] sortings)
+		public object Get<TKey>(TKey key, IDictionary<string, object> states, params Sorting[] sortings)
+		{
+			return this.Get<TKey>(key, string.Empty, null, states, sortings);
+		}
+
+		public object Get<TKey>(TKey key, Paging paging, params Sorting[] sortings)
+		{
+			return this.Get<TKey>(key, string.Empty, paging, null, sortings);
+		}
+
+		public object Get<TKey>(TKey key, Paging paging, IDictionary<string, object> states, params Sorting[] sortings)
+		{
+			return this.Get<TKey>(key, string.Empty, paging, states, sortings);
+		}
+
+		public object Get<TKey>(TKey key, Paging paging, string scope, params Sorting[] sortings)
+		{
+			return this.Get<TKey>(key, scope, paging, null, sortings);
+		}
+
+		public object Get<TKey>(TKey key, Paging paging, string scope, IDictionary<string, object> states, params Sorting[] sortings)
+		{
+			return this.Get<TKey>(key, scope, paging, states, sortings);
+		}
+
+		public object Get<TKey>(TKey key, string scope, params Sorting[] sortings)
+		{
+			return this.Get<TKey>(key, scope, null, null, sortings);
+		}
+
+		public object Get<TKey>(TKey key, string scope, IDictionary<string, object> states, params Sorting[] sortings)
+		{
+			return this.Get<TKey>(key, scope, null, states, sortings);
+		}
+
+		public object Get<TKey>(TKey key, string scope, Paging paging, params Sorting[] sortings)
+		{
+			return this.Get<TKey>(key, scope, paging, null, sortings);
+		}
+
+		public virtual object Get<TKey>(TKey key, string scope, Paging paging, IDictionary<string, object> states, params Sorting[] sortings)
 		{
 			bool singleton;
 			var condition = this.ConvertKey(key, out singleton);
 
 			if(singleton)
-				return this.GetSingle(condition, scope);
+				return this.OnGet(condition, scope, states);
 			else
-				return this.Select(condition, scope, paging, sortings);
+				return this.Select(condition, scope, paging, states, sortings);
 		}
+		#endregion
 
-		public object Get<TKey>(TKey key, Paging paging, string scope = null, params Sorting[] sortings)
-		{
-			return this.Get(key, scope, paging, sortings);
-		}
-
+		#region 双键查询
 		public object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, params Sorting[] sortings)
 		{
-			return this.Get(key1, key2, string.Empty, null, sortings);
+			return this.Get<TKey1, TKey2>(key1, key2, string.Empty, null, null, sortings);
 		}
 
-		public virtual object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string scope, Paging paging = null, params Sorting[] sortings)
+		public object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, IDictionary<string, object> states, params Sorting[] sortings)
+		{
+			return this.Get<TKey1, TKey2>(key1, key2, string.Empty, null, states, sortings);
+		}
+
+		public object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, Paging paging, params Sorting[] sortings)
+		{
+			return this.Get<TKey1, TKey2>(key1, key2, string.Empty, paging, null, sortings);
+		}
+
+		public object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, Paging paging, IDictionary<string, object> states, params Sorting[] sortings)
+		{
+			return this.Get<TKey1, TKey2>(key1, key2, string.Empty, paging, states, sortings);
+		}
+
+		public object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, Paging paging, string scope, params Sorting[] sortings)
+		{
+			return this.Get<TKey1, TKey2>(key1, key2, scope, paging, null, sortings);
+		}
+
+		public object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, Paging paging, string scope, IDictionary<string, object> states, params Sorting[] sortings)
+		{
+			return this.Get<TKey1, TKey2>(key1, key2, scope, paging, states, sortings);
+		}
+
+		public object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string scope, params Sorting[] sortings)
+		{
+			return this.Get<TKey1, TKey2>(key1, key2, scope, null, null, sortings);
+		}
+
+		public object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string scope, IDictionary<string, object> states, params Sorting[] sortings)
+		{
+			return this.Get<TKey1, TKey2>(key1, key2, scope, null, states, sortings);
+		}
+
+		public object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string scope, Paging paging, params Sorting[] sortings)
+		{
+			return this.Get<TKey1, TKey2>(key1, key2, scope, paging, null, sortings);
+		}
+
+		public virtual object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string scope, Paging paging, IDictionary<string, object> states, params Sorting[] sortings)
 		{
 			bool singleton;
 			var condition = this.ConvertKey(key1, key2, out singleton);
 
 			if(singleton)
-				return this.GetSingle(condition, scope);
+				return this.OnGet(condition, scope, states);
 			else
-				return this.Select(condition, scope, paging, sortings);
+				return this.Select(condition, scope, paging, states, sortings);
 		}
+		#endregion
 
-		public object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, Paging paging, string scope = null, params Sorting[] sortings)
-		{
-			return this.Get(key1, key2, scope, paging, sortings);
-		}
-
+		#region 三键查询
 		public object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, params Sorting[] sortings)
 		{
-			return this.Get(key1, key2, key3, string.Empty, null, sortings);
+			return this.Get(key1, key2, key3, string.Empty, null, null, sortings);
 		}
 
-		public virtual object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string scope, Paging paging = null, params Sorting[] sortings)
+		public object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, IDictionary<string, object> states, params Sorting[] sortings)
+		{
+			return this.Get(key1, key2, key3, string.Empty, null, states, sortings);
+		}
+
+		public object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, Paging paging, params Sorting[] sortings)
+		{
+			return this.Get(key1, key2, key3, string.Empty, paging, null, sortings);
+		}
+
+		public object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, Paging paging, IDictionary<string, object> states, params Sorting[] sortings)
+		{
+			return this.Get(key1, key2, key3, string.Empty, paging, states, sortings);
+		}
+
+		public object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, Paging paging, string scope, params Sorting[] sortings)
+		{
+			return this.Get(key1, key2, key3, scope, paging, null, sortings);
+		}
+
+		public object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, Paging paging, string scope, IDictionary<string, object> states, params Sorting[] sortings)
+		{
+			return this.Get(key1, key2, key3, scope, paging, states, sortings);
+		}
+
+		public object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string scope, params Sorting[] sortings)
+		{
+			return this.Get(key1, key2, key3, scope, null, null, sortings);
+		}
+
+		public object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string scope, IDictionary<string, object> states, params Sorting[] sortings)
+		{
+			return this.Get(key1, key2, key3, scope, null, states, sortings);
+		}
+
+		public object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string scope, Paging paging, params Sorting[] sortings)
+		{
+			return this.Get(key1, key2, key3, scope, paging, null, sortings);
+		}
+
+		public virtual object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string scope, Paging paging, IDictionary<string, object> states, params Sorting[] sortings)
 		{
 			bool singleton;
 			var condition = this.ConvertKey(key1, key2, key3, out singleton);
 
 			if(singleton)
-				return this.GetSingle(condition, scope);
+				return this.OnGet(condition, scope, states);
 			else
-				return this.Select(condition, scope, paging, sortings);
+				return this.Select(condition, scope, paging, states, sortings);
 		}
 
-		public object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, Paging paging, string scope = null, params Sorting[] sortings)
+		protected virtual TEntity OnGet(ICondition condition, string scope, IDictionary<string, object> states)
 		{
-			return this.Get(key1, key2, key3, scope, paging, sortings);
+			return this.DataAccess.Select<TEntity>(this.Name, condition, scope, null, states, null, ctx => this.OnGetting(ctx), ctx => this.OnGetted(ctx)).FirstOrDefault();
+		}
+		#endregion
+
+		#region 常规查询
+		public IEnumerable<TEntity> Select(IDictionary<string, object> states = null, params Sorting[] sortings)
+		{
+			return this.Select(null, string.Empty, null, states, sortings);
 		}
 
-		private TEntity GetSingle(ICondition condition, string scope)
+		public IEnumerable<TEntity> Select(ICondition condition, params Sorting[] sortings)
 		{
-			return this.OnGet(condition, scope);
+			return this.Select(condition, string.Empty, null, null, sortings);
 		}
 
-		protected virtual TEntity OnGet(ICondition condition, string scope)
+		public IEnumerable<TEntity> Select(ICondition condition, IDictionary<string, object> states, params Sorting[] sortings)
 		{
-			return this.DataAccess.Select<TEntity>(this.Name, condition, scope, null, null, ctx => this.OnGetting(ctx), ctx => this.OnGetted(ctx)).FirstOrDefault();
-		}
-
-		public IEnumerable<TEntity> Select(ICondition condition = null, params Sorting[] sortings)
-		{
-			return this.Select(condition, string.Empty, null, sortings);
+			return this.Select(condition, string.Empty, null, states, sortings);
 		}
 
 		public IEnumerable<TEntity> Select(ICondition condition, Paging paging, params Sorting[] sortings)
 		{
-			return this.Select(condition, string.Empty, paging, sortings);
+			return this.Select(condition, string.Empty, paging, null, sortings);
+		}
+
+		public IEnumerable<TEntity> Select(ICondition condition, Paging paging, IDictionary<string, object> states, params Sorting[] sortings)
+		{
+			return this.Select(condition, string.Empty, paging, states, sortings);
 		}
 
 		public IEnumerable<TEntity> Select(ICondition condition, Paging paging, string scope, params Sorting[] sortings)
 		{
-			return this.Select(condition, scope, paging, sortings);
+			return this.Select(condition, scope, paging, null, sortings);
+		}
+
+		public IEnumerable<TEntity> Select(ICondition condition, Paging paging, string scope, IDictionary<string, object> states, params Sorting[] sortings)
+		{
+			return this.Select(condition, scope, paging, states, sortings);
 		}
 
 		public IEnumerable<TEntity> Select(ICondition condition, string scope, params Sorting[] sortings)
 		{
-			return this.Select(condition, scope, null, sortings);
+			return this.Select(condition, scope, null, null, sortings);
+		}
+
+		public IEnumerable<TEntity> Select(ICondition condition, string scope, IDictionary<string, object> states, params Sorting[] sortings)
+		{
+			return this.Select(condition, scope, null, states, sortings);
 		}
 
 		public IEnumerable<TEntity> Select(ICondition condition, string scope, Paging paging, params Sorting[] sortings)
 		{
-			return this.OnSelect(condition, scope, paging, sortings);
+			return this.Select(condition, scope, paging, null, sortings);
 		}
 
-		protected virtual IEnumerable<TEntity> OnSelect(ICondition condition, string scope, Paging paging, params Sorting[] sortings)
+		public IEnumerable<TEntity> Select(ICondition condition, string scope, Paging paging, IDictionary<string, object> states, params Sorting[] sortings)
 		{
-			return this.DataAccess.Select<TEntity>(this.Name, condition, scope, paging, sortings, ctx => this.OnSelecting(ctx), ctx => this.OnSelected(ctx));
+			return this.OnSelect(condition, scope, paging, states, sortings);
+		}
+
+		protected virtual IEnumerable<TEntity> OnSelect(ICondition condition, string scope, Paging paging, IDictionary<string, object> states, params Sorting[] sortings)
+		{
+			return this.DataAccess.Select<TEntity>(this.Name, condition, scope, paging, states, sortings, ctx => this.OnSelecting(ctx), ctx => this.OnSelected(ctx));
+		}
+
+		public IEnumerable<T> Select<T>(Grouping grouping, IDictionary<string, object> states = null, params Sorting[] sortings)
+		{
+			return this.OnSelect<T>(grouping, null, null, states, sortings);
 		}
 
 		public IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, params Sorting[] sortings)
 		{
-			return this.OnSelect<T>(grouping, condition, null, sortings);
+			return this.OnSelect<T>(grouping, condition, null, null, sortings);
+		}
+
+		public IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, IDictionary<string, object> states, params Sorting[] sortings)
+		{
+			return this.OnSelect<T>(grouping, condition, null, states, sortings);
 		}
 
 		public IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, Paging paging, params Sorting[] sortings)
 		{
-			return this.OnSelect<T>(grouping, condition, paging, sortings);
+			return this.OnSelect<T>(grouping, condition, paging, null, sortings);
 		}
 
-		protected virtual IEnumerable<T> OnSelect<T>(Grouping grouping, ICondition condition, Paging paging, params Sorting[] sortings)
+		public IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, Paging paging, IDictionary<string, object> states, params Sorting[] sortings)
 		{
-			return this.DataAccess.Select<T>(this.Name, grouping, condition, paging, sortings, ctx => this.OnSelecting(ctx), ctx => this.OnSelected(ctx));
+			return this.OnSelect<T>(grouping, condition, paging, states, sortings);
 		}
+
+		protected virtual IEnumerable<T> OnSelect<T>(Grouping grouping, ICondition condition, Paging paging, IDictionary<string, object> states, params Sorting[] sortings)
+		{
+			return this.DataAccess.Select<T>(this.Name, grouping, condition, paging, states, sortings, ctx => this.OnSelecting(ctx), ctx => this.OnSelected(ctx));
+		}
+		#endregion
 
 		#region 显式实现
+		IEnumerable IDataService.Select(IDictionary<string, object> states, params Sorting[] sortings)
+		{
+			return this.Select(states, sortings);
+		}
+
 		IEnumerable IDataService.Select(ICondition condition, params Sorting[] sortings)
 		{
 			return this.Select(condition, sortings);
+		}
+
+		IEnumerable IDataService.Select(ICondition condition, IDictionary<string, object> states, params Sorting[] sortings)
+		{
+			return this.Select(condition, states, sortings);
 		}
 
 		IEnumerable IDataService.Select(ICondition condition, string scope, params Sorting[] sortings)
@@ -604,9 +806,19 @@ namespace Zongsoft.Data
 			return this.Select(condition, scope, sortings);
 		}
 
+		IEnumerable IDataService.Select(ICondition condition, string scope, IDictionary<string, object> states, params Sorting[] sortings)
+		{
+			return this.Select(condition, scope, states, sortings);
+		}
+
 		IEnumerable IDataService.Select(ICondition condition, string scope, Paging paging, params Sorting[] sortings)
 		{
 			return this.Select(condition, scope, paging, sortings);
+		}
+
+		IEnumerable IDataService.Select(ICondition condition, string scope, Paging paging, IDictionary<string, object> states, params Sorting[] sortings)
+		{
+			return this.Select(condition, scope, paging, states, sortings);
 		}
 
 		IEnumerable IDataService.Select(ICondition condition, Paging paging, params Sorting[] sortings)
@@ -614,9 +826,19 @@ namespace Zongsoft.Data
 			return this.Select(condition, paging, sortings);
 		}
 
+		IEnumerable IDataService.Select(ICondition condition, Paging paging, IDictionary<string, object> states, params Sorting[] sortings)
+		{
+			return this.Select(condition, paging, states, sortings);
+		}
+
 		IEnumerable IDataService.Select(ICondition condition, Paging paging, string scope, params Sorting[] sortings)
 		{
 			return this.Select(condition, paging, scope, sortings);
+		}
+
+		IEnumerable IDataService.Select(ICondition condition, Paging paging, string scope, IDictionary<string, object> states, params Sorting[] sortings)
+		{
+			return this.Select(condition, paging, scope, states, sortings);
 		}
 		#endregion
 
