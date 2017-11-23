@@ -42,7 +42,23 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		protected DataAccessContextBase(IDataAccess dataAccess, string name, DataAccessMethod method, IDictionary<string, object> states = null)
+		protected DataAccessContextBase(IDataAccess dataAccess, string name, DataAccessMethod method, object state)
+		{
+			if(dataAccess == null)
+				throw new ArgumentNullException(nameof(dataAccess));
+
+			if(string.IsNullOrEmpty(name))
+				throw new ArgumentNullException(nameof(name));
+
+			_name = name;
+			_method = method;
+			_dataAccess = dataAccess;
+
+			if(state != null)
+				_states = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase) { { string.Empty, state } };
+		}
+
+		protected DataAccessContextBase(IDataAccess dataAccess, string name, DataAccessMethod method, IDictionary<string, object> states)
 		{
 			if(dataAccess == null)
 				throw new ArgumentNullException(nameof(dataAccess));

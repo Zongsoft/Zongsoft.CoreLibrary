@@ -82,118 +82,151 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 执行方法
-		IEnumerable<T> Execute<T>(string name, IDictionary<string, object> inParameters, IDictionary<string, object> states = null, Func<DataExecutionContext, bool> executing = null, Action<DataExecutionContext> executed = null);
-		IEnumerable<T> Execute<T>(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters, IDictionary<string, object> states = null, Func<DataExecutionContext, bool> executing = null, Action<DataExecutionContext> executed = null);
+		IEnumerable<T> Execute<T>(string name, IDictionary<string, object> inParameters, object state = null, Func<DataExecutionContext, bool> executing = null, Action<DataExecutionContext> executed = null);
+		IEnumerable<T> Execute<T>(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters, object state = null, Func<DataExecutionContext, bool> executing = null, Action<DataExecutionContext> executed = null);
 
-		object ExecuteScalar(string name, IDictionary<string, object> inParameters, IDictionary<string, object> states = null, Func<DataExecutionContext, bool> executing = null, Action<DataExecutionContext> executed = null);
-		object ExecuteScalar(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters, IDictionary<string, object> states = null, Func<DataExecutionContext, bool> executing = null, Action<DataExecutionContext> executed = null);
+		object ExecuteScalar(string name, IDictionary<string, object> inParameters, object state = null, Func<DataExecutionContext, bool> executing = null, Action<DataExecutionContext> executed = null);
+		object ExecuteScalar(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters, object state = null, Func<DataExecutionContext, bool> executing = null, Action<DataExecutionContext> executed = null);
 		#endregion
 
 		#region 存在方法
-		bool Exists<T>(ICondition condition, IDictionary<string, object> states = null, Func<DataExistenceContext, bool> existing = null, Action<DataExistenceContext> existed = null);
-		bool Exists(string name, ICondition condition, IDictionary<string, object> states = null, Func<DataExistenceContext, bool> existing = null, Action<DataExistenceContext> existed = null);
+		bool Exists<T>(ICondition condition, object state = null, Func<DataExistenceContext, bool> existing = null, Action<DataExistenceContext> existed = null);
+		bool Exists(string name, ICondition condition, object state = null, Func<DataExistenceContext, bool> existing = null, Action<DataExistenceContext> existed = null);
 		#endregion
 
 		#region 计数方法
-		int Count<T>(ICondition condition, string includes = null, IDictionary<string, object> states = null, Func<DataCountContext, bool> counting = null, Action<DataCountContext> counted = null);
-		int Count(string name, ICondition condition, string includes = null, IDictionary<string, object> states = null, Func<DataCountContext, bool> counting = null, Action<DataCountContext> counted = null);
+		int Count<T>(ICondition condition);
+		int Count<T>(ICondition condition, object state);
+		int Count<T>(ICondition condition, string includes);
+		int Count<T>(ICondition condition, string includes, object state, Func<DataCountContext, bool> counting = null, Action<DataCountContext> counted = null);
+
+		int Count(string name, ICondition condition);
+		int Count(string name, ICondition condition, object state);
+		int Count(string name, ICondition condition, string includes);
+		int Count(string name, ICondition condition, string includes, object state, Func<DataCountContext, bool> counting = null, Action<DataCountContext> counted = null);
 		#endregion
 
 		#region 递增方法
-		long Increment<T>(string member, ICondition condition, int interval = 1, IDictionary<string, object> states = null, Func<DataIncrementContext, bool> incrementing = null, Action<DataIncrementContext> incremented = null);
-		long Increment(string name, string member, ICondition condition, int interval = 1, IDictionary<string, object> states = null, Func<DataIncrementContext, bool> incrementing = null, Action<DataIncrementContext> incremented = null);
+		long Increment<T>(string member, ICondition condition);
+		long Increment<T>(string member, ICondition condition, object state);
+		long Increment<T>(string member, ICondition condition, int interval);
+		long Increment<T>(string member, ICondition condition, int interval, object state, Func<DataIncrementContext, bool> incrementing = null, Action<DataIncrementContext> incremented = null);
 
-		long Decrement<T>(string member, ICondition condition, int interval = 1, IDictionary<string, object> states = null, Func<DataIncrementContext, bool> decrementing = null, Action<DataIncrementContext> decremented = null);
-		long Decrement(string name, string member, ICondition condition, int interval = 1, IDictionary<string, object> states = null, Func<DataIncrementContext, bool> decrementing = null, Action<DataIncrementContext> decremented = null);
+		long Increment(string name, string member, ICondition condition);
+		long Increment(string name, string member, ICondition condition, object state);
+		long Increment(string name, string member, ICondition condition, int interval);
+		long Increment(string name, string member, ICondition condition, int interval, object state, Func<DataIncrementContext, bool> incrementing = null, Action<DataIncrementContext> incremented = null);
+
+		long Decrement<T>(string member, ICondition condition);
+		long Decrement<T>(string member, ICondition condition, object state);
+		long Decrement<T>(string member, ICondition condition, int interval);
+		long Decrement<T>(string member, ICondition condition, int interval, object state, Func<DataIncrementContext, bool> decrementing = null, Action<DataIncrementContext> decremented = null);
+
+		long Decrement(string name, string member, ICondition condition);
+		long Decrement(string name, string member, ICondition condition, object state);
+		long Decrement(string name, string member, ICondition condition, int interval);
+		long Decrement(string name, string member, ICondition condition, int interval, object state, Func<DataIncrementContext, bool> decrementing = null, Action<DataIncrementContext> decremented = null);
 		#endregion
 
 		#region 删除方法
 		int Delete<T>(ICondition condition, params string[] cascades);
-		int Delete<T>(ICondition condition, IDictionary<string, object> states, params string[] cascades);
-		int Delete<T>(ICondition condition, IDictionary<string, object> states, string[] cascades, Func<DataDeletionContext, bool> deleting, Action<DataDeletionContext> deleted);
+		int Delete<T>(ICondition condition, object state, params string[] cascades);
+		int Delete<T>(ICondition condition, object state, string[] cascades, Func<DataDeletionContext, bool> deleting = null, Action<DataDeletionContext> deleted = null);
 
 		int Delete(string name, ICondition condition, params string[] cascades);
-		int Delete(string name, ICondition condition, IDictionary<string, object> states, params string[] cascades);
-		int Delete(string name, ICondition condition, IDictionary<string, object> states, string[] cascades, Func<DataDeletionContext, bool> deleting, Action<DataDeletionContext> deleted);
+		int Delete(string name, ICondition condition, object state, params string[] cascades);
+		int Delete(string name, ICondition condition, object state, string[] cascades, Func<DataDeletionContext, bool> deleting = null, Action<DataDeletionContext> deleted = null);
 		#endregion
 
 		#region 插入方法
 		int Insert<T>(T data);
+		int Insert<T>(T data, object state);
 		int Insert<T>(T data, string scope);
-		int Insert<T>(T data, IDictionary<string, object> states);
-		int Insert<T>(T data, string scope, IDictionary<string, object> states, Func<DataInsertionContext, bool> inserting, Action<DataInsertionContext> inserted);
+		int Insert<T>(T data, string scope, object state, Func<DataInsertionContext, bool> inserting = null, Action<DataInsertionContext> inserted = null);
 
 		int Insert(string name, object data);
+		int Insert(string name, object data, object state);
 		int Insert(string name, object data, string scope);
-		int Insert(string name, object data, IDictionary<string, object> states);
-		int Insert(string name, object data, string scope, IDictionary<string, object> states, Func<DataInsertionContext, bool> inserting, Action<DataInsertionContext> inserted);
+		int Insert(string name, object data, string scope, object state, Func<DataInsertionContext, bool> inserting = null, Action<DataInsertionContext> inserted = null);
 
 		int InsertMany<T>(IEnumerable<T> items);
+		int InsertMany<T>(IEnumerable<T> items, object state);
 		int InsertMany<T>(IEnumerable<T> items, string scope);
-		int InsertMany<T>(IEnumerable<T> items, IDictionary<string, object> states);
-		int InsertMany<T>(IEnumerable<T> items, string scope, IDictionary<string, object> states, Func<DataInsertionContext, bool> inserting, Action<DataInsertionContext> inserted);
+		int InsertMany<T>(IEnumerable<T> items, string scope, object state, Func<DataInsertionContext, bool> inserting = null, Action<DataInsertionContext> inserted = null);
 
 		int InsertMany(string name, IEnumerable items);
+		int InsertMany(string name, IEnumerable items, object state);
 		int InsertMany(string name, IEnumerable items, string scope);
-		int InsertMany(string name, IEnumerable items, IDictionary<string, object> states);
-		int InsertMany(string name, IEnumerable items, string scope, IDictionary<string, object> states, Func<DataInsertionContext, bool> inserting, Action<DataInsertionContext> inserted);
+		int InsertMany(string name, IEnumerable items, string scope, object state, Func<DataInsertionContext, bool> inserting = null, Action<DataInsertionContext> inserted = null);
 		#endregion
 
 		#region 更新方法
-		int Update<T>(T data, IDictionary<string, object> states = null, Func<DataUpdationContext, bool> updating = null, Action<DataUpdationContext> updated = null);
-		int Update<T>(T data, string scope, IDictionary<string, object> states = null, Func<DataUpdationContext, bool> updating = null, Action<DataUpdationContext> updated = null);
-		int Update<T>(T data, ICondition condition, IDictionary<string, object> states = null, Func<DataUpdationContext, bool> updating = null, Action<DataUpdationContext> updated = null);
-		int Update<T>(T data, ICondition condition, string scope, IDictionary<string, object> states = null, Func<DataUpdationContext, bool> updating = null, Action<DataUpdationContext> updated = null);
+		int Update<T>(T data);
+		int Update<T>(T data, object state);
+		int Update<T>(T data, string scope);
+		int Update<T>(T data, string scope, object state);
+		int Update<T>(T data, ICondition condition);
+		int Update<T>(T data, ICondition condition, object state);
+		int Update<T>(T data, ICondition condition, string scope);
+		int Update<T>(T data, ICondition condition, string scope, object state, Func<DataUpdationContext, bool> updating = null, Action<DataUpdationContext> updated = null);
 
-		int Update(string name, object data, IDictionary<string, object> states = null, Func<DataUpdationContext, bool> updating = null, Action<DataUpdationContext> updated = null);
-		int Update(string name, object data, string scope, IDictionary<string, object> states = null, Func<DataUpdationContext, bool> updating = null, Action<DataUpdationContext> updated = null);
-		int Update(string name, object data, ICondition condition, IDictionary<string, object> states = null, Func<DataUpdationContext, bool> updating = null, Action<DataUpdationContext> updated = null);
-		int Update(string name, object data, ICondition condition, string scope, IDictionary<string, object> states = null, Func<DataUpdationContext, bool> updating = null, Action<DataUpdationContext> updated = null);
+		int Update(string name, object data);
+		int Update(string name, object data, object state);
+		int Update(string name, object data, string scope);
+		int Update(string name, object data, string scope, object state);
+		int Update(string name, object data, ICondition condition);
+		int Update(string name, object data, ICondition condition, object state);
+		int Update(string name, object data, ICondition condition, string scope);
+		int Update(string name, object data, ICondition condition, string scope, object state, Func<DataUpdationContext, bool> updating = null, Action<DataUpdationContext> updated = null);
 
-		int UpdateMany<T>(IEnumerable<T> items, IDictionary<string, object> states = null, Func<DataUpdationContext, bool> updating = null, Action<DataUpdationContext> updated = null);
-		int UpdateMany<T>(IEnumerable<T> items, string scope, IDictionary<string, object> states = null, Func<DataUpdationContext, bool> updating = null, Action<DataUpdationContext> updated = null);
+		int UpdateMany<T>(IEnumerable<T> items);
+		int UpdateMany<T>(IEnumerable<T> items, object state);
+		int UpdateMany<T>(IEnumerable<T> items, string scope);
+		int UpdateMany<T>(IEnumerable<T> items, string scope, object state, Func<DataUpdationContext, bool> updating = null, Action<DataUpdationContext> updated = null);
 
-		int UpdateMany(string name, IEnumerable items, IDictionary<string, object> states = null, Func<DataUpdationContext, bool> updating = null, Action<DataUpdationContext> updated = null);
-		int UpdateMany(string name, IEnumerable items, string scope, IDictionary<string, object> states = null, Func<DataUpdationContext, bool> updating = null, Action<DataUpdationContext> updated = null);
+		int UpdateMany(string name, IEnumerable items);
+		int UpdateMany(string name, IEnumerable items, object state);
+		int UpdateMany(string name, IEnumerable items, string scope);
+		int UpdateMany(string name, IEnumerable items, string scope, object state, Func<DataUpdationContext, bool> updating = null, Action<DataUpdationContext> updated = null);
 		#endregion
 
 		#region 查询方法
-		IEnumerable<T> Select<T>(IDictionary<string, object> states = null, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(object state = null, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(ICondition condition, params Sorting[] sortings);
-		IEnumerable<T> Select<T>(ICondition condition, IDictionary<string, object> states, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(ICondition condition, object state, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(ICondition condition, Paging paging, params Sorting[] sortings);
-		IEnumerable<T> Select<T>(ICondition condition, Paging paging, IDictionary<string, object> states, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(ICondition condition, Paging paging, object state, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(ICondition condition, Paging paging, string scope, params Sorting[] sortings);
-		IEnumerable<T> Select<T>(ICondition condition, Paging paging, string scope, IDictionary<string, object> states, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(ICondition condition, Paging paging, string scope, object state, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(ICondition condition, string scope, params Sorting[] sortings);
-		IEnumerable<T> Select<T>(ICondition condition, string scope, IDictionary<string, object> states, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(ICondition condition, string scope, object state, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(ICondition condition, string scope, Paging paging, params Sorting[] sortings);
-		IEnumerable<T> Select<T>(ICondition condition, string scope, Paging paging, IDictionary<string, object> states, params Sorting[] sortings);
-		IEnumerable<T> Select<T>(ICondition condition, string scope, Paging paging, IDictionary<string, object> states, Sorting[] sortings, Func<DataSelectionContext, bool> selecting, Action<DataSelectionContext> selected);
+		IEnumerable<T> Select<T>(ICondition condition, string scope, Paging paging, object state, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(ICondition condition, string scope, Paging paging, object state, Sorting[] sortings, Func<DataSelectionContext, bool> selecting, Action<DataSelectionContext> selected);
 
-		IEnumerable<T> Select<T>(string name, IDictionary<string, object> states = null, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(string name, object state = null, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(string name, ICondition condition, params Sorting[] sortings);
-		IEnumerable<T> Select<T>(string name, ICondition condition, IDictionary<string, object> states, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(string name, ICondition condition, object state, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(string name, ICondition condition, Paging paging, params Sorting[] sortings);
-		IEnumerable<T> Select<T>(string name, ICondition condition, Paging paging, IDictionary<string, object> states, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(string name, ICondition condition, Paging paging, object state, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(string name, ICondition condition, Paging paging, string scope, params Sorting[] sortings);
-		IEnumerable<T> Select<T>(string name, ICondition condition, Paging paging, string scope, IDictionary<string, object> states, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(string name, ICondition condition, Paging paging, string scope, object state, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(string name, ICondition condition, string scope, params Sorting[] sortings);
-		IEnumerable<T> Select<T>(string name, ICondition condition, string scope, IDictionary<string, object> states, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(string name, ICondition condition, string scope, object state, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(string name, ICondition condition, string scope, Paging paging, params Sorting[] sortings);
-		IEnumerable<T> Select<T>(string name, ICondition condition, string scope, Paging paging, IDictionary<string, object> states, params Sorting[] sortings);
-		IEnumerable<T> Select<T>(string name, ICondition condition, string scope, Paging paging, IDictionary<string, object> states, Sorting[] sortings, Func<DataSelectionContext, bool> selecting, Action<DataSelectionContext> selected);
+		IEnumerable<T> Select<T>(string name, ICondition condition, string scope, Paging paging, object state, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(string name, ICondition condition, string scope, Paging paging, object state, Sorting[] sortings, Func<DataSelectionContext, bool> selecting, Action<DataSelectionContext> selected);
 
 		//IEnumerable<T> Select<T, TEntity>(Grouping<TEntity> grouping, ICondition condition = null, params Sorting[] sortings);
 		//IEnumerable<T> Select<T, TEntity>(Grouping<TEntity> grouping, ICondition condition = null, Paging paging = null, params Sorting[] sortings);
 		//IEnumerable<T> Select<T, TEntity>(Grouping<TEntity> grouping, ICondition condition, Paging paging, Sorting[] sortings, Func<DataSelectionContext, bool> selecting, Action<DataSelectionContext> selected);
 
-		IEnumerable<T> Select<T>(string name, Grouping grouping, IDictionary<string, object> states = null, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(string name, Grouping grouping, object state = null, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, params Sorting[] sortings);
-		IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, IDictionary<string, object> states, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, object state, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, Paging paging, params Sorting[] sortings);
-		IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, Paging paging, IDictionary<string, object> states, params Sorting[] sortings);
-		IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, Paging paging, IDictionary<string, object> states, Sorting[] sortings, Func<DataSelectionContext, bool> selecting, Action<DataSelectionContext> selected);
+		IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, Paging paging, object state, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, Paging paging, object state, Sorting[] sortings, Func<DataSelectionContext, bool> selecting, Action<DataSelectionContext> selected);
 		#endregion
 	}
 }

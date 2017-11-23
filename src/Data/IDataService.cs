@@ -73,132 +73,140 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 执行方法
-		IEnumerable<T> Execute<T>(string name, IDictionary<string, object> inParameters, IDictionary<string, object> states = null);
-		IEnumerable<T> Execute<T>(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters, IDictionary<string, object> states = null);
+		IEnumerable<T> Execute<T>(string name, IDictionary<string, object> inParameters, object state = null);
+		IEnumerable<T> Execute<T>(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters, object state = null);
 
-		object ExecuteScalar(string name, IDictionary<string, object> inParameters, IDictionary<string, object> states = null);
-		object ExecuteScalar(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters, IDictionary<string, object> states = null);
+		object ExecuteScalar(string name, IDictionary<string, object> inParameters, object state = null);
+		object ExecuteScalar(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters, object state = null);
 		#endregion
 
 		#region 存在方法
-		bool Exists(ICondition condition, IDictionary<string, object> states = null);
-		bool Exists<TKey>(TKey key, IDictionary<string, object> states = null);
-		bool Exists<TKey1, TKey2>(TKey1 key1, TKey2 key2, IDictionary<string, object> states = null);
-		bool Exists<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, IDictionary<string, object> states = null);
+		bool Exists(ICondition condition, object state = null);
+
+		bool Exists<TKey>(TKey key, object state = null);
+		bool Exists<TKey1, TKey2>(TKey1 key1, TKey2 key2, object state = null);
+		bool Exists<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, object state = null);
 		#endregion
 
 		#region 计数方法
-		int Count(ICondition condition, string includes = null, IDictionary<string, object> states = null);
+		int Count(ICondition condition, object state);
+		int Count(ICondition condition, string includes);
+		int Count(ICondition condition, string includes = null, object state = null);
 		#endregion
 
 		#region 递增方法
-		long Increment(string member, ICondition condition, int interval = 1, IDictionary<string, object> states = null);
-		long Decrement(string member, ICondition condition, int interval = 1, IDictionary<string, object> states = null);
+		long Increment(string member, ICondition condition, object state);
+		long Increment(string member, ICondition condition, int interval);
+		long Increment(string member, ICondition condition, int interval = 1, object state = null);
+
+		long Decrement(string member, ICondition condition, object state);
+		long Decrement(string member, ICondition condition, int interval);
+		long Decrement(string member, ICondition condition, int interval = 1, object state = null);
 		#endregion
 
 		#region 删除方法
 		int Delete<TKey>(TKey key, params string[] cascades);
-		int Delete<TKey>(TKey key, IDictionary<string, object> states, params string[] cascades);
+		int Delete<TKey>(TKey key, object state, params string[] cascades);
 		int Delete<TKey1, TKey2>(TKey1 key1, TKey2 key2, params string[] cascades);
-		int Delete<TKey1, TKey2>(TKey1 key1, TKey2 key2, IDictionary<string, object> states, params string[] cascades);
+		int Delete<TKey1, TKey2>(TKey1 key1, TKey2 key2, object state, params string[] cascades);
 		int Delete<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, params string[] cascades);
-		int Delete<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, IDictionary<string, object> states, params string[] cascades);
+		int Delete<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, object state, params string[] cascades);
 
 		int Delete(ICondition condition, params string[] cascades);
-		int Delete(ICondition condition, IDictionary<string, object> states, params string[] cascades);
+		int Delete(ICondition condition, object state, params string[] cascades);
 		#endregion
 
 		#region 插入方法
 		int Insert(object data);
+		int Insert(object data, object state);
 		int Insert(object data, string scope);
-		int Insert(object data, IDictionary<string, object> states);
-		int Insert(object data, string scope, IDictionary<string, object> states);
+		int Insert(object data, string scope, object state);
 
 		int InsertMany(IEnumerable items);
+		int InsertMany(IEnumerable items, object state);
 		int InsertMany(IEnumerable items, string scope);
-		int InsertMany(IEnumerable items, IDictionary<string, object> states);
-		int InsertMany(IEnumerable items, string scope, IDictionary<string, object> states);
+		int InsertMany(IEnumerable items, string scope, object state);
 		#endregion
 
 		#region 更新方法
-		int Update<TKey>(object data, TKey key, IDictionary<string, object> states = null);
-		int Update<TKey>(object data, TKey key, string scope, IDictionary<string, object> states = null);
-		int Update<TKey1, TKey2>(object data, TKey1 key1, TKey2 key2, IDictionary<string, object> states = null);
-		int Update<TKey1, TKey2>(object data, TKey1 key1, TKey2 key2, string scope, IDictionary<string, object> states = null);
-		int Update<TKey1, TKey2, TKey3>(object data, TKey1 key1, TKey2 key2, TKey3 key3, IDictionary<string, object> states = null);
-		int Update<TKey1, TKey2, TKey3>(object data, TKey1 key1, TKey2 key2, TKey3 key3, string scope, IDictionary<string, object> states = null);
+		int Update<TKey>(object data, TKey key, object state = null);
+		int Update<TKey>(object data, TKey key, string scope, object state = null);
+		int Update<TKey1, TKey2>(object data, TKey1 key1, TKey2 key2, object state = null);
+		int Update<TKey1, TKey2>(object data, TKey1 key1, TKey2 key2, string scope, object state = null);
+		int Update<TKey1, TKey2, TKey3>(object data, TKey1 key1, TKey2 key2, TKey3 key3, object state = null);
+		int Update<TKey1, TKey2, TKey3>(object data, TKey1 key1, TKey2 key2, TKey3 key3, string scope, object state = null);
 
-		int Update(object data, IDictionary<string, object> states = null);
-		int Update(object data, string scope, IDictionary<string, object> states = null);
-		int Update(object data, ICondition condition, IDictionary<string, object> states = null);
-		int Update(object data, ICondition condition, string scope, IDictionary<string, object> states = null);
+		int Update(object data, object state = null);
+		int Update(object data, string scope, object state = null);
+		int Update(object data, ICondition condition, object state = null);
+		int Update(object data, ICondition condition, string scope, object state = null);
 
-		int UpdateMany(IEnumerable items, IDictionary<string, object> states = null);
-		int UpdateMany(IEnumerable items, string scope, IDictionary<string, object> states = null);
+		int UpdateMany(IEnumerable items, object state = null);
+		int UpdateMany(IEnumerable items, string scope, object state = null);
 		#endregion
 
 		#region 查询方法
 		object Search(string keyword, params Sorting[] sortings);
-		object Search(string keyword, IDictionary<string, object> states, params Sorting[] sortings);
+		object Search(string keyword, object state, params Sorting[] sortings);
 		object Search(string keyword, Paging paging, params Sorting[] sortings);
-		object Search(string keyword, Paging paging, IDictionary<string, object> states, params Sorting[] sortings);
+		object Search(string keyword, Paging paging, object state, params Sorting[] sortings);
 		object Search(string keyword, Paging paging, string scope, params Sorting[] sortings);
-		object Search(string keyword, Paging paging, string scope, IDictionary<string, object> states, params Sorting[] sortings);
+		object Search(string keyword, Paging paging, string scope, object state, params Sorting[] sortings);
 		object Search(string keyword, string scope, params Sorting[] sortings);
-		object Search(string keyword, string scope, IDictionary<string, object> states, params Sorting[] sortings);
+		object Search(string keyword, string scope, object state, params Sorting[] sortings);
 		object Search(string keyword, string scope, Paging paging, params Sorting[] sortings);
-		object Search(string keyword, string scope, Paging paging, IDictionary<string, object> states, params Sorting[] sortings);
+		object Search(string keyword, string scope, Paging paging, object state, params Sorting[] sortings);
 
 		object Get<TKey>(TKey key, params Sorting[] sortings);
-		object Get<TKey>(TKey key, IDictionary<string, object> states, params Sorting[] sortings);
+		object Get<TKey>(TKey key, object state, params Sorting[] sortings);
 		object Get<TKey>(TKey key, Paging paging, params Sorting[] sortings);
-		object Get<TKey>(TKey key, Paging paging, IDictionary<string, object> states, params Sorting[] sortings);
+		object Get<TKey>(TKey key, Paging paging, object state, params Sorting[] sortings);
 		object Get<TKey>(TKey key, Paging paging, string scope, params Sorting[] sortings);
-		object Get<TKey>(TKey key, Paging paging, string scope, IDictionary<string, object> states, params Sorting[] sortings);
+		object Get<TKey>(TKey key, Paging paging, string scope, object state, params Sorting[] sortings);
 		object Get<TKey>(TKey key, string scope, params Sorting[] sortings);
-		object Get<TKey>(TKey key, string scope, IDictionary<string, object> states, params Sorting[] sortings);
+		object Get<TKey>(TKey key, string scope, object state, params Sorting[] sortings);
 		object Get<TKey>(TKey key, string scope, Paging paging, params Sorting[] sortings);
-		object Get<TKey>(TKey key, string scope, Paging paging, IDictionary<string, object> states, params Sorting[] sortings);
+		object Get<TKey>(TKey key, string scope, Paging paging, object state, params Sorting[] sortings);
 
 		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, params Sorting[] sortings);
-		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, IDictionary<string, object> states, params Sorting[] sortings);
+		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, object state, params Sorting[] sortings);
 		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, Paging paging, params Sorting[] sortings);
-		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, Paging paging, IDictionary<string, object> states, params Sorting[] sortings);
+		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, Paging paging, object state, params Sorting[] sortings);
 		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, Paging paging, string scope, params Sorting[] sortings);
-		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, Paging paging, string scope, IDictionary<string, object> states, params Sorting[] sortings);
+		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, Paging paging, string scope, object state, params Sorting[] sortings);
 		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string scope, params Sorting[] sortings);
-		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string scope, IDictionary<string, object> states, params Sorting[] sortings);
+		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string scope, object state, params Sorting[] sortings);
 		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string scope, Paging paging, params Sorting[] sortings);
-		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string scope, Paging paging, IDictionary<string, object> states, params Sorting[] sortings);
+		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string scope, Paging paging, object state, params Sorting[] sortings);
 
 		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, params Sorting[] sortings);
-		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, IDictionary<string, object> states, params Sorting[] sortings);
+		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, object state, params Sorting[] sortings);
 		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, Paging paging, params Sorting[] sortings);
-		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, Paging paging, IDictionary<string, object> states, params Sorting[] sortings);
+		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, Paging paging, object state, params Sorting[] sortings);
 		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, Paging paging, string scope, params Sorting[] sortings);
-		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, Paging paging, string scope, IDictionary<string, object> states, params Sorting[] sortings);
+		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, Paging paging, string scope, object state, params Sorting[] sortings);
 		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string scope, params Sorting[] sortings);
-		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string scope, IDictionary<string, object> states, params Sorting[] sortings);
+		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string scope, object state, params Sorting[] sortings);
 		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string scope, Paging paging, params Sorting[] sortings);
-		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string scope, Paging paging, IDictionary<string, object> states, params Sorting[] sortings);
+		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string scope, Paging paging, object state, params Sorting[] sortings);
 
-		IEnumerable Select(IDictionary<string, object> states = null, params Sorting[] sortings);
+		IEnumerable Select(object state = null, params Sorting[] sortings);
 		IEnumerable Select(ICondition condition, params Sorting[] sortings);
-		IEnumerable Select(ICondition condition, IDictionary<string, object> states, params Sorting[] sortings);
+		IEnumerable Select(ICondition condition, object state, params Sorting[] sortings);
 		IEnumerable Select(ICondition condition, Paging paging, params Sorting[] sortings);
-		IEnumerable Select(ICondition condition, Paging paging, IDictionary<string, object> states, params Sorting[] sortings);
+		IEnumerable Select(ICondition condition, Paging paging, object state, params Sorting[] sortings);
 		IEnumerable Select(ICondition condition, Paging paging, string scope, params Sorting[] sortings);
-		IEnumerable Select(ICondition condition, Paging paging, string scope, IDictionary<string, object> states, params Sorting[] sortings);
+		IEnumerable Select(ICondition condition, Paging paging, string scope, object state, params Sorting[] sortings);
 		IEnumerable Select(ICondition condition, string scope, params Sorting[] sortings);
-		IEnumerable Select(ICondition condition, string scope, IDictionary<string, object> states, params Sorting[] sortings);
+		IEnumerable Select(ICondition condition, string scope, object state, params Sorting[] sortings);
 		IEnumerable Select(ICondition condition, string scope, Paging paging, params Sorting[] sortings);
-		IEnumerable Select(ICondition condition, string scope, Paging paging, IDictionary<string, object> states, params Sorting[] sortings);
+		IEnumerable Select(ICondition condition, string scope, Paging paging, object state, params Sorting[] sortings);
 
-		IEnumerable<T> Select<T>(Grouping grouping, IDictionary<string, object> states = null, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(Grouping grouping, object state = null, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, params Sorting[] sortings);
-		IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, IDictionary<string, object> states, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, object state, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, Paging paging, params Sorting[] sortings);
-		IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, Paging paging, IDictionary<string, object> states, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, Paging paging, object state, params Sorting[] sortings);
 		#endregion
 	}
 }
