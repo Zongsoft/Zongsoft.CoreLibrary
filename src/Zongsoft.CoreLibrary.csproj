@@ -229,12 +229,17 @@
     <Compile Include="IO\LocalFileSystem.cs" />
     <Compile Include="IO\Path.cs" />
     <Compile Include="IO\PathException.cs" />
+    <Compile Include="Messaging\TopicSubscriptionFallbackBehavior.cs" />
     <Compile Include="Messaging\IMessageQueue.cs" />
+    <Compile Include="Messaging\ITopic.cs" />
+    <Compile Include="Messaging\ITopicProvider.cs" />
+    <Compile Include="Messaging\ITopicSubscription.cs" />
     <Compile Include="Messaging\MessageBase.cs" />
     <Compile Include="Messaging\MessageDequeueSettings.cs" />
     <Compile Include="Messaging\MessageEnqueueSettings.cs" />
     <Compile Include="Messaging\MessageQueueBase.cs" />
     <Compile Include="Messaging\MessageQueueListener.cs" />
+    <Compile Include="Messaging\TopicSubscription.cs" />
     <Compile Include="Options\Configuration\ConnectionStringElement.cs" />
     <Compile Include="Options\Configuration\ConnectionStringElementCollection.cs" />
     <Compile Include="Options\Configuration\ModuleElement.cs" />
