@@ -317,6 +317,7 @@ namespace Zongsoft.Data
 		#region 成员字段
 		private Type _entityType;
 		private IEnumerable _result;
+		private IEnumerable _filteringResult;
 		private ICondition _condition;
 		private string _scope;
 		private Paging _paging;
@@ -328,7 +329,7 @@ namespace Zongsoft.Data
 		#region 构造函数
 		public DataSelectionContext(IDataAccess dataAccess, string name, Type entityType, ICondition condition, string scope, Paging paging, Sorting[] sortings, object state = null) : base(dataAccess, name, DataAccessMethod.Select, state)
 		{
-			_entityType = entityType;
+			_entityType = entityType ?? typeof(object);
 			_condition = condition;
 			_scope = scope;
 			_paging = paging;
@@ -337,7 +338,7 @@ namespace Zongsoft.Data
 
 		public DataSelectionContext(IDataAccess dataAccess, string name, Type entityType, ICondition condition, Grouping grouping, Paging paging, Sorting[] sortings, object state = null) : base(dataAccess, name, DataAccessMethod.Select, state)
 		{
-			_entityType = entityType;
+			_entityType = entityType ?? typeof(object);
 			_condition = condition;
 			_grouping = grouping;
 			_paging = paging;
@@ -369,11 +370,27 @@ namespace Zongsoft.Data
 				if(filter == null)
 					return _result;
 
-				return new DataFilterEnumerable<DataSelectionContext>(this, _result, _resultFilter);
+				if(_filteringResult == null)
+				{
+					lock(this)
+					{
+						if(_filteringResult == null)
+						{
+							var type = typeof(DataFilterEnumerable<,>).MakeGenericType(this.GetType(), _entityType);
+							_filteringResult = (IEnumerable)System.Activator.CreateInstance(type, new object[] { this, _result, _resultFilter });
+						}
+					}
+				}
+
+				return _filteringResult;
 			}
 			set
 			{
+				if(value == null)
+					throw new ArgumentNullException();
+
 				_result = value;
+				_filteringResult = null;
 			}
 		}
 
@@ -389,6 +406,7 @@ namespace Zongsoft.Data
 			set
 			{
 				_resultFilter = value;
+				_filteringResult = null;
 			}
 		}
 
@@ -798,7 +816,8 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
-	internal class DataFilterEnumerable<TContext> : IEnumerable where TContext : DataAccessContextBase
+	#region 过滤遍历器类
+	internal class DataFilterEnumerable<TContext, TEntity> : IEnumerable<TEntity> where TContext : DataAccessContextBase
 	{
 		private TContext _context;
 		private IEnumerable _source;
@@ -816,37 +835,65 @@ namespace Zongsoft.Data
 			_filter = filter;
 		}
 
-		public IEnumerator GetEnumerator()
+		public IEnumerator<TEntity> GetEnumerator()
 		{
 			return new DataFilterIterator(this);
 		}
 
-		private class DataFilterIterator : IEnumerator
+		IEnumerator IEnumerable.GetEnumerator()
 		{
-			private DataFilterEnumerable<TContext> _owner;
+			return new DataFilterIterator(this);
+		}
+
+		private class DataFilterIterator : IEnumerator<TEntity>
+		{
+			private DataFilterEnumerable<TContext, TEntity> _owner;
 			private IEnumerator _iterator;
 
-			public DataFilterIterator(DataFilterEnumerable<TContext> owner)
+			public DataFilterIterator(DataFilterEnumerable<TContext, TEntity> owner)
 			{
 				_owner = owner;
 				_iterator = owner._source.GetEnumerator();
 			}
 
-			public object Current
+			public TEntity Current
 			{
 				get
 				{
-					return _iterator.Current;
+					var iterator = _iterator;
+
+					if(iterator == null)
+						throw new ObjectDisposedException(this.GetType().FullName);
+
+					return (TEntity)iterator.Current;
+				}
+			}
+
+			object IEnumerator.Current
+			{
+				get
+				{
+					var iterator = _iterator;
+
+					if(iterator == null)
+						throw new ObjectDisposedException(this.GetType().FullName);
+
+					return iterator.Current;
 				}
 			}
 
 			public bool MoveNext()
 			{
+				var iterator = _iterator;
+
+				if(iterator == null)
+					throw new ObjectDisposedException(this.GetType().FullName);
+
 				var filter = _owner._filter;
 
-				while(_iterator.MoveNext())
+				while(iterator.MoveNext())
 				{
-					if(filter == null || filter(_owner._context, _iterator.Current))
+					if(filter == null || filter(_owner._context, iterator.Current))
 						return true;
 				}
 
@@ -855,8 +902,20 @@ namespace Zongsoft.Data
 
 			public void Reset()
 			{
-				_iterator.Reset();
+				var iterator = _iterator;
+
+				if(iterator == null)
+					throw new ObjectDisposedException(this.GetType().FullName);
+
+				iterator.Reset();
+			}
+
+			public void Dispose()
+			{
+				_iterator = null;
+				_owner = null;
 			}
 		}
 	}
+	#endregion
 }
