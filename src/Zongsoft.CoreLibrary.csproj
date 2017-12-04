@@ -229,6 +229,8 @@
     <Compile Include="IO\LocalFileSystem.cs" />
     <Compile Include="IO\Path.cs" />
     <Compile Include="IO\PathException.cs" />
+    <Compile Include="Messaging\TopicMessage.cs" />
+    <Compile Include="Messaging\TopicReceiverBase.cs" />
     <Compile Include="Messaging\TopicSubscriptionFallbackBehavior.cs" />
     <Compile Include="Messaging\IMessageQueue.cs" />
     <Compile Include="Messaging\ITopic.cs" />

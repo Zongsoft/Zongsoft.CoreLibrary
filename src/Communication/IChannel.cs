@@ -29,7 +29,7 @@ using System.ComponentModel;
 
 namespace Zongsoft.Communication
 {
-	public interface IChannel : IReceiver, ISender, IDisposable
+	public interface IChannel : IDisposable
 	{
 		#region 事件定义
 		event EventHandler<ChannelEventArgs> Closed;
@@ -38,6 +38,11 @@ namespace Zongsoft.Communication
 
 		#region 属性定义
 		int ChannelId
+		{
+			get;
+		}
+
+		object Host
 		{
 			get;
 		}

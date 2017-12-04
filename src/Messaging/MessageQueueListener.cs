@@ -115,16 +115,11 @@ namespace Zongsoft.Messaging
 		{
 			#region 私有变量
 			private volatile int _isClosed;
-			private IMessageQueue _queue;
 			#endregion
 
 			#region 构造函数
-			public MessageQueueChannel(int channelId, IMessageQueue queue) : base(channelId)
+			public MessageQueueChannel(int channelId, IMessageQueue queue) : base(channelId, queue)
 			{
-				if(queue == null)
-					throw new ArgumentNullException("queue");
-
-				_queue = queue;
 			}
 			#endregion
 
@@ -147,7 +142,7 @@ namespace Zongsoft.Messaging
 
 			private void OnReceive()
 			{
-				var queue = _queue;
+				var queue = (IMessageQueue)this.Host;
 
 				if(queue == null)
 					return;
@@ -165,12 +160,12 @@ namespace Zongsoft.Messaging
 			#region 发送方法
 			public override void Send(Stream stream, object asyncState = null)
 			{
-				var queue = _queue;
+				var queue = (IMessageQueue)this.Host;
 
 				if(queue == null || _isClosed != 0)
 					return;
 
-				_queue.EnqueueAsync(stream).ContinueWith(_ =>
+				queue.EnqueueAsync(stream).ContinueWith(_ =>
 				{
 					this.OnSent(new Communication.SentEventArgs(this, asyncState));
 				});
@@ -178,7 +173,7 @@ namespace Zongsoft.Messaging
 
 			public override void Send(byte[] buffer, int offset, int count, object asyncState = null)
 			{
-				var queue = _queue;
+				var queue = (IMessageQueue)this.Host;
 
 				if(queue == null || _isClosed != 0)
 					return;
@@ -195,7 +190,7 @@ namespace Zongsoft.Messaging
 				var data = new byte[count];
 				Array.Copy(buffer, offset, data, 0, count);
 
-				_queue.EnqueueAsync(data).ContinueWith(_ =>
+				queue.EnqueueAsync(data).ContinueWith(_ =>
 				{
 					this.OnSent(new Communication.SentEventArgs(this, asyncState));
 				});

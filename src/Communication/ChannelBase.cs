@@ -41,7 +41,7 @@ namespace Zongsoft.Communication
 	/// <summary>
 	/// 定义通道基本功能的抽象基类。
 	/// </summary>
-	public abstract class ChannelBase : IChannel, IDisposable
+	public abstract class ChannelBase : IChannel, IReceiver, ISender, IDisposable
 	{
 		#region 事件定义
 		public event EventHandler<ChannelFailureEventArgs> Failed;
@@ -53,13 +53,15 @@ namespace Zongsoft.Communication
 
 		#region 成员字段
 		private int _channelId;
+		private object _host;
 		private DateTime _lastSendTime;
 		private DateTime _lastReceivedTime;
 		#endregion
 
 		#region 构造函数
-		protected ChannelBase(int channelId)
+		protected ChannelBase(int channelId, object host)
 		{
+			_host = null;
 			_channelId = channelId;
 			_lastSendTime = new DateTime(1900, 1, 1);
 			_lastReceivedTime = new DateTime(1900, 1, 1);
@@ -75,6 +77,17 @@ namespace Zongsoft.Communication
 			get
 			{
 				return _channelId;
+			}
+		}
+
+		/// <summary>
+		/// 获取当前通道所属的宿主对象。
+		/// </summary>
+		public object Host
+		{
+			get
+			{
+				return _host;
 			}
 		}
 
