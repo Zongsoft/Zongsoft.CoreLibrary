@@ -31,12 +31,11 @@ using System.Xml;
 
 namespace Zongsoft.Options.Configuration
 {
-	public abstract class OptionConfigurationElementCollection : OptionConfigurationElement, ICollection<OptionConfigurationElement>
+	public abstract class OptionConfigurationElementCollection : OptionConfigurationElement, IReadOnlyDictionary<string, OptionConfigurationElement>, ICollection<OptionConfigurationElement>
 	{
 		#region 成员字段
 		private string _elementName;
-		private IList<OptionConfigurationElement> _items;
-		private IEqualityComparer<string> _comparer;
+		private IDictionary<string, OptionConfigurationElement> _dictionary;
 		#endregion
 
 		#region 构造函数
@@ -55,8 +54,7 @@ namespace Zongsoft.Options.Configuration
 		protected OptionConfigurationElementCollection(string elementName, IEqualityComparer<string> comparer)
 		{
 			_elementName = elementName == null ? string.Empty : elementName.Trim();
-			_comparer = comparer ?? StringComparer.OrdinalIgnoreCase;
-			_items = new List<OptionConfigurationElement>();
+			_dictionary = new Dictionary<string, OptionConfigurationElement>(comparer ?? StringComparer.OrdinalIgnoreCase);
 		}
 		#endregion
 
@@ -65,25 +63,17 @@ namespace Zongsoft.Options.Configuration
 		{
 			get
 			{
-				return _items.Count;
+				return _dictionary.Count;
 			}
-		}
-
-		bool ICollection<OptionConfigurationElement>.IsReadOnly
-		{
-		    get
-		    {
-		        return false;
-		    }
 		}
 		#endregion
 
 		#region 保护属性
-		protected IList<OptionConfigurationElement> Items
+		protected IDictionary<string, OptionConfigurationElement> InnerDictionary
 		{
 			get
 			{
-				return _items;
+				return _dictionary;
 			}
 		}
 
@@ -104,94 +94,102 @@ namespace Zongsoft.Options.Configuration
 
 			string key = this.GetElementKey(item);
 
-			lock(_items)
-			{
-				foreach(var existedItem in _items)
-				{
-					if(_comparer.Equals(this.GetElementKey(existedItem), key))
-						throw new OptionConfigurationException();
-				}
-
-				_items.Add(item);
-			}
+			if(key != null)
+				_dictionary.Add(key, item);
 		}
 
 		public void Clear()
 		{
-			lock(_items)
-			{
-				_items.Clear();
-			}
+			_dictionary.Clear();
 		}
 
 		public bool ContainsKey(string key)
 		{
-			lock(_items)
-			{
-				foreach(var item in _items)
-				{
-					if(_comparer.Equals(this.GetElementKey(item), key))
-						return true;
-				}
-			}
-
-			return false;
+			return _dictionary.ContainsKey(key);
 		}
 
 		public bool Contains(OptionConfigurationElement item)
 		{
-			return _items.Contains(item);
+			return _dictionary.Values.Contains(item);
 		}
 
 		public void CopyTo(OptionConfigurationElement[] array, int arrayIndex)
 		{
-			_items.CopyTo(array, arrayIndex);
+			_dictionary.Values.CopyTo(array, arrayIndex);
 		}
 
 		public bool Remove(string key)
 		{
-			lock(_items)
-			{
-				foreach(var item in _items)
-				{
-					if(_comparer.Equals(this.GetElementKey(item), key))
-						return _items.Remove(item);
-				}
-			}
-
-			return false;
+			return _dictionary.Remove(key);
 		}
 
 		public bool Remove(OptionConfigurationElement item)
 		{
-			lock(_items)
-			{
-				return _items.Remove(item);
-			}
-		}
+			if(item == null)
+				return false;
 
-		public void RemoveAt(int index)
-		{
-			lock(_items)
-			{
-				_items.RemoveAt(index);
-			}
+			var key = this.GetElementKey(item);
+			return _dictionary.Remove(key);
 		}
 		#endregion
 
 		#region 保护方法
-		protected OptionConfigurationElement Find(string key)
+		protected OptionConfigurationElement Get(int index)
 		{
-			lock(_items)
+			var items = _dictionary.Values;
+
+			if(index < 0 || index >= items.Count)
+				throw new IndexOutOfRangeException();
+
+			var iterator = items.GetEnumerator();
+
+			for(int i = 0; i < index; i++)
 			{
-				foreach(var item in _items)
-				{
-					if(_comparer.Equals(this.GetElementKey(item), key))
-						return item;
-				}
+				iterator.MoveNext();
 			}
 
+			if(iterator.MoveNext())
+				return iterator.Current;
+
 			return null;
+		}
+
+		protected OptionConfigurationElement Get(string key)
+		{
+			OptionConfigurationElement result;
+
+			if(_dictionary.TryGetValue(key, out result))
+				return result;
+
+			return null;
+		}
+
+		protected object GetAttributeValue(string name)
+		{
+			if(string.IsNullOrEmpty(name))
+				throw new ArgumentNullException(nameof(name));
+
+			OptionConfigurationProperty property;
+
+			if(this.Properties.TryGetValue(name, out property))
+				return this[property];
+
+			throw new OptionConfigurationException(string.Format("The '{0}' attribute is not existed in the configuration collection.", name));
+		}
+
+		protected bool SetAttributeValue(string name, object value)
+		{
+			if(string.IsNullOrEmpty(name))
+				throw new ArgumentNullException(nameof(name));
+
+			OptionConfigurationProperty property;
+
+			var result = this.Properties.TryGetValue(name, out property);
+
+			if(result)
+				this[property] = value;
+
+			return result;
 		}
 		#endregion
 
@@ -245,7 +243,7 @@ namespace Zongsoft.Options.Configuration
 			if(!string.IsNullOrEmpty(collectionName))
 				writer.WriteStartElement(collectionName);
 
-			foreach(var item in _items)
+			foreach(var item in _dictionary.Values)
 			{
 				writer.WriteStartElement(this.ElementName);
 				item.SerializeElement(writer);
@@ -257,21 +255,62 @@ namespace Zongsoft.Options.Configuration
 		}
 		#endregion
 
+		#region 显式实现
+		bool ICollection<OptionConfigurationElement>.IsReadOnly
+		{
+			get
+			{
+				return false;
+			}
+		}
+
+		IEnumerable<string> IReadOnlyDictionary<string, OptionConfigurationElement>.Keys
+		{
+			get
+			{
+				return _dictionary.Keys;
+			}
+		}
+
+		IEnumerable<OptionConfigurationElement> IReadOnlyDictionary<string, OptionConfigurationElement>.Values
+		{
+			get
+			{
+				return _dictionary.Values;
+			}
+		}
+
+		OptionConfigurationElement IReadOnlyDictionary<string, OptionConfigurationElement>.this[string key]
+		{
+			get
+			{
+				return _dictionary[key];
+			}
+		}
+
+		bool IReadOnlyDictionary<string, OptionConfigurationElement>.TryGetValue(string key, out OptionConfigurationElement value)
+		{
+			return _dictionary.TryGetValue(key, out value);
+		}
+		#endregion
+
 		#region 遍历枚举
 		public IEnumerator<OptionConfigurationElement> GetEnumerator()
 		{
-			foreach(var item in _items)
+			foreach(var item in _dictionary)
 			{
-				yield return item;
+				yield return item.Value;
 			}
 		}
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 		{
-			foreach(var item in _items)
-			{
-				yield return item;
-			}
+			return this.GetEnumerator();
+		}
+
+		IEnumerator<KeyValuePair<string, OptionConfigurationElement>> IEnumerable<KeyValuePair<string, OptionConfigurationElement>>.GetEnumerator()
+		{
+			return _dictionary.GetEnumerator();
 		}
 		#endregion
 	}

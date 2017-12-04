@@ -29,7 +29,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Options.Configuration
 {
-	public class OptionConfigurationElementCollection<T> : OptionConfigurationElementCollection where T : OptionConfigurationElement
+	public class OptionConfigurationElementCollection<T> : OptionConfigurationElementCollection, ICollection<T>, IReadOnlyDictionary<string, T> where T : OptionConfigurationElement
 	{
 		#region 构造函数
 		public OptionConfigurationElementCollection(string elementName, IEqualityComparer<string> comparer = null) : base(elementName, comparer)
@@ -46,7 +46,7 @@ namespace Zongsoft.Options.Configuration
 		{
 			get
 			{
-				return (T)base.Items[index];
+				return (T)base.Get(index);
 			}
 		}
 
@@ -54,7 +54,7 @@ namespace Zongsoft.Options.Configuration
 		{
 			get
 			{
-				return (T)base.Find(key);
+				return (T)base.Get(key);
 			}
 		}
 		#endregion
@@ -76,6 +76,89 @@ namespace Zongsoft.Options.Configuration
 				throw new OptionConfigurationException();
 
 			return (string)value.ToString();
+		}
+		#endregion
+
+		#region 显式实现
+		bool ICollection<T>.IsReadOnly
+		{
+			get
+			{
+				return false;
+			}
+		}
+
+		IEnumerable<string> IReadOnlyDictionary<string, T>.Keys
+		{
+			get
+			{
+				return base.InnerDictionary.Keys;
+			}
+		}
+
+		IEnumerable<T> IReadOnlyDictionary<string, T>.Values
+		{
+			get
+			{
+				foreach(var item in base.InnerDictionary.Values)
+				{
+					yield return (T)item;
+				}
+			}
+		}
+
+		void ICollection<T>.Add(T item)
+		{
+			base.Add(item);
+		}
+
+		bool ICollection<T>.Contains(T item)
+		{
+			return base.Contains(item);
+		}
+
+		void ICollection<T>.CopyTo(T[] array, int arrayIndex)
+		{
+			base.CopyTo(array, arrayIndex);
+		}
+
+		bool ICollection<T>.Remove(T item)
+		{
+			return base.Remove(item);
+		}
+
+		bool IReadOnlyDictionary<string, T>.TryGetValue(string key, out T value)
+		{
+			OptionConfigurationElement element;
+
+			if(base.InnerDictionary.TryGetValue(key, out element))
+			{
+				value = (T)element;
+				return true;
+			}
+
+			value = null;
+			return false;
+		}
+
+		IEnumerator<T> IEnumerable<T>.GetEnumerator()
+		{
+			var iterator = base.GetEnumerator();
+
+			while(iterator.MoveNext())
+			{
+				yield return (T)iterator.Current;
+			}
+		}
+
+		IEnumerator<KeyValuePair<string, T>> IEnumerable<KeyValuePair<string, T>>.GetEnumerator()
+		{
+			var iterator = base.InnerDictionary.GetEnumerator();
+
+			while(iterator.MoveNext())
+			{
+				yield return new KeyValuePair<string, T>(iterator.Current.Key, (T)iterator.Current.Value);
+			}
 		}
 		#endregion
 	}

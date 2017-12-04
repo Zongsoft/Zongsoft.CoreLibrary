@@ -51,7 +51,7 @@ namespace Zongsoft.Options.Configuration
 		{
 			get
 			{
-				var element = base.Find(name) as SettingElement;
+				var element = base.Get(name) as SettingElement;
 
 				if(element != null)
 					return element.Value;
@@ -67,7 +67,7 @@ namespace Zongsoft.Options.Configuration
 					this.Remove(name);
 				else
 				{
-					var element = base.Find(name) as SettingElement;
+					var element = base.Get(name) as SettingElement;
 
 					if(element != null)
 						element.Value = value;
