@@ -186,7 +186,7 @@ namespace Zongsoft.Options.Configuration
 		{
 			get
 			{
-				return ((int)_behavior & 2) == 2;
+				return (_behavior & OptionConfigurationPropertyBehavior.IsKey) == OptionConfigurationPropertyBehavior.IsKey;
 			}
 		}
 
@@ -210,7 +210,7 @@ namespace Zongsoft.Options.Configuration
 		{
 			get
 			{
-				return typeof(OptionConfigurationElementCollection).IsAssignableFrom(_type);
+				return Common.TypeExtension.IsCollection(_type) || Common.TypeExtension.IsDictionary(_type);
 			}
 		}
 		#endregion
