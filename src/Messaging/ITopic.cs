@@ -44,14 +44,6 @@ namespace Zongsoft.Messaging
 		}
 
 		/// <summary>
-		/// 获取主题消息的接收执行器。
-		/// </summary>
-		Zongsoft.Communication.Composition.IExecutor Executor
-		{
-			get;
-		}
-
-		/// <summary>
 		/// 获取主题订阅服务。
 		/// </summary>
 		/// <returns></returns>
