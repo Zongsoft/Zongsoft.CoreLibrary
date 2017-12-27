@@ -26,6 +26,7 @@
 
 using System;
 using System.Collections.Generic;
+using Zongsoft.Collections;
 
 namespace Zongsoft.Options.Configuration
 {
@@ -51,7 +52,7 @@ namespace Zongsoft.Options.Configuration
 		{
 			get
 			{
-				var element = base.Get(name) as SettingElement;
+				var element = base.GetElement(name) as SettingElement;
 
 				if(element != null)
 					return element.Value;
@@ -67,7 +68,7 @@ namespace Zongsoft.Options.Configuration
 					this.Remove(name);
 				else
 				{
-					var element = base.Get(name) as SettingElement;
+					var element = base.GetElement(name) as SettingElement;
 
 					if(element != null)
 						element.Value = value;

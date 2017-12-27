@@ -28,11 +28,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Linq;
 
 namespace Zongsoft.Collections
 {
-	public class NamedCollection<T> : ICollection<T>, IDictionary<string, T>
+	public class NamedCollection<T> : ICollection<T>, IDictionary<string, T>, INamedCollection<T>
 	{
 		#region 私有变量
 		private Func<T, string> _getKeyForItem;
@@ -166,6 +165,30 @@ namespace Zongsoft.Collections
 				throw new ArgumentNullException("item");
 
 			_items.Add(item);
+		}
+
+		public T Get(string name, bool throwsOnNotExisted)
+		{
+			T result;
+
+			if(_innerDictionary == null)
+			{
+				foreach(var item in _items)
+				{
+					if(this.OnItemMatch(item) && _comparer.Compare(this.GetKeyForItem((T)item), name) == 0)
+						return (T)item;
+				}
+			}
+			else
+			{
+				if(_innerDictionary.TryGetValue(name, out result))
+					return result;
+			}
+
+			if(throwsOnNotExisted)
+				throw new KeyNotFoundException();
+
+			return default(T);
 		}
 
 		public void Clear()

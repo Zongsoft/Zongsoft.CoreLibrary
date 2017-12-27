@@ -29,7 +29,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Options.Configuration
 {
-	public class OptionConfigurationElementCollection<TElement> : OptionConfigurationElementCollection, ICollection<TElement>, IReadOnlyDictionary<string, TElement>, Collections.INamedCollection<TElement> where TElement : OptionConfigurationElement
+	public class OptionConfigurationElementCollection<TElement, TContract> : OptionConfigurationElementCollection, ICollection<TContract>, IReadOnlyDictionary<string, TContract>, Collections.INamedCollection<TContract> where TElement : OptionConfigurationElement, TContract
 	{
 		#region 构造函数
 		public OptionConfigurationElementCollection(string elementName, IEqualityComparer<string> comparer = null) : base(elementName, comparer)
@@ -42,7 +42,7 @@ namespace Zongsoft.Options.Configuration
 		#endregion
 
 		#region 公共属性
-		public TElement this[int index]
+		public TContract this[int index]
 		{
 			get
 			{
@@ -50,7 +50,7 @@ namespace Zongsoft.Options.Configuration
 			}
 		}
 
-		public new TElement this[string key]
+		public new TContract this[string key]
 		{
 			get
 			{
@@ -80,7 +80,7 @@ namespace Zongsoft.Options.Configuration
 		#endregion
 
 		#region 显式实现
-		TElement Collections.INamedCollection<TElement>.Get(string name, bool throwsOnNotExisted)
+		TContract Collections.INamedCollection<TContract>.Get(string name, bool throwsOnNotExisted)
 		{
 			var result = base.GetElement(name);
 
@@ -90,7 +90,7 @@ namespace Zongsoft.Options.Configuration
 			return (TElement)result;
 		}
 
-		bool ICollection<TElement>.IsReadOnly
+		bool ICollection<TContract>.IsReadOnly
 		{
 			get
 			{
@@ -98,7 +98,7 @@ namespace Zongsoft.Options.Configuration
 			}
 		}
 
-		IEnumerable<string> IReadOnlyDictionary<string, TElement>.Keys
+		IEnumerable<string> IReadOnlyDictionary<string, TContract>.Keys
 		{
 			get
 			{
@@ -106,7 +106,7 @@ namespace Zongsoft.Options.Configuration
 			}
 		}
 
-		IEnumerable<TElement> IReadOnlyDictionary<string, TElement>.Values
+		IEnumerable<TContract> IReadOnlyDictionary<string, TContract>.Values
 		{
 			get
 			{
@@ -117,32 +117,61 @@ namespace Zongsoft.Options.Configuration
 			}
 		}
 
-		void ICollection<TElement>.Add(TElement item)
+		void ICollection<TContract>.Add(TContract item)
 		{
-			base.Add(item);
+			var element = item as OptionConfigurationElement;
+
+			if(element == null)
+				throw new ArgumentException();
+
+			base.Add(element);
 		}
 
-		bool ICollection<TElement>.Contains(TElement item)
+		bool ICollection<TContract>.Contains(TContract item)
 		{
-			return base.Contains(item);
+			var element = item as OptionConfigurationElement;
+
+			if(element == null)
+				throw new ArgumentException();
+
+			return base.Contains(element);
 		}
 
-		void ICollection<TElement>.CopyTo(TElement[] array, int arrayIndex)
+		void ICollection<TContract>.CopyTo(TContract[] array, int arrayIndex)
 		{
-			base.CopyTo(array, arrayIndex);
+			if(array == null)
+				throw new ArgumentNullException(nameof(array));
+
+			if(array.Length == 0)
+				return;
+
+			if(arrayIndex < 0 || arrayIndex >= array.Length)
+				throw new ArgumentOutOfRangeException(nameof(arrayIndex));
+
+			var index = 0;
+
+			foreach(var value in this.InnerDictionary.Values)
+			{
+				array[arrayIndex + index++] = (TElement)value;
+			}
 		}
 
-		bool ICollection<TElement>.Remove(TElement item)
+		bool ICollection<TContract>.Remove(TContract item)
 		{
-			return base.Remove(item);
+			var element = item as OptionConfigurationElement;
+
+			if(element == null)
+				throw new ArgumentException();
+
+			return base.Remove(element);
 		}
 
-		bool IReadOnlyDictionary<string, TElement>.ContainsKey(string key)
+		bool IReadOnlyDictionary<string, TContract>.ContainsKey(string key)
 		{
 			return base.InnerDictionary.ContainsKey(key);
 		}
 
-		bool IReadOnlyDictionary<string, TElement>.TryGetValue(string key, out TElement value)
+		bool IReadOnlyDictionary<string, TContract>.TryGetValue(string key, out TContract value)
 		{
 			OptionConfigurationElement element;
 
@@ -152,11 +181,11 @@ namespace Zongsoft.Options.Configuration
 				return true;
 			}
 
-			value = null;
+			value = default(TContract);
 			return false;
 		}
 
-		IEnumerator<TElement> IEnumerable<TElement>.GetEnumerator()
+		IEnumerator<TContract> IEnumerable<TContract>.GetEnumerator()
 		{
 			var iterator = base.GetEnumerator();
 
@@ -166,13 +195,13 @@ namespace Zongsoft.Options.Configuration
 			}
 		}
 
-		IEnumerator<KeyValuePair<string, TElement>> IEnumerable<KeyValuePair<string, TElement>>.GetEnumerator()
+		IEnumerator<KeyValuePair<string, TContract>> IEnumerable<KeyValuePair<string, TContract>>.GetEnumerator()
 		{
 			var iterator = base.InnerDictionary.GetEnumerator();
 
 			while(iterator.MoveNext())
 			{
-				yield return new KeyValuePair<string, TElement>(iterator.Current.Key, (TElement)iterator.Current.Value);
+				yield return new KeyValuePair<string, TContract>(iterator.Current.Key, (TElement)iterator.Current.Value);
 			}
 		}
 		#endregion

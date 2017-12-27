@@ -30,7 +30,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Collections
 {
-	public abstract class NamedCollectionBase<T> : Collection<T>
+	public abstract class NamedCollectionBase<T> : Collection<T>, INamedCollection<T>
 	{
 		#region 成员字段
 		private StringComparer _comparer;
@@ -110,6 +110,21 @@ namespace Zongsoft.Collections
 		public bool Contains(string name)
 		{
 			return _innerDictionary.ContainsKey(name ?? string.Empty);
+		}
+
+		public T Get(string name, bool throwsOnNotExisted)
+		{
+			name = name ?? string.Empty;
+
+			T result;
+
+			if(_innerDictionary.TryGetValue(name, out result))
+				return result;
+
+			if(throwsOnNotExisted)
+				throw new KeyNotFoundException();
+
+			return default(T);
 		}
 
 		public bool Remove(string name)

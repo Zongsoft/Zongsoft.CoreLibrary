@@ -10,32 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Zongsoft</RootNamespace>
     <AssemblyName>Zongsoft.CoreLibrary</AssemblyName>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
-    <OldToolsVersion>3.5</OldToolsVersion>
-    <UpgradeBackupLocation>
-    </UpgradeBackupLocation>
-    <IsWebBootstrapper>true</IsWebBootstrapper>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <PublishUrl>http://localhost/Zongsoft.CoreLibrary/</PublishUrl>
-    <Install>true</Install>
-    <InstallFrom>Web</InstallFrom>
-    <UpdateEnabled>true</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <UseApplicationTrust>false</UseApplicationTrust>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
-    <TargetFrameworkProfile />
-    <SccProjectName />
-    <SccLocalPath />
-    <SccAuxPath />
-    <SccProvider />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -46,7 +21,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\Zongsoft.CoreLibrary.XML</DocumentationFile>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Prefer32Bit>false</Prefer32Bit>
@@ -59,7 +33,6 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DocumentationFile>bin\Release\Zongsoft.CoreLibrary.XML</DocumentationFile>
     <Prefer32Bit>false</Prefer32Bit>
@@ -87,6 +60,7 @@
     <Compile Include="Collections\HierarchicalNode.cs" />
     <Compile Include="Collections\HierarchicalNodeCollection.cs" />
     <Compile Include="Collections\BinaryComparer.cs" />
+    <Compile Include="Collections\INamedCollection.cs" />
     <Compile Include="Collections\IQueueProvider.cs" />
     <Compile Include="Collections\IQueue`1.cs" />
     <Compile Include="Collections\KeyValuePairExtension.cs" />
@@ -284,6 +258,7 @@
     <Compile Include="Options\Configuration\OptionConfigurationElement.cs" />
     <Compile Include="Options\Configuration\OptionConfigurationElementCollection.cs" />
     <Compile Include="Options\Configuration\OptionConfigurationElementCollection`1.cs" />
+    <Compile Include="Options\Configuration\OptionConfigurationElementCollection`2.cs" />
     <Compile Include="Options\Configuration\OptionConfigurationException.cs" />
     <Compile Include="Options\Configuration\OptionConfigurationProperty.cs" />
     <Compile Include="Options\Configuration\OptionConfigurationPropertyAttribute.cs" />
@@ -551,33 +526,6 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="Options\Profiles\Profile.ini" />
-  </ItemGroup>
-  <ItemGroup>
-    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.0 %28x86%29</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.resx">

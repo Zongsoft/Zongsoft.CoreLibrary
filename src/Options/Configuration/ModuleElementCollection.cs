@@ -46,7 +46,7 @@ namespace Zongsoft.Options.Configuration
 		{
 			get
 			{
-				return (ModuleElement)this.Get(index);
+				return (ModuleElement)this.GetElement(index);
 			}
 		}
 
@@ -54,7 +54,7 @@ namespace Zongsoft.Options.Configuration
 		{
 			get
 			{
-				return base.Get(name) as ModuleElement;
+				return base.GetElement(name) as ModuleElement;
 			}
 		}
 		#endregion

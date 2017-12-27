@@ -26,12 +26,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Xml;
 
 namespace Zongsoft.Options.Configuration
 {
-	public abstract class OptionConfigurationElementCollection : OptionConfigurationElement, IReadOnlyDictionary<string, OptionConfigurationElement>, ICollection<OptionConfigurationElement>
+	public abstract class OptionConfigurationElementCollection : OptionConfigurationElement, IReadOnlyDictionary<string, OptionConfigurationElement>, ICollection<OptionConfigurationElement>, Collections.INamedCollection<OptionConfigurationElement>
 	{
 		#region 成员字段
 		private string _elementName;
@@ -103,7 +102,7 @@ namespace Zongsoft.Options.Configuration
 			_dictionary.Clear();
 		}
 
-		public bool ContainsKey(string key)
+		public bool Contains(string key)
 		{
 			return _dictionary.ContainsKey(key);
 		}
@@ -134,7 +133,7 @@ namespace Zongsoft.Options.Configuration
 		#endregion
 
 		#region 保护方法
-		protected OptionConfigurationElement Get(int index)
+		protected OptionConfigurationElement GetElement(int index)
 		{
 			var items = _dictionary.Values;
 
@@ -154,7 +153,7 @@ namespace Zongsoft.Options.Configuration
 			return null;
 		}
 
-		protected OptionConfigurationElement Get(string key)
+		protected OptionConfigurationElement GetElement(string key)
 		{
 			OptionConfigurationElement result;
 
@@ -256,6 +255,22 @@ namespace Zongsoft.Options.Configuration
 		#endregion
 
 		#region 显式实现
+		OptionConfigurationElement Collections.INamedCollection<OptionConfigurationElement>.Get(string name, bool throwsOnNotExisted)
+		{
+			if(name == null)
+				throw new ArgumentNullException(nameof(name));
+
+			OptionConfigurationElement element;
+
+			if(_dictionary.TryGetValue(name, out element))
+				return element;
+
+			if(throwsOnNotExisted)
+				throw new KeyNotFoundException();
+
+			return null;
+		}
+
 		bool ICollection<OptionConfigurationElement>.IsReadOnly
 		{
 			get
@@ -286,6 +301,11 @@ namespace Zongsoft.Options.Configuration
 			{
 				return _dictionary[key];
 			}
+		}
+
+		bool IReadOnlyDictionary<string, OptionConfigurationElement>.ContainsKey(string key)
+		{
+			return _dictionary.ContainsKey(key);
 		}
 
 		bool IReadOnlyDictionary<string, OptionConfigurationElement>.TryGetValue(string key, out OptionConfigurationElement value)

@@ -80,7 +80,7 @@ namespace Zongsoft.Options.Configuration
 			else
 				throw new InvalidOperationException("Unsupported value type.");
 
-			if(this.ContainsKey(name))
+			if(this.Contains(name))
 			{
 				this[name].Value = text;
 
