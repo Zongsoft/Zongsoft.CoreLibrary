@@ -26,7 +26,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 
 namespace Zongsoft.IO
 {
@@ -56,50 +55,54 @@ namespace Zongsoft.IO
 	/// </remarks>
 	public sealed class Path
 	{
-		#region 常量定义
-		private const string SCHEME_REGEX = @"\s*((?<scheme>[A-Za-z]+(\.[A-Za-z_\-]+)?):)?";
-		private const string PATH_REGEX = @"(?<path>(?<part>[/\\][^/\\\*\?:]+)*(?<part>[/\\])?)\s*";
-		#endregion
-
-		#region 私有变量
-		private static readonly Regex _regex = new Regex("^" + SCHEME_REGEX + PATH_REGEX + "$", RegexOptions.Compiled | RegexOptions.ExplicitCapture | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
-		#endregion
-
 		#region 成员字段
-		private string _originalString;
 		private string _scheme;
 		private string _fullPath;
 		private string _directoryName;
 		private string _fileName;
+		private string[] _segments;
+		private PathAnchor _anchor;
 		#endregion
 
-		#region 构造函数
-		private Path(string originalString, string scheme, string fullPath)
+		#region 私有构造
+		private Path(string scheme, string[] segments, PathAnchor anchor)
 		{
-			if(string.IsNullOrWhiteSpace(originalString))
-				throw new ArgumentNullException("originalString");
+			_scheme = scheme;
+			_segments = segments;
+			_anchor = anchor;
 
-			_originalString = originalString.Trim();
-			_scheme = string.IsNullOrWhiteSpace(scheme) ? null : scheme.Trim().ToLowerInvariant();
+			//计算并保存路径全称
+			_fullPath = GetAnchorString(anchor, true) + string.Join("/", segments);
 
-			if(string.IsNullOrWhiteSpace(fullPath))
+			if(segments.Length == 0)
 			{
-				_fullPath = "/";
-				_directoryName = "/";
 				_fileName = string.Empty;
-
-				return;
+				_directoryName = GetAnchorString(anchor, true);
 			}
+			else
+			{
+				if(string.IsNullOrEmpty(segments[segments.Length - 1]))
+				{
+					_fileName = string.Empty;
+					_directoryName = _fullPath;
+				}
+				else
+				{
+					_fileName = segments[segments.Length - 1];
 
-			_fullPath = fullPath.Trim();
-
-			var parts = _fullPath.Split('/', '\\');
-			_fileName = parts[parts.Length - 1];
-			_directoryName = string.Join("/", parts, 0, parts.Length - 1) + "/";
+					if(segments.Length == 1)
+						_directoryName = GetAnchorString(anchor, true);
+					else
+						_directoryName = GetAnchorString(anchor, true) + string.Join("/", segments, 0, segments.Length - 1) + "/";
+				}
+			}
 		}
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取路径的文件系统<see cref="IFileSystem.Scheme"/>方案。
+		/// </summary>
 		public string Scheme
 		{
 			get
@@ -108,14 +111,23 @@ namespace Zongsoft.IO
 			}
 		}
 
-		public string DirectoryName
+		/// <summary>
+		/// 获取路径的锚点，即路径的起始点。
+		/// </summary>
+		public PathAnchor Anchor
 		{
 			get
 			{
-				return _directoryName;
+				return _anchor;
 			}
 		}
 
+		/// <summary>
+		/// 获取路径中的文件名，有关路径中文件名的定义请参考备注说明。
+		/// </summary>
+		/// <remarks>
+		///		<para>路径如果以斜杠(/)结尾，则表示该路径为「目录路径」，即<see cref="FileName"/>属性为空(null)或空字符串("")；否则文件名则为<see cref="Segments"/>路径节数组中的最后一个节的内容。</para>
+		/// </remarks>
 		public string FileName
 		{
 			get
@@ -124,6 +136,9 @@ namespace Zongsoft.IO
 			}
 		}
 
+		/// <summary>
+		/// 获取路径的完整路径（注：不含<see cref="Scheme"/>部分）。
+		/// </summary>
 		public string FullPath
 		{
 			get
@@ -132,17 +147,37 @@ namespace Zongsoft.IO
 			}
 		}
 
+		/// <summary>
+		/// 获取路径中的目录名，目录名不含<see cref="Scheme"/>部分。
+		/// </summary>
+		public string DirectoryName
+		{
+			get
+			{
+				return _directoryName;
+			}
+		}
+
+		/// <summary>
+		/// 获取路径中的目录URL，该属性值包含<see cref="Scheme"/>和<see cref="DirectoryName"/>。
+		/// </summary>
+		/// <remarks>
+		///		<para>如果<see cref="Scheme"/>为空(null)或空字符串("")，则<see cref="DirectoryUrl"/>与<see cref="DirectoryName"/>属性值相同。</para>
+		/// </remarks>
 		public string DirectoryUrl
 		{
 			get
 			{
-				if(string.IsNullOrWhiteSpace(_scheme))
-					return _directoryName;
-				else
-					return _scheme + ":" + _directoryName;
+				return string.IsNullOrEmpty(_scheme) ? _directoryName : (_scheme + ":" + _directoryName);
 			}
 		}
 
+		/// <summary>
+		/// 获取路径的完整URL，该属性值包含<see cref="Scheme"/>和<see cref="FullPath"/>。
+		/// </summary>
+		/// <remarks>
+		///		<para>如果<see cref="Scheme"/>为空(null)或空字符串("")，则<see cref="Url"/>与<see cref="FullPath"/>属性值相同。</para>
+		/// </remarks>
 		public string Url
 		{
 			get
@@ -151,6 +186,40 @@ namespace Zongsoft.IO
 			}
 		}
 
+		/// <summary>
+		/// 获取路径中各节点数组，更多内容请参考备注说明。
+		/// </summary>
+		/// <remarks>
+		///		<para>如果当前路径是一个「文件路径」，即<see cref="IsFile"/>属性为真(True)，则该数组的最后一个元素内容就是<see cref="FileName"/>的值，亦文件路径的<see cref="Segments"/>不可能为空数组，因为它至少包含一个为文件名的元素。</para>
+		///		<para>如果当前路径是一个「目录路径」，即<see cref="IsDirectory"/>属性为真(True)，并且不是空目录，则该数组的最后一个元素值为空(null)或空字符串("")。所谓“空目录”的示例如下：</para>
+		///		<list type="bullet">
+		///			<item>空目录：scheme:/</item>
+		///			<item>空目录：scheme:./</item>
+		///			<item>空目录：scheme:../</item>
+		///			<item>非空目录：scheme:root/</item>
+		///			<item>非空目录：scheme:root/directory/</item>
+		///			<item>非空目录：scheme:/root/</item>
+		///			<item>非空目录：scheme:/root/directory/</item>
+		///			<item>非空目录：scheme:./root/</item>
+		///			<item>非空目录：scheme:./root/directory/</item>
+		///			<item>非空目录：scheme:../root/</item>
+		///			<item>非空目录：scheme:../root/directory/</item>
+		///		</list>
+		/// </remarks>
+		public string[] Segments
+		{
+			get
+			{
+				return _segments;
+			}
+		}
+
+		/// <summary>
+		/// 获取一个值，指示当前路径是否为文件路径。如果返回真(True)，即表示<see cref="FileName"/>有值。
+		/// </summary>
+		/// <remarks>
+		///		<para>路径如果不是以斜杠(/)结尾，则表示该路径为「文件路径」，文件路径中的<see cref="FileName"/>即为<see cref="Segments"/>数组中最后一个元素的值。</para>
+		/// </remarks>
 		public bool IsFile
 		{
 			get
@@ -159,6 +228,12 @@ namespace Zongsoft.IO
 			}
 		}
 
+		/// <summary>
+		/// 获取一个值，指示当前路径是否为目录路径。有关「目录路径」定义请参考备注说明。
+		/// </summary>
+		/// <remarks>
+		///		<para>路径如果以斜杠(/)结尾，则表示该路径为「目录路径」，即<see cref="FileName"/>属性为空(null)或空字符串("")；否则文件名则为<see cref="Segments"/>路径节数组中的最后一个节的内容。</para>
+		/// </remarks>
 		public bool IsDirectory
 		{
 			get
@@ -171,22 +246,12 @@ namespace Zongsoft.IO
 		#region 重写方法
 		public override string ToString()
 		{
-			if(string.IsNullOrWhiteSpace(_scheme))
-				return _fullPath;
-			else
-				return _scheme + ":" + _fullPath;
+			return this.Url;
 		}
 
 		public override int GetHashCode()
 		{
-			switch(Environment.OSVersion.Platform)
-			{
-				case PlatformID.MacOSX:
-				case PlatformID.Unix:
-					return (_scheme + _fullPath).GetHashCode();
-				default:
-					return (_scheme + _fullPath.ToLowerInvariant()).GetHashCode();
-			}
+			return this.Url.GetHashCode();
 		}
 
 		public override bool Equals(object obj)
@@ -194,111 +259,292 @@ namespace Zongsoft.IO
 			if(obj == null || obj.GetType() != this.GetType())
 				return false;
 
-			var other = (Path)obj;
-
-			if(!string.Equals(_scheme, other._scheme))
-				return false;
-
-			switch(Environment.OSVersion.Platform)
-			{
-				case PlatformID.MacOSX:
-				case PlatformID.Unix:
-					return string.Equals(_fullPath, other._fullPath, StringComparison.Ordinal);
-				default:
-					return string.Equals(_fullPath, other._fullPath, StringComparison.OrdinalIgnoreCase);
-			}
+			return string.Equals(this.Url, ((Path)obj).Url);
 		}
 		#endregion
 
 		#region 静态方法
 		/// <summary>
-		/// 解析文本格式的路径。
+		/// 解析路径。
 		/// </summary>
 		/// <param name="text">要解析的路径文本。</param>
 		/// <returns>返回解析成功的<see cref="Path"/>路径对象。</returns>
-		/// <exception cref="ArgumentNullException">当<paramref name="text"/>参数为空或空白字符串。</exception>
 		/// <exception cref="PathException">当<paramref name="text"/>参数为无效的路径格式。</exception>
 		public static Path Parse(string text)
 		{
-			if(string.IsNullOrWhiteSpace(text))
-				throw new ArgumentNullException("text");
+			string scheme;
+			string[] segments;
+			PathAnchor anchor;
 
-			string scheme, path;
+			//解析路径文本，并确保无效的路径文本格式会触发异常
+			ParseCore(text, true, out scheme, out segments, out anchor);
 
-			if(TryParse(text, out scheme, out path))
-				return new Path(text, scheme, path);
-
-			throw new PathException(text);
+			//返回解析成功后的路径对象
+			return new Path(scheme, segments, anchor);
 		}
 
 		/// <summary>
-		/// 尝试解析文本格式的路径。
+		/// 尝试解析路径。
 		/// </summary>
 		/// <param name="text">要解析的路径文本。</param>
-		/// <param name="result">解析成功的<see cref="Path"/>路径对象。</param>
+		/// <param name="path">解析成功的<see cref="Path"/>路径对象。</param>
 		/// <returns>如果解析成功则返回真(True)，否则返回假(False)。</returns>
-		public static bool TryParse(string text, out Path result)
+		public static bool TryParse(string text, out Path path)
 		{
-			result = null;
-			string scheme, path;
+			//设置输出参数的默认值
+			path = null;
 
-			if(TryParse(text, out scheme, out path))
+			string scheme;
+			string[] segments;
+			PathAnchor anchor;
+
+			if(ParseCore(text, false, out scheme, out segments, out anchor))
 			{
-				result = new Path(text, scheme, path);
+				path = new Path(scheme, segments, anchor);
 				return true;
 			}
 
 			return false;
 		}
 
+		/// <summary>
+		/// 尝试解析路径。
+		/// </summary>
+		/// <param name="text">指定要解析的路径文本。</param>
+		/// <param name="scheme">返回解析成功的路径对应的文件系统<see cref="IFileSystem.Scheme"/>方案。</param>
+		/// <param name="path">返回解析成功的完整路径，更多信息请参考<see cref="Path.FullPath"/>属性文档。</param>
+		/// <returns>如果解析成功则返回真(True)，否则返回假(False)。</returns>
 		public static bool TryParse(string text, out string scheme, out string path)
 		{
-			scheme = null;
-			path = null;
-
-			if(string.IsNullOrWhiteSpace(text))
-				return false;
-
-			var match = _regex.Match(text);
-
-			if(match.Success)
-			{
-				scheme = string.IsNullOrWhiteSpace(match.Groups["scheme"].Value) ? null : match.Groups["scheme"].Value;
-				path = match.Groups["path"].Value.Replace('\\', '/');
-			}
-
-			return match.Success;
+			PathAnchor anchor;
+			return TryParse(text, out scheme, out path, out anchor);
 		}
 
 		/// <summary>
-		/// 解析路径文本中指定的方案名。
+		/// 尝试解析路径。
 		/// </summary>
-		/// <param name="text">指定的路径文本。</param>
-		/// <returns>返回的路径方案名，如果解析失败或者路径文本未包含方案则返回空。</returns>
-		public static string GetScheme(string text)
+		/// <param name="text">指定要解析的路径文本。</param>
+		/// <param name="scheme">返回解析成功的路径对应的文件系统<see cref="IFileSystem.Scheme"/>方案。</param>
+		/// <param name="path">返回解析成功的完整路径，更多信息请参考<see cref="Path.FullPath"/>属性文档。</param>
+		/// <param name="anchor">返回解析成功的路径锚点。</param>
+		/// <returns>如果解析成功则返回真(True)，否则返回假(False)。</returns>
+		public static bool TryParse(string text, out string scheme, out string path, out PathAnchor anchor)
 		{
-			if(string.IsNullOrWhiteSpace(text))
-				return null;
+			path = null;
+			string[] segments;
 
-			var match = _regex.Match(text);
+			if(ParseCore(text, false, out scheme, out segments, out anchor))
+			{
+				path = GetAnchorString(anchor, true) + string.Join("/", segments);
+				return true;
+			}
 
-			if(match.Success)
-				return string.IsNullOrWhiteSpace(match.Groups["scheme"].Value) ? null : match.Groups["scheme"].Value;
-
-			return null;
+			return false;
 		}
 
-		public static string GetPath(string text)
+		/// <summary>
+		/// 尝试解析路径。
+		/// </summary>
+		/// <param name="text">指定要解析的路径文本。</param>
+		/// <param name="scheme">返回解析成功的路径对应的文件系统<see cref="IFileSystem.Scheme"/>方案。</param>
+		/// <param name="segments">返回解析成功的路径节点数组，更多信息请参考<see cref="Path.Segments"/>属性文档。</param>
+		/// <param name="anchor">返回解析成功的路径锚点。</param>
+		/// <returns>如果解析成功则返回真(True)，否则返回假(False)。</returns>
+		public static bool TryParse(string text, out string scheme, out string[] segments, out PathAnchor anchor)
 		{
-			if(string.IsNullOrWhiteSpace(text))
-				return null;
+			return ParseCore(text, false, out scheme, out segments, out anchor);
+		}
 
-			var match = _regex.Match(text);
+		/// <summary>
+		/// 解析路径。
+		/// </summary>
+		/// <param name="text">指定要解析的路径文本。</param>
+		/// <param name="throwException">指定无效的路径文本是否激发异常。</param>
+		/// <param name="scheme">返回解析成功的路径对应的文件系统<see cref="IFileSystem.Scheme"/>方案。</param>
+		/// <param name="segments">返回解析成功的路径节点数组，更多信息请参考<see cref="Path.Segments"/>属性文档。</param>
+		/// <param name="anchor">返回解析成功的路径锚点。</param>
+		/// <returns>如果解析成功则返回真(True)，否则返回假(False)。</returns>
+		private static bool ParseCore(string text, bool throwException, out string scheme, out string[] segments, out PathAnchor anchor)
+		{
+			const int PATH_NONE_STATE = 0;      //状态机：初始态
+			const int PATH_SLASH_STATE = 1;     //状态机：斜杠态（路径分隔符）
+			const int PATH_ANCHOR_STATE = 2;    //状态机：锚点态
+			const int PATH_SEGMENT_STATE = 3;   //状态机：内容态
 
-			if(match.Success)
-				return match.Groups["path"].Value.Replace('\\', '/');
+			scheme = null;
+			segments = null;
+			anchor = PathAnchor.None;
 
-			return null;
+			if(string.IsNullOrEmpty(text))
+			{
+				if(throwException)
+					throw new PathException("The path text is null or empty.");
+
+				return false;
+			}
+
+			var state = 0;
+			var spaces = 0;
+			var part = string.Empty;
+			var parts = new List<string>();
+
+			for(int i=0; i<text.Length; i++)
+			{
+				var chr = text[i];
+
+				switch(chr)
+				{
+					case ' ':
+						if(state == PATH_ANCHOR_STATE && anchor == PathAnchor.Current)
+						{
+							if(throwException)
+								throw new PathException("");
+
+							return false;
+						}
+
+						if(part.Length > 0)
+							spaces++;
+
+						break;
+					case '\t':
+					case '\n':
+					case '\r':
+						break;
+					case ':':
+						//注意：当首次遇到冒号时，其为Scheme定语；否则即为普通字符
+						if(parts.Count == 0)
+						{
+							if(string.IsNullOrEmpty(part))
+							{
+								if(throwException)
+									throw new PathException("The scheme of path is empty.");
+
+								return false;
+							}
+
+							//设置路径方案
+							scheme = part;
+
+							//重置空格计数器
+							spaces = 0;
+
+							//重置内容文本
+							part = string.Empty;
+
+							//设置当前状态为初始态
+							state = PATH_NONE_STATE;
+						}
+						else
+						{
+							//跳转到默认分支，即做普通字符处理
+							goto default;
+						}
+
+						break;
+					case '.':
+						switch(state)
+						{
+							case PATH_NONE_STATE:
+								anchor = PathAnchor.Current;
+								break;
+							case PATH_ANCHOR_STATE:
+								if(anchor == PathAnchor.Current)
+								{
+									anchor = PathAnchor.Parent;
+								}
+								else
+								{
+									if(throwException)
+										throw new PathException("Invalid anchor of path.");
+
+									return false;
+								}
+
+								break;
+							default:
+								goto TEXT_LABEL;
+						}
+
+						state = PATH_ANCHOR_STATE;
+
+						break;
+					case '/':
+					case '\\':
+						switch(state)
+						{
+							case PATH_NONE_STATE:
+								anchor = PathAnchor.Root;
+								break;
+							case PATH_SLASH_STATE:
+								if(throwException)
+									throw new PathException("Invalid path text, it contains repeated slash character.");
+
+								return false;
+							case PATH_SEGMENT_STATE:
+								if(string.IsNullOrEmpty(part))
+								{
+									if(throwException)
+										throw new PathException("Error occurred, The path parser internal error.");
+
+									return false;
+								}
+
+								parts.Add(part);
+
+								break;
+						}
+
+						spaces = 0;
+						part = string.Empty;
+						state = PATH_SLASH_STATE;
+
+						break;
+					//注意：忽略对“?”、“*”字符的检验处理，因为需要支持对通配符模式路径的链接。
+					//case '?':
+					//case '*':
+					case '"':
+					case '|':
+					case '<':
+					case '>':
+						if(throwException)
+							throw new ArgumentException(string.Format("Invalid path, it contains '{0}' illegal character(s).", chr));
+
+						return false;
+					default:
+TEXT_LABEL:
+						if(spaces > 0)
+						{
+							part += new string(' ', spaces);
+							spaces = 0;
+						}
+
+						part += chr;
+						state = PATH_SEGMENT_STATE;
+
+						break;
+				}
+			}
+
+			if(parts.Count == 0 && anchor == PathAnchor.None)
+			{
+				if(throwException)
+					throw new PathException("The path text is all whitespaces.");
+
+				return false;
+			}
+
+			if(state == PATH_SEGMENT_STATE && part.Length > 0)
+				parts.Add(part);
+
+			segments = new string[parts.Count + (state == PATH_SLASH_STATE && parts.Count > 0 ? 1 : 0)];
+
+			for(var i = 0; i < parts.Count; i++)
+			{
+				segments[i] = parts[i];
+			}
+
+			return true;
 		}
 
 		/// <summary>
@@ -419,6 +665,23 @@ namespace Zongsoft.IO
 			}
 
 			return (segments.Count == 0 ? string.Empty : string.Join("/", segments)) + (slashed ? "/" : "");
+		}
+		#endregion
+
+		#region 私有方法
+		private static string GetAnchorString(PathAnchor anchor, bool slashed)
+		{
+			switch(anchor)
+			{
+				case PathAnchor.Root:
+					return "/";
+				case PathAnchor.Current:
+					return slashed ? "./" : ".";
+				case PathAnchor.Parent:
+					return slashed ? "../" : "..";
+				default:
+					return string.Empty;
+			}
 		}
 		#endregion
 	}

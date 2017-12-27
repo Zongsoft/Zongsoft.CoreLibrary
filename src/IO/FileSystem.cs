@@ -121,7 +121,7 @@ namespace Zongsoft.IO
 			Path path;
 			var fs = GetFileSystem(virtualPath, false, out path);
 
-			return fs == null ? null : fs.GetUrl(path.FullPath);
+			return fs == null ? null : fs.GetUrl(path);
 		}
 		#endregion
 
@@ -130,14 +130,6 @@ namespace Zongsoft.IO
 		{
 			//设置输出参数的默认值
 			path = null;
-
-			if(string.IsNullOrWhiteSpace(text))
-			{
-				if(throwException)
-					throw new ArgumentNullException("text");
-
-				return null;
-			}
 
 			var providers = _providers;
 
@@ -156,12 +148,12 @@ namespace Zongsoft.IO
 			var scheme = path.Scheme;
 
 			//如果路径模式为空则使用默认文件系统方案
-			if(string.IsNullOrWhiteSpace(scheme))
+			if(string.IsNullOrEmpty(scheme))
 			{
 				scheme = FileSystem.Scheme;
 
 				//如果文件系统模式为空则返回本地文件方案
-				if(string.IsNullOrWhiteSpace(scheme))
+				if(string.IsNullOrEmpty(scheme))
 					return LocalFileSystem.Instance;
 			}
 

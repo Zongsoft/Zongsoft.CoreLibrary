@@ -61,12 +61,22 @@ namespace Zongsoft.IO
 		/// <summary>
 		/// 获取本地路径对应的外部访问Url地址。
 		/// </summary>
-		/// <param name="path">要获取的本地路径。</param>
+		/// <param name="path">要解析的本地路径。</param>
 		/// <returns>返回对应的Url地址。</returns>
 		/// <remarks>
 		///		<para>本地路径：是指特定的<see cref="IFileSystem"/>文件目录系统的路径格式。</para>
 		///		<para>外部访问Url地址：是指可通过Web方式访问某个文件或目录的URL。</para>
 		/// </remarks>
 		string GetUrl(string path);
+
+		/// <summary>
+		/// 获取本地路径对应的外部访问Url地址。
+		/// </summary>
+		/// <param name="path">要解析的<see cref="Path"/>路径对象。</param>
+		/// <returns>返回对应的Url地址。</returns>
+		/// <remarks>
+		///		<para>外部访问Url地址：是指可通过Web方式访问某个文件或目录的URL。</para>
+		/// </remarks>
+		string GetUrl(Path path);
 	}
 }

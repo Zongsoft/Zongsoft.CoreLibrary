@@ -77,6 +77,17 @@ namespace Zongsoft.IO
 		#region 公共方法
 		public string GetUrl(string path)
 		{
+			if(string.IsNullOrEmpty(path))
+				return null;
+
+			return @"file:///" + GetLocalPath(path);
+		}
+
+		public string GetUrl(Path path)
+		{
+			if(path == null)
+				return null;
+
 			return @"file:///" + GetLocalPath(path);
 		}
 		#endregion
@@ -84,10 +95,13 @@ namespace Zongsoft.IO
 		#region 路径解析
 		public static string GetLocalPath(string text)
 		{
-			if(string.IsNullOrWhiteSpace(text))
-				throw new ArgumentNullException("text");
+			return GetLocalPath(Path.Parse(text));
+		}
 
-			var path = Path.Parse(text);
+		private static string GetLocalPath(Path path)
+		{
+			if(path == null)
+				throw new ArgumentNullException(nameof(path));
 
 			switch(Environment.OSVersion.Platform)
 			{
@@ -111,7 +125,7 @@ namespace Zongsoft.IO
 				}
 
 				if(string.IsNullOrWhiteSpace(driveName))
-					throw new PathException(string.Format("The '{0}' path not cantians drive.", text));
+					throw new PathException(string.Format("The '{0}' path not cantians drive.", path.Url));
 			}
 
 			if(driveName.Length > 1)
@@ -131,7 +145,7 @@ namespace Zongsoft.IO
 				}
 
 				if(!matched)
-					throw new PathException(string.Format("Not matched drive for '{0}' path.", text));
+					throw new PathException(string.Format("Not matched drive for '{0}' path.", path.Url));
 			}
 
 			return driveName + ":" + fullPath;
