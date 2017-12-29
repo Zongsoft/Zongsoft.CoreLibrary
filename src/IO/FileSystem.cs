@@ -141,8 +141,10 @@ namespace Zongsoft.IO
 				return null;
 			}
 
-			//如果路径解析失败则返回空
-			if(!Path.TryParse(text, out path))
+			//解析路径文本
+			path = Path.Parse(text, throwException);
+
+			if(path == null)
 				return null;
 
 			var scheme = path.Scheme;

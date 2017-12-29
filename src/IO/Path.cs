@@ -268,19 +268,20 @@ namespace Zongsoft.IO
 		/// 解析路径。
 		/// </summary>
 		/// <param name="text">要解析的路径文本。</param>
+		/// <param name="throwException">指示当路径文本无效时是否需要抛出异常，默认为真(True)。</param>
 		/// <returns>返回解析成功的<see cref="Path"/>路径对象。</returns>
 		/// <exception cref="PathException">当<paramref name="text"/>参数为无效的路径格式。</exception>
-		public static Path Parse(string text)
+		public static Path Parse(string text, bool throwException = true)
 		{
 			string scheme;
 			string[] segments;
 			PathAnchor anchor;
 
-			//解析路径文本，并确保无效的路径文本格式会触发异常
-			ParseCore(text, true, out scheme, out segments, out anchor);
+			//解析路径文本，由特定参数指定解析失败是否抛出异常
+			if(ParseCore(text, throwException, out scheme, out segments, out anchor))
+				return new Path(scheme, segments, anchor);
 
-			//返回解析成功后的路径对象
-			return new Path(scheme, segments, anchor);
+			return null;
 		}
 
 		/// <summary>
@@ -526,6 +527,9 @@ TEXT_LABEL:
 				}
 			}
 
+			if(state == PATH_SEGMENT_STATE && part.Length > 0)
+				parts.Add(part);
+
 			if(parts.Count == 0 && anchor == PathAnchor.None)
 			{
 				if(throwException)
@@ -533,9 +537,6 @@ TEXT_LABEL:
 
 				return false;
 			}
-
-			if(state == PATH_SEGMENT_STATE && part.Length > 0)
-				parts.Add(part);
 
 			segments = new string[parts.Count + (state == PATH_SLASH_STATE && parts.Count > 0 ? 1 : 0)];
 
