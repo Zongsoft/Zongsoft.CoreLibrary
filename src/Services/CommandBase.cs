@@ -247,6 +247,19 @@ namespace Zongsoft.Services
 				//执行具体的工作
 				result = this.OnExecute(parameter);
 			}
+			catch(AggregateException ex)
+			{
+				//创建事件参数对象
+				executedArgs = this.CreateExecutedEventArgs(parameter, ex.InnerException);
+
+				//激发“Executed”事件
+				this.OnExecuted(executedArgs);
+
+				if(!executedArgs.ExceptionHandled)
+					throw ex.InnerException;
+
+				return executedArgs.Result;
+			}
 			catch(Exception ex)
 			{
 				//创建事件参数对象
