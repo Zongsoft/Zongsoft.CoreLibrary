@@ -23,6 +23,9 @@ Zongsoft.CoreLibrary 类库提供了.NET开发的常用功能集以及一些相�
 - Communication
 	> 该命名空间内包括进行通讯和自定义通讯协议包解析的基类、接口，设计通讯处理程序时应尽量使用这里定义的接口或基类。具体实现请参考 [Zongsoft.Net](https://github.com/Zongsoft/Zongsoft.Net) 项目。
 
+	- Composition
+		> 该命名空间内包括“执行管道(ExecutionPipelines)”模式的全部接口和实现，执行管道是一套强大的扩展接口方案，通讯层的 `Communication.Net.TcpServer` 和 `Communication.Net.FtpServer` 类均采用该机制来保证服务器端的扩展性。
+
 - ComponentModel
 	> 该命名空间内包括一些相对 .NET BCL 中进行了功能强化的 `TypeConverter`，譬如：`EnumConverter`、`CustomBooleanConverter`、`GuidConverter` 类；表示应用程序上下文的 `ApplicationContextBase` 类，该基类提供了一个应用程序可能会使用到的常用服务；其中的 `AliasAttribute` 类可用来定义枚举项或其他元素的别称。
 
@@ -77,9 +80,6 @@ Zongsoft.CoreLibrary 类库提供了.NET开发的常用功能集以及一些相�
 
 - Services
 	> 该命名空间内包括一套服务访问和管理的 `IServiceProvider`、`IServiceProviderFactory` 接口和实现 `ServiceProvider`、`ServiceProviderFactory`；以及一套有关命令装配模式的接口和实现；还有一个后台服务的工作者 `IWorker` 接口和 `WorkerBase` 基类。
-
-	- Composition
-		> 该命名空间内包括“执行管道(ExecutionPipelines)”模式的全部接口和实现，执行管道是一套强大的扩展接口方案，通讯层的 `Communication.Net.TcpServer` 和 `Communication.Net.FtpServer` 类均采用该机制来保证服务器端的扩展性。
 
 - Terminals
 	> 该命名空间内包括一套终端程序的接口和实现，使用该实现可以快速的完成一个强大的基于控制台的应用。
