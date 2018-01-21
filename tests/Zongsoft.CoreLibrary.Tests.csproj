@@ -65,6 +65,7 @@
     <Compile Include="Data\ConditionalTest.cs" />
     <Compile Include="Data\ConditionCollectionTest.cs" />
     <Compile Include="Data\ConditionTest.cs" />
+    <Compile Include="Data\ScopingTest.cs" />
     <Compile Include="Data\SortingTest.cs" />
     <Compile Include="Department.cs" />
     <Compile Include="Expressions\LexerTest.cs" />
