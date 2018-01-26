@@ -28,7 +28,10 @@ using System;
 
 namespace Zongsoft.Services
 {
-	public class CommandCompletionContext : CommandExecutorContext
+	/// <summary>
+	/// 表示命令会话执行完成的上下文类。
+	/// </summary>
+	public class CommandCompletionContext : CommandContext
 	{
 		#region 成员字段
 		private object _result;
@@ -36,7 +39,7 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 构造函数
-		public CommandCompletionContext(ICommandExecutor executor, CommandExpression expression, object parameter, object result, Exception exception = null) : base(executor, expression, parameter)
+		public CommandCompletionContext(CommandContext context, object result, Exception exception = null) : base(context)
 		{
 			_result = result;
 			_exception = exception;
@@ -44,38 +47,30 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取当前命令的执行结果。
+		/// </summary>
 		public object Result
 		{
 			get
 			{
 				return _result;
 			}
-			set
-			{
-				_result = value;
-			}
 		}
 
+		/// <summary>
+		/// 获取命令执行中发生的异常。
+		/// </summary>
 		public Exception Exception
 		{
 			get
 			{
 				return _exception;
 			}
-			set
+			internal set
 			{
 				_exception = value;
 			}
-		}
-		#endregion
-
-		#region 静态方法
-		public static CommandCompletionContext Create(CommandExecutorContext context, object result, Exception exception = null)
-		{
-			if(context == null)
-				throw new ArgumentNullException(nameof(context));
-
-			return new CommandCompletionContext(context.Executor, context.Expression, context.Parameter, result, exception);
 		}
 		#endregion
 	}

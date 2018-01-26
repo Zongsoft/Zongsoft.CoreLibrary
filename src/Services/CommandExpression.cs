@@ -32,6 +32,7 @@ namespace Zongsoft.Services
 	public class CommandExpression
 	{
 		#region 成员字段
+		private int _index;
 		private string _name;
 		private string _path;
 		private string _fullPath;
@@ -141,6 +142,14 @@ namespace Zongsoft.Services
 			}
 		}
 
+		public int Index
+		{
+			get
+			{
+				return _index;
+			}
+		}
+
 		public CommandExpression Next
 		{
 			get
@@ -149,7 +158,30 @@ namespace Zongsoft.Services
 			}
 			set
 			{
-				_next = value;
+				if(object.ReferenceEquals(value, this))
+					throw new ArgumentException();
+
+				var current = _next = value;
+
+				if(current == null)
+					return;
+
+				//创建更新栈（以避免循环引用导致的死锁）
+				var stack = new HashSet<CommandExpression>();
+
+				while(current != null)
+				{
+					if(!stack.Add(current))
+					{
+						_next = null;
+						throw new InvalidOperationException("The operation has been declined. Because a circular references error occurred.");
+					}
+
+					current = current._next;
+				}
+
+				//更新后趋命令表达式的序号
+				value.SetIndex(_index + 1);
 			}
 		}
 		#endregion
@@ -199,6 +231,26 @@ namespace Zongsoft.Services
 				return result;
 			else
 				return result + " | " + next.ToString();
+		}
+		#endregion
+
+		#region 私有方法
+		private void SetIndex(int value)
+		{
+			if(value < 0)
+				return;
+
+			//设置当前表达式的序号
+			_index = value;
+
+			//获取下一个表达式
+			var current = _next;
+
+			while(current != null)
+			{
+				current._index = ++value;
+				current = current._next;
+			}
 		}
 		#endregion
 	}

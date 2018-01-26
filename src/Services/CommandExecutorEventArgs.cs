@@ -33,17 +33,12 @@ namespace Zongsoft.Services
 	{
 		#region 成员字段
 		private CommandExecutorContext _context;
-		private object _result;
 		#endregion
 
 		#region 构造函数
-		public CommandExecutorEventArgs(CommandExecutorContext context, object result)
+		public CommandExecutorEventArgs(CommandExecutorContext context)
 		{
-			if(context == null)
-				throw new ArgumentNullException("context");
-
-			_context = context;
-			_result = result;
+			_context = context ?? throw new ArgumentNullException(nameof(context));
 		}
 		#endregion
 
@@ -60,11 +55,11 @@ namespace Zongsoft.Services
 		{
 			get
 			{
-				return _result;
+				return _context.Result;
 			}
 			set
 			{
-				_result = value;
+				_context.Result = value;
 			}
 		}
 		#endregion

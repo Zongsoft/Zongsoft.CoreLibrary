@@ -26,6 +26,7 @@
 
 using System;
 using System.IO;
+using System.Collections.Generic;
 
 namespace Zongsoft.Services
 {
@@ -74,6 +75,14 @@ namespace Zongsoft.Services
 		{
 			get;
 			set;
+		}
+
+		/// <summary>
+		/// 获取命令执行器的状态字典。
+		/// </summary>
+		IDictionary<string, object> States
+		{
+			get;
 		}
 		#endregion
 

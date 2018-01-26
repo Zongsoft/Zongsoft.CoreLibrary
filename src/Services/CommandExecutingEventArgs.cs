@@ -62,7 +62,7 @@ namespace Zongsoft.Services
 				if(extendedProperties != null && extendedProperties.Count > 0)
 				{
 					foreach(var pair in extendedProperties)
-						context.ExtendedProperties[pair.Key] = pair.Value;
+						context.States[pair.Key] = pair.Value;
 				}
 			}
 			else
@@ -133,7 +133,7 @@ namespace Zongsoft.Services
 			get
 			{
 				if(_context != null)
-					return _context.HasExtendedProperties;
+					return _context.HasStates;
 				else
 					return _extendedProperties != null && _extendedProperties.Count > 0;
 			}
@@ -147,7 +147,7 @@ namespace Zongsoft.Services
 			get
 			{
 				if(_context != null)
-					return _context.ExtendedProperties;
+					return _context.States;
 
 				if(_extendedProperties == null)
 					System.Threading.Interlocked.CompareExchange(ref _extendedProperties, new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase), null);

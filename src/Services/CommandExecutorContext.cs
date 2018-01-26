@@ -26,15 +26,21 @@
 
 using System;
 using System.IO;
+using System.Collections.Generic;
 
 namespace Zongsoft.Services
 {
+	/// <summary>
+	/// 表示命令执行器的上下文（命令执行会话）类。
+	/// </summary>
 	public class CommandExecutorContext
 	{
 		#region 成员字段
 		private ICommandExecutor _executor;
 		private CommandExpression _expression;
 		private object _parameter;
+		private object _result;
+		private IDictionary<string, object> _states;
 		#endregion
 
 		#region 构造函数
@@ -87,6 +93,21 @@ namespace Zongsoft.Services
 		}
 
 		/// <summary>
+		/// 获取或设置命令执行器的最终结果。
+		/// </summary>
+		public object Result
+		{
+			get
+			{
+				return _result;
+			}
+			set
+			{
+				_result = value;
+			}
+		}
+
+		/// <summary>
 		/// 获取当前命令执行器的标准输出器。
 		/// </summary>
 		public ICommandOutlet Output
@@ -105,6 +126,31 @@ namespace Zongsoft.Services
 			get
 			{
 				return _executor.Error;
+			}
+		}
+
+		/// <summary>
+		/// 获取一个值，指示命令执行会话是否包含状态字典。
+		/// </summary>
+		public bool HasStates
+		{
+			get
+			{
+				return _states != null && _states.Count > 0;
+			}
+		}
+
+		/// <summary>
+		/// 获取当前命令执行会话的状态字典。
+		/// </summary>
+		public IDictionary<string, object> States
+		{
+			get
+			{
+				if(_states == null)
+					System.Threading.Interlocked.CompareExchange(ref _states, new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase), null);
+
+				return _states;
 			}
 		}
 		#endregion

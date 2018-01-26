@@ -172,9 +172,9 @@ namespace Zongsoft.Terminals
 		#endregion
 
 		#region 重写方法
-		protected override CommandContext CreateCommandContext(CommandExpression expression, CommandTreeNode node, object parameter)
+		protected override CommandContext CreateCommandContext(CommandExecutorContext session, CommandExpression expression, CommandTreeNode node, object parameter)
 		{
-			return new TerminalCommandContext(this, expression, node, parameter);
+			return new TerminalCommandContext(session, expression, node, parameter);
 		}
 
 		protected override void OnExecuted(CommandExecutorExecutedEventArgs args)

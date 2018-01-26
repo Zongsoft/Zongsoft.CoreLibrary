@@ -36,7 +36,7 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 构造函数
-		public CommandExecutorExecutingEventArgs(CommandExecutorContext context, bool cancel = false) : base(context, null)
+		public CommandExecutorExecutingEventArgs(CommandExecutorContext context, bool cancel = false) : base(context)
 		{
 			_cancel = cancel;
 		}

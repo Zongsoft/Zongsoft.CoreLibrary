@@ -78,7 +78,7 @@ namespace Zongsoft.Services
 				if(extendedProperties != null && extendedProperties.Count > 0)
 				{
 					foreach(var pair in extendedProperties)
-						context.ExtendedProperties[pair.Key] = pair.Value;
+						context.States[pair.Key] = pair.Value;
 				}
 			}
 			else
@@ -107,7 +107,7 @@ namespace Zongsoft.Services
 				if(extendedProperties != null && extendedProperties.Count > 0)
 				{
 					foreach(var pair in extendedProperties)
-						context.ExtendedProperties[pair.Key] = pair.Value;
+						context.States[pair.Key] = pair.Value;
 				}
 			}
 			else

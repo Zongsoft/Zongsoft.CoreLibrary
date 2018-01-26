@@ -27,42 +27,39 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Collections.Concurrent;
 
 namespace Zongsoft.Services
 {
+	/// <summary>
+	/// 表示命令执行的上下文类。
+	/// </summary>
 	public class CommandContext
 	{
-		#region 静态字段
-		private static ConcurrentDictionary<string, object> _states;
-		private static ConcurrentDictionary<ICommandExecutor, ConcurrentDictionary<string, object>> _statesProvider;
-		#endregion
-
 		#region 成员字段
 		private ICommand _command;
 		private CommandTreeNode _commandNode;
 		private CommandExpression _expression;
-		private ICommandExecutor _executor;
+		private CommandExecutorContext _session;
 		private object _parameter;
-		private IDictionary<string, object> _extendedProperties;
+		private IDictionary<string, object> _states;
 		#endregion
 
 		#region 构造函数
-		public CommandContext(ICommandExecutor executor, CommandExpression expression, ICommand command, object parameter, IDictionary<string, object> extendedProperties = null)
+		public CommandContext(CommandExecutorContext session, CommandExpression expression, ICommand command, object parameter, IDictionary<string, object> extendedProperties = null)
 		{
 			if(command == null)
 				throw new ArgumentNullException("command");
 
-			_executor = executor;
+			_session = session;
 			_command = command;
 			_parameter = parameter;
 			_expression = expression;
 
 			if(extendedProperties != null && extendedProperties.Count > 0)
-				_extendedProperties = new Dictionary<string, object>(extendedProperties, StringComparer.OrdinalIgnoreCase);
+				_states = new Dictionary<string, object>(extendedProperties, StringComparer.OrdinalIgnoreCase);
 		}
 
-		public CommandContext(ICommandExecutor executor, CommandExpression expression, CommandTreeNode commandNode, object parameter, IDictionary<string, object> extendedProperties = null)
+		public CommandContext(CommandExecutorContext session, CommandExpression expression, CommandTreeNode commandNode, object parameter, IDictionary<string, object> extendedProperties = null)
 		{
 			if(commandNode == null)
 				throw new ArgumentNullException("commandNode");
@@ -70,14 +67,27 @@ namespace Zongsoft.Services
 			if(commandNode.Command == null)
 				throw new ArgumentException(string.Format("The Command property of '{0}' command-node is null.", commandNode.FullPath));
 
-			_executor = executor;
+			_session = session;
 			_commandNode = commandNode;
 			_command = commandNode.Command;
 			_parameter = parameter;
 			_expression = expression;
 
 			if(extendedProperties != null && extendedProperties.Count > 0)
-				_extendedProperties = new Dictionary<string, object>(extendedProperties, StringComparer.OrdinalIgnoreCase);
+				_states = new Dictionary<string, object>(extendedProperties, StringComparer.OrdinalIgnoreCase);
+		}
+
+		protected CommandContext(CommandContext context)
+		{
+			if(context == null)
+				throw new ArgumentNullException(nameof(context));
+
+			_session = context._session;
+			_expression = context._expression;
+			_command = context._command;
+			_commandNode = context._commandNode;
+			_parameter = context._parameter;
+			_states = context._states;
 		}
 		#endregion
 
@@ -127,30 +137,30 @@ namespace Zongsoft.Services
 		}
 
 		/// <summary>
-		/// 获取扩展属性集是否有内容。
+		/// 获取一个值，指示当前上下文是否包含状态字典。
 		/// </summary>
 		/// <remarks>
-		///		<para>在不确定扩展属性集是否含有内容之前，建议先使用该属性来检测。</para>
+		///		<para>在不确定状态字典是否含有内容之前，建议先使用该属性来检测。</para>
 		/// </remarks>
-		public bool HasExtendedProperties
+		public bool HasStates
 		{
 			get
 			{
-				return _extendedProperties != null && _extendedProperties.Count > 0;
+				return _states != null && _states.Count > 0;
 			}
 		}
 
 		/// <summary>
-		/// 获取可用于在本次执行过程中在各处理模块之间组织和共享数据的键/值集合。
+		/// 获取当前上下文的状态字典。
 		/// </summary>
-		public IDictionary<string, object> ExtendedProperties
+		public IDictionary<string, object> States
 		{
 			get
 			{
-				if(_extendedProperties == null)
-					System.Threading.Interlocked.CompareExchange(ref _extendedProperties, new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase), null);
+				if(_states == null)
+					System.Threading.Interlocked.CompareExchange(ref _states, new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase), null);
 
-				return _extendedProperties;
+				return _states;
 			}
 		}
 
@@ -161,7 +171,7 @@ namespace Zongsoft.Services
 		{
 			get
 			{
-				return _executor.Output;
+				return _session?.Executor?.Output;
 			}
 		}
 
@@ -172,43 +182,29 @@ namespace Zongsoft.Services
 		{
 			get
 			{
-				return _executor.Error;
+				return _session?.Executor?.Error;
 			}
 		}
 
 		/// <summary>
-		/// 获取执行命令所在的命令执行器。
+		/// 获取命令所在的命令执行器。
 		/// </summary>
 		public ICommandExecutor Executor
 		{
 			get
 			{
-				return _executor;
+				return _session?.Executor;
 			}
 		}
 
 		/// <summary>
-		/// 获取一个由当前命令执行器为宿主的字典容器。
+		/// 获取当前执行命令的会话，即命令管道执行上下文。
 		/// </summary>
-		/// <remarks>
-		///		<para>在本属性返回的字典集合中的内容对于相同<see cref="ICommandExecutor"/>中的命令而言都是可见(读写)的，但对于不同<seealso cref="ICommandExecutor"/>下的命令而言，这些字典集合内的内容则是不可见的。</para>
-		/// </remarks>
-		public ConcurrentDictionary<string, object> States
+		public CommandExecutorContext Session
 		{
 			get
 			{
-				if(_executor == null)
-				{
-					if(_states == null)
-						System.Threading.Interlocked.CompareExchange(ref _states, new ConcurrentDictionary<string, object>(StringComparer.OrdinalIgnoreCase), null);
-
-					return _states;
-				}
-
-				if(_statesProvider == null)
-					System.Threading.Interlocked.CompareExchange(ref _statesProvider, new ConcurrentDictionary<ICommandExecutor, ConcurrentDictionary<string, object>>(), null);
-
-				return _statesProvider.GetOrAdd(_executor, _ => new ConcurrentDictionary<string, object>(StringComparer.OrdinalIgnoreCase));
+				return _session;
 			}
 		}
 		#endregion

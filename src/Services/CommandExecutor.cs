@@ -49,6 +49,7 @@ namespace Zongsoft.Services
 		private ICommandExpressionParser _parser;
 		private ICommandOutlet _output;
 		private TextWriter _error;
+		private IDictionary<string, object> _states;
 		#endregion
 
 		#region 构造函数
@@ -58,6 +59,7 @@ namespace Zongsoft.Services
 			_parser = parser ?? CommandExpressionParser.Instance;
 			_output = NullCommandOutlet.Instance;
 			_error = CommandErrorWriter.Instance;
+			_states = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 		}
 		#endregion
 
@@ -131,6 +133,14 @@ namespace Zongsoft.Services
 				_error = value ?? TextWriter.Null;
 			}
 		}
+
+		public IDictionary<string, object> States
+		{
+			get
+			{
+				return _states;
+			}
+		}
 		#endregion
 
 		#region 查找方法
@@ -174,21 +184,20 @@ namespace Zongsoft.Services
 			if(executingArgs.Cancel)
 				return executingArgs.Result;
 
-			object result = null;
-			bool complateInvoked = false;
-			IEnumerable<CommandCompleterDescriptor> descriptors = null;
+			var complateInvoked = false;
+			IEnumerable<CommandCompletionContext> completes = null;
 
 			try
 			{
 				//调用执行请求
-				result = this.OnExecute(context, out descriptors);
+				context.Result = this.OnExecute(context, out completes);
 			}
 			catch(Exception ex)
 			{
 				complateInvoked = true;
 
 				//执行命令完成通知
-				this.OnCompleted(context, descriptors, ex);
+				this.OnCompletes(completes, ex);
 
 				//激发“Error”事件
 				if(!this.OnFailed(context, ex))
@@ -197,10 +206,10 @@ namespace Zongsoft.Services
 
 			//执行命令完成通知
 			if(!complateInvoked)
-				this.OnCompleted(context, descriptors);
+				this.OnCompletes(completes, null);
 
 			//创建事件参数对象
-			var executedArgs = new CommandExecutorExecutedEventArgs(context, result);
+			var executedArgs = new CommandExecutorExecutedEventArgs(context);
 
 			//激发“Executed”事件
 			this.OnExecuted(executedArgs);
@@ -211,13 +220,13 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 执行实现
-		protected virtual object OnExecute(CommandExecutorContext context, out IEnumerable<CommandCompleterDescriptor> descriptors)
+		protected virtual object OnExecute(CommandExecutorContext session, out IEnumerable<CommandCompletionContext> completes)
 		{
 			var queue = new Queue<Tuple<CommandExpression, CommandTreeNode>>();
-			var expression = context.Expression;
+			var expression = session.Expression;
 
 			//设置输出参数默认值
-			descriptors = System.Linq.Enumerable.Empty<CommandCompleterDescriptor>();
+			completes = System.Linq.Enumerable.Empty<CommandCompletionContext>();
 
 			while(expression != null)
 			{
@@ -244,39 +253,38 @@ namespace Zongsoft.Services
 				return null;
 
 			//创建输出参数的列表对象
-			descriptors = new List<CommandCompleterDescriptor>();
+			completes = new List<CommandCompletionContext>();
 
 			//初始化第一个输入参数
-			var parameter = context.Parameter;
+			var parameter = session.Parameter;
 
 			while(queue.Count > 0)
 			{
 				var entry = queue.Dequeue();
 
-				//执行队列中的命令
-				parameter = this.ExecuteCommand(context, entry.Item1, entry.Item2, parameter);
+				//创建命令执行上下文
+				var context = this.CreateCommandContext(session, entry.Item1, entry.Item2, parameter);
 
-				//判断命令是否需要清理，如果是则加入到清理列表中
-				if(entry.Item2 != null && entry.Item2.Command is ICommandCompletion)
-					((IList<CommandCompleterDescriptor>)descriptors).Add(new CommandCompleterDescriptor((ICommandCompletion)entry.Item2.Command, parameter));
+				//执行当前命令
+				parameter = this.OnExecuteCommand(context);
+
+				//判断命令是否需要完成通知，如果是则加入到清理列表中
+				if(context.Command is ICommandCompletion completion)
+					((ICollection<CommandCompletionContext>)completes).Add(new CommandCompletionContext(context, parameter));
 			}
 
 			//返回最后一个命令的执行结果
 			return parameter;
 		}
 
-		protected virtual object ExecuteCommand(CommandExecutorContext context, CommandExpression expression, CommandTreeNode node, object parameter)
+		protected virtual object OnExecuteCommand(CommandContext context)
 		{
-			if(context == null)
-				throw new ArgumentNullException(nameof(context));
+			var command = context?.Command;
 
-			if(node == null)
-				throw new ArgumentNullException(nameof(node));
+			if(command == null)
+				throw new InvalidOperationException("Missing command.");
 
-			if(node.Command == null)
-				return null;
-
-			return node.Command.Execute(this.CreateCommandContext(expression, node, parameter));
+			return command.Execute(context);
 		}
 		#endregion
 
@@ -292,9 +300,9 @@ namespace Zongsoft.Services
 			return new CommandExecutorContext(this, expression, parameter);
 		}
 
-		protected virtual CommandContext CreateCommandContext(CommandExpression expression, CommandTreeNode node, object parameter)
+		protected virtual CommandContext CreateCommandContext(CommandExecutorContext session, CommandExpression expression, CommandTreeNode node, object parameter)
 		{
-			return new CommandContext(this, expression, node, parameter);
+			return new CommandContext(session, expression, node, parameter);
 		}
 
 		protected virtual CommandExpression OnParse(string text)
@@ -335,41 +343,23 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 私有方法
-		private void OnCompleted(CommandExecutorContext context, IEnumerable<CommandCompleterDescriptor> descriptors, Exception exception = null)
+		private void OnCompletes(IEnumerable<CommandCompletionContext> contexts, Exception exception)
 		{
-			if(descriptors == null)
+			if(contexts == null)
 				return;
 
-			foreach(var descriptor in descriptors)
+			foreach(var context in contexts)
 			{
-				try
-				{
-					descriptor.Command.OnCompleted(CommandCompletionContext.Create(context, descriptor.Result, exception));
-				}
-				catch(Exception ex)
-				{
-					Zongsoft.Diagnostics.Logger.Error(ex);
-				}
+				//设置会话完成通知上下文的异常属性
+				context.Exception = exception;
+
+				//回调命令执行器会话完成通知
+				((ICommandCompletion)context.Command).OnCompleted(context);
 			}
 		}
 		#endregion
 
 		#region 嵌套子类
-		protected class CommandCompleterDescriptor
-		{
-			public ICommandCompletion Command;
-			public object Result;
-
-			public CommandCompleterDescriptor(ICommandCompletion command, object result)
-			{
-				if(command == null)
-					throw new ArgumentNullException(nameof(command));
-
-				this.Command = command;
-				this.Result = result;
-			}
-		}
-
 		private class NullCommandOutlet : ICommandOutlet
 		{
 			#region 单例字段
