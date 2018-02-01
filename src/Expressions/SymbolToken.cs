@@ -69,6 +69,8 @@ namespace Zongsoft.Expressions
 		private const string COALESCE = "??";
 		//问号(?)
 		private const string QUESTION = "?";
+		//句点(.)
+		private const string DOT = ".";
 		//冒号(:)
 		private const string COLON = ":";
 		//逗号(,)
@@ -159,6 +161,8 @@ namespace Zongsoft.Expressions
 					return SymbolToken.Coalesce;
 				case QUESTION:
 					return SymbolToken.Question;
+				case DOT:
+					return SymbolToken.Dot;
 				case COLON:
 					return SymbolToken.Colon;
 				case COMMA:
@@ -191,7 +195,7 @@ namespace Zongsoft.Expressions
 			PLUS, MINUS, MULTIPLY, DIVIDE, MODULO,
 			ASSIGN, NOT, ANDALSO, ORELSE, EQUAL, NOTEQUAL,
 			LESSTHAN, LESSTHANOREQUAL, GREATERTHAN, GREATERTHANOREQUAL,
-			COALESCE, QUESTION, COLON, COMMA, SEMICOLON, PIPELINE,
+			COALESCE, QUESTION, DOT, COLON, COMMA, SEMICOLON, PIPELINE,
 			OPENINGPARENTHESIS, CLOSINGPARENTHESIS,
 			OPENINGBRACKET, CLOSINGBRACKET,
 			OPENINGBRACE, CLOSINGBRACE,
@@ -248,13 +252,16 @@ namespace Zongsoft.Expressions
 		/// <summary>问号(?)</summary>
 		public static readonly SymbolToken Question = new SymbolToken(QUESTION);
 
+		/// <summary>句点(.)</summary>
+		public static readonly SymbolToken Dot = new SymbolToken(DOT);
+
 		/// <summary>冒号(:)</summary>
 		public static readonly SymbolToken Colon = new SymbolToken(COLON);
 
-		/// <summary>逗号(|)</summary>
+		/// <summary>逗号(,)</summary>
 		public static readonly SymbolToken Comma = new SymbolToken(COMMA);
 
-		/// <summary>分号(|)</summary>
+		/// <summary>分号(;)</summary>
 		public static readonly SymbolToken Semicolon = new SymbolToken(SEMICOLON);
 
 		/// <summary>管道符(|)</summary>
@@ -266,16 +273,16 @@ namespace Zongsoft.Expressions
 		/// <summary>右小括号：)</summary>
 		public static readonly SymbolToken ClosingParenthesis = new SymbolToken(CLOSINGPARENTHESIS);
 
-		/// <summary>左中括号：(</summary>
+		/// <summary>左中括号：[</summary>
 		public static readonly SymbolToken OpeningBracket = new SymbolToken(OPENINGBRACKET);
 
-		/// <summary>右中括号：)</summary>
+		/// <summary>右中括号：]</summary>
 		public static readonly SymbolToken ClosingBracket = new SymbolToken(CLOSINGBRACKET);
 
-		/// <summary>左大括号：(</summary>
+		/// <summary>左大括号：{</summary>
 		public static readonly SymbolToken OpeningBrace = new SymbolToken(OPENINGBRACE);
 
-		/// <summary>右大括号：)</summary>
+		/// <summary>右大括号：}</summary>
 		public static readonly SymbolToken ClosingBrace = new SymbolToken(CLOSINGBRACE);
 		#endregion
 	}

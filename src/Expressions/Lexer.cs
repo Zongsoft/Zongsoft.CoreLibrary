@@ -25,6 +25,7 @@
  */
 
 using System;
+using System.IO;
 using System.Collections.Generic;
 
 namespace Zongsoft.Expressions
@@ -74,6 +75,14 @@ namespace Zongsoft.Expressions
 				throw new ArgumentNullException(nameof(text));
 
 			return new TokenScanner(this, text);
+		}
+
+		public TokenScanner GetScanner(Stream stream)
+		{
+			if(stream == null)
+				throw new ArgumentNullException(nameof(stream));
+
+			return new TokenScanner(this, stream);
 		}
 		#endregion
 	}

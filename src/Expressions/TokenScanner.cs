@@ -39,7 +39,7 @@ namespace Zongsoft.Expressions
 	{
 		#region 成员字段
 		private Lexer _lexer;
-		private TokenCharacterReader _reader;
+		private ITokenReader _reader;
 		#endregion
 
 		#region 构造函数
@@ -49,7 +49,16 @@ namespace Zongsoft.Expressions
 				throw new ArgumentNullException(nameof(lexer));
 
 			_lexer = lexer;
-			_reader = new TokenCharacterReader(text);
+			_reader = new TokenStringReader(text);
+		}
+
+		internal TokenScanner(Lexer lexer, Stream stream)
+		{
+			if(lexer == null)
+				throw new ArgumentNullException(nameof(lexer));
+
+			_lexer = lexer;
+			_reader = new TokenStreamReader(stream);
 		}
 		#endregion
 
@@ -65,7 +74,7 @@ namespace Zongsoft.Expressions
 				this.SkipWhitespaces(_reader);
 
 				//执行分词操作
-				var result = tokenizer.Tokenize(_reader);
+				var result = tokenizer.Tokenize((TextReader)_reader);
 
 				//重新定位读取器的指针位置
 				_reader.Seek(result.Offset, SeekOrigin.Current);
@@ -82,7 +91,7 @@ namespace Zongsoft.Expressions
 		#endregion
 
 		#region 私有方法
-		private void SkipWhitespaces(TokenCharacterReader reader)
+		private void SkipWhitespaces(ITokenReader reader)
 		{
 			int value;
 
@@ -123,7 +132,39 @@ namespace Zongsoft.Expressions
 		#endregion
 
 		#region 嵌套子类
-		private class TokenCharacterReader : TextReader
+		internal interface ITokenReader : IDisposable
+		{
+			int Position
+			{
+				get;
+			}
+
+			int Seek(int offset, SeekOrigin origin);
+			int Peek();
+			int Read();
+		}
+
+		private class TokenStreamReader : StreamReader, ITokenReader
+		{
+			public TokenStreamReader(Stream stream) : base(stream)
+			{
+			}
+
+			public int Position
+			{
+				get
+				{
+					return (int)this.BaseStream.Position;
+				}
+			}
+
+			public int Seek(int offset, SeekOrigin origin)
+			{
+				return (int)this.BaseStream.Seek(offset, origin);
+			}
+		}
+
+		private class TokenStringReader : TextReader, ITokenReader
 		{
 			#region 成员字段
 			private string _text;
@@ -131,7 +172,7 @@ namespace Zongsoft.Expressions
 			#endregion
 
 			#region 构造函数
-			public TokenCharacterReader(string text)
+			public TokenStringReader(string text)
 			{
 				if(string.IsNullOrEmpty(text))
 					throw new ArgumentNullException(nameof(text));
