@@ -188,45 +188,70 @@ namespace Zongsoft.Common
 		/// 将指定的字节数组转换为其用十六进制数字编码的等效字符串表示形式。
 		/// </summary>
 		/// <param name="bytes">一个 8 位无符号字节数组。</param>
+		/// <param name="lowerCase">返回的十六进制字符串中是否使用小写字符，默认为大写。</param>
 		/// <returns>参数中元素的字符串表示形式，以十六进制文本表示。</returns>
-		public static string ToHexString(byte[] bytes)
+		public static string ToHexString(byte[] bytes, bool lowerCase = false)
 		{
-			return ToHexString(bytes, '\0');
+			return ToHexString(bytes, 0, 0, '\0', lowerCase);
 		}
 
 		/// <summary>
 		/// 将指定的字节数组转换为其用十六进制数字编码的等效字符串表示形式。
 		/// </summary>
 		/// <param name="bytes">一个 8 位无符号字节数组。</param>
-		/// <param name="isLower">返回的十六进制字符串中是否使用小写字符，默认为大写。</param>
+		/// <param name="offset">指定字节数组的起始下标。</param>
+		/// <param name="count">指定字节数组的元素个数。</param>
+		/// <param name="lowerCase">返回的十六进制字符串中是否使用小写字符，默认为大写。</param>
 		/// <returns>参数中元素的字符串表示形式，以十六进制文本表示。</returns>
-		public static string ToHexString(byte[] bytes, bool isLower)
+		public static string ToHexString(byte[] bytes, int offset, int count, bool lowerCase = false)
 		{
-			return ToHexString(bytes, '\0', isLower);
+			return ToHexString(bytes, offset, count, '\0', lowerCase);
 		}
 
 		/// <summary>
-		/// 将指定的字节数组转换为其用十六进制数字编码的等效字符串表示形式。参数指定是否在返回值中插入分隔符。
+		/// 将指定的字节数组转换为其用十六进制数字编码的等效字符串表示形式。
 		/// </summary>
 		/// <param name="bytes">一个 8 位无符号字节数组。</param>
 		/// <param name="separator">每字节对应的十六进制文本中间的分隔符。</param>
-		/// <param name="isLower">返回的十六进制字符串中是否使用小写字符，默认为大写。</param>
+		/// <param name="lowerCase">返回的十六进制字符串中是否使用小写字符，默认为大写。</param>
 		/// <returns>参数中元素的字符串表示形式，以十六进制文本表示。</returns>
-		public static string ToHexString(byte[] bytes, char separator, bool isLower = false)
+		public static string ToHexString(byte[] bytes, char separator, bool lowerCase = false)
 		{
-			if(bytes == null || bytes.Length < 1)
+			return ToHexString(bytes, 0, 0, separator, lowerCase);
+		}
+
+		/// <summary>
+		/// 将指定的字节数组转换为其用十六进制数字编码的等效字符串表示形式。
+		/// </summary>
+		/// <param name="bytes">一个 8 位无符号字节数组。</param>
+		/// <param name="offset">指定字节数组的起始下标。</param>
+		/// <param name="count">指定字节数组的元素个数。</param>
+		/// <param name="separator">每字节对应的十六进制文本中间的分隔符。</param>
+		/// <param name="lowerCase">返回的十六进制字符串中是否使用小写字符，默认为大写。</param>
+		/// <returns>参数中元素的字符串表示形式，以十六进制文本表示。</returns>
+		public static string ToHexString(byte[] bytes, int offset, int count, char separator, bool lowerCase = false)
+		{
+			if(bytes == null || bytes.Length == 0)
 				return string.Empty;
 
-			var alpha = isLower ? 'a' : 'A';
+			if(offset < 0 || offset >= bytes.Length)
+				throw new ArgumentOutOfRangeException(nameof(offset));
+
+			if(count < 1)
+				count = (bytes.Length - offset);
+			else
+				count = Math.Min(bytes.Length - offset, count);
+
+			var alpha = lowerCase ? 'a' : 'A';
 			var rank = separator == '\0' ? 2 : 3;
-			var characters = new char[bytes.Length * rank - (rank - 2)];
+			var characters = new char[count * rank - (rank - 2)];
 
-			for(int i = 0; i < bytes.Length; i++)
+			for(int i = 0; i < count; i++)
 			{
-				characters[i * rank] = GetDigit((byte)(bytes[i] / 16), alpha);
-				characters[i * rank + 1] = GetDigit((byte)(bytes[i] % 16), alpha);
+				characters[i * rank] = GetDigit((byte)(bytes[offset + i] / 16), alpha);
+				characters[i * rank + 1] = GetDigit((byte)(bytes[offset + i] % 16), alpha);
 
-				if(rank == 3 && i < bytes.Length - 1)
+				if(rank == 3 && i < count - 1)
 					characters[i * rank + 2] = separator;
 			}
 
