@@ -60,6 +60,7 @@
     <Compile Include="Collections\HierarchicalNode.cs" />
     <Compile Include="Collections\HierarchicalNodeCollection.cs" />
     <Compile Include="Collections\BinaryComparer.cs" />
+    <Compile Include="Collections\ISelectable.cs" />
     <Compile Include="Collections\INamedCollection.cs" />
     <Compile Include="Collections\IQueueProvider.cs" />
     <Compile Include="Collections\IQueue`1.cs" />
@@ -309,6 +310,7 @@
     <Compile Include="Security\CredentialPrincipal.cs" />
     <Compile Include="Security\ICensorship.cs" />
     <Compile Include="Security\ICredentialValidator.cs" />
+    <Compile Include="Security\IVerifier.cs" />
     <Compile Include="Security\Membership\AuthenticatedEventArgs.cs" />
     <Compile Include="Security\Membership\AuthenticationException.cs" />
     <Compile Include="Security\Membership\AuthenticationReason.cs" />
@@ -376,15 +378,15 @@
     <Compile Include="Services\ICommandExecutor.cs" />
     <Compile Include="Services\ICommandExpressionParser.cs" />
     <Compile Include="Services\ICommandResult.cs" />
-    <Compile Include="Services\IMatchable`1.cs" />
-    <Compile Include="Services\IMatcher.cs" />
-    <Compile Include="Services\IMatcher`1.cs" />
+    <Compile Include="Collections\IMatchable`1.cs" />
+    <Compile Include="Collections\IMatcher.cs" />
+    <Compile Include="Collections\IMatcher`1.cs" />
     <Compile Include="Services\IPredication`1.cs" />
     <Compile Include="Services\IServiceBuilder.cs" />
     <Compile Include="Services\IServiceLifetime.cs" />
     <Compile Include="Services\IServiceStorage.cs" />
-    <Compile Include="Services\MatcherAttribute.cs" />
-    <Compile Include="Services\Matcher.cs" />
+    <Compile Include="Collections\MatcherAttribute.cs" />
+    <Compile Include="Collections\Matcher.cs" />
     <Compile Include="Services\ServiceDependencyAttribute.cs" />
     <Compile Include="Services\ServiceNotFoundException.cs" />
     <Compile Include="Services\PredicationBase.cs" />
@@ -449,7 +451,7 @@
     <Compile Include="Data\IDataAccess.cs" />
     <Compile Include="Data\DataAccessExtension.cs" />
     <Compile Include="Services\ICommand.cs" />
-    <Compile Include="Services\IMatchable.cs" />
+    <Compile Include="Collections\IMatchable.cs" />
     <Compile Include="Services\IServiceProvider.cs" />
     <Compile Include="Services\IServiceProviderFactory.cs" />
     <Compile Include="Services\IWorker.cs" />

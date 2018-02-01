@@ -25,25 +25,12 @@
  */
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 
-namespace Zongsoft.Services
+namespace Zongsoft.Collections
 {
-	public interface IServiceStorage : IEnumerable<ServiceEntry>
+	public interface IMatcher
 	{
-		Collections.IMatcher Matcher
-		{
-			get;
-			set;
-		}
-
-		void Clear();
-		void Add(ServiceEntry entry);
-		ServiceEntry Remove(string name);
-
-		ServiceEntry Get(string name);
-		ServiceEntry Get(Type type, object parameter = null);
-		IEnumerable<ServiceEntry> GetAll(Type type, object parameter = null);
+		bool Match(object target, object parameter);
 	}
 }

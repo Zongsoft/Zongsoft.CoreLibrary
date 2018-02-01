@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2014 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2013 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,12 +25,27 @@
  */
 
 using System;
-using System.Collections.Generic;
+using System.Collections;
 
-namespace Zongsoft.Services
+namespace Zongsoft.Collections
 {
-	public interface IMatcher
+	/// <summary>
+	/// 表示可匹配元素集的接口。
+	/// </summary>
+	public interface ISelectable
 	{
-		bool Match(object target, object parameter);
+		/// <summary>
+		/// 选取匹配指定参数的元素。
+		/// </summary>
+		/// <param name="parameter">指定要进行匹配的参数。</param>
+		/// <returns>返回首个匹配成功的元素。</returns>
+		object Select(object parameter);
+
+		/// <summary>
+		/// 选取匹配指定参数的元素集。
+		/// </summary>
+		/// <param name="parameter">指定要进行匹配的参数。</param>
+		/// <returns>返回所有匹配成功的元素集。</returns>
+		IEnumerable SelectMany(object parameter);
 	}
 }

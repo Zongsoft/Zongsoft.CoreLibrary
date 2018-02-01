@@ -27,8 +27,6 @@
 using System;
 using System.Collections.Generic;
 
-using Zongsoft.Runtime.Serialization;
-
 namespace Zongsoft.Collections
 {
 	[Serializable]

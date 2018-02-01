@@ -34,16 +34,16 @@ namespace Zongsoft.Services
 	public abstract class ServiceStorageBase : IServiceStorage, IEnumerable<ServiceEntry>
 	{
 		#region 成员字段
-		private IMatcher _matcher;
+		private Collections.IMatcher _matcher;
 		private IServiceProvider _provider;
 		#endregion
 
 		#region 构造函数
-		protected ServiceStorageBase(IServiceProvider provider) : this(provider, Zongsoft.Services.Matcher.Default)
+		protected ServiceStorageBase(IServiceProvider provider) : this(provider, Zongsoft.Collections.Matcher.Default)
 		{
 		}
 
-		protected ServiceStorageBase(IServiceProvider provider, IMatcher matcher)
+		protected ServiceStorageBase(IServiceProvider provider, Collections.IMatcher matcher)
 		{
 			if(provider == null)
 				throw new ArgumentNullException("provider");
@@ -59,7 +59,7 @@ namespace Zongsoft.Services
 			get;
 		}
 
-		public IMatcher Matcher
+		public Collections.IMatcher Matcher
 		{
 			get
 			{
@@ -167,7 +167,7 @@ namespace Zongsoft.Services
 			if(entry == null)
 				return false;
 
-			var matcher = this.Matcher ?? Zongsoft.Services.Matcher.Default;
+			var matcher = this.Matcher ?? Zongsoft.Collections.Matcher.Default;
 			return matcher.Match(entry.Service, parameter);
 		}
 		#endregion

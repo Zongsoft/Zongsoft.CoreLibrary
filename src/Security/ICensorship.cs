@@ -30,7 +30,7 @@ using System.Collections.Generic;
 namespace Zongsoft.Security
 {
 	/// <summary>
-	/// 表示单词或词语的审查。
+	/// 提供单词或词语审查功能的接口。
 	/// </summary>
 	public interface ICensorship
 	{

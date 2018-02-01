@@ -28,7 +28,7 @@ using System;
 
 namespace Zongsoft.Text
 {
-	public interface ITextRegular : Zongsoft.Services.IMatchable<string>
+	public interface ITextRegular : Zongsoft.Collections.IMatchable<string>
 	{
 		bool IsMatch(string text, out string result);
 	}

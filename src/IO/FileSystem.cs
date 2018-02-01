@@ -219,7 +219,7 @@ namespace Zongsoft.IO
 		#endregion
 
 		#region 匹配器类
-		public class Matcher : Zongsoft.Services.IMatcher<string>
+		public class Matcher : Zongsoft.Collections.IMatcher<string>
 		{
 			public bool Match(object target, string parameter)
 			{
@@ -227,7 +227,7 @@ namespace Zongsoft.IO
 				return fileSystem != null && string.Equals(fileSystem.Scheme, parameter, StringComparison.OrdinalIgnoreCase);
 			}
 
-			bool Zongsoft.Services.IMatcher.Match(object target, object parameter)
+			bool Zongsoft.Collections.IMatcher.Match(object target, object parameter)
 			{
 				var fileSystem = target as IFileSystem;
 				return fileSystem != null && string.Equals(fileSystem.Scheme, (parameter as string), StringComparison.OrdinalIgnoreCase);

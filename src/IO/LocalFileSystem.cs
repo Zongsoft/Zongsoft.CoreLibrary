@@ -32,7 +32,7 @@ using System.Text.RegularExpressions;
 
 namespace Zongsoft.IO
 {
-	[Zongsoft.Services.Matcher(typeof(FileSystem.Matcher))]
+	[Zongsoft.Collections.Matcher(typeof(FileSystem.Matcher))]
 	public class LocalFileSystem : IFileSystem
 	{
 		#region 单例字段

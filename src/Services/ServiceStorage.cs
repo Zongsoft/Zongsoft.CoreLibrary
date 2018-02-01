@@ -39,11 +39,11 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 构造函数
-		public ServiceStorage(IServiceProvider provider) : this(provider, Zongsoft.Services.Matcher.Default)
+		public ServiceStorage(IServiceProvider provider) : this(provider, Zongsoft.Collections.Matcher.Default)
 		{
 		}
 
-		public ServiceStorage(IServiceProvider provider, IMatcher matcher) : base(provider, matcher)
+		public ServiceStorage(IServiceProvider provider, Collections.IMatcher matcher) : base(provider, matcher)
 		{
 			_entries = new List<ServiceEntry>();
 			_namedEntries = new ConcurrentDictionary<string, ServiceEntry>(StringComparer.OrdinalIgnoreCase);

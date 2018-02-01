@@ -28,7 +28,7 @@ using System;
 
 namespace Zongsoft.Services
 {
-	public abstract class PredicationBase<T> : IPredication<T>, IMatchable<string>
+	public abstract class PredicationBase<T> : IPredication<T>, Collections.IMatchable<string>
 	{
 		#region 成员字段
 		private string _name;
@@ -76,7 +76,7 @@ namespace Zongsoft.Services
 			return string.Equals(this.Name, parameter, StringComparison.OrdinalIgnoreCase);
 		}
 
-		bool IMatchable.IsMatch(object parameter)
+		bool Collections.IMatchable.IsMatch(object parameter)
 		{
 			return this.IsMatch(parameter as string);
 		}

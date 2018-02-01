@@ -27,7 +27,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Zongsoft.Services
+namespace Zongsoft.Collections
 {
 	[AttributeUsage(AttributeTargets.Class)]
 	public class MatcherAttribute : Attribute

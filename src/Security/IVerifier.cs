@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2014 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,25 +25,21 @@
  */
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
 
-namespace Zongsoft.Services
+namespace Zongsoft.Security
 {
-	public interface IServiceStorage : IEnumerable<ServiceEntry>
+	/// <summary>
+	/// 提供校验功能的接口。
+	/// </summary>
+	/// <typeparam name="T">校验值的类型参数。</typeparam>
+	public interface IVerifier<T>
 	{
-		Collections.IMatcher Matcher
-		{
-			get;
-			set;
-		}
-
-		void Clear();
-		void Add(ServiceEntry entry);
-		ServiceEntry Remove(string name);
-
-		ServiceEntry Get(string name);
-		ServiceEntry Get(Type type, object parameter = null);
-		IEnumerable<ServiceEntry> GetAll(Type type, object parameter = null);
+		/// <summary>
+		/// 校验方法。
+		/// </summary>
+		/// <param name="name">指定的校验标识名。</param>
+		/// <param name="value">指定的待校验的值。</param>
+		/// <returns>返回校验是否成功。</returns>
+		bool Verify(string name, T value);
 	}
 }
