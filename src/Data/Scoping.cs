@@ -51,6 +51,9 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取范围包含的元素数量。
+		/// </summary>
 		public int Count
 		{
 			get
@@ -154,12 +157,18 @@ namespace Zongsoft.Data
 			return this;
 		}
 
-		public string[] ToArray(Func<IEnumerable<string>> starThunk = null)
+		/// <summary>
+		/// 将当前范围转换映射成元素数值。
+		/// </summary>
+		/// <param name="map">指定的映射函数，回调的映射函数参数为空则表示初始化；否则即为通配符（譬如：“*” 星号表示所有可用元素）。</param>
+		/// <returns>返回映射后的元素数组。</returns>
+		public string[] ToArray(Func<string, IEnumerable<string>> map = null)
 		{
-			if(starThunk == null)
+			if(map == null)
 				return _items.ToArray();
 
-			var result = new HashSet<string>(starThunk(), StringComparer.OrdinalIgnoreCase);
+			var initialized = false;
+			var result = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
 			foreach(var item in _items)
 			{
@@ -171,18 +180,46 @@ namespace Zongsoft.Data
 					switch(item)
 					{
 						case "!":
+							//确保后续不用再进行初始化处理
+							initialized = true;
+
+							//清空结果集
 							result.Clear();
+
 							break;
 						case "*":
-							result.UnionWith(starThunk());
+							//确保后续不用再进行初始化处理
+							initialized = true;
+
+							//处理通配符映射
+							result.UnionWith(map(item));
+
+							break;
+						default:
+							//确认是否需要初始化，如果需要则初始化
+							if(!initialized)
+								result.UnionWith(map(null));
+
+							//将当前元素加入结果集
+							result.Add(item);
+
 							break;
 					}
 				}
 				else
 				{
+					//确认是否需要初始化，如果需要则初始化
+					if(!initialized)
+						result.UnionWith(map(null));
+
 					if(item[0] == '!')
 						result.Remove(item.Substring(1));
+					else
+						result.Add(item);
 				}
+
+				//设置初始化标记为已完成，即初始化最多只能进行一次
+				initialized = true;
 			}
 
 			return result.ToArray();
