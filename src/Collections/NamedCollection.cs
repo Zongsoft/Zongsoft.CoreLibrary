@@ -167,7 +167,7 @@ namespace Zongsoft.Collections
 			_items.Add(item);
 		}
 
-		public T Get(string name, bool throwsOnNotExisted)
+		public T Get(string name, Func<Exception> onError)
 		{
 			T result;
 
@@ -185,10 +185,52 @@ namespace Zongsoft.Collections
 					return result;
 			}
 
-			if(throwsOnNotExisted)
-				throw new KeyNotFoundException();
+			if(onError != null)
+				throw onError() ?? new KeyNotFoundException();
 
-			return default(T);
+			throw new KeyNotFoundException();
+		}
+
+		public T Get(string name)
+		{
+			T result;
+
+			if(_innerDictionary == null)
+			{
+				foreach(var item in _items)
+				{
+					if(this.OnItemMatch(item) && _comparer.Compare(this.GetKeyForItem((T)item), name) == 0)
+						return (T)item;
+				}
+			}
+			else
+			{
+				if(_innerDictionary.TryGetValue(name, out result))
+					return result;
+			}
+
+			throw new KeyNotFoundException();
+		}
+
+		public bool TryGet(string name, out T value)
+		{
+			if(_innerDictionary != null)
+				return _innerDictionary.TryGetValue(name, out value);
+
+			foreach(var item in _items)
+			{
+				if(this.OnItemMatch(item) && _comparer.Compare(this.GetKeyForItem((T)item), name) == 0)
+				{
+					value = (T)item;
+					return true;
+				}
+			}
+
+			//设置输出参数默认值
+			value = default(T);
+
+			//返回查找失败
+			return false;
 		}
 
 		public void Clear()

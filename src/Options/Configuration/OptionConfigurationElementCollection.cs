@@ -255,7 +255,7 @@ namespace Zongsoft.Options.Configuration
 		#endregion
 
 		#region 显式实现
-		OptionConfigurationElement Collections.INamedCollection<OptionConfigurationElement>.Get(string name, bool throwsOnNotExisted)
+		OptionConfigurationElement Collections.INamedCollection<OptionConfigurationElement>.Get(string name)
 		{
 			if(name == null)
 				throw new ArgumentNullException(nameof(name));
@@ -265,10 +265,31 @@ namespace Zongsoft.Options.Configuration
 			if(_dictionary.TryGetValue(name, out element))
 				return element;
 
-			if(throwsOnNotExisted)
-				throw new KeyNotFoundException();
+			throw new KeyNotFoundException();
+		}
 
-			return null;
+		OptionConfigurationElement Collections.INamedCollection<OptionConfigurationElement>.Get(string name, Func<Exception> onError)
+		{
+			if(name == null)
+				throw new ArgumentNullException(nameof(name));
+
+			OptionConfigurationElement element;
+
+			if(_dictionary.TryGetValue(name, out element))
+				return element;
+
+			if(onError != null)
+				throw onError() ?? new KeyNotFoundException();
+
+			throw new KeyNotFoundException();
+		}
+
+		bool Collections.INamedCollection<OptionConfigurationElement>.TryGet(string name, out OptionConfigurationElement value)
+		{
+			if(name == null)
+				throw new ArgumentNullException(nameof(name));
+
+			return _dictionary.TryGetValue(name, out value);
 		}
 
 		bool ICollection<OptionConfigurationElement>.IsReadOnly

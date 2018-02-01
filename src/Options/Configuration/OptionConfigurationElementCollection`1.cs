@@ -80,14 +80,35 @@ namespace Zongsoft.Options.Configuration
 		#endregion
 
 		#region 显式实现
-		TElement Collections.INamedCollection<TElement>.Get(string name, bool throwsOnNotExisted)
+		TElement Collections.INamedCollection<TElement>.Get(string name)
 		{
 			var result = base.GetElement(name);
 
-			if(result == null && throwsOnNotExisted)
+			if(result == null)
 				throw new KeyNotFoundException();
 
 			return (TElement)result;
+		}
+
+		TElement Collections.INamedCollection<TElement>.Get(string name, Func<Exception> onError)
+		{
+			var result = base.GetElement(name);
+
+			if(result == null)
+			{
+				if(onError != null)
+					throw onError() ?? new KeyNotFoundException();
+
+				throw new KeyNotFoundException();
+			}
+
+			return (TElement)result;
+		}
+
+		bool Collections.INamedCollection<TElement>.TryGet(string name, out TElement value)
+		{
+			value = (TElement)base.GetElement(name);
+			return value != null;
 		}
 
 		bool ICollection<TElement>.IsReadOnly

@@ -33,16 +33,8 @@ namespace Zongsoft.Collections
 	/// 表示命名集合基类的接口。
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	public interface INamedCollection<out T> : IEnumerable<T>
+	public interface INamedCollection<T> : ICollection<T>
 	{
-		/// <summary>
-		/// 获取一个值，指示当前集合的成员数。
-		/// </summary>
-		int Count
-		{
-			get;
-		}
-
 		/// <summary>
 		/// 判断当前集合是否包含指定名称的元素。
 		/// </summary>
@@ -54,9 +46,31 @@ namespace Zongsoft.Collections
 		/// 获取指定名称的元素。
 		/// </summary>
 		/// <param name="name">指定要获取的元素名。</param>
-		/// <param name="throwsOnNotExisted">指定一个值，指示当指定名称的元素不存在时是否抛出异常。</param>
-		/// <returns>返回指定名称的元素对象，如果没有找到则返回空(null)或抛出异常。。</returns>
-		/// <exception cref="KeyNotFoundException">当指定名称的元素不存在并且<paramref name="throwsOnNotExisted"/>参数为真(True)。</exception>
-		T Get(string name, bool throwsOnNotExisted);
+		/// <returns>返回指定名称的元素对象，如果没有找到则抛出<seealso cref="KeyNotFoundException"/>异常。</returns>
+		/// <exception cref="KeyNotFoundException">当指定<paramref name="name"/>名称的元素不存在则激发该异常。</exception>
+		T Get(string name);
+
+		/// <summary>
+		/// 获取指定名称的元素。
+		/// </summary>
+		/// <param name="name">指定要获取的元素名。</param>
+		/// <param name="onError">当指定名称的元素不存在时的回调委托；如果该参数为空(null)或返回值为空(null)，则查找失败时默认抛出<seealso cref="KeyNotFoundException"/>异常。</param>
+		/// <returns>返回指定名称的元素对象，如果没有找到则抛出<paramref name="onError"/>参数返回的异常。</returns>
+		T Get(string name, Func<Exception> onError);
+
+		/// <summary>
+		/// 尝试获取指定名称的元素。
+		/// </summary>
+		/// <param name="name">指定要获取的元素名。</param>
+		/// <param name="value">输出参数，包含指定名称的元素对象。</param>
+		/// <returns>返回一个值，指示指定名称的元素是否获取成功。</returns>
+		bool TryGet(string name, out T value);
+
+		/// <summary>
+		/// 删除指定名称的元素。
+		/// </summary>
+		/// <param name="name">指定要删除的元素名。</param>
+		/// <returns>如果删除成功则返回真（True），否则返回假（False）。</returns>
+		bool Remove(string name);
 	}
 }

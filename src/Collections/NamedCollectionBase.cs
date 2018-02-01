@@ -34,7 +34,7 @@ namespace Zongsoft.Collections
 	{
 		#region 成员字段
 		private StringComparer _comparer;
-		private IDictionary<string, T> _innerDictionary;
+		private Dictionary<string, T> _innerDictionary;
 		#endregion
 
 		#region 构造函数
@@ -112,7 +112,7 @@ namespace Zongsoft.Collections
 			return _innerDictionary.ContainsKey(name ?? string.Empty);
 		}
 
-		public T Get(string name, bool throwsOnNotExisted)
+		public T Get(string name, Func<Exception> onError)
 		{
 			name = name ?? string.Empty;
 
@@ -121,10 +121,28 @@ namespace Zongsoft.Collections
 			if(_innerDictionary.TryGetValue(name, out result))
 				return result;
 
-			if(throwsOnNotExisted)
-				throw new KeyNotFoundException();
+			if(onError != null)
+				throw onError() ?? new KeyNotFoundException();
 
-			return default(T);
+			throw new KeyNotFoundException();
+		}
+
+		public T Get(string name)
+		{
+			name = name ?? string.Empty;
+
+			T result;
+
+			if(_innerDictionary.TryGetValue(name, out result))
+				return result;
+
+			throw new KeyNotFoundException();
+		}
+
+		public bool TryGet(string name, out T value)
+		{
+			name = name ?? string.Empty;
+			return _innerDictionary.TryGetValue(name, out value);
 		}
 
 		public bool Remove(string name)
