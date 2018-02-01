@@ -66,6 +66,8 @@
     <Compile Include="Collections\KeyValuePairExtension.cs" />
     <Compile Include="Collections\NamedCollectionBase.cs" />
     <Compile Include="Collections\NamedCollection.cs" />
+    <Compile Include="Collections\NamedCollectionBaseEx.cs" />
+    <Compile Include="Collections\NamedCollectionEx.cs" />
     <Compile Include="Collections\ObjectCache.cs" />
     <Compile Include="Common\Activator.cs" />
     <Compile Include="Common\ActivatorParameterDescriptor.cs" />
@@ -204,6 +206,8 @@
     <Compile Include="IO\LocalFileSystem.cs" />
     <Compile Include="IO\Path.cs" />
     <Compile Include="IO\PathException.cs" />
+    <Compile Include="IO\BinaryReaderExtension.cs" />
+    <Compile Include="IO\TextReaderExtension.cs" />
     <Compile Include="Messaging\TopicMessage.cs" />
     <Compile Include="Messaging\TopicReceiverBase.cs" />
     <Compile Include="Messaging\TopicSubscriptionFallbackBehavior.cs" />
@@ -484,6 +488,7 @@
     <Compile Include="Text\Evaluation\RandomEvaluator.cs" />
     <Compile Include="Text\IParser.cs" />
     <Compile Include="Text\ITemplateEvaluator.cs" />
+    <Compile Include="Communication\INotifier.cs" />
     <Compile Include="Text\ITextRegular.cs" />
     <Compile Include="Text\ParserContextBase.cs" />
     <Compile Include="Text\ParserExpression.cs" />
@@ -533,7 +538,9 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Data\Common\" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

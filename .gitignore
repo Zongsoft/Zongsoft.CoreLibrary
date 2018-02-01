@@ -15,6 +15,7 @@ build/
 bld/
 [Bb]in/
 [Oo]bj/
+.vs/
 
 # MSTest test Results
 [Tt]est[Rr]esult*/
@@ -173,4 +174,3 @@ UpgradeLog*.htm
 # Microsoft Fakes
 FakesAssemblies/
 *.nupkg
-src/.vs/Zongsoft.CoreLibrary/v15/sqlite3/storage.ide
