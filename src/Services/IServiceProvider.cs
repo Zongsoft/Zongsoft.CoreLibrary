@@ -29,7 +29,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Services
 {
-	public interface IServiceProvider : System.IServiceProvider
+	public interface IServiceProvider : System.IServiceProvider, Collections.ISelectable
 	{
 		#region 事件定义
 		event EventHandler<ServiceRegisteredEventArgs> Registered;
@@ -72,17 +72,17 @@ namespace Zongsoft.Services
 		object ResolveRequired(Type type);
 		object ResolveRequired(Type type, object parameter);
 
-		T Resolve<T>() where T : class;
-		T Resolve<T>(object parameter) where T : class;
+		T Resolve<T>();
+		T Resolve<T>(object parameter);
 
-		T ResolveRequired<T>() where T : class;
-		T ResolveRequired<T>(object parameter) where T : class;
+		T ResolveRequired<T>();
+		T ResolveRequired<T>(object parameter);
 
 		IEnumerable<object> ResolveAll(Type type);
 		IEnumerable<object> ResolveAll(Type type, object parameter);
 
-		IEnumerable<T> ResolveAll<T>() where T : class;
-		IEnumerable<T> ResolveAll<T>(object parameter) where T : class;
+		IEnumerable<T> ResolveAll<T>();
+		IEnumerable<T> ResolveAll<T>(object parameter);
 		#endregion
 	}
 }

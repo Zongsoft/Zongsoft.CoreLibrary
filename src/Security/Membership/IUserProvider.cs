@@ -221,11 +221,8 @@ namespace Zongsoft.Security.Membership
 		/// </summary>
 		/// <param name="identity">要重置密码的用户标识，仅限用户的“邮箱地址”或“手机号码”。</param>
 		/// <param name="namespace">指定的用户标识所属的命名空间。</param>
-		/// <param name="secret">指定的验证码。</param>
-		/// <param name="timeout">指定验证码的有效期，默认为60分钟。</param>
-		/// <exception cref="System.ArgumentNullException"><paramref name="secret"/>参数为空(null)或全空白字符串。</exception>
 		/// <returns>返回<paramref name="identity"/>参数对应的用户编号，如果指定用户标识不存在则返回零。</returns>
-		uint ForgetPassword(string identity, string @namespace, string secret, TimeSpan? timeout = null);
+		uint ForgetPassword(string identity, string @namespace);
 
 		/// <summary>
 		/// 重置指定用户的密码，以验证码摘要的方式进行密码重置。
@@ -283,18 +280,17 @@ namespace Zongsoft.Security.Membership
 		/// <param name="passwordAnswers">当前用户的密码问答的答案集。</param>
 		/// <returns>如果设置成则返回真(True)，否则返回假(False)。</returns>
 		bool SetPasswordQuestionsAndAnswers(uint userId, string password, string[] passwordQuestions, string[] passwordAnswers);
+		#endregion
 
+		#region 秘密校验
 		/// <summary>
-		/// 设置指定用户的密码参数选项。
+		/// 校验指定的秘钥是否正确。
 		/// </summary>
-		/// <param name="userId">要设置的用户编号。</param>
-		/// <param name="changePasswordOnFirstTime">用户第一次登入是否必须变更密码的参数选项。</param>
-		/// <param name="maxInvalidPasswordAttempts">锁定用户前允许的无效密码或无效密码提示问题答案尝试次数。</param>
-		/// <param name="minRequiredPasswordLength">密码所要求的最小长度。</param>
-		/// <param name="passwordAttemptWindow">无效密码被锁定后到下次解锁的间隔分钟数。</param>
-		/// <param name="passwordExpires">密码的过期时间。</param>
-		/// <returns>如果设置成功则返回真(True)，否则返回假(False)。</returns>
-		bool SetPasswordOptions(uint userId, bool changePasswordOnFirstTime = false, byte maxInvalidPasswordAttempts = 3, byte minRequiredPasswordLength = 6, TimeSpan? passwordAttemptWindow = null, DateTime? passwordExpires = null);
+		/// <param name="name">指定的待校验的类型名。</param>
+		/// <param name="secret">指定的待校验的秘钥。</param>
+		/// <param name="state">指定的校验附加参数。</param>
+		/// <returns>如果校验成功则返回真(True)，否则返回假(False)。</returns>
+		bool Verify(string name, string secret, object state = null);
 		#endregion
 	}
 }

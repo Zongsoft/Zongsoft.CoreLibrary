@@ -26,6 +26,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Zongsoft.Collections
 {
@@ -37,15 +38,33 @@ namespace Zongsoft.Collections
 		/// <summary>
 		/// 选取匹配指定参数的元素。
 		/// </summary>
+		/// <typeparam name="T">指定要匹配的元素类型。</typeparam>
 		/// <param name="parameter">指定要进行匹配的参数。</param>
 		/// <returns>返回首个匹配成功的元素。</returns>
-		object Select(object parameter);
+		T Select<T>(object parameter = null);
+
+		/// <summary>
+		/// 选取匹配指定参数的元素。
+		/// </summary>
+		/// <param name="type">指定要匹配的元素类型。</param>
+		/// <param name="parameter">指定要进行匹配的参数。</param>
+		/// <returns>返回首个匹配成功的元素。</returns>
+		object Select(Type type, object parameter = null);
 
 		/// <summary>
 		/// 选取匹配指定参数的元素集。
 		/// </summary>
+		/// <typeparam name="T">指定要匹配的元素类型。</typeparam>
 		/// <param name="parameter">指定要进行匹配的参数。</param>
 		/// <returns>返回所有匹配成功的元素集。</returns>
-		IEnumerable SelectMany(object parameter);
+		IEnumerable<T> SelectAll<T>(object parameter = null);
+
+		/// <summary>
+		/// 选取匹配指定参数的元素集。
+		/// </summary>
+		/// <param name="type">指定要匹配的元素类型。</param>
+		/// <param name="parameter">指定要进行匹配的参数。</param>
+		/// <returns>返回所有匹配成功的元素集。</returns>
+		IEnumerable SelectAll(Type type, object parameter = null);
 	}
 }

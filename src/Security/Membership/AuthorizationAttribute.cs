@@ -38,7 +38,7 @@ namespace Zongsoft.Security.Membership
 		private string[] _roles;
 		private AuthorizationMode _mode;
 		private Type _validatorType;
-		private ICredentialValidator _validator;
+		private Common.IValidator<Credential> _validator;
 		#endregion
 
 		#region 构造函数
@@ -115,31 +115,6 @@ namespace Zongsoft.Security.Membership
 		}
 
 		/// <summary>
-		/// 获取凭证验证器实例。
-		/// </summary>
-		public virtual ICredentialValidator Validator
-		{
-			get
-			{
-				if(_validator == null)
-				{
-					var type = this.ValidatorType;
-
-					if(type == null)
-						return null;
-
-					lock(type)
-					{
-						if(_validator == null)
-							_validator = Activator.CreateInstance(type) as ICredentialValidator;
-					}
-				}
-
-				return _validator;
-			}
-		}
-
-		/// <summary>
 		/// 获取或设置凭证验证器的类型。
 		/// </summary>
 		public Type ValidatorType
@@ -153,12 +128,41 @@ namespace Zongsoft.Security.Membership
 				if(_validatorType == value)
 					return;
 
-				if(value != null && !typeof(ICredentialValidator).IsAssignableFrom(value))
+				if(value != null && !typeof(Common.IValidator<Credential>).IsAssignableFrom(value))
 					throw new ArgumentException();
 
 				_validatorType = value;
 				_validator = null;
 			}
+		}
+		#endregion
+
+		#region 公共方法
+		/// <summary>
+		/// 获取凭证验证器实例。
+		/// </summary>
+		public virtual Common.IValidator<Credential> GetValidator(Func<Type, Common.IValidator<Credential>> creator = null)
+		{
+			if(_validator == null)
+			{
+				var type = this.ValidatorType;
+
+				if(type == null)
+					return null;
+
+				if(creator == null)
+					creator = _ => Activator.CreateInstance(_) as Common.IValidator<Credential>;
+
+				lock(type)
+				{
+					if(_validator == null)
+					{
+						_validator = creator(type);
+					}
+				}
+			}
+
+			return _validator;
 		}
 		#endregion
 	}

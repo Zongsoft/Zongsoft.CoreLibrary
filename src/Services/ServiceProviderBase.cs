@@ -30,7 +30,7 @@ using System.Linq;
 
 namespace Zongsoft.Services
 {
-	public class ServiceProviderBase : IServiceProvider, System.IServiceProvider
+	public class ServiceProviderBase : IServiceProvider, System.IServiceProvider, Collections.ISelectable
 	{
 		#region 事件声明
 		public event EventHandler<ServiceRegisteredEventArgs> Registered;
@@ -247,17 +247,17 @@ namespace Zongsoft.Services
 			return result;
 		}
 
-		public T Resolve<T>() where T : class
+		public T Resolve<T>()
 		{
 			return (T)this.Resolve(typeof(T), null);
 		}
 
-		public T Resolve<T>(object parameter) where T : class
+		public T Resolve<T>(object parameter)
 		{
 			return (T)this.Resolve(typeof(T), parameter);
 		}
 
-		public T ResolveRequired<T>() where T : class
+		public T ResolveRequired<T>()
 		{
 			var result = this.Resolve<T>();
 
@@ -267,7 +267,7 @@ namespace Zongsoft.Services
 			return result;
 		}
 
-		public T ResolveRequired<T>(object parameter) where T : class
+		public T ResolveRequired<T>(object parameter)
 		{
 			var result = this.Resolve<T>(parameter);
 
@@ -310,12 +310,12 @@ namespace Zongsoft.Services
 			return result;
 		}
 
-		public IEnumerable<T> ResolveAll<T>() where T : class
+		public IEnumerable<T> ResolveAll<T>()
 		{
 			return this.ResolveAll(typeof(T), null).Cast<T>();
 		}
 
-		public IEnumerable<T> ResolveAll<T>(object parameter) where T : class
+		public IEnumerable<T> ResolveAll<T>(object parameter)
 		{
 			return this.ResolveAll(typeof(T), parameter).Cast<T>();
 		}
@@ -358,6 +358,28 @@ namespace Zongsoft.Services
 		protected virtual ServiceEntry CreateEntry(string name, Type serviceType, Type[] contractTypes)
 		{
 			return new ServiceEntry(name, serviceType, contractTypes);
+		}
+		#endregion
+
+		#region 选择方法
+		T Collections.ISelectable.Select<T>(object parameter)
+		{
+			return this.Resolve<T>(parameter);
+		}
+
+		object Collections.ISelectable.Select(Type type, object parameter)
+		{
+			return this.Resolve(type, parameter);
+		}
+
+		IEnumerable<T> Collections.ISelectable.SelectAll<T>(object parameter)
+		{
+			return this.ResolveAll<T>(parameter);
+		}
+
+		System.Collections.IEnumerable Collections.ISelectable.SelectAll(Type type, object parameter)
+		{
+			return this.ResolveAll(type, parameter);
 		}
 		#endregion
 

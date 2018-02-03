@@ -27,31 +27,29 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Zongsoft.Communication
+namespace Zongsoft.Security
 {
 	/// <summary>
-	/// 表示通知激发器的接口。
+	/// 提供秘密校验通知功能的接口。
 	/// </summary>
-	public interface INotifier
+	public interface ISecretNotifier
 	{
 		/// <summary>
-		/// 激发一个通知给指定的接受者。
+		/// 发送通知。
 		/// </summary>
-		/// <param name="name">指定要激发的通知名。</param>
-		/// <param name="content">指定的通知内容。</param>
-		/// <param name="destination">指定通知的接受者，由具体实现者定义支持的接受者类型。</param>
-		/// <param name="settings">指定的通知设置。</param>
-		/// <returns>返回通知结果对象，由具体实现者定义。</returns>
-		Common.IExecutionResult Notify(string name, object content, object destination, object settings = null);
+		/// <param name="name">指定的通知名。</param>
+		/// <param name="parameter">激发通知的参数对象。</param>
+		/// <param name="state">激发通知的附加状态值。</param>
+		/// <returns>返回的通知结果。</returns>
+		Common.IExecutionResult Notify(string name, object parameter, object state = null);
 
 		/// <summary>
-		/// 异步激发一个通知给指定的接受者。
+		/// 异步发送通知。
 		/// </summary>
-		/// <param name="name">指定要激发的通知名。</param>
-		/// <param name="content">指定的通知内容。</param>
-		/// <param name="destination">指定通知的接受者，由具体实现者定义支持的接受者类型。</param>
-		/// <param name="settings">指定的通知设置。</param>
-		/// <returns>返回通知结果对象，由具体实现者定义。</returns>
-		Task<Common.IExecutionResult> NotifyAsync(string name, object content, object destination, object settings = null);
+		/// <param name="name">指定的通知名。</param>
+		/// <param name="parameter">激发通知的参数对象。</param>
+		/// <param name="state">激发通知的附加状态值。</param>
+		/// <returns>返回的通知结果。</returns>
+		Task<Common.IExecutionResult> NotifyAsync(string name, object parameter, object state = null);
 	}
 }

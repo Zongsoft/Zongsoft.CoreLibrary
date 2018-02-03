@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -27,18 +27,22 @@
 using System;
 using System.Collections.Generic;
 
-namespace Zongsoft.Security
+namespace Zongsoft.Common
 {
-	/// <summary>
-	/// 表示凭证检验器的接口。
-	/// </summary>
-	public interface ICredentialValidator
+	public interface IExecutionHandler<in T> : IExecutionHandler
 	{
 		/// <summary>
-		/// 校验指定的凭证是否有效。
+		/// 确认当前处理程序能否处理本次执行请求。
 		/// </summary>
-		/// <param name="credential">指定的要检验的<seealso cref="Credential"/>凭证对象。</param>
-		/// <returns>如果检验成功则返回真(True)，否则返回假(False)。</returns>
-		bool Validate(Credential credential);
+		/// <param name="parameter">当前执行的请求参数。</param>
+		/// <returns>如果能处理本次执行请求则返回真(true)，否则返回假(false)。</returns>
+		bool CanHandle(T parameter);
+
+		/// <summary>
+		/// 处理本次执行请求。
+		/// </summary>
+		/// <param name="parameter">当前执行的请求参数。</param>
+		/// <returns>返回执行结果。约定当结果为空(null)表示处理成功。</returns>
+		IExecutionResult Handle(T parameter);
 	}
 }

@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,21 +25,45 @@
  */
 
 using System;
+using System.Collections.Generic;
 
-namespace Zongsoft.Security
+namespace Zongsoft.Common
 {
 	/// <summary>
-	/// 提供校验功能的接口。
+	/// 表示执行结果的接口。
 	/// </summary>
-	/// <typeparam name="T">校验值的类型参数。</typeparam>
-	public interface IVerifier<T>
+	public interface IExecutionResult
 	{
 		/// <summary>
-		/// 校验方法。
+		/// 获取一个值，指示执行是否成功。
 		/// </summary>
-		/// <param name="name">指定的校验标识名。</param>
-		/// <param name="value">指定的待校验的值。</param>
-		/// <returns>返回校验是否成功。</returns>
-		bool Verify(string name, T value);
+		bool Succeed
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取执行失败的原因代号。
+		/// </summary>
+		string Code
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取执行失败的消息。
+		/// </summary>
+		string Message
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取执行结果。
+		/// </summary>
+		object Result
+		{
+			get;
+		}
 	}
 }
