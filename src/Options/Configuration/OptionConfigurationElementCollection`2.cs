@@ -90,21 +90,6 @@ namespace Zongsoft.Options.Configuration
 			return (TElement)result;
 		}
 
-		TContract Collections.INamedCollection<TContract>.Get(string name, Func<Exception> onError)
-		{
-			var result = base.GetElement(name);
-
-			if(result == null)
-			{
-				if(onError != null)
-					throw onError() ?? new KeyNotFoundException();
-
-				throw new KeyNotFoundException();
-			}
-
-			return (TElement)result;
-		}
-
 		bool Collections.INamedCollection<TContract>.TryGet(string name, out TContract value)
 		{
 			value = (TElement)base.GetElement(name);

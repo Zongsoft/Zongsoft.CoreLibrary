@@ -51,14 +51,6 @@ namespace Zongsoft.Collections
 		T Get(string name);
 
 		/// <summary>
-		/// 获取指定名称的元素。
-		/// </summary>
-		/// <param name="name">指定要获取的元素名。</param>
-		/// <param name="onError">当指定名称的元素不存在时的回调委托；如果该参数为空(null)或返回值为空(null)，则查找失败时默认抛出<seealso cref="KeyNotFoundException"/>异常。</param>
-		/// <returns>返回指定名称的元素对象，如果没有找到则抛出<paramref name="onError"/>参数返回的异常。</returns>
-		T Get(string name, Func<Exception> onError);
-
-		/// <summary>
 		/// 尝试获取指定名称的元素。
 		/// </summary>
 		/// <param name="name">指定要获取的元素名。</param>

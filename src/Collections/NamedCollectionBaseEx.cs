@@ -132,19 +132,6 @@ namespace Zongsoft.Collections
 			throw new KeyNotFoundException();
 		}
 
-		public T Get(string name, Func<Exception> onError)
-		{
-			T value;
-
-			if(_innerDictionary.TryGetValue(name, out value))
-				return value;
-
-			if(onError != null)
-				throw onError() ?? new KeyNotFoundException();
-
-			throw new KeyNotFoundException();
-		}
-
 		public bool TryGet(string name, out T value)
 		{
 			return _innerDictionary.TryGetValue(name, out value);

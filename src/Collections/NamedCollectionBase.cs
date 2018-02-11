@@ -112,21 +112,6 @@ namespace Zongsoft.Collections
 			return _innerDictionary.ContainsKey(name ?? string.Empty);
 		}
 
-		public T Get(string name, Func<Exception> onError)
-		{
-			name = name ?? string.Empty;
-
-			T result;
-
-			if(_innerDictionary.TryGetValue(name, out result))
-				return result;
-
-			if(onError != null)
-				throw onError() ?? new KeyNotFoundException();
-
-			throw new KeyNotFoundException();
-		}
-
 		public T Get(string name)
 		{
 			name = name ?? string.Empty;

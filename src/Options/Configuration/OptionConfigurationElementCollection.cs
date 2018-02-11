@@ -268,22 +268,6 @@ namespace Zongsoft.Options.Configuration
 			throw new KeyNotFoundException();
 		}
 
-		OptionConfigurationElement Collections.INamedCollection<OptionConfigurationElement>.Get(string name, Func<Exception> onError)
-		{
-			if(name == null)
-				throw new ArgumentNullException(nameof(name));
-
-			OptionConfigurationElement element;
-
-			if(_dictionary.TryGetValue(name, out element))
-				return element;
-
-			if(onError != null)
-				throw onError() ?? new KeyNotFoundException();
-
-			throw new KeyNotFoundException();
-		}
-
 		bool Collections.INamedCollection<OptionConfigurationElement>.TryGet(string name, out OptionConfigurationElement value)
 		{
 			if(name == null)

@@ -167,30 +167,6 @@ namespace Zongsoft.Collections
 			_items.Add(item);
 		}
 
-		public T Get(string name, Func<Exception> onError)
-		{
-			T result;
-
-			if(_innerDictionary == null)
-			{
-				foreach(var item in _items)
-				{
-					if(this.OnItemMatch(item) && _comparer.Compare(this.GetKeyForItem((T)item), name) == 0)
-						return (T)item;
-				}
-			}
-			else
-			{
-				if(_innerDictionary.TryGetValue(name, out result))
-					return result;
-			}
-
-			if(onError != null)
-				throw onError() ?? new KeyNotFoundException();
-
-			throw new KeyNotFoundException();
-		}
-
 		public T Get(string name)
 		{
 			T result;
