@@ -28,11 +28,12 @@ using System;
 using System.Threading.Tasks;
 
 using Zongsoft.Common;
+using Zongsoft.Communication;
 using Zongsoft.Runtime.Caching;
 
 namespace Zongsoft.Security
 {
-	public abstract class SceretNotifierBase : ISecretNotifier
+	public abstract class SecretNotifierBase : INotifier
 	{
 		#region 成员字段
 		private string _prefix;
@@ -41,13 +42,13 @@ namespace Zongsoft.Security
 		#endregion
 
 		#region 构造函数
-		protected SceretNotifierBase(string prefix)
+		protected SecretNotifierBase(string prefix)
 		{
 			if(prefix != null)
 				_prefix = prefix.Trim();
 
 			//设置过期时长的默认值
-			_timeout = TimeSpan.FromHours(30);
+			_timeout = TimeSpan.FromMinutes(30);
 		}
 		#endregion
 
@@ -94,7 +95,7 @@ namespace Zongsoft.Security
 		#endregion
 
 		#region 公共方法
-		public IExecutionResult Notify(string name, object parameter, object state = null)
+		public IExecutionResult Notify(string name, object content, object destination, object settings = null)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
@@ -104,15 +105,15 @@ namespace Zongsoft.Security
 			if(cache == null)
 				throw new InvalidOperationException("Missing cache for the secret notify operation.");
 
-			var key = this.GetCacheKey(name, parameter, state);
-			var value = this.GetCacheValue(name, parameter, state, out var secret);
+			var key = this.GetCacheKey(name, content, destination);
+			var value = this.GetCacheValue(name, content, destination, out var secret);
 
 			//将秘密内容保存到缓存容器中
 			if(!cache.SetValue(key, value, _timeout))
 				return ExecutionResult.Failure("The secret caching failed.");
 
 			//激发消息通知
-			var result = this.OnNotify(name, parameter, state, secret);
+			var result = this.OnNotify(name, content, destination, secret);
 
 			//如果通知发送失败则删除缓存项
 			if(result != null && !result.Succeed)
@@ -121,33 +122,38 @@ namespace Zongsoft.Security
 			return result;
 		}
 
-		public Task<IExecutionResult> NotifyAsync(string name, object parameter, object state = null)
+		public Task<IExecutionResult> NotifyAsync(string name, object content, object destination, object settings = null)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
-			return Task.Run(() => this.Notify(name, parameter, state));
+			return Task.Run(() => this.Notify(name, content, destination, settings));
 		}
 		#endregion
 
 		#region 抽象方法
-		protected abstract IExecutionResult OnNotify(string name, object parameter, object state, string secret);
+		protected abstract IExecutionResult OnNotify(string name, object content, object destination, string secret);
 		#endregion
 
 		#region 虚拟方法
-		protected virtual string GetCacheKey(string name, object parameter, object state)
+		protected virtual string GetCacheKey(string name, object content, object destination)
 		{
 			if(string.IsNullOrEmpty(_prefix))
 				return name;
 			else
 				return _prefix +
-				       (char.IsLetterOrDigit(_prefix[_prefix.Length - 1]) ? ":" : string.Empty) +
+				       (char.IsLetterOrDigit(_prefix[_prefix.Length - 1]) ? "." : string.Empty) +
 				       name;
 		}
 
-		protected virtual string GetCacheValue(string name, object parameter, object state, out string secret)
+		protected virtual string GetCacheValue(string name, object content, object destination, out string secret)
 		{
-			return secret = Zongsoft.Common.RandomGenerator.GenerateString(6, true);
+			secret = Zongsoft.Common.RandomGenerator.GenerateString(6, true);
+
+			if(destination != null)
+				return secret + "|" + destination.ToString();
+
+			return secret;
 		}
 		#endregion
 	}

@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,31 +25,21 @@
  */
 
 using System;
-using System.Threading.Tasks;
 
-namespace Zongsoft.Security
+namespace Zongsoft.Collections
 {
 	/// <summary>
-	/// 提供秘密校验通知功能的接口。
+	/// 表示提供查找功能的接口。
 	/// </summary>
-	public interface ISecretNotifier
+	/// <typeparam name="T">指示查找元素的泛型参数。</typeparam>
+	public interface IFindable<T> : IFindable
 	{
 		/// <summary>
-		/// 发送通知。
+		/// 查找方法。
 		/// </summary>
-		/// <param name="name">指定的通知名。</param>
-		/// <param name="parameter">激发通知的参数对象。</param>
-		/// <param name="state">激发通知的附加状态值。</param>
-		/// <returns>返回的通知结果。</returns>
-		Common.IExecutionResult Notify(string name, object parameter, object state = null);
-
-		/// <summary>
-		/// 异步发送通知。
-		/// </summary>
-		/// <param name="name">指定的通知名。</param>
-		/// <param name="parameter">激发通知的参数对象。</param>
-		/// <param name="state">激发通知的附加状态值。</param>
-		/// <returns>返回的通知结果。</returns>
-		Task<Common.IExecutionResult> NotifyAsync(string name, object parameter, object state = null);
+		/// <param name="parameter">指定的查找参数。</param>
+		/// <param name="result">输出参数，表示查找成果的结果。</param>
+		/// <returns>返回真(True)表示查找成果，否则表示查找失败。</returns>
+		bool Find(object parameter, out T result);
 	}
 }

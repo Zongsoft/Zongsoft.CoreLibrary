@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,22 +25,38 @@
  */
 
 using System;
-using System.Collections.Generic;
+using System.Collections;
 
-namespace Zongsoft.Common
+namespace Zongsoft.Collections
 {
-	/// <summary>
-	/// 表示提供有效性验证功能的接口。
-	/// </summary>
-	/// <typeparam name="T">指定</typeparam>
-	public interface IValidator<in T>
+	public class Finder : IFindable
 	{
-		/// <summary>
-		/// 验证指定的数据是否有效。
-		/// </summary>
-		/// <param name="data">指定的待验证的数据。</param>
-		/// <param name="failure">当内部验证失败的回调处理函数。该回调函数返回一个布尔值（真或假）作为整个验证方法的返回值，空(null)表示继续后续的验证环节。</param>
-		/// <returns>如果验证通过则返回真(True)，否则返回假(False)。</returns>
-		bool Validate(T data, Func<string, string, bool?> failure = null);
+		#region 成员字段
+		private IEnumerable _items;
+		#endregion
+
+		#region 构造函数
+		public Finder(IEnumerable items)
+		{
+			_items = items ?? throw new ArgumentNullException(nameof(items));
+		}
+		#endregion
+
+		#region 查找方法
+		public bool Find(object parameter, out object result)
+		{
+			foreach(var item in _items)
+			{
+				if(item != null && item is IMatchable matchable && matchable.IsMatch(parameter))
+				{
+					result = item;
+					return true;
+				}
+			}
+
+			result = null;
+			return false;
+		}
+		#endregion
 	}
 }

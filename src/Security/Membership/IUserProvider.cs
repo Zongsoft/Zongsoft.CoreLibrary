@@ -286,11 +286,11 @@ namespace Zongsoft.Security.Membership
 		/// <summary>
 		/// 校验指定的秘钥是否正确。
 		/// </summary>
-		/// <param name="name">指定的待校验的类型名。</param>
+		/// <param name="userId">指定的用户编号。</param>
+		/// <param name="type">指定的待校验的类型名。</param>
 		/// <param name="secret">指定的待校验的秘钥。</param>
-		/// <param name="state">指定的校验附加参数。</param>
 		/// <returns>如果校验成功则返回真(True)，否则返回假(False)。</returns>
-		bool Verify(string name, string secret, object state = null);
+		bool Verify(uint userId, string type, string secret);
 		#endregion
 	}
 }

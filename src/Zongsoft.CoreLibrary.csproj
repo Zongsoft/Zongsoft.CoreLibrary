@@ -55,11 +55,15 @@
     <Compile Include="Collections\CollectionRemovedReason.cs" />
     <Compile Include="Collections\DictionaryExtension.cs" />
     <Compile Include="Collections\EnqueuedEventArgs.cs" />
+    <Compile Include="Collections\Finder`1.cs" />
+    <Compile Include="Collections\Finder.cs" />
     <Compile Include="Collections\HashSetExtension.cs" />
     <Compile Include="Collections\HierarchicalExpression.cs" />
     <Compile Include="Collections\HierarchicalNode.cs" />
     <Compile Include="Collections\HierarchicalNodeCollection.cs" />
     <Compile Include="Collections\BinaryComparer.cs" />
+    <Compile Include="Collections\IFindable`1.cs" />
+    <Compile Include="Collections\IFindable.cs" />
     <Compile Include="Collections\ISelectable.cs" />
     <Compile Include="Collections\INamedCollection.cs" />
     <Compile Include="Collections\IQueueProvider.cs" />
@@ -83,6 +87,7 @@
     <Compile Include="Common\IExecutionHandler`1.cs" />
     <Compile Include="Common\IExecutionResult.cs" />
     <Compile Include="Common\IObjectReference.cs" />
+    <Compile Include="Common\IVerifier.cs" />
     <Compile Include="Common\ISequence.cs" />
     <Compile Include="Common\IValidator.cs" />
     <Compile Include="Common\ModelBase.cs" />
@@ -314,8 +319,6 @@
     <Compile Include="Security\CredentialIdentity.cs" />
     <Compile Include="Security\CredentialPrincipal.cs" />
     <Compile Include="Security\ICensorship.cs" />
-    <Compile Include="Security\ISceretVerifier.cs" />
-    <Compile Include="Security\ISecretNotifier.cs" />
     <Compile Include="Security\Membership\AuthenticatedEventArgs.cs" />
     <Compile Include="Security\Membership\AuthenticationException.cs" />
     <Compile Include="Security\Membership\AuthenticationReason.cs" />
@@ -342,7 +345,7 @@
     <Compile Include="Security\Membership\Role.cs" />
     <Compile Include="Security\Membership\User.cs" />
     <Compile Include="Security\PasswordUtility.cs" />
-    <Compile Include="Security\SceretNotifierBase.cs" />
+    <Compile Include="Security\SecretNotifierBase.cs" />
     <Compile Include="Security\SecretVerifierBase.cs" />
     <Compile Include="Security\SecurityException.cs" />
     <Compile Include="Security\Membership\UserStatus.cs" />
@@ -425,7 +428,6 @@
     <Compile Include="Communication\Composition\ExecutionHandlerBase.cs" />
     <Compile Include="Communication\Composition\IExecutionFilter.cs" />
     <Compile Include="Communication\Composition\IExecutionHandler.cs" />
-    <Compile Include="Common\UrlUtility.cs" />
     <Compile Include="Communication\IPEndPointConverter.cs" />
     <Compile Include="Communication\Utility.cs" />
     <Compile Include="Services\CommandException.cs" />

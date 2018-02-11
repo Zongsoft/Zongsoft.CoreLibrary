@@ -31,7 +31,7 @@ using Zongsoft.Runtime.Caching;
 
 namespace Zongsoft.Security
 {
-	public abstract class SecretVerifierBase : ISecretVerifier
+	public abstract class SecretVerifierBase : IVerifier
 	{
 		#region 成员字段
 		private string _prefix;
@@ -92,10 +92,13 @@ namespace Zongsoft.Security
 		#endregion
 
 		#region 公共方法
-		public bool Verify(string name, string secret, object state = null)
+		public bool Verify(string name, object value, object state = null)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
+
+			if(value == null)
+				return false;
 
 			var cache = this.Cache;
 
@@ -103,37 +106,36 @@ namespace Zongsoft.Security
 				throw new InvalidOperationException("Missing cache for the secret verify operation.");
 
 			//获取当前校验请求对应的缓存键
-			var key = this.GetCacheKey(name, state);
+			var cacheKey = this.GetCacheKey(name, state);
 
 			//从缓存容器中获取对应的内容
-			var value = cache.GetValue<string>(key);
+			var cacheValue = cache.GetValue<string>(cacheKey);
 
 			//从缓存内容解析出对应的秘密值
-			var cachedSecret = this.GetSecret(value);
+			var cacheSecret = this.GetSecret(cacheValue);
 
 			//确定秘密内容的比对方式
 			var comparison = _ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
 
 			//比对秘密内容
-			if(string.Equals(secret, cachedSecret, comparison))
+			if(string.Equals(value.ToString(), cacheSecret, comparison))
 			{
-				//激发比对成功
-				this.OnVerified(name, state, value);
+				//激发校验成功事件
+				this.OnSucceed(name, cacheValue, state);
 
 				//删除缓存项
-				cache.Remove(key);
+				cache.Remove(cacheKey);
 
 				//返回校验成功
 				return true;
 			}
 
+			//激发校验失败事件
+			this.OnFailed(name, cacheValue, state);
+
 			//返回校验失败
 			return false;
 		}
-		#endregion
-
-		#region 抽象方法
-		protected abstract void OnVerified(string name, object state, string value);
 		#endregion
 
 		#region 虚拟方法
@@ -158,6 +160,16 @@ namespace Zongsoft.Security
 				return cachedValue.Substring(0, index);
 
 			return cachedValue;
+		}
+		#endregion
+
+		#region 激发事件
+		protected virtual void OnFailed(string name, object value, object state)
+		{
+		}
+
+		protected virtual void OnSucceed(string name, object value, object state)
+		{
 		}
 		#endregion
 	}

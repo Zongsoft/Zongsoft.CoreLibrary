@@ -26,20 +26,20 @@
 
 using System;
 
-namespace Zongsoft.Security
+namespace Zongsoft.Common
 {
 	/// <summary>
-	/// 提供秘密校验功能的接口。
+	/// 提供校验功能的接口。
 	/// </summary>
-	public interface ISecretVerifier
+	public interface IVerifier
 	{
 		/// <summary>
 		/// 校验方法。
 		/// </summary>
 		/// <param name="name">指定的校验标识名。</param>
-		/// <param name="secret">指定的待校验的值。</param>
+		/// <param name="value">指定的待校验的值。</param>
 		/// <param name="state">指定的附加状态值。</param>
 		/// <returns>返回校验是否成功。</returns>
-		bool Verify(string name, string secret, object state = null);
+		bool Verify(string name, object value, object state = null);
 	}
 }
