@@ -42,17 +42,17 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 查询方法
-		IEnumerable<TEntity> Select(object state = null, params Sorting[] sortings);
-		IEnumerable<TEntity> Select(ICondition condition, params Sorting[] sortings);
-		IEnumerable<TEntity> Select(ICondition condition, object state, params Sorting[] sortings);
-		IEnumerable<TEntity> Select(ICondition condition, Paging paging, params Sorting[] sortings);
-		IEnumerable<TEntity> Select(ICondition condition, Paging paging, object state, params Sorting[] sortings);
-		IEnumerable<TEntity> Select(ICondition condition, Paging paging, string scope, params Sorting[] sortings);
-		IEnumerable<TEntity> Select(ICondition condition, Paging paging, string scope, object state, params Sorting[] sortings);
-		IEnumerable<TEntity> Select(ICondition condition, string scope, params Sorting[] sortings);
-		IEnumerable<TEntity> Select(ICondition condition, string scope, object state, params Sorting[] sortings);
-		IEnumerable<TEntity> Select(ICondition condition, string scope, Paging paging, params Sorting[] sortings);
-		IEnumerable<TEntity> Select(ICondition condition, string scope, Paging paging, object state, params Sorting[] sortings);
+		new IEnumerable<TEntity> Select(object state = null, params Sorting[] sortings);
+		new IEnumerable<TEntity> Select(ICondition condition, params Sorting[] sortings);
+		new IEnumerable<TEntity> Select(ICondition condition, object state, params Sorting[] sortings);
+		new IEnumerable<TEntity> Select(ICondition condition, Paging paging, params Sorting[] sortings);
+		new IEnumerable<TEntity> Select(ICondition condition, Paging paging, object state, params Sorting[] sortings);
+		new IEnumerable<TEntity> Select(ICondition condition, Paging paging, string scope, params Sorting[] sortings);
+		new IEnumerable<TEntity> Select(ICondition condition, Paging paging, string scope, object state, params Sorting[] sortings);
+		new IEnumerable<TEntity> Select(ICondition condition, string scope, params Sorting[] sortings);
+		new IEnumerable<TEntity> Select(ICondition condition, string scope, object state, params Sorting[] sortings);
+		new IEnumerable<TEntity> Select(ICondition condition, string scope, Paging paging, params Sorting[] sortings);
+		new IEnumerable<TEntity> Select(ICondition condition, string scope, Paging paging, object state, params Sorting[] sortings);
 		#endregion
 	}
 }

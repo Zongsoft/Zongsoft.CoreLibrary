@@ -121,6 +121,9 @@ namespace Zongsoft.IO
 			}
 		}
 
+		/// <summary>
+		/// 获取路径信息对应的<see cref="Zongsoft.IO.Path"/>对象。
+		/// </summary>
 		public Zongsoft.IO.Path Path
 		{
 			get
@@ -139,7 +142,7 @@ namespace Zongsoft.IO
 		/// <summary>
 		/// 获取或设置外部访问的URL地址。
 		/// </summary>
-		/// <remarks>有关外部访问的URL请参考：<seealso cref="IFileSystem.GetUrl"/>方法。</remarks>
+		/// <remarks>有关外部访问的URL请参考：<seealso cref="Path.Url"/>属性。</remarks>
 		public virtual string Url
 		{
 			get
