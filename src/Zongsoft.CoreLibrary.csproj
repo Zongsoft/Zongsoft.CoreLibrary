@@ -318,6 +318,8 @@
     <Compile Include="Security\CensorshipException.cs" />
     <Compile Include="Security\CredentialIdentity.cs" />
     <Compile Include="Security\CredentialPrincipal.cs" />
+    <Compile Include="Security\CredentialUnregisterEventArgs.cs" />
+    <Compile Include="Security\CredentialRegisterEventArgs.cs" />
     <Compile Include="Security\ICensorship.cs" />
     <Compile Include="Security\Membership\AuthenticatedEventArgs.cs" />
     <Compile Include="Security\Membership\AuthenticationException.cs" />

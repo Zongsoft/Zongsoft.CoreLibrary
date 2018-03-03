@@ -1,4 +1,11 @@
 ﻿/*
+ *   _____                                ______
+ *  /_   /  ____  ____  ____  _________  / __/ /_
+ *    / /  / __ \/ __ \/ __ \/ ___/ __ \/ /_/ __/
+ *   / /__/ /_/ / / / / /_/ /\_ \/ /_/ / __/ /_
+ *  /____/\____/_/ /_/\__  /____/\____/_/  \__/
+ *                   /____/
+ *
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
@@ -34,6 +41,18 @@ namespace Zongsoft.Security
 	/// </summary>
 	public interface ICredentialProvider
 	{
+		/// <summary>表示注册完成事件。</summary>
+		event EventHandler<CredentialRegisterEventArgs> Registered;
+
+		/// <summary>表示准备注册事件。</summary>
+		event EventHandler<CredentialRegisterEventArgs> Registering;
+
+		/// <summary>表示注销完成事件。</summary>
+		event EventHandler<CredentialUnregisterEventArgs> Unregistered;
+
+		/// <summary>表示准备注销事件。</summary>
+		event EventHandler<CredentialUnregisterEventArgs> Unregistering;
+
 		/// <summary>
 		/// 为指定的用户注册安全凭证。
 		/// </summary>
