@@ -68,7 +68,7 @@ namespace Zongsoft.Security.Membership
 		/// <summary>
 		/// 获取指定命名空间中的角色集。
 		/// </summary>
-		/// <param name="namespace">要获取的用户集所属的命名空间。如果为空(null)则忽略命名空间即系统中的所有用户，如果为空字符串("")则查找未设置命名空间的用户集。</param>
+		/// <param name="namespace">要获取的角色集所属的命名空间。如果为星号(*)则忽略命名空间即系统中的所有角色，如果为空(null)或空字符串("")则查找未设置命名空间的角色集。</param>
 		/// <param name="paging">查询的分页设置，默认为第一页。</param>
 		/// <returns>返回当前命名空间中的所有角色对象集。</returns>
 		IEnumerable<Role> GetRoles(string @namespace, Zongsoft.Data.Paging paging = null);

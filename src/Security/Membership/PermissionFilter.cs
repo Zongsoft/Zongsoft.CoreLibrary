@@ -29,28 +29,61 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Security.Membership
 {
-	[Serializable]
-	public class PermissionFilter : Permission
+	public struct PermissionFilter
 	{
 		#region 成员变量
+		private string _schemaId;
+		private string _actionId;
 		private string _filter;
 		#endregion
 
 		#region 构造函数
-		public PermissionFilter()
+		public PermissionFilter(string schemaId, string actionId, string filter)
 		{
-		}
+			if(string.IsNullOrEmpty(schemaId))
+				throw new ArgumentNullException(nameof(schemaId));
+			if(string.IsNullOrEmpty(actionId))
+				throw new ArgumentNullException(nameof(actionId));
+			if(string.IsNullOrEmpty(filter))
+				throw new ArgumentNullException(nameof(filter));
 
-		public PermissionFilter(uint memberId, MemberType memberType, string schemaId, string actionId, string filter) : base(memberId, memberType, schemaId, actionId, false)
-		{
-			if(string.IsNullOrWhiteSpace(filter))
-				throw new ArgumentNullException("filter");
-
+			_schemaId = schemaId.Trim();
+			_actionId = actionId.Trim();
 			_filter = filter.Trim();
 		}
 		#endregion
 
 		#region 公共属性
+		public string SchemaId
+		{
+			get
+			{
+				return _schemaId;
+			}
+			set
+			{
+				if(string.IsNullOrEmpty(value))
+					throw new ArgumentNullException();
+
+				_schemaId = value.Trim();
+			}
+		}
+
+		public string ActionId
+		{
+			get
+			{
+				return _actionId;
+			}
+			set
+			{
+				if(string.IsNullOrEmpty(value))
+					throw new ArgumentNullException();
+
+				_actionId = value.Trim();
+			}
+		}
+
 		public string Filter
 		{
 			get
@@ -59,18 +92,35 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_filter = value;
+				if(string.IsNullOrEmpty(value))
+					throw new ArgumentNullException();
+
+				_filter = value.Trim();
 			}
 		}
 		#endregion
 
 		#region 重写方法
+		public override bool Equals(object obj)
+		{
+			if(obj == null || obj.GetType() != this.GetType())
+				return false;
+
+			var other = (PermissionFilter)obj;
+
+			return string.Equals(_schemaId, other._schemaId, StringComparison.OrdinalIgnoreCase) &&
+			       string.Equals(_actionId, other._actionId, StringComparison.OrdinalIgnoreCase) &&
+			       string.Equals(_filter, other._filter, StringComparison.OrdinalIgnoreCase);
+		}
+
+		public override int GetHashCode()
+		{
+			return (_schemaId + ":" + _actionId + ":" + _filter).ToLowerInvariant().GetHashCode();
+		}
+
 		public override string ToString()
 		{
-			if(string.IsNullOrEmpty(_filter))
-				return base.ToString();
-
-			return base.ToString() + Environment.NewLine + _filter;
+			return string.Format("{0}:{1}\r\n{2}", _schemaId, _actionId, _filter);
 		}
 		#endregion
 	}

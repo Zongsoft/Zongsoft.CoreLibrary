@@ -32,6 +32,7 @@ namespace Zongsoft.Common
 	/// <summary>
 	/// 表示命令执行结果的包装类。
 	/// </summary>
+	[Obsolete]
 	public class ExecutionResult : IExecutionResult
 	{
 		#region 成员字段

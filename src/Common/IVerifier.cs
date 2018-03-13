@@ -31,6 +31,7 @@ namespace Zongsoft.Common
 	/// <summary>
 	/// 提供校验功能的接口。
 	/// </summary>
+	[Obsolete]
 	public interface IVerifier
 	{
 		/// <summary>

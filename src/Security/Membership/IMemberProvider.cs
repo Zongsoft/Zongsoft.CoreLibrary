@@ -63,15 +63,7 @@ namespace Zongsoft.Security.Membership
 		/// </summary>
 		/// <param name="roleId">要搜索的角色编号。</param>
 		/// <returns>返回隶属于指定角色的直属子级成员集。</returns>
-		IEnumerable<Member> GetMembers(uint roleId);
-
-		/// <summary>
-		/// 设置更新指定角色下的成员。
-		/// </summary>
-		/// <param name="roleId">指定要更新的角色编号。</param>
-		/// <param name="members">要更新的角色成员集。</param>
-		/// <returns>如果更新成功则返回更新的数量，否则返回零。</returns>
-		int SetMembers(uint roleId, params Member[] members);
+		IEnumerable<IMember> GetMembers(uint roleId);
 
 		/// <summary>
 		/// 设置更新指定角色下的成员。
@@ -80,34 +72,23 @@ namespace Zongsoft.Security.Membership
 		/// <param name="members">要更新的角色成员集。</param>
 		/// <param name="shouldResetting">指示是否以重置的方式更新角色成员，即是否在更新角色成员之前先清空指定角色下的所有成员。默认值为假(False)。</param>
 		/// <returns>如果更新成功则返回更新的数量，否则返回零。</returns>
-		int SetMembers(uint roleId, IEnumerable<Member> members, bool shouldResetting = false);
+		int SetMembers(uint roleId, IEnumerable<IMember> members, bool shouldResetting = false);
 
 		/// <summary>
-		/// 删除一个或多个角色成员。
+		/// 删除单个角色成员。
 		/// </summary>
-		/// <param name="members">要删除的角色成员数组。</param>
-		/// <returns>如果删除成功则返回删除的数量，否则返回零。</returns>
-		int DeleteMembers(params Member[] members);
+		/// <param name="roleId">指定要删除成员所属的角色编号。</param>
+		/// <param name="memberId">指定要删除的成员编号。</param>
+		/// <param name="memberType">指定要删除的成员类型。</param>
+		/// <returns>如果删除成功则返回真(True)，否则返回假(False)。</returns>
+		bool RemoveMember(uint roleId, uint memberId, MemberType memberType);
 
 		/// <summary>
 		/// 删除单个或多个角色成员。
 		/// </summary>
+		/// <param name="roleId">指定要删除成员集所属的角色编号。</param>
 		/// <param name="members">要删除的角色成员集合。</param>
 		/// <returns>如果删除成功则返回删除的数量，否则返回零。</returns>
-		int DeleteMembers(IEnumerable<Member> members);
-
-		/// <summary>
-		/// 创建单个或多个角色成员。
-		/// </summary>
-		/// <param name="members">要创建的角色成员数组。</param>
-		/// <returns>返回创建成功的角色成员数量。</returns>
-		int CreateMembers(params Member[] members);
-
-		/// <summary>
-		/// 创建单个或多个角色成员。
-		/// </summary>
-		/// <param name="members">要创建的角色成员集合。</param>
-		/// <returns>返回创建成功的角色成员数量。</returns>
-		int CreateMembers(IEnumerable<Member> members);
+		int RemoveMembers(uint roleId, IEnumerable<IMember> members);
 	}
 }

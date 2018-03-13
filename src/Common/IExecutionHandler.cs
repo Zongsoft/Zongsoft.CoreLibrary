@@ -45,7 +45,7 @@ namespace Zongsoft.Common
 		/// 处理本次执行请求。
 		/// </summary>
 		/// <param name="parameter">当前执行的请求参数。</param>
-		/// <returns>返回执行结果。约定当结果为空(null)表示处理成功。</returns>
-		IExecutionResult Handle(object parameter);
+		/// <returns>返回执行结果。</returns>
+		object Handle(object parameter);
 	}
 }

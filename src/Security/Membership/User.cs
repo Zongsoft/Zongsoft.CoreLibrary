@@ -33,7 +33,7 @@ namespace Zongsoft.Security.Membership
 	/// 表示用户的实体类。
 	/// </summary>
 	[Serializable]
-	public class User : Zongsoft.Common.ModelBase
+	public class User : Zongsoft.Common.ModelBase, IMember
 	{
 		#region 静态字段
 		public static readonly string Administrator = "Administrator";
@@ -67,6 +67,32 @@ namespace Zongsoft.Security.Membership
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取或设置成员编号，即用户编号。
+		/// </summary>
+		uint IMember.MemberId
+		{
+			get
+			{
+				return this.UserId;
+			}
+			set
+			{
+				this.UserId = value;
+			}
+		}
+
+		/// <summary>
+		/// 获取成员类型，始终返回<see cref="MemberType.User"/>。
+		/// </summary>
+		MemberType IMember.MemberType
+		{
+			get
+			{
+				return MemberType.User;
+			}
+		}
+
 		/// <summary>
 		/// 获取或设置用户编号。
 		/// </summary>

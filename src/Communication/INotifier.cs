@@ -42,7 +42,7 @@ namespace Zongsoft.Communication
 		/// <param name="destination">指定通知的接受者，由具体实现者定义支持的接受者类型。</param>
 		/// <param name="settings">指定的通知设置。</param>
 		/// <returns>返回通知结果对象，由具体实现者定义。</returns>
-		Common.IExecutionResult Notify(string name, object content, object destination, object settings = null);
+		object Notify(string name, object content, object destination, object settings = null);
 
 		/// <summary>
 		/// 异步激发一个通知给指定的接受者。
@@ -52,6 +52,6 @@ namespace Zongsoft.Communication
 		/// <param name="destination">指定通知的接受者，由具体实现者定义支持的接受者类型。</param>
 		/// <param name="settings">指定的通知设置。</param>
 		/// <returns>返回通知结果对象，由具体实现者定义。</returns>
-		Task<Common.IExecutionResult> NotifyAsync(string name, object content, object destination, object settings = null);
+		Task<object> NotifyAsync(string name, object content, object destination, object settings = null);
 	}
 }

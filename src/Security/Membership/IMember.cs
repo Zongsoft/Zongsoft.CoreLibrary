@@ -1,8 +1,15 @@
 ﻿/*
+ *   _____                                ______
+ *  /_   /  ____  ____  ____  _________  / __/ /_
+ *    / /  / __ \/ __ \/ __ \/ ___/ __ \/ /_/ __/
+ *   / /__/ /_/ / / / / /_/ /\_ \/ /_/ / __/ /_
+ *  /____/\____/_/ /_/\__  /____/\____/_/  \__/
+ *                   /____/
+ *
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2016-2017 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2003-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -26,44 +33,64 @@
 
 using System;
 
-namespace Zongsoft.Services
+namespace Zongsoft.Security.Membership
 {
 	/// <summary>
-	/// 表示包装命令执行结果的接口。
+	/// 表示权限系统成员（用户或角色）的接口。
 	/// </summary>
-	[Obsolete]
-	public interface ICommandResult
+	public interface IMember
 	{
 		/// <summary>
-		/// 获取一个值，指示命令是否执行成功。
+		/// 获取或设置成员编号。
 		/// </summary>
-		bool Succeed
+		uint MemberId
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// 获取成员类型。
+		/// </summary>
+		MemberType MemberType
 		{
 			get;
 		}
 
 		/// <summary>
-		/// 获取命令执行失败的原因代号。
+		/// 获取或设置成员名称。
 		/// </summary>
-		string Code
+		string Name
 		{
 			get;
+			set;
 		}
 
 		/// <summary>
-		/// 获取命令执行失败的消息。
+		/// 获取或设置成员全称。
 		/// </summary>
-		string Message
+		string FullName
 		{
 			get;
+			set;
 		}
 
 		/// <summary>
-		/// 获取命令执行结果。
+		/// 获取或设置成员所属的命令空间。
 		/// </summary>
-		object Result
+		string Namespace
 		{
 			get;
+			set;
+		}
+
+		/// <summary>
+		/// 获取或设置成员的描述文本。
+		/// </summary>
+		string Description
+		{
+			get;
+			set;
 		}
 	}
 }

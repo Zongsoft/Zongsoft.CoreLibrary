@@ -42,6 +42,14 @@ namespace Zongsoft.Security
 		{
 			_credentialId = credentialId;
 		}
+
+		public CredentialUnregisterEventArgs(Credential credential)
+		{
+			_credential = credential;
+
+			if(credential != null)
+				_credentialId = credential.CredentialId;
+		}
 		#endregion
 
 		#region 公共属性
@@ -57,17 +65,13 @@ namespace Zongsoft.Security
 		}
 
 		/// <summary>
-		/// 获取或设置注销的凭证对象。
+		/// 获取注销的凭证对象。
 		/// </summary>
 		public Credential Credential
 		{
 			get
 			{
 				return _credential;
-			}
-			set
-			{
-				_credential = value;
 			}
 		}
 		#endregion

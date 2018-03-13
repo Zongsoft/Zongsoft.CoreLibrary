@@ -54,7 +54,7 @@ namespace Zongsoft.Security.Membership
 		/// <summary>
 		/// 获取指定命名空间中的用户集。
 		/// </summary>
-		/// <param name="namespace">要获取的用户集所属的命名空间。如果为空(null)则忽略命名空间即系统中的所有用户，如果为空字符串("")则查找未设置命名空间的用户集。</param>
+		/// <param name="namespace">要获取的用户集所属的命名空间。如果为星号(*)则忽略命名空间即系统中的所有用户，如果为空(null)或空字符串("")则查找未设置命名空间的用户集。</param>
 		/// <param name="paging">查询的分页设置，默认为第一页。</param>
 		/// <returns>返回当前命名空间中的所有用户对象集。</returns>
 		IEnumerable<User> GetUsers(string @namespace, Zongsoft.Data.Paging paging = null);
@@ -229,22 +229,12 @@ namespace Zongsoft.Security.Membership
 		/// </summary>
 		/// <param name="userId">要重置的用户编号。</param>
 		/// <param name="secret">重置密码的验证码。</param>
-		/// <param name="newPassword">重置后的新密码，如果为空(null)或空字符串("")则不进行密码设置，只进行验证码摘要的校验（即判断验证码摘要是否正确）。</param>
-		/// <returns>如果重置或者验证码摘要校验成功则返回真(True)，否则返回假(False)。</returns>
+		/// <param name="newPassword">重置后的新密码。</param>
+		/// <returns>如果密码重置成功则返回真(True)，否则返回假(False)。</returns>
 		/// <remarks>
 		///		<para>本重置方法通常由Web请求的方式进行，请求的URL大致如下：<c><![CDATA[http://zongsoft.com/security/user/resetpassword?userId=xxx&secret=xxxxxx]]></c></para>
 		/// </remarks>
 		bool ResetPassword(uint userId, string secret, string newPassword = null);
-
-		/// <summary>
-		/// 重置指定用户的密码，以验证码的方式进行密码重置。
-		/// </summary>
-		/// <param name="identity">要重置的用户标识，可以是“用户名”、“邮箱地址”或“手机号码”。</param>
-		/// <param name="namespace">指定的用户标识所属的命名空间。</param>
-		/// <param name="secret">重置密码的验证码。</param>
-		/// <param name="newPassword">重置后的新密码，如果为空(null)或空字符串("")则不进行密码设置，只进行验证码的校验（即判断验证码是否正确）。</param>
-		/// <returns>如果重置或者验证码校验成功则返回真(True)，否则返回假(False)。</returns>
-		bool ResetPassword(string identity, string @namespace, string secret, string newPassword = null);
 
 		/// <summary>
 		/// 重置指定用户的密码，以密码问答的方式进行密码重置。
@@ -252,8 +242,8 @@ namespace Zongsoft.Security.Membership
 		/// <param name="identity">要重置的用户标识，可以是“用户名”、“邮箱地址”或“手机号码”。</param>
 		/// <param name="namespace">指定的用户标识所属的命名空间。</param>
 		/// <param name="passwordAnswers">指定用户的密码问答的答案集。</param>
-		/// <param name="newPassword">重置后的新密码，如果为空(null)或空字符串("")则不进行密码设置，只进行密码问答的校验（即判断密码问答的答案集是否全部正确）。</param>
-		/// <returns>如果重置或者密码问答校验成功则返回真(True)，否则返回假(False)。</returns>
+		/// <param name="newPassword">重置后的新密码。</param>
+		/// <returns>如果密码重置成功则返回真(True)，否则返回假(False)。</returns>
 		bool ResetPassword(string identity, string @namespace, string[] passwordAnswers, string newPassword = null);
 
 		/// <summary>

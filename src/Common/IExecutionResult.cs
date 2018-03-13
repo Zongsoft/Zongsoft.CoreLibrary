@@ -32,6 +32,7 @@ namespace Zongsoft.Common
 	/// <summary>
 	/// 表示执行结果的接口。
 	/// </summary>
+	[Obsolete]
 	public interface IExecutionResult
 	{
 		/// <summary>

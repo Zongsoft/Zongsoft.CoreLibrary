@@ -28,7 +28,7 @@ using System;
 
 namespace Zongsoft.Security.Membership
 {
-	public class AuthorizationState
+	public struct AuthorizationState
 	{
 		#region 成员变量
 		private string _schemaId;

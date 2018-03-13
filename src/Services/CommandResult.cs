@@ -32,6 +32,7 @@ namespace Zongsoft.Services
 	/// <summary>
 	/// 表示命令执行结果的包装类。
 	/// </summary>
+	[Obsolete]
 	public class CommandResult : ICommandResult
 	{
 		#region 成员字段

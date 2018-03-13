@@ -33,7 +33,7 @@ namespace Zongsoft.Security.Membership
 	/// 表示角色的实体类。
 	/// </summary>
 	[Serializable]
-	public class Role : Zongsoft.Common.ModelBase
+	public class Role : Zongsoft.Common.ModelBase, IMember
 	{
 		#region 静态字段
 		public static readonly string Administrators = "Administrators";
@@ -67,6 +67,32 @@ namespace Zongsoft.Security.Membership
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取或设置成员编号，即角色编号。
+		/// </summary>
+		uint IMember.MemberId
+		{
+			get
+			{
+				return this.RoleId;
+			}
+			set
+			{
+				this.RoleId = value;
+			}
+		}
+
+		/// <summary>
+		/// 获取成员类型，始终返回<see cref="MemberType.Role"/>。
+		/// </summary>
+		MemberType IMember.MemberType
+		{
+			get
+			{
+				return MemberType.Role;
+			}
+		}
+
 		/// <summary>
 		/// 获取或设置角色编号。
 		/// </summary>

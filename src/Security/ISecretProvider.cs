@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2016-2017 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -26,44 +26,16 @@
 
 using System;
 
-namespace Zongsoft.Services
+namespace Zongsoft.Security
 {
-	/// <summary>
-	/// 表示包装命令执行结果的接口。
-	/// </summary>
-	[Obsolete]
-	public interface ICommandResult
+	public interface ISecretProvider
 	{
-		/// <summary>
-		/// 获取一个值，指示命令是否执行成功。
-		/// </summary>
-		bool Succeed
-		{
-			get;
-		}
+		string Generate(string name, string extra = null);
+		string Generate(string name, TimeSpan expires);
+		string Generate(string name, string extra, TimeSpan expires);
+		void Generate(string name, string secret, string extra, TimeSpan expires);
 
-		/// <summary>
-		/// 获取命令执行失败的原因代号。
-		/// </summary>
-		string Code
-		{
-			get;
-		}
-
-		/// <summary>
-		/// 获取命令执行失败的消息。
-		/// </summary>
-		string Message
-		{
-			get;
-		}
-
-		/// <summary>
-		/// 获取命令执行结果。
-		/// </summary>
-		object Result
-		{
-			get;
-		}
+		bool Verify(string name, string secret);
+		bool Verify(string name, string secret, out string extra);
 	}
 }

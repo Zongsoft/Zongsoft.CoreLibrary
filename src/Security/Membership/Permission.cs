@@ -29,62 +29,29 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Security.Membership
 {
-	[Serializable]
-	public class Permission
+	public struct Permission
 	{
 		#region 成员变量
-		private uint _memberId;
-		private MemberType _memberType;
 		private string _schemaId;
 		private string _actionId;
 		private bool _granted;
 		#endregion
 
 		#region 构造函数
-		public Permission()
-		{
-		}
-
-		public Permission(uint memberId, MemberType memberType, string schemaId, string actionId, bool granted)
+		public Permission(string schemaId, string actionId, bool granted)
 		{
 			if(string.IsNullOrEmpty(schemaId))
-				throw new ArgumentNullException("schemaId");
+				throw new ArgumentNullException(nameof(schemaId));
 			if(string.IsNullOrEmpty(actionId))
-				throw new ArgumentNullException("actionId");
+				throw new ArgumentNullException(nameof(actionId));
 
-			_memberId = memberId;
-			_memberType = memberType;
-			_schemaId = schemaId;
-			_actionId = actionId;
+			_schemaId = schemaId.Trim();
+			_actionId = actionId.Trim();
 			_granted = granted;
 		}
 		#endregion
 
 		#region 公共属性
-		public uint MemberId
-		{
-			get
-			{
-				return _memberId;
-			}
-			set
-			{
-				_memberId = value;
-			}
-		}
-
-		public MemberType MemberType
-		{
-			get
-			{
-				return _memberType;
-			}
-			set
-			{
-				_memberType = value;
-			}
-		}
-
 		public string SchemaId
 		{
 			get
@@ -136,19 +103,19 @@ namespace Zongsoft.Security.Membership
 
 			var other = (Permission)obj;
 
-			return _granted == other._granted && _memberId == other._memberId && _memberType == other._memberType &&
+			return _granted == other._granted &&
 				   string.Equals(_schemaId, other._schemaId, StringComparison.OrdinalIgnoreCase) &&
 				   string.Equals(_actionId, other._actionId, StringComparison.OrdinalIgnoreCase);
 		}
 
 		public override int GetHashCode()
 		{
-			return (_memberId + ":" + _memberType + ":" + _schemaId + ":" + _actionId + ":" + _granted.ToString()).ToLowerInvariant().GetHashCode();
+			return (_schemaId + ":" + _actionId + ":" + _granted.ToString()).ToLowerInvariant().GetHashCode();
 		}
 
 		public override string ToString()
 		{
-			return string.Format("{0}[{1}]{2}:{3}({4})", _memberId, _memberType, _schemaId, _actionId, (_granted ? "Granted" : "Denied"));
+			return string.Format("{0}:{1} [{2}]", _schemaId, _actionId, (_granted ? "Granted" : "Denied"));
 		}
 		#endregion
 	}

@@ -55,12 +55,12 @@ namespace Zongsoft.Security.Membership
 		/// 获取指定用户或角色的最终授权状态集。
 		/// </summary>
 		/// <param name="memberId">指定要获取的最终授权状态集的成员编号(用户或角色编号)。</param>
-		/// <param name="memberType">指定要获取的最终授权状态集的成员类型。</param>
+		/// <param name="memberType">指定要获取的最终授权状态集的成员类型，默认为用户。</param>
 		/// <returns>返回指定成员的最终授权状态集。注意：该集合仅包含了最终的已授权状态信息。</returns>
 		/// <remarks>
 		///		<para>注意：该集合仅包含了最终的已授权状态信息。</para>
 		///		<para>该方法对指定用户及其所属角色进行逐级向上展开做授权计算，因此只需对本方法一次调用即可得知指定成员的最终授权计算结果。</para>
 		/// </remarks>
-		IEnumerable<AuthorizationState> GetAuthorizedStates(uint memberId, MemberType memberType);
+		IEnumerable<AuthorizationState> Authorizes(uint memberId, MemberType memberType = MemberType.User);
 	}
 }
