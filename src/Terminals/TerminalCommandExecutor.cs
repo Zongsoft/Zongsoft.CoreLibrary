@@ -208,7 +208,7 @@ namespace Zongsoft.Terminals
 			else
 			{
 				args.ExceptionHandled = true;
-				this.Terminal.WriteLine(CommandOutletColor.Red, args.Exception.Message);
+				this.Terminal.WriteLine(CommandOutletColor.Red, Resources.ResourceUtility.GetString("Text.CommandError.Label") + args.Exception.Message);
 			}
 		}
 		#endregion

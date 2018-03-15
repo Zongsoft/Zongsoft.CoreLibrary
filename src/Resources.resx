@@ -258,4 +258,7 @@
   <data name="Text.AuthenticationReason.Forbidden" xml:space="preserve">
     <value>禁止访问，您的账号没有被授权访问当前资源。</value>
   </data>
+  <data name="Text.CommandError.Label" xml:space="preserve">
+    <value>命令出错：</value>
+  </data>
 </root>
