@@ -39,8 +39,9 @@ namespace Zongsoft.Security.Membership
 		/// </summary>
 		/// <param name="memberId">指定要获取的权限集的成员编号(用户或角色)。</param>
 		/// <param name="memberType">指定要获取的权限集的成员类型。</param>
+		/// <param name="schemaId">指定的要获取的权限集的目标标识，如果为空(null)或空字符串则忽略该参数。</param>
 		/// <returns>返回指定用户或角色的权限集。注意：该结果集不包含指定成员所属的上级角色的权限设置。</returns>
-		IEnumerable<Permission> GetPermissions(uint memberId, MemberType memberType);
+		IEnumerable<Permission> GetPermissions(uint memberId, MemberType memberType, string schemaId = null);
 
 		/// <summary>
 		/// 设置指定用户或角色的权限集。
@@ -70,8 +71,9 @@ namespace Zongsoft.Security.Membership
 		/// </summary>
 		/// <param name="memberId">指定要获取的权限过滤集的成员编号(用户或角色)。</param>
 		/// <param name="memberType">指定要获取的权限过滤集的成员类型。</param>
+		/// <param name="schemaId">指定的要获取的权限过滤集的目标标识，如果为空(null)或空字符串则忽略该参数。</param>
 		/// <returns>返回指定用户或角色的权限过滤集。注意：该结果集不包含指定成员所属的上级角色的权限设置。</returns>
-		IEnumerable<PermissionFilter> GetPermissionFilters(uint memberId, MemberType memberType);
+		IEnumerable<PermissionFilter> GetPermissionFilters(uint memberId, MemberType memberType, string schemaId = null);
 
 		/// <summary>
 		/// 设置指定用户或角色的权限过滤集。
