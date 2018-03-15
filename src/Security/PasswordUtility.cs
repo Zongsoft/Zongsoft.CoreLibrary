@@ -81,9 +81,9 @@ namespace Zongsoft.Security
 		/// <param name="password">待散列(哈希)的口令明文。</param>
 		/// <param name="passwordSalt">输出参数，返回随机生成的整型数。</param>
 		/// <returns>散列后的口令值。</returns>
-		public static byte[] HashPassword(string password, out int passwordSalt)
+		public static byte[] HashPassword(string password, out long passwordSalt)
 		{
-			passwordSalt = Zongsoft.Common.RandomGenerator.GenerateInt32();
+			passwordSalt = Zongsoft.Common.RandomGenerator.GenerateInt64();
 			return HashPassword(password, BitConverter.GetBytes(passwordSalt));
 		}
 
@@ -106,7 +106,7 @@ namespace Zongsoft.Security
 		/// <param name="passwordSalt">对密码进行散列操作的随机整型数。</param>
 		/// <param name="hashAlgorithm">进行散列算法的名称，默认为SHA1。</param>
 		/// <returns>散列后的口令值。</returns>
-		public static byte[] HashPassword(string password, int passwordSalt, string hashAlgorithm = "SHA1")
+		public static byte[] HashPassword(string password, long passwordSalt, string hashAlgorithm = "SHA1")
 		{
 			return HashPassword(password, BitConverter.GetBytes(passwordSalt), hashAlgorithm);
 		}
@@ -149,7 +149,7 @@ namespace Zongsoft.Security
 		/// <param name="storedPasswordSalt">存储在数据库中的与之匹对的整型随机Salt数。</param>
 		/// <param name="hashAlgorithm">进行散列算法的名称，默认为SHA1。</param>
 		/// <returns>验证成功则返回真，否则返回假。</returns>
-		public static bool VerifyPassword(string password, byte[] storedPassword, int storedPasswordSalt, string hashAlgorithm = "SHA1")
+		public static bool VerifyPassword(string password, byte[] storedPassword, long storedPasswordSalt, string hashAlgorithm = "SHA1")
 		{
 			return VerifyPassword(password, storedPassword, BitConverter.GetBytes(storedPasswordSalt), hashAlgorithm);
 		}
