@@ -32,16 +32,32 @@ namespace Zongsoft.Security
 {
 	public class SecretProvider : ISecretProvider
 	{
+		#region 常量定义
+		private static readonly DateTime EPOCH = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+		#endregion
+
 		#region 成员字段
 		private ICache _cache;
 		private TimeSpan _expiry;
+		private TimeSpan _period;
 		#endregion
 
 		#region 构造函数
 		public SecretProvider()
 		{
-			//设置默认过期时长
+			//设置属性的默认值
 			_expiry = TimeSpan.FromMinutes(10);
+			_period = TimeSpan.FromSeconds(60);
+		}
+
+		public SecretProvider(ICache cache)
+		{
+			//设置缓存容器
+			_cache = cache ?? throw new ArgumentNullException(nameof(cache));
+
+			//设置属性的默认值
+			_expiry = TimeSpan.FromMinutes(10);
+			_period = TimeSpan.FromSeconds(60);
 		}
 		#endregion
 
@@ -62,7 +78,7 @@ namespace Zongsoft.Security
 		}
 
 		/// <summary>
-		/// 获取或设置秘密内容的过期时长，默认为10分钟。
+		/// 获取或设置秘密内容的默认过期时长（默认为10分钟）。
 		/// </summary>
 		public TimeSpan Expiry
 		{
@@ -74,6 +90,21 @@ namespace Zongsoft.Security
 			{
 				if(value > TimeSpan.Zero)
 					_expiry = value;
+			}
+		}
+
+		/// <summary>
+		/// 获取或设置重新生成秘密（验证码）的最小间隔时长（默认为60秒），如果为零则表示不做限制。
+		/// </summary>
+		public TimeSpan Period
+		{
+			get
+			{
+				return _period;
+			}
+			set
+			{
+				_period = value;
 			}
 		}
 		#endregion
@@ -91,32 +122,46 @@ namespace Zongsoft.Security
 
 		public string Generate(string name, string extra, TimeSpan expiry)
 		{
-			//生成一个默认规则的随机数作为密文
-			var secret = this.GenerateSecret(name);
-
-			//生成指定密文到缓存容器中
-			this.Generate(name, secret, extra, expiry);
-
-			//返回生成的密文
-			return secret;
+			return this.Generate(name, null, extra, expiry);
 		}
 
-		public void Generate(string name, string secret, string extra, TimeSpan expiry)
+		public string Generate(string name, string pattern, string extra, TimeSpan expiry)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
-			if(string.IsNullOrEmpty(secret))
-				throw new ArgumentNullException(nameof(secret));
-
 			var cache = this.Cache;
 
 			if(cache == null)
-				throw new InvalidOperationException("Missing cache for the secret notify operation.");
+				throw new InvalidOperationException("Missing cache for the secret generate operation.");
+
+			//修复秘密名（转换成小写并剔除收尾空格）
+			name = name.ToLowerInvariant().Trim();
+
+			//根据指定的模式生成或获取秘密（验证码）
+			var secret = this.GenerateSecret(name, pattern);
+
+			if(_period > TimeSpan.Zero)
+			{
+				//从缓存容器中获取对应的内容
+				var cacheValue = cache.GetValue<string>(name);
+
+				if(this.Unpack(cacheValue, out var cacheSecret, out var timestamp, out var cacheExtra))
+				{
+					if(DateTime.UtcNow - timestamp < _period)
+						throw new InvalidOperationException("The secret generate operation called too frequently.");
+
+					//重新使用原来的内容（可选）
+					secret = cacheSecret;
+					extra = cacheExtra;
+				}
+			}
 
 			//将秘密内容保存到缓存容器中（如果指定的过期时长为零则采用默认过期时长）
-			if(!cache.SetValue(name, this.GetValue(name, secret, extra), expiry > TimeSpan.Zero ? expiry : _expiry))
+			if(!cache.SetValue(name, this.Pack(secret, extra), expiry > TimeSpan.Zero ? expiry : _expiry))
 				throw new InvalidOperationException("The secret caching failed.");
+
+			return secret;
 		}
 		#endregion
 
@@ -141,14 +186,15 @@ namespace Zongsoft.Security
 			if(cache == null)
 				throw new InvalidOperationException("Missing cache for the secret verify operation.");
 
+			//修复秘密名（转换成小写并剔除收尾空格）
+			name = name.ToLowerInvariant().Trim();
+
 			//从缓存容器中获取对应的内容
 			var cacheValue = cache.GetValue<string>(name);
 
-			//从缓存内容解析出对应的秘密值
-			var cacheSecret = this.GetSecret(name, cacheValue, out extra);
-
-			//比对秘密内容
-			if(string.Equals(secret, cacheSecret, StringComparison.OrdinalIgnoreCase))
+			//从缓存内容解析出对应的秘密值并且比对秘密内容成功
+			if(this.Unpack(cacheValue, out var cacheSecret, out var timestamp, out extra) &&
+			   string.Equals(secret, cacheSecret, StringComparison.OrdinalIgnoreCase))
 			{
 				//删除缓存项
 				cache.Remove(name);
@@ -163,35 +209,74 @@ namespace Zongsoft.Security
 		#endregion
 
 		#region 虚拟方法
-		protected virtual string GenerateSecret(string name)
+		protected virtual string GenerateSecret(string name, string pattern = null)
 		{
-			return Zongsoft.Common.RandomGenerator.GenerateString(6, true);
+			if(string.IsNullOrWhiteSpace(pattern))
+				return Common.RandomGenerator.GenerateString(6, true);
+
+			if(string.Equals(pattern, "guid", StringComparison.OrdinalIgnoreCase) || string.Equals(pattern, "uuid", StringComparison.OrdinalIgnoreCase))
+				return Guid.NewGuid().ToString("N");
+
+			if(pattern.Length > 1 && (pattern[0] == '?' || pattern[0] == '*' || pattern[0] == '#'))
+			{
+				if(int.TryParse(pattern.Substring(1), out var count))
+					return Common.RandomGenerator.GenerateString(count, pattern[0] == '#');
+
+				throw new ArgumentException("Invalid secret pattern.");
+			}
+			else
+			{
+				if(pattern.Contains(":") | pattern.Contains("|"))
+					throw new ArgumentException("The secret argument contains illegal characters.");
+			}
+
+			return pattern.Trim();
 		}
 
-		protected virtual string GetValue(string name, string secret, string extra)
+		protected virtual string Pack(string secret, string extra)
 		{
+			var timestamp = (ulong)(DateTime.UtcNow - EPOCH).TotalSeconds;
+
 			if(string.IsNullOrEmpty(extra))
-				return secret;
+				return secret + ":" + timestamp.ToString();
 
-			return secret + "|" + extra;
+			return secret + ":" + timestamp.ToString() + "|" + extra;
 		}
 
-		protected virtual string GetSecret(string name, string value, out string extra)
+		protected virtual bool Unpack(string value, out string secret, out DateTime timestamp, out string extra)
 		{
+			secret = null;
 			extra = null;
+			timestamp = EPOCH;
 
 			if(string.IsNullOrEmpty(value))
-				return null;
+				return false;
 
+			//首先查找附加文本的分隔符位置
 			var index = value.IndexOf('|');
 
 			if(index > 0)
 			{
 				extra = value.Substring(index + 1);
-				return value.Substring(0, index);
+				value = value.Substring(0, index);
 			}
 
-			return value;
+			//继而查找生成时间戳的分隔符位置
+			index = value.LastIndexOf(':');
+
+			if(index > 0)
+			{
+				if(ulong.TryParse(value.Substring(index + 1), out var seconds) && seconds > 0)
+					timestamp = EPOCH.AddSeconds(seconds);
+
+				secret = value.Substring(0, index);
+			}
+			else
+			{
+				secret = value;
+			}
+
+			return !string.IsNullOrEmpty(secret);
 		}
 		#endregion
 	}
