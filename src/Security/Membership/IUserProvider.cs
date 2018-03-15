@@ -214,6 +214,7 @@ namespace Zongsoft.Security.Membership
 		/// <param name="userId">要修改密码的用户编号。</param>
 		/// <param name="oldPassword">指定的用户的当前密码。</param>
 		/// <param name="newPassword">指定的用户的新密码。</param>
+		/// <returns>如果修改成功返回真(True)，否则返回假(False)。</returns>
 		bool ChangePassword(uint userId, string oldPassword, string newPassword);
 
 		/// <summary>
@@ -244,6 +245,7 @@ namespace Zongsoft.Security.Membership
 		/// <param name="passwordAnswers">指定用户的密码问答的答案集。</param>
 		/// <param name="newPassword">重置后的新密码。</param>
 		/// <returns>如果密码重置成功则返回真(True)，否则返回假(False)。</returns>
+		/// <exception cref="SecurityException">如果指定的用户没有设置密码问答或者密码问答验证失败。</exception>
 		bool ResetPassword(string identity, string @namespace, string[] passwordAnswers, string newPassword = null);
 
 		/// <summary>
