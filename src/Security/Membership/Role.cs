@@ -33,17 +33,29 @@ namespace Zongsoft.Security.Membership
 	/// 表示角色的实体类。
 	/// </summary>
 	[Serializable]
-	public class Role : Zongsoft.Common.ModelBase, IMember
+	public class Role : IMember, IEquatable<Role>
 	{
 		#region 静态字段
 		public static readonly string Administrators = "Administrators";
 		public static readonly string Securities = "Securities";
 		#endregion
 
+		#region 成员字段
+		private uint _roleId;
+		private string _name;
+		private string _fullName;
+		private string _namespace;
+		private string _description;
+		private uint? _creatorId;
+		private DateTime _createdTime;
+		private uint? _modifierId;
+		private DateTime? _modifiedTime;
+		#endregion
+
 		#region 构造函数
 		public Role()
 		{
-			this.CreatedTime = DateTime.Now;
+			this.CreatedTime = DateTime.UtcNow;
 		}
 
 		public Role(string name, string @namespace) : this(0, name, @namespace)
@@ -57,12 +69,12 @@ namespace Zongsoft.Security.Membership
 		public Role(uint roleId, string name, string @namespace)
 		{
 			if(string.IsNullOrWhiteSpace(name))
-				throw new ArgumentNullException("name");
+				throw new ArgumentNullException(nameof(name));
 
 			this.RoleId = roleId;
 			this.Name = this.FullName = name.Trim();
 			this.Namespace = @namespace;
-			this.CreatedTime = DateTime.Now;
+			this.CreatedTime = DateTime.UtcNow;
 		}
 		#endregion
 
@@ -100,11 +112,11 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return this.GetPropertyValue(() => this.RoleId);
+				return _roleId;
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.RoleId, value);
+				_roleId = value;
 			}
 		}
 
@@ -115,7 +127,7 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return this.GetPropertyValue(() => this.Name);
+				return _name;
 			}
 			set
 			{
@@ -136,7 +148,7 @@ namespace Zongsoft.Security.Membership
 					throw new ArgumentOutOfRangeException($"The '{value}' role name length must be greater than 3.");
 
 				//更新属性内容
-				this.SetPropertyValue(() => this.Name, value);
+				_name = value;
 			}
 		}
 
@@ -147,11 +159,11 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return this.GetPropertyValue(() => this.FullName);
+				return _fullName;
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.FullName, value);
+				_fullName = value;
 			}
 		}
 
@@ -162,7 +174,7 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return this.GetPropertyValue(() => this.Namespace);
+				return _namespace;
 			}
 			set
 			{
@@ -174,12 +186,12 @@ namespace Zongsoft.Security.Membership
 					{
 						//命名空间的字符必须是字母、数字、下划线或点号组成
 						if(!Char.IsLetterOrDigit(chr) && chr != '_' && chr != '.')
-							throw new ArgumentException("The role namespace contains invalid character.");
+							throw new ArgumentException("The role namespace contains illegal character.");
 					}
 				}
 
 				//更新属性内容
-				this.SetPropertyValue(() => this.Namespace, string.IsNullOrWhiteSpace(value) ? null : value.Trim());
+				_namespace = string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 			}
 		}
 
@@ -190,26 +202,26 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return this.GetPropertyValue(() => this.Description);
+				return _description;
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.Description, value);
+				_description = value;
 			}
 		}
 
 		/// <summary>
 		/// 获取或设置角色的创人编号。
 		/// </summary>
-		public uint CreatorId
+		public uint? CreatorId
 		{
 			get
 			{
-				return this.GetPropertyValue(() => this.CreatorId);
+				return _creatorId;
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.CreatorId, value);
+				_creatorId = value;
 			}
 		}
 
@@ -220,11 +232,11 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return this.GetPropertyValue(() => this.CreatedTime);
+				return _createdTime;
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.CreatedTime, value);
+				_createdTime = value;
 			}
 		}
 
@@ -235,11 +247,11 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return this.GetPropertyValue(() => this.ModifierId);
+				return _modifierId;
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.ModifierId, value);
+				_modifierId = value;
 			}
 		}
 
@@ -250,37 +262,50 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return this.GetPropertyValue(() => this.ModifiedTime);
+				return _modifiedTime;
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.ModifiedTime, value);
+				_modifiedTime = value;
 			}
 		}
 		#endregion
 
 		#region 重写方法
+		public bool Equals(Role other)
+		{
+			if(other == null)
+				return false;
+
+			return this.RoleId == other.RoleId &&
+			       string.Equals(this.Namespace, other.Namespace, StringComparison.OrdinalIgnoreCase) &&
+			       string.Equals(this.Name, other.Name, StringComparison.OrdinalIgnoreCase);
+		}
+
 		public override bool Equals(object obj)
 		{
 			if(obj == null || obj.GetType() != this.GetType())
 				return false;
 
-			var other = (Role)obj;
-
-			return this.RoleId == other.RoleId && string.Equals(this.Namespace, other.Namespace, StringComparison.OrdinalIgnoreCase);
+			return this.Equals((Role)obj);
 		}
 
 		public override int GetHashCode()
 		{
-			return (this.Namespace + ":" + this.RoleId.ToString()).ToLowerInvariant().GetHashCode();
+			var roleId = this.RoleId;
+
+			if(roleId != 0)
+				return (int)roleId;
+			else
+				return (this.Namespace + ":" + this.Name).ToLowerInvariant().GetHashCode();
 		}
 
 		public override string ToString()
 		{
 			if(string.IsNullOrWhiteSpace(this.Namespace))
-				return string.Format("[{0}]{1}", this.RoleId.ToString(), this.Name);
+				return $"[{this.RoleId.ToString()}]{this.Name}";
 			else
-				return string.Format("[{0}]{1}@{2}", this.RoleId.ToString(), this.Name, this.Namespace);
+				return $"[{this.RoleId.ToString()}]{this.Namespace}:{this.Name}";
 		}
 		#endregion
 

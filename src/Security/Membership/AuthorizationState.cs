@@ -28,23 +28,25 @@ using System;
 
 namespace Zongsoft.Security.Membership
 {
-	public struct AuthorizationState
+	public class AuthorizationState : IEquatable<AuthorizationState>
 	{
 		#region 成员变量
 		private string _schemaId;
 		private string _actionId;
+		private string _filter;
 		#endregion
 
 		#region 构造函数
-		public AuthorizationState(string schemaId, string actionId)
+		public AuthorizationState(string schemaId, string actionId, string filter = null)
 		{
 			if(string.IsNullOrWhiteSpace(schemaId))
-				throw new ArgumentNullException("schemaId");
+				throw new ArgumentNullException(nameof(schemaId));
 			if(string.IsNullOrWhiteSpace(actionId))
-				throw new ArgumentNullException("actionId");
+				throw new ArgumentNullException(nameof(actionId));
 
 			_schemaId = schemaId.Trim();
 			_actionId = actionId.Trim();
+			_filter = filter;
 		}
 		#endregion
 
@@ -84,18 +86,36 @@ namespace Zongsoft.Security.Membership
 				_actionId = value.Trim();
 			}
 		}
+
+		/// <summary>
+		/// 获取或设置过滤文本。
+		/// </summary>
+		public string Filter
+		{
+			get
+			{
+				return _filter;
+			}
+			set
+			{
+				_filter = value;
+			}
+		}
 		#endregion
 
 		#region 重写方法
+		public bool Equals(AuthorizationState other)
+		{
+			return string.Equals(_schemaId, other._schemaId, StringComparison.OrdinalIgnoreCase) &&
+			       string.Equals(_actionId, other._actionId, StringComparison.OrdinalIgnoreCase);
+		}
+
 		public override bool Equals(object obj)
 		{
 			if(obj == null || obj.GetType() != this.GetType())
 				return false;
 
-			var other = (AuthorizationState)obj;
-
-			return string.Equals(_schemaId, other._schemaId, StringComparison.OrdinalIgnoreCase) &&
-				   string.Equals(_actionId, other._actionId, StringComparison.OrdinalIgnoreCase);
+			return this.Equals((AuthorizationState)obj);
 		}
 
 		public override int GetHashCode()
@@ -105,7 +125,10 @@ namespace Zongsoft.Security.Membership
 
 		public override string ToString()
 		{
-			return string.Format("{0}:{1}", _schemaId, _actionId);
+			if(string.IsNullOrEmpty(_filter))
+				return string.Format("{0}:{1}", _schemaId, _actionId);
+			else
+				return string.Format("{0}:{1} ({2})", _schemaId, _actionId, _filter);
 		}
 		#endregion
 	}

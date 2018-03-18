@@ -33,17 +33,36 @@ namespace Zongsoft.Security.Membership
 	/// 表示用户的实体类。
 	/// </summary>
 	[Serializable]
-	public class User : Zongsoft.Common.ModelBase, IMember
+	public class User : IMember, IEquatable<User>
 	{
 		#region 静态字段
 		public static readonly string Administrator = "Administrator";
 		public static readonly string Guest = "Guest";
 		#endregion
 
+		#region 成员字段
+		private uint _userId;
+		private string _name;
+		private string _fullName;
+		private string _namespace;
+		private string _avatar;
+		private string _email;
+		private string _phoneNumber;
+		private string _principalId;
+		private object _principal;
+		private UserStatus _status;
+		private DateTime? _statusTimestamp;
+		private string _description;
+		private uint? _creatorId;
+		private DateTime _createdTime;
+		private uint? _modifierId;
+		private DateTime? _modifiedTime;
+		#endregion
+
 		#region 构造函数
 		public User()
 		{
-			this.CreatedTime = DateTime.Now;
+			this.CreatedTime = DateTime.UtcNow;
 		}
 
 		public User(string name, string @namespace) : this(0, name, @namespace)
@@ -57,12 +76,12 @@ namespace Zongsoft.Security.Membership
 		public User(uint userId, string name, string @namespace)
 		{
 			if(string.IsNullOrWhiteSpace(name))
-				throw new ArgumentNullException("name");
+				throw new ArgumentNullException(nameof(name));
 
 			this.UserId = userId;
 			this.Name = this.FullName = name.Trim();
 			this.Namespace = @namespace;
-			this.CreatedTime = DateTime.Now;
+			this.CreatedTime = DateTime.UtcNow;
 		}
 		#endregion
 
@@ -100,11 +119,11 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return this.GetPropertyValue(() => this.UserId);
+				return _userId;
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.UserId, value);
+				_userId = value;
 			}
 		}
 
@@ -115,7 +134,7 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return this.GetPropertyValue(() => this.Name);
+				return _name;
 			}
 			set
 			{
@@ -136,7 +155,7 @@ namespace Zongsoft.Security.Membership
 					throw new ArgumentOutOfRangeException($"The '{value}' user name length must be greater than 3.");
 
 				//更新属性内容
-				this.SetPropertyValue(() => this.Name, value);
+				_name = value;
 			}
 		}
 
@@ -147,11 +166,11 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return this.GetPropertyValue(() => this.FullName);
+				return _fullName;
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.FullName, value);
+				_fullName = value;
 			}
 		}
 
@@ -162,7 +181,7 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return this.GetPropertyValue(()=>this.Namespace);
+				return _namespace;
 			}
 			set
 			{
@@ -174,12 +193,12 @@ namespace Zongsoft.Security.Membership
 					{
 						//命名空间的字符必须是字母、数字、下划线或点号组成
 						if(!Char.IsLetterOrDigit(chr) && chr != '_' && chr != '.')
-							throw new ArgumentException("The user namespace contains invalid character.");
+							throw new ArgumentException("The user namespace contains illegal character.");
 					}
 				}
 
 				//更新属性内容
-				this.SetPropertyValue(() => this.Namespace, string.IsNullOrWhiteSpace(value) ? null : value.Trim());
+				_namespace = string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 			}
 		}
 
@@ -190,11 +209,11 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return this.GetPropertyValue(() => this.Description);
+				return _description;
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.Description, value);
+				_description = value;
 			}
 		}
 
@@ -205,7 +224,7 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return this.GetPropertyValue(() => this.Avatar);
+				return _avatar;
 			}
 			set
 			{
@@ -223,7 +242,7 @@ namespace Zongsoft.Security.Membership
 					catch { }
 				}
 
-				this.SetPropertyValue(() => this.Avatar, value);
+				_avatar = value;
 			}
 		}
 
@@ -234,11 +253,11 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return this.GetPropertyValue(() => this.Principal);
+				return _principal;
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.Principal, value);
+				_principal = value;
 			}
 		}
 
@@ -249,32 +268,26 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return this.GetPropertyValue(() => this.PrincipalId);
+				return _principalId;
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.PrincipalId, value);
+				_principalId = value;
 			}
 		}
 
 		/// <summary>
-		/// 获取或设置用户的电子邮箱地址，邮箱地址不允许重复。
+		/// 获取或设置用户的电子邮箱地址。
 		/// </summary>
 		public string Email
 		{
 			get
 			{
-				return this.GetPropertyValue(() => this.Email);
+				return _email;
 			}
 			set
 			{
-				if(!string.IsNullOrWhiteSpace(value))
-				{
-					if(!Text.TextRegular.Web.Email.IsMatch(value))
-						throw new ArgumentException("Invalid email format.");
-				}
-
-				this.SetPropertyValue(() => this.Email, string.IsNullOrWhiteSpace(value) ? null : value.Trim());
+				_email = string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 			}
 		}
 
@@ -285,11 +298,11 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return this.GetPropertyValue(() => this.PhoneNumber);
+				return _phoneNumber;
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.PhoneNumber, string.IsNullOrWhiteSpace(value) ? null : value.Trim());
+				_phoneNumber = string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 			}
 		}
 
@@ -300,14 +313,11 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return this.GetPropertyValue(() => this.Status);
+				return _status;
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.Status, value);
-
-				//同步设置状态更新时间戳
-				this.StatusTimestamp = DateTime.Now;
+				_status = value;
 			}
 		}
 
@@ -318,11 +328,11 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return this.GetPropertyValue(() => this.StatusTimestamp);
+				return _statusTimestamp;
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.StatusTimestamp, value);
+				_statusTimestamp = value;
 			}
 		}
 
@@ -333,11 +343,11 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return this.GetPropertyValue(() => this.CreatorId);
+				return _creatorId;
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.CreatorId, value);
+				_creatorId = value;
 			}
 		}
 
@@ -348,11 +358,11 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return this.GetPropertyValue(() => this.CreatedTime);
+				return _createdTime;
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.CreatedTime, value);
+				_createdTime = value;
 			}
 		}
 
@@ -363,11 +373,11 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return this.GetPropertyValue(() => this.ModifierId);
+				return _modifierId;
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.ModifierId, value);
+				_modifierId = value;
 			}
 		}
 
@@ -378,37 +388,50 @@ namespace Zongsoft.Security.Membership
 		{
 			get
 			{
-				return this.GetPropertyValue(() => this.ModifiedTime);
+				return _modifiedTime;
 			}
 			set
 			{
-				this.SetPropertyValue(() => this.ModifiedTime, value);
+				_modifiedTime = value;
 			}
 		}
 		#endregion
 
 		#region 重写方法
+		public bool Equals(User other)
+		{
+			if(other == null)
+				return false;
+
+			return this.UserId == other.UserId &&
+			       string.Equals(this.Namespace, other.Namespace, StringComparison.OrdinalIgnoreCase) &&
+			       string.Equals(this.Name, other.Name, StringComparison.OrdinalIgnoreCase);
+		}
+
 		public override bool Equals(object obj)
 		{
 			if(obj == null || obj.GetType() != this.GetType())
 				return false;
 
-			var other = (User)obj;
-
-			return this.UserId == other.UserId && string.Equals(this.Namespace, other.Namespace, StringComparison.OrdinalIgnoreCase);
+			return this.Equals((User)obj);
 		}
 
 		public override int GetHashCode()
 		{
-			return (this.Namespace + ":" + this.UserId.ToString()).ToLowerInvariant().GetHashCode();
+			var userId = this.UserId;
+
+			if(userId != 0)
+				return (int)userId;
+			else
+				return (this.Namespace + ":" + this.Name).ToLowerInvariant().GetHashCode();
 		}
 
 		public override string ToString()
 		{
 			if(string.IsNullOrWhiteSpace(this.Namespace))
-				return string.Format("[{0}]{1}", this.UserId.ToString(), this.Name);
+				return $"[{this.UserId.ToString()}]{this.Name}";
 			else
-				return string.Format("[{0}]{1}@{2}", this.UserId.ToString(), this.Name, this.Namespace);
+				return $"[{this.UserId.ToString()}]{this.Namespace}:{this.Name}";
 		}
 		#endregion
 
