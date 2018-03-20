@@ -33,7 +33,7 @@ namespace Zongsoft.Security.Membership
 	/// 表示角色的实体类。
 	/// </summary>
 	[Serializable]
-	public class Role : IMember, IEquatable<Role>
+	public class Role : Common.ModelBase, IMember, IEquatable<Role>
 	{
 		#region 静态字段
 		public static readonly string Administrators = "Administrators";
@@ -116,7 +116,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_roleId = value;
+				this.SetPropertyValue(nameof(RoleId), ref _roleId, value);
 			}
 		}
 
@@ -148,7 +148,7 @@ namespace Zongsoft.Security.Membership
 					throw new ArgumentOutOfRangeException($"The '{value}' role name length must be greater than 3.");
 
 				//更新属性内容
-				_name = value;
+				this.SetPropertyValue(nameof(Name), ref _name, value);
 			}
 		}
 
@@ -163,7 +163,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_fullName = value;
+				this.SetPropertyValue(nameof(FullName), ref _fullName, value);
 			}
 		}
 
@@ -191,7 +191,7 @@ namespace Zongsoft.Security.Membership
 				}
 
 				//更新属性内容
-				_namespace = string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+				this.SetPropertyValue(nameof(Namespace), ref _namespace, string.IsNullOrWhiteSpace(value) ? null : value.Trim());
 			}
 		}
 
@@ -206,7 +206,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_description = value;
+				this.SetPropertyValue(nameof(Description), ref _description, value);
 			}
 		}
 
@@ -221,7 +221,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_creatorId = value;
+				this.SetPropertyValue(nameof(CreatorId), ref _creatorId, value);
 			}
 		}
 
@@ -236,7 +236,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_createdTime = value;
+				this.SetPropertyValue(nameof(CreatedTime), ref _createdTime, value);
 			}
 		}
 
@@ -251,7 +251,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_modifierId = value;
+				this.SetPropertyValue(nameof(ModifierId), ref _modifierId, value);
 			}
 		}
 
@@ -266,7 +266,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_modifiedTime = value;
+				this.SetPropertyValue(nameof(ModifiedTime), ref _modifiedTime, value);
 			}
 		}
 		#endregion

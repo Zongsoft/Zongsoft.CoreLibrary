@@ -123,7 +123,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_userId = value;
+				this.SetPropertyValue(nameof(UserId), ref _userId, value);
 			}
 		}
 
@@ -155,7 +155,7 @@ namespace Zongsoft.Security.Membership
 					throw new ArgumentOutOfRangeException($"The '{value}' user name length must be greater than 3.");
 
 				//更新属性内容
-				_name = value;
+				this.SetPropertyValue(nameof(Name), ref _name, value);
 			}
 		}
 
@@ -170,7 +170,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_fullName = value;
+				this.SetPropertyValue(nameof(FullName), ref _fullName, value);
 			}
 		}
 
@@ -198,7 +198,7 @@ namespace Zongsoft.Security.Membership
 				}
 
 				//更新属性内容
-				_namespace = string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+				this.SetPropertyValue(nameof(Namespace), ref _namespace, string.IsNullOrWhiteSpace(value) ? null : value.Trim());
 			}
 		}
 
@@ -213,7 +213,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_description = value;
+				this.SetPropertyValue(nameof(Description), ref _description, value);
 			}
 		}
 
@@ -242,7 +242,7 @@ namespace Zongsoft.Security.Membership
 					catch { }
 				}
 
-				_avatar = value;
+				this.SetPropertyValue(nameof(Avatar), ref _avatar, value);
 			}
 		}
 
@@ -257,7 +257,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_principal = value;
+				this.SetPropertyValue(nameof(Principal), ref _principal, value);
 			}
 		}
 
@@ -272,7 +272,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_principalId = value;
+				this.SetPropertyValue(nameof(PrincipalId), ref _principalId, value);
 			}
 		}
 
@@ -287,7 +287,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_email = string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+				this.SetPropertyValue(nameof(Email), ref _email, string.IsNullOrWhiteSpace(value) ? null : value.Trim());
 			}
 		}
 
@@ -302,7 +302,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_phoneNumber = string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+				this.SetPropertyValue(nameof(PhoneNumber), ref _phoneNumber, string.IsNullOrWhiteSpace(value) ? null : value.Trim());
 			}
 		}
 
@@ -317,7 +317,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_status = value;
+				this.SetPropertyValue(nameof(Status), ref _status, value);
 			}
 		}
 
@@ -332,7 +332,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_statusTimestamp = value;
+				this.SetPropertyValue(nameof(StatusTimestamp), ref _statusTimestamp, value);
 			}
 		}
 
@@ -347,7 +347,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_creatorId = value;
+				this.SetPropertyValue(nameof(CreatorId), ref _creatorId, value);
 			}
 		}
 
@@ -362,7 +362,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_createdTime = value;
+				this.SetPropertyValue(nameof(CreatedTime), ref _createdTime, value);
 			}
 		}
 
@@ -377,7 +377,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_modifierId = value;
+				this.SetPropertyValue(nameof(ModifierId), ref _modifierId, value);
 			}
 		}
 
@@ -392,7 +392,7 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				_modifiedTime = value;
+				this.SetPropertyValue(nameof(ModifiedTime), ref _modifiedTime, value);
 			}
 		}
 		#endregion
