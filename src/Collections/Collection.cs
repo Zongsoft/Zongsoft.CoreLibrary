@@ -197,8 +197,7 @@ namespace Zongsoft.Collections
 			_items.Clear();
 
 			//激发“CollectionChanged”事件
-			if(this.CollectionChanged != null)
-				this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+			this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
 		}
 
 		protected virtual void InsertItems(int index, IEnumerable<T> items)
@@ -214,7 +213,7 @@ namespace Zongsoft.Collections
 				list = new List<T>(items);
 
 			//激发“CollectionChanged”事件
-			if(list.Count > 0 && this.CollectionChanged != null)
+			if(list.Count > 0)
 				this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, list, index));
 		}
 
@@ -225,8 +224,7 @@ namespace Zongsoft.Collections
 			_items.RemoveAt(index);
 
 			//激发“CollectionChanged”事件
-			if(this.CollectionChanged != null)
-				this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, index));
+			this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, index));
 		}
 
 		protected virtual void SetItem(int index, T item)
@@ -236,8 +234,7 @@ namespace Zongsoft.Collections
 			_items[index] = item;
 
 			//激发“CollectionChanged”事件
-			if(this.CollectionChanged != null)
-				this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, item, oldItem, index));
+			this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, item, oldItem, index));
 		}
 
 		protected virtual bool TryConvertItem(object value, out T item)
