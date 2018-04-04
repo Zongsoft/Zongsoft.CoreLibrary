@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2014 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2014-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -83,7 +83,7 @@ namespace Zongsoft.Options.Profiles
 			}
 		}
 
-		public ProfileItemCollection Items
+		public ICollection<ProfileItem> Items
 		{
 			get
 			{
@@ -91,7 +91,7 @@ namespace Zongsoft.Options.Profiles
 			}
 		}
 
-		public ProfileCommentCollection Comments
+		public ICollection<ProfileComment> Comments
 		{
 			get
 			{
@@ -102,7 +102,7 @@ namespace Zongsoft.Options.Profiles
 			}
 		}
 
-		public ProfileSectionCollection Sections
+		public Collections.INamedCollection<ProfileSection> Sections
 		{
 			get
 			{
@@ -150,9 +150,7 @@ namespace Zongsoft.Options.Profiles
 
 							foreach(string part in parts)
 							{
-								section = sections[part];
-
-								if(section == null)
+								if(!sections.TryGet(part, out section))
 									section = sections.Add(part, lineNumber);
 
 								sections = section.Sections;
@@ -274,30 +272,24 @@ namespace Zongsoft.Options.Profiles
 
 			if(section == null)
 			{
-				section = this.Sections[name];
-
-				if(section == null)
-					return null;
-				else
+				if(this.Sections.TryGet(name, out section))
 					return section.Entries;
+				else
+					return null;
 			}
 
 			if(isSectionPath)
 			{
-				section = section.Sections[name];
-
-				if(section == null)
-					return null;
-				else
+				if(section.Sections.TryGet(name, out section))
 					return section.Entries;
+				else
+					return null;
 			}
 
-			var entry = section.Entries[name];
-
-			if(entry == null)
-				return null;
-			else
+			if(section.Entries.TryGet(name, out var entry))
 				return entry.Value;
+
+			return null;
 		}
 
 		public void SetOptionValue(string path, object optionObject)
@@ -311,15 +303,19 @@ namespace Zongsoft.Options.Profiles
 
 			if(section == null)
 			{
-				section = this.Sections[name] ?? this.Sections.Add(name);
-				this.UpdateEntries(section, optionObject);
+				if(!this.Sections.TryGet(name, out var child))
+					child = this.Sections.Add(name);
+
+				this.UpdateEntries(child, optionObject);
 			}
 			else
 			{
 				if(isSectionPath)
 				{
-					section = section.Sections[name] ?? section.Sections.Add(name);
-					this.UpdateEntries(section, optionObject);
+					if(!section.Sections.TryGet(name, out var child))
+						child = section.Sections.Add(name);
+
+					this.UpdateEntries(child, optionObject);
 				}
 				else
 				{
@@ -372,9 +368,7 @@ namespace Zongsoft.Options.Profiles
 				if(string.IsNullOrWhiteSpace(parts[i]))
 					continue;
 
-				section = sections[parts[i]];
-
-				if(section == null)
+				if(!sections.TryGet(parts[i], out section))
 				{
 					if(!createSectionOnNotExists)
 						return false;
@@ -508,6 +502,9 @@ namespace Zongsoft.Options.Profiles
 			result = text;
 			return LineType.Entry;
 		}
+		#endregion
+
+		#region 嵌套子类
 		#endregion
 	}
 }

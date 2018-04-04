@@ -33,7 +33,7 @@ namespace Zongsoft.Reflection
 	public class MemberAccess
 	{
 		#region 路径操作
-		public static MemberToken[] Resolve(string path)
+		public static MemberPathSegment[] Resolve(string path)
 		{
 			if(string.IsNullOrWhiteSpace(path))
 				return null;
@@ -44,7 +44,7 @@ namespace Zongsoft.Reflection
 			});
 		}
 
-		public static bool TryResolve(string path, out MemberToken[] members)
+		public static bool TryResolve(string path, out MemberPathSegment[] members)
 		{
 			members = null;
 
@@ -61,13 +61,13 @@ namespace Zongsoft.Reflection
 			return succeed;
 		}
 
-		public static MemberToken[] Resolve(string path, Action<string> onError)
+		public static MemberPathSegment[] Resolve(string path, Action<string> onError)
 		{
 			if(string.IsNullOrWhiteSpace(path))
 				return null;
 
 			var part = string.Empty;
-			var parts = new List<MemberToken>();
+			var parts = new List<MemberPathSegment>();
 			var quote = '\0';
 			var escaping = false;
 			var spaces = 0;
@@ -146,7 +146,7 @@ namespace Zongsoft.Reflection
 
 							spaces = 0;
 
-							parts.Add(new MemberToken(part));
+							parts.Add(new MemberPathSegment(part));
 							part = string.Empty;
 
 							break;
@@ -185,7 +185,7 @@ namespace Zongsoft.Reflection
 							}
 
 							if(part.Length > 0)
-								parts.Add(new MemberToken(part));
+								parts.Add(new MemberPathSegment(part));
 
 							spaces = 0;
 							part = null;
@@ -207,7 +207,7 @@ namespace Zongsoft.Reflection
 							}
 
 							parameters.Add(GetParameterValue(part, isString));
-							parts.Add(new MemberToken(parameters.ToArray()));
+							parts.Add(new MemberPathSegment(parameters.ToArray()));
 
 							spaces = 0;
 							part = string.Empty;
@@ -275,7 +275,7 @@ namespace Zongsoft.Reflection
 					return null;
 				}
 
-				parts.Add(new MemberToken(part));
+				parts.Add(new MemberPathSegment(part));
 			}
 
 			return parts.ToArray();
@@ -329,7 +329,7 @@ namespace Zongsoft.Reflection
 			return GetMemberType(origin, Resolve(path));
 		}
 
-		public static Type GetMemberType(object origin, MemberToken[] members)
+		public static Type GetMemberType(object origin, MemberPathSegment[] members)
 		{
 			if(origin == null)
 				throw new ArgumentNullException(nameof(origin));
@@ -359,7 +359,7 @@ namespace Zongsoft.Reflection
 			return TryGetMemberType(origin, Resolve(path), out memberType);
 		}
 
-		public static bool TryGetMemberType(object origin, MemberToken[] members, out Type memberType)
+		public static bool TryGetMemberType(object origin, MemberPathSegment[] members, out Type memberType)
 		{
 			if(origin == null)
 				throw new ArgumentNullException(nameof(origin));
@@ -399,7 +399,7 @@ namespace Zongsoft.Reflection
 			return GetMemberValue<T>(origin, Resolve(path), resolve);
 		}
 
-		public static T GetMemberValue<T>(object origin, MemberToken[] members, Func<MemberGettingContext, MemberGettingResult> resolve = null)
+		public static T GetMemberValue<T>(object origin, MemberPathSegment[] members, Func<MemberGettingContext, MemberGettingResult> resolve = null)
 		{
 			if(origin == null)
 				throw new ArgumentNullException(nameof(origin));
@@ -422,7 +422,7 @@ namespace Zongsoft.Reflection
 			return TryGetMemberValue<T>(origin, Resolve(path), out value, resolve);
 		}
 
-		public static bool TryGetMemberValue<T>(object origin, MemberToken[] members, out T value, Func<MemberGettingContext, MemberGettingResult> resolve = null)
+		public static bool TryGetMemberValue<T>(object origin, MemberPathSegment[] members, out T value, Func<MemberGettingContext, MemberGettingResult> resolve = null)
 		{
 			if(origin == null)
 				throw new ArgumentNullException(nameof(origin));
@@ -458,7 +458,7 @@ namespace Zongsoft.Reflection
 			SetMemberValue(origin, Resolve(path), valueFactory, getter, setter);
 		}
 
-		public static void SetMemberValue<T>(object origin, MemberToken[] members, T value, Func<MemberGettingContext, object> getter = null, Action<MemberSettingContext<T>> setter = null)
+		public static void SetMemberValue<T>(object origin, MemberPathSegment[] members, T value, Func<MemberGettingContext, object> getter = null, Action<MemberSettingContext<T>> setter = null)
 		{
 			if(origin == null)
 				throw new ArgumentNullException(nameof(origin));
@@ -468,7 +468,7 @@ namespace Zongsoft.Reflection
 			SetMemberValue(origin, members, () => value, getter, setter);
 		}
 
-		public static void SetMemberValue<T>(object origin, MemberToken[] members, Func<T> valueFactory, Func<MemberGettingContext, object> getter = null, Action<MemberSettingContext<T>> setter = null)
+		public static void SetMemberValue<T>(object origin, MemberPathSegment[] members, Func<T> valueFactory, Func<MemberGettingContext, object> getter = null, Action<MemberSettingContext<T>> setter = null)
 		{
 			if(origin == null)
 				throw new ArgumentNullException(nameof(origin));
@@ -519,12 +519,12 @@ namespace Zongsoft.Reflection
 			return TrySetMemberValue(origin, Resolve(path), valueFactory, getter, setter);
 		}
 
-		public static bool TrySetMemberValue<T>(object origin, MemberToken[] members, T value, Func<MemberGettingContext, object> getter = null, Action<MemberSettingContext<T>> setter = null)
+		public static bool TrySetMemberValue<T>(object origin, MemberPathSegment[] members, T value, Func<MemberGettingContext, object> getter = null, Action<MemberSettingContext<T>> setter = null)
 		{
 			return TrySetMemberValue(origin, members, () => value, getter, setter);
 		}
 
-		public static bool TrySetMemberValue<T>(object origin, MemberToken[] members, Func<T> valueFactory, Func<MemberGettingContext, object> getter = null, Action<MemberSettingContext<T>> setter = null)
+		public static bool TrySetMemberValue<T>(object origin, MemberPathSegment[] members, Func<T> valueFactory, Func<MemberGettingContext, object> getter = null, Action<MemberSettingContext<T>> setter = null)
 		{
 			if(origin == null || members == null || valueFactory == null || members.Length == 0)
 				return false;
@@ -591,7 +591,7 @@ namespace Zongsoft.Reflection
 			return false;
 		}
 
-		internal static MemberInfo GetMemberInfo(object owner, MemberToken token)
+		internal static MemberInfo GetMemberInfo(object owner, MemberPathSegment token)
 		{
 			if(owner == null)
 				return null;
@@ -600,7 +600,7 @@ namespace Zongsoft.Reflection
 
 			var members = type.FindMembers(MemberTypes.Field | MemberTypes.Property, BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static, (member, criteria) =>
 			{
-				MemberToken memberToken = (MemberToken)criteria;
+				MemberPathSegment memberToken = (MemberPathSegment)criteria;
 
 				if(memberToken.IsIndexer && member.MemberType == MemberTypes.Property)
 				{
@@ -648,7 +648,7 @@ namespace Zongsoft.Reflection
 			return null;
 		}
 
-		internal static bool TryGetMemberValueCore(object owner, MemberToken token, out object value)
+		internal static bool TryGetMemberValueCore(object owner, MemberPathSegment token, out object value)
 		{
 			value = null;
 
@@ -673,7 +673,7 @@ namespace Zongsoft.Reflection
 			return false;
 		}
 
-		internal static void SetMemberValueCore<T>(object owner, MemberToken member, Func<T> valueFactory, bool throwsOnError)
+		internal static void SetMemberValueCore<T>(object owner, MemberPathSegment member, Func<T> valueFactory, bool throwsOnError)
 		{
 			if(owner == null)
 				throw new ArgumentNullException(nameof(owner));
@@ -705,7 +705,7 @@ namespace Zongsoft.Reflection
 			}
 		}
 
-		private static T GetMemberValueCore<T>(object origin, MemberToken[] members, Func<MemberGettingContext, MemberGettingResult> resolve, Action<object, MemberToken> onError)
+		private static T GetMemberValueCore<T>(object origin, MemberPathSegment[] members, Func<MemberGettingContext, MemberGettingResult> resolve, Action<object, MemberPathSegment> onError)
 		{
 			var owner = origin;
 			MemberGettingContext context = null;

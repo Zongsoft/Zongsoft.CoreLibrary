@@ -26,12 +26,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Zongsoft.Options.Profiles
 {
-	public class ProfileItemCollection : Zongsoft.Collections.Collection<ProfileItem>
+	internal class ProfileItemCollection : System.Collections.ObjectModel.ObservableCollection<ProfileItem>
 	{
 		#region 成员字段
 		private object _owner;
@@ -40,10 +38,7 @@ namespace Zongsoft.Options.Profiles
 		#region 构造函数
 		public ProfileItemCollection(object owner)
 		{
-			if(owner == null)
-				throw new ArgumentNullException("owner");
-
-			_owner = owner;
+			_owner = owner ?? throw new ArgumentNullException(nameof(owner));
 		}
 		#endregion
 
@@ -66,47 +61,20 @@ namespace Zongsoft.Options.Profiles
 		#endregion
 
 		#region 重写方法
-		protected override void InsertItems(int index, IEnumerable<ProfileItem> items)
+		protected override void InsertItem(int index, ProfileItem item)
 		{
-			foreach(var item in items)
-			{
+			if(item != null)
 				item.Owner = _owner;
-			}
 
-			base.InsertItems(index, items);
+			base.InsertItem(index, item);
 		}
 
 		protected override void SetItem(int index, ProfileItem item)
 		{
-			var oldItem = this.Items[index];
-
-			if(oldItem != null)
-				oldItem.Owner = null;
-
-			item.Owner = _owner;
+			if(item != null)
+				item.Owner = _owner;
 
 			base.SetItem(index, item);
-		}
-
-		protected override void RemoveItem(int index)
-		{
-			var item = this.Items[index];
-
-			if(item != null)
-				item.Owner = null;
-
-			base.RemoveItem(index);
-		}
-
-		protected override void ClearItems()
-		{
-			foreach(var item in this.Items)
-			{
-				if(item != null)
-					item.Owner = null;
-			}
-
-			base.ClearItems();
 		}
 		#endregion
 	}

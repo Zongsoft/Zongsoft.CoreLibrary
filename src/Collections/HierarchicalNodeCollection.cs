@@ -59,47 +59,20 @@ namespace Zongsoft.Collections
 			return item.Name;
 		}
 
-		protected override void InsertItems(int index, IEnumerable<T> items)
+		protected override void AddItem(T item)
 		{
-			foreach(var item in items)
-			{
-				item.InnerParent = _owner;
-			}
-
-			base.InsertItems(index, items);
-		}
-
-		protected override void SetItem(int index, T item)
-		{
-			var oldItem = this.Items[index];
-
-			if(oldItem != null)
-				oldItem.InnerParent = null;
-
-			item.InnerParent = _owner;
-
-			base.SetItem(index, item);
-		}
-
-		protected override void RemoveItem(int index)
-		{
-			var item = this.Items[index];
-
 			if(item != null)
-				item.InnerParent = null;
+				item.InnerParent = _owner;
 
-			base.RemoveItem(index);
+			base.AddItem(item);
 		}
 
-		protected override void ClearItems()
+		protected override void SetItem(string name, T item)
 		{
-			foreach(var item in this.Items)
-			{
-				if(item != null)
-					item.InnerParent = null;
-			}
+			if(item != null)
+				item.InnerParent = _owner;
 
-			base.ClearItems();
+			base.SetItem(name, item);
 		}
 		#endregion
 	}

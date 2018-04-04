@@ -83,7 +83,7 @@ namespace Zongsoft.Options.Profiles
 			}
 		}
 
-		public ProfileItemCollection Items
+		public ICollection<ProfileItem> Items
 		{
 			get
 			{
@@ -91,7 +91,7 @@ namespace Zongsoft.Options.Profiles
 			}
 		}
 
-		public ProfileEntryCollection Entries
+		public Collections.INamedCollection<ProfileEntry> Entries
 		{
 			get
 			{
@@ -102,7 +102,7 @@ namespace Zongsoft.Options.Profiles
 			}
 		}
 
-		public ProfileCommentCollection Comments
+		public ICollection<ProfileComment> Comments
 		{
 			get
 			{
@@ -113,7 +113,7 @@ namespace Zongsoft.Options.Profiles
 			}
 		}
 
-		public ProfileSectionCollection Sections
+		public Collections.INamedCollection<ProfileSection> Sections
 		{
 			get
 			{
@@ -143,9 +143,7 @@ namespace Zongsoft.Options.Profiles
 		#region 公共方法
 		public string GetEntryValue(string name)
 		{
-			var entry = this.Entries[name];
-
-			if(entry != null)
+			if(this.Entries.TryGet(name, out var entry))
 				return entry.Value;
 
 			return null;
@@ -153,9 +151,7 @@ namespace Zongsoft.Options.Profiles
 
 		public void SetEntryValue(string name, string value)
 		{
-			var entry = this.Entries[name];
-
-			if(entry != null)
+			if(this.Entries.TryGet(name, out var entry))
 				entry.Value = value;
 			else
 				this.Entries.Add(name, value);

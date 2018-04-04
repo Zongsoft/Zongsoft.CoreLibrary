@@ -30,7 +30,7 @@ using System.Linq;
 
 namespace Zongsoft.Options.Profiles
 {
-	public class ProfileCommentCollection : ICollection<ProfileComment>
+	internal class ProfileCommentCollection : ICollection<ProfileComment>
 	{
 		#region 成员字段
 		private ProfileItemCollection _items;
@@ -59,7 +59,7 @@ namespace Zongsoft.Options.Profiles
 		{
 			get
 			{
-				return _items.IsReadOnly;
+				return false;
 			}
 		}
 		#endregion

@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2014 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2014-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,37 +25,41 @@
  */
 
 using System;
-using System.Collections;
+using System.Collections.Generic;
 
 namespace Zongsoft.Options.Profiles
 {
-	internal class ProfileSectionCollection : ProfileItemViewBase<ProfileSection>
+	internal static class ProfileItemCollectionExtension
 	{
-		#region 构造函数
-		public ProfileSectionCollection(ProfileItemCollection items) : base(items)
+		public static ProfileComment Add(this ICollection<ProfileComment> comments, string comment, int lineNumber = -1)
 		{
-		}
-		#endregion
+			if(comment == null)
+				return null;
 
-		#region 公共方法
-		public ProfileSection Add(string name, int lineNumber = -1)
-		{
-			var item = new ProfileSection(name, lineNumber);
-			base.Add(item);
+			var item = new ProfileComment(comment, lineNumber);
+			comments.Add(item);
 			return item;
 		}
-		#endregion
 
-		#region 重写方法
-		protected override string GetKeyForItem(ProfileSection item)
+		public static ProfileSection Add(this Collections.INamedCollection<ProfileSection> sections, string name, int lineNumber = -1)
 		{
-			return item.Name;
+			var item = new ProfileSection(name, lineNumber);
+			sections.Add(item);
+			return item;
 		}
 
-		protected override bool OnItemMatch(ProfileItem item)
+		public static ProfileEntry Add(this Collections.INamedCollection<ProfileEntry> entries, string name, string value = null)
 		{
-			return item.ItemType == ProfileItemType.Section;
+			var item = new ProfileEntry(name, value);
+			entries.Add(item);
+			return item;
 		}
-		#endregion
+
+		public static ProfileEntry Add(this Collections.INamedCollection<ProfileEntry> entries, int lineNumber, string name, string value = null)
+		{
+			var item = new ProfileEntry(lineNumber, name, value);
+			entries.Add(item);
+			return item;
+		}
 	}
 }

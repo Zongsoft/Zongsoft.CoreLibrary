@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2013-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -30,22 +30,21 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Collections
 {
-	public abstract class NamedCollectionBase<T> : Collection<T>, INamedCollection<T>
+	public abstract class NamedCollectionBase<T> : ICollection<T>, ICollection, INamedCollection<T>
 	{
 		#region 成员字段
-		private StringComparer _comparer;
-		private Dictionary<string, T> _innerDictionary;
+		private readonly Dictionary<string, T> _innerDictionary;
 		#endregion
 
 		#region 构造函数
-		protected NamedCollectionBase() : this(null)
+		public NamedCollectionBase()
 		{
+			_innerDictionary = new Dictionary<string, T>(StringComparer.OrdinalIgnoreCase);
 		}
 
-		protected NamedCollectionBase(StringComparer comparer)
+		public NamedCollectionBase(StringComparer comparer)
 		{
-			_comparer = comparer ?? StringComparer.OrdinalIgnoreCase;
-			_innerDictionary = new Dictionary<string, T>(_comparer);
+			_innerDictionary = new Dictionary<string, T>(comparer ?? StringComparer.OrdinalIgnoreCase);
 		}
 		#endregion
 
@@ -54,36 +53,19 @@ namespace Zongsoft.Collections
 		{
 			get
 			{
-				name = name ?? string.Empty;
-
-				T result;
-
-				if(_innerDictionary.TryGetValue(name, out result))
-					return result;
-
-				return default(T);
+				return this.GetItem(name);
 			}
 			set
 			{
-				name = name ?? string.Empty;
+				this.SetItem(name, value);
+			}
+		}
 
-				T result;
-
-				if(_innerDictionary.TryGetValue(name, out result))
-				{
-					_innerDictionary[name] = value;
-
-					int index = this.Items.IndexOf(value);
-					if(index >= 0)
-						this.Items[index] = value;
-					else
-						this.Items.Add(value);
-				}
-				else
-				{
-					_innerDictionary.Add(name, value);
-					this.Items.Add(value);
-				}
+		public int Count
+		{
+			get
+			{
+				return _innerDictionary.Count;
 			}
 		}
 
@@ -99,99 +81,191 @@ namespace Zongsoft.Collections
 		{
 			get
 			{
-				T[] array = new T[this.Count];
-				base.Items.CopyTo(array, 0);
-				return array;
+				return _innerDictionary.Values;
+			}
+		}
+		#endregion
+
+		#region 保护方法
+		protected IDictionary<string, T> InnerDictionary
+		{
+			get
+			{
+				return _innerDictionary;
 			}
 		}
 		#endregion
 
 		#region 公共方法
+		public void Clear()
+		{
+			this.ClearItems();
+		}
+
 		public bool Contains(string name)
 		{
-			return _innerDictionary.ContainsKey(name ?? string.Empty);
+			return this.ContainsName(name);
+		}
+
+		public void CopyTo(T[] array, int arrayIndex)
+		{
+			if(array == null)
+				throw new ArgumentNullException(nameof(array));
+
+			if(arrayIndex < 0 || arrayIndex >= array.Length)
+				throw new ArgumentOutOfRangeException(nameof(arrayIndex));
+
+			var iterator = _innerDictionary.GetEnumerator();
+
+			for(int i = arrayIndex; i < array.Length; i++)
+			{
+				if(iterator.MoveNext())
+					array[i] = iterator.Current.Value;
+			}
 		}
 
 		public T Get(string name)
 		{
-			name = name ?? string.Empty;
-
-			T result;
-
-			if(_innerDictionary.TryGetValue(name, out result))
-				return result;
-
-			throw new KeyNotFoundException();
+			return this.GetItem(name);
 		}
 
 		public bool TryGet(string name, out T value)
 		{
-			name = name ?? string.Empty;
-			return _innerDictionary.TryGetValue(name, out value);
+			return this.TryGetItem(name, out value);
+		}
+
+		public void Add(T item)
+		{
+			this.AddItem(item);
 		}
 
 		public bool Remove(string name)
 		{
-			name = name ?? string.Empty;
-
-			T value;
-
-			if(_innerDictionary.TryGetValue(name, out value))
-			{
-				_innerDictionary.Remove(name);
-				base.Remove(value);
-				return true;
-			}
-
-			return false;
+			return this.RemoveItem(name);
 		}
 		#endregion
 
-		#region 重写方法
-		protected override void ClearItems()
+		#region 虚拟方法
+		protected virtual void ClearItems()
 		{
 			_innerDictionary.Clear();
-			base.ClearItems();
 		}
 
-		protected override void InsertItems(int index, IEnumerable<T> items)
+		protected virtual bool ContainsName(string name)
 		{
-			foreach(var item in items)
-			{
-				_innerDictionary.Add(this.GetKeyForItem(item), item);
-			}
-
-			base.InsertItems(index, items);
+			return _innerDictionary.ContainsKey(name);
 		}
 
-		protected override void RemoveItem(int index)
+		protected virtual T GetItem(string name)
 		{
-			string key = this.GetKeyForItem(this.Items[index]);
-			_innerDictionary.Remove(key);
-			base.RemoveItem(index);
+			T value;
+
+			if(_innerDictionary.TryGetValue(name, out value))
+				return value;
+
+			throw new KeyNotFoundException();
 		}
 
-		protected override void SetItem(int index, T item)
+		protected virtual void SetItem(string name, T value)
 		{
-			var newKey = this.GetKeyForItem(item);
-			var oldKey = this.GetKeyForItem(this.Items[index]);
+			var key = this.GetKeyForItem(value);
+			var comparer = (StringComparer)_innerDictionary.Comparer;
 
-			if(_comparer.Equals(oldKey, newKey))
-			{
-				_innerDictionary[newKey] = item;
-			}
-			else
-			{
-				_innerDictionary[newKey] = item;
-				_innerDictionary.Remove(oldKey);
-			}
+			if(comparer.Compare(key, name) != 0)
+				throw new InvalidOperationException("Specified name not equal to computed key of the item.");
 
-			base.SetItem(index, item);
+			_innerDictionary[name] = value;
+		}
+
+		protected virtual bool TryGetItem(string name, out T value)
+		{
+			return _innerDictionary.TryGetValue(name, out value);
+		}
+
+		protected virtual void AddItem(T item)
+		{
+			_innerDictionary.Add(this.GetKeyForItem(item), item);
+		}
+
+		protected virtual bool RemoveItem(string name)
+		{
+			return _innerDictionary.Remove(name);
 		}
 		#endregion
 
 		#region 抽象方法
 		protected abstract string GetKeyForItem(T item);
+		#endregion
+
+		#region 显式实现
+		bool ICollection<T>.IsReadOnly
+		{
+			get
+			{
+				return false;
+			}
+		}
+
+		bool ICollection.IsSynchronized
+		{
+			get
+			{
+				return ((ICollection)_innerDictionary).IsSynchronized;
+			}
+		}
+
+		object ICollection.SyncRoot
+		{
+			get
+			{
+				return ((ICollection)_innerDictionary).SyncRoot;
+			}
+		}
+
+		void ICollection.CopyTo(Array array, int arrayIndex)
+		{
+			if(array == null)
+				throw new ArgumentNullException(nameof(array));
+
+			if(arrayIndex < 0 || arrayIndex >= array.Length)
+				throw new ArgumentOutOfRangeException(nameof(arrayIndex));
+
+			var iterator = _innerDictionary.GetEnumerator();
+
+			for(int i = arrayIndex; i < array.Length; i++)
+			{
+				if(iterator.MoveNext())
+					array.SetValue(iterator.Current.Value, i);
+			}
+		}
+
+		bool ICollection<T>.Contains(T item)
+		{
+			return _innerDictionary.ContainsKey(this.GetKeyForItem(item));
+		}
+
+		bool ICollection<T>.Remove(T item)
+		{
+			return _innerDictionary.Remove(this.GetKeyForItem(item));
+		}
+		#endregion
+
+		#region 遍历枚举
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			foreach(var entry in _innerDictionary)
+			{
+				yield return entry.Value;
+			}
+		}
+
+		public IEnumerator<T> GetEnumerator()
+		{
+			foreach(var entry in _innerDictionary)
+			{
+				yield return entry.Value;
+			}
+		}
 		#endregion
 	}
 }

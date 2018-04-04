@@ -25,10 +25,9 @@
  */
 
 using System;
-using System.ComponentModel;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Text;
+using System.Collections.ObjectModel;
 
 namespace Zongsoft.Options
 {
@@ -52,7 +51,7 @@ namespace Zongsoft.Options
 
 		#region 成员字段
 		private OptionNode _root;
-		private Collections.Collection<IOptionProvider> _providers;
+		private ObservableCollection<IOptionProvider> _providers;
 		private IOptionLoaderSelector _loaderSelector;
 		#endregion
 
@@ -61,7 +60,7 @@ namespace Zongsoft.Options
 		{
 			_root = new OptionNode();
 			_unloadedProviders = new HashSet<IOptionProvider>();
-			_providers = new Zongsoft.Collections.Collection<IOptionProvider>();
+			_providers = new ObservableCollection<IOptionProvider>();
 			_providers.CollectionChanged += Providers_CollectionChanged;
 		}
 		#endregion

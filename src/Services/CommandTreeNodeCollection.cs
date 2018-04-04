@@ -30,7 +30,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Services
 {
-	public class CommandTreeNodeCollection : Zongsoft.Collections.HierarchicalNodeCollection<CommandTreeNode>
+	public class CommandTreeNodeCollection : Zongsoft.Collections.HierarchicalNodeCollection<CommandTreeNode>, ICollection<ICommand>
 	{
 		#region 构造函数
 		public CommandTreeNodeCollection(CommandTreeNode owner) : base(owner)
@@ -58,18 +58,70 @@ namespace Zongsoft.Services
 			this.Add(node);
 			return node;
 		}
+
+		public bool Contains(ICommand command)
+		{
+			if(command == null)
+				return false;
+
+			return this.ContainsName(command.Name);
+		}
+
+		public void CopyTo(ICommand[] array, int arrayIndex)
+		{
+			if(array == null)
+				throw new ArgumentNullException(nameof(array));
+
+			if(arrayIndex < 0 || arrayIndex >= array.Length)
+				throw new ArgumentOutOfRangeException(nameof(arrayIndex));
+
+			var iterator = base.GetEnumerator();
+
+			for(int i = arrayIndex; i < array.Length; i++)
+			{
+				if(iterator.MoveNext())
+					array[i] = iterator.Current?.Command;
+			}
+		}
+
+		public bool Remove(ICommand command)
+		{
+			if(command == null)
+				return false;
+
+			return base.RemoveItem(command.Name);
+		}
 		#endregion
 
 		#region 重写方法
-		protected override bool TryConvertItem(object value, out CommandTreeNode item)
+		protected override string GetKeyForItem(CommandTreeNode item)
 		{
-			if(value is ICommand)
-			{
-				item = new CommandTreeNode((ICommand)value, this.Owner);
-				return true;
-			}
+			return item.Name;
+		}
+		#endregion
 
-			return base.TryConvertItem(value, out item);
+		#region 接口实现
+		bool ICollection<ICommand>.IsReadOnly
+		{
+			get
+			{
+				return false;
+			}
+		}
+
+		void ICollection<ICommand>.Add(ICommand item)
+		{
+			this.Add(item);
+		}
+
+		IEnumerator<ICommand> IEnumerable<ICommand>.GetEnumerator()
+		{
+			var iterator = base.GetEnumerator();
+
+			while(iterator.MoveNext())
+			{
+				yield return iterator.Current?.Command;
+			}
 		}
 		#endregion
 	}

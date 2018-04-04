@@ -38,13 +38,13 @@ namespace Zongsoft.Reflection
 		#endregion
 
 		#region 构造函数
-		internal MemberSettingContext(object owner, MemberToken memberToken, T value, MemberGettingContext parent = null) : base(owner, memberToken, parent)
+		internal MemberSettingContext(object owner, MemberPathSegment memberToken, T value, MemberGettingContext parent = null) : base(owner, memberToken, parent)
 		{
 			_value = value;
 			_valueEvaluated = 1;
 		}
 
-		internal MemberSettingContext(object owner, MemberToken memberToken, Func<T> valueFactory, MemberGettingContext parent = null) : base(owner, memberToken, parent)
+		internal MemberSettingContext(object owner, MemberPathSegment memberToken, Func<T> valueFactory, MemberGettingContext parent = null) : base(owner, memberToken, parent)
 		{
 			if(valueFactory == null)
 				throw new ArgumentNullException(nameof(valueFactory));

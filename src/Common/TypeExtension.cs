@@ -33,11 +33,37 @@ namespace Zongsoft.Common
 {
 	public static class TypeExtension
 	{
+		public static bool IsAssignableFrom(this Type type, Type instanceType)
+		{
+			return IsAssignableFrom(type, instanceType, null);
+		}
+
+		public static bool IsAssignableFrom(this Type type, Type instanceType, out IEnumerable<Type> genericTypes)
+		{
+			var list = new List<Type>();
+
+			if(IsAssignableFrom(type, instanceType, t =>
+			{
+				list.Add(t);
+				return false;
+			}))
+			{
+				genericTypes = list;
+				return true;
+			}
+			else
+			{
+				genericTypes = list;
+				return false;
+			}
+		}
+
 		/// <summary>
 		/// 提供比<see cref="System.Type.IsAssignableFrom"/>加强的功能，支持对泛型定义接口或类的匹配。
 		/// </summary>
 		/// <param name="type">指定的接口或基类的类型。</param>
 		/// <param name="instanceType">指定的实例类型。</param>
+		/// <param name="genericMatch">当参数为泛型原型，则该委托表示找到的实现者的泛化类型，返回真表示不再进行后续匹配。</param>
 		/// <returns>如果当满足如下条件之一则返回真(true)：
 		/// <list type="bullet">
 		///		<item>
@@ -73,13 +99,13 @@ namespace Zongsoft.Common
 		///		</code>
 		///		</example>
 		/// </remarks>
-		public static bool IsAssignableFrom(this Type type, Type instanceType)
+		public static bool IsAssignableFrom(this Type type, Type instanceType, Func<Type, bool> genericMatch)
 		{
 			if(type == null)
-				throw new ArgumentNullException("type");
+				throw new ArgumentNullException(nameof(type));
 
 			if(instanceType == null)
-				throw new ArgumentNullException("instanceType");
+				throw new ArgumentNullException(nameof(instanceType));
 
 			if(type.IsGenericType && type.IsGenericTypeDefinition)
 			{
@@ -113,16 +139,58 @@ namespace Zongsoft.Common
 					}
 				}
 
+				bool isMatched = false;
+
 				foreach(var baseType in baseTypes)
 				{
 					if(baseType.IsGenericType && baseType.GetGenericTypeDefinition() == type)
 					{
-						return true;
+						isMatched = true;
+
+						//如果没有指定泛型匹配回调或者匹配回调返回真（cancel=true)则返回成功
+						if(genericMatch == null || genericMatch(baseType))
+							return true;
 					}
 				}
+
+				return isMatched;
 			}
 
 			return type.IsAssignableFrom(instanceType);
+		}
+
+		public static string GetExplicitImplementationName(this Type interfaceType, string memberName)
+		{
+			if(interfaceType == null)
+				throw new ArgumentNullException(nameof(interfaceType));
+
+			if(string.IsNullOrEmpty(memberName))
+				throw new ArgumentNullException(nameof(memberName));
+
+			if(interfaceType.IsGenericTypeDefinition)
+				return null;
+
+			if(!interfaceType.IsInterface)
+				return memberName;
+
+			if(interfaceType.IsGenericType)
+			{
+				var text = new System.Text.StringBuilder(interfaceType.Namespace + "." + interfaceType.Name.Substring(0, interfaceType.Name.Length - 2) + "<", 128);
+				var argumentTypes = interfaceType.GetGenericArguments();
+
+				for(int i = 0; i < argumentTypes.Length; i++)
+				{
+					text.Append(argumentTypes[i].FullName);
+
+					if(i < argumentTypes.Length - 1)
+						text.Append(",");
+				}
+
+				text.Append(">." + memberName);
+				return text.ToString();
+			}
+
+			return interfaceType.Namespace + "." + interfaceType.Name + "." + memberName;
 		}
 
 		public static bool IsEnumerable(this Type type)
@@ -148,7 +216,7 @@ namespace Zongsoft.Common
 		public static bool IsScalarType(this Type type)
 		{
 			if(type == null)
-				throw new ArgumentNullException("type");
+				throw new ArgumentNullException(nameof(type));
 
 			if(type.IsArray)
 				return IsScalarType(type.GetElementType());
@@ -159,7 +227,7 @@ namespace Zongsoft.Common
 			var result = type.IsPrimitive || type.IsEnum ||
 			             type == typeof(string) || type == typeof(decimal) ||
 			             type == typeof(DateTime) || type == typeof(TimeSpan) ||
-			             type == typeof(DateTimeOffset) || type == typeof(Guid);
+			             type == typeof(DateTimeOffset) || type == typeof(Guid) || type == typeof(DBNull);
 
 			if(result)
 				return result;

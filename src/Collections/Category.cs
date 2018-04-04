@@ -68,27 +68,6 @@ namespace Zongsoft.Collections
 		}
 		#endregion
 
-		#region 公共方法
-		[Obsolete]
-		public Category[] GetVisibleChildren()
-		{
-			var children = _children;
-
-			if(children == null || children.Count <= 0)
-				return new Category[0];
-
-			var visibleCategories = new List<Category>(children.Count);
-
-			foreach(Category category in children)
-			{
-				if(category.Visible)
-					visibleCategories.Add(category);
-			}
-
-			return visibleCategories.ToArray();
-		}
-		#endregion
-
 		#region 重写方法
 		protected override HierarchicalNode GetChild(string name)
 		{

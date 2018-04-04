@@ -27,20 +27,27 @@ namespace Zongsoft.Data
 			scoping.Add("!");
 			Assert.Equal(1, scoping.Count);
 
-			var members = scoping.ToArray();
+			var members = scoping.Resolve();
 
-			Assert.Equal(1, members.Length);
-			Assert.Equal("!", members[0]);
+			Assert.Equal(1, members.Count);
+			Assert.True(members.Contains("!"));
 
-			members = scoping.ToArray(wildcard => this.GetEntityProperties());
-			Assert.Equal(0, members.Length);
+			members = scoping.Resolve(wildcard => this.GetEntityProperties());
+			Assert.Equal(0, members.Count);
 
 			scoping.Add("*, !CreatorId, ! createdTime");
-			members = scoping.ToArray(wildcard => this.GetEntityProperties());
-			Assert.True(members.Length > 1);
-			Assert.True(Array.Exists(members, item => string.Equals(item, "AssetId", StringComparison.OrdinalIgnoreCase)));
-			Assert.False(Array.Exists(members, item => string.Equals(item, "CreatorId", StringComparison.OrdinalIgnoreCase)));
-			Assert.False(Array.Exists(members, item => string.Equals(item, "CreatedTime", StringComparison.OrdinalIgnoreCase)));
+			members = scoping.Resolve(wildcard => this.GetEntityProperties());
+			Assert.True(members.Count > 1);
+			Assert.True(members.Contains("AssetId"));
+			Assert.False(members.Contains("CreatorId"));
+			Assert.False(members.Contains("CreatedTime"));
+
+			Assert.True(scoping.Count > 1);
+			scoping.Add("!");
+			Assert.Equal(1, scoping.Count);
+
+			members = scoping.Resolve(_ => this.GetEntityProperties());
+			Assert.Equal(0, members.Count);
 		}
 
 		private string[] GetEntityProperties()

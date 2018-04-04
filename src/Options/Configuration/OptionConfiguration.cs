@@ -279,9 +279,7 @@ namespace Zongsoft.Options.Configuration
 			if(string.IsNullOrWhiteSpace(reader.GetAttribute("path")))
 				throw new OptionConfigurationException("The 'path' attribute of option element is empty or unspecified.");
 
-			var section = configuration._sections[reader.GetAttribute(XML_PATH_ATTRIBUTE)];
-
-			if(section == null)
+			if(!configuration._sections.TryGet(reader.GetAttribute(XML_PATH_ATTRIBUTE), out var section))
 				section = configuration._sections.Add(reader.GetAttribute(XML_PATH_ATTRIBUTE));
 
 			while(reader.Read() && reader.Depth > 1)

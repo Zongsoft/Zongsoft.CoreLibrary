@@ -29,7 +29,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Services
 {
-	public class PredicationCollection : Zongsoft.Collections.Collection<IPredication>, IPredication
+	public class PredicationCollection : System.Collections.ObjectModel.Collection<IPredication>, IPredication
 	{
 		#region 成员字段
 		private PredicationCombination _combine;

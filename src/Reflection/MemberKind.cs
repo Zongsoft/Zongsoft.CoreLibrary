@@ -1,8 +1,8 @@
 ﻿/*
  * Authors:
- *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
+ *   钟峰(Popeye Zhong) <9555843@qq.com>
  *
- * Copyright (C) 2014 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,37 +25,19 @@
  */
 
 using System;
-using System.Collections;
 
-namespace Zongsoft.Options.Profiles
+namespace Zongsoft.Reflection
 {
-	internal class ProfileSectionCollection : ProfileItemViewBase<ProfileSection>
+	/// <summary>
+	/// 表示成员种类的枚举。
+	/// </summary>
+	[Flags]
+	public enum MemberKind
 	{
-		#region 构造函数
-		public ProfileSectionCollection(ProfileItemCollection items) : base(items)
-		{
-		}
-		#endregion
+		/// <summary>字段成员</summary>
+		Field = 1,
 
-		#region 公共方法
-		public ProfileSection Add(string name, int lineNumber = -1)
-		{
-			var item = new ProfileSection(name, lineNumber);
-			base.Add(item);
-			return item;
-		}
-		#endregion
-
-		#region 重写方法
-		protected override string GetKeyForItem(ProfileSection item)
-		{
-			return item.Name;
-		}
-
-		protected override bool OnItemMatch(ProfileItem item)
-		{
-			return item.ItemType == ProfileItemType.Section;
-		}
-		#endregion
+		/// <summary>属性成员</summary>
+		Property = 2,
 	}
 }

@@ -81,19 +81,6 @@ namespace Zongsoft.Tests
 		}
 
 		/// <summary>
-		/// 获取当前部门中指定序号的员工。
-		/// </summary>
-		/// <param name="index">指定的要获取的员工所在本部门的序号。</param>
-		/// <returns>返回的员工对象。</returns>
-		public Employee this[int index]
-		{
-			get
-			{
-				return _employees[index];
-			}
-		}
-
-		/// <summary>
 		/// 获取当前部门的员工集合。
 		/// </summary>
 		public EmployeeCollection Employees

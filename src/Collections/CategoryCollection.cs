@@ -25,6 +25,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 
 namespace Zongsoft.Collections
 {
@@ -47,6 +48,22 @@ namespace Zongsoft.Collections
 			var category = new Category(name, title, description);
 			this.Add(category);
 			return category;
+		}
+
+		public void AddRange(IEnumerable<Category> categories)
+		{
+			if(categories == null)
+				return;
+
+			foreach(var category in categories)
+			{
+				this.Add(category);
+			}
+		}
+
+		public void AddRange(params Category[] categories)
+		{
+			this.AddRange((IEnumerable<Category>)categories);
 		}
 		#endregion
 	}

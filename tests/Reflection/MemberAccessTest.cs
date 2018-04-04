@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 using Xunit;
 
@@ -51,7 +52,7 @@ namespace Zongsoft.Reflection.Tests
 			Assert.Null(MemberAccess.Resolve(""));
 			Assert.Null(MemberAccess.Resolve("   "));
 
-			MemberToken[] members;
+			MemberPathSegment[] members;
 
 			members = MemberAccess.Resolve("[key].workbench.views[0, 'column'].Value");
 			Assert.NotNull(members);
@@ -96,7 +97,7 @@ namespace Zongsoft.Reflection.Tests
 		[Fact]
 		public void AccessMemberValueTest()
 		{
-			var emp1 = _department[0];
+			var emp1 = _department.Employees.First();
 
 			Assert.Equal("Popeye Zhong", MemberAccess.GetMemberValue<string>(emp1, "Name"));
 			Assert.Equal("Wuhan", MemberAccess.GetMemberValue<string>(emp1, "HomeAddress.City"));

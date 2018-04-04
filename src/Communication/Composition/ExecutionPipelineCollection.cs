@@ -26,32 +26,25 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 
 namespace Zongsoft.Communication.Composition
 {
-	public class ExecutionPipelineCollection : Zongsoft.Collections.Collection<ExecutionPipeline>
+	public class ExecutionPipelineCollection : System.Collections.ObjectModel.Collection<ExecutionPipeline>, ICollection<IExecutionHandler>
 	{
 		#region 构造函数
 		public ExecutionPipelineCollection()
 		{
 		}
 
-		public ExecutionPipelineCollection(IEnumerable<ExecutionPipeline> pipelines) : base(pipelines)
+		public ExecutionPipelineCollection(IEnumerable<ExecutionPipeline> pipelines)
 		{
-		}
-		#endregion
-
-		#region 重写方法
-		protected override bool TryConvertItem(object value, out ExecutionPipeline item)
-		{
-			if(value is IExecutionHandler)
+			if(pipelines != null)
 			{
-				item = new ExecutionPipeline((IExecutionHandler)value);
-				return true;
+				foreach(var pipeline in pipelines)
+				{
+					this.Add(pipeline);
+				}
 			}
-
-			return base.TryConvertItem(value, out item);
 		}
 		#endregion
 
@@ -65,6 +58,58 @@ namespace Zongsoft.Communication.Composition
 			base.Add(item);
 
 			return item;
+		}
+		#endregion
+
+		#region 显式实现
+		bool ICollection<IExecutionHandler>.IsReadOnly
+		{
+			get
+			{
+				return false;
+			}
+		}
+
+		void ICollection<IExecutionHandler>.Add(IExecutionHandler item)
+		{
+			this.Add(item, null);
+		}
+
+		void ICollection<IExecutionHandler>.CopyTo(IExecutionHandler[] array, int arrayIndex)
+		{
+			if(array == null)
+				throw new ArgumentNullException(nameof(array));
+
+			if(arrayIndex < 0 || arrayIndex >= array.Length)
+				throw new ArgumentOutOfRangeException(nameof(arrayIndex));
+
+			var iterator = base.GetEnumerator();
+
+			for(int i = arrayIndex; i < array.Length; i++)
+			{
+				if(iterator.MoveNext())
+					array[i] = iterator.Current?.Handler;
+			}
+		}
+
+		bool ICollection<IExecutionHandler>.Contains(IExecutionHandler item)
+		{
+			throw new NotSupportedException();
+		}
+
+		bool ICollection<IExecutionHandler>.Remove(IExecutionHandler item)
+		{
+			throw new NotImplementedException();
+		}
+
+		IEnumerator<IExecutionHandler> IEnumerable<IExecutionHandler>.GetEnumerator()
+		{
+			var iterator = this.GetEnumerator();
+
+			while(iterator.MoveNext())
+			{
+				yield return iterator.Current?.Handler;
+			}
 		}
 		#endregion
 	}

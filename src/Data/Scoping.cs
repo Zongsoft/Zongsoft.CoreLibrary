@@ -162,10 +162,14 @@ namespace Zongsoft.Data
 		/// </summary>
 		/// <param name="map">指定的映射函数，回调的映射函数参数为空则表示初始化；否则即为通配符（譬如：“*” 星号表示所有可用元素）。</param>
 		/// <returns>返回映射后的元素数组。</returns>
-		public string[] ToArray(Func<string, IEnumerable<string>> map = null)
+		public ISet<string> Resolve(Func<string, IEnumerable<string>> map = null)
 		{
 			if(map == null)
-				return _items.ToArray();
+				return _items;
+
+			//如果没有指定范围项，则默认映射为星号结果
+			if(_items.Count == 0)
+				return new HashSet<string>(map("*"), StringComparer.OrdinalIgnoreCase);
 
 			var initialized = false;
 			var result = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -222,7 +226,7 @@ namespace Zongsoft.Data
 				initialized = true;
 			}
 
-			return result.ToArray();
+			return result;
 		}
 		#endregion
 

@@ -85,20 +85,33 @@ namespace Zongsoft.Tests
 			_department = department;
 		}
 
+		public void AddRange(params Employee[] employees)
+		{
+			this.AddRange((IEnumerable<Employee>)employees);
+		}
+
+		public void AddRange(IEnumerable<Employee> employees)
+		{
+			if(employees == null)
+				return;
+
+			foreach(var employee in employees)
+			{
+				this.AddItem(employee);
+			}
+		}
+
 		protected override string GetKeyForItem(Employee item)
 		{
 			return item.Name;
 		}
 
-		protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs args)
+		protected override void AddItem(Employee item)
 		{
-			if(args.Action == NotifyCollectionChangedAction.Add)
-			{
-				foreach(Employee item in args.NewItems)
-					item.Department = _department;
-			}
+			if(item != null)
+				item.Department = _department;
 
-			base.OnCollectionChanged(args);
+			base.AddItem(item);
 		}
 	}
 }

@@ -27,11 +27,8 @@ namespace Zongsoft.Collections.Tests
 			file.Children.Add("Save", "Save", "保存");
 			file.Children.Add("SaveAs", "SaveAs", "另存为");
 			file.Children.Add("Recents", "Recents", "最近的文件").Children.AddRange(
-				new Category[]
-				{
-					new Category("Document-1"),
-					new Category("Document-2"),
-				}
+				new Category("Document-1"),
+				new Category("Document-2")
 			);
 		}
 

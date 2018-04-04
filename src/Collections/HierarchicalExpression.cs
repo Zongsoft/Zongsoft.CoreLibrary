@@ -47,15 +47,15 @@ namespace Zongsoft.Collections
 		#region 成员字段
 		private string _path;
 		private string[] _segments;
-		private Reflection.MemberToken[] _members;
+		private Reflection.MemberPathSegment[] _members;
 		private IO.PathAnchor _anchor;
 		#endregion
 
 		#region 构造函数
-		private HierarchicalExpression(string[] segments, Reflection.MemberToken[] members)
+		private HierarchicalExpression(string[] segments, Reflection.MemberPathSegment[] members)
 		{
 			_segments = segments ?? new string[0];
-			_members = members ?? new Reflection.MemberToken[0];
+			_members = members ?? new Reflection.MemberPathSegment[0];
 			_anchor = IO.PathAnchor.None;
 			_path = string.Empty;
 
@@ -119,7 +119,7 @@ namespace Zongsoft.Collections
 		/// <summary>
 		/// 获取层次表达式中的成员项数组。
 		/// </summary>
-		public Reflection.MemberToken[] Members
+		public Reflection.MemberPathSegment[] Members
 		{
 			get
 			{

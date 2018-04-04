@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <9555843@qq.com>
  *
- * Copyright (C) 2010-2017 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,71 +25,91 @@
  */
 
 using System;
+using System.Reflection;
 
 namespace Zongsoft.Reflection
 {
+	/// <summary>
+	/// 表示类型成员信息的类。
+	/// </summary>
 	public class MemberToken
 	{
-		#region 公共字段
-		public readonly string Name;
-		public readonly object[] Parameters;
+		#region 成员字段
+		private string _name;
+		private Type _type;
+		private MemberKind _kind;
+		private Func<object, object> _getter;
 		#endregion
 
 		#region 构造函数
-		public MemberToken(string name)
+		public MemberToken(PropertyInfo property)
 		{
-			if(string.IsNullOrWhiteSpace(name))
-				throw new ArgumentNullException(nameof(name));
+			if(property == null)
+				throw new ArgumentNullException(nameof(property));
 
-			this.Name = name;
-			this.Parameters = null;
+			_name = property.Name;
+			_type = property.PropertyType;
+			_kind = MemberKind.Property;
+
+			if(property.CanRead)
+				_getter = PropertyInfoExtension.GenerateGetter(property);
 		}
 
-		public MemberToken(object[] parameters)
+		public MemberToken(FieldInfo field)
 		{
-			if(parameters == null || parameters.Length == 0)
-				throw new ArgumentNullException(nameof(parameters));
+			if(field == null)
+				throw new ArgumentNullException(nameof(field));
 
-			this.Name = string.Empty;
-			this.Parameters = parameters;
+			_name = field.Name;
+			_type = field.FieldType;
+			_kind = MemberKind.Field;
+
+			_getter = FieldInfoExtension.GenerateGetter(field);
 		}
 		#endregion
 
 		#region 公共属性
-		public bool IsIndexer
+		/// <summary>
+		/// 获取成员的名称。
+		/// </summary>
+		public string Name
 		{
 			get
 			{
-				return this.Parameters != null && this.Parameters.Length > 0;
+				return _name;
+			}
+		}
+
+		/// <summary>
+		/// 获取成员的类型。
+		/// </summary>
+		public Type Type
+		{
+			get
+			{
+				return _type;
+			}
+		}
+
+		/// <summary>
+		/// 获取成员的种类，指示成员是否为属性或字段。
+		/// </summary>
+		public MemberKind Kind
+		{
+			get
+			{
+				return _kind;
 			}
 		}
 		#endregion
 
-		#region 重写方法
-		public override string ToString()
+		#region 公共方法
+		public object GetValue(object target)
 		{
-			if(!string.IsNullOrEmpty(this.Name))
-				return this.Name;
+			if(_getter == null)
+				throw new NotSupportedException();
 
-			var result = new System.Text.StringBuilder();
-
-			foreach(var parameter in this.Parameters)
-			{
-				if(result.Length > 0)
-					result.Append(", ");
-
-				if(parameter == null)
-					result.Append("null");
-				else
-				{
-					if(parameter is string)
-						result.Append("\"" + parameter + "\"");
-					else
-						result.Append(parameter.ToString());
-				}
-			}
-
-			return "[" + result.ToString() + "]";
+			return _getter.Invoke(target);
 		}
 		#endregion
 	}

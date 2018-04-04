@@ -55,7 +55,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Collections\CategoryTests.cs" />
-    <Compile Include="Collections\NamedCollectionTests.cs" />
     <Compile Include="Address.cs" />
     <Compile Include="Collections\QueueTests.cs" />
     <Compile Include="Common\BufferTests.cs" />

@@ -56,28 +56,12 @@ namespace Zongsoft.ComponentModel
 			return item.Name;
 		}
 
-		protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs args)
+		protected override void AddItem(SchemaAction item)
 		{
-			//调用基类同名方法
-			base.OnCollectionChanged(args);
+			if(item != null)
+				item.Schema = _schema;
 
-			if(args.OldItems != null)
-			{
-				foreach(var item in args.OldItems)
-				{
-					if(item != null)
-						((SchemaAction)item).Schema = null;
-				}
-			}
-
-			if(args.NewItems != null)
-			{
-				foreach(var item in args.NewItems)
-				{
-					if(item != null)
-						((SchemaAction)item).Schema = _schema;
-				}
-			}
+			base.AddItem(item);
 		}
 		#endregion
 	}

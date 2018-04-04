@@ -36,22 +36,17 @@ namespace Zongsoft.Reflection
 	{
 		#region 成员字段
 		private object _owner;
-		private MemberToken _memberToken;
+		private MemberPathSegment _memberSegment;
 		private MemberInfo _memberInfo;
 		private MemberGettingContext _parent;
 		#endregion
 
 		#region 构造函数
-		internal MemberGettingContext(object owner, MemberToken member, MemberGettingContext parent = null)
+		internal MemberGettingContext(object owner, MemberPathSegment memberSegment, MemberGettingContext parent = null)
 		{
-			if(owner == null)
-				throw new ArgumentNullException(nameof(owner));
-			if(member == null)
-				throw new ArgumentNullException(nameof(member));
-
-			_owner = owner;
+			_owner = owner ?? throw new ArgumentNullException(nameof(owner));
 			_parent = parent;
-			_memberToken = member;
+			_memberSegment = memberSegment;
 		}
 		#endregion
 
@@ -81,11 +76,11 @@ namespace Zongsoft.Reflection
 		/// <summary>
 		/// 获取当前访问的成员标志。
 		/// </summary>
-		public MemberToken MemberToken
+		public MemberPathSegment MemberToken
 		{
 			get
 			{
-				return _memberToken;
+				return _memberSegment;
 			}
 		}
 
@@ -97,7 +92,7 @@ namespace Zongsoft.Reflection
 			get
 			{
 				if(_memberInfo == null)
-					_memberInfo = MemberAccess.GetMemberInfo(_owner is Type ? (Type)_owner : _owner.GetType(), _memberToken);
+					_memberInfo = MemberAccess.GetMemberInfo(_owner is Type ? (Type)_owner : _owner.GetType(), _memberSegment);
 
 				return _memberInfo;
 			}
@@ -123,15 +118,15 @@ namespace Zongsoft.Reflection
 		{
 			object value;
 
-			if(MemberAccess.TryGetMemberValueCore(_owner, _memberToken, out value))
+			if(MemberAccess.TryGetMemberValueCore(_owner, _memberSegment, out value))
 				return value;
 
-			throw new InvalidOperationException(string.Format("The '{0}' member is not exists in the '{1}' type.", _memberToken, (_owner is Type ? ((Type)_owner).FullName : _owner.GetType().FullName)));
+			throw new InvalidOperationException(string.Format("The '{0}' member is not exists in the '{1}' type.", _memberSegment, (_owner is Type ? ((Type)_owner).FullName : _owner.GetType().FullName)));
 		}
 
 		public bool TryGetMemberValue(out object value)
 		{
-			return MemberAccess.TryGetMemberValueCore(_owner, _memberToken, out value);
+			return MemberAccess.TryGetMemberValueCore(_owner, _memberSegment, out value);
 		}
 		#endregion
 	}

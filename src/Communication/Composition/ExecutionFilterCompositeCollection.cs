@@ -54,54 +54,29 @@ namespace Zongsoft.Communication.Composition
 
 			return result;
 		}
-		#endregion
-
-		#region 重写方法
-		protected override string GetKeyForItem(ExecutionFilterComposite item)
-		{
-			return item.Filter.Name;
-		}
-
-		protected override bool TryConvertItem(object value, out ExecutionFilterComposite item)
-		{
-			if(value is IExecutionFilter)
-			{
-				item = new ExecutionFilterComposite((IExecutionFilter)value);
-				return true;
-			}
-
-			return base.TryConvertItem(value, out item);
-		}
-		#endregion
-
-		#region 接口实现
-		void ICollection<IExecutionFilter>.Add(IExecutionFilter item)
-		{
-			if(item == null)
-				throw new ArgumentNullException("item");
-
-			base.Add(new ExecutionFilterComposite(item, null));
-		}
 
 		public bool Contains(IExecutionFilter item)
 		{
 			if(item == null)
 				return false;
 
-			return base.Items.Any(p => p.Filter == item);
+			return this.ContainsName(item.Name);
 		}
 
 		public void CopyTo(IExecutionFilter[] array, int arrayIndex)
 		{
 			if(array == null)
-				throw new ArgumentNullException("array");
+				throw new ArgumentNullException(nameof(array));
 
 			if(arrayIndex < 0 || arrayIndex >= array.Length)
-				throw new ArgumentOutOfRangeException("arrayIndex");
+				throw new ArgumentOutOfRangeException(nameof(arrayIndex));
+
+			var iterator = base.GetEnumerator();
 
 			for(int i = arrayIndex; i < array.Length; i++)
 			{
-				array[i] = base.Items[i - arrayIndex];
+				if(iterator.MoveNext())
+					array[i] = iterator.Current?.Filter;
 			}
 		}
 
@@ -110,27 +85,50 @@ namespace Zongsoft.Communication.Composition
 			if(item == null)
 				return false;
 
-			for(int i = 0; i < base.Items.Count; i++)
-			{
-				if(base.Items[i].Filter == item)
-				{
-					base.Items.RemoveAt(i);
-					return true;
-				}
-			}
+			return base.RemoveItem(item.Name);
+		}
+		#endregion
 
-			return false;
+		#region 重写方法
+		protected override string GetKeyForItem(ExecutionFilterComposite item)
+		{
+			return item.Filter.Name;
+		}
+
+		//protected override bool TryConvertItem(object value, out ExecutionFilterComposite item)
+		//{
+		//	if(value is IExecutionFilter)
+		//	{
+		//		item = new ExecutionFilterComposite((IExecutionFilter)value);
+		//		return true;
+		//	}
+
+		//	return base.TryConvertItem(value, out item);
+		//}
+		#endregion
+
+		#region 接口实现
+		bool ICollection<IExecutionFilter>.IsReadOnly
+		{
+			get
+			{
+				return false;
+			}
+		}
+
+		void ICollection<IExecutionFilter>.Add(IExecutionFilter item)
+		{
+			this.Add(item);
 		}
 
 		IEnumerator<IExecutionFilter> IEnumerable<IExecutionFilter>.GetEnumerator()
 		{
-			foreach(var item in base.Items)
-				yield return item.Filter;
-		}
+			var iterator = base.GetEnumerator();
 
-		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-		{
-			return base.GetEnumerator();
+			while(iterator.MoveNext())
+			{
+				yield return iterator.Current?.Filter;
+			}
 		}
 		#endregion
 	}

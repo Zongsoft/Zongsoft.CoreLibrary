@@ -31,7 +31,7 @@ using System.Linq;
 
 namespace Zongsoft.Data
 {
-	public class ConditionCollection : Zongsoft.Collections.Collection<ICondition>, ICondition
+	public class ConditionCollection : System.Collections.ObjectModel.Collection<ICondition>, ICondition
 	{
 		#region 成员字段
 		private ConditionCombination _conditionCombination;
@@ -43,14 +43,30 @@ namespace Zongsoft.Data
 			_conditionCombination = conditionCombination;
 		}
 
-		public ConditionCollection(ConditionCombination conditionCombination, IEnumerable<ICondition> items) : base(items)
+		public ConditionCollection(ConditionCombination conditionCombination, IEnumerable<ICondition> items)
 		{
 			_conditionCombination = conditionCombination;
+
+			if(items != null)
+			{
+				foreach(var item in items)
+				{
+					this.Add(item);
+				}
+			}
 		}
 
-		public ConditionCollection(ConditionCombination conditionCombination, params ICondition[] items) : base(items)
+		public ConditionCollection(ConditionCombination conditionCombination, params ICondition[] items)
 		{
 			_conditionCombination = conditionCombination;
+
+			if(items != null && items.Length > 0)
+			{
+				foreach(var item in items)
+				{
+					this.Add(item);
+				}
+			}
 		}
 		#endregion
 

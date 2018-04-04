@@ -1,8 +1,8 @@
 ﻿/*
  * Authors:
- *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
+ *   钟峰(Popeye Zhong) <9555843@qq.com>
  *
- * Copyright (C) 2013-2018 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,26 +25,16 @@
  */
 
 using System;
+using System.Collections.Generic;
 
-namespace Zongsoft.Collections
+namespace Zongsoft.Reflection
 {
-	public class NamedCollectionEx<T> : NamedCollectionBaseEx<T>
+	public class MemberTokenCollection : Collections.NamedCollectionBase<MemberToken>
 	{
-		#region 成员字段
-		private Func<T, string> _getKey;
-		#endregion
-
-		#region 构造函数
-		public NamedCollectionEx(Func<T, string> getKey, StringComparer comparer = null) : base(comparer)
-		{
-			_getKey = getKey ?? throw new ArgumentNullException(nameof(getKey));
-		}
-		#endregion
-
 		#region 重写方法
-		protected override string GetKeyForItem(T item)
+		protected override string GetKeyForItem(MemberToken item)
 		{
-			return _getKey(item);
+			return item.Name;
 		}
 		#endregion
 	}

@@ -33,7 +33,7 @@ namespace Zongsoft.Text
 	/// 表示表达式节点的集合类。
 	/// </summary>
 	[Obsolete()]
-	public class TextExpressionNodeCollection : Zongsoft.Collections.Collection<TextExpressionNode>
+	public class TextExpressionNodeCollection : System.Collections.ObjectModel.Collection<TextExpressionNode>
 	{
 		/// <summary>
 		/// 表示一个<see cref="TextExpressionNodeCollection"/>类型的空集合。

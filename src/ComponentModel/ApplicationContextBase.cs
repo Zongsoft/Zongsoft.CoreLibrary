@@ -242,7 +242,7 @@ namespace Zongsoft.ComponentModel
 			get
 			{
 				if(_modules == null)
-					System.Threading.Interlocked.CompareExchange(ref _modules, new Zongsoft.Collections.Collection<IApplicationModule>(), null);
+					System.Threading.Interlocked.CompareExchange(ref _modules, new List<IApplicationModule>(), null);
 
 				return _modules;
 			}

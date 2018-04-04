@@ -92,16 +92,14 @@ namespace Zongsoft.Options.Configuration
 				//在添加了选项上级空节点添加完成之后再添加选项元素的节点
 				foreach(var elementName in section.Children.Keys)
 				{
-					var elementNode = sectionNode.Children[elementName];
-
-					if(elementNode == null)
-					{
-						sectionNode.Children.Add(elementName, configuration);
-					}
-					else
+					if(sectionNode.Children.TryGet(elementName, out var elementNode))
 					{
 						if(elementNode.Option == null)
 							elementNode.Option = new Option(elementNode, configuration);
+					}
+					else
+					{
+						sectionNode.Children.Add(elementName, configuration);
 					}
 				}
 			}
@@ -128,7 +126,7 @@ namespace Zongsoft.Options.Configuration
 
 							var parent = node.Parent;
 							if(parent != null)
-								parent.Children.Remove(node);
+								parent.Children.Remove(node.Name);
 						}
 					}
 				}
