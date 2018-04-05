@@ -63,7 +63,7 @@ namespace Zongsoft.Common
 		/// </summary>
 		/// <param name="type">指定的接口或基类的类型。</param>
 		/// <param name="instanceType">指定的实例类型。</param>
-		/// <param name="genericMatch">当参数为泛型原型，则该委托表示找到的实现者的泛化类型，返回真表示不再进行后续匹配。</param>
+		/// <param name="genericMatch">当<paramref name="type"/>参数为泛型原型，则该委托表示找到的实现者的泛化类型，返回空表示继续后续匹配，否则结束匹配并将该委托的返回作为方法的结果。</param>
 		/// <returns>如果当满足如下条件之一则返回真(true)：
 		/// <list type="bullet">
 		///		<item>
@@ -99,7 +99,7 @@ namespace Zongsoft.Common
 		///		</code>
 		///		</example>
 		/// </remarks>
-		public static bool IsAssignableFrom(this Type type, Type instanceType, Func<Type, bool> genericMatch)
+		public static bool IsAssignableFrom(this Type type, Type instanceType, Func<Type, bool?> genericMatch)
 		{
 			if(type == null)
 				throw new ArgumentNullException(nameof(type));
@@ -139,21 +139,24 @@ namespace Zongsoft.Common
 					}
 				}
 
-				bool isMatched = false;
-
 				foreach(var baseType in baseTypes)
 				{
 					if(baseType.IsGenericType && baseType.GetGenericTypeDefinition() == type)
 					{
-						isMatched = true;
-
-						//如果没有指定泛型匹配回调或者匹配回调返回真（cancel=true)则返回成功
-						if(genericMatch == null || genericMatch(baseType))
+						//如果没有指定泛型匹配回调则返回成功
+						if(genericMatch == null)
 							return true;
+
+						//调用匹配委托
+						var match = genericMatch(baseType);
+
+						//如果匹配回调有确定的结果，则返回该结果，否则忽略该次回调并等待下一轮匹配
+						if(match.HasValue)
+							return match.Value;
 					}
 				}
 
-				return isMatched;
+				return false;
 			}
 
 			return type.IsAssignableFrom(instanceType);
