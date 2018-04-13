@@ -36,13 +36,13 @@ namespace Zongsoft.Data
 	public class Grouping
 	{
 		#region 成员字段
-		private GroupMember[] _keys;
+		private GroupKey[] _keys;
 		private ICondition _condition;
 		private GroupAggregationCollection _aggregations;
 		#endregion
 
 		#region 构造函数
-		private Grouping(ICondition condition, params GroupMember[] keys)
+		private Grouping(ICondition condition, params GroupKey[] keys)
 		{
 			if(keys == null || keys.Length == 0)
 				throw new ArgumentNullException(nameof(keys));
@@ -57,7 +57,7 @@ namespace Zongsoft.Data
 		/// <summary>
 		/// 获取分组键的成员数组。
 		/// </summary>
-		public GroupMember[] Keys
+		public GroupKey[] Keys
 		{
 			get
 			{
@@ -96,7 +96,7 @@ namespace Zongsoft.Data
 		/// <summary>
 		/// 创建一个分组设置。
 		/// </summary>
-		/// <param name="keys">分组键成员数组。</param>
+		/// <param name="keys">分组键成员数组，分组键元素使用冒号分隔成员的名称和别名。</param>
 		/// <returns>返回创建的分组设置。</returns>
 		public static Grouping Group(params string[] keys)
 		{
@@ -107,14 +107,14 @@ namespace Zongsoft.Data
 		/// 创建一个分组设置。
 		/// </summary>
 		/// <param name="filter">分组的过滤条件。</param>
-		/// <param name="keys">分组键成员数组。</param>
+		/// <param name="keys">分组键成员数组，分组键元素使用冒号分隔成员的名称和别名。</param>
 		/// <returns>返回创建的分组设置。</returns>
 		public static Grouping Group(ICondition filter, params string[] keys)
 		{
 			if(keys == null || keys.Length < 1)
 				throw new ArgumentNullException(nameof(keys));
 
-			var members = new List<GroupMember>(keys.Length);
+			var list = new List<GroupKey>(keys.Length);
 
 			foreach(var key in keys)
 			{
@@ -124,12 +124,12 @@ namespace Zongsoft.Data
 				var index = key.IndexOf(':');
 
 				if(index > 0)
-					members.Add(new GroupMember(key.Substring(0, index), key.Substring(index)));
+					list.Add(new GroupKey(key.Substring(0, index), key.Substring(index)));
 				else
-					members.Add(new GroupMember(key, null));
+					list.Add(new GroupKey(key, null));
 			}
 
-			return new Grouping(filter, members.ToArray());
+			return new Grouping(filter, list.ToArray());
 		}
 		#endregion
 
@@ -192,12 +192,12 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 嵌套结构
-		public struct GroupMember
+		public struct GroupKey
 		{
 			public string Name;
 			public string Alias;
 
-			public GroupMember(string name, string alias)
+			public GroupKey(string name, string alias)
 			{
 				this.Name = name;
 				this.Alias = alias;
