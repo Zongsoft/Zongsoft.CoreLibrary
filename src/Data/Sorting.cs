@@ -25,139 +25,116 @@
  */
 
 using System;
-using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
 	/// <summary>
 	/// 表示数据排序的设置项。
 	/// </summary>
-	public class Sorting
+	public struct Sorting : IEquatable<Sorting>
 	{
 		#region 成员字段
 		private SortingMode _mode;
-		private string[] _members;
+		private string _name;
 		#endregion
 
 		#region 构造函数
-		public Sorting()
+		public Sorting(string name, SortingMode mode = SortingMode.Ascending)
 		{
-		}
+			if(string.IsNullOrWhiteSpace(name))
+				throw new ArgumentNullException(nameof(name));
 
-		public Sorting(params string[] members) : this(SortingMode.Ascending, members)
-		{
-		}
-
-		public Sorting(SortingMode mode, params string[] members)
-		{
-			if(members == null || members.Length == 0)
-				throw new ArgumentNullException("members");
-
-			this.Mode = mode;
-			this.Members = members;
+			_name = name;
+			_mode = mode;
 		}
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取一个值，指示排序方式。
+		/// </summary>
 		public SortingMode Mode
 		{
 			get
 			{
 				return _mode;
 			}
-			set
-			{
-				_mode = value;
-			}
 		}
 
-		public string MembersText
+		/// <summary>
+		/// 获取排序项名称（即排序的成员名）。
+		/// </summary>
+		public string Name
 		{
 			get
 			{
-				if(_members == null || _members.Length < 1)
-					return string.Empty;
-
-				return string.Join(", ", _members);
-			}
-			set
-			{
-				if(string.IsNullOrWhiteSpace(value))
-					throw new ArgumentNullException();
-
-				this.Members = value.Split(',');
-			}
-		}
-
-		public string[] Members
-		{
-			get
-			{
-				return _members;
-			}
-			set
-			{
-				if(value == null || value.Length == 0)
-					throw new ArgumentNullException();
-
-				var hashset = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-				foreach(var member in value)
-				{
-					if(!string.IsNullOrWhiteSpace(member))
-						hashset.Add(member.Trim());
-				}
-
-				if(hashset == null)
-					throw new ArgumentException();
-
-				string[] members = new string[hashset.Count];
-				hashset.CopyTo(members);
-
-				_members = members;
+				return _name;
 			}
 		}
 		#endregion
 
 		#region 静态方法
-		public static Sorting Ascending(params string[] members)
+		/// <summary>
+		/// 创建一个正序的排序设置项。
+		/// </summary>
+		/// <param name="name">指定的排序项名称。</param>
+		/// <returns>返回创建成果的排序设置项实例。</returns>
+		public static Sorting Ascending(string name)
 		{
-			if(members == null || members.Length < 1)
-				throw new ArgumentNullException("members");
-
-			return new Sorting(SortingMode.Ascending, members);
+			return new Sorting(name, SortingMode.Ascending);
 		}
 
-		public static Sorting Descending(params string[] members)
+		/// <summary>
+		/// 创建一个倒序的排序设置项。
+		/// </summary>
+		/// <param name="name">指定的排序项名称。</param>
+		/// <returns>返回创建成果的排序设置项实例。</returns>
+		public static Sorting Descending(string name)
 		{
-			if(members == null || members.Length < 1)
-				throw new ArgumentNullException("members");
-
-			return new Sorting(SortingMode.Descending, members);
+			return new Sorting(name, SortingMode.Descending);
 		}
 		#endregion
 
 		#region 重写方法
+		public bool Equals(Sorting other)
+		{
+			return other._mode == _mode &&
+			       string.Equals(other._name, _name, StringComparison.OrdinalIgnoreCase);
+		}
+
+		public override bool Equals(object obj)
+		{
+			if(obj == null || obj.GetType() != this.GetType())
+				return false;
+
+			return this.Equals((Sorting)obj);
+		}
+
+		public override int GetHashCode()
+		{
+			return _name.GetHashCode() ^ _mode.GetHashCode();
+		}
+
 		public override string ToString()
 		{
-			return string.Format("{0} ({1})", _mode, this.MembersText);
+			return string.Format("{0}({1})", _mode, _name);
 		}
 		#endregion
 
 		#region 操作符重载
-		public static Sorting[] operator +(Sorting[] values, Sorting value)
+		public static Sorting[] operator +(Sorting[] sortings, Sorting value)
 		{
-			if((values == null || values.Length == 0) && value == null)
-				return new Sorting[0];
-
-			if(values == null || values.Length == 0)
+			if(sortings == null || sortings.Length == 0)
 				return new Sorting[] { value };
 
-			if(value == null)
-				return values;
+			foreach(var sorting in sortings)
+			{
+				if(string.Equals(sorting._name, value._name, StringComparison.OrdinalIgnoreCase))
+					return sortings;
+			}
 
-			var result = new Sorting[values.Length + 1];
-			Array.Copy(values, 0, result, 0, values.Length);
+			var result = new Sorting[sortings.Length + 1];
+			Array.Copy(sortings, 0, result, 0, sortings.Length);
 			result[result.Length - 1] = value;
 
 			return result;
@@ -165,35 +142,17 @@ namespace Zongsoft.Data
 
 		public static Sorting[] operator +(Sorting a, Sorting b)
 		{
-			if(a == null && b == null)
-				return new Sorting[0];
-
-			if(a == null)
+			if(string.Equals(a._name, b._name, StringComparison.OrdinalIgnoreCase))
 				return new Sorting[] { b };
-
-			if(b == null)
-				return new Sorting[] { a };
-
-			if(a.Mode == b.Mode)
-			{
-				var hashset = new HashSet<string>(a.Members, StringComparer.OrdinalIgnoreCase);
-
-				foreach(var field in b.Members)
-				{
-					hashset.Add(field);
-				}
-
-				string[] fields = new string[hashset.Count];
-				hashset.CopyTo(fields);
-
-				return new Sorting[] { new Sorting(a.Mode, fields) };
-			}
-
-			return new Sorting[] { a, b };
+			else
+				return new Sorting[] { a, b };
 		}
 		#endregion
 	}
 
+	/// <summary>
+	/// 表示排序方式的枚举。
+	/// </summary>
 	public enum SortingMode
 	{
 		/// <summary>正序</summary>
