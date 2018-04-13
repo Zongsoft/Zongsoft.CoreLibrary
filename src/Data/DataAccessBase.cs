@@ -1083,38 +1083,63 @@ namespace Zongsoft.Data
 			return this.Select<T>(context, selecting, selected);
 		}
 
-		public IEnumerable<T> Select<T>(string name, Grouping grouping, object state = null, params Sorting[] sortings)
+		public IEnumerable<T> Select<T>(string name, Grouping grouping, params Sorting[] sortings)
 		{
-			return this.Select<T>(name, grouping, null, null, state, sortings, null, null);
+			return this.Select<T>(name, grouping, null, string.Empty, null, null, sortings, null, null);
+		}
+
+		public IEnumerable<T> Select<T>(string name, Grouping grouping, object state, params Sorting[] sortings)
+		{
+			return this.Select<T>(name, grouping, null, string.Empty, null, state, sortings, null, null);
+		}
+
+		public IEnumerable<T> Select<T>(string name, Grouping grouping, string scope, object state = null, params Sorting[] sortings)
+		{
+			return this.Select<T>(name, grouping, null, scope, null, state, sortings, null, null);
+		}
+
+		public IEnumerable<T> Select<T>(string name, Grouping grouping, Paging paging, object state = null, params Sorting[] sortings)
+		{
+			return this.Select<T>(name, grouping, null, string.Empty, paging, state, sortings, null, null);
+		}
+
+		public IEnumerable<T> Select<T>(string name, Grouping grouping, string scope, Paging paging, object state = null, params Sorting[] sortings)
+		{
+			return this.Select<T>(name, grouping, null, scope, paging, state, sortings, null, null);
 		}
 
 		public IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, params Sorting[] sortings)
 		{
-			return this.Select<T>(name, grouping, condition, null, null, sortings, null, null);
+			return this.Select<T>(name, grouping, condition, string.Empty, null, null, sortings, null, null);
 		}
 
 		public IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, object state, params Sorting[] sortings)
 		{
-			return this.Select<T>(name, grouping, condition, null, state, sortings, null, null);
+			return this.Select<T>(name, grouping, condition, string.Empty, null, state, sortings, null, null);
 		}
 
-		public IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, Paging paging, params Sorting[] sortings)
+		public IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, string scope, object state = null, params Sorting[] sortings)
 		{
-			return this.Select<T>(name, grouping, condition, paging, null, sortings, null, null);
+			return this.Select<T>(name, grouping, condition, scope, null, state, sortings, null, null);
 		}
 
-		public IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, Paging paging, object state, params Sorting[] sortings)
+		public IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, Paging paging, object state = null, params Sorting[] sortings)
 		{
-			return this.Select<T>(name, grouping, condition, paging, state, sortings, null, null);
+			return this.Select<T>(name, grouping, condition, string.Empty, paging, state, sortings, null, null);
 		}
 
-		public IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, Paging paging, object state, Sorting[] sortings, Func<DataSelectionContext, bool> selecting, Action<DataSelectionContext> selected)
+		public IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, string scope, Paging paging, object state = null, params Sorting[] sortings)
+		{
+			return this.Select<T>(name, grouping, condition, scope, paging, state, sortings, null, null);
+		}
+
+		public IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, string scope, Paging paging, object state, Sorting[] sortings, Func<DataSelectionContext, bool> selecting, Action<DataSelectionContext> selected)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
 			//创建数据访问上下文对象
-			var context = this.CreateSelectionContext(name, typeof(T), condition, grouping, null, paging, sortings, state);
+			var context = this.CreateSelectionContext(name, typeof(T), condition, grouping, scope, paging, sortings, state);
 
 			//执行查询方法
 			return this.Select<T>(context, selecting, selected);
@@ -1221,10 +1246,7 @@ namespace Zongsoft.Data
 
 		protected virtual DataSelectionContext CreateSelectionContext(string name, Type entityType, ICondition condition, Grouping grouping, string scope, Paging paging, Sorting[] sortings, object state)
 		{
-			if(grouping == null || grouping.Keys == null || grouping.Keys.Length == 0)
-				return new DataSelectionContext(this, name, entityType, condition, scope, paging, sortings, state);
-			else
-				return new DataSelectionContext(this, name, entityType, condition, grouping, paging, sortings, state);
+			return new DataSelectionContext(this, name, entityType, grouping, condition, scope, paging, sortings, state);
 		}
 		#endregion
 

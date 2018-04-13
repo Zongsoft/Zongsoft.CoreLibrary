@@ -784,34 +784,59 @@ namespace Zongsoft.Data
 			return this.DataAccess.Select<TEntity>(this.Name, condition, scope, paging, state, sortings, ctx => this.OnSelecting(ctx), ctx => this.OnSelected(ctx));
 		}
 
-		public IEnumerable<T> Select<T>(Grouping grouping, object state = null, params Sorting[] sortings)
+		public IEnumerable<T> Select<T>(Grouping grouping, params Sorting[] sortings)
 		{
-			return this.OnSelect<T>(grouping, null, null, sortings, state);
+			return this.OnSelect<T>(grouping, null, string.Empty, null, sortings, null);
+		}
+
+		public IEnumerable<T> Select<T>(Grouping grouping, object state, params Sorting[] sortings)
+		{
+			return this.OnSelect<T>(grouping, null, string.Empty, null, sortings, state);
+		}
+
+		public IEnumerable<T> Select<T>(Grouping grouping, string scope, object state = null, params Sorting[] sortings)
+		{
+			return this.OnSelect<T>(grouping, null, scope, null, sortings, state);
+		}
+
+		public IEnumerable<T> Select<T>(Grouping grouping, Paging paging, object state = null, params Sorting[] sortings)
+		{
+			return this.OnSelect<T>(grouping, null, string.Empty, paging, sortings, state);
+		}
+
+		public IEnumerable<T> Select<T>(Grouping grouping, string scope, Paging paging, object state = null, params Sorting[] sortings)
+		{
+			return this.OnSelect<T>(grouping, null, scope, paging, sortings, state);
 		}
 
 		public IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, params Sorting[] sortings)
 		{
-			return this.OnSelect<T>(grouping, condition, null, sortings, null);
+			return this.OnSelect<T>(grouping, condition, string.Empty, null, sortings, null);
 		}
 
 		public IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, object state, params Sorting[] sortings)
 		{
-			return this.OnSelect<T>(grouping, condition, null, sortings, state);
+			return this.OnSelect<T>(grouping, condition, string.Empty, null, sortings, state);
 		}
 
-		public IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, Paging paging, params Sorting[] sortings)
+		public IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, string scope, object state = null, params Sorting[] sortings)
 		{
-			return this.OnSelect<T>(grouping, condition, paging, sortings, null);
+			return this.OnSelect<T>(grouping, condition, scope, null, sortings, state);
 		}
 
-		public IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, Paging paging, object state, params Sorting[] sortings)
+		public IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, Paging paging, object state = null, params Sorting[] sortings)
 		{
-			return this.OnSelect<T>(grouping, condition, paging, sortings, state);
+			return this.OnSelect<T>(grouping, condition, string.Empty, paging, sortings, state);
 		}
 
-		protected virtual IEnumerable<T> OnSelect<T>(Grouping grouping, ICondition condition, Paging paging, Sorting[] sortings, object state)
+		public IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, string scope, Paging paging, object state = null, params Sorting[] sortings)
 		{
-			return this.DataAccess.Select<T>(this.Name, grouping, condition, paging, state, sortings, ctx => this.OnSelecting(ctx), ctx => this.OnSelected(ctx));
+			return this.OnSelect<T>(grouping, condition, scope, paging, sortings, state);
+		}
+
+		protected virtual IEnumerable<T> OnSelect<T>(Grouping grouping, ICondition condition, string scope, Paging paging, Sorting[] sortings, object state)
+		{
+			return this.DataAccess.Select<T>(this.Name, grouping, condition, scope, paging, state, sortings, ctx => this.OnSelecting(ctx), ctx => this.OnSelected(ctx));
 		}
 		#endregion
 

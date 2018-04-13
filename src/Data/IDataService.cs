@@ -202,11 +202,22 @@ namespace Zongsoft.Data
 		IEnumerable Select(ICondition condition, string scope, Paging paging, params Sorting[] sortings);
 		IEnumerable Select(ICondition condition, string scope, Paging paging, object state, params Sorting[] sortings);
 
-		IEnumerable<T> Select<T>(Grouping grouping, object state = null, params Sorting[] sortings);
+		//IEnumerable<T> Select<T>(Grouping grouping, object state = null, params Sorting[] sortings);
+		//IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, params Sorting[] sortings);
+		//IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, object state, params Sorting[] sortings);
+		//IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, Paging paging, params Sorting[] sortings);
+		//IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, Paging paging, object state, params Sorting[] sortings);
+
+		IEnumerable<T> Select<T>(Grouping grouping, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(Grouping grouping, object state, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(Grouping grouping, string scope, object state = null, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(Grouping grouping, Paging paging, object state = null, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(Grouping grouping, string scope, Paging paging, object state = null, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, object state, params Sorting[] sortings);
-		IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, Paging paging, params Sorting[] sortings);
-		IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, Paging paging, object state, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, string scope, object state = null, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, Paging paging, object state = null, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, string scope, Paging paging, object state = null, params Sorting[] sortings);
 		#endregion
 	}
 }
