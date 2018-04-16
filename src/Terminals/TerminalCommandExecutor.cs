@@ -124,6 +124,18 @@ namespace Zongsoft.Terminals
 			if(this.Root.Children.Count < 1)
 				return 0;
 
+			const string splash = @"
+     _____                                ___ __
+    /_   /  ____  ____  ____  ____ ____  / __/ /_
+      / /  / __ \/ __ \/ __ \/ ___/ __ \/ /_/ __/
+     / /__/ /_/ / / / / /_/ /\_ \/ /_/ / __/ /_
+    /____/\____/_/ /_/\__  /____/\____/_/  \__/
+                     /____/
+";
+
+			//打印闪屏信息
+			_terminal.WriteLine(splash);
+
 			while(true)
 			{
 				//重置控制台，准备执行命令
