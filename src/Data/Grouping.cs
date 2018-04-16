@@ -37,18 +37,18 @@ namespace Zongsoft.Data
 	{
 		#region 成员字段
 		private GroupKey[] _keys;
-		private ICondition _condition;
+		private ICondition _filter;
 		private GroupAggregationCollection _aggregations;
 		#endregion
 
 		#region 构造函数
-		private Grouping(ICondition condition, params GroupKey[] keys)
+		private Grouping(ICondition filter, params GroupKey[] keys)
 		{
 			if(keys == null || keys.Length == 0)
 				throw new ArgumentNullException(nameof(keys));
 
 			_keys = keys;
-			_condition = condition;
+			_filter = filter;
 			_aggregations = new GroupAggregationCollection(this);
 		}
 		#endregion
@@ -79,15 +79,15 @@ namespace Zongsoft.Data
 		/// <summary>
 		/// 获取或设置分组的过滤条件，默认为空。
 		/// </summary>
-		public ICondition Condition
+		public ICondition Filter
 		{
 			get
 			{
-				return _condition;
+				return _filter;
 			}
 			set
 			{
-				_condition = value;
+				_filter = value;
 			}
 		}
 		#endregion
@@ -124,25 +124,12 @@ namespace Zongsoft.Data
 				var index = key.IndexOf(':');
 
 				if(index > 0)
-					list.Add(new GroupKey(key.Substring(0, index), key.Substring(index)));
+					list.Add(new GroupKey(key.Substring(0, index), key.Substring(index + 1)));
 				else
 					list.Add(new GroupKey(key, null));
 			}
 
 			return new Grouping(filter, list.ToArray());
-		}
-		#endregion
-
-		#region 公共方法
-		/// <summary>
-		/// 设置分组的过滤条件。
-		/// </summary>
-		/// <param name="condition">指定的过滤条件。</param>
-		/// <returns>返回带过滤条件的分组设置。</returns>
-		public Grouping Filter(ICondition condition)
-		{
-			_condition = condition;
-			return this;
 		}
 		#endregion
 
@@ -179,9 +166,9 @@ namespace Zongsoft.Data
 				}
 			}
 
-			if(_condition != null)
+			if(_filter != null)
 			{
-				text.AppendLine("Filter: " + _condition.ToString());
+				text.AppendLine("Filter: " + _filter.ToString());
 			}
 
 			if(text == null)
