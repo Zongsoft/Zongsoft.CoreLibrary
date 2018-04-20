@@ -25,6 +25,7 @@
  */
 
 using System;
+using System.Linq;
 using System.ComponentModel;
 using System.Collections;
 using System.Collections.Generic;
@@ -262,6 +263,29 @@ namespace Zongsoft.Common
 			return TypeExtension.IsInteger(type) ||
 				   code == TypeCode.Single || code == TypeCode.Double ||
 				   code == TypeCode.Decimal || code == TypeCode.Char;
+		}
+
+		public static Type GetCollectionElementType(this Type type)
+		{
+			if(type == null)
+				throw new ArgumentNullException(nameof(type));
+
+			if(type.IsArray)
+				return type.GetElementType();
+
+			if(type.IsInterface && type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ICollection<>))
+				return type.GetGenericArguments()[0];
+
+			var collectionType = type.GetInterfaces().FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(ICollection<>));
+
+			if(collectionType != null)
+				return collectionType.GetGenericArguments()[0];
+
+			//如果指定的类型是一个非泛型集合接口的实现则返回其元素类型为object类型
+			if(typeof(ICollection).IsAssignableFrom(type))
+				return typeof(object);
+
+			return null;
 		}
 
 		public static object GetDefaultValue(this Type type)
