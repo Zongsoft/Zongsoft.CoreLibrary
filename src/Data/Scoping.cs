@@ -37,16 +37,15 @@ namespace Zongsoft.Data
 	public class Scoping : ICollection<string>
 	{
 		#region 成员字段
+		private bool _shouldInitialize;
 		private ISet<string> _items;
 		#endregion
 
 		#region 构造函数
-		private Scoping(IEnumerable<string> items)
+		private Scoping()
 		{
-			if(items == null)
-				_items = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-			else
-				_items = new HashSet<string>(items, StringComparer.OrdinalIgnoreCase);
+			_shouldInitialize = true;
+			_items = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 		}
 		#endregion
 
@@ -66,7 +65,7 @@ namespace Zongsoft.Data
 		#region 公共方法
 		public bool Contains(string item)
 		{
-			if(string.IsNullOrWhiteSpace(item))
+			if(string.IsNullOrEmpty(item))
 				return false;
 
 			return _items.Contains(item);
@@ -75,6 +74,7 @@ namespace Zongsoft.Data
 		public void Clear()
 		{
 			_items.Clear();
+			_shouldInitialize = true;
 		}
 
 		public bool Remove(string item)
@@ -85,27 +85,53 @@ namespace Zongsoft.Data
 			return _items.Remove(item);
 		}
 
-		public Scoping Include(string item)
+		public Scoping Include(string scope)
 		{
-			if(string.IsNullOrEmpty(item))
+			if(string.IsNullOrEmpty(scope))
 				return this;
 
-			return this.Add(item.Trim('!'));
+			IEnumerable<string> GetParts(string[] parts)
+			{
+				for(int i = 0; i < parts.Length; i++)
+				{
+					var part = parts[i].Trim();
+
+					if(string.IsNullOrEmpty(part))
+						continue;
+
+					yield return part.TrimStart('!');
+				}
+			}
+
+			this.AddCore(GetParts(scope.Split(',')));
+			return this;
 		}
 
-		public Scoping Exclude(string item)
+		public Scoping Exclude(string scope)
 		{
-			if(string.IsNullOrEmpty(item))
+			if(string.IsNullOrEmpty(scope))
 				return this;
 
-			item = item.Trim();
+			IEnumerable<string> GetParts(string[] parts)
+			{
+				for(int i=0; i<parts.Length; i++)
+				{
+					var part = parts[i].Trim();
 
-			if(item == "*")
-				item = "!";
-			else if(item.Length > 0 && item[0] != '!')
-				item = "!" + item;
+					if(string.IsNullOrEmpty(part))
+						continue;
 
-			return this.Add(item);
+					if(part == "*")
+						yield return "!";
+					else if(part.Length > 0 && part[0] != '!')
+						yield return "!" + part;
+					else
+						yield return part;
+				}
+			}
+
+			this.AddCore(GetParts(scope.Split(',')));
+			return this;
 		}
 
 		public Scoping Add(string scope)
@@ -113,46 +139,8 @@ namespace Zongsoft.Data
 			if(string.IsNullOrEmpty(scope))
 				return this;
 
-			var parts = scope.Split(',');
-
-			foreach(var part in parts)
-			{
-				var item = part.Trim();
-
-				if(string.IsNullOrEmpty(item))
-					continue;
-
-				if(item.Length == 1)
-				{
-					switch(item)
-					{
-						case "!":
-							_items.Clear();
-							break;
-						case "*":
-							_items.Remove("*");
-							break;
-					}
-				}
-				else
-				{
-					if(item[0] == '!')
-					{
-						var name = item.Substring(1).Trim();
-						item = "!" + name;
-
-						_items.Remove(item);
-						_items.Remove(name);
-					}
-					else
-					{
-						_items.Remove(item);
-						_items.Remove("!" + item);
-					}
-				}
-
-				_items.Add(item);
-			}
+			//调用增加元素核心方法
+			this.AddCore(scope.Split(','));
 
 			return this;
 		}
@@ -160,82 +148,80 @@ namespace Zongsoft.Data
 		/// <summary>
 		/// 将当前范围转换映射成元素数值。
 		/// </summary>
-		/// <param name="map">指定的映射函数，回调的映射函数参数为空则表示初始化；否则即为通配符（譬如：“*” 星号表示所有可用元素）。</param>
-		/// <returns>返回映射后的元素数组。</returns>
-		public ISet<string> Resolve(Func<string, IEnumerable<string>> map = null)
+		/// <param name="resolve">指定的模式解析函数，第一个参数为空表示初始化；否则即为通配符（譬如：“*” 星号表示所有可用元素）。</param>
+		/// <returns>返回映射后的元素集。</returns>
+		public IEnumerable<string> Map(Func<string, IEnumerable<string>> resolve = null)
 		{
-			if(map == null)
-				return _items;
+			//如果没有指定解析函数，则返回内部集
+			if(resolve == null)
+			{
+				foreach(var item in _items)
+					yield return item;
 
-			//如果没有指定范围项，则默认映射为星号结果
-			if(_items.Count == 0)
-				return new HashSet<string>(map("*"), StringComparer.OrdinalIgnoreCase);
+				//终止内部遍历
+				yield break;
+			}
 
-			var initialized = false;
-			var result = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+			//如果需要初始化解析
+			if(_shouldInitialize)
+			{
+				//调用解析函数进行初始化
+				var items = resolve(_items.Count > 0 ? string.Empty : null);
+
+				if(items != null)
+				{
+					foreach(var item in items)
+					{
+						if(!this.IsIgnorable(item))
+							yield return item;
+					}
+				}
+			}
 
 			foreach(var item in _items)
 			{
-				if(string.IsNullOrEmpty(item))
-					continue;
-
-				if(item.Length == 1)
+				if(item == "*")
 				{
-					switch(item)
+					var children = resolve(item);
+
+					if(children != null)
 					{
-						case "!":
-							//确保后续不用再进行初始化处理
-							initialized = true;
-
-							//清空结果集
-							result.Clear();
-
-							break;
-						case "*":
-							//确保后续不用再进行初始化处理
-							initialized = true;
-
-							//处理通配符映射
-							result.UnionWith(map(item));
-
-							break;
-						default:
-							//确认是否需要初始化，如果需要则初始化
-							if(!initialized)
-								result.UnionWith(map(null));
-
-							//将当前元素加入结果集
-							result.Add(item);
-
-							break;
+						foreach(var child in children)
+						{
+							if(!this.IsIgnorable(child))
+								yield return child;
+						}
 					}
 				}
 				else
 				{
-					//确认是否需要初始化，如果需要则初始化
-					if(!initialized)
-						result.UnionWith(map(null));
-
-					if(item[0] == '!')
-						result.Remove(item.Substring(1));
-					else
-						result.Add(item);
+					//只返回非排除成员（排除成员即以惊叹号打头的成员）
+					if(item.Length > 0 && item[0] != '!')
+						yield return item;
 				}
-
-				//设置初始化标记为已完成，即初始化最多只能进行一次
-				initialized = true;
 			}
-
-			return result;
 		}
 		#endregion
 
 		#region 静态方法
 		public static Scoping Parse(string text)
 		{
-			var scoping = new Scoping(null);
-			scoping.Add(text);
+			var scoping = new Scoping();
+
+			if(!string.IsNullOrWhiteSpace(text))
+				scoping.AddCore(text.Split(','));
+
 			return scoping;
+		}
+		#endregion
+
+		#region 重写方法
+		public override string ToString()
+		{
+			if(_items.Count == 0)
+				return string.Empty;
+
+			return string.Join(", ", _items);
 		}
 		#endregion
 
@@ -271,23 +257,73 @@ namespace Zongsoft.Data
 		}
 		#endregion
 
-		#region 重写方法
-		public override string ToString()
+		#region 私有方法
+		private bool IsIgnorable(string item)
 		{
-			if(_items.Count == 0)
-				return string.Empty;
+			if(string.IsNullOrEmpty(item))
+				return true;
 
-			var text = new System.Text.StringBuilder();
+			return _items.Contains(item) || _items.Contains("!" + item);
+		}
 
-			foreach(var item in _items)
+		private void AddCore(IEnumerable<string> parts)
+		{
+			if(parts == null)
+				return;
+
+			foreach(var temp in parts)
 			{
-				if(text.Length > 0)
-					text.Append(", ");
+				var part = temp.Trim();
 
-				text.Append(item);
+				if(string.IsNullOrEmpty(part))
+					continue;
+
+				if(part.Length == 1)
+				{
+					switch(part)
+					{
+						case "!":
+							_items.Clear();
+							_shouldInitialize = false;
+
+							break;
+						case "*":
+							_items.Remove("*");
+							_shouldInitialize = false;
+
+							break;
+					}
+				}
+				else
+				{
+					if(part[0] == '!')
+					{
+						var name = part.Substring(1);
+
+						_items.Remove(part);
+						_items.Remove(name);
+
+						var removes = new List<string>();
+
+						foreach(var item in _items)
+						{
+							if(item.StartsWith(part + ".", StringComparison.OrdinalIgnoreCase) ||
+							   item.StartsWith(name + ".", StringComparison.OrdinalIgnoreCase))
+								removes.Add(item);
+						}
+
+						_items.ExceptWith(removes);
+					}
+					else
+					{
+						_items.Remove(part);
+						_items.Remove("!" + part);
+					}
+				}
+
+				if(part != "!")
+					_items.Add(part);
 			}
-
-			return text.ToString();
 		}
 		#endregion
 	}

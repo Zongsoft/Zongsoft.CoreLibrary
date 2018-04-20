@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 
 using Xunit;
@@ -25,29 +26,24 @@ namespace Zongsoft.Data
 			Assert.Equal(3, scoping.Count);
 
 			scoping.Add("!");
-			Assert.Equal(1, scoping.Count);
+			Assert.Equal(0, scoping.Count);
 
-			var members = scoping.Resolve();
+			var members = scoping.Map();
+			Assert.Equal(0, members.Count());
 
-			Assert.Equal(1, members.Count);
-			Assert.True(members.Contains("!"));
+			members = scoping.Map(wildcard => this.GetEntityProperties());
+			Assert.Equal(0, members.Count());
 
-			members = scoping.Resolve(wildcard => this.GetEntityProperties());
-			Assert.Equal(0, members.Count);
-
-			scoping.Add("*, !CreatorId, ! createdTime");
-			members = scoping.Resolve(wildcard => this.GetEntityProperties());
-			Assert.True(members.Count > 1);
+			scoping.Add("*, !CreatorId, !createdtime");
+			members = scoping.Map(wildcard => this.GetEntityProperties());
+			Assert.True(members.Count() > 1);
 			Assert.True(members.Contains("AssetId"));
 			Assert.False(members.Contains("CreatorId"));
 			Assert.False(members.Contains("CreatedTime"));
 
 			Assert.True(scoping.Count > 1);
 			scoping.Add("!");
-			Assert.Equal(1, scoping.Count);
-
-			members = scoping.Resolve(_ => this.GetEntityProperties());
-			Assert.Equal(0, members.Count);
+			Assert.Equal(0, scoping.Count);
 		}
 
 		private string[] GetEntityProperties()
