@@ -50,6 +50,43 @@ namespace Zongsoft.Reflection
 		#endregion
 
 		#region 公共方法
+		public MemberToken GetMember(Type type, string path)
+		{
+			if(type == null)
+				throw new ArgumentNullException(nameof(type));
+
+			if(string.IsNullOrEmpty(path))
+				return null;
+
+			var parts = path.Split('.');
+			var members = this.GetMembers(type);
+			MemberToken member = null;
+
+			for(int i = 0; i < parts.Length; i++)
+			{
+				var part = parts[i].Trim();
+
+				if(string.IsNullOrEmpty(part) || part == "*")
+				{
+					var elementType = Common.TypeExtension.GetCollectionElementType(member == null ? type : member.Type);
+
+					if(elementType == null)
+						return null;
+
+					members = this.GetMembers(elementType);
+				}
+				else
+				{
+					if(members != null && members.TryGet(part, out member))
+						members = this.GetMembers(member.Type);
+					else
+						return null;
+				}
+			}
+
+			return member;
+		}
+
 		public MemberTokenCollection GetMembers(Type type, MemberKind kinds = (MemberKind.Field | MemberKind.Property))
 		{
 			if(type == null)
