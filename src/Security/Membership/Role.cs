@@ -271,6 +271,26 @@ namespace Zongsoft.Security.Membership
 		}
 		#endregion
 
+		#region 导航属性
+		/// <summary>
+		/// 获取或设置当前角色的创建人。
+		/// </summary>
+		public User Creator
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// 获取或设置当前角色的最后修改人。
+		/// </summary>
+		public User Modifier
+		{
+			get;
+			set;
+		}
+		#endregion
+
 		#region 重写方法
 		public bool Equals(Role other)
 		{
