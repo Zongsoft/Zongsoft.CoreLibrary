@@ -38,7 +38,7 @@ namespace Zongsoft.Data
 		#region 成员字段
 		private GroupKey[] _keys;
 		private ICondition _filter;
-		private GroupAggregationCollection _aggregations;
+		private AggregateCollection _aggregates;
 		#endregion
 
 		#region 构造函数
@@ -49,7 +49,7 @@ namespace Zongsoft.Data
 
 			_keys = keys;
 			_filter = filter;
-			_aggregations = new GroupAggregationCollection(this);
+			_aggregates = new AggregateCollection(this);
 		}
 		#endregion
 
@@ -68,11 +68,11 @@ namespace Zongsoft.Data
 		/// <summary>
 		/// 获取分组的聚合成员集合。
 		/// </summary>
-		public GroupAggregationCollection Aggregations
+		public AggregateCollection Aggregates
 		{
 			get
 			{
-				return _aggregations;
+				return _aggregates;
 			}
 		}
 
@@ -153,14 +153,14 @@ namespace Zongsoft.Data
 				text.AppendLine();
 			}
 
-			if(_aggregations != null)
+			if(_aggregates != null)
 			{
-				foreach(var aggregation in _aggregations)
+				foreach(var aggregate in _aggregates)
 				{
-					text.Append(aggregation.Method.ToString() + ": " + aggregation.Name);
+					text.Append(aggregate.Method.ToString() + ": " + aggregate.Name);
 
-					if(aggregation.Alias != null && aggregation.Alias.Length > 0)
-						text.Append(" '" + aggregation.Alias + "'");
+					if(aggregate.Alias != null && aggregate.Alias.Length > 0)
+						text.Append(" '" + aggregate.Alias + "'");
 
 					text.AppendLine();
 				}
@@ -191,13 +191,13 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public struct GroupAggregation
+		public struct Aggregate
 		{
 			public string Name;
 			public string Alias;
-			public GroupAggregationMethod Method;
+			public AggregateMethod Method;
 
-			public GroupAggregation(GroupAggregationMethod method, string name, string alias)
+			public Aggregate(AggregateMethod method, string name, string alias)
 			{
 				this.Method = method;
 				this.Name = name;
@@ -205,87 +205,87 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public class GroupAggregationCollection : IEnumerable<GroupAggregation>
+		public class AggregateCollection : IEnumerable<Aggregate>
 		{
 			#region 私有变量
 			private Grouping _grouping;
-			private ICollection<GroupAggregation> _members;
+			private ICollection<Aggregate> _members;
 			#endregion
 
 			#region 私有构造
-			internal GroupAggregationCollection(Grouping grouping)
+			internal AggregateCollection(Grouping grouping)
 			{
 				_grouping = grouping;
-				_members = new List<GroupAggregation>();
+				_members = new List<Aggregate>();
 			}
 			#endregion
 
 			#region 公共方法
-			public GroupAggregationCollection Count(string name, string alias = null)
+			public AggregateCollection Count(string name, string alias = null)
 			{
-				return this.Aggregate(GroupAggregationMethod.Count, name, alias);
+				return this.Aggregate(AggregateMethod.Count, name, alias);
 			}
 
-			public GroupAggregationCollection Sum(string name, string alias = null)
+			public AggregateCollection Sum(string name, string alias = null)
 			{
-				return this.Aggregate(GroupAggregationMethod.Sum, name, alias);
+				return this.Aggregate(AggregateMethod.Sum, name, alias);
 			}
 
-			public GroupAggregationCollection Average(string name, string alias = null)
+			public AggregateCollection Average(string name, string alias = null)
 			{
-				return this.Aggregate(GroupAggregationMethod.Average, name, alias);
+				return this.Aggregate(AggregateMethod.Average, name, alias);
 			}
 
-			public GroupAggregationCollection Median(string name, string alias = null)
+			public AggregateCollection Median(string name, string alias = null)
 			{
-				return this.Aggregate(GroupAggregationMethod.Median, name, alias);
+				return this.Aggregate(AggregateMethod.Median, name, alias);
 			}
 
-			public GroupAggregationCollection Maximum(string name, string alias = null)
+			public AggregateCollection Maximum(string name, string alias = null)
 			{
-				return this.Aggregate(GroupAggregationMethod.Maximum, name, alias);
+				return this.Aggregate(AggregateMethod.Maximum, name, alias);
 			}
 
-			public GroupAggregationCollection Minimum(string name, string alias = null)
+			public AggregateCollection Minimum(string name, string alias = null)
 			{
-				return this.Aggregate(GroupAggregationMethod.Minimum, name, alias);
+				return this.Aggregate(AggregateMethod.Minimum, name, alias);
 			}
 
-			public GroupAggregationCollection Deviation(string name, string alias = null)
+			public AggregateCollection Deviation(string name, string alias = null)
 			{
-				return this.Aggregate(GroupAggregationMethod.Deviation, name, alias);
+				return this.Aggregate(AggregateMethod.Deviation, name, alias);
 			}
 
-			public GroupAggregationCollection DeviationPopulation(string name, string alias = null)
+			public AggregateCollection DeviationPopulation(string name, string alias = null)
 			{
-				return this.Aggregate(GroupAggregationMethod.DeviationPopulation, name, alias);
+				return this.Aggregate(AggregateMethod.DeviationPopulation, name, alias);
 			}
 
-			public GroupAggregationCollection Variance(string name, string alias = null)
+			public AggregateCollection Variance(string name, string alias = null)
 			{
-				return this.Aggregate(GroupAggregationMethod.Variance, name, alias);
+				return this.Aggregate(AggregateMethod.Variance, name, alias);
 			}
 
-			public GroupAggregationCollection VariancePopulation(string name, string alias = null)
+			public AggregateCollection VariancePopulation(string name, string alias = null)
 			{
-				return this.Aggregate(GroupAggregationMethod.VariancePopulation, name, alias);
+				return this.Aggregate(AggregateMethod.VariancePopulation, name, alias);
 			}
 			#endregion
 
 			#region 私有方法
-			private GroupAggregationCollection Aggregate(GroupAggregationMethod method, string name, string alias = null)
+			private AggregateCollection Aggregate(AggregateMethod method, string name, string alias = null)
 			{
-				if(string.IsNullOrEmpty(name))
+				if(string.IsNullOrEmpty(name) && method != AggregateMethod.Count)
 					throw new ArgumentNullException(nameof(name));
 
-				_members.Add(new GroupAggregation(GroupAggregationMethod.Count, name, alias));
+				_members.Add(new Aggregate(method, name, alias));
 
 				return this;
 			}
 			#endregion
 
 			#region 遍历实现
-			public IEnumerator<GroupAggregation> GetEnumerator()
+			public IEnumerator<Aggregate> GetEnumerator()
 			{
 				foreach(var member in _members)
 					yield return member;
@@ -298,7 +298,10 @@ namespace Zongsoft.Data
 			#endregion
 		}
 
-		public enum GroupAggregationMethod
+		/// <summary>
+		/// 表示聚合方法的枚举。
+		/// </summary>
+		public enum AggregateMethod
 		{
 			/// <summary>数量</summary>
 			Count,
