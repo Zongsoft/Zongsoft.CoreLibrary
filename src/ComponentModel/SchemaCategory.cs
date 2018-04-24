@@ -87,10 +87,10 @@ namespace Zongsoft.ComponentModel
 		{
 			var children = _children;
 
-			if(children == null)
-				return null;
+			if(children != null && children.TryGet(name, out var child))
+				return child;
 
-			return children[name];
+			return null;
 		}
 		#endregion
 	}

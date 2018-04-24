@@ -163,7 +163,7 @@ namespace Zongsoft.Options
 		#region 重写方法
 		protected override Collections.HierarchicalNode GetChild(string name)
 		{
-			if(_children.TryGet(name, out var child))
+			if(_children != null && _children.TryGet(name, out var child))
 				return child;
 
 			return null;
