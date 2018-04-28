@@ -26,15 +26,7 @@
 
 using System;
 using System.IO;
-using System.Net;
-using System.Net.Sockets;
-using System.ComponentModel;
-using System.Collections;
-using System.Collections.Generic;
-using System.Threading;
 using System.Text;
-
-using Zongsoft.ComponentModel;
 
 namespace Zongsoft.Communication
 {
@@ -168,47 +160,29 @@ namespace Zongsoft.Communication
 		#endregion
 
 		#region 激发事件
-		protected virtual void OnClosed(ChannelEventArgs args)
+		protected virtual void OnClosed()
 		{
-			var handler = this.Closed;
-
-			if(handler != null)
-				handler(this, args);
+			this.Closed?.Invoke(this, new ChannelEventArgs(this));
 		}
 
-		protected virtual void OnClosing(ChannelEventArgs args)
+		protected virtual void OnClosing()
 		{
-			var handler = this.Closing;
-
-			if(handler != null)
-				handler(this, args);
+			this.Closing?.Invoke(this, new ChannelEventArgs(this));
 		}
 
-		protected virtual void OnFailed(ChannelFailureEventArgs args)
+		protected virtual void OnFailed(Exception exception, object asyncState)
 		{
-			var handler = this.Failed;
-
-			if(handler != null)
-				handler(this, args);
+			this.Failed?.Invoke(this, new ChannelFailureEventArgs(this, exception, asyncState));
 		}
 
-		protected virtual void OnSent(SentEventArgs args)
+		protected virtual void OnSent(object asyncState)
 		{
-			//更新最后发送时间
-			_lastSendTime = DateTime.Now;
-
-			var handler = this.Sent;
-
-			if(handler != null)
-				handler(this, args);
+			this.Sent?.Invoke(this, new SentEventArgs(this, asyncState));
 		}
 
-		protected virtual void OnReceived(ReceivedEventArgs args)
+		protected virtual void OnReceived(object receivedObject)
 		{
-			var handler = this.Received;
-
-			if(handler != null)
-				handler(this, args);
+			this.Received?.Invoke(this, new ReceivedEventArgs(this, receivedObject));
 		}
 		#endregion
 
@@ -235,20 +209,14 @@ namespace Zongsoft.Communication
 			if(this.IsIdled)
 				return;
 
-			var args = new ChannelEventArgs(this);
-
 			//激发“Closing”关闭前事件
-			this.OnClosing(args);
-
-			//如果关闭前事件处理函数取消后续的关闭操作则退出
-			//if(args.Cancel)
-			//    return;
+			this.OnClosing();
 
 			//执行子类实现的真正关闭动作
 			this.OnClose();
 
 			//激发“Closed”关闭后事件
-			this.OnClosed(new ChannelEventArgs(this));
+			this.OnClosed();
 		}
 		#endregion
 

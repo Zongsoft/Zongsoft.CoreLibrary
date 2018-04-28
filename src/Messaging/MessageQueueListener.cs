@@ -26,15 +26,13 @@
 
 using System;
 using System.IO;
-using System.ComponentModel;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Zongsoft.Messaging
 {
-	[DisplayName("${Text.MessageQueueListener.Title}")]
-	[Description("${Text.MessageQueueListener.Description}")]
+	[System.ComponentModel.DisplayName("${Text.MessageQueueListener.Title}")]
+	[System.ComponentModel.Description("${Text.MessageQueueListener.Description}")]
 	public class MessageQueueListener : Zongsoft.Communication.ListenerBase
 	{
 		#region 成员字段
@@ -68,13 +66,10 @@ namespace Zongsoft.Messaging
 			}
 			set
 			{
-				if(value == null)
-					throw new ArgumentNullException();
-
 				if(this.State == Services.WorkerState.Running)
 					throw new InvalidOperationException();
 
-				_queue = value;
+				_queue = value ?? throw new ArgumentNullException();
 			}
 		}
 		#endregion
@@ -83,7 +78,7 @@ namespace Zongsoft.Messaging
 		protected override void OnStart(string[] args)
 		{
 #if DEBUG
-			Zongsoft.Diagnostics.Logger.Trace(this.GetType().FullName + " [Starting]");
+			Zongsoft.Diagnostics.Logger.Trace(this.Name + " [Starting]");
 #endif
 
 			var queue = this.Queue;
@@ -91,15 +86,14 @@ namespace Zongsoft.Messaging
 			if(queue == null)
 				throw new InvalidOperationException("Missing the 'Queue' for the operation.");
 
-			_channel = new MessageQueueChannel(1, queue);
-			this.Receiver = _channel;
+			this.Receiver = _channel = new MessageQueueChannel(1, queue);
 			_channel.ReceiveAsync();
 		}
 
 		protected override void OnStop(string[] args)
 		{
 #if DEBUG
-			Zongsoft.Diagnostics.Logger.Trace(this.GetType().FullName + " [Stopping]");
+			Zongsoft.Diagnostics.Logger.Trace(this.Name + " [Stopping]");
 #endif
 
 			var channel = System.Threading.Interlocked.Exchange(ref _channel, null);
@@ -114,12 +108,13 @@ namespace Zongsoft.Messaging
 		private class MessageQueueChannel : Zongsoft.Communication.ChannelBase
 		{
 			#region 私有变量
-			private volatile int _isClosed;
+			private CancellationTokenSource _cancellation;
 			#endregion
 
 			#region 构造函数
 			public MessageQueueChannel(int channelId, IMessageQueue queue) : base(channelId, queue)
 			{
+				_cancellation = new CancellationTokenSource();
 			}
 			#endregion
 
@@ -128,7 +123,7 @@ namespace Zongsoft.Messaging
 			{
 				get
 				{
-					return _isClosed != 0;
+					return !_cancellation.IsCancellationRequested;
 				}
 			}
 			#endregion
@@ -136,8 +131,15 @@ namespace Zongsoft.Messaging
 			#region 收取消息
 			public void ReceiveAsync()
 			{
-				var task = new Task(this.OnReceive, CancellationToken.None, TaskCreationOptions.LongRunning);
-				task.Start();
+				if(!_cancellation.IsCancellationRequested)
+				{
+					try
+					{
+						var token = _cancellation.Token;
+						Task.Factory.StartNew(this.OnReceive, token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+					}
+					catch { }
+				}
 			}
 
 			private void OnReceive()
@@ -147,12 +149,16 @@ namespace Zongsoft.Messaging
 				if(queue == null)
 					return;
 
-				while(_isClosed == 0)
+				while(!_cancellation.IsCancellationRequested)
 				{
-					var message = queue.Dequeue(new MessageDequeueSettings(TimeSpan.FromSeconds(30)));
+					//以同步方式从消息队列中获取一条消息
+					var message = queue.Dequeue(new MessageDequeueSettings(TimeSpan.FromSeconds(10)));
 
-					if(message != null)
-						this.OnReceived(new Communication.ReceivedEventArgs(this, message));
+					//如果消息获取失败则休息一小会
+					if(message == null)
+						Thread.Sleep(500);
+					else //以异步方式激发消息接收事件
+						Task.Run(() => this.OnReceived(message));
 				}
 			}
 			#endregion
@@ -162,12 +168,12 @@ namespace Zongsoft.Messaging
 			{
 				var queue = (IMessageQueue)this.Host;
 
-				if(queue == null || _isClosed != 0)
+				if(queue == null || _cancellation.IsCancellationRequested)
 					return;
 
 				queue.EnqueueAsync(stream).ContinueWith(_ =>
 				{
-					this.OnSent(new Communication.SentEventArgs(this, asyncState));
+					this.OnSent(asyncState);
 				});
 			}
 
@@ -175,7 +181,7 @@ namespace Zongsoft.Messaging
 			{
 				var queue = (IMessageQueue)this.Host;
 
-				if(queue == null || _isClosed != 0)
+				if(queue == null || _cancellation.IsCancellationRequested)
 					return;
 
 				if(buffer == null)
@@ -192,7 +198,7 @@ namespace Zongsoft.Messaging
 
 				queue.EnqueueAsync(data).ContinueWith(_ =>
 				{
-					this.OnSent(new Communication.SentEventArgs(this, asyncState));
+					this.OnSent(asyncState);
 				});
 			}
 			#endregion
@@ -200,7 +206,8 @@ namespace Zongsoft.Messaging
 			#region 关闭处理
 			protected override void OnClose()
 			{
-				_isClosed = 1;
+				_cancellation.Cancel();
+				_cancellation.Dispose();
 			}
 			#endregion
 		}
