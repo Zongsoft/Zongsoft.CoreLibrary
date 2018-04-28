@@ -25,14 +25,23 @@
  */
 
 using System;
-using System.ComponentModel;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading;
 
 namespace Zongsoft.Services
 {
+	/// <summary>
+	/// 这是工作器的基类。
+	/// </summary>
+	/// <remarks>
+	///		<para>该实现提供了对<see cref="OnStart(string[])"/>、<see cref="OnStop(string[])"/>、<see cref="OnPause"/>、<see cref="OnResume"/>这四个方法之间的线程重入的隔离。</para>
+	///		<para>对于子类的实现者而言，无需担心这些方法会在多线程中会导致状态的不一致，并确保了它们不会发生线程重入。</para>
+	/// </remarks>
 	public abstract class WorkerBase : IWorker, IDisposable
 	{
+		#region 常量定义
+		private const int DISPOSED_FLAG = 1;
+		#endregion
+
 		#region 事件声明
 		public event EventHandler<WorkerStateChangedEventArgs> StateChanged;
 		#endregion
@@ -41,32 +50,30 @@ namespace Zongsoft.Services
 		private string _name;
 		private bool _disabled;
 		private bool _canPauseAndContinue;
-		private WorkerState _state;
-		private int _isDisposed;
+		private int _state;
+		private int _disposing;
+		private readonly AutoResetEvent _semaphore;
 		#endregion
 
 		#region 构造函数
-		protected WorkerBase()
+		protected WorkerBase() : this(null)
 		{
-			_name = this.GetType().Name;
-			_disabled = false;
-			_canPauseAndContinue = false;
-			_state = WorkerState.Stopped;
 		}
 
 		protected WorkerBase(string name)
 		{
-			if(string.IsNullOrWhiteSpace(name))
-				throw new ArgumentNullException("name");
-
-			_name = name.Trim();
+			_name = string.IsNullOrWhiteSpace(name) ? this.GetType().Name : name.Trim();
 			_disabled = false;
 			_canPauseAndContinue = false;
-			_state = WorkerState.Stopped;
+			_state = (int)WorkerState.Stopped;
+			_semaphore = new AutoResetEvent(true);
 		}
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取或设置工作器的名称。
+		/// </summary>
 		public string Name
 		{
 			get
@@ -115,7 +122,7 @@ namespace Zongsoft.Services
 			}
 			protected set
 			{
-				if(_state != WorkerState.Stopped)
+				if(_state != (int)WorkerState.Stopped)
 					throw new InvalidOperationException();
 
 				_canPauseAndContinue = value;
@@ -129,82 +136,79 @@ namespace Zongsoft.Services
 		{
 			get
 			{
-				return _state;
-			}
-		}
-
-		/// <summary>
-		/// 获取一个值表示工作器是否已经被处置了。
-		/// </summary>
-		public bool IsDisposed
-		{
-			get
-			{
-				return _isDisposed != 0;
+				return (WorkerState)_state;
 			}
 		}
 		#endregion
 
 		#region 公共方法
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
 		public void Start(params string[] args)
 		{
-			if(this.IsDisposed)
-				throw new ObjectDisposedException(_name);
-
-			if(_disabled || _state != WorkerState.Stopped)
+			if(_disabled || _state != (int)WorkerState.Stopped)
 				return;
-
-			//更新当前状态为“整体启动中”
-			_state = WorkerState.Starting;
 
 			try
 			{
+				//等待信号量
+				_semaphore.WaitOne();
+
+				if(_disabled || _state != (int)WorkerState.Stopped)
+					return;
+
+				//更新当前状态为“正在启动中”
+				_state = (int)WorkerState.Starting;
+
 				//调用启动抽象方法，以执行实际的启动操作
 				this.OnStart(args);
 
 				//更新当前状态为“运行中”
-				_state = WorkerState.Running;
+				_state = (int)WorkerState.Running;
 
 				//激发“StateChanged”事件
-				this.OnStateChanged(new WorkerStateChangedEventArgs("Start", WorkerState.Running));
+				this.OnStateChanged(nameof(Start), WorkerState.Running);
 			}
 			catch(Exception ex)
 			{
-				_state = WorkerState.Stopped;
+				_state = (int)WorkerState.Stopped;
 
 				//激发“StateChanged”事件
-				this.OnStateChanged(new WorkerStateChangedEventArgs("Start", WorkerState.Stopped, ex));
+				this.OnStateChanged(nameof(Start), WorkerState.Stopped, ex);
 
 				throw;
 			}
+			finally
+			{
+				//释放信号量
+				_semaphore.Set();
+			}
 		}
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
 		public void Stop(params string[] args)
 		{
-			if(this.IsDisposed)
-				throw new ObjectDisposedException(_name);
-
-			if(_disabled || _state == WorkerState.Stopping || _state == WorkerState.Stopped)
+			if(_disabled || _state == (int)WorkerState.Stopping || _state == (int)WorkerState.Stopped)
 				return;
 
-			//保存原来的状态
-			var originalState = _state;
-
-			//更新当前状态为“正在停止中”
-			_state = WorkerState.Stopping;
+			int originalState = -1;
 
 			try
 			{
+				//等待信号量
+				_semaphore.WaitOne();
+
+				if(_disabled || _state == (int)WorkerState.Stopping || _state == (int)WorkerState.Stopped)
+					return;
+
+				//更新当前状态为“正在停止中”，并保存原来的状态
+				originalState = Interlocked.Exchange(ref _state, (int)WorkerState.Stopping);
+
 				//调用停止抽象方法，以执行实际的停止操作
 				this.OnStop(args);
 
 				//更新当前状态为已停止
-				_state = WorkerState.Stopped;
+				_state = (int)WorkerState.Stopped;
 
 				//激发“StateChanged”事件
-				this.OnStateChanged(new WorkerStateChangedEventArgs("Stop", WorkerState.Stopped));
+				this.OnStateChanged(nameof(Stop), WorkerState.Stopped);
 			}
 			catch(Exception ex)
 			{
@@ -212,40 +216,46 @@ namespace Zongsoft.Services
 				_state = originalState;
 
 				//激发“StateChanged”事件
-				this.OnStateChanged(new WorkerStateChangedEventArgs("Stop", originalState, ex));
+				this.OnStateChanged(nameof(Stop), (WorkerState)originalState, ex);
 
 				throw;
 			}
+			finally
+			{
+				//释放信号量
+				_semaphore.Set();
+			}
 		}
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
 		public void Pause()
 		{
-			if(this.IsDisposed)
-				throw new ObjectDisposedException(_name);
-
 			if(_disabled || (!_canPauseAndContinue))
 				return;
 
-			if(_state != WorkerState.Running)
+			if(_state != (int)WorkerState.Running)
 				return;
 
-			//保存原来的状态
-			var originalState = _state;
-
-			//更新当前状态为“正在暂停中”
-			_state = WorkerState.Pausing;
+			int originalState = -1;
 
 			try
 			{
+				//等待信号量
+				_semaphore.WaitOne();
+
+				if(_state != (int)WorkerState.Running)
+					return;
+
+				//更新当前状态为“正在暂停中”，并保存原来的状态
+				originalState = Interlocked.Exchange(ref _state, (int)WorkerState.Pausing);
+
 				//执行暂停操作
 				this.OnPause();
 
 				//更新当前状态为“已经暂停”
-				_state = WorkerState.Paused;
+				_state = (int)WorkerState.Paused;
 
 				//激发“StateChanged”事件
-				this.OnStateChanged(new WorkerStateChangedEventArgs("Pause", WorkerState.Paused));
+				this.OnStateChanged(nameof(Pause), WorkerState.Paused);
 			}
 			catch(Exception ex)
 			{
@@ -253,39 +263,45 @@ namespace Zongsoft.Services
 				_state = originalState;
 
 				//激发“StateChanged”事件
-				this.OnStateChanged(new WorkerStateChangedEventArgs("Pause", originalState, ex));
+				this.OnStateChanged(nameof(Pause), (WorkerState)originalState, ex);
 
 				throw;
+			}
+			finally
+			{
+				//释放信号量
+				_semaphore.Set();
 			}
 		}
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
 		public void Resume()
 		{
-			if(this.IsDisposed)
-				throw new ObjectDisposedException(_name);
-
 			if(_disabled || (!_canPauseAndContinue))
 				return;
 
-			if(_state != WorkerState.Paused)
+			if(_state != (int)WorkerState.Paused)
 				return;
 
-			//保存原来的状态
-			var originalState = _state;
-
-			//更新当前状态为“正在恢复中”
-			_state = WorkerState.Resuming;
+			int originalState = -1;
 
 			try
 			{
+				//等待信号量
+				_semaphore.WaitOne();
+
+				if(_state != (int)WorkerState.Paused)
+					return;
+
+				//更新当前状态为“正在恢复中”，并保存原来的状态
+				originalState = Interlocked.Exchange(ref _state, (int)WorkerState.Resuming);
+
 				//执行恢复操作
 				this.OnResume();
 
-				_state = WorkerState.Running;
+				_state = (int)WorkerState.Running;
 
 				//激发“StateChanged”事件
-				this.OnStateChanged(new WorkerStateChangedEventArgs("Resume", WorkerState.Running));
+				this.OnStateChanged(nameof(Resume), WorkerState.Running);
 			}
 			catch(Exception ex)
 			{
@@ -293,9 +309,14 @@ namespace Zongsoft.Services
 				_state = originalState;
 
 				//激发“StateChanged”事件
-				this.OnStateChanged(new WorkerStateChangedEventArgs("Resume", originalState, ex));
+				this.OnStateChanged(nameof(Resume), (WorkerState)originalState, ex);
 
 				throw;
+			}
+			finally
+			{
+				//释放信号量
+				_semaphore.Set();
 			}
 		}
 		#endregion
@@ -314,12 +335,9 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 事件激发
-		protected virtual void OnStateChanged(WorkerStateChangedEventArgs args)
+		protected virtual void OnStateChanged(string actionName, WorkerState state, Exception exception = null)
 		{
-			var stateChanged = this.StateChanged;
-
-			if(stateChanged != null)
-				stateChanged(this, args);
+			this.StateChanged?.Invoke(this, new WorkerStateChangedEventArgs(actionName, state, exception));
 		}
 		#endregion
 
@@ -331,11 +349,12 @@ namespace Zongsoft.Services
 
 		void IDisposable.Dispose()
 		{
-			var isDisposed = System.Threading.Interlocked.CompareExchange(ref _isDisposed, 1, 0);
+			var original = Interlocked.Exchange(ref _disposing, DISPOSED_FLAG);
 
-			if(isDisposed == 0)
+			if(original != DISPOSED_FLAG)
 			{
 				this.Dispose(true);
+				_semaphore.Dispose();
 				GC.SuppressFinalize(this);
 			}
 		}

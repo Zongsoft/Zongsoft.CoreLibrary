@@ -52,7 +52,7 @@ namespace Zongsoft.Services
 		[Description("${Text.WorkerState.Pausing}")]
 		Pausing,
 
-		/// <summary>暂停中。</summary>
+		/// <summary>已经暂停。</summary>
 		[Description("${Text.WorkerState.Paused}")]
 		Paused,
 

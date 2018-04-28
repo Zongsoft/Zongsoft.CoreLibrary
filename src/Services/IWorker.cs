@@ -25,15 +25,15 @@
  */
 
 using System;
-using System.ComponentModel;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Zongsoft.Services
 {
 	/// <summary>
 	/// 关于工作器的接口。
 	/// </summary>
+	/// <remarks>
+	///		<para>对于实现者的约定：应支持 <see cref="Start(string[])"/>、<see cref="Stop(string[])"/>、<see cref="Pause"/>、<see cref="Resume"/> 这四个工作方法的线程重入隔离性。</para>
+	/// </remarks>
 	public interface IWorker
 	{
 		/// <summary>表示状态发生了改变。</summary>
