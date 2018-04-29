@@ -53,7 +53,7 @@ namespace Zongsoft.Communication
 		#region 构造函数
 		protected ChannelBase(int channelId, object host)
 		{
-			_host = null;
+			_host = host;
 			_channelId = channelId;
 			_lastSendTime = new DateTime(1900, 1, 1);
 			_lastReceivedTime = new DateTime(1900, 1, 1);
