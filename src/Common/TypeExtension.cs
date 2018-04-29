@@ -265,7 +265,22 @@ namespace Zongsoft.Common
 				   code == TypeCode.Decimal || code == TypeCode.Char;
 		}
 
+		public static Type GetListElementType(this Type type)
+		{
+			return GetElementType(type, typeof(IList<>), typeof(IList));
+		}
+
 		public static Type GetCollectionElementType(this Type type)
+		{
+			return GetElementType(type, typeof(ICollection<>), typeof(ICollection));
+		}
+
+		public static Type GetElementType(this Type type)
+		{
+			return GetElementType(type, typeof(IEnumerable<>), typeof(IEnumerable));
+		}
+
+		private static Type GetElementType(Type type, Type genericDefinitionInterface, Type collectionInterface)
 		{
 			if(type == null)
 				throw new ArgumentNullException(nameof(type));
@@ -273,16 +288,16 @@ namespace Zongsoft.Common
 			if(type.IsArray)
 				return type.GetElementType();
 
-			if(type.IsInterface && type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ICollection<>))
+			if(type.IsInterface && type.IsGenericType && type.GetGenericTypeDefinition() == genericDefinitionInterface)
 				return type.GetGenericArguments()[0];
 
-			var collectionType = type.GetInterfaces().FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(ICollection<>));
+			var collectionType = type.GetInterfaces().FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == genericDefinitionInterface);
 
 			if(collectionType != null)
 				return collectionType.GetGenericArguments()[0];
 
 			//如果指定的类型是一个非泛型集合接口的实现则返回其元素类型为object类型
-			if(typeof(ICollection).IsAssignableFrom(type))
+			if(collectionInterface.IsAssignableFrom(type))
 				return typeof(object);
 
 			return null;
