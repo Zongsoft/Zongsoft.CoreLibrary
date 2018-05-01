@@ -123,7 +123,8 @@ namespace Zongsoft.Messaging
 			{
 				get
 				{
-					return !_cancellation.IsCancellationRequested;
+					var cancellation = _cancellation;
+					return cancellation != null && !cancellation.IsCancellationRequested;
 				}
 			}
 			#endregion
@@ -131,15 +132,12 @@ namespace Zongsoft.Messaging
 			#region 收取消息
 			public void ReceiveAsync()
 			{
-				if(!_cancellation.IsCancellationRequested)
-				{
-					try
-					{
-						var token = _cancellation.Token;
-						Task.Factory.StartNew(this.OnReceive, token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
-					}
-					catch { }
-				}
+				var cancellation = _cancellation;
+
+				if(cancellation == null || cancellation.IsCancellationRequested)
+					return;
+
+				Task.Factory.StartNew(this.OnReceive, cancellation.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 			}
 
 			private void OnReceive()
@@ -149,16 +147,33 @@ namespace Zongsoft.Messaging
 				if(queue == null)
 					return;
 
-				while(!_cancellation.IsCancellationRequested)
+				var cancellation = _cancellation;
+				MessageBase message = null;
+
+				while(!cancellation.IsCancellationRequested)
 				{
-					//以同步方式从消息队列中获取一条消息
-					var message = queue.Dequeue(new MessageDequeueSettings(TimeSpan.FromSeconds(10)));
+					try
+					{
+						//以同步方式从消息队列中获取一条消息
+						message = queue.Dequeue(new MessageDequeueSettings(TimeSpan.FromSeconds(10)));
+					}
+					catch
+					{
+						message = null;
+					}
 
 					//如果消息获取失败则休息一小会
 					if(message == null)
 						Thread.Sleep(500);
 					else //以异步方式激发消息接收事件
-						Task.Run(() => this.OnReceived(message));
+						Task.Run(() =>
+						{
+							try
+							{
+								this.OnReceived(message);
+							}
+							catch { }
+						}, cancellation.Token);
 				}
 			}
 			#endregion
@@ -206,8 +221,10 @@ namespace Zongsoft.Messaging
 			#region 关闭处理
 			protected override void OnClose()
 			{
-				_cancellation.Cancel();
-				_cancellation.Dispose();
+				var cancellation = Interlocked.Exchange(ref _cancellation, null);
+
+				if(cancellation != null)
+					cancellation.Cancel();
 			}
 			#endregion
 		}
