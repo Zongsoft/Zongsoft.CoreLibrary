@@ -26,11 +26,16 @@
 
 using System;
 using System.IO;
+using System.ComponentModel;
 
 namespace Zongsoft.Terminals
 {
 	public interface ITerminal : Zongsoft.Services.ICommandOutlet
 	{
+		#region 事件定义
+		event CancelEventHandler Abortion;
+		#endregion
+
 		#region 属性定义
 		Zongsoft.Services.CommandOutletColor BackgroundColor
 		{

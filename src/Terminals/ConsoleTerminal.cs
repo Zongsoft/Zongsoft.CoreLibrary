@@ -27,6 +27,7 @@
 using System;
 using System.IO;
 using System.Text;
+using System.ComponentModel;
 
 using Zongsoft.Services;
 
@@ -34,6 +35,10 @@ namespace Zongsoft.Terminals
 {
 	public class ConsoleTerminal : ITerminal
 	{
+		#region 事件定义
+		public event CancelEventHandler Abortion;
+		#endregion
+
 		#region 同步变量
 		private readonly object _syncRoot;
 		#endregion
@@ -46,15 +51,18 @@ namespace Zongsoft.Terminals
 		public ConsoleTerminal()
 		{
 			_syncRoot = new object();
+
+			Console.TreatControlCAsInput = false;
+			Console.CancelKeyPress += this.Console_CancelKeyPress;
 		}
 
 		public ConsoleTerminal(TerminalCommandExecutor executor)
 		{
-			if(executor == null)
-				throw new ArgumentNullException("executor");
-
 			_syncRoot = new object();
-			_executor = executor;
+			_executor = executor ?? throw new ArgumentNullException(nameof(executor));
+
+			Console.TreatControlCAsInput = false;
+			Console.CancelKeyPress += this.Console_CancelKeyPress;
 		}
 		#endregion
 
@@ -294,6 +302,29 @@ namespace Zongsoft.Terminals
 			{
 				return Console.Out;
 			}
+		}
+		#endregion
+
+		#region 激发事件
+		protected virtual bool OnAbortion()
+		{
+			var e = this.Abortion;
+
+			if(e != null)
+			{
+				var args = new CancelEventArgs();
+				e(this, args);
+				return args.Cancel;
+			}
+
+			return false;
+		}
+		#endregion
+
+		#region 中断事件
+		private void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
+		{
+			e.Cancel = this.OnAbortion();
 		}
 		#endregion
 
