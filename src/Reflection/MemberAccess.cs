@@ -591,7 +591,7 @@ namespace Zongsoft.Reflection
 			return false;
 		}
 
-		internal static MemberInfo GetMemberInfo(object owner, MemberPathSegment token)
+		internal static MemberInfo GetMemberInfo(object owner, MemberPathSegment segment)
 		{
 			if(owner == null)
 				return null;
@@ -600,26 +600,26 @@ namespace Zongsoft.Reflection
 
 			var members = type.FindMembers(MemberTypes.Field | MemberTypes.Property, BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static, (member, criteria) =>
 			{
-				MemberPathSegment memberToken = (MemberPathSegment)criteria;
+				MemberPathSegment memberSegment = (MemberPathSegment)criteria;
 
-				if(memberToken.IsIndexer && member.MemberType == MemberTypes.Property)
+				if(memberSegment.IsIndexer && member.MemberType == MemberTypes.Property)
 				{
 					var parameters = ((PropertyInfo)member).GetIndexParameters();
 
-					if(parameters.Length != memberToken.Parameters.Length)
+					if(parameters.Length != memberSegment.Parameters.Length)
 						return false;
 
 					for(int i = 0; i < parameters.Length; i++)
 					{
-						if(parameters[i].ParameterType != memberToken.Parameters[i].GetType())
+						if(parameters[i].ParameterType != memberSegment.Parameters[i].GetType())
 							return false;
 					}
 
 					return true;
 				}
 
-				return string.Equals(member.Name, memberToken.Name, StringComparison.OrdinalIgnoreCase);
-			}, token);
+				return string.Equals(member.Name, memberSegment.Name, StringComparison.OrdinalIgnoreCase);
+			}, segment);
 
 			if(members != null && members.Length > 0)
 				return members[0];
