@@ -77,10 +77,6 @@ namespace Zongsoft.Messaging
 		#region 重写方法
 		protected override void OnStart(string[] args)
 		{
-#if DEBUG
-			Zongsoft.Diagnostics.Logger.Trace(this.Name + " [Starting]");
-#endif
-
 			var queue = this.Queue;
 
 			if(queue == null)
@@ -92,11 +88,7 @@ namespace Zongsoft.Messaging
 
 		protected override void OnStop(string[] args)
 		{
-#if DEBUG
-			Zongsoft.Diagnostics.Logger.Trace(this.Name + " [Stopping]");
-#endif
-
-			var channel = System.Threading.Interlocked.Exchange(ref _channel, null);
+			var channel = Interlocked.Exchange(ref _channel, null);
 			this.Receiver = null;
 
 			if(channel != null)
