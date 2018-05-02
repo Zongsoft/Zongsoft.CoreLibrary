@@ -35,31 +35,24 @@ namespace Zongsoft.Terminals
 {
 	public class ConsoleTerminal : ITerminal
 	{
+		#region 单例字段
+		public static readonly ConsoleTerminal Instance = new ConsoleTerminal();
+		#endregion
+
 		#region 事件定义
-		public event CancelEventHandler Abortion;
+		public event EventHandler Resetted;
+		public event EventHandler Resetting;
+		public event CancelEventHandler Aborting;
 		#endregion
 
 		#region 同步变量
 		private readonly object _syncRoot;
 		#endregion
 
-		#region 成员变量
-		private TerminalCommandExecutor _executor;
-		#endregion
-
-		#region 构造函数
-		public ConsoleTerminal()
+		#region 私有构造
+		private ConsoleTerminal()
 		{
 			_syncRoot = new object();
-
-			Console.TreatControlCAsInput = false;
-			Console.CancelKeyPress += this.Console_CancelKeyPress;
-		}
-
-		public ConsoleTerminal(TerminalCommandExecutor executor)
-		{
-			_syncRoot = new object();
-			_executor = executor ?? throw new ArgumentNullException(nameof(executor));
 
 			Console.TreatControlCAsInput = false;
 			Console.CancelKeyPress += this.Console_CancelKeyPress;
@@ -67,14 +60,6 @@ namespace Zongsoft.Terminals
 		#endregion
 
 		#region 公共属性
-		public TerminalCommandExecutor Executor
-		{
-			get
-			{
-				return _executor;
-			}
-		}
-
 		public TextReader Input
 		{
 			get
@@ -144,6 +129,9 @@ namespace Zongsoft.Terminals
 
 		public void Reset()
 		{
+			//激发“Resetting”事件
+			this.OnResetting();
+
 			//恢复默认的颜色设置
 			Console.ResetColor();
 
@@ -156,11 +144,8 @@ namespace Zongsoft.Terminals
 			{
 			}
 
-			//先显示命令提示符
-			if(_executor == null || _executor.Current == null || _executor.Current == _executor.Root)
-				Console.Write("#>");
-			else
-				Console.Write("{0}>", _executor.Current.FullPath);
+			//激发“Resetted”事件
+			this.OnResetted();
 		}
 
 		public void ResetStyles(TerminalStyles styles)
@@ -306,9 +291,9 @@ namespace Zongsoft.Terminals
 		#endregion
 
 		#region 激发事件
-		protected virtual bool OnAbortion()
+		protected virtual bool OnAborting()
 		{
-			var e = this.Abortion;
+			var e = this.Aborting;
 
 			if(e != null)
 			{
@@ -319,12 +304,22 @@ namespace Zongsoft.Terminals
 
 			return false;
 		}
+
+		protected virtual void OnResetted()
+		{
+			this.Resetted?.Invoke(this, EventArgs.Empty);
+		}
+
+		protected virtual void OnResetting()
+		{
+			this.Resetting?.Invoke(this, EventArgs.Empty);
+		}
 		#endregion
 
 		#region 中断事件
 		private void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
 		{
-			e.Cancel = this.OnAbortion();
+			e.Cancel = this.OnAborting();
 		}
 		#endregion
 

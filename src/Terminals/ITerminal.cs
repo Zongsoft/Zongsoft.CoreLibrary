@@ -33,7 +33,9 @@ namespace Zongsoft.Terminals
 	public interface ITerminal : Zongsoft.Services.ICommandOutlet
 	{
 		#region 事件定义
-		event CancelEventHandler Abortion;
+		event EventHandler Resetted;
+		event EventHandler Resetting;
+		event CancelEventHandler Aborting;
 		#endregion
 
 		#region 属性定义

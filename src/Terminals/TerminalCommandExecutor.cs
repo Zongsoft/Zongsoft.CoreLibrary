@@ -33,6 +33,10 @@ namespace Zongsoft.Terminals
 {
 	public class TerminalCommandExecutor : Zongsoft.Services.CommandExecutor
 	{
+		#region 单例字段
+		public static readonly TerminalCommandExecutor Console = new TerminalCommandExecutor(ConsoleTerminal.Instance);
+		#endregion
+
 		#region 事件声明
 		public event EventHandler CurrentChanged;
 		public event EventHandler<ExitEventArgs> Exit;
@@ -44,25 +48,16 @@ namespace Zongsoft.Terminals
 		#endregion
 
 		#region 构造函数
-		public TerminalCommandExecutor()
-		{
-			_terminal = new ConsoleTerminal(this);
-		}
-
 		public TerminalCommandExecutor(ITerminal terminal)
 		{
-			if(terminal == null)
-				throw new ArgumentNullException(nameof(terminal));
-
-			_terminal = terminal;
+			_terminal = terminal ?? throw new ArgumentNullException(nameof(terminal));
+			_terminal.Resetted += this.Terminal_Resetted;
 		}
 
 		public TerminalCommandExecutor(ITerminal terminal, ICommandExpressionParser parser) : base(parser)
 		{
-			if(terminal == null)
-				throw new ArgumentNullException(nameof(terminal));
-
-			_terminal = terminal;
+			_terminal = terminal ?? throw new ArgumentNullException(nameof(terminal));
+			_terminal.Resetted += this.Terminal_Resetted;
 		}
 		#endregion
 
@@ -244,6 +239,16 @@ namespace Zongsoft.Terminals
 		protected virtual void OnCurrentChanged(EventArgs args)
 		{
 			this.CurrentChanged?.Invoke(this, args);
+		}
+		#endregion
+
+		#region 终端重置
+		private void Terminal_Resetted(object sender, EventArgs e)
+		{
+			if(_current == null || _current == this.Root)
+				_terminal.Write("$>");
+			else
+				_terminal.Write(_current.FullPath + ">");
 		}
 		#endregion
 
