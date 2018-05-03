@@ -95,5 +95,31 @@ namespace Zongsoft.Services.Commands
 			this.PropertyChanged?.Invoke(this, new ComponentModel.PropertyChangedEventArgs(propertyName, newValue, oldValue));
 		}
 		#endregion
+
+		#region 静态方法
+		internal static CommandOutletColor GetWorkerColor(IWorker worker)
+		{
+			if(worker == null)
+				return CommandOutletColor.White;
+
+			if(!worker.Enabled)
+				return CommandOutletColor.DarkGray;
+
+			switch(worker.State)
+			{
+				case WorkerState.Pausing:
+				case WorkerState.Paused:
+					return CommandOutletColor.DarkYellow;
+				case WorkerState.Resuming:
+				case WorkerState.Starting:
+					return CommandOutletColor.DarkGreen;
+				case WorkerState.Stopped:
+				case WorkerState.Stopping:
+					return CommandOutletColor.Gray;
+				default:
+					return CommandOutletColor.Green;
+			}
+		}
+		#endregion
 	}
 }

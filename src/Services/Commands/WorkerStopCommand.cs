@@ -32,6 +32,10 @@ namespace Zongsoft.Services.Commands
 	[CommandOption(KEY_TIMEOUT_OPTION, typeof(TimeSpan), DefaultValue = "5s", Description = "${Text.Command.Options.Timeout}")]
 	public class WorkerStopCommand : CommandBase<CommandContext>
 	{
+		#region 单例字段
+		public static readonly WorkerStopCommand Default = new WorkerStopCommand();
+		#endregion
+
 		#region 常量定义
 		private const string KEY_TIMEOUT_OPTION = "timeout";
 		#endregion

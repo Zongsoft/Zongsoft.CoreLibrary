@@ -30,6 +30,10 @@ namespace Zongsoft.Services.Commands
 {
 	public class WorkerInfoCommand : CommandBase<CommandContext>
 	{
+		#region 单例字段
+		public static readonly WorkerInfoCommand Default = new WorkerInfoCommand();
+		#endregion
+
 		#region 构造函数
 		public WorkerInfoCommand() : base("Info")
 		{
@@ -62,9 +66,9 @@ namespace Zongsoft.Services.Commands
 		protected void Info(CommandContext context, IWorker worker)
 		{
 			if(worker.Enabled)
-				context.Output.WriteLine($"[{worker.State}] {worker.Name}");
+				context.Output.WriteLine(WorkerCommandBase.GetWorkerColor(worker), $"[{worker.State}] {worker.Name}");
 			else
-				context.Output.WriteLine(CommandOutletColor.DarkGray, $"[{worker.State}](Disabled) {worker.Name}");
+				context.Output.WriteLine(WorkerCommandBase.GetWorkerColor(worker), $"[{worker.State}](Disabled) {worker.Name}");
 		}
 		#endregion
 	}

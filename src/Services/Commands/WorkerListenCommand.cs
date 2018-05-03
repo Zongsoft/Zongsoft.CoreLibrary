@@ -125,35 +125,10 @@ namespace Zongsoft.Services.Commands
 
 		protected virtual void OnStateChanged(IWorker worker, WorkerStateChangedEventArgs args)
 		{
-			if(!worker.Enabled)
-			{
-				//打印禁用的信息
-				_context.Output.WriteLine(CommandOutletColor.DarkGray, $"[{args.State}](Disabled) {worker.Name}");
-
-				//退出
-				return;
-			}
-
-			//默认运行中为绿色
-			var color = CommandOutletColor.Green;
-
-			switch(args.State)
-			{
-				case WorkerState.Pausing:
-				case WorkerState.Paused:
-					color = CommandOutletColor.DarkYellow;
-					break;
-				case WorkerState.Resuming:
-				case WorkerState.Starting:
-					color = CommandOutletColor.DarkGreen;
-					break;
-				case WorkerState.Stopped:
-				case WorkerState.Stopping:
-					color = CommandOutletColor.Gray;
-					break;
-			}
-
-			_context.Output.WriteLine(color, $"[{args.State}] {worker.Name}");
+			if(worker.Enabled)
+				_context.Output.WriteLine(WorkerCommandBase.GetWorkerColor(worker), $"[{args.State}] {worker.Name}");
+			else
+				_context.Output.WriteLine(WorkerCommandBase.GetWorkerColor(worker), $"[{args.State}](Disabled) {worker.Name}");
 		}
 		#endregion
 
