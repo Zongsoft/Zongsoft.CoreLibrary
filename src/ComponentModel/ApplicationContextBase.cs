@@ -124,7 +124,7 @@ namespace Zongsoft.ComponentModel
 				_applicationId = value.Trim();
 
 				//激发“PropertyChanged”事件
-				this.OnPropertyChanged("ApplicationId");
+				this.OnPropertyChanged(nameof(ApplicationId));
 			}
 		}
 
@@ -157,7 +157,7 @@ namespace Zongsoft.ComponentModel
 				_title = value ?? string.Empty;
 
 				//激发“PropertyChanged”事件
-				this.OnPropertyChanged("Title");
+				this.OnPropertyChanged(nameof(Title));
 			}
 		}
 
@@ -179,7 +179,7 @@ namespace Zongsoft.ComponentModel
 				_description = value ?? string.Empty;
 
 				//激发“PropertyChanged”事件
-				this.OnPropertyChanged("Description");
+				this.OnPropertyChanged(nameof(Description));
 			}
 		}
 
@@ -264,7 +264,7 @@ namespace Zongsoft.ComponentModel
 					_principal = value;
 
 					//激发“PropertyChanged”事件
-					this.OnPropertyChanged("Principal");
+					this.OnPropertyChanged(nameof(Principal));
 				}
 			}
 		}
@@ -327,10 +327,10 @@ namespace Zongsoft.ComponentModel
 			if(string.IsNullOrEmpty(propertyName))
 				throw new ArgumentNullException("propertyName");
 
-			this.OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
+			this.OnPropertyChanged(new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 		}
 
-		protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
+		protected virtual void OnPropertyChanged(System.ComponentModel.PropertyChangedEventArgs e)
 		{
 			var propertyChanged = this.PropertyChanged;
 
