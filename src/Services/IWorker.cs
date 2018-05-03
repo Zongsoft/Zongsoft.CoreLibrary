@@ -56,9 +56,9 @@ namespace Zongsoft.Services
 		}
 
 		/// <summary>
-		/// 获取或设置是否禁用工作器。
+		/// 获取或设置一个值，指示工作器是否可用。
 		/// </summary>
-		bool Disabled
+		bool Enabled
 		{
 			get;
 			set;

@@ -48,7 +48,7 @@ namespace Zongsoft.Services
 
 		#region 成员变量
 		private string _name;
-		private bool _disabled;
+		private bool _enabled;
 		private bool _canPauseAndContinue;
 		private int _state;
 		private int _disposing;
@@ -63,7 +63,7 @@ namespace Zongsoft.Services
 		protected WorkerBase(string name)
 		{
 			_name = string.IsNullOrWhiteSpace(name) ? this.GetType().Name : name.Trim();
-			_disabled = false;
+			_enabled = true;
 			_canPauseAndContinue = false;
 			_state = (int)WorkerState.Stopped;
 			_semaphore = new AutoResetEvent(true);
@@ -93,20 +93,20 @@ namespace Zongsoft.Services
 		/// 获取或设置是否禁用当前工作器。
 		/// </summary>
 		/// <remarks>如果当前工作器</remarks>
-		public bool Disabled
+		public bool Enabled
 		{
 			get
 			{
-				return _disabled;
+				return _enabled;
 			}
 			set
 			{
-				if(_disabled == value)
+				if(_enabled == value)
 					return;
 
-				_disabled = value;
+				_enabled = value;
 
-				if(value)
+				if(!value)
 					this.Stop();
 			}
 		}
@@ -144,7 +144,8 @@ namespace Zongsoft.Services
 		#region 公共方法
 		public void Start(params string[] args)
 		{
-			if(_disabled || _state != (int)WorkerState.Stopped)
+			//如果不可用或当前状态不是已停止则返回
+			if(!_enabled || _state != (int)WorkerState.Stopped)
 				return;
 
 			try
@@ -152,7 +153,7 @@ namespace Zongsoft.Services
 				//等待信号量
 				_semaphore.WaitOne();
 
-				if(_disabled || _state != (int)WorkerState.Stopped)
+				if(!_enabled || _state != (int)WorkerState.Stopped)
 					return;
 
 				//更新当前状态为“正在启动中”
@@ -185,7 +186,7 @@ namespace Zongsoft.Services
 
 		public void Stop(params string[] args)
 		{
-			if(_disabled || _state == (int)WorkerState.Stopping || _state == (int)WorkerState.Stopped)
+			if(_state == (int)WorkerState.Stopping || _state == (int)WorkerState.Stopped)
 				return;
 
 			int originalState = -1;
@@ -195,7 +196,7 @@ namespace Zongsoft.Services
 				//等待信号量
 				_semaphore.WaitOne();
 
-				if(_disabled || _state == (int)WorkerState.Stopping || _state == (int)WorkerState.Stopped)
+				if(_state == (int)WorkerState.Stopping || _state == (int)WorkerState.Stopped)
 					return;
 
 				//更新当前状态为“正在停止中”，并保存原来的状态
@@ -229,7 +230,8 @@ namespace Zongsoft.Services
 
 		public void Pause()
 		{
-			if(_disabled || (!_canPauseAndContinue))
+			//如果不可用或不支持暂停恢复则退出
+			if(!_enabled || !_canPauseAndContinue)
 				return;
 
 			if(_state != (int)WorkerState.Running)
@@ -276,7 +278,8 @@ namespace Zongsoft.Services
 
 		public void Resume()
 		{
-			if(_disabled || (!_canPauseAndContinue))
+			//如果不可用或不支持暂停恢复则退出
+			if(!_enabled || !_canPauseAndContinue)
 				return;
 
 			if(_state != (int)WorkerState.Paused)
@@ -331,6 +334,16 @@ namespace Zongsoft.Services
 
 		protected virtual void OnResume()
 		{
+		}
+		#endregion
+
+		#region 重写方法
+		public override string ToString()
+		{
+			if(_enabled)
+				return $"[{_state}] {_name}";
+			else
+				return $"[{_state}](Disabled) {_name}";
 		}
 		#endregion
 
