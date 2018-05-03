@@ -158,10 +158,14 @@ namespace Zongsoft.Services
 			return (CommandTreeNode)base.FindNode(parts, null);
 		}
 
-		public CommandTreeNode Find(ICommand command)
+		public CommandTreeNode Find(ICommand command, bool rooting = false)
 		{
 			if(command == null)
 				return null;
+
+			//向上查找（往根节点方向）
+			if(rooting)
+				return this.FindUp(this, node => node._command == command);
 
 			//确保当前加载器已经被加载过
 			this.EnsureChildren();
@@ -169,10 +173,39 @@ namespace Zongsoft.Services
 			return this.FindDown(this, node => node._command == command);
 		}
 
-		public CommandTreeNode Find(Predicate<CommandTreeNode> predicate)
+		public TCommand Find<TCommand>(bool rooting = false) where TCommand : class, ICommand
+		{
+			Predicate<CommandTreeNode> predicate = node =>
+			{
+				var command = node._command;
+
+				if(command == null)
+					return false;
+
+				if(typeof(TCommand).IsInterface || typeof(TCommand).IsAbstract)
+					return typeof(TCommand).IsAssignableFrom(command.GetType());
+				else
+					return typeof(TCommand) == command.GetType();
+			};
+
+			//向上查找（往根节点方向）
+			if(rooting)
+				return (TCommand)this.FindUp(this, predicate)?._command;
+
+			//确保当前加载器已经被加载过
+			this.EnsureChildren();
+
+			return (TCommand)this.FindDown(this, predicate)?._command;
+		}
+
+		public CommandTreeNode Find(Predicate<CommandTreeNode> predicate, bool rooting = false)
 		{
 			if(predicate == null)
-				return null;
+				throw new ArgumentNullException(nameof(predicate));
+
+			//向上查找（往根节点方向）
+			if(rooting)
+				return this.FindUp(this, predicate);
 
 			//确保当前加载器已经被加载过
 			this.EnsureChildren();
@@ -205,6 +238,22 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 私有方法
+		private CommandTreeNode FindUp(CommandTreeNode current, Predicate<CommandTreeNode> predicate)
+		{
+			if(current == null || predicate == null)
+				return null;
+
+			while(current != null)
+			{
+				if(predicate(current))
+					return current;
+
+				current = current.Parent;
+			}
+
+			return null;
+		}
+
 		private CommandTreeNode FindDown(CommandTreeNode current, Predicate<CommandTreeNode> predicate)
 		{
 			if(current == null || predicate == null)
