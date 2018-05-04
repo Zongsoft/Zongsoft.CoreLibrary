@@ -190,6 +190,33 @@ namespace Zongsoft.Terminals
 			}
 		}
 
+		public void Write(CommandOutletContent content)
+		{
+			if(content == null)
+				return;
+
+			lock(_syncRoot)
+			{
+				//获取当前的前景色
+				var originalColor = this.ForegroundColor;
+
+				while(content != null)
+				{
+					//设置片段内容指定的颜色值
+					this.ForegroundColor = content.Color.HasValue ? content.Color.Value : originalColor;
+
+					//输出指定的片段内容文本
+					Console.Write(content.Text);
+
+					//将当前片段内容指定为下一个
+					content = content.Next;
+				}
+
+				//还原原来的前景色
+				this.ForegroundColor = originalColor;
+			}
+		}
+
 		public void Write(string format, params object[] args)
 		{
 			Console.Write(format, args);
@@ -246,6 +273,36 @@ namespace Zongsoft.Terminals
 				Console.WriteLine(value);
 
 				this.ForegroundColor = originalColor;
+			}
+		}
+
+		public void WriteLine(CommandOutletContent content)
+		{
+			if(content == null)
+				return;
+
+			lock(_syncRoot)
+			{
+				//获取当前的前景色
+				var originalColor = this.ForegroundColor;
+
+				while(content != null)
+				{
+					//设置片段内容指定的颜色值
+					this.ForegroundColor = content.Color.HasValue ? content.Color.Value : originalColor;
+
+					//输出指定的片段内容文本
+					Console.Write(content.Text);
+
+					//将当前片段内容指定为下一个
+					content = content.Next;
+				}
+
+				//还原原来的前景色
+				this.ForegroundColor = originalColor;
+
+				//输出最后的换行
+				Console.WriteLine();
 			}
 		}
 

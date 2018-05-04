@@ -405,6 +405,10 @@ namespace Zongsoft.Services
 			{
 			}
 
+			public void Write(CommandOutletContent content)
+			{
+			}
+
 			public void Write(CommandOutletColor color, string format, params object[] args)
 			{
 			}
@@ -430,6 +434,10 @@ namespace Zongsoft.Services
 			}
 
 			public void WriteLine(string format, params object[] args)
+			{
+			}
+
+			public void WriteLine(CommandOutletContent content)
 			{
 			}
 

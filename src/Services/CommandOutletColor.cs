@@ -28,6 +28,9 @@ using System;
 
 namespace Zongsoft.Services
 {
+	/// <summary>
+	/// 表示命令输出内容颜色的枚举。
+	/// </summary>
 	public enum CommandOutletColor
 	{
 		/// <summary>黑色。</summary>

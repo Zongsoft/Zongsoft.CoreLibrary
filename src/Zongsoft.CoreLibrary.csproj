@@ -379,6 +379,7 @@
     <Compile Include="Services\CommandOptionException.cs" />
     <Compile Include="Services\CommandOptionMissingException.cs" />
     <Compile Include="Services\CommandOptionValueException.cs" />
+    <Compile Include="Services\CommandOutletContent.cs" />
     <Compile Include="Services\CommandResult.cs" />
     <Compile Include="Services\Commands\WorkerCommandBase.cs" />
     <Compile Include="Services\Commands\WorkerInfoCommand.cs" />

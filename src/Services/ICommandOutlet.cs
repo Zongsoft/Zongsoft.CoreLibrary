@@ -46,6 +46,7 @@ namespace Zongsoft.Services
 		void Write(string text);
 		void Write(object value);
 		void Write(string format, params object[] args);
+		void Write(CommandOutletContent content);
 		void Write(CommandOutletColor color, string text);
 		void Write(CommandOutletColor color, object value);
 		void Write(CommandOutletColor color, string format, params object[] args);
@@ -54,6 +55,7 @@ namespace Zongsoft.Services
 		void WriteLine(string text);
 		void WriteLine(object value);
 		void WriteLine(string format, params object[] args);
+		void WriteLine(CommandOutletContent content);
 		void WriteLine(CommandOutletColor color, string text);
 		void WriteLine(CommandOutletColor color, object value);
 		void WriteLine(CommandOutletColor color, string format, params object[] args);
