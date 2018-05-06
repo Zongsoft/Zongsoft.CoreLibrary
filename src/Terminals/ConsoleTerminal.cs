@@ -33,7 +33,7 @@ using Zongsoft.Services;
 
 namespace Zongsoft.Terminals
 {
-	public class ConsoleTerminal : ITerminal
+	public class ConsoleTerminal : ITerminal, ICommandOutlet
 	{
 		#region 单例字段
 		public static readonly ConsoleTerminal Instance = new ConsoleTerminal();
@@ -156,12 +156,18 @@ namespace Zongsoft.Terminals
 
 		public void Write(string text)
 		{
-			Console.Write(text);
+			lock(_syncRoot)
+			{
+				Console.Write(text);
+			}
 		}
 
 		public void Write(object value)
 		{
-			Console.Write(value);
+			lock(_syncRoot)
+			{
+				Console.Write(value);
+			}
 		}
 
 		public void Write(CommandOutletColor foregroundColor, string text)
@@ -192,34 +198,20 @@ namespace Zongsoft.Terminals
 
 		public void Write(CommandOutletContent content)
 		{
-			if(content == null)
-				return;
+			this.WriteContent(content, false, null);
+		}
 
-			lock(_syncRoot)
-			{
-				//获取当前的前景色
-				var originalColor = this.ForegroundColor;
-
-				while(content != null)
-				{
-					//设置片段内容指定的颜色值
-					this.ForegroundColor = content.Color.HasValue ? content.Color.Value : originalColor;
-
-					//输出指定的片段内容文本
-					Console.Write(content.Text);
-
-					//将当前片段内容指定为下一个
-					content = content.Next;
-				}
-
-				//还原原来的前景色
-				this.ForegroundColor = originalColor;
-			}
+		public void Write(CommandOutletColor foregroundColor, CommandOutletContent content)
+		{
+			this.WriteContent(content, false, foregroundColor);
 		}
 
 		public void Write(string format, params object[] args)
 		{
-			Console.Write(format, args);
+			lock(_syncRoot)
+			{
+				Console.Write(format, args);
+			}
 		}
 
 		public void Write(CommandOutletColor foregroundColor, string format, params object[] args)
@@ -237,17 +229,26 @@ namespace Zongsoft.Terminals
 
 		public void WriteLine()
 		{
-			Console.WriteLine();
+			lock(_syncRoot)
+			{
+				Console.WriteLine();
+			}
 		}
 
 		public void WriteLine(string text)
 		{
-			Console.WriteLine(text);
+			lock(_syncRoot)
+			{
+				Console.WriteLine(text);
+			}
 		}
 
 		public void WriteLine(object value)
 		{
-			Console.WriteLine(value);
+			lock(_syncRoot)
+			{
+				Console.WriteLine(value);
+			}
 		}
 
 		public void WriteLine(CommandOutletColor foregroundColor, string text)
@@ -278,37 +279,20 @@ namespace Zongsoft.Terminals
 
 		public void WriteLine(CommandOutletContent content)
 		{
-			if(content == null)
-				return;
+			this.WriteContent(content, true, null);
+		}
 
-			lock(_syncRoot)
-			{
-				//获取当前的前景色
-				var originalColor = this.ForegroundColor;
-
-				while(content != null)
-				{
-					//设置片段内容指定的颜色值
-					this.ForegroundColor = content.Color.HasValue ? content.Color.Value : originalColor;
-
-					//输出指定的片段内容文本
-					Console.Write(content.Text);
-
-					//将当前片段内容指定为下一个
-					content = content.Next;
-				}
-
-				//还原原来的前景色
-				this.ForegroundColor = originalColor;
-
-				//输出最后的换行
-				Console.WriteLine();
-			}
+		public void WriteLine(CommandOutletColor foregroundColor, CommandOutletContent content)
+		{
+			this.WriteContent(content, true, foregroundColor);
 		}
 
 		public void WriteLine(string format, params object[] args)
 		{
-			Console.WriteLine(format, args);
+			lock(_syncRoot)
+			{
+				Console.WriteLine(format, args);
+			}
 		}
 
 		public void WriteLine(CommandOutletColor foregroundColor, string format, params object[] args)
@@ -399,6 +383,41 @@ namespace Zongsoft.Terminals
 				return result;
 			else
 				return defaultColor;
+		}
+
+		private void WriteContent(CommandOutletContent content, bool appendLine, CommandOutletColor? foregroundColor)
+		{
+			if(content == null)
+				return;
+
+			lock(_syncRoot)
+			{
+				//获取当前的前景色
+				var originalColor = this.ForegroundColor;
+
+				//如果未指定前景色则使用当前前景色
+				if(foregroundColor == null)
+					foregroundColor = originalColor;
+
+				while(content != null)
+				{
+					//设置片段内容指定的颜色值
+					this.ForegroundColor = content.Color.HasValue ? content.Color.Value : foregroundColor.Value;
+
+					//输出指定的片段内容文本
+					Console.Write(content.Text);
+
+					//将当前片段内容指定为下一个
+					content = content.Next;
+				}
+
+				//还原原来的前景色
+				this.ForegroundColor = originalColor;
+
+				//输出最后的换行
+				if(appendLine)
+					Console.WriteLine();
+			}
 		}
 		#endregion
 	}

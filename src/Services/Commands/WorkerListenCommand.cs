@@ -126,9 +126,9 @@ namespace Zongsoft.Services.Commands
 		protected virtual void OnStateChanged(IWorker worker, WorkerStateChangedEventArgs args)
 		{
 			if(worker.Enabled)
-				_context.Output.WriteLine(WorkerCommandBase.GetWorkerColor(worker), $"[{args.State}] {worker.Name}");
+				_context.Output.WriteLine(WorkerCommandBase.GetStateColor(worker), $"[{args.State}] {worker.Name}");
 			else
-				_context.Output.WriteLine(WorkerCommandBase.GetWorkerColor(worker), $"[{args.State}](Disabled) {worker.Name}");
+				_context.Output.WriteLine(WorkerCommandBase.GetStateColor(worker), $"[{args.State}](Disabled) {worker.Name}");
 		}
 		#endregion
 

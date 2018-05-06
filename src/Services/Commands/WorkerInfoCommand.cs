@@ -63,12 +63,12 @@ namespace Zongsoft.Services.Commands
 		#endregion
 
 		#region 虚拟方法
-		protected void Info(CommandContext context, IWorker worker)
+		protected virtual void Info(CommandContext context, IWorker worker)
 		{
 			if(worker.Enabled)
-				context.Output.WriteLine(WorkerCommandBase.GetWorkerColor(worker), $"[{worker.State}] {worker.Name}");
+				context.Output.WriteLine(WorkerCommandBase.GetStateColor(worker), $"[{worker.State}] {worker.Name}");
 			else
-				context.Output.WriteLine(WorkerCommandBase.GetWorkerColor(worker), $"[{worker.State}](Disabled) {worker.Name}");
+				context.Output.WriteLine(WorkerCommandBase.GetStateColor(worker), $"[{worker.State}](Disabled) {worker.Name}");
 		}
 		#endregion
 	}

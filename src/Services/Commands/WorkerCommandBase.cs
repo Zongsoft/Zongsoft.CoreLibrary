@@ -36,7 +36,7 @@ namespace Zongsoft.Services.Commands
 		#endregion
 
 		#region 成员字段
-		public IWorker _worker;
+		private IWorker _worker;
 		#endregion
 
 		#region 构造函数
@@ -97,13 +97,13 @@ namespace Zongsoft.Services.Commands
 		#endregion
 
 		#region 静态方法
-		internal static CommandOutletColor GetWorkerColor(IWorker worker)
+		public static CommandOutletColor GetStateColor(IWorker worker)
 		{
 			if(worker == null)
 				return CommandOutletColor.White;
 
 			if(!worker.Enabled)
-				return CommandOutletColor.DarkGray;
+				return CommandOutletColor.DarkRed;
 
 			switch(worker.State)
 			{
