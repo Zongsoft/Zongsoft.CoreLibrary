@@ -230,9 +230,13 @@ namespace Zongsoft.Services
 
 		public void Pause()
 		{
-			//如果不可用或不支持暂停恢复则退出
-			if(!_enabled || !_canPauseAndContinue)
+			//如果不可用则退出
+			if(!_enabled)
 				return;
+
+			//如果不支持暂停继续则抛出异常
+			if(!_canPauseAndContinue)
+				throw new NotSupportedException($"The {_name} worker does not support the Pause/Resume operation.");
 
 			if(_state != (int)WorkerState.Running)
 				return;
@@ -278,9 +282,13 @@ namespace Zongsoft.Services
 
 		public void Resume()
 		{
-			//如果不可用或不支持暂停恢复则退出
-			if(!_enabled || !_canPauseAndContinue)
+			//如果不可用则退出
+			if(!_enabled)
 				return;
+
+			//如果不支持暂停继续则抛出异常
+			if(!_canPauseAndContinue)
+				throw new NotSupportedException($"The {_name} worker does not support the Pause/Resume operation.");
 
 			if(_state != (int)WorkerState.Paused)
 				return;
