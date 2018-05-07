@@ -377,7 +377,13 @@ namespace Zongsoft.Reflection
 				memberInfo = GetMemberInfo(memberType, member);
 
 				if(memberInfo == null)
+				{
+					//将输出参数置空
+					memberType = null;
+
+					//返回失败
 					return false;
+				}
 			}
 
 			//获取最后一个成员的成员类型
