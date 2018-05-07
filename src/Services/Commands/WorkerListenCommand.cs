@@ -115,8 +115,8 @@ namespace Zongsoft.Services.Commands
 		#region 虚拟方法
 		protected virtual void OnListening(CommandContext context, IWorker worker)
 		{
-			context.Output.WriteLine($"Welcome to the {worker.Name} listening mode.");
-			context.Output.WriteLine(CommandOutletColor.DarkYellow, "Press the Ctrl+C key to exit the listening." + Environment.NewLine);
+			context.Output.WriteLine(CommandOutletColor.Green, string.Format(Properties.Resources.Text_WorkerListenCommand_Welcome, worker.Name));
+			context.Output.WriteLine(CommandOutletColor.DarkYellow, Properties.Resources.Text_WorkerListenCommand_Prompt + Environment.NewLine);
 		}
 
 		protected virtual void OnListened(CommandContext context, IWorker worker)
@@ -125,10 +125,7 @@ namespace Zongsoft.Services.Commands
 
 		protected virtual void OnStateChanged(IWorker worker, WorkerStateChangedEventArgs args)
 		{
-			if(worker.Enabled)
-				_context.Output.WriteLine(WorkerCommandBase.GetStateColor(worker), $"[{args.State}] {worker.Name}");
-			else
-				_context.Output.WriteLine(WorkerCommandBase.GetStateColor(worker), $"[{args.State}](Disabled) {worker.Name}");
+			_context.Output.WriteLine(WorkerInfoCommand.GetInfo(worker));
 		}
 		#endregion
 

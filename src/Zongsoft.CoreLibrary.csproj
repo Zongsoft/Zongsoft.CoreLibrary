@@ -256,6 +256,11 @@
     <Compile Include="Options\Profiles\ProfileItemViewBase.cs" />
     <Compile Include="Options\Profiles\ProfileSection.cs" />
     <Compile Include="Options\Profiles\ProfileSectionCollection.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Reflection\MemberToken.cs" />
     <Compile Include="Reflection\MemberTokenCollection.cs" />
     <Compile Include="Reflection\MemberKind.cs" />
@@ -381,6 +386,7 @@
     <Compile Include="Services\CommandOptionValueException.cs" />
     <Compile Include="Services\CommandOutletContent.cs" />
     <Compile Include="Services\CommandResult.cs" />
+    <Compile Include="Services\Commands\Utility.cs" />
     <Compile Include="Services\Commands\WorkerCommandBase.cs" />
     <Compile Include="Services\Commands\WorkerInfoCommand.cs" />
     <Compile Include="Services\Commands\WorkerResumeCommand.cs" />
@@ -564,8 +570,10 @@
     <None Include="Options\Profiles\Profile.ini" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources.resx">
+    <EmbeddedResource Include="Properties\Resources.resx">
       <SubType>Designer</SubType>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

@@ -97,25 +97,19 @@ namespace Zongsoft.Services.Commands
 		#endregion
 
 		#region 静态方法
-		public static CommandOutletColor GetStateColor(IWorker worker)
+		public static CommandOutletColor GetStateColor(WorkerState state)
 		{
-			if(worker == null)
-				return CommandOutletColor.White;
-
-			if(!worker.Enabled)
-				return CommandOutletColor.DarkRed;
-
-			switch(worker.State)
+			switch(state)
 			{
 				case WorkerState.Pausing:
 				case WorkerState.Paused:
-					return CommandOutletColor.DarkYellow;
+					return CommandOutletColor.Yellow;
 				case WorkerState.Resuming:
 				case WorkerState.Starting:
-					return CommandOutletColor.DarkGreen;
+					return CommandOutletColor.DarkCyan;
 				case WorkerState.Stopped:
 				case WorkerState.Stopping:
-					return CommandOutletColor.Gray;
+					return CommandOutletColor.DarkGray;
 				default:
 					return CommandOutletColor.Green;
 			}

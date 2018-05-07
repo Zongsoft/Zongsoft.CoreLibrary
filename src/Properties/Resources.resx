@@ -261,4 +261,28 @@
   <data name="Text.CommandError.Label" xml:space="preserve">
     <value>命令出错：</value>
   </data>
+  <data name="Text.Command.ExecutionFailed.Message" xml:space="preserve">
+    <value>{0} 执行失败。</value>
+  </data>
+  <data name="Text.Command.ExecutionSucceed.Message" xml:space="preserve">
+    <value>{0} 执行成功。</value>
+  </data>
+  <data name="Text.WorkerListenCommand.Prompt" xml:space="preserve">
+    <value>提示：按 Ctrl+C 组合键可以退出侦听模式。</value>
+  </data>
+  <data name="Text.WorkerListenCommand.Welcome" xml:space="preserve">
+    <value>欢迎进入 {0} 的侦听模式。</value>
+  </data>
+  <data name="Text.WorkerPauseCommand.Name" xml:space="preserve">
+    <value>暂停</value>
+  </data>
+  <data name="Text.WorkerResumeCommand.Name" xml:space="preserve">
+    <value>恢复</value>
+  </data>
+  <data name="Text.WorkerStartCommand.Name" xml:space="preserve">
+    <value>启动</value>
+  </data>
+  <data name="Text.WorkerStopCommand.Name" xml:space="preserve">
+    <value>停止</value>
+  </data>
 </root>

@@ -107,15 +107,12 @@ namespace Zongsoft.Services.Commands
 		#region 私有方法
 		private void OnFailed(ICommandOutlet output, IWorker worker)
 		{
-			if(worker.State == WorkerState.Stopped)
-				output.WriteLine(CommandOutletColor.DarkRed, $"The {worker.Name} worker was pause failed.");
-			else
-				output.WriteLine(CommandOutletColor.DarkRed, $"[{worker.State}] The {worker.Name} worker was pause failed.");
+			output.WriteLine(Utility.GetWorkerActionContent(worker, string.Format(Properties.Resources.Text_Command_ExecutionFailed_Message, Properties.Resources.Text_WorkerPauseCommand_Name), CommandOutletColor.DarkRed));
 		}
 
 		private void OnSucceed(ICommandOutlet output, IWorker worker)
 		{
-			output.WriteLine(CommandOutletColor.Green, $"The {worker.Name} worker was paused successfully.");
+			output.WriteLine(Utility.GetWorkerActionContent(worker, string.Format(Properties.Resources.Text_Command_ExecutionSucceed_Message, Properties.Resources.Text_WorkerPauseCommand_Name), CommandOutletColor.DarkGreen));
 		}
 		#endregion
 	}

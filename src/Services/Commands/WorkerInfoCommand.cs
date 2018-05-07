@@ -65,10 +65,26 @@ namespace Zongsoft.Services.Commands
 		#region 虚拟方法
 		protected virtual void Info(CommandContext context, IWorker worker)
 		{
-			if(worker.Enabled)
-				context.Output.WriteLine(WorkerCommandBase.GetStateColor(worker), $"[{worker.State}] {worker.Name}");
-			else
-				context.Output.WriteLine(WorkerCommandBase.GetStateColor(worker), $"[{worker.State}](Disabled) {worker.Name}");
+			context.Output.WriteLine(GetInfo(worker));
+		}
+		#endregion
+
+		#region 内部方法
+		internal static CommandOutletContent GetInfo(IWorker worker)
+		{
+			//构建状态内容部分
+			var content = CommandOutletContent.Create(WorkerCommandBase.GetStateColor(worker.State), $"[{worker.State}]");
+
+			//构建可用内容部分
+			if(!worker.Enabled)
+			{
+				content.Append(CommandOutletColor.Gray, "(");
+				content.Append(CommandOutletColor.Red, Properties.Resources.Disabled);
+				content.Append(CommandOutletColor.Gray, ")");
+			}
+
+			//构建名称内容部分
+			return content.Append(" " + worker.Name);
 		}
 		#endregion
 	}
