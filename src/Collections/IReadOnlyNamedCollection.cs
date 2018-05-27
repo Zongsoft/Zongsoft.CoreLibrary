@@ -33,7 +33,7 @@ namespace Zongsoft.Collections
 	/// 表示命名集合基类的接口。
 	/// </summary>
 	/// <typeparam name="T">集合成员的类型。</typeparam>
-	public interface INamedCollection<T> : ICollection<T>
+	public interface IReadOnlyNamedCollection<T> : IReadOnlyCollection<T>
 	{
 		/// <summary>
 		/// 判断当前集合是否包含指定名称的元素。
@@ -57,12 +57,5 @@ namespace Zongsoft.Collections
 		/// <param name="value">输出参数，包含指定名称的元素对象。</param>
 		/// <returns>返回一个值，指示指定名称的元素是否获取成功。</returns>
 		bool TryGet(string name, out T value);
-
-		/// <summary>
-		/// 删除指定名称的元素。
-		/// </summary>
-		/// <param name="name">指定要删除的元素名。</param>
-		/// <returns>如果删除成功则返回真（True），否则返回假（False）。</returns>
-		bool Remove(string name);
 	}
 }

@@ -64,11 +64,14 @@
     <Compile Include="Collections\BinaryComparer.cs" />
     <Compile Include="Collections\IFindable`1.cs" />
     <Compile Include="Collections\IFindable.cs" />
+    <Compile Include="Collections\IReadOnlyNamedCollection.cs" />
     <Compile Include="Collections\ISelectable.cs" />
     <Compile Include="Collections\INamedCollection.cs" />
     <Compile Include="Collections\IQueueProvider.cs" />
     <Compile Include="Collections\IQueue`1.cs" />
     <Compile Include="Collections\KeyValuePairExtension.cs" />
+    <Compile Include="Collections\ReadOnlyNamedCollection.cs" />
+    <Compile Include="Collections\ReadOnlyNamedCollectionBase.cs" />
     <Compile Include="Collections\NamedCollectionBaseOriginal.cs" />
     <Compile Include="Collections\NamedCollectionOriginal.cs" />
     <Compile Include="Collections\NamedCollectionBase.cs" />
