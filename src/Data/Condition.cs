@@ -34,7 +34,7 @@ namespace Zongsoft.Data
 	/// <summary>
 	/// 表示数据过滤条件的设置项。
 	/// </summary>
-	public class Condition : ICondition
+	public class Condition : ICondition, IEquatable<Condition>
 	{
 		#region 成员字段
 		private string _name;
@@ -132,21 +132,6 @@ namespace Zongsoft.Data
 				foreach(T item in items)
 					yield return item;
 			}
-		}
-		#endregion
-
-		#region 显式实现
-		bool ICondition.Contains(string name)
-		{
-			return string.Equals(name, _name, StringComparison.OrdinalIgnoreCase);
-		}
-
-		ICondition[] ICondition.Find(string name)
-		{
-			if(string.Equals(name, _name, StringComparison.OrdinalIgnoreCase))
-				return new ICondition[] { this };
-
-			return null;
 		}
 		#endregion
 
@@ -320,6 +305,28 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 重写方法
+		public bool Equals(Condition other)
+		{
+			if(other == null)
+				return false;
+
+			return string.Equals(_name, other.Name, StringComparison.OrdinalIgnoreCase) &&
+			       _operator == other.Operator && _value == other.Value;
+		}
+
+		public override bool Equals(object obj)
+		{
+			return obj != null && this.Equals(obj as Condition);
+		}
+
+		public override int GetHashCode()
+		{
+			if(_value == null)
+				return _name.GetHashCode() ^ _operator.GetHashCode();
+			else
+				return _name.GetHashCode() ^ _operator.GetHashCode() ^ _value.GetHashCode();
+		}
+
 		public override string ToString()
 		{
 			var value = this.Value;

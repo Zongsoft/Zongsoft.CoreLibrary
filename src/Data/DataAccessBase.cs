@@ -55,6 +55,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 成员字段
+		private string _name;
 		private IDataAccessNaming _naming;
 		private ICollection<IDataAccessFilter> _filters;
 		#endregion
@@ -62,21 +63,42 @@ namespace Zongsoft.Data
 		#region 构造函数
 		protected DataAccessBase()
 		{
+			_name = string.Empty;
 			_naming = new DataAccessNaming();
 			_filters = new List<IDataAccessFilter>();
 		}
 
-		protected DataAccessBase(IDataAccessNaming naming)
+		protected DataAccessBase(string name)
 		{
-			if(naming == null)
-				throw new ArgumentNullException(nameof(naming));
+			_name = name ?? string.Empty;
+			_naming = new DataAccessNaming();
+			_filters = new List<IDataAccessFilter>();
+		}
 
-			_naming = naming;
+		protected DataAccessBase(string name, IDataAccessNaming naming)
+		{
+			_name = name ?? string.Empty;
+			_naming = naming ?? throw new ArgumentNullException(nameof(naming));
 			_filters = new List<IDataAccessFilter>();
 		}
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取数据访问的应用名。
+		/// </summary>
+		public string Name
+		{
+			get
+			{
+				return _name;
+			}
+			set
+			{
+				_name = value ?? string.Empty;
+			}
+		}
+
 		/// <summary>
 		/// 获取数据访问名称映射器。
 		/// </summary>
