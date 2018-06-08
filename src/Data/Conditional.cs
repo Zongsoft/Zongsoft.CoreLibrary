@@ -42,7 +42,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 成员字段
-		private ConditionCombination _conditionCombination;
+		private ConditionCombination _combination;
 		private ConditionalBehaviors _defaultBehaviors;
 		#endregion
 
@@ -50,26 +50,26 @@ namespace Zongsoft.Data
 		protected Conditional()
 		{
 			_defaultBehaviors = ConditionalBehaviors.None;
-			_conditionCombination = ConditionCombination.And;
+			_combination = ConditionCombination.And;
 		}
 
 		protected Conditional(ConditionalBehaviors defaultBehaviors)
 		{
 			_defaultBehaviors = defaultBehaviors;
-			_conditionCombination = ConditionCombination.And;
+			_combination = ConditionCombination.And;
 		}
 		#endregion
 
 		#region 保护属性
-		protected ConditionCombination ConditionCombination
+		protected ConditionCombination Combination
 		{
 			get
 			{
-				return _conditionCombination;
+				return _combination;
 			}
 			set
 			{
-				_conditionCombination = value;
+				_combination = value;
 			}
 		}
 
@@ -82,6 +82,20 @@ namespace Zongsoft.Data
 			set
 			{
 				_defaultBehaviors = value;
+			}
+		}
+		#endregion
+
+		#region 显式属性
+		ConditionCombination IConditional.Combination
+		{
+			get
+			{
+				return this.Combination;
+			}
+			set
+			{
+				this.Combination = value;
 			}
 		}
 		#endregion
@@ -168,8 +182,10 @@ namespace Zongsoft.Data
 
 			return null;
 		}
+		#endregion
 
-		public virtual ConditionCollection ToConditions()
+		#region 虚拟方法
+		protected virtual ConditionCollection ToConditions()
 		{
 			ConditionCollection conditions = null;
 			var descriptor = _cache.GetOrAdd(this.GetType(), type => new ConditionalDescriptor(type));
@@ -182,7 +198,7 @@ namespace Zongsoft.Data
 				if(condition != null)
 				{
 					if(conditions == null)
-						conditions = new ConditionCollection(this.ConditionCombination);
+						conditions = new ConditionCollection(this.Combination);
 
 					conditions.Add(condition);
 				}
@@ -201,6 +217,18 @@ namespace Zongsoft.Data
 				return string.Empty;
 
 			return conditions.ToString();
+		}
+		#endregion
+
+		#region 枚举遍历
+		public IEnumerator<ICondition> GetEnumerator()
+		{
+			return this.ToConditions().GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return this.ToConditions().GetEnumerator();
 		}
 		#endregion
 

@@ -16,7 +16,6 @@ namespace Zongsoft.Data
 			Assert.Null(conditional.DepartmentId);
 			Assert.Null(conditional.Name);
 			Assert.Null(conditional.CreatedTime);
-			Assert.Null(conditional.ToConditions());
 
 			conditional.CorporationId = 0;
 			conditional.DepartmentId = null;

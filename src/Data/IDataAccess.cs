@@ -59,11 +59,25 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 属性声明
+		/// <summary>
+		/// 获取数据访问的应用名。
+		/// </summary>
+		string Name
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取数据访问名映射器。
+		/// </summary>
 		IDataAccessNaming Naming
 		{
 			get;
 		}
 
+		/// <summary>
+		/// 获取数据访问的过滤器集合。
+		/// </summary>
 		ICollection<IDataAccessFilter> Filters
 		{
 			get;

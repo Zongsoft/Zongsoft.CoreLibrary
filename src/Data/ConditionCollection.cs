@@ -31,7 +31,7 @@ using System.Linq;
 
 namespace Zongsoft.Data
 {
-	public class ConditionCollection : System.Collections.ObjectModel.Collection<ICondition>, ICondition
+	public class ConditionCollection : System.Collections.ObjectModel.Collection<ICondition>, IConditional
 	{
 		#region 成员字段
 		private ConditionCombination _conditionCombination;
@@ -74,7 +74,7 @@ namespace Zongsoft.Data
 		/// <summary>
 		/// 获取或设置查询条件的组合方式。
 		/// </summary>
-		public ConditionCombination ConditionCombination
+		public ConditionCombination Combination
 		{
 			get
 			{
@@ -96,7 +96,7 @@ namespace Zongsoft.Data
 			if(condition == null)
 				return conditions;
 
-			return new ConditionCollection(conditions.ConditionCombination, Combine(condition, conditions));
+			return new ConditionCollection(conditions.Combination, Combine(condition, conditions));
 		}
 
 		public static ConditionCollection operator +(ConditionCollection conditions, Condition condition)
@@ -107,7 +107,7 @@ namespace Zongsoft.Data
 			if(condition == null)
 				return conditions;
 
-			return new ConditionCollection(conditions.ConditionCombination, Combine(conditions, condition));
+			return new ConditionCollection(conditions.Combination, Combine(conditions, condition));
 		}
 
 		public static ConditionCollection operator &(Condition condition, ConditionCollection conditions)
@@ -118,7 +118,7 @@ namespace Zongsoft.Data
 			if(conditions == null)
 				return new ConditionCollection(ConditionCombination.And, condition);
 
-			if(conditions.ConditionCombination == ConditionCombination.And)
+			if(conditions.Combination == ConditionCombination.And)
 				return new ConditionCollection(ConditionCombination.And, Combine(condition, conditions));
 			else
 				return new ConditionCollection(ConditionCombination.And, condition, conditions);
@@ -132,7 +132,7 @@ namespace Zongsoft.Data
 			if(conditions == null)
 				return new ConditionCollection(ConditionCombination.And, condition);
 
-			if(conditions.ConditionCombination == ConditionCombination.And)
+			if(conditions.Combination == ConditionCombination.And)
 				return new ConditionCollection(ConditionCombination.And, Combine(conditions, condition));
 			else
 				return new ConditionCollection(ConditionCombination.And, conditions, condition);
@@ -146,16 +146,16 @@ namespace Zongsoft.Data
 			if(right == null)
 				return left;
 
-			if(left.ConditionCombination == ConditionCombination.And)
+			if(left.Combination == ConditionCombination.And)
 			{
-				if(right.ConditionCombination == ConditionCombination.And)
+				if(right.Combination == ConditionCombination.And)
 					return new ConditionCollection(ConditionCombination.And, Combine(left, right));
 				else
 					return left.Append(right);
 			}
 			else
 			{
-				if(right.ConditionCombination == ConditionCombination.And)
+				if(right.Combination == ConditionCombination.And)
 					return right.Prepend(left);
 				else
 					return new ConditionCollection(ConditionCombination.And, left, right);
@@ -170,7 +170,7 @@ namespace Zongsoft.Data
 			if(conditions == null)
 				return new ConditionCollection(ConditionCombination.Or, condition);
 
-			if(conditions.ConditionCombination == ConditionCombination.Or)
+			if(conditions.Combination == ConditionCombination.Or)
 				return new ConditionCollection(ConditionCombination.Or, Combine(condition, conditions));
 			else
 				return new ConditionCollection(ConditionCombination.Or, condition, conditions);
@@ -184,7 +184,7 @@ namespace Zongsoft.Data
 			if(conditions == null)
 				return new ConditionCollection(ConditionCombination.Or, condition);
 
-			if(conditions.ConditionCombination == ConditionCombination.Or)
+			if(conditions.Combination == ConditionCombination.Or)
 				return new ConditionCollection(ConditionCombination.Or, Combine(conditions, condition));
 			else
 				return new ConditionCollection(ConditionCombination.Or, conditions, condition);
@@ -198,16 +198,16 @@ namespace Zongsoft.Data
 			if(right == null)
 				return left;
 
-			if(left.ConditionCombination == ConditionCombination.Or)
+			if(left.Combination == ConditionCombination.Or)
 			{
-				if(right.ConditionCombination == ConditionCombination.Or)
+				if(right.Combination == ConditionCombination.Or)
 					return new ConditionCollection(ConditionCombination.Or, Combine(left, right));
 				else
 					return left.Append(right);
 			}
 			else
 			{
-				if(right.ConditionCombination == ConditionCombination.Or)
+				if(right.Combination == ConditionCombination.Or)
 					return right.Prepend(left);
 				else
 					return new ConditionCollection(ConditionCombination.Or, left, right);
@@ -252,10 +252,18 @@ namespace Zongsoft.Data
 
 			foreach(var item in this.Items)
 			{
-				var array = item.Find(name);
+				if(item is Condition condition)
+				{
+					if(string.Equals(condition.Name, name, StringComparison.OrdinalIgnoreCase))
+						list.Add(condition);
+				}
+				else if(item is IConditional conditional)
+				{
+					var array = conditional.Find(name);
 
-				if(array != null && array.Length > 0)
-					list.AddRange(array);
+					if(array != null && array.Length > 0)
+						list.AddRange(array);
+				}
 			}
 
 			return list.ToArray();
@@ -271,7 +279,7 @@ namespace Zongsoft.Data
 			if(items == null || items.Length < 1)
 				return this;
 
-			return new ConditionCollection(this.ConditionCombination, this.Items.Concat(items).Where(item => item != null));
+			return new ConditionCollection(this.Combination, this.Items.Concat(items).Where(item => item != null));
 		}
 
 		/// <summary>
@@ -284,7 +292,7 @@ namespace Zongsoft.Data
 			if(items == null || items.Length < 1)
 				return this;
 
-			return new ConditionCollection(this.ConditionCombination, items.Concat(this.Items).Where(item => item != null));
+			return new ConditionCollection(this.Combination, items.Concat(this.Items).Where(item => item != null));
 		}
 		#endregion
 
@@ -344,8 +352,16 @@ namespace Zongsoft.Data
 
 			foreach(var condition in conditions)
 			{
-				if(condition != null && condition.Contains(name))
-					return true;
+				if(condition is Condition c)
+				{
+					if(string.Equals(c.Name, name, StringComparison.OrdinalIgnoreCase))
+						return true;
+				}
+				else if(condition is IConditional cc)
+				{
+					if(cc.Contains(name))
+						return true;
+				}
 			}
 
 			return false;
