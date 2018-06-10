@@ -32,10 +32,10 @@ namespace Zongsoft.Data
 	/// <summary>
 	/// 为数据访问的更新事件提供数据。
 	/// </summary>
-	public class DataUpdatedEventArgs : DataAccessEventArgs<DataUpdationContext>
+	public class DataUpdatedEventArgs : DataAccessEventArgs<DataUpdateContext>
 	{
 		#region 构造函数
-		public DataUpdatedEventArgs(DataUpdationContext context) : base(context)
+		public DataUpdatedEventArgs(DataUpdateContext context) : base(context)
 		{
 		}
 		#endregion

@@ -32,10 +32,10 @@ namespace Zongsoft.Data
 	/// <summary>
 	/// 为数据访问的执行事件提供数据。
 	/// </summary>
-	public class DataExecutedEventArgs : DataAccessEventArgs<DataExecutionContext>
+	public class DataExecutedEventArgs : DataAccessEventArgs<DataExecuteContext>
 	{
 		#region 构造函数
-		public DataExecutedEventArgs(DataExecutionContext context) : base(context)
+		public DataExecutedEventArgs(DataExecuteContext context) : base(context)
 		{
 		}
 		#endregion

@@ -94,7 +94,7 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
-	public class DataExistenceContext : DataAccessContextBase
+	public class DataExistContext : DataAccessContextBase
 	{
 		#region 成员字段
 		private ICondition _condition;
@@ -102,7 +102,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataExistenceContext(IDataAccess dataAccess, string name, ICondition condition, object state = null) : base(dataAccess, name, DataAccessMethod.Exists, state)
+		public DataExistContext(IDataAccess dataAccess, string name, ICondition condition, object state = null) : base(dataAccess, name, DataAccessMethod.Exists, state)
 		{
 			_condition = condition;
 		}
@@ -135,7 +135,7 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
-	public class DataExecutionContext : DataAccessContextBase
+	public class DataExecuteContext : DataAccessContextBase
 	{
 		#region 成员字段
 		private bool _isScalar;
@@ -146,7 +146,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataExecutionContext(IDataAccess dataAccess, string name, bool isScalar, Type resultType, IDictionary<string, object> inParameters, IDictionary<string, object> outParameters, object state = null) : base(dataAccess, name, DataAccessMethod.Execute, state)
+		public DataExecuteContext(IDataAccess dataAccess, string name, bool isScalar, Type resultType, IDictionary<string, object> inParameters, IDictionary<string, object> outParameters, object state = null) : base(dataAccess, name, DataAccessMethod.Execute, state)
 		{
 			if(resultType == null)
 				throw new ArgumentNullException(nameof(resultType));
@@ -312,7 +312,7 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
-	public class DataSelectionContext : DataAccessContextBase
+	public class DataSelectContext : DataAccessContextBase
 	{
 		#region 成员字段
 		private Type _entityType;
@@ -323,11 +323,11 @@ namespace Zongsoft.Data
 		private Paging _paging;
 		private Grouping _grouping;
 		private Sorting[] _sortings;
-		private Func<DataSelectionContext, object, bool> _resultFilter;
+		private Func<DataSelectContext, object, bool> _resultFilter;
 		#endregion
 
 		#region 构造函数
-		public DataSelectionContext(IDataAccess dataAccess, string name, Type entityType, Grouping grouping, ICondition condition, string scope, Paging paging, Sorting[] sortings, object state = null) : base(dataAccess, name, DataAccessMethod.Select, state)
+		public DataSelectContext(IDataAccess dataAccess, string name, Type entityType, Grouping grouping, ICondition condition, string scope, Paging paging, Sorting[] sortings, object state = null) : base(dataAccess, name, DataAccessMethod.Select, state)
 		{
 			_entityType = entityType ?? typeof(object);
 			_grouping = grouping;
@@ -389,7 +389,7 @@ namespace Zongsoft.Data
 		/// <summary>
 		/// 获取或设置查询结果的过滤器。
 		/// </summary>
-		public Func<DataSelectionContext, object, bool> ResultFilter
+		public Func<DataSelectContext, object, bool> ResultFilter
 		{
 			get
 			{
@@ -479,7 +479,7 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
-	public class DataDeletionContext : DataAccessContextBase
+	public class DataDeleteContext : DataAccessContextBase
 	{
 		#region 成员字段
 		private int _count;
@@ -488,7 +488,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataDeletionContext(IDataAccess dataAccess, string name, ICondition condition, string[] cascades, object state = null) : base(dataAccess, name, DataAccessMethod.Delete, state)
+		public DataDeleteContext(IDataAccess dataAccess, string name, ICondition condition, string[] cascades, object state = null) : base(dataAccess, name, DataAccessMethod.Delete, state)
 		{
 			_condition = condition;
 			_cascades = cascades;
@@ -543,7 +543,7 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
-	public class DataInsertionContext : DataAccessContextBase
+	public class DataInsertContext : DataAccessContextBase
 	{
 		#region 成员字段
 		private int _count;
@@ -553,7 +553,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataInsertionContext(IDataAccess dataAccess, string name, bool isMultiple, object data, string scope, object state = null) : base(dataAccess, name, DataAccessMethod.Insert, state)
+		public DataInsertContext(IDataAccess dataAccess, string name, bool isMultiple, object data, string scope, object state = null) : base(dataAccess, name, DataAccessMethod.Insert, state)
 		{
 			_data = data;
 			_scope = scope;
@@ -620,7 +620,7 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
-	public class DataUpdationContext : DataAccessContextBase
+	public class DataUpdateContext : DataAccessContextBase
 	{
 		#region 成员字段
 		private int _count;
@@ -631,7 +631,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataUpdationContext(IDataAccess dataAccess, string name, bool isMultiple, object data, ICondition condition, string scope, object state = null) : base(dataAccess, name, DataAccessMethod.Update, state)
+		public DataUpdateContext(IDataAccess dataAccess, string name, bool isMultiple, object data, ICondition condition, string scope, object state = null) : base(dataAccess, name, DataAccessMethod.Update, state)
 		{
 			_data = data;
 			_condition = condition;
@@ -714,21 +714,19 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
-	public class DataUpsertionContext : DataAccessContextBase
+	public class DataUpsertContext : DataAccessContextBase
 	{
 		#region 成员字段
 		private int _count;
 		private object _data;
-		private ICondition _condition;
 		private string _scope;
 		private bool _isMultiple;
 		#endregion
 
 		#region 构造函数
-		public DataUpsertionContext(IDataAccess dataAccess, string name, bool isMultiple, object data, ICondition condition, string scope, object state = null) : base(dataAccess, name, DataAccessMethod.Update, state)
+		public DataUpsertContext(IDataAccess dataAccess, string name, bool isMultiple, object data, string scope, object state = null) : base(dataAccess, name, DataAccessMethod.Upsert, state)
 		{
 			_data = data;
-			_condition = condition;
 			_scope = scope;
 			_isMultiple = isMultiple;
 		}
@@ -773,21 +771,6 @@ namespace Zongsoft.Data
 			set
 			{
 				_data = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置操作的条件。
-		/// </summary>
-		public ICondition Condition
-		{
-			get
-			{
-				return _condition;
-			}
-			set
-			{
-				_condition = value;
 			}
 		}
 

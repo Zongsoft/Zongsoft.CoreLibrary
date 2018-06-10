@@ -39,7 +39,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataInsertingEventArgs(DataInsertionContext context) : base(context)
+		public DataInsertingEventArgs(DataInsertContext context) : base(context)
 		{
 		}
 		#endregion
