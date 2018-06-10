@@ -39,7 +39,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataSelectingEventArgs(DataSelectionContext context) : base(context)
+		public DataSelectingEventArgs(DataSelectContext context) : base(context)
 		{
 			_cancel = false;
 		}

@@ -39,7 +39,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataDeletingEventArgs(DataDeletionContext context) : base(context)
+		public DataDeletingEventArgs(DataDeleteContext context) : base(context)
 		{
 			_cancel = false;
 		}

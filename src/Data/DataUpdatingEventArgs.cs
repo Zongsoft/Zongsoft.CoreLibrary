@@ -39,7 +39,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataUpdatingEventArgs(DataUpdationContext context) : base(context)
+		public DataUpdatingEventArgs(DataUpdateContext context) : base(context)
 		{
 		}
 		#endregion

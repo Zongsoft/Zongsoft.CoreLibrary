@@ -132,19 +132,19 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 执行方法
-		public IEnumerable<T> Execute<T>(string name, IDictionary<string, object> inParameters, object state = null, Func<DataExecutionContext, bool> executing = null, Action<DataExecutionContext> executed = null)
+		public IEnumerable<T> Execute<T>(string name, IDictionary<string, object> inParameters, object state = null, Func<DataExecuteContext, bool> executing = null, Action<DataExecuteContext> executed = null)
 		{
 			IDictionary<string, object> outParameters;
 			return this.Execute<T>(name, inParameters, out outParameters, state, executing, executed);
 		}
 
-		public IEnumerable<T> Execute<T>(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters, object state = null, Func<DataExecutionContext, bool> executing = null, Action<DataExecutionContext> executed = null)
+		public IEnumerable<T> Execute<T>(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters, object state = null, Func<DataExecuteContext, bool> executing = null, Action<DataExecuteContext> executed = null)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
 			//创建数据访问上下文对象
-			var context = this.CreateExecutionContext(name, false, typeof(T), inParameters, state);
+			var context = this.CreateExecuteContext(name, false, typeof(T), inParameters, state);
 
 			//处理数据访问操作前的回调
 			if(executing != null && executing(context))
@@ -189,19 +189,19 @@ namespace Zongsoft.Data
 			return context.Result as IEnumerable<T>;
 		}
 
-		public object ExecuteScalar(string name, IDictionary<string, object> inParameters, object state = null, Func<DataExecutionContext, bool> executing = null, Action<DataExecutionContext> executed = null)
+		public object ExecuteScalar(string name, IDictionary<string, object> inParameters, object state = null, Func<DataExecuteContext, bool> executing = null, Action<DataExecuteContext> executed = null)
 		{
 			IDictionary<string, object> outParameters;
 			return this.ExecuteScalar(name, inParameters, out outParameters, state, executing, executed);
 		}
 
-		public object ExecuteScalar(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters, object state = null, Func<DataExecutionContext, bool> executing = null, Action<DataExecutionContext> executed = null)
+		public object ExecuteScalar(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters, object state = null, Func<DataExecuteContext, bool> executing = null, Action<DataExecuteContext> executed = null)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
 			//创建数据访问上下文对象
-			var context = this.CreateExecutionContext(name, true, typeof(object), inParameters, state);
+			var context = this.CreateExecuteContext(name, true, typeof(object), inParameters, state);
 
 			//处理数据访问操作前的回调
 			if(executing != null && executing(context))
@@ -246,23 +246,23 @@ namespace Zongsoft.Data
 			return context.Result;
 		}
 
-		protected abstract void OnExecute<T>(DataExecutionContext context);
-		protected abstract void OnExecuteScalar(DataExecutionContext context);
+		protected abstract void OnExecute<T>(DataExecuteContext context);
+		protected abstract void OnExecuteScalar(DataExecuteContext context);
 		#endregion
 
 		#region 存在方法
-		public bool Exists<T>(ICondition condition, object state = null, Func<DataExistenceContext, bool> existing = null, Action<DataExistenceContext> existed = null)
+		public bool Exists<T>(ICondition condition, object state = null, Func<DataExistContext, bool> existing = null, Action<DataExistContext> existed = null)
 		{
 			return this.Exists(this.GetName<T>(), condition, state, existing, existed);
 		}
 
-		public bool Exists(string name, ICondition condition, object state = null, Func<DataExistenceContext, bool> existing = null, Action<DataExistenceContext> existed = null)
+		public bool Exists(string name, ICondition condition, object state = null, Func<DataExistContext, bool> existing = null, Action<DataExistContext> existed = null)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
 			//创建数据访问上下文对象
-			var context = this.CreateExistenceContext(name, condition, state);
+			var context = this.CreateExistContext(name, condition, state);
 
 			//处理数据访问操作前的回调
 			if(existing != null && existing(context))
@@ -292,7 +292,7 @@ namespace Zongsoft.Data
 			return context.Result;
 		}
 
-		protected abstract void OnExists(DataExistenceContext context);
+		protected abstract void OnExists(DataExistContext context);
 		#endregion
 
 		#region 计数方法
@@ -499,7 +499,7 @@ namespace Zongsoft.Data
 			return this.Delete(this.GetName<T>(), condition, state, cascades, null, null);
 		}
 
-		public int Delete<T>(ICondition condition, object state, string[] cascades, Func<DataDeletionContext, bool> deleting = null, Action<DataDeletionContext> deleted = null)
+		public int Delete<T>(ICondition condition, object state, string[] cascades, Func<DataDeleteContext, bool> deleting = null, Action<DataDeleteContext> deleted = null)
 		{
 			return this.Delete(this.GetName<T>(), condition, state, cascades, deleting, deleted);
 		}
@@ -514,7 +514,7 @@ namespace Zongsoft.Data
 			return this.Delete(name, condition, state, cascades, null, null);
 		}
 
-		public int Delete(string name, ICondition condition, object state, string[] cascades, Func<DataDeletionContext, bool> deleting = null, Action<DataDeletionContext> deleted = null)
+		public int Delete(string name, ICondition condition, object state, string[] cascades, Func<DataDeleteContext, bool> deleting = null, Action<DataDeleteContext> deleted = null)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
@@ -523,7 +523,7 @@ namespace Zongsoft.Data
 				cascades = cascades[0].Split(',', ';');
 
 			//创建数据访问上下文对象
-			var context = this.CreateDeletionContext(name, condition, cascades, state);
+			var context = this.CreateDeleteContext(name, condition, cascades, state);
 
 			//处理数据访问操作前的回调
 			if(deleting != null && deleting(context))
@@ -553,7 +553,7 @@ namespace Zongsoft.Data
 			return context.Count;
 		}
 
-		protected abstract void OnDelete(DataDeletionContext context);
+		protected abstract void OnDelete(DataDeleteContext context);
 		#endregion
 
 		#region 插入方法
@@ -581,7 +581,7 @@ namespace Zongsoft.Data
 			return this.Insert(this.GetName(data.GetType()), data, scope, null, null, null);
 		}
 
-		public int Insert<T>(T data, string scope, object state, Func<DataInsertionContext, bool> inserting = null, Action<DataInsertionContext> inserted = null)
+		public int Insert<T>(T data, string scope, object state, Func<DataInsertContext, bool> inserting = null, Action<DataInsertContext> inserted = null)
 		{
 			if(data == null)
 				return 0;
@@ -604,7 +604,7 @@ namespace Zongsoft.Data
 			return this.Insert(name, data, scope, null, null, null);
 		}
 
-		public int Insert(string name, object data, string scope, object state, Func<DataInsertionContext, bool> inserting = null, Action<DataInsertionContext> inserted = null)
+		public int Insert(string name, object data, string scope, object state, Func<DataInsertContext, bool> inserting = null, Action<DataInsertContext> inserted = null)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
@@ -613,7 +613,7 @@ namespace Zongsoft.Data
 				return 0;
 
 			//创建数据访问上下文对象
-			var context = this.CreateInsertionContext(name, false, data, scope, state);
+			var context = this.CreateInsertContext(name, false, data, scope, state);
 
 			//处理数据访问操作前的回调
 			if(inserting != null && inserting(context))
@@ -667,7 +667,7 @@ namespace Zongsoft.Data
 			return this.InsertMany(this.GetName<T>(), items, scope, null, null, null);
 		}
 
-		public int InsertMany<T>(IEnumerable<T> items, string scope, object state, Func<DataInsertionContext, bool> inserting = null, Action<DataInsertionContext> inserted = null)
+		public int InsertMany<T>(IEnumerable<T> items, string scope, object state, Func<DataInsertContext, bool> inserting = null, Action<DataInsertContext> inserted = null)
 		{
 			if(items == null)
 				return 0;
@@ -690,7 +690,7 @@ namespace Zongsoft.Data
 			return this.InsertMany(name, items, scope, null, null, null);
 		}
 
-		public int InsertMany(string name, IEnumerable items, string scope, object state, Func<DataInsertionContext, bool> inserting = null, Action<DataInsertionContext> inserted = null)
+		public int InsertMany(string name, IEnumerable items, string scope, object state, Func<DataInsertContext, bool> inserting = null, Action<DataInsertContext> inserted = null)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
@@ -699,7 +699,7 @@ namespace Zongsoft.Data
 				return 0;
 
 			//创建数据访问上下文对象
-			var context = this.CreateInsertionContext(name, true, items, scope, state);
+			var context = this.CreateInsertContext(name, true, items, scope, state);
 
 			//处理数据访问操作前的回调
 			if(inserting != null && inserting(context))
@@ -729,7 +729,7 @@ namespace Zongsoft.Data
 			return context.Count;
 		}
 
-		protected abstract void OnInsert(DataInsertionContext context);
+		protected abstract void OnInsert(DataInsertContext context);
 		#endregion
 
 		#region 更新方法
@@ -797,7 +797,7 @@ namespace Zongsoft.Data
 			return this.Update(this.GetName(data.GetType()), data, condition, scope, state, null, null);
 		}
 
-		public int Update<T>(T data, ICondition condition, string scope, object state, Func<DataUpdationContext, bool> updating = null, Action<DataUpdationContext> updated = null)
+		public int Update<T>(T data, ICondition condition, string scope, object state, Func<DataUpdateContext, bool> updating = null, Action<DataUpdateContext> updated = null)
 		{
 			if(data == null)
 				return 0;
@@ -851,7 +851,7 @@ namespace Zongsoft.Data
 		/// <param name="updating">指定的更新前回调函数。</param>
 		/// <param name="updated">指定的更新后回调函数。</param>
 		/// <returns>返回受影响的记录行数，执行成功返回大于零的整数，失败则返回负数。</returns>
-		public int Update(string name, object data, ICondition condition, string scope, object state, Func<DataUpdationContext, bool> updating = null, Action<DataUpdationContext> updated = null)
+		public int Update(string name, object data, ICondition condition, string scope, object state, Func<DataUpdateContext, bool> updating = null, Action<DataUpdateContext> updated = null)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
@@ -860,7 +860,7 @@ namespace Zongsoft.Data
 				return 0;
 
 			//创建数据访问上下文对象
-			var context = this.CreateUpdationContext(name, false, data, condition, scope, state);
+			var context = this.CreateUpdateContext(name, false, data, condition, scope, state);
 
 			//处理数据访问操作前的回调
 			if(updating != null && updating(context))
@@ -905,7 +905,7 @@ namespace Zongsoft.Data
 			return this.UpdateMany(this.GetName<T>(), items, scope, null, null, null);
 		}
 
-		public int UpdateMany<T>(IEnumerable<T> items, string scope, object state, Func<DataUpdationContext, bool> updating = null, Action<DataUpdationContext> updated = null)
+		public int UpdateMany<T>(IEnumerable<T> items, string scope, object state, Func<DataUpdateContext, bool> updating = null, Action<DataUpdateContext> updated = null)
 		{
 			return this.UpdateMany(this.GetName<T>(), items, scope, state, updating, updated);
 		}
@@ -935,7 +935,7 @@ namespace Zongsoft.Data
 		/// <param name="updating">可选的更新前回调委托参数。</param>
 		/// <param name="updated">可选的更新后回调委托参数。</param>
 		/// <returns>返回受影响的记录行数，执行成功返回大于零的整数，失败则返回负数。</returns>
-		public int UpdateMany(string name, IEnumerable items, string scope, object state, Func<DataUpdationContext, bool> updating = null, Action<DataUpdationContext> updated = null)
+		public int UpdateMany(string name, IEnumerable items, string scope, object state, Func<DataUpdateContext, bool> updating = null, Action<DataUpdateContext> updated = null)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
@@ -944,7 +944,7 @@ namespace Zongsoft.Data
 				return 0;
 
 			//创建数据访问上下文对象
-			var context = this.CreateUpdationContext(name, true, items, null, scope, state);
+			var context = this.CreateUpdateContext(name, true, items, null, scope, state);
 
 			//处理数据访问操作前的回调
 			if(updating != null && updating(context))
@@ -974,7 +974,7 @@ namespace Zongsoft.Data
 			return context.Count;
 		}
 
-		protected abstract void OnUpdate(DataUpdationContext context);
+		protected abstract void OnUpdate(DataUpdateContext context);
 		#endregion
 
 		#region 查询方法
@@ -1033,7 +1033,7 @@ namespace Zongsoft.Data
 			return this.Select<T>(this.GetName<T>(), condition, scope, paging, state, sortings, null, null);
 		}
 
-		public IEnumerable<T> Select<T>(ICondition condition, string scope, Paging paging, object state, Sorting[] sortings, Func<DataSelectionContext, bool> selecting, Action<DataSelectionContext> selected)
+		public IEnumerable<T> Select<T>(ICondition condition, string scope, Paging paging, object state, Sorting[] sortings, Func<DataSelectContext, bool> selecting, Action<DataSelectContext> selected)
 		{
 			return this.Select<T>(this.GetName<T>(), condition, scope, paging, state, sortings, selecting, selected);
 		}
@@ -1093,13 +1093,13 @@ namespace Zongsoft.Data
 			return this.Select<T>(name, condition, scope, paging, state, sortings, null, null);
 		}
 
-		public IEnumerable<T> Select<T>(string name, ICondition condition, string scope, Paging paging, object state, Sorting[] sortings, Func<DataSelectionContext, bool> selecting, Action<DataSelectionContext> selected)
+		public IEnumerable<T> Select<T>(string name, ICondition condition, string scope, Paging paging, object state, Sorting[] sortings, Func<DataSelectContext, bool> selecting, Action<DataSelectContext> selected)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
 			//创建数据访问上下文对象
-			var context = this.CreateSelectionContext(name, typeof(T), condition, null, scope, paging, sortings, state);
+			var context = this.CreateSelectContext(name, typeof(T), condition, null, scope, paging, sortings, state);
 
 			//执行查询方法
 			return this.Select<T>(context, selecting, selected);
@@ -1155,19 +1155,19 @@ namespace Zongsoft.Data
 			return this.Select<T>(name, grouping, condition, scope, paging, state, sortings, null, null);
 		}
 
-		public IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, string scope, Paging paging, object state, Sorting[] sortings, Func<DataSelectionContext, bool> selecting, Action<DataSelectionContext> selected)
+		public IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, string scope, Paging paging, object state, Sorting[] sortings, Func<DataSelectContext, bool> selecting, Action<DataSelectContext> selected)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
 			//创建数据访问上下文对象
-			var context = this.CreateSelectionContext(name, typeof(T), condition, grouping, scope, paging, sortings, state);
+			var context = this.CreateSelectContext(name, typeof(T), condition, grouping, scope, paging, sortings, state);
 
 			//执行查询方法
 			return this.Select<T>(context, selecting, selected);
 		}
 
-		private IEnumerable<T> Select<T>(DataSelectionContext context, Func<DataSelectionContext, bool> selecting, Action<DataSelectionContext> selected)
+		private IEnumerable<T> Select<T>(DataSelectContext context, Func<DataSelectContext, bool> selecting, Action<DataSelectContext> selected)
 		{
 			//处理数据访问操作前的回调
 			if(selecting != null && selecting(context))
@@ -1197,7 +1197,7 @@ namespace Zongsoft.Data
 			return context.Result as IEnumerable<T>;
 		}
 
-		protected abstract void OnSelect<T>(DataSelectionContext context);
+		protected abstract void OnSelect<T>(DataSelectContext context);
 		#endregion
 
 		#region 虚拟方法
@@ -1216,14 +1216,14 @@ namespace Zongsoft.Data
 			return new DataCountContext(this, name, condition, includes, state);
 		}
 
-		protected virtual DataExecutionContext CreateExecutionContext(string name, bool isScalar, Type resultType, IDictionary<string, object> inParameters, object state)
+		protected virtual DataExistContext CreateExistContext(string name, ICondition condition, object state)
 		{
-			return new DataExecutionContext(this, name, isScalar, resultType, inParameters, null, state);
+			return new DataExistContext(this, name, condition, state);
 		}
 
-		protected virtual DataExistenceContext CreateExistenceContext(string name, ICondition condition, object state)
+		protected virtual DataExecuteContext CreateExecuteContext(string name, bool isScalar, Type resultType, IDictionary<string, object> inParameters, object state)
 		{
-			return new DataExistenceContext(this, name, condition, state);
+			return new DataExecuteContext(this, name, isScalar, resultType, inParameters, null, state);
 		}
 
 		protected virtual DataIncrementContext CreateIncrementContext(string name, string member, ICondition condition, int interval, object state)
@@ -1231,44 +1231,44 @@ namespace Zongsoft.Data
 			return new DataIncrementContext(this, name, member, condition, interval, state);
 		}
 
-		protected virtual DataDeletionContext CreateDeletionContext(string name, ICondition condition, string[] cascades, object state)
+		protected virtual DataDeleteContext CreateDeleteContext(string name, ICondition condition, string[] cascades, object state)
 		{
-			return new DataDeletionContext(this, name, condition, cascades, state);
+			return new DataDeleteContext(this, name, condition, cascades, state);
 		}
 
-		protected virtual DataInsertionContext CreateInsertionContext(string name, bool isMultiple, object data, string scope, object state)
+		protected virtual DataInsertContext CreateInsertContext(string name, bool isMultiple, object data, string scope, object state)
 		{
 			if(isMultiple)
 				data = GetDataDictionaries(data);
 			else
 				data = GetDataDictionary(data);
 
-			return new DataInsertionContext(this, name, isMultiple, data, scope, state);
+			return new DataInsertContext(this, name, isMultiple, data, scope, state);
 		}
 
-		protected virtual DataUpdationContext CreateUpdationContext(string name, bool isMultiple, object data, ICondition condition, string scope, object state)
+		protected virtual DataUpsertContext CreateUpsertContext(string name, bool isMultiple, object data, string scope, object state)
 		{
 			if(isMultiple)
 				data = GetDataDictionaries(data);
 			else
 				data = GetDataDictionary(data);
 
-			return new DataUpdationContext(this, name, isMultiple, data, condition, scope, state);
+			return new DataUpsertContext(this, name, isMultiple, data, scope, state);
 		}
 
-		protected virtual DataUpsertionContext CreateUpsertionContext(string name, bool isMultiple, object data, ICondition condition, string scope, object state)
+		protected virtual DataUpdateContext CreateUpdateContext(string name, bool isMultiple, object data, ICondition condition, string scope, object state)
 		{
 			if(isMultiple)
 				data = GetDataDictionaries(data);
 			else
 				data = GetDataDictionary(data);
 
-			return new DataUpsertionContext(this, name, isMultiple, data, condition, scope, state);
+			return new DataUpdateContext(this, name, isMultiple, data, condition, scope, state);
 		}
 
-		protected virtual DataSelectionContext CreateSelectionContext(string name, Type entityType, ICondition condition, Grouping grouping, string scope, Paging paging, Sorting[] sortings, object state)
+		protected virtual DataSelectContext CreateSelectContext(string name, Type entityType, ICondition condition, Grouping grouping, string scope, Paging paging, Sorting[] sortings, object state)
 		{
-			return new DataSelectionContext(this, name, entityType, grouping, condition, scope, paging, sortings, state);
+			return new DataSelectContext(this, name, entityType, grouping, condition, scope, paging, sortings, state);
 		}
 		#endregion
 
@@ -1293,7 +1293,7 @@ namespace Zongsoft.Data
 			return args.Cancel;
 		}
 
-		protected virtual void OnExecuted(DataExecutionContext context)
+		protected virtual void OnExecuted(DataExecuteContext context)
 		{
 			var e = this.Executed;
 
@@ -1301,7 +1301,7 @@ namespace Zongsoft.Data
 				e(this, new DataExecutedEventArgs(context));
 		}
 
-		protected virtual bool OnExecuting(DataExecutionContext context)
+		protected virtual bool OnExecuting(DataExecuteContext context)
 		{
 			var e = this.Executing;
 
@@ -1313,7 +1313,7 @@ namespace Zongsoft.Data
 			return args.Cancel;
 		}
 
-		protected virtual void OnExisted(DataExistenceContext context)
+		protected virtual void OnExisted(DataExistContext context)
 		{
 			var e = this.Existed;
 
@@ -1321,7 +1321,7 @@ namespace Zongsoft.Data
 				e(this, new DataExistedEventArgs(context));
 		}
 
-		protected virtual bool OnExisting(DataExistenceContext context)
+		protected virtual bool OnExisting(DataExistContext context)
 		{
 			var e = this.Existing;
 
@@ -1353,7 +1353,7 @@ namespace Zongsoft.Data
 			return args.Cancel;
 		}
 
-		protected virtual void OnDeleted(DataDeletionContext context)
+		protected virtual void OnDeleted(DataDeleteContext context)
 		{
 			var e = this.Deleted;
 
@@ -1361,7 +1361,7 @@ namespace Zongsoft.Data
 				e(this, new DataDeletedEventArgs(context));
 		}
 
-		protected virtual bool OnDeleting(DataDeletionContext context)
+		protected virtual bool OnDeleting(DataDeleteContext context)
 		{
 			var e = this.Deleting;
 
@@ -1373,7 +1373,7 @@ namespace Zongsoft.Data
 			return args.Cancel;
 		}
 
-		protected virtual void OnInserted(DataInsertionContext context)
+		protected virtual void OnInserted(DataInsertContext context)
 		{
 			var e = this.Inserted;
 
@@ -1381,7 +1381,7 @@ namespace Zongsoft.Data
 				e(this, new DataInsertedEventArgs(context));
 		}
 
-		protected virtual bool OnInserting(DataInsertionContext context)
+		protected virtual bool OnInserting(DataInsertContext context)
 		{
 			var e = this.Inserting;
 
@@ -1393,7 +1393,7 @@ namespace Zongsoft.Data
 			return args.Cancel;
 		}
 
-		protected virtual void OnUpdated(DataUpdationContext context)
+		protected virtual void OnUpdated(DataUpdateContext context)
 		{
 			var e = this.Updated;
 
@@ -1401,7 +1401,7 @@ namespace Zongsoft.Data
 				e(this, new DataUpdatedEventArgs(context));
 		}
 
-		protected virtual bool OnUpdating(DataUpdationContext context)
+		protected virtual bool OnUpdating(DataUpdateContext context)
 		{
 			var e = this.Updating;
 
@@ -1413,7 +1413,7 @@ namespace Zongsoft.Data
 			return args.Cancel;
 		}
 
-		protected virtual void OnSelected(DataSelectionContext context)
+		protected virtual void OnSelected(DataSelectContext context)
 		{
 			var e = this.Selected;
 
@@ -1421,7 +1421,7 @@ namespace Zongsoft.Data
 				e(this, new DataSelectedEventArgs(context));
 		}
 
-		protected virtual bool OnSelecting(DataSelectionContext context)
+		protected virtual bool OnSelecting(DataSelectContext context)
 		{
 			var e = this.Selecting;
 

@@ -77,28 +77,28 @@ namespace Zongsoft.Data
 					this.OnCounted((DataCountContext)context);
 					break;
 				case DataAccessMethod.Execute:
-					this.OnExecuted((DataExecutionContext)context);
+					this.OnExecuted((DataExecuteContext)context);
 					break;
 				case DataAccessMethod.Exists:
-					this.OnExisted((DataExistenceContext)context);
+					this.OnExisted((DataExistContext)context);
 					break;
 				case DataAccessMethod.Increment:
 					this.OnIncremented((DataIncrementContext)context);
 					break;
 				case DataAccessMethod.Select:
-					this.OnSelected((DataSelectionContext)context);
+					this.OnSelected((DataSelectContext)context);
 					break;
 				case DataAccessMethod.Delete:
-					this.OnDeleted((DataDeletionContext)context);
+					this.OnDeleted((DataDeleteContext)context);
 					break;
 				case DataAccessMethod.Insert:
-					this.OnInserted((DataInsertionContext)context);
+					this.OnInserted((DataInsertContext)context);
 					break;
 				case DataAccessMethod.Update:
-					this.OnUpdated((DataUpdationContext)context);
+					this.OnUpdated((DataUpdateContext)context);
 					break;
 				case DataAccessMethod.Upsert:
-					this.OnUpserted((DataUpsertionContext)context);
+					this.OnUpserted((DataUpsertContext)context);
 					break;
 			}
 		}
@@ -111,28 +111,28 @@ namespace Zongsoft.Data
 					this.OnCounting((DataCountContext)context);
 					break;
 				case DataAccessMethod.Execute:
-					this.OnExecuting((DataExecutionContext)context);
+					this.OnExecuting((DataExecuteContext)context);
 					break;
 				case DataAccessMethod.Exists:
-					this.OnExisting((DataExistenceContext)context);
+					this.OnExisting((DataExistContext)context);
 					break;
 				case DataAccessMethod.Increment:
 					this.OnIncrementing((DataIncrementContext)context);
 					break;
 				case DataAccessMethod.Select:
-					this.OnSelecting((DataSelectionContext)context);
+					this.OnSelecting((DataSelectContext)context);
 					break;
 				case DataAccessMethod.Delete:
-					this.OnDeleting((DataDeletionContext)context);
+					this.OnDeleting((DataDeleteContext)context);
 					break;
 				case DataAccessMethod.Insert:
-					this.OnInserting((DataInsertionContext)context);
+					this.OnInserting((DataInsertContext)context);
 					break;
 				case DataAccessMethod.Update:
-					this.OnUpdating((DataUpdationContext)context);
+					this.OnUpdating((DataUpdateContext)context);
 					break;
 				case DataAccessMethod.Upsert:
-					this.OnUpserting((DataUpsertionContext)context);
+					this.OnUpserting((DataUpsertContext)context);
 					break;
 			}
 		}
@@ -157,19 +157,19 @@ namespace Zongsoft.Data
 		{
 		}
 
-		protected virtual void OnExecuting(DataExecutionContext context)
+		protected virtual void OnExecuting(DataExecuteContext context)
 		{
 		}
 
-		protected virtual void OnExecuted(DataExecutionContext context)
+		protected virtual void OnExecuted(DataExecuteContext context)
 		{
 		}
 
-		protected virtual void OnExisting(DataExistenceContext context)
+		protected virtual void OnExisting(DataExistContext context)
 		{
 		}
 
-		protected virtual void OnExisted(DataExistenceContext context)
+		protected virtual void OnExisted(DataExistContext context)
 		{
 		}
 
@@ -181,43 +181,43 @@ namespace Zongsoft.Data
 		{
 		}
 
-		protected virtual void OnSelecting(DataSelectionContext context)
+		protected virtual void OnSelecting(DataSelectContext context)
 		{
 		}
 
-		protected virtual void OnSelected(DataSelectionContext context)
+		protected virtual void OnSelected(DataSelectContext context)
 		{
 		}
 
-		protected virtual void OnDeleting(DataDeletionContext context)
+		protected virtual void OnDeleting(DataDeleteContext context)
 		{
 		}
 
-		protected virtual void OnDeleted(DataDeletionContext context)
+		protected virtual void OnDeleted(DataDeleteContext context)
 		{
 		}
 
-		protected virtual void OnInserting(DataInsertionContext context)
+		protected virtual void OnInserting(DataInsertContext context)
 		{
 		}
 
-		protected virtual void OnInserted(DataInsertionContext context)
+		protected virtual void OnInserted(DataInsertContext context)
 		{
 		}
 
-		protected virtual void OnUpdating(DataUpdationContext context)
+		protected virtual void OnUpdating(DataUpdateContext context)
 		{
 		}
 
-		protected virtual void OnUpdated(DataUpdationContext context)
+		protected virtual void OnUpdated(DataUpdateContext context)
 		{
 		}
 
-		protected virtual void OnUpserting(DataUpsertionContext context)
+		protected virtual void OnUpserting(DataUpsertContext context)
 		{
 		}
 
-		protected virtual void OnUpserted(DataUpsertionContext context)
+		protected virtual void OnUpserted(DataUpsertContext context)
 		{
 		}
 		#endregion
