@@ -80,6 +80,30 @@ namespace Zongsoft.Options.Configuration
 				this[XML_VALUE_ATTRIBUTE] = value;
 			}
 		}
+
+		public bool HasExtendedProperties
+		{
+			get
+			{
+				return this.HasUnrecognizedProperties;
+			}
+		}
+
+		public IDictionary<string, string> ExtendedProperties
+		{
+			get
+			{
+				return this.UnrecognizedProperties;
+			}
+		}
+		#endregion
+
+		#region 重写方法
+		protected override bool OnDeserializeUnrecognizedAttribute(string name, string value)
+		{
+			this.UnrecognizedProperties.Add(name, value);
+			return true;
+		}
 		#endregion
 	}
 }
