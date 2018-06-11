@@ -1266,9 +1266,9 @@ namespace Zongsoft.Data
 			return new DataUpdateContext(this, name, isMultiple, data, condition, scope, state);
 		}
 
-		protected virtual DataSelectContext CreateSelectContext(string name, Type entityType, ICondition condition, Grouping grouping, string scope, Paging paging, Sorting[] sortings, object state)
+		protected virtual DataSelectContext CreateSelectContext(string name, Type elementType, ICondition condition, Grouping grouping, string scope, Paging paging, Sorting[] sortings, object state)
 		{
-			return new DataSelectContext(this, name, entityType, grouping, condition, scope, paging, sortings, state);
+			return new DataSelectContext(this, name, elementType, grouping, condition, scope, paging, sortings, state);
 		}
 		#endregion
 

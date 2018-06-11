@@ -315,7 +315,7 @@ namespace Zongsoft.Data
 	public class DataSelectContext : DataAccessContextBase
 	{
 		#region 成员字段
-		private Type _entityType;
+		private Type _elementType;
 		private IEnumerable _result;
 		private IEnumerable _filteringResult;
 		private ICondition _condition;
@@ -327,9 +327,9 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataSelectContext(IDataAccess dataAccess, string name, Type entityType, Grouping grouping, ICondition condition, string scope, Paging paging, Sorting[] sortings, object state = null) : base(dataAccess, name, DataAccessMethod.Select, state)
+		public DataSelectContext(IDataAccess dataAccess, string name, Type elementType, Grouping grouping, ICondition condition, string scope, Paging paging, Sorting[] sortings, object state = null) : base(dataAccess, name, DataAccessMethod.Select, state)
 		{
-			_entityType = entityType ?? typeof(object);
+			_elementType = elementType ?? typeof(object);
 			_grouping = grouping;
 			_condition = condition;
 			_scope = scope;
@@ -340,18 +340,18 @@ namespace Zongsoft.Data
 
 		#region 公共属性
 		/// <summary>
-		/// 获取查询要返回的实体类型。
+		/// 获取查询要返回的结果集元素类型。
 		/// </summary>
-		public Type EntityType
+		public Type ElementType
 		{
 			get
 			{
-				return _entityType;
+				return _elementType;
 			}
 		}
 
 		/// <summary>
-		/// 获取或设置查询操作的结果。
+		/// 获取或设置查询操作的结果集。
 		/// </summary>
 		public IEnumerable Result
 		{
@@ -368,7 +368,7 @@ namespace Zongsoft.Data
 					{
 						if(_filteringResult == null)
 						{
-							var type = typeof(DataFilterEnumerable<,>).MakeGenericType(this.GetType(), _entityType);
+							var type = typeof(DataFilterEnumerable<,>).MakeGenericType(this.GetType(), _elementType);
 							_filteringResult = (IEnumerable)System.Activator.CreateInstance(type, new object[] { this, _result, _resultFilter });
 						}
 					}
