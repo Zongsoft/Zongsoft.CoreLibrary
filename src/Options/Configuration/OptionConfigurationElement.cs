@@ -150,7 +150,7 @@ namespace Zongsoft.Options.Configuration
 		protected virtual bool OnDeserializeUnrecognizedAttribute(string name, string value)
 		{
 			/*
-			 * 在子类中重写该方法，可使用以下被注释代码用来处理允许未知的属性
+			 * 在子类中重写该方法，可使用以下代码处理允许未声明的属性
 			this.UnrecognizedProperties.Add(name, value);
 			return true;
 			*/
