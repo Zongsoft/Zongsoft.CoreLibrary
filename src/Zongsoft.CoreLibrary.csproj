@@ -120,6 +120,8 @@
     <Compile Include="ComponentModel\SchemaCategoryCollection.cs" />
     <Compile Include="ComponentModel\SchemaCollection.cs" />
     <Compile Include="Data\ConditionalBehaviors.cs" />
+    <Compile Include="Data\DataAccessProviderBase.cs" />
+    <Compile Include="Data\IDataAccessProvider.cs" />
     <Compile Include="Data\Range.cs" />
     <Compile Include="Data\Range`1.cs" />
     <Compile Include="Data\ConditionalRange`1.cs" />
