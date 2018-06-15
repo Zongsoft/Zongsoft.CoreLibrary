@@ -25,13 +25,14 @@
  */
 
 using System;
+using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
 	/// <summary>
 	/// 提供数据访问名映射的接口。
 	/// </summary>
-	public interface IDataAccessNaming
+	public interface IDataAccessNaming : ICollection<KeyValuePair<Type, string>>
 	{
 		void Map(Type type, string name = null);
 		void Map<T>(string name = null);

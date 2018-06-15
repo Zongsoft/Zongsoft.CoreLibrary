@@ -61,17 +61,10 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		protected DataAccessBase()
-		{
-			_name = string.Empty;
-			_naming = new DataAccessNaming();
-			_filters = new List<IDataAccessFilter>();
-		}
-
 		protected DataAccessBase(string name)
 		{
 			_name = name ?? string.Empty;
-			_naming = new DataAccessNaming();
+			_naming = new DataAccessNaming(name);
 			_filters = new List<IDataAccessFilter>();
 		}
 
