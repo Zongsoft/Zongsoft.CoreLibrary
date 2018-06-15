@@ -29,8 +29,25 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
-	public interface IDataAccessProvider : IEnumerable<IDataAccess>
+	/// <summary>
+	/// 表示数据访问提供程序的接口。
+	/// </summary>
+	public interface IDataAccessProvider : ICollection<IDataAccess>
 	{
+		/// <summary>
+		/// 获取或设置宿主程序中默认的数据访问器。
+		/// </summary>
+		IDataAccess Default
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// 获取或创建指定应用的数据访问器。
+		/// </summary>
+		/// <param name="name">指定的应用名。</param>
+		/// <returns>返回指定应用名的数据访问器。</returns>
 		IDataAccess GetAccessor(string name);
 	}
 }

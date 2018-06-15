@@ -33,6 +33,7 @@ namespace Zongsoft.Data
 	public abstract class DataAccessProviderBase : IDataAccessProvider
 	{
 		#region 成员字段
+		private IDataAccess _default;
 		private readonly Collections.INamedCollection<IDataAccess> _accesses;
 		#endregion
 
@@ -44,11 +45,23 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 公共属性
-		public ICollection<IDataAccess> Accesses
+		public int Count
 		{
 			get
 			{
-				return _accesses;
+				return _accesses.Count;
+			}
+		}
+
+		public IDataAccess Default
+		{
+			get
+			{
+				return _default;
+			}
+			set
+			{
+				_default = value ?? throw new ArgumentNullException();
 			}
 		}
 		#endregion
@@ -76,6 +89,44 @@ namespace Zongsoft.Data
 
 		#region 抽象方法
 		protected abstract IDataAccess CreateAccessor(string name);
+		#endregion
+
+		#region 集合接口
+		bool ICollection<IDataAccess>.IsReadOnly
+		{
+			get
+			{
+				return false;
+			}
+		}
+
+		void ICollection<IDataAccess>.Add(IDataAccess item)
+		{
+			_accesses.Add(item ?? throw new ArgumentNullException(nameof(item)));
+		}
+
+		void ICollection<IDataAccess>.Clear()
+		{
+			_accesses.Clear();
+		}
+
+		bool ICollection<IDataAccess>.Contains(IDataAccess item)
+		{
+			if(item == null)
+				return false;
+
+			return _accesses.Contains(item);
+		}
+
+		void ICollection<IDataAccess>.CopyTo(IDataAccess[] array, int arrayIndex)
+		{
+			_accesses.CopyTo(array, arrayIndex);
+		}
+
+		bool ICollection<IDataAccess>.Remove(IDataAccess item)
+		{
+			return _accesses.Remove(item);
+		}
 		#endregion
 
 		#region 枚举遍历
