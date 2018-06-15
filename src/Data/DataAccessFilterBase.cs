@@ -25,7 +25,6 @@
  */
 
 using System;
-using System.Linq;
 using System.Collections.Generic;
 
 namespace Zongsoft.Data
@@ -33,28 +32,52 @@ namespace Zongsoft.Data
 	public abstract class DataAccessFilterBase : IDataAccessFilter, Zongsoft.Services.IPredication<DataAccessContextBase>
 	{
 		#region 成员字段
-		private string[] _names;
-		private DataAccessMethod[] _methods;
+		private readonly int _flags;
+		private readonly string[] _names;
 		#endregion
 
 		#region 构造函数
 		protected DataAccessFilterBase(params string[] names)
 		{
 			_names = names;
+
+			if(_names != null && _names.Length > 0)
+				Array.Sort(_names);
+		}
+
+		protected DataAccessFilterBase(params Type[] types)
+		{
+			_names = GetNames(types);
 		}
 
 		protected DataAccessFilterBase(DataAccessMethod method, params string[] names)
 		{
-			_methods = new DataAccessMethod[] { method };
+			_flags = GetFlag(method);
 			_names = names;
+
+			if(_names != null && _names.Length > 0)
+				Array.Sort(_names);
+		}
+
+		protected DataAccessFilterBase(DataAccessMethod method, params Type[] types)
+		{
+			_flags = GetFlag(method);
+			_names = GetNames(types);
 		}
 
 		protected DataAccessFilterBase(IEnumerable<DataAccessMethod> methods, params string[] names)
 		{
-			if(methods != null)
-				_methods = methods.ToArray();
-
+			_flags = GetFlags(methods);
 			_names = names;
+
+			if(_names != null && _names.Length > 0)
+				Array.Sort(_names);
+		}
+
+		protected DataAccessFilterBase(IEnumerable<DataAccessMethod> methods, params Type[] types)
+		{
+			_flags = GetFlags(methods);
+			_names = GetNames(types);
 		}
 		#endregion
 
@@ -225,15 +248,18 @@ namespace Zongsoft.Data
 		#region 断言方法
 		public virtual bool Predicate(DataAccessContextBase context)
 		{
-			var result = true;
+			if(_flags != 0)
+			{
+				var flag = GetFlag(context.Method);
 
-			if(result && (_methods != null && _methods.Length > 0))
-				result &= _methods.Contains(context.Method);
+				if((_flags & flag) != flag)
+					return false;
+			}
 
-			if(result && (_names != null && _names.Length > 0))
-				result &= _names.Contains(context.Name, StringComparer.OrdinalIgnoreCase);
+			if(_names != null && _names.Length > 0)
+				return Array.Exists(_names, name => context.Name.EndsWith(name, StringComparison.OrdinalIgnoreCase));
 
-			return result;
+			return true;
 		}
 
 		bool Zongsoft.Services.IPredication.Predicate(object parameter)
@@ -244,6 +270,50 @@ namespace Zongsoft.Data
 				return false;
 			else
 				return this.Predicate(context);
+		}
+		#endregion
+
+		#region 静态方法
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		private static int GetFlag(DataAccessMethod method)
+		{
+			return (int)Math.Pow(2, (int)method);
+		}
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		private static int GetFlags(IEnumerable<DataAccessMethod> methods)
+		{
+			if(methods == null)
+				return 0;
+
+			int flags = 0;
+
+			foreach(var method in methods)
+			{
+				flags |= (int)Math.Pow(2, (int)method);
+			}
+
+			return flags;
+		}
+
+		private static string[] GetNames(Type[] types)
+		{
+			if(types == null || types.Length == 0)
+				return null;
+
+			var names = new List<string>(types.Length);
+
+			for(int i = 0; i < types.Length; i++)
+			{
+				var name = DataAccessNaming.GetName(types[i]);
+
+				if(!string.IsNullOrEmpty(name))
+					names.Add(name);
+			}
+
+			names.Sort();
+
+			return names.ToArray();
 		}
 		#endregion
 	}
