@@ -696,18 +696,26 @@ namespace Zongsoft.Reflection
 				return;
 			}
 
-			switch(memberInfo.MemberType)
+			try
 			{
-				case MemberTypes.Field:
-					((FieldInfo)memberInfo).SetValue(owner, valueFactory());
-					break;
-				case MemberTypes.Property:
-					((PropertyInfo)memberInfo).SetValue(owner, valueFactory());
-					break;
-				default:
-					if(throwsOnError)
-						throw new InvalidOperationException($"Dont support set value of '{member}' member in the '{type}' type.");
-					return;
+				switch(memberInfo.MemberType)
+				{
+					case MemberTypes.Field:
+						((FieldInfo)memberInfo).SetValue(owner, valueFactory());
+						break;
+					case MemberTypes.Property:
+						((PropertyInfo)memberInfo).SetValue(owner, valueFactory());
+						break;
+					default:
+						if(throwsOnError)
+							throw new InvalidOperationException($"Dont support set value of '{member}' member in the '{type}' type.");
+						return;
+				}
+			}
+			catch
+			{
+				if(throwsOnError)
+					throw;
 			}
 		}
 
