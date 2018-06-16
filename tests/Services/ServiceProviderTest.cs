@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 using Xunit;
 
@@ -15,11 +13,11 @@ namespace Zongsoft.Services.Tests
 
 		public ServiceProviderTest()
 		{
-			_provider1 = new ServiceProvider();
-			_provider2 = new ServiceProvider();
-			_provider3 = new ServiceProvider();
+			_provider1 = new ServiceProvider("ServiceProvider#1");
+			_provider2 = new ServiceProvider("ServiceProvider#2");
+			_provider3 = new ServiceProvider("ServiceProvider#3");
 
-			ServiceProviderFactory.Instance.Default = new ServiceProvider();
+			ServiceProviderFactory.Instance.Default = new ServiceProvider("Default");
 			ServiceProviderFactory.Instance.Default.Register("string", "I'm a service.");
 
 			_provider1.Register("MC1", new Zongsoft.Runtime.Caching.MemoryCache("MemoryCache-1"), typeof(Zongsoft.Runtime.Caching.ICache));

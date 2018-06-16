@@ -41,26 +41,34 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 成员字段
+		private string _name;
 		private IServiceStorage _storage;
 		private IServiceBuilder _builder;
 		#endregion
 
 		#region 构造函数
-		protected ServiceProviderBase()
+		protected ServiceProviderBase(string name)
 		{
+			_name = string.IsNullOrEmpty(name) ? string.Empty : name.Trim();
 		}
 
-		protected ServiceProviderBase(IServiceStorage storage, IServiceBuilder builder = null)
+		protected ServiceProviderBase(string name, IServiceStorage storage, IServiceBuilder builder = null)
 		{
-			if(storage == null)
-				throw new ArgumentNullException("storage");
-
-			_storage = storage;
+			_name = string.IsNullOrEmpty(name) ? string.Empty : name.Trim();
+			_storage = storage ?? throw new ArgumentNullException(nameof(storage));
 			_builder = builder;
 		}
 		#endregion
 
 		#region 公共属性
+		public string Name
+		{
+			get
+			{
+				return _name;
+			}
+		}
+
 		public IServiceBuilder Builder
 		{
 			get
@@ -81,10 +89,7 @@ namespace Zongsoft.Services
 			}
 			protected set
 			{
-				if(value == null)
-					throw new ArgumentNullException();
-
-				_storage = value;
+				_storage = value ?? throw new ArgumentNullException();
 			}
 		}
 		#endregion

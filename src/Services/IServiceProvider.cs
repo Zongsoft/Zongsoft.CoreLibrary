@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2016 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -37,6 +37,17 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 属性定义
+		/// <summary>
+		/// 获取服务提供程序的名字。
+		/// </summary>
+		string Name
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取服务提供程序的存储器。
+		/// </summary>
 		IServiceStorage Storage
 		{
 			get;
