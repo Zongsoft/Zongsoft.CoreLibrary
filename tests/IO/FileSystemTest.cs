@@ -7,11 +7,6 @@ namespace Zongsoft.IO
 {
 	public class FileSystemTest
 	{
-		public FileSystemTest()
-		{
-			FileSystem.Providers.Register(LocalFileSystem.Instance, typeof(IFileSystem));
-		}
-
 		[Fact]
 		public void DirectoryCreate()
 		{

@@ -32,7 +32,6 @@ using System.Text.RegularExpressions;
 
 namespace Zongsoft.IO
 {
-	[Zongsoft.Collections.Matcher(typeof(FileSystem.Matcher))]
 	public class LocalFileSystem : IFileSystem
 	{
 		#region 单例字段

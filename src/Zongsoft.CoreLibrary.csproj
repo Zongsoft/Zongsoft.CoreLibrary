@@ -573,6 +573,12 @@
     <Compile Include="Transitions\StateVector.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\LICENSE">
+      <Link>LICENSE</Link>
+    </None>
+    <None Include="..\README.md">
+      <Link>README.md</Link>
+    </None>
     <None Include="Options\Option.option">
       <SubType>Designer</SubType>
     </None>

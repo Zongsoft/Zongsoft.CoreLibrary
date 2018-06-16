@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2014-2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2014-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -36,7 +36,7 @@ namespace Zongsoft.IO
 		#region 成员字段
 		private static readonly IFile _file;
 		private static readonly IDirectory _directory;
-		private static Zongsoft.Services.IServiceProvider _providers;
+		private static readonly Collections.INamedCollection<IFileSystem> _providers;
 		private static string _scheme;
 		#endregion
 
@@ -45,6 +45,10 @@ namespace Zongsoft.IO
 		{
 			_file = new FileProvider();
 			_directory = new DirectoryProvider();
+			_providers = new Collections.NamedCollection<IFileSystem>(p => p.Scheme, StringComparer.OrdinalIgnoreCase);
+
+			//默认将本地文件系统加入到提供程序集合中
+			_providers.Add(LocalFileSystem.Instance);
 		}
 		#endregion
 
@@ -72,23 +76,13 @@ namespace Zongsoft.IO
 		}
 
 		/// <summary>
-		/// 获取或设置一个服务容器，该容器包含文件系统提供程序。
+		/// 获取文件系统提供程序集。
 		/// </summary>
-		public static Zongsoft.Services.IServiceProvider Providers
+		public static ICollection<IFileSystem> Providers
 		{
 			get
 			{
-				if(_providers == null)
-					System.Threading.Interlocked.CompareExchange(ref _providers, new Zongsoft.Services.ServiceProvider(), null);
-
 				return _providers;
-			}
-			set
-			{
-				if(value == null)
-					throw new ArgumentNullException();
-
-				_providers = value;
 			}
 		}
 
@@ -131,16 +125,6 @@ namespace Zongsoft.IO
 			//设置输出参数的默认值
 			path = null;
 
-			var providers = _providers;
-
-			if(providers == null)
-			{
-				if(throwException)
-					throw new InvalidOperationException("The value of 'Providers' property is null.");
-
-				return null;
-			}
-
 			//解析路径文本
 			path = Path.Parse(text, throwException);
 
@@ -159,13 +143,13 @@ namespace Zongsoft.IO
 					return LocalFileSystem.Instance;
 			}
 
-			//根据文件系统模式从服务容器中获得对应的文件系统提供程序
-			var fileSystem = providers.Resolve<IFileSystem>(scheme);
+			//尝试获取对应的文件系统提供程序
+			_providers.TryGet(scheme, out var fileSystem);
 
 			if(fileSystem == null)
 			{
 				if(throwException)
-					throw new InvalidOperationException(string.Format("Can not obtain the File or Directory provider by the '{0}'.", text));
+					throw new IOException($"Can not obtain the File or Directory provider by the '{text}'.");
 
 				return null;
 			}
@@ -215,23 +199,6 @@ namespace Zongsoft.IO
 			}
 
 			return result;
-		}
-		#endregion
-
-		#region 匹配器类
-		public class Matcher : Zongsoft.Collections.IMatcher<string>
-		{
-			public bool Match(object target, string parameter)
-			{
-				var fileSystem = target as IFileSystem;
-				return fileSystem != null && string.Equals(fileSystem.Scheme, parameter, StringComparison.OrdinalIgnoreCase);
-			}
-
-			bool Zongsoft.Collections.IMatcher.Match(object target, object parameter)
-			{
-				var fileSystem = target as IFileSystem;
-				return fileSystem != null && string.Equals(fileSystem.Scheme, (parameter as string), StringComparison.OrdinalIgnoreCase);
-			}
 		}
 		#endregion
 
