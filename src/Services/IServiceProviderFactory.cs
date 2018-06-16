@@ -25,16 +25,14 @@
  */
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Zongsoft.Services
 {
 	/// <summary>
 	/// 提供关于服务供应程序容器的功能。
 	/// </summary>
-	public interface IServiceProviderFactory
+	public interface IServiceProviderFactory : ICollection<IServiceProvider>
 	{
 		/// <summary>
 		/// 获取或设置默认的服务供应程序。

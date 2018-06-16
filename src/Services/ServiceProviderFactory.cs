@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -26,13 +26,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Concurrent;
-using System.Linq;
-using System.Text;
 
 namespace Zongsoft.Services
 {
-	public class ServiceProviderFactory : IServiceProviderFactory, IEnumerable<KeyValuePair<string, IServiceProvider>>
+	public class ServiceProviderFactory : IServiceProviderFactory, ICollection<IServiceProvider>
 	{
 		#region 单例字段
 		private static ServiceProviderFactory _instance;
@@ -40,18 +37,20 @@ namespace Zongsoft.Services
 
 		#region 成员字段
 		private string _defaultName;
-		private ConcurrentDictionary<string, IServiceProvider> _providers;
+		private readonly IDictionary<string, IServiceProvider> _providers;
 		#endregion
 
 		#region 构造函数
-		protected ServiceProviderFactory() : this(string.Empty)
+		protected ServiceProviderFactory()
 		{
+			_defaultName = string.Empty;
+			_providers = new Dictionary<string, IServiceProvider>(StringComparer.OrdinalIgnoreCase);
 		}
 
 		protected ServiceProviderFactory(string defaultName)
 		{
 			_defaultName = string.IsNullOrWhiteSpace(defaultName) ? string.Empty : defaultName.Trim();
-			_providers = new ConcurrentDictionary<string, IServiceProvider>(StringComparer.OrdinalIgnoreCase);
+			_providers = new Dictionary<string, IServiceProvider>(StringComparer.OrdinalIgnoreCase);
 		}
 		#endregion
 
@@ -92,7 +91,10 @@ namespace Zongsoft.Services
 				if(value == null)
 					throw new ArgumentNullException();
 
-				this.Register(_defaultName, value);
+				this.Register(value);
+
+				//更新默认服务名字
+				_defaultName = value.Name;
 			}
 		}
 		#endregion
@@ -108,35 +110,33 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 公共方法
-		public void Register(string name, IServiceProvider provider)
-		{
-			this.Register(name, provider, true);
-		}
-
-		public bool Register(string name, IServiceProvider provider, bool replaceOnExists)
+		public void Register(IServiceProvider provider)
 		{
 			if(provider == null)
-				throw new ArgumentNullException("provider");
+				throw new ArgumentNullException(nameof(provider));
 
-			name = string.IsNullOrWhiteSpace(name) ? string.Empty : name.Trim();
+			_providers[provider.Name ?? string.Empty] = provider;
+		}
+
+		public void Register(IServiceProvider provider, bool replaceOnExists)
+		{
+			if(provider == null)
+				throw new ArgumentNullException(nameof(provider));
 
 			if(replaceOnExists)
-				_providers.AddOrUpdate(name, provider, (_, __) => provider);
+				_providers[provider.Name ?? string.Empty] = provider;
 			else
-				return _providers.TryAdd(name, provider);
-
-			//返回成功
-			return true;
+				_providers.Add(provider.Name ?? string.Empty, provider);
 		}
 
 		/// <summary>
 		/// 注销服务供应程序。
 		/// </summary>
 		/// <param name="name">要注销服务供应程序的名称。</param>
-		public void Unregister(string name)
+		/// <returns>如果注销成功则返回真(True)，否则返回假(False)。</returns>
+		public bool Unregister(string name)
 		{
-			IServiceProvider temp;
-			_providers.TryRemove(string.IsNullOrWhiteSpace(name) ? string.Empty : name.Trim(), out temp);
+			return _providers.Remove(name ?? string.Empty);
 		}
 
 		/// <summary>
@@ -148,7 +148,7 @@ namespace Zongsoft.Services
 		{
 			IServiceProvider result;
 
-			if(_providers.TryGetValue(string.IsNullOrWhiteSpace(name) ? string.Empty : name.Trim(), out result))
+			if(_providers.TryGetValue(name ?? string.Empty, out result))
 				return result;
 
 			return null;
@@ -156,14 +156,47 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 显式实现
-		IEnumerator<KeyValuePair<string, IServiceProvider>> IEnumerable<KeyValuePair<string, IServiceProvider>>.GetEnumerator()
+		bool ICollection<IServiceProvider>.IsReadOnly
 		{
-			return _providers.GetEnumerator();
+			get
+			{
+				return false;
+			}
+		}
+
+		void ICollection<IServiceProvider>.Add(IServiceProvider item)
+		{
+			_providers.Add(item.Name ?? string.Empty, item);
+		}
+
+		void ICollection<IServiceProvider>.Clear()
+		{
+			_providers.Clear();
+		}
+
+		bool ICollection<IServiceProvider>.Contains(IServiceProvider item)
+		{
+			return _providers.ContainsKey(item.Name ?? string.Empty);
+		}
+
+		void ICollection<IServiceProvider>.CopyTo(IServiceProvider[] array, int arrayIndex)
+		{
+			_providers.Values.CopyTo(array, arrayIndex);
+		}
+
+		bool ICollection<IServiceProvider>.Remove(IServiceProvider item)
+		{
+			return _providers.Remove(item.Name ?? string.Empty);
+		}
+
+		IEnumerator<IServiceProvider> IEnumerable<IServiceProvider>.GetEnumerator()
+		{
+			return _providers.Values.GetEnumerator();
 		}
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 		{
-			return _providers.GetEnumerator();
+			return _providers.Values.GetEnumerator();
 		}
 		#endregion
 	}
