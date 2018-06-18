@@ -29,14 +29,14 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Services
 {
-	public class ServiceEntry
+	public class ServiceEntry : IEquatable<ServiceEntry>
 	{
 		#region 私有变量
 		private readonly object _syncRoot = new object();
 		#endregion
 
 		#region 成员字段
-		private string _name;
+		private readonly string _name;
 		private object _service;
 		private Type _serviceType;
 		private Type[] _contractTypes;
@@ -51,16 +51,21 @@ namespace Zongsoft.Services
 		{
 		}
 
+		protected ServiceEntry(string name)
+		{
+			if(string.IsNullOrWhiteSpace(name))
+				throw new ArgumentNullException(nameof(name));
+
+			_name = name.Trim();
+		}
+
 		public ServiceEntry(string name, object service, Type[] contractTypes, object userToken = null)
 		{
 			if(string.IsNullOrWhiteSpace(name))
-				throw new ArgumentNullException("name");
-
-			if(service == null)
-				throw new ArgumentNullException("service");
+				throw new ArgumentNullException(nameof(name));
 
 			_name = name.Trim();
-			_service = service;
+			_service = service ?? throw new ArgumentNullException(nameof(service));
 			_serviceType = service.GetType();
 			_contractTypes = contractTypes;
 			_userToken = userToken;
@@ -69,23 +74,17 @@ namespace Zongsoft.Services
 		public ServiceEntry(string name, Type serviceType, Type[] contractTypes, object userToken = null)
 		{
 			if(string.IsNullOrWhiteSpace(name))
-				throw new ArgumentNullException("name");
-
-			if(serviceType == null)
-				throw new ArgumentNullException("serviceType");
+				throw new ArgumentNullException(nameof(name));
 
 			_name = name.Trim();
-			_serviceType = serviceType;
+			_serviceType = serviceType ?? throw new ArgumentNullException(nameof(serviceType));
 			_contractTypes = contractTypes;
 			_userToken = userToken;
 		}
 
 		public ServiceEntry(object service, Type[] contractTypes, object userToken = null)
 		{
-			if(service == null)
-				throw new ArgumentNullException("service");
-
-			_service = service;
+			_service = service ?? throw new ArgumentNullException(nameof(service));
 			_serviceType = service.GetType();
 			_contractTypes = contractTypes;
 			_userToken = userToken;
@@ -93,17 +92,14 @@ namespace Zongsoft.Services
 
 		public ServiceEntry(Type serviceType, Type[] contractTypes, object userToken = null)
 		{
-			if(serviceType == null)
-				throw new ArgumentNullException("serviceType");
-
-			_serviceType = serviceType;
+			_serviceType = serviceType ?? throw new ArgumentNullException(nameof(serviceType));
 			_contractTypes = contractTypes;
 			_userToken = userToken;
 		}
 		#endregion
 
 		#region 公共属性
-		public virtual string Name
+		public string Name
 		{
 			get
 			{
@@ -111,23 +107,18 @@ namespace Zongsoft.Services
 			}
 		}
 
-		public virtual Type ServiceType
+		public Type ServiceType
 		{
 			get
 			{
 				if(_serviceType == null)
-				{
-					object instance = this.Service;
-
-					if(instance != null)
-						_serviceType = instance.GetType();
-				}
+					_serviceType = this.GetServiceType();
 
 				return _serviceType;
 			}
 		}
 
-		public virtual object Service
+		public object Service
 		{
 			get
 			{
@@ -222,7 +213,18 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 虚拟方法
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
+		/// <summary>
+		/// 获取当前服务的类型。
+		/// </summary>
+		/// <returns>返回当前的服务类型。</returns>
+		/// <remarks>
+		///		<para>注意：实现者不应该在该方法内调用<see cref="CreateService()"/>方法或获取<see cref="Service"/>属性值，否则可能会引发程序死锁（StackOverflow）。</para>
+		/// </remarks>
+		protected virtual Type GetServiceType()
+		{
+			return _serviceType;
+		}
+
 		protected virtual object CreateService()
 		{
 			var builder = _builder;
@@ -237,28 +239,25 @@ namespace Zongsoft.Services
 				return instance;
 			}
 
-			var type = _serviceType;
+			var serviceType = _serviceType ?? this.GetServiceType();
 
-			if(type != null)
-				return Activator.CreateInstance(type);
+			if(serviceType != null)
+				return Activator.CreateInstance(serviceType);
 
 			return null;
 		}
 		#endregion
 
 		#region 重写方法
-		public override string ToString()
+		public bool Equals(ServiceEntry other)
 		{
-			if(string.IsNullOrWhiteSpace(this.Name))
-				return this.ServiceType.FullName;
-			else
-				return string.Format("{0} ({1})", this.Name, this.ServiceType.FullName);
-		}
+			if(other == null)
+				return false;
 
-		public override int GetHashCode()
-		{
-			var instance = this.Service;
-			return instance == null ? 0 : instance.GetHashCode();
+			if(string.IsNullOrEmpty(_name))
+				return this.ServiceType == other.ServiceType;
+			else
+				return string.Equals(_name, other.Name);
 		}
 
 		public override bool Equals(object obj)
@@ -266,7 +265,26 @@ namespace Zongsoft.Services
 			if(obj == null || obj.GetType() != typeof(ServiceEntry))
 				return false;
 
-			return object.ReferenceEquals(this.Service, ((ServiceEntry)obj).Service);
+			return this.Equals(obj as ServiceEntry);
+		}
+
+		public override int GetHashCode()
+		{
+			if(string.IsNullOrEmpty(_name))
+			{
+				var serviceType = this.ServiceType;
+				return serviceType == null ? 0 : serviceType.GetHashCode();
+			}
+
+			return _name.GetHashCode();
+		}
+
+		public override string ToString()
+		{
+			if(string.IsNullOrEmpty(_name))
+				return this.ServiceType.FullName;
+			else
+				return $"{_name} ({this.ServiceType.FullName})";
 		}
 		#endregion
 	}

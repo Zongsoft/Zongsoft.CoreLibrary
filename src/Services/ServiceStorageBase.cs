@@ -129,12 +129,6 @@ namespace Zongsoft.Services
 			return entry;
 		}
 
-		public abstract void Add(ServiceEntry entry);
-
-		public abstract void Clear();
-
-		public abstract ServiceEntry Remove(string name);
-
 		public virtual ServiceEntry Get(string name)
 		{
 			if(string.IsNullOrWhiteSpace(name))
@@ -143,11 +137,16 @@ namespace Zongsoft.Services
 			//从当前容器及其外链容器中查找指定名称的服务
 			var result = this.Find(name, new List<IServiceStorage>(new[] { this }));
 
-			//如果上面的查找失败，则尝试从默认服务容器及其外链容器中查找指定名称的服务
-			if(result == null && ServiceProviderFactory.Instance.Default != null && !object.ReferenceEquals(ServiceProviderFactory.Instance.Default, this))
-				result = this.Find(name, new List<IServiceStorage>(new[] { ServiceProviderFactory.Instance.Default.Storage }));
+			//如果查找成功，则返回找到的服务项
+			if(result != null)
+				return result;
 
-			return result;
+			//如果上面的查找失败，则尝试从默认服务容器及其外链容器中查找指定名称的服务
+			if(ServiceProviderFactory.Instance.Default != null && !object.ReferenceEquals(ServiceProviderFactory.Instance.Default, _provider))
+				return this.Find(name, new List<IServiceStorage>(new[] { ServiceProviderFactory.Instance.Default.Storage }));
+
+			//返回查找失败
+			return null;
 		}
 
 		public virtual ServiceEntry Get(Type type, object parameter = null)
@@ -161,22 +160,11 @@ namespace Zongsoft.Services
 		}
 		#endregion
 
-		#region 匹配方法
-		protected virtual bool OnMatch(ServiceEntry entry, object parameter)
-		{
-			if(entry == null)
-				return false;
-
-			var matcher = this.Matcher ?? Zongsoft.Collections.Matcher.Default;
-			return matcher.Match(entry.Service, parameter);
-		}
-		#endregion
-
 		#region 查找方法
-		protected virtual object Find(Type type, object parameter, bool isMultiplex)
+		private object Find(Type type, object parameter, bool isMultiplex)
 		{
 			//从当前容器及其外链容器中查找指定类型的服务
-			var result = Find(type, parameter, isMultiplex, new List<IServiceStorage>(new[] { this }));
+			var result = this.Find(type, parameter, isMultiplex, new List<IServiceStorage>(new[] { this }));
 
 			var succeed = result != null;
 
@@ -187,7 +175,7 @@ namespace Zongsoft.Services
 			}
 
 			//如果上面的查找失败，则尝试从默认服务容器及其外链容器中查找指定名称的服务
-			if(!succeed && ServiceProviderFactory.Instance.Default != null && !object.ReferenceEquals(ServiceProviderFactory.Instance.Default, this))
+			if(!succeed && ServiceProviderFactory.Instance.Default != null && !object.ReferenceEquals(ServiceProviderFactory.Instance.Default, _provider))
 				result = this.Find(type, parameter, isMultiplex, new List<IServiceStorage>(new[] { ServiceProviderFactory.Instance.Default.Storage }));
 
 			return result;
@@ -321,6 +309,25 @@ namespace Zongsoft.Services
 			//返回空(查找失败)
 			return null;
 		}
+		#endregion
+
+		#region 匹配方法
+		protected virtual bool OnMatch(ServiceEntry entry, object parameter)
+		{
+			if(entry == null)
+				return false;
+
+			var matcher = this.Matcher ?? Zongsoft.Collections.Matcher.Default;
+			return matcher.Match(entry.Service, parameter);
+		}
+		#endregion
+
+		#region 抽象方法
+		public abstract void Add(ServiceEntry entry);
+
+		public abstract void Clear();
+
+		public abstract ServiceEntry Remove(string name);
 		#endregion
 
 		#region 枚举遍历

@@ -60,7 +60,7 @@ namespace Zongsoft.Services
 		}
 		#endregion
 
-		#region 公共方法
+		#region 重写方法
 		public override void Add(ServiceEntry entry)
 		{
 			if(entry == null)
