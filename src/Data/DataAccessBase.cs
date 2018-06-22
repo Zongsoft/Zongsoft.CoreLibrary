@@ -163,7 +163,7 @@ namespace Zongsoft.Data
 			this.InvokeFilters(context, (filter, ctx) => filter.OnFiltering(ctx));
 
 			//执行数据操作方法
-			this.OnExecute<T>(context);
+			this.OnExecute(context);
 
 			//调用数据访问过滤器后事件
 			this.InvokeFilters(context, (filter, ctx) => filter.OnFiltered(ctx));
@@ -220,7 +220,7 @@ namespace Zongsoft.Data
 			this.InvokeFilters(context, (filter, ctx) => filter.OnFiltering(ctx));
 
 			//执行数据操作方法
-			this.OnExecuteScalar(context);
+			this.OnExecute(context);
 
 			//调用数据访问过滤器后事件
 			this.InvokeFilters(context, (filter, ctx) => filter.OnFiltered(ctx));
@@ -239,8 +239,7 @@ namespace Zongsoft.Data
 			return context.Result;
 		}
 
-		protected abstract void OnExecute<T>(DataExecuteContext context);
-		protected abstract void OnExecuteScalar(DataExecuteContext context);
+		protected abstract void OnExecute(DataExecuteContext context);
 		#endregion
 
 		#region 存在方法
