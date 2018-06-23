@@ -28,10 +28,10 @@ using System;
 
 namespace Zongsoft.Data
 {
-	public class DataIncrementedEventArgs : DataAccessEventArgs<DataIncrementContext>
+	public class DataIncrementedEventArgs : DataAccessEventArgs<DataIncrementContextBase>
 	{
 		#region 构造函数
-		public DataIncrementedEventArgs(DataIncrementContext context) : base(context)
+		public DataIncrementedEventArgs(DataIncrementContextBase context) : base(context)
 		{
 		}
 		#endregion

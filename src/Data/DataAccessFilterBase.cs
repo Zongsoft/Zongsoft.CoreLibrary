@@ -97,31 +97,31 @@ namespace Zongsoft.Data
 			switch(context.Method)
 			{
 				case DataAccessMethod.Count:
-					this.OnCounted((DataCountContext)context);
+					this.OnCounted((DataCountContextBase)context);
 					break;
 				case DataAccessMethod.Execute:
-					this.OnExecuted((DataExecuteContext)context);
+					this.OnExecuted((DataExecuteContextBase)context);
 					break;
 				case DataAccessMethod.Exists:
-					this.OnExisted((DataExistContext)context);
+					this.OnExisted((DataExistContextBase)context);
 					break;
 				case DataAccessMethod.Increment:
-					this.OnIncremented((DataIncrementContext)context);
+					this.OnIncremented((DataIncrementContextBase)context);
 					break;
 				case DataAccessMethod.Select:
-					this.OnSelected((DataSelectContext)context);
+					this.OnSelected((DataSelectContextBase)context);
 					break;
 				case DataAccessMethod.Delete:
-					this.OnDeleted((DataDeleteContext)context);
+					this.OnDeleted((DataDeleteContextBase)context);
 					break;
 				case DataAccessMethod.Insert:
-					this.OnInserted((DataInsertContext)context);
+					this.OnInserted((DataInsertContextBase)context);
 					break;
 				case DataAccessMethod.Update:
-					this.OnUpdated((DataUpdateContext)context);
+					this.OnUpdated((DataUpdateContextBase)context);
 					break;
 				case DataAccessMethod.Upsert:
-					this.OnUpserted((DataUpsertContext)context);
+					this.OnUpserted((DataUpsertContextBase)context);
 					break;
 			}
 		}
@@ -131,31 +131,31 @@ namespace Zongsoft.Data
 			switch(context.Method)
 			{
 				case DataAccessMethod.Count:
-					this.OnCounting((DataCountContext)context);
+					this.OnCounting((DataCountContextBase)context);
 					break;
 				case DataAccessMethod.Execute:
-					this.OnExecuting((DataExecuteContext)context);
+					this.OnExecuting((DataExecuteContextBase)context);
 					break;
 				case DataAccessMethod.Exists:
-					this.OnExisting((DataExistContext)context);
+					this.OnExisting((DataExistContextBase)context);
 					break;
 				case DataAccessMethod.Increment:
-					this.OnIncrementing((DataIncrementContext)context);
+					this.OnIncrementing((DataIncrementContextBase)context);
 					break;
 				case DataAccessMethod.Select:
-					this.OnSelecting((DataSelectContext)context);
+					this.OnSelecting((DataSelectContextBase)context);
 					break;
 				case DataAccessMethod.Delete:
-					this.OnDeleting((DataDeleteContext)context);
+					this.OnDeleting((DataDeleteContextBase)context);
 					break;
 				case DataAccessMethod.Insert:
-					this.OnInserting((DataInsertContext)context);
+					this.OnInserting((DataInsertContextBase)context);
 					break;
 				case DataAccessMethod.Update:
-					this.OnUpdating((DataUpdateContext)context);
+					this.OnUpdating((DataUpdateContextBase)context);
 					break;
 				case DataAccessMethod.Upsert:
-					this.OnUpserting((DataUpsertContext)context);
+					this.OnUpserting((DataUpsertContextBase)context);
 					break;
 			}
 		}
@@ -172,75 +172,75 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 虚拟方法
-		protected virtual void OnCounting(DataCountContext context)
+		protected virtual void OnCounting(DataCountContextBase context)
 		{
 		}
 
-		protected virtual void OnCounted(DataCountContext context)
+		protected virtual void OnCounted(DataCountContextBase context)
 		{
 		}
 
-		protected virtual void OnExecuting(DataExecuteContext context)
+		protected virtual void OnExecuting(DataExecuteContextBase context)
 		{
 		}
 
-		protected virtual void OnExecuted(DataExecuteContext context)
+		protected virtual void OnExecuted(DataExecuteContextBase context)
 		{
 		}
 
-		protected virtual void OnExisting(DataExistContext context)
+		protected virtual void OnExisting(DataExistContextBase context)
 		{
 		}
 
-		protected virtual void OnExisted(DataExistContext context)
+		protected virtual void OnExisted(DataExistContextBase context)
 		{
 		}
 
-		protected virtual void OnIncrementing(DataIncrementContext context)
+		protected virtual void OnIncrementing(DataIncrementContextBase context)
 		{
 		}
 
-		protected virtual void OnIncremented(DataIncrementContext context)
+		protected virtual void OnIncremented(DataIncrementContextBase context)
 		{
 		}
 
-		protected virtual void OnSelecting(DataSelectContext context)
+		protected virtual void OnSelecting(DataSelectContextBase context)
 		{
 		}
 
-		protected virtual void OnSelected(DataSelectContext context)
+		protected virtual void OnSelected(DataSelectContextBase context)
 		{
 		}
 
-		protected virtual void OnDeleting(DataDeleteContext context)
+		protected virtual void OnDeleting(DataDeleteContextBase context)
 		{
 		}
 
-		protected virtual void OnDeleted(DataDeleteContext context)
+		protected virtual void OnDeleted(DataDeleteContextBase context)
 		{
 		}
 
-		protected virtual void OnInserting(DataInsertContext context)
+		protected virtual void OnInserting(DataInsertContextBase context)
 		{
 		}
 
-		protected virtual void OnInserted(DataInsertContext context)
+		protected virtual void OnInserted(DataInsertContextBase context)
 		{
 		}
 
-		protected virtual void OnUpdating(DataUpdateContext context)
+		protected virtual void OnUpdating(DataUpdateContextBase context)
 		{
 		}
 
-		protected virtual void OnUpdated(DataUpdateContext context)
+		protected virtual void OnUpdated(DataUpdateContextBase context)
 		{
 		}
 
-		protected virtual void OnUpserting(DataUpsertContext context)
+		protected virtual void OnUpserting(DataUpsertContextBase context)
 		{
 		}
 
-		protected virtual void OnUpserted(DataUpsertContext context)
+		protected virtual void OnUpserted(DataUpsertContextBase context)
 		{
 		}
 		#endregion

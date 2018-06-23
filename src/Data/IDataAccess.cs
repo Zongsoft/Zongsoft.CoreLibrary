@@ -96,82 +96,82 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 执行方法
-		IEnumerable<T> Execute<T>(string name, IDictionary<string, object> inParameters, object state = null, Func<DataExecuteContext, bool> executing = null, Action<DataExecuteContext> executed = null);
-		IEnumerable<T> Execute<T>(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters, object state = null, Func<DataExecuteContext, bool> executing = null, Action<DataExecuteContext> executed = null);
+		IEnumerable<T> Execute<T>(string name, IDictionary<string, object> inParameters, object state = null, Func<DataExecuteContextBase, bool> executing = null, Action<DataExecuteContextBase> executed = null);
+		IEnumerable<T> Execute<T>(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters, object state = null, Func<DataExecuteContextBase, bool> executing = null, Action<DataExecuteContextBase> executed = null);
 
-		object ExecuteScalar(string name, IDictionary<string, object> inParameters, object state = null, Func<DataExecuteContext, bool> executing = null, Action<DataExecuteContext> executed = null);
-		object ExecuteScalar(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters, object state = null, Func<DataExecuteContext, bool> executing = null, Action<DataExecuteContext> executed = null);
+		object ExecuteScalar(string name, IDictionary<string, object> inParameters, object state = null, Func<DataExecuteContextBase, bool> executing = null, Action<DataExecuteContextBase> executed = null);
+		object ExecuteScalar(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters, object state = null, Func<DataExecuteContextBase, bool> executing = null, Action<DataExecuteContextBase> executed = null);
 		#endregion
 
 		#region 存在方法
-		bool Exists<T>(ICondition condition, object state = null, Func<DataExistContext, bool> existing = null, Action<DataExistContext> existed = null);
-		bool Exists(string name, ICondition condition, object state = null, Func<DataExistContext, bool> existing = null, Action<DataExistContext> existed = null);
+		bool Exists<T>(ICondition condition, object state = null, Func<DataExistContextBase, bool> existing = null, Action<DataExistContextBase> existed = null);
+		bool Exists(string name, ICondition condition, object state = null, Func<DataExistContextBase, bool> existing = null, Action<DataExistContextBase> existed = null);
 		#endregion
 
 		#region 计数方法
 		int Count<T>(ICondition condition);
 		int Count<T>(ICondition condition, object state);
 		int Count<T>(ICondition condition, string includes);
-		int Count<T>(ICondition condition, string includes, object state, Func<DataCountContext, bool> counting = null, Action<DataCountContext> counted = null);
+		int Count<T>(ICondition condition, string includes, object state, Func<DataCountContextBase, bool> counting = null, Action<DataCountContextBase> counted = null);
 
 		int Count(string name, ICondition condition);
 		int Count(string name, ICondition condition, object state);
 		int Count(string name, ICondition condition, string includes);
-		int Count(string name, ICondition condition, string includes, object state, Func<DataCountContext, bool> counting = null, Action<DataCountContext> counted = null);
+		int Count(string name, ICondition condition, string includes, object state, Func<DataCountContextBase, bool> counting = null, Action<DataCountContextBase> counted = null);
 		#endregion
 
 		#region 递增方法
 		long Increment<T>(string member, ICondition condition);
 		long Increment<T>(string member, ICondition condition, object state);
 		long Increment<T>(string member, ICondition condition, int interval);
-		long Increment<T>(string member, ICondition condition, int interval, object state, Func<DataIncrementContext, bool> incrementing = null, Action<DataIncrementContext> incremented = null);
+		long Increment<T>(string member, ICondition condition, int interval, object state, Func<DataIncrementContextBase, bool> incrementing = null, Action<DataIncrementContextBase> incremented = null);
 
 		long Increment(string name, string member, ICondition condition);
 		long Increment(string name, string member, ICondition condition, object state);
 		long Increment(string name, string member, ICondition condition, int interval);
-		long Increment(string name, string member, ICondition condition, int interval, object state, Func<DataIncrementContext, bool> incrementing = null, Action<DataIncrementContext> incremented = null);
+		long Increment(string name, string member, ICondition condition, int interval, object state, Func<DataIncrementContextBase, bool> incrementing = null, Action<DataIncrementContextBase> incremented = null);
 
 		long Decrement<T>(string member, ICondition condition);
 		long Decrement<T>(string member, ICondition condition, object state);
 		long Decrement<T>(string member, ICondition condition, int interval);
-		long Decrement<T>(string member, ICondition condition, int interval, object state, Func<DataIncrementContext, bool> decrementing = null, Action<DataIncrementContext> decremented = null);
+		long Decrement<T>(string member, ICondition condition, int interval, object state, Func<DataIncrementContextBase, bool> decrementing = null, Action<DataIncrementContextBase> decremented = null);
 
 		long Decrement(string name, string member, ICondition condition);
 		long Decrement(string name, string member, ICondition condition, object state);
 		long Decrement(string name, string member, ICondition condition, int interval);
-		long Decrement(string name, string member, ICondition condition, int interval, object state, Func<DataIncrementContext, bool> decrementing = null, Action<DataIncrementContext> decremented = null);
+		long Decrement(string name, string member, ICondition condition, int interval, object state, Func<DataIncrementContextBase, bool> decrementing = null, Action<DataIncrementContextBase> decremented = null);
 		#endregion
 
 		#region 删除方法
 		int Delete<T>(ICondition condition, params string[] cascades);
 		int Delete<T>(ICondition condition, object state, params string[] cascades);
-		int Delete<T>(ICondition condition, object state, string[] cascades, Func<DataDeleteContext, bool> deleting = null, Action<DataDeleteContext> deleted = null);
+		int Delete<T>(ICondition condition, object state, string[] cascades, Func<DataDeleteContextBase, bool> deleting = null, Action<DataDeleteContextBase> deleted = null);
 
 		int Delete(string name, ICondition condition, params string[] cascades);
 		int Delete(string name, ICondition condition, object state, params string[] cascades);
-		int Delete(string name, ICondition condition, object state, string[] cascades, Func<DataDeleteContext, bool> deleting = null, Action<DataDeleteContext> deleted = null);
+		int Delete(string name, ICondition condition, object state, string[] cascades, Func<DataDeleteContextBase, bool> deleting = null, Action<DataDeleteContextBase> deleted = null);
 		#endregion
 
 		#region 插入方法
 		int Insert<T>(T data);
 		int Insert<T>(T data, object state);
 		int Insert<T>(T data, string scope);
-		int Insert<T>(T data, string scope, object state, Func<DataInsertContext, bool> inserting = null, Action<DataInsertContext> inserted = null);
+		int Insert<T>(T data, string scope, object state, Func<DataInsertContextBase, bool> inserting = null, Action<DataInsertContextBase> inserted = null);
 
 		int Insert(string name, object data);
 		int Insert(string name, object data, object state);
 		int Insert(string name, object data, string scope);
-		int Insert(string name, object data, string scope, object state, Func<DataInsertContext, bool> inserting = null, Action<DataInsertContext> inserted = null);
+		int Insert(string name, object data, string scope, object state, Func<DataInsertContextBase, bool> inserting = null, Action<DataInsertContextBase> inserted = null);
 
 		int InsertMany<T>(IEnumerable<T> items);
 		int InsertMany<T>(IEnumerable<T> items, object state);
 		int InsertMany<T>(IEnumerable<T> items, string scope);
-		int InsertMany<T>(IEnumerable<T> items, string scope, object state, Func<DataInsertContext, bool> inserting = null, Action<DataInsertContext> inserted = null);
+		int InsertMany<T>(IEnumerable<T> items, string scope, object state, Func<DataInsertContextBase, bool> inserting = null, Action<DataInsertContextBase> inserted = null);
 
 		int InsertMany(string name, IEnumerable items);
 		int InsertMany(string name, IEnumerable items, object state);
 		int InsertMany(string name, IEnumerable items, string scope);
-		int InsertMany(string name, IEnumerable items, string scope, object state, Func<DataInsertContext, bool> inserting = null, Action<DataInsertContext> inserted = null);
+		int InsertMany(string name, IEnumerable items, string scope, object state, Func<DataInsertContextBase, bool> inserting = null, Action<DataInsertContextBase> inserted = null);
 		#endregion
 
 		#region 更新方法
@@ -182,7 +182,7 @@ namespace Zongsoft.Data
 		int Update<T>(T data, ICondition condition);
 		int Update<T>(T data, ICondition condition, object state);
 		int Update<T>(T data, ICondition condition, string scope);
-		int Update<T>(T data, ICondition condition, string scope, object state, Func<DataUpdateContext, bool> updating = null, Action<DataUpdateContext> updated = null);
+		int Update<T>(T data, ICondition condition, string scope, object state, Func<DataUpdateContextBase, bool> updating = null, Action<DataUpdateContextBase> updated = null);
 
 		int Update(string name, object data);
 		int Update(string name, object data, object state);
@@ -191,17 +191,17 @@ namespace Zongsoft.Data
 		int Update(string name, object data, ICondition condition);
 		int Update(string name, object data, ICondition condition, object state);
 		int Update(string name, object data, ICondition condition, string scope);
-		int Update(string name, object data, ICondition condition, string scope, object state, Func<DataUpdateContext, bool> updating = null, Action<DataUpdateContext> updated = null);
+		int Update(string name, object data, ICondition condition, string scope, object state, Func<DataUpdateContextBase, bool> updating = null, Action<DataUpdateContextBase> updated = null);
 
 		int UpdateMany<T>(IEnumerable<T> items);
 		int UpdateMany<T>(IEnumerable<T> items, object state);
 		int UpdateMany<T>(IEnumerable<T> items, string scope);
-		int UpdateMany<T>(IEnumerable<T> items, string scope, object state, Func<DataUpdateContext, bool> updating = null, Action<DataUpdateContext> updated = null);
+		int UpdateMany<T>(IEnumerable<T> items, string scope, object state, Func<DataUpdateContextBase, bool> updating = null, Action<DataUpdateContextBase> updated = null);
 
 		int UpdateMany(string name, IEnumerable items);
 		int UpdateMany(string name, IEnumerable items, object state);
 		int UpdateMany(string name, IEnumerable items, string scope);
-		int UpdateMany(string name, IEnumerable items, string scope, object state, Func<DataUpdateContext, bool> updating = null, Action<DataUpdateContext> updated = null);
+		int UpdateMany(string name, IEnumerable items, string scope, object state, Func<DataUpdateContextBase, bool> updating = null, Action<DataUpdateContextBase> updated = null);
 		#endregion
 
 		#region 查询方法
@@ -216,7 +216,7 @@ namespace Zongsoft.Data
 		IEnumerable<T> Select<T>(ICondition condition, string scope, object state, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(ICondition condition, string scope, Paging paging, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(ICondition condition, string scope, Paging paging, object state, params Sorting[] sortings);
-		IEnumerable<T> Select<T>(ICondition condition, string scope, Paging paging, object state, Sorting[] sortings, Func<DataSelectContext, bool> selecting, Action<DataSelectContext> selected);
+		IEnumerable<T> Select<T>(ICondition condition, string scope, Paging paging, object state, Sorting[] sortings, Func<DataSelectContextBase, bool> selecting, Action<DataSelectContextBase> selected);
 
 		IEnumerable<T> Select<T>(string name, object state = null, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(string name, ICondition condition, params Sorting[] sortings);
@@ -229,7 +229,7 @@ namespace Zongsoft.Data
 		IEnumerable<T> Select<T>(string name, ICondition condition, string scope, object state, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(string name, ICondition condition, string scope, Paging paging, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(string name, ICondition condition, string scope, Paging paging, object state, params Sorting[] sortings);
-		IEnumerable<T> Select<T>(string name, ICondition condition, string scope, Paging paging, object state, Sorting[] sortings, Func<DataSelectContext, bool> selecting, Action<DataSelectContext> selected);
+		IEnumerable<T> Select<T>(string name, ICondition condition, string scope, Paging paging, object state, Sorting[] sortings, Func<DataSelectContextBase, bool> selecting, Action<DataSelectContextBase> selected);
 
 		//IEnumerable<T> Select<T, TEntity>(Grouping<TEntity> grouping, ICondition condition = null, params Sorting[] sortings);
 		//IEnumerable<T> Select<T, TEntity>(Grouping<TEntity> grouping, ICondition condition = null, Paging paging = null, params Sorting[] sortings);
@@ -245,7 +245,7 @@ namespace Zongsoft.Data
 		IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, string scope, object state = null, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, Paging paging, object state = null, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, string scope, Paging paging, object state = null, params Sorting[] sortings);
-		IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, string scope, Paging paging, object state, Sorting[] sortings, Func<DataSelectContext, bool> selecting, Action<DataSelectContext> selected);
+		IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, string scope, Paging paging, object state, Sorting[] sortings, Func<DataSelectContextBase, bool> selecting, Action<DataSelectContextBase> selected);
 		#endregion
 	}
 }

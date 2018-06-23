@@ -28,10 +28,10 @@ using System;
 
 namespace Zongsoft.Data
 {
-	public class DataExistedEventArgs : DataAccessEventArgs<DataExistContext>
+	public class DataExistedEventArgs : DataAccessEventArgs<DataExistContextBase>
 	{
 		#region 构造函数
-		public DataExistedEventArgs(DataExistContext context) : base(context)
+		public DataExistedEventArgs(DataExistContextBase context) : base(context)
 		{
 		}
 		#endregion

@@ -39,7 +39,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataCountingEventArgs(DataCountContext context) : base(context)
+		public DataCountingEventArgs(DataCountContextBase context) : base(context)
 		{
 			_cancel = false;
 		}

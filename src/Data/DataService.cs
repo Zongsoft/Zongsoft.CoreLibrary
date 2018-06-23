@@ -900,7 +900,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 激发事件
-		protected virtual void OnGetted(DataSelectContext context)
+		protected virtual void OnGetted(DataSelectContextBase context)
 		{
 			var e = this.Getted;
 
@@ -908,7 +908,7 @@ namespace Zongsoft.Data
 				e(this, new DataGettedEventArgs<TEntity>(context));
 		}
 
-		protected virtual bool OnGetting(DataSelectContext context)
+		protected virtual bool OnGetting(DataSelectContextBase context)
 		{
 			var e = this.Getting;
 
@@ -920,7 +920,7 @@ namespace Zongsoft.Data
 			return args.Cancel;
 		}
 
-		protected virtual void OnCounted(DataCountContext context)
+		protected virtual void OnCounted(DataCountContextBase context)
 		{
 			var e = this.Counted;
 
@@ -928,7 +928,7 @@ namespace Zongsoft.Data
 				e(this, new DataCountedEventArgs(context));
 		}
 
-		protected virtual bool OnCounting(DataCountContext context)
+		protected virtual bool OnCounting(DataCountContextBase context)
 		{
 			var e = this.Counting;
 
@@ -940,7 +940,7 @@ namespace Zongsoft.Data
 			return args.Cancel;
 		}
 
-		protected virtual void OnExecuted(DataExecuteContext context)
+		protected virtual void OnExecuted(DataExecuteContextBase context)
 		{
 			var e = this.Executed;
 
@@ -948,7 +948,7 @@ namespace Zongsoft.Data
 				e(this, new DataExecutedEventArgs(context));
 		}
 
-		protected virtual bool OnExecuting(DataExecuteContext context)
+		protected virtual bool OnExecuting(DataExecuteContextBase context)
 		{
 			var e = this.Executing;
 
@@ -960,7 +960,7 @@ namespace Zongsoft.Data
 			return args.Cancel;
 		}
 
-		protected virtual void OnExisted(DataExistContext context)
+		protected virtual void OnExisted(DataExistContextBase context)
 		{
 			var e = this.Existed;
 
@@ -968,7 +968,7 @@ namespace Zongsoft.Data
 				e(this, new DataExistedEventArgs(context));
 		}
 
-		protected virtual bool OnExisting(DataExistContext context)
+		protected virtual bool OnExisting(DataExistContextBase context)
 		{
 			var e = this.Existing;
 
@@ -980,7 +980,7 @@ namespace Zongsoft.Data
 			return args.Cancel;
 		}
 
-		protected virtual void OnIncremented(DataIncrementContext context)
+		protected virtual void OnIncremented(DataIncrementContextBase context)
 		{
 			var e = this.Incremented;
 
@@ -988,7 +988,7 @@ namespace Zongsoft.Data
 				e(this, new DataIncrementedEventArgs(context));
 		}
 
-		protected virtual bool OnIncrementing(DataIncrementContext context)
+		protected virtual bool OnIncrementing(DataIncrementContextBase context)
 		{
 			var e = this.Incrementing;
 
@@ -1000,7 +1000,7 @@ namespace Zongsoft.Data
 			return args.Cancel;
 		}
 
-		protected virtual void OnDeleted(DataDeleteContext context)
+		protected virtual void OnDeleted(DataDeleteContextBase context)
 		{
 			var e = this.Deleted;
 
@@ -1008,7 +1008,7 @@ namespace Zongsoft.Data
 				e(this, new DataDeletedEventArgs(context));
 		}
 
-		protected virtual bool OnDeleting(DataDeleteContext context)
+		protected virtual bool OnDeleting(DataDeleteContextBase context)
 		{
 			var e = this.Deleting;
 
@@ -1020,7 +1020,7 @@ namespace Zongsoft.Data
 			return args.Cancel;
 		}
 
-		protected virtual void OnInserted(DataInsertContext context)
+		protected virtual void OnInserted(DataInsertContextBase context)
 		{
 			var e = this.Inserted;
 
@@ -1028,7 +1028,7 @@ namespace Zongsoft.Data
 				e(this, new DataInsertedEventArgs(context));
 		}
 
-		protected virtual bool OnInserting(DataInsertContext context)
+		protected virtual bool OnInserting(DataInsertContextBase context)
 		{
 			var e = this.Inserting;
 
@@ -1040,7 +1040,7 @@ namespace Zongsoft.Data
 			return args.Cancel;
 		}
 
-		protected virtual void OnUpdated(DataUpdateContext context)
+		protected virtual void OnUpdated(DataUpdateContextBase context)
 		{
 			var e = this.Updated;
 
@@ -1048,7 +1048,7 @@ namespace Zongsoft.Data
 				e(this, new DataUpdatedEventArgs(context));
 		}
 
-		protected virtual bool OnUpdating(DataUpdateContext context)
+		protected virtual bool OnUpdating(DataUpdateContextBase context)
 		{
 			var e = this.Updating;
 
@@ -1060,7 +1060,7 @@ namespace Zongsoft.Data
 			return args.Cancel;
 		}
 
-		protected virtual void OnSelected(DataSelectContext context)
+		protected virtual void OnSelected(DataSelectContextBase context)
 		{
 			var e = this.Selected;
 
@@ -1068,7 +1068,7 @@ namespace Zongsoft.Data
 				e(this, new DataSelectedEventArgs(context));
 		}
 
-		protected virtual bool OnSelecting(DataSelectContext context)
+		protected virtual bool OnSelecting(DataSelectContextBase context)
 		{
 			var e = this.Selecting;
 
