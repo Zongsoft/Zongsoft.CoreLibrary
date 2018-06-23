@@ -35,7 +35,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataExistingEventArgs(DataExistContext context) : base(context)
+		public DataExistingEventArgs(DataExistContextBase context) : base(context)
 		{
 			_cancel = false;
 		}

@@ -32,10 +32,10 @@ namespace Zongsoft.Data
 	/// <summary>
 	/// 为数据访问的删除事件提供数据。
 	/// </summary>
-	public class DataDeletedEventArgs : DataAccessEventArgs<DataDeleteContext>
+	public class DataDeletedEventArgs : DataAccessEventArgs<DataDeleteContextBase>
 	{
 		#region 构造函数
-		public DataDeletedEventArgs(DataDeleteContext context) : base(context)
+		public DataDeletedEventArgs(DataDeleteContextBase context) : base(context)
 		{
 		}
 		#endregion

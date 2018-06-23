@@ -30,7 +30,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
-	public class DataCountContext : DataAccessContextBase
+	public class DataCountContextBase : DataAccessContextBase
 	{
 		#region 成员字段
 		private int _result;
@@ -39,7 +39,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataCountContext(IDataAccess dataAccess, string name, ICondition condition, string includes, object state = null) : base(dataAccess, name, DataAccessMethod.Count, state)
+		protected DataCountContextBase(IDataAccess dataAccess, string name, ICondition condition, string includes, object state = null) : base(dataAccess, name, DataAccessMethod.Count, state)
 		{
 			_condition = condition;
 			_includes = includes;
@@ -94,7 +94,7 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
-	public class DataExistContext : DataAccessContextBase
+	public class DataExistContextBase : DataAccessContextBase
 	{
 		#region 成员字段
 		private ICondition _condition;
@@ -102,7 +102,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataExistContext(IDataAccess dataAccess, string name, ICondition condition, object state = null) : base(dataAccess, name, DataAccessMethod.Exists, state)
+		protected DataExistContextBase(IDataAccess dataAccess, string name, ICondition condition, object state = null) : base(dataAccess, name, DataAccessMethod.Exists, state)
 		{
 			_condition = condition;
 		}
@@ -135,7 +135,7 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
-	public class DataExecuteContext : DataAccessContextBase
+	public class DataExecuteContextBase : DataAccessContextBase
 	{
 		#region 成员字段
 		private bool _isScalar;
@@ -146,7 +146,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataExecuteContext(IDataAccess dataAccess, string name, bool isScalar, Type resultType, IDictionary<string, object> inParameters, IDictionary<string, object> outParameters, object state = null) : base(dataAccess, name, DataAccessMethod.Execute, state)
+		protected DataExecuteContextBase(IDataAccess dataAccess, string name, bool isScalar, Type resultType, IDictionary<string, object> inParameters, IDictionary<string, object> outParameters, object state = null) : base(dataAccess, name, DataAccessMethod.Execute, state)
 		{
 			if(resultType == null)
 				throw new ArgumentNullException(nameof(resultType));
@@ -231,7 +231,7 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
-	public class DataIncrementContext : DataAccessContextBase
+	public class DataIncrementContextBase : DataAccessContextBase
 	{
 		#region 成员字段
 		private string _member;
@@ -241,7 +241,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataIncrementContext(IDataAccess dataAccess, string name, string member, ICondition condition, int interval = 1, object state = null) : base(dataAccess, name, DataAccessMethod.Increment, state)
+		protected DataIncrementContextBase(IDataAccess dataAccess, string name, string member, ICondition condition, int interval = 1, object state = null) : base(dataAccess, name, DataAccessMethod.Increment, state)
 		{
 			if(string.IsNullOrEmpty(member))
 				throw new ArgumentNullException(nameof(member));
@@ -312,7 +312,7 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
-	public class DataSelectContext : DataAccessContextBase
+	public class DataSelectContextBase : DataAccessContextBase
 	{
 		#region 成员字段
 		private Type _elementType;
@@ -323,11 +323,11 @@ namespace Zongsoft.Data
 		private Paging _paging;
 		private Grouping _grouping;
 		private Sorting[] _sortings;
-		private Func<DataSelectContext, object, bool> _resultFilter;
+		private Func<DataSelectContextBase, object, bool> _resultFilter;
 		#endregion
 
 		#region 构造函数
-		public DataSelectContext(IDataAccess dataAccess, string name, Type elementType, Grouping grouping, ICondition condition, string scope, Paging paging, Sorting[] sortings, object state = null) : base(dataAccess, name, DataAccessMethod.Select, state)
+		protected DataSelectContextBase(IDataAccess dataAccess, string name, Type elementType, Grouping grouping, ICondition condition, string scope, Paging paging, Sorting[] sortings, object state = null) : base(dataAccess, name, DataAccessMethod.Select, state)
 		{
 			_elementType = elementType ?? typeof(object);
 			_grouping = grouping;
@@ -389,7 +389,7 @@ namespace Zongsoft.Data
 		/// <summary>
 		/// 获取或设置查询结果的过滤器。
 		/// </summary>
-		public Func<DataSelectContext, object, bool> ResultFilter
+		public Func<DataSelectContextBase, object, bool> ResultFilter
 		{
 			get
 			{
@@ -479,7 +479,7 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
-	public class DataDeleteContext : DataAccessContextBase
+	public class DataDeleteContextBase : DataAccessContextBase
 	{
 		#region 成员字段
 		private int _count;
@@ -488,7 +488,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataDeleteContext(IDataAccess dataAccess, string name, ICondition condition, string[] cascades, object state = null) : base(dataAccess, name, DataAccessMethod.Delete, state)
+		protected DataDeleteContextBase(IDataAccess dataAccess, string name, ICondition condition, string[] cascades, object state = null) : base(dataAccess, name, DataAccessMethod.Delete, state)
 		{
 			_condition = condition;
 			_cascades = cascades;
@@ -543,7 +543,7 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
-	public class DataInsertContext : DataAccessContextBase
+	public class DataInsertContextBase : DataAccessContextBase
 	{
 		#region 成员字段
 		private int _count;
@@ -553,7 +553,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataInsertContext(IDataAccess dataAccess, string name, bool isMultiple, object data, string scope, object state = null) : base(dataAccess, name, DataAccessMethod.Insert, state)
+		protected DataInsertContextBase(IDataAccess dataAccess, string name, bool isMultiple, object data, string scope, object state = null) : base(dataAccess, name, DataAccessMethod.Insert, state)
 		{
 			_data = data;
 			_scope = scope;
@@ -620,7 +620,7 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
-	public class DataUpdateContext : DataAccessContextBase
+	public class DataUpdateContextBase : DataAccessContextBase
 	{
 		#region 成员字段
 		private int _count;
@@ -631,7 +631,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataUpdateContext(IDataAccess dataAccess, string name, bool isMultiple, object data, ICondition condition, string scope, object state = null) : base(dataAccess, name, DataAccessMethod.Update, state)
+		protected DataUpdateContextBase(IDataAccess dataAccess, string name, bool isMultiple, object data, ICondition condition, string scope, object state = null) : base(dataAccess, name, DataAccessMethod.Update, state)
 		{
 			_data = data;
 			_condition = condition;
@@ -714,7 +714,7 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
-	public class DataUpsertContext : DataAccessContextBase
+	public class DataUpsertContextBase : DataAccessContextBase
 	{
 		#region 成员字段
 		private int _count;
@@ -724,7 +724,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataUpsertContext(IDataAccess dataAccess, string name, bool isMultiple, object data, string scope, object state = null) : base(dataAccess, name, DataAccessMethod.Upsert, state)
+		protected DataUpsertContextBase(IDataAccess dataAccess, string name, bool isMultiple, object data, string scope, object state = null) : base(dataAccess, name, DataAccessMethod.Upsert, state)
 		{
 			_data = data;
 			_scope = scope;

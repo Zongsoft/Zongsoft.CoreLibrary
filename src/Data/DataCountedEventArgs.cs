@@ -32,10 +32,10 @@ namespace Zongsoft.Data
 	/// <summary>
 	/// 为数据访问的计数事件提供数据。
 	/// </summary>
-	public class DataCountedEventArgs : DataAccessEventArgs<DataCountContext>
+	public class DataCountedEventArgs : DataAccessEventArgs<DataCountContextBase>
 	{
 		#region 构造函数
-		public DataCountedEventArgs(DataCountContext context) : base(context)
+		public DataCountedEventArgs(DataCountContextBase context) : base(context)
 		{
 		}
 		#endregion

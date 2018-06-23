@@ -35,7 +35,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataIncrementingEventArgs(DataIncrementContext context) : base(context)
+		public DataIncrementingEventArgs(DataIncrementContextBase context) : base(context)
 		{
 			_cancel = false;
 		}

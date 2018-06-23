@@ -32,10 +32,10 @@ namespace Zongsoft.Data
 	/// <summary>
 	/// 为数据访问的插入事件提供数据。
 	/// </summary>
-	public class DataInsertedEventArgs : DataAccessEventArgs<DataInsertContext>
+	public class DataInsertedEventArgs : DataAccessEventArgs<DataInsertContextBase>
 	{
 		#region 构造函数
-		public DataInsertedEventArgs(DataInsertContext context) : base(context)
+		public DataInsertedEventArgs(DataInsertContextBase context) : base(context)
 		{
 		}
 		#endregion

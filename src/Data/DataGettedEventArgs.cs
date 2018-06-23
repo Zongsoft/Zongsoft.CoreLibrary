@@ -31,10 +31,10 @@ namespace Zongsoft.Data
 	/// <summary>
 	/// 为数据服务的获取事件提供数据。
 	/// </summary>
-	public class DataGettedEventArgs<T> : DataAccessEventArgs<DataSelectContext>
+	public class DataGettedEventArgs<T> : DataAccessEventArgs<DataSelectContextBase>
 	{
 		#region 构造函数
-		public DataGettedEventArgs(DataSelectContext context) : base(context)
+		public DataGettedEventArgs(DataSelectContextBase context) : base(context)
 		{
 		}
 		#endregion
