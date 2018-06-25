@@ -125,6 +125,7 @@
     <Compile Include="Data\DataUpsertedEventArgs.cs" />
     <Compile Include="Data\DataUpseringEventArgs.cs" />
     <Compile Include="Data\IDataAccessProvider.cs" />
+    <Compile Include="Data\IDataEntity.cs" />
     <Compile Include="Data\Range.cs" />
     <Compile Include="Data\Range`1.cs" />
     <Compile Include="Data\ConditionalRange`1.cs" />
