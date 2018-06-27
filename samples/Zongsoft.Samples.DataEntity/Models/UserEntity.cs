@@ -9,18 +9,18 @@ namespace Zongsoft.Samples.DataEntity.Models
 		private static readonly string[] __NAMES__ = new string[] { "UserId", "Namespace", "Name", "FullName", "Email", "PhoneNumber", "Avatar", "Status", "StatusTimestamp", "PrincipalId", "CreatedTime", "Description" };
 		private static readonly Dictionary<string, DataEntity.PropertyToken<UserEntity>> __PROPERTIES__ = new Dictionary<string, DataEntity.PropertyToken<UserEntity>>()
 		{
-			{ "UserId", new DataEntity.PropertyToken<UserEntity>(0, target => target._userId, (target, value) => target.UserId = (uint)value) },
-			{ "Namespace", new DataEntity.PropertyToken<UserEntity>(1, target => target._namespace, (target, value) => target.Namespace = (string)value) },
-			{ "Name", new DataEntity.PropertyToken<UserEntity>(2, target => target._name, (target, value) => target.Name = (string)value) },
-			{ "FullName", new DataEntity.PropertyToken<UserEntity>(3, target => target._fullName, (target, value) => target.FullName = (string)value) },
-			{ "Email", new DataEntity.PropertyToken<UserEntity>(4, target => target._email, (target, value) => target.Email = (string)value) },
-			{ "PhoneNumber", new DataEntity.PropertyToken<UserEntity>(5, target => target._phoneNumber, (target, value) => target.PhoneNumber = (string)value) },
-			{ "Avatar", new DataEntity.PropertyToken<UserEntity>(6, target => target._avatar, (target, value) => target.Avatar = (string)value) },
-			{ "Status", new DataEntity.PropertyToken<UserEntity>(7, target => target._status, (target, value) => target.Status = (byte)value) },
-			{ "StatusTimestamp", new DataEntity.PropertyToken<UserEntity>(8, target => target._statusTimestamp, (target, value) => target.StatusTimestamp = (DateTime?)value) },
-			{ "PrincipalId", new DataEntity.PropertyToken<UserEntity>(9, target => target._principalId, (target, value) => target.PrincipalId = (string)value) },
-			{ "CreatedTime", new DataEntity.PropertyToken<UserEntity>(10, target => target._createdTime, (target, value) => target.CreatedTime = (DateTime)value) },
-			{ "Description", new DataEntity.PropertyToken<UserEntity>(11, target => target._description, (target, value) => target.Description = (string)value) },
+			{ "UserId", new DataEntity.PropertyToken<UserEntity>(0, target => target._userId, (target, value) => target.UserId = (uint) value) },
+			{ "Namespace", new DataEntity.PropertyToken<UserEntity>(1, target => target._namespace, (target, value) => target.Namespace = (string) value) },
+			{ "Name", new DataEntity.PropertyToken<UserEntity>(2, target => target._name, (target, value) => target.Name = (string) value) },
+			{ "FullName", new DataEntity.PropertyToken<UserEntity>(3, target => target._fullName, (target, value) => target.FullName = (string) value) },
+			{ "Email", new DataEntity.PropertyToken<UserEntity>(4, target => target._email, (target, value) => target.Email = (string) value) },
+			{ "PhoneNumber", new DataEntity.PropertyToken<UserEntity>(5, target => target._phoneNumber, (target, value) => target.PhoneNumber = (string) value) },
+			{ "Avatar", new DataEntity.PropertyToken<UserEntity>(6, target => target._avatar, (target, value) => target.Avatar = (string) value) },
+			{ "Status", new DataEntity.PropertyToken<UserEntity>(7, target => target._status, (target, value) => target.Status = (byte) value) },
+			{ "StatusTimestamp", new DataEntity.PropertyToken<UserEntity>(8, target => target._statusTimestamp, (target, value) => target.StatusTimestamp = (DateTime?) value) },
+			{ "PrincipalId", new DataEntity.PropertyToken<UserEntity>(9, target => target._principalId, (target, value) => target.PrincipalId = (string) value) },
+			{ "CreatedTime", new DataEntity.PropertyToken<UserEntity>(10, target => target._createdTime, (target, value) => target.CreatedTime = (DateTime) value) },
+			{ "Description", new DataEntity.PropertyToken<UserEntity>(11, target => target._description, (target, value) => target.Description = (string) value) },
 		};
 		#endregion
 
@@ -185,12 +185,14 @@ namespace Zongsoft.Samples.DataEntity.Models
 		#region 接口方法
 		bool Zongsoft.Data.IDataEntity.HasChanges(params string[] names)
 		{
+			DataEntity.PropertyToken<UserEntity> property;
+
 			if(names == null || names.Length == 0)
 				return _MASK_ != 0;
 
 			for(var i = 0; i < names.Length; i++)
 			{
-				if(__PROPERTIES__.TryGetValue(names[i], out var property) && (_MASK_ >> property.Ordinal & 1) == 1)
+				if(__PROPERTIES__.TryGetValue(names[i], out property) && (_MASK_ >> property.Ordinal & 1) == 1)
 					return true;
 			}
 
@@ -285,9 +287,17 @@ namespace Zongsoft.Samples.DataEntity.Models
 		}
 		#endregion
 
-		private static object Create()
+		private static class Anonymous
 		{
-			return new UserEntity();
+			private static uint GetUserId(UserEntity target)
+			{
+				return target._userId;
+			}
+
+			private static void SetUserId(UserEntity target, uint value)
+			{
+				target.UserId = value;
+			}
 		}
 	}
 }

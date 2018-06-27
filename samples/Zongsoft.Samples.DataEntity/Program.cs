@@ -5,14 +5,24 @@ namespace Zongsoft.Samples.DataEntity
 {
 	class Program
 	{
+		private const int COUNT = 10000 * 100;
+
 		static void Main(string[] args)
 		{
 			//TestChanges();
-			//Performance(10000 * 100);
+			//Performance(COUNT);
+			//PerformanceDynamic(COUNT);
 
-			var entity = DataEntity.Build<Models.IUserEntity>();
-			entity.UserId = 100;
-			entity.Name = "Popeye";
+			var user = DataEntity.Build<Models.IUserEntity>();
+			user.UserId = 100;
+			user.Name = "Popeye";
+
+			//var entities = DataEntity.Build<Models.IUserEntity>(COUNT);
+
+			//foreach(var entity in entities)
+			//{
+			//	entity.UserId = 100;
+			//}
 
 			Console.ReadLine();
 		}
@@ -99,6 +109,87 @@ namespace Zongsoft.Samples.DataEntity
 			}
 
 			Console.WriteLine($"DataEntity(TrySet): {stopwatch.ElapsedMilliseconds}");
+		}
+
+		private static void PerformanceDynamic(int count)
+		{
+			var creator = DataEntity.GetCreator<Models.IUserEntity>(); //预先编译
+			DataEntity.Build<Models.IUserEntity>(); //预热（预先编译）
+
+			var stopwatch = new Stopwatch();
+
+			stopwatch.Start();
+
+			for(int i = 0; i < count; i++)
+			{
+				var user = (Models.IUserEntity)creator();
+
+				user.UserId = (uint)i;
+				user.Avatar = ":smile:";
+				user.Name = "Name: " + i.ToString();
+				user.FullName = "FullName";
+				user.Namespace = "Zongsoft";
+				user.Status = (byte)(i % byte.MaxValue);
+				user.StatusTimestamp = (i % 11 == 0) ? DateTime.Now : DateTime.MinValue;
+				user.CreatedTime = DateTime.Now;
+			}
+
+			//var entities = DataEntity.Build<Models.IUserEntity>(count, (entity, index) =>
+			//{
+			//	entity.UserId = (uint)index;
+			//	entity.Avatar = ":smile:";
+			//	entity.Name = "Name: " + index.ToString();
+			//	entity.FullName = "FullName";
+			//	entity.Namespace = "Zongsoft";
+			//	entity.Status = (byte)(index % byte.MaxValue);
+			//	entity.StatusTimestamp = (index % 11 == 0) ? DateTime.Now : DateTime.MinValue;
+			//	entity.CreatedTime = DateTime.Now;
+			//});
+
+			//foreach(var entity in entities)
+			//{
+			//}
+
+			//int index = 0;
+			//var entities = DataEntity.Build<Models.IUserEntity>(count);
+
+			//foreach(var user in entities)
+			//{
+			//	user.UserId = (uint)index;
+			//	user.Avatar = ":smile:";
+			//	user.Name = "Name: " + index.ToString();
+			//	user.FullName = "FullName";
+			//	user.Namespace = "Zongsoft";
+			//	user.Status = (byte)(index % byte.MaxValue);
+			//	user.StatusTimestamp = (index % 11 == 0) ? DateTime.Now : DateTime.MinValue;
+			//	user.CreatedTime = DateTime.Now;
+			//}
+
+			//var iterator = entities.GetEnumerator();
+
+			//while(iterator.MoveNext())
+			//{
+			//}
+
+			//while(iterator.MoveNext())
+			//{
+			//	var user = iterator.Current;
+
+			//	user.UserId = (uint)index;
+			//	user.Avatar = ":smile:";
+			//	user.Name = "Name: " + index.ToString();
+			//	user.FullName = "FullName";
+			//	user.Namespace = "Zongsoft";
+			//	user.Status = (byte)(index % byte.MaxValue);
+			//	user.StatusTimestamp = (index % 11 == 0) ? DateTime.Now : DateTime.MinValue;
+			//	user.CreatedTime = DateTime.Now;
+
+			//	//index++;
+			//}
+
+			Console.WriteLine($"Dynamic Object: {stopwatch.ElapsedMilliseconds}");
+
+			stopwatch.Stop();
 		}
 
 		private static void TestChanges()
