@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -14,7 +13,7 @@ namespace Zongsoft.Samples.DataEntity
 		private const string ASSEMBLY_NAME = "Zongsoft.Dynamics.Entities";
 
 		private const string PROPERTY_NAMES_VARIABLE = "$NAMES$";
-		private const string PROPERTY_ACCESSORS_VARIABLE = "$PROPERTIES$";
+		private const string PROPERTY_TOKENS_VARIABLE = "$PROPERTIES$";
 		private const string MASK_VARIABLE = "$MASK$";
 		#endregion
 
@@ -32,6 +31,38 @@ namespace Zongsoft.Samples.DataEntity
 		#region 公共方法
 		public static T Build<T>() where T : Zongsoft.Data.IDataEntity
 		{
+			return (T)GetCreator<T>()();
+		}
+
+		public static IEnumerable<T> Build<T>(int count, Action<T, int> map = null) where T : Zongsoft.Data.IDataEntity
+		{
+			if(count < 1)
+				throw new ArgumentOutOfRangeException(nameof(count));
+
+			var creator = GetCreator<T>();
+
+			if(map == null)
+			{
+				for(int i = 0; i < count; i++)
+				{
+					yield return (T)creator();
+				}
+			}
+			else
+			{
+				for(int i = 0; i < count; i++)
+				{
+					var entity = (T)creator();
+					map(entity, i);
+					yield return entity;
+				}
+			}
+		}
+		#endregion
+
+		#region 私有方法
+		public static Func<object> GetCreator<T>()
+		{
 			var type = typeof(T);
 
 			if(!type.IsInterface)
@@ -42,74 +73,87 @@ namespace Zongsoft.Samples.DataEntity
 			_locker.ExitReadLock();
 
 			if(existed)
-				return (T)creator();
-
-			_locker.EnterWriteLock();
+				return creator;
 
 			try
 			{
+				_locker.EnterWriteLock();
+
 				if(!_cache.TryGetValue(type, out creator))
 					creator = _cache[type] = Compile(type);
+
+				return creator;
 			}
 			finally
 			{
 				_locker.ExitWriteLock();
 			}
-
-			var result =creator();
-
-			return (T)result;
 		}
-		#endregion
 
-		#region 私有方法
 		private static Func<object> Compile(Type type)
 		{
+			ILGenerator generator;
+
+			//if(_module.GetType("PropertyToken") == null)
+			//	GeneratePropertyToken();
+
 			var builder = _module.DefineType(
-				GetClassName(type),
-				TypeAttributes.Class | TypeAttributes.Public | TypeAttributes.Sealed,
-				null,
-				new Type[] { typeof(Zongsoft.Data.IDataEntity) });
+				GetClassName(type) + "Ex",
+				TypeAttributes.Class | TypeAttributes.Public | TypeAttributes.Sealed);
 
 			//添加类型的实现接口声明
-			builder.AddInterfaceImplementation(typeof(Zongsoft.Data.IDataEntity));
 			builder.AddInterfaceImplementation(type);
+			builder.AddInterfaceImplementation(typeof(Zongsoft.Data.IDataEntity));
 
 			//获取指定接口的所有属性集
 			var properties = type.GetProperties();
 
-			//生成静态构造函数
-			GenerateTypeInitializer(builder, properties, out var names, out var accessors);
-
-			FieldBuilder mask = null;
-			ILGenerator generator;
-
-			if(properties.Length <= 8)
-				mask = builder.DefineField(MASK_VARIABLE, typeof(byte), FieldAttributes.Private);
-			else if(properties.Length <= 16)
-				mask = builder.DefineField(MASK_VARIABLE, typeof(UInt16), FieldAttributes.Private);
-			else if(properties.Length <= 32)
-				mask = builder.DefineField(MASK_VARIABLE, typeof(UInt32), FieldAttributes.Private);
-			else if(properties.Length <= 64)
-				mask = builder.DefineField(MASK_VARIABLE, typeof(UInt64), FieldAttributes.Private);
-			else
-				mask = builder.DefineField(MASK_VARIABLE, typeof(byte[]), FieldAttributes.Private);
-
 			//生成构造函数
-			if(properties.Length > 64)
-			{
-				var constructor = builder
-					.DefineConstructor(MethodAttributes.Public, CallingConventions.HasThis, null)
-					.GetILGenerator();
+			GenerateConstructor(builder, properties.Length, out var mask);
 
-				constructor.Emit(OpCodes.Ldarg_0);
-				constructor.Emit(OpCodes.Call, typeof(object).GetConstructor(Type.EmptyTypes));
-				constructor.Emit(OpCodes.Ldarg_0);
-				constructor.Emit(OpCodes.Ldc_I4, (int)Math.Ceiling(properties.Length / 8.0));
-				constructor.Emit(OpCodes.Newarr, typeof(byte));
-				constructor.Emit(OpCodes.Stfld, mask);
-				constructor.Emit(OpCodes.Ret);
-			}
+			//生成属性定义以及嵌套子类
+			GenerateProperties(builder, mask, properties, out var methods);
+
+			var constructor = GeneratePropertyToken(builder);
+
+			//生成静态构造函数
+			GenerateTypeInitializer(builder, properties, constructor, methods, out var names, out var tokens);
+
+			//生成“HasChanges”方法
+			GenerateHasChangesMethod(builder, mask, names, tokens);
+
+			//生成“GetChanges”方法
+			GenerateGetChangesMethod(builder);
+
+			//生成“TryGet”方法
+			GenerateTryGetMethod(builder);
+
+			//生成“TrySet”方法
+			GenerateTrySetMethod(builder);
+
+			//构建类型
+			type = builder.CreateType();
+
+			_assembly.Save(ASSEMBLY_NAME + ".dll");
+
+			//生成创建实例的动态方法
+			var creator = new DynamicMethod("Create", typeof(object), Type.EmptyTypes);
+
+			generator = creator.GetILGenerator();
+			generator.Emit(OpCodes.Newobj, type.GetConstructor(Type.EmptyTypes));
+			generator.Emit(OpCodes.Ret);
+
+			//返回实例创建方法的委托
+			return (Func<object>)creator.CreateDelegate(typeof(Func<object>));
+		}
+
+		private static void GenerateProperties(TypeBuilder builder, FieldBuilder mask, PropertyInfo[] properties, out MethodToken[] methods)
+		{
+			//生成嵌套匿名委托静态类
+			var nested = builder.DefineNestedType("!Methods!", TypeAttributes.NestedPrivate | TypeAttributes.Abstract | TypeAttributes.Sealed | TypeAttributes.BeforeFieldInit);
+
+			//创建返回参数（即方法标记）
+			methods = new MethodToken[properties.Length];
 
 			//生成属性定义
 			for(int i = 0; i < properties.Length; i++)
@@ -118,7 +162,7 @@ namespace Zongsoft.Samples.DataEntity
 				var property = builder.DefineProperty(properties[i].Name, PropertyAttributes.None, properties[i].PropertyType, null);
 
 				var getter = builder.DefineMethod("get_" + properties[i].Name, MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.NewSlot, properties[i].PropertyType, Type.EmptyTypes);
-				generator = getter.GetILGenerator();
+				var generator = getter.GetILGenerator();
 				generator.Emit(OpCodes.Ldarg_0);
 				generator.Emit(OpCodes.Ldfld, field);
 				generator.Emit(OpCodes.Ret);
@@ -179,43 +223,49 @@ namespace Zongsoft.Samples.DataEntity
 
 				generator.Emit(OpCodes.Ret);
 				property.SetSetMethod(setter);
+
+				//生成获取属性字段的方法
+				var getMethod = nested.DefineMethod("Get" + properties[i].Name, MethodAttributes.Assembly | MethodAttributes.Static, CallingConventions.Standard, typeof(object), new Type[] { field.DeclaringType });
+				getMethod.DefineParameter(1, ParameterAttributes.None, "target");
+
+				generator = getMethod.GetILGenerator();
+				generator.Emit(OpCodes.Ldarg_0);
+				generator.Emit(OpCodes.Ldfld, field);
+				if(properties[i].PropertyType.IsValueType)
+					generator.Emit(OpCodes.Box, properties[i].PropertyType);
+				generator.Emit(OpCodes.Ret);
+
+				//生成设置属性的方法
+				var setMethod = nested.DefineMethod("Set" + properties[i].Name, MethodAttributes.Assembly | MethodAttributes.Static, CallingConventions.Standard, null, new Type[] { field.DeclaringType, typeof(object) });
+				setMethod.DefineParameter(1, ParameterAttributes.None, "target");
+				setMethod.DefineParameter(2, ParameterAttributes.None, "value");
+
+				generator = setMethod.GetILGenerator();
+				generator.Emit(OpCodes.Ldarg_0);
+				generator.Emit(OpCodes.Ldarg_1);
+				if(properties[i].PropertyType.IsValueType)
+					generator.Emit(OpCodes.Unbox_Any, properties[i].PropertyType);
+				else
+					generator.Emit(OpCodes.Castclass, properties[i].PropertyType);
+				generator.Emit(OpCodes.Call, setter);
+				generator.Emit(OpCodes.Ret);
+
+				//将委托方法保存到方法标记数组元素中
+				methods[i] = new MethodToken(getMethod, setMethod);
 			}
 
-			//生成“HasChanges”方法
-			GenerateHasChangesMethod(builder);
-
-			//生成“GetChanges”方法
-			GenerateGetChangesMethod(builder);
-
-			//生成“TryGet”方法
-			GenerateTryGetMethod(builder);
-
-			//生成“TrySet”方法
-			GenerateTrySetMethod(builder);
-
-			//创建类型代码
-			type = builder.CreateType();
-
-			_assembly.Save(ASSEMBLY_NAME + ".dll");
-
-			//生成一个创建实例的动态方法
-			var creator = new DynamicMethod("Create", typeof(object), Type.EmptyTypes);
-
-			generator = creator.GetILGenerator();
-			generator.DeclareLocal(typeof(object));
-			generator.Emit(OpCodes.Newobj, builder.UnderlyingSystemType.GetConstructor(Type.EmptyTypes));
-			generator.Emit(OpCodes.Stloc_0);
-			generator.Emit(OpCodes.Ldloc_0);
-			generator.Emit(OpCodes.Ret);
-
-			//返回实例创建方法的委托
-			return (Func<object>)creator.CreateDelegate(typeof(Func<object>));
+			//构建嵌套匿名静态类
+			nested.CreateType();
 		}
 
-		private static void GenerateTypeInitializer(TypeBuilder builder, PropertyInfo[] properties, out FieldBuilder names, out FieldBuilder accessors)
+		private static void GenerateTypeInitializer(TypeBuilder builder, PropertyInfo[] properties, ConstructorBuilder constructor, MethodToken[] methods, out FieldBuilder names, out FieldBuilder tokens)
 		{
+			//var tokenType = typeof(PropertyToken<>).MakeGenericType(typeof(Zongsoft.Data.IDataEntity));
+			//var tokenType = _module.GetType(builder.UnderlyingSystemType.FullName + "!PropertyToken");
+			var tokenType = _module.GetType(constructor.DeclaringType.FullName);
 			names = builder.DefineField(PROPERTY_NAMES_VARIABLE, typeof(string[]), FieldAttributes.Private | FieldAttributes.Static | FieldAttributes.InitOnly);
-			accessors = builder.DefineField(PROPERTY_ACCESSORS_VARIABLE, typeof(Dictionary<string, DataEntity.PropertyToken<Zongsoft.Data.IDataEntity>>), FieldAttributes.Private | FieldAttributes.Static | FieldAttributes.InitOnly);
+			tokens = builder.DefineField(PROPERTY_TOKENS_VARIABLE, typeof(Dictionary<,>).MakeGenericType(typeof(string), tokenType), FieldAttributes.Private | FieldAttributes.Static | FieldAttributes.InitOnly);
+			var entityType = _module.GetType(builder.UnderlyingSystemType.FullName);
 
 			var generator = builder.DefineTypeInitializer().GetILGenerator();
 
@@ -232,15 +282,74 @@ namespace Zongsoft.Samples.DataEntity
 
 			generator.Emit(OpCodes.Stsfld, names);
 
+			generator.Emit(OpCodes.Newobj, tokens.FieldType.GetConstructor(Type.EmptyTypes));
+
+			for(int i = 0; i < properties.Length; i++)
+			{
+				generator.Emit(OpCodes.Dup);
+				generator.Emit(OpCodes.Ldstr, properties[i].Name);
+				generator.Emit(OpCodes.Ldc_I4, i);
+
+				generator.Emit(OpCodes.Ldnull);
+				generator.Emit(OpCodes.Ldftn, methods[i].GetMethod);
+				generator.Emit(OpCodes.Newobj, typeof(Func<,>).MakeGenericType(typeof(object), typeof(object)).GetConstructor(new Type[] { typeof(object), typeof(IntPtr) }));
+
+				generator.Emit(OpCodes.Ldnull);
+				generator.Emit(OpCodes.Ldftn, methods[i].SetMethod);
+				generator.Emit(OpCodes.Newobj, typeof(Action<,>).MakeGenericType(typeof(object), typeof(object)).GetConstructor(new Type[] { typeof(object), typeof(IntPtr) }));
+
+				generator.Emit(OpCodes.Newobj, constructor);
+				//generator.Emit(OpCodes.Newobj, tokenType.GetConstructor(new Type[] { typeof(int), typeof(Func<object, object>), typeof(Action<object, object>) }));
+				generator.Emit(OpCodes.Call, tokens.FieldType.GetMethod("Add"));
+			}
+
+			generator.Emit(OpCodes.Stsfld, tokens);
+
 			generator.Emit(OpCodes.Ret);
 		}
 
-		private static void GenerateHasChangesMethod(TypeBuilder builder)
+		private static ConstructorBuilder GenerateConstructor(TypeBuilder builder, int count, out FieldBuilder mask)
+		{
+			mask = null;
+
+			if(count <= 8)
+				mask = builder.DefineField(MASK_VARIABLE, typeof(byte), FieldAttributes.Private);
+			else if(count <= 16)
+				mask = builder.DefineField(MASK_VARIABLE, typeof(UInt16), FieldAttributes.Private);
+			else if(count <= 32)
+				mask = builder.DefineField(MASK_VARIABLE, typeof(UInt32), FieldAttributes.Private);
+			else if(count <= 64)
+				mask = builder.DefineField(MASK_VARIABLE, typeof(UInt64), FieldAttributes.Private);
+			else
+				mask = builder.DefineField(MASK_VARIABLE, typeof(byte[]), FieldAttributes.Private);
+
+			var constructor = builder.DefineConstructor(MethodAttributes.Public, CallingConventions.HasThis, null);
+			var generator = constructor.GetILGenerator();
+
+			generator.Emit(OpCodes.Ldarg_0);
+			generator.Emit(OpCodes.Call, typeof(object).GetConstructor(Type.EmptyTypes));
+
+			if(count > 64)
+			{
+				generator.Emit(OpCodes.Ldarg_0);
+				generator.Emit(OpCodes.Ldc_I4, (int)Math.Ceiling(count / 8.0));
+				generator.Emit(OpCodes.Newarr, typeof(byte));
+				generator.Emit(OpCodes.Stfld, mask);
+			}
+
+			generator.Emit(OpCodes.Ret);
+
+			return constructor;
+		}
+
+		private static void GenerateHasChangesMethod(TypeBuilder builder, FieldBuilder mask, FieldBuilder names, FieldBuilder tokens)
 		{
 			var method = builder.DefineMethod(typeof(Zongsoft.Data.IDataEntity).FullName + ".HasChanges",
 				MethodAttributes.Private | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.NewSlot,
 				typeof(bool),
 				new Type[] { typeof(string[]) });
+
+			var tokenType = _module.GetType(builder.UnderlyingSystemType.FullName + "!PropertyToken");
 
 			//添加方法的实现标记
 			builder.DefineMethodOverride(method, typeof(Zongsoft.Data.IDataEntity).GetMethod("HasChanges"));
@@ -251,8 +360,53 @@ namespace Zongsoft.Samples.DataEntity
 			//获取代码生成器
 			var generator = method.GetILGenerator();
 
+			generator.DeclareLocal(tokenType);
+			generator.DeclareLocal(typeof(int));
+
+			var loop = generator.DefineLabel();
+			var exit = generator.DefineLabel();
+
+			generator.Emit(OpCodes.Ldarg_1);
+			generator.Emit(OpCodes.Brfalse_S, exit);
+			generator.Emit(OpCodes.Ldarg_1);
+			generator.Emit(OpCodes.Ldlen);
+			generator.Emit(OpCodes.Ldc_I4_0);
+			generator.Emit(OpCodes.Ceq);
+			generator.Emit(OpCodes.Brfalse_S, exit);
+
 			generator.Emit(OpCodes.Ldarg_0);
+			generator.Emit(OpCodes.Ldfld, mask);
+			generator.Emit(OpCodes.Ldc_I4_0);
+			generator.Emit(OpCodes.Cgt_Un);
+			generator.Emit(OpCodes.Brtrue, exit);
+
+			generator.Emit(OpCodes.Ldsfld, tokens);
+			generator.Emit(OpCodes.Ldarg_1);
+			generator.Emit(OpCodes.Ldloc_1);
+			generator.Emit(OpCodes.Ldelem_Ref);
+			generator.Emit(OpCodes.Ldloca_S, 0);
+			generator.Emit(OpCodes.Call, tokens.FieldType.GetMethod("TryGetValue", BindingFlags.Public | BindingFlags.Instance));
+			generator.Emit(OpCodes.Brfalse_S, loop);
+
+			generator.Emit(OpCodes.Ldarg_0);
+			generator.Emit(OpCodes.Ldfld, mask);
+			generator.Emit(OpCodes.Ldloc_0);
+			generator.Emit(OpCodes.Ldfld, tokenType.GetField("Ordinal"));
+			generator.Emit(OpCodes.Shr);
 			generator.Emit(OpCodes.Ldc_I4_1);
+			generator.Emit(OpCodes.And);
+			generator.Emit(OpCodes.Ldc_I4_1);
+			generator.Emit(OpCodes.Ceq);
+			generator.Emit(OpCodes.Brfalse_S, loop);
+
+			generator.Emit(OpCodes.Ldc_I4_1);
+			generator.Emit(OpCodes.Ret);
+
+			generator.MarkLabel(loop);
+
+			generator.MarkLabel(exit);
+
+			generator.Emit(OpCodes.Ldc_I4_0);
 			generator.Emit(OpCodes.Ret);
 		}
 
@@ -317,14 +471,46 @@ namespace Zongsoft.Samples.DataEntity
 			generator.Emit(OpCodes.Ret);
 		}
 
+		private static ConstructorBuilder GeneratePropertyToken(TypeBuilder type)
+		{
+			var builder = _module.DefineType(type.FullName + "!PropertyToken", TypeAttributes.NotPublic | TypeAttributes.Sealed | TypeAttributes.BeforeFieldInit | TypeAttributes.SequentialLayout, typeof(ValueType));
+			//var builder = type.DefineNestedType("PropertyToken", TypeAttributes.NestedAssembly | TypeAttributes.Sealed | TypeAttributes.BeforeFieldInit | TypeAttributes.SequentialLayout, typeof(ValueType));
+
+			var ordinal = builder.DefineField("Ordinal", typeof(int), FieldAttributes.Public | FieldAttributes.InitOnly);
+			var getter = builder.DefineField("Getter", typeof(Func<,>).MakeGenericType(type, typeof(object)), FieldAttributes.Public | FieldAttributes.InitOnly);
+			var setter = builder.DefineField("Setter", typeof(Action<,>).MakeGenericType(type, typeof(object)), FieldAttributes.Public | FieldAttributes.InitOnly);
+
+			var constructor = builder.DefineConstructor(MethodAttributes.Public, CallingConventions.HasThis, new Type[] { typeof(int), getter.FieldType, setter.FieldType });
+			constructor.DefineParameter(1, ParameterAttributes.None, "ordinal");
+			constructor.DefineParameter(2, ParameterAttributes.None, "getter");
+			constructor.DefineParameter(3, ParameterAttributes.None, "setter");
+
+			var generator = constructor.GetILGenerator();
+			generator.Emit(OpCodes.Ldarg_0);
+			generator.Emit(OpCodes.Ldarg_1);
+			generator.Emit(OpCodes.Stfld, ordinal);
+			generator.Emit(OpCodes.Ldarg_0);
+			generator.Emit(OpCodes.Ldarg_2);
+			generator.Emit(OpCodes.Stfld, getter);
+			generator.Emit(OpCodes.Ldarg_0);
+			generator.Emit(OpCodes.Ldarg_3);
+			generator.Emit(OpCodes.Stfld, setter);
+			generator.Emit(OpCodes.Ret);
+
+			builder.CreateType();
+
+			return constructor;
+		}
+
 		private static string GetClassName(Type type)
 		{
-			return type.Name[0] == 'I' && char.IsUpper(type.Name[1]) ? type.Name.Substring(1) : type.Name;
+			return (string.IsNullOrEmpty(type.Namespace) ? string.Empty : type.Namespace + ".") +
+			       (type.Name.Length > 1 && type.Name[0] == 'I' && char.IsUpper(type.Name[1]) ? type.Name.Substring(1) : type.Name);
 		}
 		#endregion
 
 		#region 嵌套子类
-		internal struct PropertyToken<T> where T : Zongsoft.Data.IDataEntity
+		internal struct PropertyToken<T>
 		{
 			public PropertyToken(int ordinal, Func<T, object> getter, Action<T, object> setter)
 			{
@@ -336,6 +522,32 @@ namespace Zongsoft.Samples.DataEntity
 			public readonly int Ordinal;
 			public readonly Func<T, object> Getter;
 			public readonly Action<T, object> Setter;
+		}
+
+		internal struct PropertyTokenEx
+		{
+			public PropertyTokenEx(int ordinal, Func<object, object> getter, Action<object, object> setter)
+			{
+				this.Ordinal = ordinal;
+				this.Getter = getter;
+				this.Setter = setter;
+			}
+
+			public int Ordinal;
+			public Func<object, object> Getter;
+			public Action<object, object> Setter;
+		}
+
+		private struct MethodToken
+		{
+			public MethodToken(MethodBuilder getMethod, MethodBuilder setMethod)
+			{
+				this.GetMethod = getMethod;
+				this.SetMethod = setMethod;
+			}
+
+			public readonly MethodBuilder GetMethod;
+			public readonly MethodBuilder SetMethod;
 		}
 		#endregion
 	}

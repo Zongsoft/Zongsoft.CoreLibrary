@@ -42,7 +42,6 @@
   <ItemGroup>
     <Compile Include="DataEntity.cs" />
     <Compile Include="Models\IUserEntity.cs" />
-    <Compile Include="Tester.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Models\UserEntity.cs" />
     <Compile Include="Program.cs" />
