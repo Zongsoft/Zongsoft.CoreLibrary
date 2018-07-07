@@ -3,8 +3,10 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Samples.DataEntity.Models
 {
-	public interface IUserEntity : Zongsoft.Data.IDataEntity
+	[Zongsoft.Data.DataAccess("Security.User")]
+	public interface IUserEntity : IPerson
 	{
+		[Zongsoft.Data.Conditional(ConverterType = typeof(object))]
 		uint UserId
 		{
 			get; set;
@@ -12,16 +14,6 @@ namespace Zongsoft.Samples.DataEntity.Models
 
 		[System.ComponentModel.DefaultValue("Zongsoft")]
 		string Namespace
-		{
-			get; set;
-		}
-
-		string Name
-		{
-			get; set;
-		}
-
-		string FullName
 		{
 			get; set;
 		}
@@ -36,9 +28,16 @@ namespace Zongsoft.Samples.DataEntity.Models
 			get; set;
 		}
 
+		[PropertyExtension(typeof(UserExtension))]
 		string Avatar
 		{
 			get; set;
+		}
+
+		[PropertyExtension(typeof(UserExtension))]
+		string AvatarUrl
+		{
+			get;
 		}
 
 		byte Status

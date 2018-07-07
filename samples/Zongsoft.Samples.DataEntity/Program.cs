@@ -13,10 +13,6 @@ namespace Zongsoft.Samples.DataEntity
 			//Performance(COUNT);
 			//PerformanceDynamic(COUNT);
 
-			var user = DataEntity.Build<Models.IUserEntity>();
-			user.UserId = 100;
-			user.Name = "Popeye";
-
 			//var entities = DataEntity.Build<Models.IUserEntity>(COUNT);
 
 			//foreach(var entity in entities)
@@ -24,7 +20,56 @@ namespace Zongsoft.Samples.DataEntity
 			//	entity.UserId = 100;
 			//}
 
+			BuildTest();
+
 			Console.ReadLine();
+		}
+
+		private static void BuildTest()
+		{
+			var person = DataEntity.Build<Models.IPerson>();
+			var person1 = DataEntity.Build<Models.IPerson>();
+			var user = DataEntity.Build<Models.IUserEntity>();
+			var employee = DataEntity.Build<Models.IEmployee>();
+			var manager = DataEntity.Build<Models.IManager>();
+
+			DataEntity.Save();
+
+			var property = user.GetType().GetProperty("Namespace");
+
+			employee.PropertyChanged += User_PropertyChanged;
+
+			employee.UserId = 100;
+			employee.Name = "Popeye";
+			employee.Name = "Popeye";
+			employee.Name = "Popeye";
+			employee.FullName = "Popeye Zhong";
+			employee.Status = 1;
+			employee.StatusTimestamp = DateTime.Now;
+			employee.TrySet("Email", "zongsoft@qq.com");
+			employee.TrySet("Description", "Here is the description.");
+
+			Console.WriteLine();
+
+			if(employee.TryGet("Name", out var name))
+				Console.WriteLine($"Name: {name}");
+			if(employee.TryGet("FullName", out var fullName))
+				Console.WriteLine($"FullName: {fullName}");
+			if(employee.TryGet("Email", out var email))
+				Console.WriteLine($"Email: {email}");
+			if(employee.TryGet("NoExists", out var noExists))
+				Console.WriteLine($"NoExists: {noExists}");
+
+			Console.WriteLine();
+			Console.WriteLine("HasChanges(Email, Name): " + employee.HasChanges("Email", "Name"));
+			Console.WriteLine();
+
+			DisplayChanges(employee);
+		}
+
+		private static void User_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+		{
+			Console.WriteLine("PropertyChanged: " + e.PropertyName);
 		}
 
 		private static void Performance(int count)
@@ -220,7 +265,7 @@ namespace Zongsoft.Samples.DataEntity
 
 			foreach(var entry in entity.GetChanges())
 			{
-				Console.WriteLine($"\t[{index++}] {entry.Key} = {entry.Value}");
+				Console.WriteLine($"\t[{++index}] {entry.Key} = {entry.Value}");
 			}
 		}
 	}
