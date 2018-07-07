@@ -41,11 +41,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataEntity.cs" />
+    <Compile Include="Models\IEmployee.cs" />
+    <Compile Include="Models\IManager.cs" />
+    <Compile Include="Models\IPerson.cs" />
     <Compile Include="Models\IUserEntity.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Models\UserEntity.cs" />
+    <Compile Include="Models\UserExtension.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PropertyExtensionAttribute.cs" />
+    <Compile Include="PropertyToken.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

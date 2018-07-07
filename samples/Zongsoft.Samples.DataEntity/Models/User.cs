@@ -3,8 +3,12 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Samples.DataEntity.Models
 {
-	public class User : IUserEntity
+	public class User : IUserEntity, System.ComponentModel.INotifyPropertyChanged
 	{
+		#region 事件定义
+		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+		#endregion
+
 		#region 成员字段
 		private uint _userId;
 		private string _namespace;
@@ -24,112 +28,78 @@ namespace Zongsoft.Samples.DataEntity.Models
 		public uint UserId
 		{
 			get => _userId;
-			set
-			{
-				_userId = value;
-			}
+			set => _userId = value;
 		}
 
 		public string Namespace
 		{
 			get => _namespace;
-			set
-			{
-				_namespace = value;
-			}
+			set => _namespace = value;
 		}
 
 		public string Name
 		{
 			get => _name;
-			set
-			{
-				_name = value;
-			}
+			set => _name = value;
 		}
 
 		public string FullName
 		{
 			get => _fullName;
-			set
-			{
-				_fullName = value;
-			}
+			set => _fullName = value;
 		}
 
 		public string Email
 		{
 			get => _email;
-			set
-			{
-				_email = value;
-			}
+			set => _email = value;
 		}
 
 		public string PhoneNumber
 		{
 			get => _phoneNumber;
-			set
-			{
-				_phoneNumber = value;
-			}
+			set => _phoneNumber = value;
 		}
 
 		public string Avatar
 		{
 			get => _avatar;
-			set
-			{
-				_avatar = value;
-			}
+			set => _avatar = value;
+		}
+
+		public string AvatarUrl
+		{
+			get => null;
 		}
 
 		public byte Status
 		{
 			get => _status;
-			set
-			{
-				_status = value;
-			}
+			set => _status = value;
 		}
 
 		public DateTime? StatusTimestamp
 		{
 			get => _statusTimestamp;
-			set
-			{
-				_statusTimestamp = value;
-			}
+			set => _statusTimestamp = value;
 		}
 
 		public string PrincipalId
 		{
 			get => _principalId;
-			set
-			{
-				_principalId = value;
-			}
+			set => _principalId = value;
 		}
 
 		public DateTime CreatedTime
 		{
 			get => _createdTime;
-			set
-			{
-				_createdTime = value;
-			}
+			set => _createdTime = value;
 		}
 
 		public string Description
 		{
-			get
-			{
-				return _description;
-			}
-			set
-			{
-				_description = value;
-			}
+			get => _description;
+			set => _description = value;
 		}
 		#endregion
 

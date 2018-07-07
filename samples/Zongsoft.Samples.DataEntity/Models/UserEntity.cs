@@ -1,38 +1,43 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Collections.Generic;
 
 namespace Zongsoft.Samples.DataEntity.Models
 {
-	public class UserEntity : IUserEntity
+	public class UserEntity : IUserEntity, System.ComponentModel.INotifyPropertyChanged
 	{
 		#region 静态字段
 		private static readonly string[] __NAMES__ = new string[] { "UserId", "Namespace", "Name", "FullName", "Email", "PhoneNumber", "Avatar", "Status", "StatusTimestamp", "PrincipalId", "CreatedTime", "Description" };
-		private static readonly Dictionary<string, DataEntity.PropertyToken<UserEntity>> __PROPERTIES__ = new Dictionary<string, DataEntity.PropertyToken<UserEntity>>()
+		private static readonly Dictionary<string, PropertyToken<UserEntity>> __PROPERTIES__ = new Dictionary<string, PropertyToken<UserEntity>>()
 		{
-			{ "UserId", new DataEntity.PropertyToken<UserEntity>(0, target => target._userId, (target, value) => target.UserId = (uint) value) },
-			{ "Namespace", new DataEntity.PropertyToken<UserEntity>(1, target => target._namespace, (target, value) => target.Namespace = (string) value) },
-			{ "Name", new DataEntity.PropertyToken<UserEntity>(2, target => target._name, (target, value) => target.Name = (string) value) },
-			{ "FullName", new DataEntity.PropertyToken<UserEntity>(3, target => target._fullName, (target, value) => target.FullName = (string) value) },
-			{ "Email", new DataEntity.PropertyToken<UserEntity>(4, target => target._email, (target, value) => target.Email = (string) value) },
-			{ "PhoneNumber", new DataEntity.PropertyToken<UserEntity>(5, target => target._phoneNumber, (target, value) => target.PhoneNumber = (string) value) },
-			{ "Avatar", new DataEntity.PropertyToken<UserEntity>(6, target => target._avatar, (target, value) => target.Avatar = (string) value) },
-			{ "Status", new DataEntity.PropertyToken<UserEntity>(7, target => target._status, (target, value) => target.Status = (byte) value) },
-			{ "StatusTimestamp", new DataEntity.PropertyToken<UserEntity>(8, target => target._statusTimestamp, (target, value) => target.StatusTimestamp = (DateTime?) value) },
-			{ "PrincipalId", new DataEntity.PropertyToken<UserEntity>(9, target => target._principalId, (target, value) => target.PrincipalId = (string) value) },
-			{ "CreatedTime", new DataEntity.PropertyToken<UserEntity>(10, target => target._createdTime, (target, value) => target.CreatedTime = (DateTime) value) },
-			{ "Description", new DataEntity.PropertyToken<UserEntity>(11, target => target._description, (target, value) => target.Description = (string) value) },
+			{ "UserId", new PropertyToken<UserEntity>(0, target => target._userId, (target, value) => target.UserId = (uint) value) },
+			{ "Namespace", new PropertyToken<UserEntity>(1, target => target._namespace, (target, value) => target.Namespace = (string) value) },
+			{ "Name", new PropertyToken<UserEntity>(2, target => target._name, (target, value) => target.Name = (string) value) },
+			{ "FullName", new PropertyToken<UserEntity>(3, target => target._fullName, (target, value) => target.FullName = (string) value) },
+			{ "Email", new PropertyToken<UserEntity>(4, target => target._email, (target, value) => target.Email = (string) value) },
+			{ "PhoneNumber", new PropertyToken<UserEntity>(5, target => target._phoneNumber, (target, value) => target.PhoneNumber = (string) value) },
+			{ "Avatar", new PropertyToken<UserEntity>(6, target => target._avatar, (target, value) => target.Avatar = (string) value) },
+			{ "Status", new PropertyToken<UserEntity>(7, target => target._status, (target, value) => target.Status = (byte) value) },
+			{ "StatusTimestamp", new PropertyToken<UserEntity>(8, target => target._statusTimestamp, (target, value) => target.StatusTimestamp = (DateTime?) value) },
+			{ "PrincipalId", new PropertyToken<UserEntity>(9, target => target._principalId, (target, value) => target.PrincipalId = (string) value) },
+			{ "CreatedTime", new PropertyToken<UserEntity>(10, target => target._createdTime, (target, value) => target.CreatedTime = (DateTime) value) },
+			{ "Description", new PropertyToken<UserEntity>(11, target => target._description, (target, value) => target.Description = (string) value) },
 		};
 		#endregion
 
+		#region 事件定义
+		public event PropertyChangedEventHandler PropertyChanged;
+		#endregion
+
 		#region 标记变量
-		private ushort _MASK_;
-		//private readonly byte[] _flags_;
+		private ulong _MASK_;
+		private readonly byte[] _flags_;
 		#endregion
 
 		#region 构造函数
 		public UserEntity()
 		{
-			//_flags_ = new byte[10];
+			_flags_ = new byte[10];
 		}
 		#endregion
 
@@ -57,8 +62,13 @@ namespace Zongsoft.Samples.DataEntity.Models
 			get => _userId;
 			set
 			{
+				if(_userId == value)
+					return;
+
 				_userId = value;
 				_MASK_ |= 1;
+
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(UserId)));
 			}
 		}
 
@@ -67,6 +77,9 @@ namespace Zongsoft.Samples.DataEntity.Models
 			get => _namespace;
 			set
 			{
+				if(_namespace == value)
+					return;
+
 				_namespace = value;
 				_MASK_ |= 2;
 			}
@@ -122,6 +135,11 @@ namespace Zongsoft.Samples.DataEntity.Models
 			}
 		}
 
+		public string AvatarUrl
+		{
+			get => UserExtension.GetAvatarUrl(this, "AvatarUrl");
+		}
+
 		public byte Status
 		{
 			get => _status;
@@ -137,6 +155,10 @@ namespace Zongsoft.Samples.DataEntity.Models
 			get => _statusTimestamp;
 			set
 			{
+				if(object.Equals(_statusTimestamp, value))
+				//if(_statusTimestamp == value)
+					return;
+
 				_statusTimestamp = value;
 				_MASK_ |= 256;
 			}
@@ -157,6 +179,9 @@ namespace Zongsoft.Samples.DataEntity.Models
 			get => _createdTime;
 			set
 			{
+				if(_createdTime == value)
+					return;
+
 				_createdTime = value;
 				_MASK_ |= 1024;
 			}
@@ -171,21 +196,45 @@ namespace Zongsoft.Samples.DataEntity.Models
 			set
 			{
 				_description = value;
-				_MASK_ |= 2048;
+				//_MASK_ |= 2048;
 				//return;
 
-				//var flag = _flags_[12 / 8];
-				//flag |= (byte)Math.Pow(2, 12 % 8);
+				//var flag = _flags_[11 / 8];
+				//flag |= (byte)Math.Pow(2, 11 % 8);
 
-				//_flags_[12 / 8] |= (byte)Math.Pow(2, 12 % 8);
+				_flags_[11 / 8] |= (byte)Math.Pow(2, 11 % 8);
 			}
 		}
 		#endregion
 
 		#region 接口方法
+		private bool HasChanges(params string[] names)
+		{
+			PropertyToken<UserEntity> property;
+
+			if(names == null || names.Length == 0)
+			{
+				for(int i = 0; i < _flags_.Length; i++)
+				{
+					if(_flags_[i] != 0)
+						return true;
+				}
+
+				return false;
+			}
+
+			for(var i = 0; i < names.Length; i++)
+			{
+				if(__PROPERTIES__.TryGetValue(names[i], out property) && (_flags_[property.Ordinal / 8] >> (property.Ordinal % 8) & 1) == 1)
+					return true;
+			}
+
+			return false;
+		}
+
 		bool Zongsoft.Data.IDataEntity.HasChanges(params string[] names)
 		{
-			DataEntity.PropertyToken<UserEntity> property;
+			PropertyToken<UserEntity> property;
 
 			if(names == null || names.Length == 0)
 				return _MASK_ != 0;
@@ -197,6 +246,21 @@ namespace Zongsoft.Samples.DataEntity.Models
 			}
 
 			return false;
+		}
+
+		private IDictionary<string, object> GetChanges()
+		{
+			var dictionary = new Dictionary<string, object>(__NAMES__.Length);
+
+			for(int i = 0; i < __NAMES__.Length; i++)
+			{
+				if((_flags_[i / 8] >> (i % 8) & 1) == 1)
+				{
+					dictionary[__NAMES__[i]] = __PROPERTIES__[__NAMES__[i]].Getter(this);
+				}
+			}
+
+			return dictionary;
 		}
 
 		IDictionary<string, object> Zongsoft.Data.IDataEntity.GetChanges()
@@ -215,6 +279,19 @@ namespace Zongsoft.Samples.DataEntity.Models
 			}
 
 			return dictionary;
+		}
+
+		private bool TryGet(string name, out object value)
+		{
+			value = null;
+
+			if(__PROPERTIES__.TryGetValue(name, out var property) && (_flags_[property.Ordinal / 8] >> (property.Ordinal % 8) & 1) == 1)
+			{
+				value = property.Getter(this);
+				return true;
+			}
+
+			return false;
 		}
 
 		bool Zongsoft.Data.IDataEntity.TryGet(string name, out object value)
@@ -291,12 +368,22 @@ namespace Zongsoft.Samples.DataEntity.Models
 		{
 			private static uint GetUserId(UserEntity target)
 			{
-				return target._userId;
+				return target.UserId;
 			}
 
 			private static void SetUserId(UserEntity target, uint value)
 			{
 				target.UserId = value;
+			}
+
+			private static byte GetStatus(object target)
+			{
+				return ((UserEntity)target)._status;
+			}
+
+			private static void SetStatus(object target, object value)
+			{
+				((UserEntity)target).Status = (byte)value;
 			}
 		}
 	}
