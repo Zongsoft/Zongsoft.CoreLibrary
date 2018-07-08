@@ -219,7 +219,7 @@ namespace Zongsoft.Samples.DataEntity
 				}
 				else
 				{
-					var method = extensionAttribute.Type.GetMethod("Get" + properties[i].Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static, null, new Type[] { properties[i].DeclaringType, typeof(string) }, null) ??
+					var method = extensionAttribute.Type.GetMethod("Get" + properties[i].Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static, null, new Type[] { properties[i].DeclaringType, properties[i].PropertyType }, null) ??
 					             extensionAttribute.Type.GetMethod("Get" + properties[i].Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static, null, new Type[] { properties[i].DeclaringType }, null);
 
 					if(method == null)
@@ -228,7 +228,15 @@ namespace Zongsoft.Samples.DataEntity
 					generator.Emit(OpCodes.Ldarg_0);
 
 					if(method.GetParameters().Length == 2)
-						generator.Emit(OpCodes.Ldstr, properties[i].Name);
+					{
+						if(field == null)
+							LoadDefaultValue(generator, properties[i].PropertyType);
+						else
+						{
+							generator.Emit(OpCodes.Ldarg_0);
+							generator.Emit(OpCodes.Ldfld, field);
+						}
+					}
 
 					generator.Emit(OpCodes.Call, method);
 					generator.Emit(OpCodes.Ret);
@@ -274,8 +282,7 @@ namespace Zongsoft.Samples.DataEntity
 					}
 					else
 					{
-						var method = extensionAttribute.Type.GetMethod("Set" + properties[i].Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static, null, new Type[] { properties[i].DeclaringType, typeof(string), properties[i].PropertyType }, null) ??
-						             extensionAttribute.Type.GetMethod("Set" + properties[i].Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static, null, new Type[] { properties[i].DeclaringType, properties[i].PropertyType }, null);
+						var method = extensionAttribute.Type.GetMethod("Set" + properties[i].Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static, null, new Type[] { properties[i].DeclaringType, properties[i].PropertyType }, null);
 
 						if(method == null)
 						{
@@ -291,8 +298,6 @@ namespace Zongsoft.Samples.DataEntity
 								throw new InvalidOperationException($"Invalid '{method}' extension method, it's return type must be boolean type.");
 
 							generator.Emit(OpCodes.Ldarg_0);
-							if(method.GetParameters().Length == 3)
-								generator.Emit(OpCodes.Ldstr, properties[i].Name);
 							generator.Emit(OpCodes.Ldarg_1);
 							generator.Emit(OpCodes.Call, method);
 							generator.Emit(OpCodes.Brfalse_S, exit);
@@ -546,20 +551,35 @@ namespace Zongsoft.Samples.DataEntity
 			tokens = builder.DefineField(PROPERTY_TOKENS_VARIABLE, typeof(Dictionary<,>).MakeGenericType(typeof(string), tokenType), FieldAttributes.Private | FieldAttributes.Static | FieldAttributes.InitOnly);
 			var entityType = _module.GetType(builder.UnderlyingSystemType.FullName);
 
+			//定义只读属性的递增数量
+			var countReadOnly = 0;
+			//定义可写属性的总数量
+			var countWritable = properties.Count - properties.Count(p => !p.CanWrite);
+
 			var generator = builder.DefineTypeInitializer().GetILGenerator();
 
-			generator.Emit(OpCodes.Ldc_I4, properties.Count);
+			generator.Emit(OpCodes.Ldc_I4, countWritable);
 			generator.Emit(OpCodes.Newarr, typeof(string));
 
 			for(int i = 0; i < properties.Count; i++)
 			{
+				//忽略只读属性
+				if(!properties[i].CanWrite)
+				{
+					countReadOnly++;
+					continue;
+				}
+
 				generator.Emit(OpCodes.Dup);
-				generator.Emit(OpCodes.Ldc_I4, i);
+				generator.Emit(OpCodes.Ldc_I4, i - countReadOnly);
 				generator.Emit(OpCodes.Ldstr, properties[i].Name);
 				generator.Emit(OpCodes.Stelem_Ref);
 			}
 
 			generator.Emit(OpCodes.Stsfld, names);
+
+			//重置只读属性的递增量
+			countReadOnly = 0;
 
 			generator.Emit(OpCodes.Newobj, tokens.FieldType.GetConstructor(Type.EmptyTypes));
 
@@ -567,7 +587,7 @@ namespace Zongsoft.Samples.DataEntity
 			{
 				generator.Emit(OpCodes.Dup);
 				generator.Emit(OpCodes.Ldstr, properties[i].Name);
-				generator.Emit(OpCodes.Ldc_I4, i);
+				generator.Emit(OpCodes.Ldc_I4, methods[i].SetMethod == null ? -1 : i - countReadOnly);
 
 				generator.Emit(OpCodes.Ldnull);
 				if(methods[i].GetMethod != null)
@@ -581,6 +601,10 @@ namespace Zongsoft.Samples.DataEntity
 				{
 					generator.Emit(OpCodes.Ldftn, methods[i].SetMethod);
 					generator.Emit(OpCodes.Newobj, typeof(Action<,>).MakeGenericType(typeof(object), typeof(object)).GetConstructor(new Type[] { typeof(object), typeof(IntPtr) }));
+				}
+				else
+				{
+					countReadOnly++;
 				}
 
 				generator.Emit(OpCodes.Newobj, PROPERTY_TOKEN_CONSTRUCTOR);
@@ -740,6 +764,11 @@ namespace Zongsoft.Samples.DataEntity
 			generator.Emit(OpCodes.Ldelem_Ref);
 			generator.Emit(OpCodes.Ldloca_S, 0);
 			generator.Emit(OpCodes.Call, tokens.FieldType.GetMethod("TryGetValue", BindingFlags.Public | BindingFlags.Instance));
+			generator.Emit(OpCodes.Brfalse_S, LOOP_INCREASE_LABEL);
+
+			// if(... && property.Setter != null && ...)
+			generator.Emit(OpCodes.Ldloc_0);
+			generator.Emit(OpCodes.Ldfld, PROPERTY_TOKEN_SETTER_FIELD);
 			generator.Emit(OpCodes.Brfalse_S, LOOP_INCREASE_LABEL);
 
 			if(mask.FieldType.IsArray)
@@ -958,6 +987,7 @@ namespace Zongsoft.Samples.DataEntity
 
 			//定义代码标签
 			var EXIT_LABEL = generator.DefineLabel();
+			var GETBODY_LABEL = generator.DefineLabel();
 
 			// value=null;
 			generator.Emit(OpCodes.Ldarg_2);
@@ -971,9 +1001,15 @@ namespace Zongsoft.Samples.DataEntity
 			generator.Emit(OpCodes.Call, tokens.FieldType.GetMethod("TryGetValue", BindingFlags.Public | BindingFlags.Instance));
 			generator.Emit(OpCodes.Brfalse_S, EXIT_LABEL);
 
+			// if(... && (property.Ordinal<0 || ...))
+			generator.Emit(OpCodes.Ldloc_0);
+			generator.Emit(OpCodes.Ldfld, PROPERTY_TOKEN_ORDINAL_FIELD);
+			generator.Emit(OpCodes.Ldc_I4_0);
+			generator.Emit(OpCodes.Blt_S, GETBODY_LABEL);
+
 			if(mask.FieldType.IsArray)
 			{
-				// if(... && (this.$MASK$[property.Ordinal / 8] >> (property.Ordinal % 8) & 1) == 1)
+				// if(... && (... || (this.$MASK$[property.Ordinal / 8] >> (property.Ordinal % 8) & 1) == 1))
 				generator.Emit(OpCodes.Ldarg_0);
 				generator.Emit(OpCodes.Ldfld, mask);
 				generator.Emit(OpCodes.Ldloc_0);
@@ -993,7 +1029,7 @@ namespace Zongsoft.Samples.DataEntity
 			}
 			else
 			{
-				// if(... && ((this.$MASK$ >> property.Ordinal) & 1) == 1)
+				// if(... && (... || ((this.$MASK$ >> property.Ordinal) & 1) == 1))
 				generator.Emit(OpCodes.Ldarg_0);
 				generator.Emit(OpCodes.Ldfld, mask);
 				generator.Emit(OpCodes.Ldloc_0);
@@ -1008,6 +1044,8 @@ namespace Zongsoft.Samples.DataEntity
 					generator.Emit(OpCodes.Conv_I8);
 				generator.Emit(OpCodes.Bne_Un_S, EXIT_LABEL);
 			}
+
+			generator.MarkLabel(GETBODY_LABEL);
 
 			// value = property.Getter(this);
 			generator.Emit(OpCodes.Ldarg_2);
@@ -1056,6 +1094,11 @@ namespace Zongsoft.Samples.DataEntity
 			generator.Emit(OpCodes.Ldarg_1);
 			generator.Emit(OpCodes.Ldloca_S, 0);
 			generator.Emit(OpCodes.Call, tokens.FieldType.GetMethod("TryGetValue", BindingFlags.Public | BindingFlags.Instance));
+			generator.Emit(OpCodes.Brfalse_S, EXIT_LABEL);
+
+			// if(... && property.Setter != null)
+			generator.Emit(OpCodes.Ldloc_0);
+			generator.Emit(OpCodes.Ldfld, PROPERTY_TOKEN_SETTER_FIELD);
 			generator.Emit(OpCodes.Brfalse_S, EXIT_LABEL);
 
 			// property.Setter(this, value);
@@ -1264,6 +1307,80 @@ namespace Zongsoft.Samples.DataEntity
 			}
 
 			return properties;
+		}
+
+		private static void LoadDefaultValue(ILGenerator generator, Type type)
+		{
+			switch(Type.GetTypeCode(type))
+			{
+				case TypeCode.Boolean:
+					generator.Emit(OpCodes.Ldc_I4_0);
+					break;
+				case TypeCode.Byte:
+					generator.Emit(OpCodes.Ldc_I4_0);
+					generator.Emit(OpCodes.Conv_U1);
+					break;
+				case TypeCode.SByte:
+					generator.Emit(OpCodes.Ldc_I4_0);
+					generator.Emit(OpCodes.Conv_I1);
+					break;
+				case TypeCode.Single:
+					generator.Emit(OpCodes.Ldc_R4, 0);
+					break;
+				case TypeCode.Double:
+					generator.Emit(OpCodes.Ldc_R8, 0);
+					break;
+				case TypeCode.Int16:
+					generator.Emit(OpCodes.Ldc_I4_0);
+					generator.Emit(OpCodes.Conv_I2);
+					break;
+				case TypeCode.Int32:
+					generator.Emit(OpCodes.Ldc_I4_0);
+					break;
+				case TypeCode.Int64:
+					generator.Emit(OpCodes.Ldc_I4_0);
+					generator.Emit(OpCodes.Conv_I8);
+					break;
+				case TypeCode.UInt16:
+					generator.Emit(OpCodes.Ldc_I4_0);
+					generator.Emit(OpCodes.Conv_U2);
+					break;
+				case TypeCode.UInt32:
+					generator.Emit(OpCodes.Ldc_I4_0);
+					generator.Emit(OpCodes.Conv_U4);
+					break;
+				case TypeCode.UInt64:
+					generator.Emit(OpCodes.Ldc_I4_0);
+					generator.Emit(OpCodes.Conv_U8);
+					break;
+				case TypeCode.String:
+					generator.Emit(OpCodes.Ldnull);
+					break;
+				case TypeCode.Char:
+					generator.Emit(OpCodes.Ldsfld, typeof(Char).GetField("MinValue", BindingFlags.Public | BindingFlags.Static));
+					break;
+				case TypeCode.DateTime:
+					generator.Emit(OpCodes.Ldsfld, typeof(DateTime).GetField("MinValue", BindingFlags.Public | BindingFlags.Static));
+					break;
+				case TypeCode.DBNull:
+					generator.Emit(OpCodes.Ldsfld, typeof(DBNull).GetField("Value", BindingFlags.Public | BindingFlags.Static));
+					break;
+				case TypeCode.Decimal:
+					generator.Emit(OpCodes.Ldsfld, typeof(Decimal).GetField("Zero", BindingFlags.Public | BindingFlags.Static));
+					break;
+			}
+
+			if(type.IsValueType)
+			{
+				if(type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+					generator.Emit(OpCodes.Ldnull);
+				else
+					generator.Emit(OpCodes.Newobj, type.GetConstructor(Type.EmptyTypes));
+			}
+			else
+			{
+				generator.Emit(OpCodes.Ldnull);
+			}
 		}
 
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
