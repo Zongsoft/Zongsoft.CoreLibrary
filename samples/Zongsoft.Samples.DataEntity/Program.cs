@@ -25,6 +25,10 @@ namespace Zongsoft.Samples.DataEntity
 			Console.ReadLine();
 		}
 
+		private static void Foo()
+		{
+		}
+
 		private static void BuildTest()
 		{
 			var person = DataEntity.Build<Models.IPerson>();
@@ -46,6 +50,8 @@ namespace Zongsoft.Samples.DataEntity
 			employee.FullName = "Popeye Zhong";
 			employee.Status = 1;
 			employee.StatusTimestamp = DateTime.Now;
+			employee.Avatar = "nothing";
+			employee.TrySet("Avatar", "/data/Zongsoft/Zongsoft.CoreLibrary/README.md");
 			employee.TrySet("Email", "zongsoft@qq.com");
 			employee.TrySet("Description", "Here is the description.");
 
@@ -57,6 +63,8 @@ namespace Zongsoft.Samples.DataEntity
 				Console.WriteLine($"FullName: {fullName}");
 			if(employee.TryGet("Email", out var email))
 				Console.WriteLine($"Email: {email}");
+			if(employee.TryGet("AvatarUrl", out var avatarUrl))
+				Console.WriteLine($"AvatarUrl: {avatarUrl}");
 			if(employee.TryGet("NoExists", out var noExists))
 				Console.WriteLine($"NoExists: {noExists}");
 

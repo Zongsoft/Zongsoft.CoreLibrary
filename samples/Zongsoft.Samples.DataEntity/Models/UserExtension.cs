@@ -5,17 +5,17 @@ namespace Zongsoft.Samples.DataEntity.Models
 {
 	public static class UserExtension
 	{
-		public static string GetAvatar(IUserEntity user)
+		public static string GetAvatar(IUserEntity user, string value)
 		{
-			return null;
+			return value;
 		}
 
-		public static bool SetAvatar(IUserEntity user, string name, string value)
+		public static bool SetAvatar(IUserEntity user, string value)
 		{
-			return false;
+			return true;
 		}
 
-		public static string GetAvatarUrl(IUserEntity user, string name)
+		public static string GetAvatarUrl(IUserEntity user)
 		{
 			var avatar = user.Avatar;
 

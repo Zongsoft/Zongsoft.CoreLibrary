@@ -137,7 +137,7 @@ namespace Zongsoft.Samples.DataEntity.Models
 
 		public string AvatarUrl
 		{
-			get => UserExtension.GetAvatarUrl(this, "AvatarUrl");
+			get => UserExtension.GetAvatarUrl(this);
 		}
 
 		public byte Status
@@ -225,7 +225,7 @@ namespace Zongsoft.Samples.DataEntity.Models
 
 			for(var i = 0; i < names.Length; i++)
 			{
-				if(__PROPERTIES__.TryGetValue(names[i], out property) && (_flags_[property.Ordinal / 8] >> (property.Ordinal % 8) & 1) == 1)
+				if(__PROPERTIES__.TryGetValue(names[i], out property) && property.Setter != null && (_flags_[property.Ordinal / 8] >> (property.Ordinal % 8) & 1) == 1)
 					return true;
 			}
 
@@ -241,7 +241,7 @@ namespace Zongsoft.Samples.DataEntity.Models
 
 			for(var i = 0; i < names.Length; i++)
 			{
-				if(__PROPERTIES__.TryGetValue(names[i], out property) && (_MASK_ >> property.Ordinal & 1) == 1)
+				if(__PROPERTIES__.TryGetValue(names[i], out property) && property.Setter != null && (_MASK_ >> property.Ordinal & 1) == 1)
 					return true;
 			}
 
@@ -285,7 +285,7 @@ namespace Zongsoft.Samples.DataEntity.Models
 		{
 			value = null;
 
-			if(__PROPERTIES__.TryGetValue(name, out var property) && (_flags_[property.Ordinal / 8] >> (property.Ordinal % 8) & 1) == 1)
+			if(__PROPERTIES__.TryGetValue(name, out var property) && (property.Ordinal < 0 || (_flags_[property.Ordinal / 8] >> (property.Ordinal % 8) & 1) == 1))
 			{
 				value = property.Getter(this);
 				return true;
@@ -298,7 +298,7 @@ namespace Zongsoft.Samples.DataEntity.Models
 		{
 			value = null;
 
-			if(__PROPERTIES__.TryGetValue(name, out var property) && (_MASK_ >> property.Ordinal & 1) == 1)
+			if(__PROPERTIES__.TryGetValue(name, out var property) && (property.Ordinal < 0 || (_MASK_ >> property.Ordinal & 1) == 1))
 			{
 				value = property.Getter(this);
 				return true;
