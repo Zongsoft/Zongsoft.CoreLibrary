@@ -22,6 +22,7 @@ namespace Zongsoft.Samples.DataEntity.Models
 		private string _principalId;
 		private DateTime _createdTime;
 		private string _description;
+		private ICollection<string> _assets;
 		#endregion
 
 		#region 公共属性
@@ -72,6 +73,23 @@ namespace Zongsoft.Samples.DataEntity.Models
 			get => null;
 		}
 
+		public ICollection<string> Assets
+		{
+			get
+			{
+				if(_assets == null)
+				{
+					lock(this)
+					{
+						if(_assets == null)
+							_assets = new List<string>();
+					}
+				}
+
+				return _assets;
+			}
+		}
+
 		public byte Status
 		{
 			get => _status;
@@ -114,13 +132,13 @@ namespace Zongsoft.Samples.DataEntity.Models
 			return null;
 		}
 
-		public bool TryGet(string name, out object value)
+		public bool TryGetValue(string name, out object value)
 		{
 			value = null;
 			return false;
 		}
 
-		public bool TrySet(string name, object value)
+		public bool TrySetValue(string name, object value)
 		{
 			return false;
 		}

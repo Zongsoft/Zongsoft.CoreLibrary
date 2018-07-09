@@ -28,14 +28,20 @@ namespace Zongsoft.Samples.DataEntity.Models
 			get; set;
 		}
 
-		[PropertyExtension(typeof(UserExtension))]
+		[Zongsoft.Data.EntityBehavior(typeof(UserExtension))]
 		string Avatar
 		{
 			get; set;
 		}
 
-		[PropertyExtension(typeof(UserExtension))]
+		[Zongsoft.Data.EntityBehavior(typeof(UserExtension))]
 		string AvatarUrl
+		{
+			get;
+		}
+
+		[Zongsoft.Data.EntityBehavior()]
+		ICollection<string> Assets
 		{
 			get;
 		}
