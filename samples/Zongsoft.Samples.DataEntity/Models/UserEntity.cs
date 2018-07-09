@@ -54,6 +54,7 @@ namespace Zongsoft.Samples.DataEntity.Models
 		private string _principalId;
 		private DateTime _createdTime;
 		private string _description;
+		private ICollection<string> _assets;
 		#endregion
 
 		#region 公共属性
@@ -138,6 +139,23 @@ namespace Zongsoft.Samples.DataEntity.Models
 		public string AvatarUrl
 		{
 			get => UserExtension.GetAvatarUrl(this);
+		}
+
+		public ICollection<string> Assets
+		{
+			get
+			{
+				if(_assets == null)
+				{
+					lock(this)
+					{
+						if(_assets == null)
+							_assets = new List<string>();
+					}
+				}
+
+				return _assets;
+			}
 		}
 
 		public byte Status
@@ -232,7 +250,7 @@ namespace Zongsoft.Samples.DataEntity.Models
 			return false;
 		}
 
-		bool Zongsoft.Data.IDataEntity.HasChanges(params string[] names)
+		bool Zongsoft.Data.IEntity.HasChanges(params string[] names)
 		{
 			PropertyToken<UserEntity> property;
 
@@ -263,7 +281,7 @@ namespace Zongsoft.Samples.DataEntity.Models
 			return dictionary;
 		}
 
-		IDictionary<string, object> Zongsoft.Data.IDataEntity.GetChanges()
+		IDictionary<string, object> Zongsoft.Data.IEntity.GetChanges()
 		{
 			if(_MASK_ == 0)
 				return null;
@@ -294,7 +312,7 @@ namespace Zongsoft.Samples.DataEntity.Models
 			return false;
 		}
 
-		bool Zongsoft.Data.IDataEntity.TryGet(string name, out object value)
+		bool Zongsoft.Data.IEntity.TryGetValue(string name, out object value)
 		{
 			value = null;
 
@@ -307,7 +325,7 @@ namespace Zongsoft.Samples.DataEntity.Models
 			return false;
 		}
 
-		bool Zongsoft.Data.IDataEntity.TrySet(string name, object value)
+		bool Zongsoft.Data.IEntity.TrySetValue(string name, object value)
 		{
 			if(__PROPERTIES__.TryGetValue(name, out var property))
 			{
@@ -318,7 +336,7 @@ namespace Zongsoft.Samples.DataEntity.Models
 			return false;
 		}
 
-		private bool TrySet(string name, object value)
+		private bool TrySetValue(string name, object value)
 		{
 			switch(name)
 			{

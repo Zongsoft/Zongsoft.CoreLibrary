@@ -25,10 +25,6 @@ namespace Zongsoft.Samples.DataEntity
 			Console.ReadLine();
 		}
 
-		private static void Foo()
-		{
-		}
-
 		private static void BuildTest()
 		{
 			var person = DataEntity.Build<Models.IPerson>();
@@ -51,21 +47,21 @@ namespace Zongsoft.Samples.DataEntity
 			employee.Status = 1;
 			employee.StatusTimestamp = DateTime.Now;
 			employee.Avatar = "nothing";
-			employee.TrySet("Avatar", "/data/Zongsoft/Zongsoft.CoreLibrary/README.md");
-			employee.TrySet("Email", "zongsoft@qq.com");
-			employee.TrySet("Description", "Here is the description.");
+			employee.TrySetValue("Avatar", "/data/Zongsoft/Zongsoft.CoreLibrary/README.md");
+			employee.TrySetValue("Email", "zongsoft@qq.com");
+			employee.TrySetValue("Description", "Here is the description.");
 
 			Console.WriteLine();
 
-			if(employee.TryGet("Name", out var name))
+			if(employee.TryGetValue("Name", out var name))
 				Console.WriteLine($"Name: {name}");
-			if(employee.TryGet("FullName", out var fullName))
+			if(employee.TryGetValue("FullName", out var fullName))
 				Console.WriteLine($"FullName: {fullName}");
-			if(employee.TryGet("Email", out var email))
+			if(employee.TryGetValue("Email", out var email))
 				Console.WriteLine($"Email: {email}");
-			if(employee.TryGet("AvatarUrl", out var avatarUrl))
+			if(employee.TryGetValue("AvatarUrl", out var avatarUrl))
 				Console.WriteLine($"AvatarUrl: {avatarUrl}");
-			if(employee.TryGet("NoExists", out var noExists))
+			if(employee.TryGetValue("NoExists", out var noExists))
 				Console.WriteLine($"NoExists: {noExists}");
 
 			Console.WriteLine();
@@ -151,14 +147,14 @@ namespace Zongsoft.Samples.DataEntity
 			{
 				Models.IUserEntity user = new Models.UserEntity();
 
-				user.TrySet("UserId", (uint)i);
-				user.TrySet("Avatar", ":smile:");
-				user.TrySet("Name", "Name: " + i.ToString());
-				user.TrySet("FullName", "FullName");
-				user.TrySet("Namespace", "Zongsoft");
-				user.TrySet("Status", (byte)(i % byte.MaxValue));
-				user.TrySet("StatusTimestamp", (i % 11 == 0) ? DateTime.Now : DateTime.MinValue);
-				user.TrySet("CreatedTime", DateTime.Now);
+				user.TrySetValue("UserId", (uint)i);
+				user.TrySetValue("Avatar", ":smile:");
+				user.TrySetValue("Name", "Name: " + i.ToString());
+				user.TrySetValue("FullName", "FullName");
+				user.TrySetValue("Namespace", "Zongsoft");
+				user.TrySetValue("Status", (byte)(i % byte.MaxValue));
+				user.TrySetValue("StatusTimestamp", (i % 11 == 0) ? DateTime.Now : DateTime.MinValue);
+				user.TrySetValue("CreatedTime", DateTime.Now);
 			}
 
 			Console.WriteLine($"DataEntity(TrySet): {stopwatch.ElapsedMilliseconds}");
@@ -260,14 +256,14 @@ namespace Zongsoft.Samples.DataEntity
 
 			Console.WriteLine("HasChanges(Name, Email): {0}", entity.HasChanges("Email", "Name"));
 
-			entity.TrySet("Email", "zongsoft@qq.com");
-			entity.TrySet("PhoneNumber", "+86.13812345678");
+			entity.TrySetValue("Email", "zongsoft@qq.com");
+			entity.TrySetValue("PhoneNumber", "+86.13812345678");
 
 			Console.WriteLine($"HasChanges: {entity.HasChanges()}");
 			DisplayChanges(entity);
 		}
 
-		private static void DisplayChanges(Zongsoft.Data.IDataEntity entity)
+		private static void DisplayChanges(Zongsoft.Data.IEntity entity)
 		{
 			int index = 0;
 

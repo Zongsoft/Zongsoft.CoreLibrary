@@ -7,9 +7,9 @@ using System.Reflection.Emit;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Zongsoft.Samples.DataEntity
+namespace Zongsoft.Data
 {
-	public static class DataEntity
+	public static class Entity
 	{
 		#region 常量定义
 		private const string ASSEMBLY_NAME = "Zongsoft.Dynamics.Entities";
@@ -29,8 +29,11 @@ namespace Zongsoft.Samples.DataEntity
 		private static readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
 		private static readonly Dictionary<Type, Func<object>> _cache = new Dictionary<Type, Func<object>>();
 
-		private static readonly AssemblyBuilder _assembly = AppDomain.CurrentDomain.DefineDynamicAssembly(new AssemblyName(ASSEMBLY_NAME), AssemblyBuilderAccess.RunAndSave);
-		private static readonly ModuleBuilder _module = _assembly.DefineDynamicModule(ASSEMBLY_NAME, ASSEMBLY_NAME + ".dll");
+		private static readonly AssemblyBuilder _assembly = AppDomain.CurrentDomain.DefineDynamicAssembly(new AssemblyName(ASSEMBLY_NAME), AssemblyBuilderAccess.Run);
+		private static readonly ModuleBuilder _module = _assembly.DefineDynamicModule(ASSEMBLY_NAME);
+
+		//private static readonly AssemblyBuilder _assembly = AppDomain.CurrentDomain.DefineDynamicAssembly(new AssemblyName(ASSEMBLY_NAME), AssemblyBuilderAccess.RunAndSave);
+		//private static readonly ModuleBuilder _module = _assembly.DefineDynamicModule(ASSEMBLY_NAME, ASSEMBLY_NAME + ".dll");
 		#endregion
 
 		#region 公共方法
@@ -183,18 +186,18 @@ namespace Zongsoft.Samples.DataEntity
 				var property = builder.DefineProperty(properties[i].Name, PropertyAttributes.None, properties[i].PropertyType, null);
 				var attributes = properties[i].GetCustomAttributesData();
 
-				var implementationAttribute = properties[i].GetCustomAttribute<Zongsoft.Data.EntityBehaviorAttribute>();
+				var implementationAttribute = properties[i].GetCustomAttribute<EntityBehaviorAttribute>();
 
-				if(implementationAttribute != null && implementationAttribute.Mode == Data.EntityBehaviorAttribute.ImplementationMode.Auto)
+				if(implementationAttribute != null && implementationAttribute.Mode == EntityBehaviorAttribute.ImplementationMode.Auto)
 				{
 					implementationAttribute.Mode = IsCollectionType(properties[i].PropertyType) ?
-					                               Data.EntityBehaviorAttribute.ImplementationMode.Singleton :
-					                               Data.EntityBehaviorAttribute.ImplementationMode.Extension;
+					                               EntityBehaviorAttribute.ImplementationMode.Singleton :
+					                               EntityBehaviorAttribute.ImplementationMode.Extension;
 				}
 
 				if(field == null && implementationAttribute != null)
 				{
-					if(implementationAttribute.Mode == Data.EntityBehaviorAttribute.ImplementationMode.Singleton)
+					if(implementationAttribute.Mode == EntityBehaviorAttribute.ImplementationMode.Singleton)
 						field = builder.DefineField("$" + properties[i].Name, properties[i].PropertyType, FieldAttributes.Private);
 				}
 
@@ -228,7 +231,7 @@ namespace Zongsoft.Samples.DataEntity
 						generator.Emit(OpCodes.Ret);
 					}
 				}
-				else if(implementationAttribute.Mode == Data.EntityBehaviorAttribute.ImplementationMode.Extension)
+				else if(implementationAttribute.Mode == EntityBehaviorAttribute.ImplementationMode.Extension)
 				{
 					var method = implementationAttribute.Type.GetMethod("Get" + properties[i].Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static, null, new Type[] { properties[i].DeclaringType, properties[i].PropertyType }, null) ??
 								 implementationAttribute.Type.GetMethod("Get" + properties[i].Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static, null, new Type[] { properties[i].DeclaringType }, null);
@@ -252,7 +255,7 @@ namespace Zongsoft.Samples.DataEntity
 					generator.Emit(OpCodes.Call, method);
 					generator.Emit(OpCodes.Ret);
 				}
-				else if(implementationAttribute.Mode == Data.EntityBehaviorAttribute.ImplementationMode.Singleton)
+				else if(implementationAttribute.Mode == EntityBehaviorAttribute.ImplementationMode.Singleton)
 				{
 					if(implementationAttribute.Type != null && !Zongsoft.Common.TypeExtension.IsAssignableFrom(field.FieldType, implementationAttribute.Type))
 						throw new InvalidOperationException($"The '{implementationAttribute.Type}' type of the '{properties[i].Name}' property does not implement '{field.FieldType}' interface or class.");
@@ -1520,6 +1523,47 @@ namespace Zongsoft.Samples.DataEntity
 		#endregion
 
 		#region 嵌套子类
+		public enum ImplementationMode
+		{
+			Auto,
+			Extension,
+			Singleton,
+		}
+
+		[AttributeUsage(AttributeTargets.Interface | AttributeTargets.Property | AttributeTargets.Method)]
+		public class PropertyAttribute : Attribute
+		{
+			#region 构造函数
+			public PropertyAttribute()
+			{
+				this.Mode = ImplementationMode.Singleton;
+			}
+
+			public PropertyAttribute(Type type) : this(type, ImplementationMode.Auto)
+			{
+			}
+
+			public PropertyAttribute(Type type, ImplementationMode mode)
+			{
+				this.Type = type ?? throw new ArgumentNullException(nameof(type));
+				this.Mode = mode;
+			}
+			#endregion
+
+			#region 公共属性
+			public Type Type
+			{
+				get;
+			}
+
+			public ImplementationMode Mode
+			{
+				get;
+				set;
+			}
+			#endregion
+		}
+
 		private struct MethodToken
 		{
 			public MethodToken(MethodBuilder getMethod, MethodBuilder setMethod)
