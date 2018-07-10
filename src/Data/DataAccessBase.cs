@@ -179,7 +179,7 @@ namespace Zongsoft.Data
 			outParameters = context.OutParameters;
 
 			//返回最终的结果
-			return context.Result as IEnumerable<T>;
+			return this.ToEnumerable<T>(context.Result);
 		}
 
 		public object ExecuteScalar(string name, IDictionary<string, object> inParameters, object state = null, Func<DataExecuteContextBase, bool> executing = null, Action<DataExecuteContextBase> executed = null)
@@ -1186,7 +1186,7 @@ namespace Zongsoft.Data
 				selected(context);
 
 			//返回最终的结果
-			return context.Result as IEnumerable<T>;
+			return this.ToEnumerable<T>(context.Result);
 		}
 
 		protected abstract void OnSelect(DataSelectContextBase context);
@@ -1401,6 +1401,17 @@ namespace Zongsoft.Data
 			}
 		}
 
+		private IEnumerable<T> ToEnumerable<T>(object result)
+		{
+			if(result == null)
+				System.Linq.Enumerable.Empty<T>();
+
+			if(result is IEnumerable<T> items)
+				return items;
+
+			return new ResultEnumerable<T>(result);
+		}
+
 		private static DataDictionary GetDataDictionary(object data)
 		{
 			if(data == null)
@@ -1424,6 +1435,67 @@ namespace Zongsoft.Data
 				{
 					if(item != null)
 						yield return (item as DataDictionary) ?? new DataDictionary(item);
+				}
+			}
+		}
+		#endregion
+
+		#region 嵌套子类
+		private class ResultEnumerable<T> : IEnumerable<T>
+		{
+			private readonly IEnumerable _items;
+
+			public ResultEnumerable(object result)
+			{
+				if(result == null)
+					throw new ArgumentNullException(nameof(result));
+
+				if(result is IEnumerable)
+					_items = (IEnumerable)result;
+				else
+				{
+					_items = Array.CreateInstance(result.GetType(), 1);
+					((Array)_items).SetValue(result, 0);
+				}
+			}
+
+			public IEnumerator<T> GetEnumerator()
+			{
+				return new Enumerator(_items.GetEnumerator());
+			}
+
+			IEnumerator IEnumerable.GetEnumerator()
+			{
+				return new Enumerator(_items.GetEnumerator());
+			}
+
+			public class Enumerator : IEnumerator<T>
+			{
+				private readonly IEnumerator _iterator;
+
+				public Enumerator(IEnumerator iterator)
+				{
+					_iterator = iterator;
+				}
+
+				public T Current => (T)System.Convert.ChangeType(_iterator.Current, typeof(T));
+
+				object IEnumerator.Current => _iterator.Current;
+
+				public void Dispose()
+				{
+					if(_iterator is IDisposable disposable)
+						disposable.Dispose();
+				}
+
+				public bool MoveNext()
+				{
+					return _iterator.MoveNext();
+				}
+
+				public void Reset()
+				{
+					_iterator.Reset();
 				}
 			}
 		}
