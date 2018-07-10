@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Zongsoft.Samples.DataEntity.Models
+namespace Zongsoft.Samples.Entities.Models
 {
 	[Zongsoft.Data.DataAccess("Manager")]
 	public interface IManager : IEmployee

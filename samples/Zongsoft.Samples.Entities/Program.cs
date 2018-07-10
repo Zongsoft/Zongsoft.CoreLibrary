@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace Zongsoft.Samples.DataEntity
+namespace Zongsoft.Samples.Entities
 {
 	class Program
 	{
@@ -10,34 +10,34 @@ namespace Zongsoft.Samples.DataEntity
 		static void Main(string[] args)
 		{
 			//TestChanges();
-			//Performance(COUNT);
-			//PerformanceDynamic(COUNT);
 
-			//var entities = DataEntity.Build<Models.IUserEntity>(COUNT);
-
-			//foreach(var entity in entities)
-			//{
-			//	entity.UserId = 100;
-			//}
+			Performance(COUNT);
+			PerformanceDynamic(COUNT);
 
 			BuildTest();
+
+			Console.ForegroundColor = ConsoleColor.DarkMagenta;
+			Console.WriteLine();
+			Console.WriteLine("Press enter key to exit.");
+			Console.ResetColor();
 
 			Console.ReadLine();
 		}
 
 		private static void BuildTest()
 		{
-			var person = DataEntity.Build<Models.IPerson>();
-			var person1 = DataEntity.Build<Models.IPerson>();
-			var user = DataEntity.Build<Models.IUserEntity>();
-			var employee = DataEntity.Build<Models.IEmployee>();
-			var manager = DataEntity.Build<Models.IManager>();
+			var person = Data.Entity.Build<Models.IPerson>();
+			var person1 = Data.Entity.Build<Models.IPerson>();
+			var user = Data.Entity.Build<Models.IUserEntity>();
+			var employee = Data.Entity.Build<Models.IEmployee>();
+			var manager = Data.Entity.Build<Models.IManager>();
 
-			DataEntity.Save();
+			Data.Entity.Save();
 
 			var property = user.GetType().GetProperty("Namespace");
 
-			employee.PropertyChanged += User_PropertyChanged;
+			if(employee is System.ComponentModel.INotifyPropertyChanged notify)
+				notify.PropertyChanged += Entity_PropertyChanged;
 
 			employee.UserId = 100;
 			employee.Name = "Popeye";
@@ -69,11 +69,6 @@ namespace Zongsoft.Samples.DataEntity
 			Console.WriteLine();
 
 			DisplayChanges(employee);
-		}
-
-		private static void User_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-		{
-			Console.WriteLine("PropertyChanged: " + e.PropertyName);
 		}
 
 		private static void Performance(int count)
@@ -121,7 +116,7 @@ namespace Zongsoft.Samples.DataEntity
 				};
 			}
 
-			Console.WriteLine($"DataEntity: {stopwatch.ElapsedMilliseconds}");
+			Console.WriteLine($"Data Entity: {stopwatch.ElapsedMilliseconds}");
 
 			stopwatch.Restart();
 
@@ -139,7 +134,7 @@ namespace Zongsoft.Samples.DataEntity
 				user.CreatedTime = DateTime.Now;
 			}
 
-			Console.WriteLine($"DataEntity(Active): {stopwatch.ElapsedMilliseconds}");
+			Console.WriteLine($"Data Entity(Creator): {stopwatch.ElapsedMilliseconds}");
 
 			stopwatch.Restart();
 
@@ -157,13 +152,13 @@ namespace Zongsoft.Samples.DataEntity
 				user.TrySetValue("CreatedTime", DateTime.Now);
 			}
 
-			Console.WriteLine($"DataEntity(TrySet): {stopwatch.ElapsedMilliseconds}");
+			Console.WriteLine($"Data Entity(TrySet): {stopwatch.ElapsedMilliseconds}");
 		}
 
 		private static void PerformanceDynamic(int count)
 		{
-			var creator = DataEntity.GetCreator<Models.IUserEntity>(); //预先编译
-			DataEntity.Build<Models.IUserEntity>(); //预热（预先编译）
+			var creator = Data.Entity.GetCreator<Models.IUserEntity>(); //预先编译
+			Data.Entity.Build<Models.IUserEntity>(); //预热（预先编译）
 
 			var stopwatch = new Stopwatch();
 
@@ -236,7 +231,7 @@ namespace Zongsoft.Samples.DataEntity
 			//	//index++;
 			//}
 
-			Console.WriteLine($"Dynamic Object: {stopwatch.ElapsedMilliseconds}");
+			Console.WriteLine($"Dynamic Entity: {stopwatch.ElapsedMilliseconds}");
 
 			stopwatch.Stop();
 		}
@@ -271,6 +266,11 @@ namespace Zongsoft.Samples.DataEntity
 			{
 				Console.WriteLine($"\t[{++index}] {entry.Key} = {entry.Value}");
 			}
+		}
+
+		private static void Entity_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+		{
+			Console.WriteLine("PropertyChanged: " + e.PropertyName);
 		}
 	}
 }
