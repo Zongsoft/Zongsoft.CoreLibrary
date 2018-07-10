@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Zongsoft.Samples.DataEntity.Models
+namespace Zongsoft.Samples.Entities.Models
 {
 	[Zongsoft.Data.DataAccess("Security.User")]
 	public interface IUserEntity : IPerson
@@ -28,19 +28,19 @@ namespace Zongsoft.Samples.DataEntity.Models
 			get; set;
 		}
 
-		[Zongsoft.Data.EntityBehavior(typeof(UserExtension))]
+		[Zongsoft.Data.Entity.Property(typeof(UserExtension))]
 		string Avatar
 		{
 			get; set;
 		}
 
-		[Zongsoft.Data.EntityBehavior(typeof(UserExtension))]
+		[Zongsoft.Data.Entity.Property(typeof(UserExtension))]
 		string AvatarUrl
 		{
 			get;
 		}
 
-		[Zongsoft.Data.EntityBehavior()]
+		[Zongsoft.Data.Entity.Property()]
 		ICollection<string> Assets
 		{
 			get;

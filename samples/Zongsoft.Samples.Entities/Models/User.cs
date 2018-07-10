@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Zongsoft.Samples.DataEntity.Models
+namespace Zongsoft.Samples.Entities.Models
 {
 	public class User : IUserEntity, System.ComponentModel.INotifyPropertyChanged
 	{

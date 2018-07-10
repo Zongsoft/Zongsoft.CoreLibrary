@@ -55,7 +55,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Collections\CategoryTests.cs" />
-    <Compile Include="Address.cs" />
     <Compile Include="Collections\QueueTests.cs" />
     <Compile Include="Common\BufferTests.cs" />
     <Compile Include="Common\ConvertTests.cs" />
@@ -64,19 +63,19 @@
     <Compile Include="Data\ConditionalTest.cs" />
     <Compile Include="Data\ConditionCollectionTest.cs" />
     <Compile Include="Data\ConditionTest.cs" />
+    <Compile Include="Data\EntityTest.cs" />
     <Compile Include="Data\ScopingTest.cs" />
     <Compile Include="Data\SortingTest.cs" />
-    <Compile Include="Department.cs" />
     <Compile Include="Expressions\LexerTest.cs" />
-    <Compile Include="Gender.cs" />
     <Compile Include="Common\ObjectReferenceTests.cs" />
     <Compile Include="IO\FileSystemTest.cs" />
     <Compile Include="IO\PathTest.cs" />
-    <Compile Include="Person.cs" />
+    <Compile Include="Entities.cs" />
     <Compile Include="Common\StringExtensionTests.cs" />
     <Compile Include="Common\TypeExtensionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Common\RandomGeneratorTests.cs" />
+    <Compile Include="PropertyToken.cs" />
     <Compile Include="Reflection\MemberAccessTest.cs" />
     <Compile Include="Runtime\Caching\MemoryCacheTest.cs" />
     <Compile Include="Runtime\Serialization\DictionarySerializerTest.cs" />

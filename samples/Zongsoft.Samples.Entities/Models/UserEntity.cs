@@ -2,13 +2,13 @@
 using System.ComponentModel;
 using System.Collections.Generic;
 
-namespace Zongsoft.Samples.DataEntity.Models
+namespace Zongsoft.Samples.Entities.Models
 {
-	public class UserEntity : IUserEntity, System.ComponentModel.INotifyPropertyChanged
+	public class UserEntity : IUserEntity, INotifyPropertyChanged
 	{
 		#region 静态字段
 		private static readonly string[] __NAMES__ = new string[] { "UserId", "Namespace", "Name", "FullName", "Email", "PhoneNumber", "Avatar", "Status", "StatusTimestamp", "PrincipalId", "CreatedTime", "Description" };
-		private static readonly Dictionary<string, PropertyToken<UserEntity>> __PROPERTIES__ = new Dictionary<string, PropertyToken<UserEntity>>()
+		private static readonly Dictionary<string, PropertyToken<UserEntity>> __TOKENS__ = new Dictionary<string, PropertyToken<UserEntity>>()
 		{
 			{ "UserId", new PropertyToken<UserEntity>(0, target => target._userId, (target, value) => target.UserId = (uint) value) },
 			{ "Namespace", new PropertyToken<UserEntity>(1, target => target._namespace, (target, value) => target.Namespace = (string) value) },
@@ -37,7 +37,7 @@ namespace Zongsoft.Samples.DataEntity.Models
 		#region 构造函数
 		public UserEntity()
 		{
-			_flags_ = new byte[10];
+			//_flags_ = new byte[10];
 		}
 		#endregion
 
@@ -63,13 +63,13 @@ namespace Zongsoft.Samples.DataEntity.Models
 			get => _userId;
 			set
 			{
-				if(_userId == value)
-					return;
+				//if(_userId == value)
+				//	return;
 
 				_userId = value;
 				_MASK_ |= 1;
 
-				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(UserId)));
+				//this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(UserId)));
 			}
 		}
 
@@ -78,8 +78,8 @@ namespace Zongsoft.Samples.DataEntity.Models
 			get => _namespace;
 			set
 			{
-				if(_namespace == value)
-					return;
+				//if(_namespace == value)
+				//	return;
 
 				_namespace = value;
 				_MASK_ |= 2;
@@ -173,9 +173,9 @@ namespace Zongsoft.Samples.DataEntity.Models
 			get => _statusTimestamp;
 			set
 			{
-				if(object.Equals(_statusTimestamp, value))
+				//if(object.Equals(_statusTimestamp, value))
 				//if(_statusTimestamp == value)
-					return;
+				//	return;
 
 				_statusTimestamp = value;
 				_MASK_ |= 256;
@@ -197,8 +197,8 @@ namespace Zongsoft.Samples.DataEntity.Models
 			get => _createdTime;
 			set
 			{
-				if(_createdTime == value)
-					return;
+				//if(_createdTime == value)
+				//	return;
 
 				_createdTime = value;
 				_MASK_ |= 1024;
@@ -220,7 +220,7 @@ namespace Zongsoft.Samples.DataEntity.Models
 				//var flag = _flags_[11 / 8];
 				//flag |= (byte)Math.Pow(2, 11 % 8);
 
-				_flags_[11 / 8] |= (byte)Math.Pow(2, 11 % 8);
+				//_flags_[11 / 8] |= (byte)Math.Pow(2, 11 % 8);
 			}
 		}
 		#endregion
@@ -243,7 +243,7 @@ namespace Zongsoft.Samples.DataEntity.Models
 
 			for(var i = 0; i < names.Length; i++)
 			{
-				if(__PROPERTIES__.TryGetValue(names[i], out property) && property.Setter != null && (_flags_[property.Ordinal / 8] >> (property.Ordinal % 8) & 1) == 1)
+				if(__TOKENS__.TryGetValue(names[i], out property) && property.Setter != null && (_flags_[property.Ordinal / 8] >> (property.Ordinal % 8) & 1) == 1)
 					return true;
 			}
 
@@ -259,7 +259,7 @@ namespace Zongsoft.Samples.DataEntity.Models
 
 			for(var i = 0; i < names.Length; i++)
 			{
-				if(__PROPERTIES__.TryGetValue(names[i], out property) && property.Setter != null && (_MASK_ >> property.Ordinal & 1) == 1)
+				if(__TOKENS__.TryGetValue(names[i], out property) && property.Setter != null && (_MASK_ >> property.Ordinal & 1) == 1)
 					return true;
 			}
 
@@ -274,11 +274,11 @@ namespace Zongsoft.Samples.DataEntity.Models
 			{
 				if((_flags_[i / 8] >> (i % 8) & 1) == 1)
 				{
-					dictionary[__NAMES__[i]] = __PROPERTIES__[__NAMES__[i]].Getter(this);
+					dictionary[__NAMES__[i]] = __TOKENS__[__NAMES__[i]].Getter(this);
 				}
 			}
 
-			return dictionary;
+			return dictionary.Count == 0 ? null : dictionary;
 		}
 
 		IDictionary<string, object> Zongsoft.Data.IEntity.GetChanges()
@@ -292,7 +292,7 @@ namespace Zongsoft.Samples.DataEntity.Models
 			{
 				if((_MASK_ >> i & 1) == 1)
 				{
-					dictionary[__NAMES__[i]] = __PROPERTIES__[__NAMES__[i]].Getter(this);
+					dictionary[__NAMES__[i]] = __TOKENS__[__NAMES__[i]].Getter(this);
 				}
 			}
 
@@ -303,7 +303,7 @@ namespace Zongsoft.Samples.DataEntity.Models
 		{
 			value = null;
 
-			if(__PROPERTIES__.TryGetValue(name, out var property) && (property.Ordinal < 0 || (_flags_[property.Ordinal / 8] >> (property.Ordinal % 8) & 1) == 1))
+			if(__TOKENS__.TryGetValue(name, out var property) && (property.Ordinal < 0 || (_flags_[property.Ordinal / 8] >> (property.Ordinal % 8) & 1) == 1))
 			{
 				value = property.Getter(this);
 				return true;
@@ -316,7 +316,7 @@ namespace Zongsoft.Samples.DataEntity.Models
 		{
 			value = null;
 
-			if(__PROPERTIES__.TryGetValue(name, out var property) && (property.Ordinal < 0 || (_MASK_ >> property.Ordinal & 1) == 1))
+			if(__TOKENS__.TryGetValue(name, out var property) && (property.Ordinal < 0 || (_MASK_ >> property.Ordinal & 1) == 1))
 			{
 				value = property.Getter(this);
 				return true;
@@ -327,7 +327,7 @@ namespace Zongsoft.Samples.DataEntity.Models
 
 		bool Zongsoft.Data.IEntity.TrySetValue(string name, object value)
 		{
-			if(__PROPERTIES__.TryGetValue(name, out var property))
+			if(__TOKENS__.TryGetValue(name, out var property) && property.Setter != null)
 			{
 				property.Setter(this, value);
 				return true;

@@ -1,14 +1,50 @@
-﻿using System;
+﻿/*
+ *   _____                                ______
+ *  /_   /  ____  ____  ____  _________  / __/ /_
+ *    / /  / __ \/ __ \/ __ \/ ___/ __ \/ /_/ __/
+ *   / /__/ /_/ / / / / /_/ /\_ \/ /_/ / __/ /_
+ *  /____/\____/_/ /_/\__  /____/\____/_/  \__/
+ *                   /____/
+ *
+ * Authors:
+ *   钟峰(Popeye Zhong) <zongsoft@qq.com>
+ *
+ * Copyright (C) 2016-2018 Zongsoft Corporation <http://www.zongsoft.com>
+ *
+ * This file is part of Zongsoft.CoreLibrary.
+ *
+ * Zongsoft.CoreLibrary is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * Zongsoft.CoreLibrary is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with Zongsoft.CoreLibrary; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ */
+
+using System;
 using System.Linq;
-using System.ComponentModel;
 using System.Threading;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.ComponentModel;
 using System.Collections;
 using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
+	/// <summary>
+	/// 提供 <see cref="IEntity"/> 数据实体的动态编译及构建的静态类。
+	/// </summary>
 	public static class Entity
 	{
 		#region 常量定义
@@ -29,20 +65,27 @@ namespace Zongsoft.Data
 		private static readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
 		private static readonly Dictionary<Type, Func<object>> _cache = new Dictionary<Type, Func<object>>();
 
-		private static readonly AssemblyBuilder _assembly = AppDomain.CurrentDomain.DefineDynamicAssembly(new AssemblyName(ASSEMBLY_NAME), AssemblyBuilderAccess.Run);
-		private static readonly ModuleBuilder _module = _assembly.DefineDynamicModule(ASSEMBLY_NAME);
+		//private static readonly AssemblyBuilder _assembly = AppDomain.CurrentDomain.DefineDynamicAssembly(new AssemblyName(ASSEMBLY_NAME), AssemblyBuilderAccess.Run);
+		//private static readonly ModuleBuilder _module = _assembly.DefineDynamicModule(ASSEMBLY_NAME);
 
-		//private static readonly AssemblyBuilder _assembly = AppDomain.CurrentDomain.DefineDynamicAssembly(new AssemblyName(ASSEMBLY_NAME), AssemblyBuilderAccess.RunAndSave);
-		//private static readonly ModuleBuilder _module = _assembly.DefineDynamicModule(ASSEMBLY_NAME, ASSEMBLY_NAME + ".dll");
+		private static readonly AssemblyBuilder _assembly = AppDomain.CurrentDomain.DefineDynamicAssembly(new AssemblyName(ASSEMBLY_NAME), AssemblyBuilderAccess.RunAndSave);
+		private static readonly ModuleBuilder _module = _assembly.DefineDynamicModule(ASSEMBLY_NAME, ASSEMBLY_NAME + ".dll");
 		#endregion
 
 		#region 公共方法
-		public static T Build<T>() where T : Zongsoft.Data.IEntity
+		public static T Build<T>() where T : IEntity
 		{
 			return (T)GetCreator<T>()();
 		}
 
-		public static IEnumerable<T> Build<T>(int count, Action<T, int> map = null) where T : Zongsoft.Data.IEntity
+		public static T Build<T>(Action<T> map) where T : IEntity
+		{
+			var entity = (T)GetCreator<T>()();
+			map?.Invoke(entity);
+			return entity;
+		}
+
+		public static IEnumerable<T> Build<T>(int count, Action<T, int> map = null) where T : IEntity
 		{
 			if(count < 1)
 				throw new ArgumentOutOfRangeException(nameof(count));
@@ -123,7 +166,7 @@ namespace Zongsoft.Data
 
 			//添加类型的实现接口声明
 			builder.AddInterfaceImplementation(type);
-			builder.AddInterfaceImplementation(typeof(Zongsoft.Data.IEntity));
+			builder.AddInterfaceImplementation(typeof(IEntity));
 
 			//添加所有接口实现声明，并获取各接口的属性集，以及确认生成“INotifyPropertyChanged”接口
 			var properties = MakeInterfaces(type, builder, out var propertyChanged);
@@ -184,29 +227,33 @@ namespace Zongsoft.Data
 			{
 				var field = properties[i].CanWrite ? builder.DefineField("$" + properties[i].Name, properties[i].PropertyType, FieldAttributes.Private) : null;
 				var property = builder.DefineProperty(properties[i].Name, PropertyAttributes.None, properties[i].PropertyType, null);
-				var attributes = properties[i].GetCustomAttributesData();
+				var propertyAttribute = properties[i].GetCustomAttribute<PropertyAttribute>();
 
-				var implementationAttribute = properties[i].GetCustomAttribute<EntityBehaviorAttribute>();
-
-				if(implementationAttribute != null && implementationAttribute.Mode == EntityBehaviorAttribute.ImplementationMode.Auto)
+				if(propertyAttribute != null)
 				{
-					implementationAttribute.Mode = IsCollectionType(properties[i].PropertyType) ?
-					                               EntityBehaviorAttribute.ImplementationMode.Singleton :
-					                               EntityBehaviorAttribute.ImplementationMode.Extension;
+					if(propertyAttribute.Mode == PropertyImplementationMode.Auto)
+					{
+						propertyAttribute.Mode = IsCollectionType(properties[i].PropertyType) ?
+						                         PropertyImplementationMode.Singleton :
+						                         PropertyImplementationMode.Extension;
+					}
+
+					if(field == null)
+					{
+						if(propertyAttribute.Mode == PropertyImplementationMode.Singleton)
+							field = builder.DefineField("$" + properties[i].Name, properties[i].PropertyType, FieldAttributes.Private);
+					}
 				}
 
-				if(field == null && implementationAttribute != null)
-				{
-					if(implementationAttribute.Mode == EntityBehaviorAttribute.ImplementationMode.Singleton)
-						field = builder.DefineField("$" + properties[i].Name, properties[i].PropertyType, FieldAttributes.Private);
-				}
+				//获取当前属性的所有自定义标签
+				var customAttributes = properties[i].GetCustomAttributesData();
 
 				//设置属性的自定义标签
-				if(attributes != null && attributes.Count > 0)
+				if(customAttributes != null && customAttributes.Count > 0)
 				{
-					foreach(var attribute in attributes)
+					foreach(var customAttribute in customAttributes)
 					{
-						var annotation = GetAnnotation(attribute);
+						var annotation = GetAnnotation(customAttribute);
 
 						if(annotation != null)
 							property.SetCustomAttribute(annotation);
@@ -217,7 +264,7 @@ namespace Zongsoft.Data
 				var generator = getter.GetILGenerator();
 				property.SetGetMethod(getter);
 
-				if(implementationAttribute == null)
+				if(propertyAttribute == null)
 				{
 					if(field == null)
 					{
@@ -231,13 +278,13 @@ namespace Zongsoft.Data
 						generator.Emit(OpCodes.Ret);
 					}
 				}
-				else if(implementationAttribute.Mode == EntityBehaviorAttribute.ImplementationMode.Extension)
+				else if(propertyAttribute.Mode == PropertyImplementationMode.Extension)
 				{
-					var method = implementationAttribute.Type.GetMethod("Get" + properties[i].Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static, null, new Type[] { properties[i].DeclaringType, properties[i].PropertyType }, null) ??
-								 implementationAttribute.Type.GetMethod("Get" + properties[i].Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static, null, new Type[] { properties[i].DeclaringType }, null);
+					var method = propertyAttribute.Type.GetMethod("Get" + properties[i].Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static, null, new Type[] { properties[i].DeclaringType, properties[i].PropertyType }, null) ??
+								 propertyAttribute.Type.GetMethod("Get" + properties[i].Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static, null, new Type[] { properties[i].DeclaringType }, null);
 
 					if(method == null)
-						throw new InvalidOperationException($"Not found the extension method of the {properties[i].Name} property in the {implementationAttribute.Type.FullName} extension type.");
+						throw new InvalidOperationException($"Not found the extension method of the {properties[i].Name} property in the {propertyAttribute.Type.FullName} extension type.");
 
 					generator.Emit(OpCodes.Ldarg_0);
 
@@ -255,12 +302,12 @@ namespace Zongsoft.Data
 					generator.Emit(OpCodes.Call, method);
 					generator.Emit(OpCodes.Ret);
 				}
-				else if(implementationAttribute.Mode == EntityBehaviorAttribute.ImplementationMode.Singleton)
+				else if(propertyAttribute.Mode == PropertyImplementationMode.Singleton)
 				{
-					if(implementationAttribute.Type != null && !Zongsoft.Common.TypeExtension.IsAssignableFrom(field.FieldType, implementationAttribute.Type))
-						throw new InvalidOperationException($"The '{implementationAttribute.Type}' type of the '{properties[i].Name}' property does not implement '{field.FieldType}' interface or class.");
+					if(propertyAttribute.Type != null && !Zongsoft.Common.TypeExtension.IsAssignableFrom(field.FieldType, propertyAttribute.Type))
+						throw new InvalidOperationException($"The '{propertyAttribute.Type}' type of the '{properties[i].Name}' property does not implement '{field.FieldType}' interface or class.");
 
-					var implementationType = GetCollectionImplementationType(implementationAttribute.Type ?? field.FieldType);
+					var implementationType = GetCollectionImplementationType(propertyAttribute.Type ?? field.FieldType);
 					var ctor = implementationType.GetConstructor(Type.EmptyTypes);
 
 					if(ctor == null)
@@ -355,7 +402,7 @@ namespace Zongsoft.Data
 					generator = setter.GetILGenerator();
 					var exit = generator.DefineLabel();
 
-					if(implementationAttribute == null)
+					if(propertyAttribute == null)
 					{
 						if(propertyChangedField != null)
 						{
@@ -365,7 +412,7 @@ namespace Zongsoft.Data
 					}
 					else
 					{
-						var method = implementationAttribute.Type.GetMethod("Set" + properties[i].Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static, null, new Type[] { properties[i].DeclaringType, properties[i].PropertyType }, null);
+						var method = propertyAttribute.Type.GetMethod("Set" + properties[i].Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static, null, new Type[] { properties[i].DeclaringType, properties[i].PropertyType }, null);
 
 						if(method == null)
 						{
@@ -606,19 +653,19 @@ namespace Zongsoft.Data
 			}
 			else
 			{
+				var equality = property.PropertyType.GetMethod("op_Equality", BindingFlags.Public | BindingFlags.Static) ??
+				               typeof(object).GetMethod("Equals", BindingFlags.Public | BindingFlags.Static);
+
 				generator.Emit(OpCodes.Ldarg_0);
 				generator.Emit(OpCodes.Ldfld, field);
 
-				if(property.PropertyType.IsValueType)
+				if(property.PropertyType.IsValueType && equality.Name == "Equals")
 					generator.Emit(OpCodes.Box, property.PropertyType);
 
 				generator.Emit(OpCodes.Ldarg_1);
 
-				if(property.PropertyType.IsValueType)
+				if(property.PropertyType.IsValueType && equality.Name == "Equals")
 					generator.Emit(OpCodes.Box, property.PropertyType);
-
-				var equality = property.PropertyType.GetMethod("op_Equality", BindingFlags.Public | BindingFlags.Static) ??
-				               typeof(object).GetMethod("Equals", BindingFlags.Public | BindingFlags.Static);
 
 				generator.Emit(OpCodes.Call, equality);
 				generator.Emit(OpCodes.Brtrue_S, exit);
@@ -1042,8 +1089,26 @@ namespace Zongsoft.Data
 
 			generator.MarkLabel(EXIT_LABEL);
 
-			generator.Emit(OpCodes.Ldloc_0);
-			generator.Emit(OpCodes.Ret);
+			if(mask.FieldType.IsArray)
+			{
+				var RETURN_NULL_LABEL = generator.DefineLabel();
+
+				generator.Emit(OpCodes.Ldloc_0);
+				generator.Emit(OpCodes.Callvirt, typeof(Dictionary<string, object>).GetProperty("Count").GetMethod);
+				generator.Emit(OpCodes.Brfalse_S, RETURN_NULL_LABEL);
+				generator.Emit(OpCodes.Ldloc_0);
+				generator.Emit(OpCodes.Ret);
+
+				generator.MarkLabel(RETURN_NULL_LABEL);
+
+				generator.Emit(OpCodes.Ldnull);
+				generator.Emit(OpCodes.Ret);
+			}
+			else
+			{
+				generator.Emit(OpCodes.Ldloc_0);
+				generator.Emit(OpCodes.Ret);
+			}
 		}
 
 		private static void GenerateTryGetValueMethod(TypeBuilder builder, FieldBuilder mask, FieldBuilder tokens)
@@ -1523,27 +1588,38 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 嵌套子类
-		public enum ImplementationMode
+		/// <summary>
+		/// 表示实体属性实现代码的生成方式。
+		/// </summary>
+		public enum PropertyImplementationMode
 		{
+			/// <summary>自动，由动态编译器根据实体属性的定义选择最佳实现方式。</summary>
 			Auto,
+
+			/// <summary>以类似扩展方法的方式实现属性。</summary>
 			Extension,
+
+			/// <summary>以单例模式的方式实现属性。</summary>
 			Singleton,
 		}
 
+		/// <summary>
+		/// 提供实体属性动态编译的自定义特性。
+		/// </summary>
 		[AttributeUsage(AttributeTargets.Interface | AttributeTargets.Property | AttributeTargets.Method)]
 		public class PropertyAttribute : Attribute
 		{
 			#region 构造函数
 			public PropertyAttribute()
 			{
-				this.Mode = ImplementationMode.Singleton;
+				this.Mode = PropertyImplementationMode.Singleton;
 			}
 
-			public PropertyAttribute(Type type) : this(type, ImplementationMode.Auto)
+			public PropertyAttribute(Type type) : this(type, PropertyImplementationMode.Auto)
 			{
 			}
 
-			public PropertyAttribute(Type type, ImplementationMode mode)
+			public PropertyAttribute(Type type, PropertyImplementationMode mode)
 			{
 				this.Type = type ?? throw new ArgumentNullException(nameof(type));
 				this.Mode = mode;
@@ -1551,12 +1627,18 @@ namespace Zongsoft.Data
 			#endregion
 
 			#region 公共属性
+			/// <summary>
+			/// 获取扩展实现的类型或属性类型为集合接口的具体类型，具体含义由<see cref="Mode"/>属性值确定。
+			/// </summary>
 			public Type Type
 			{
 				get;
 			}
 
-			public ImplementationMode Mode
+			/// <summary>
+			/// 获取或设置实体属性代码的实现方式。
+			/// </summary>
+			public PropertyImplementationMode Mode
 			{
 				get;
 				set;

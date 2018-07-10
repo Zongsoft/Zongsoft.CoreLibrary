@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{83D92987-B84D-479A-AD5D-BED18FDFDCE2}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>Zongsoft.Samples.DataEntity</RootNamespace>
-    <AssemblyName>Zongsoft.Samples.DataEntity</AssemblyName>
+    <RootNamespace>Zongsoft.Samples.Entities</RootNamespace>
+    <AssemblyName>Zongsoft.Samples.Entities</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -40,7 +40,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataEntity.cs" />
     <Compile Include="Models\IEmployee.cs" />
     <Compile Include="Models\IManager.cs" />
     <Compile Include="Models\IPerson.cs" />
