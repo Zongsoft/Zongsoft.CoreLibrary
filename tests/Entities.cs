@@ -605,7 +605,11 @@ namespace Zongsoft.Tests
 		#region 构造函数
 		public Person()
 		{
-			_MASK_ = 0;
+		}
+
+		public Person(string name)
+		{
+			this.Name = name;
 		}
 		#endregion
 
@@ -801,6 +805,17 @@ namespace Zongsoft.Tests
 		private decimal _salary;
 		#endregion
 
+		#region 构造函数
+		public Employee()
+		{
+		}
+
+		public Employee(int id, string name) : base(name)
+		{
+			this.EmployeeId = id;
+		}
+		#endregion
+
 		#region 公共属性
 		/// <summary>
 		/// 获取或设置员工编号。
@@ -962,6 +977,16 @@ namespace Zongsoft.Tests
 
 		#region 成员字段
 		private byte _level;
+		#endregion
+
+		#region 构造函数
+		public Customer()
+		{
+		}
+
+		public Customer(string name) : base(name)
+		{
+		}
 		#endregion
 
 		#region 公共属性
