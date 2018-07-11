@@ -55,6 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Collections\CategoryTests.cs" />
+    <Compile Include="Collections\EnumerableTest.cs" />
     <Compile Include="Collections\QueueTests.cs" />
     <Compile Include="Common\BufferTests.cs" />
     <Compile Include="Common\ConvertTests.cs" />
