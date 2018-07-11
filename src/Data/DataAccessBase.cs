@@ -1401,15 +1401,10 @@ namespace Zongsoft.Data
 			}
 		}
 
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 		private IEnumerable<T> ToEnumerable<T>(object result)
 		{
-			if(result == null)
-				System.Linq.Enumerable.Empty<T>();
-
-			if(result is IEnumerable<T> items)
-				return items;
-
-			return new ResultEnumerable<T>(result);
+			return Collections.Enumerable.Enumerate<T>(result);
 		}
 
 		private static DataDictionary GetDataDictionary(object data)
@@ -1435,67 +1430,6 @@ namespace Zongsoft.Data
 				{
 					if(item != null)
 						yield return (item as DataDictionary) ?? new DataDictionary(item);
-				}
-			}
-		}
-		#endregion
-
-		#region 嵌套子类
-		private class ResultEnumerable<T> : IEnumerable<T>
-		{
-			private readonly IEnumerable _items;
-
-			public ResultEnumerable(object result)
-			{
-				if(result == null)
-					throw new ArgumentNullException(nameof(result));
-
-				if(result is IEnumerable)
-					_items = (IEnumerable)result;
-				else
-				{
-					_items = Array.CreateInstance(result.GetType(), 1);
-					((Array)_items).SetValue(result, 0);
-				}
-			}
-
-			public IEnumerator<T> GetEnumerator()
-			{
-				return new Enumerator(_items.GetEnumerator());
-			}
-
-			IEnumerator IEnumerable.GetEnumerator()
-			{
-				return new Enumerator(_items.GetEnumerator());
-			}
-
-			public class Enumerator : IEnumerator<T>
-			{
-				private readonly IEnumerator _iterator;
-
-				public Enumerator(IEnumerator iterator)
-				{
-					_iterator = iterator;
-				}
-
-				public T Current => (T)System.Convert.ChangeType(_iterator.Current, typeof(T));
-
-				object IEnumerator.Current => _iterator.Current;
-
-				public void Dispose()
-				{
-					if(_iterator is IDisposable disposable)
-						disposable.Dispose();
-				}
-
-				public bool MoveNext()
-				{
-					return _iterator.MoveNext();
-				}
-
-				public void Reset()
-				{
-					_iterator.Reset();
 				}
 			}
 		}
