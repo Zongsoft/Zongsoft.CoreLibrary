@@ -22,7 +22,7 @@ namespace Zongsoft.Samples.Entities.Models
 			if(string.IsNullOrEmpty(avatar))
 				return string.Empty;
 
-			return Zongsoft.IO.FileSystem.GetUrl(avatar);
+			return "url:" + avatar;
 		}
 
 		public static ICollection<object> GetAssets(IUserEntity user)
