@@ -1917,12 +1917,11 @@ namespace Zongsoft.Data
 
 			#region 公共属性
 			/// <summary>
-			/// 获取或获取扩展实现的类型或属性的具体类型，具体含义由<see cref="Mode"/>属性值确定。
+			/// 获取扩展方法的静态类的类型或属性的具体类型，具体含义由<see cref="Mode"/>属性值确定。
 			/// </summary>
 			public Type Type
 			{
 				get;
-				set;
 			}
 
 			/// <summary>
