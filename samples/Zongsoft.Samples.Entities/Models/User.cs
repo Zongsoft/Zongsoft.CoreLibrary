@@ -22,7 +22,7 @@ namespace Zongsoft.Samples.Entities.Models
 		private string _principalId;
 		private DateTime _createdTime;
 		private string _description;
-		private ICollection<string> _assets;
+		private ICollection<object> _assets;
 		#endregion
 
 		#region 公共属性
@@ -73,7 +73,7 @@ namespace Zongsoft.Samples.Entities.Models
 			get => null;
 		}
 
-		public ICollection<string> Assets
+		ICollection<object> IUserEntity.Assets
 		{
 			get
 			{
@@ -82,7 +82,7 @@ namespace Zongsoft.Samples.Entities.Models
 					lock(this)
 					{
 						if(_assets == null)
-							_assets = new List<string>();
+							_assets = new List<object>();
 					}
 				}
 

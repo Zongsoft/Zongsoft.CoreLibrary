@@ -174,11 +174,28 @@ namespace Zongsoft.Data
 			//生成所有接口定义的注解(自定义特性)
 			GenerateAnnotations(builder, new HashSet<Type>());
 
-			//生成构造函数
-			GenerateConstructor(builder, properties.Count - properties.Count(p => !p.CanWrite), out var mask);
+			//获取可写属性的数量
+			var countWritable = properties.Count(p => p.CanWrite);
+
+			//定义掩码字段
+			FieldBuilder mask = null;
+
+			if(countWritable <= 8)
+				mask = builder.DefineField(MASK_VARIABLE, typeof(byte), FieldAttributes.Private);
+			else if(countWritable <= 16)
+				mask = builder.DefineField(MASK_VARIABLE, typeof(UInt16), FieldAttributes.Private);
+			else if(countWritable <= 32)
+				mask = builder.DefineField(MASK_VARIABLE, typeof(UInt32), FieldAttributes.Private);
+			else if(countWritable <= 64)
+				mask = builder.DefineField(MASK_VARIABLE, typeof(UInt64), FieldAttributes.Private);
+			else
+				mask = builder.DefineField(MASK_VARIABLE, typeof(byte[]), FieldAttributes.Private);
 
 			//生成属性定义以及嵌套子类
 			GenerateProperties(builder, mask, properties, propertyChanged, out var methods);
+
+			//生成构造函数
+			GenerateConstructor(builder, countWritable, mask, properties);
 
 			//生成静态构造函数
 			GenerateTypeInitializer(builder, properties, methods, out var names, out var tokens);
@@ -209,7 +226,7 @@ namespace Zongsoft.Data
 			return (Func<object>)creator.CreateDelegate(typeof(Func<object>));
 		}
 
-		private static void GenerateProperties(TypeBuilder builder, FieldBuilder mask, IList<PropertyInfo> properties, FieldBuilder propertyChangedField, out MethodToken[] methods)
+		private static void GenerateProperties(TypeBuilder builder, FieldBuilder mask, IList<PropertyMetadata> properties, FieldBuilder propertyChangedField, out MethodToken[] methods)
 		{
 			//生成嵌套匿名委托静态类
 			var nested = builder.DefineNestedType("!Methods!", TypeAttributes.NestedPrivate | TypeAttributes.Abstract | TypeAttributes.Sealed | TypeAttributes.BeforeFieldInit);
@@ -218,32 +235,62 @@ namespace Zongsoft.Data
 			methods = new MethodToken[properties.Count];
 
 			//定义只读属性的递增数量
-			var countReadOnly = 0;
+			var timesReadOnly = 0;
 			//定义可写属性的总数量
 			var countWritable = properties.Count(p => p.CanWrite);
 
 			//生成属性定义
 			for(int i = 0; i < properties.Count; i++)
 			{
-				var field = properties[i].CanWrite ? builder.DefineField("$" + properties[i].Name, properties[i].PropertyType, FieldAttributes.Private) : null;
-				var property = builder.DefineProperty(properties[i].Name, PropertyAttributes.None, properties[i].PropertyType, null);
-				var propertyAttribute = properties[i].GetCustomAttribute<PropertyAttribute>();
+				var metadata = properties[i].Metadata;
+				var fieldType = properties[i].PropertyType;
+				FieldBuilder field = null;
 
-				if(propertyAttribute != null)
+				//如果指定了实体属性标签，则进行必要的验证
+				if(metadata != null)
 				{
-					if(propertyAttribute.Mode == PropertyImplementationMode.Auto)
+					switch(metadata.Mode)
 					{
-						propertyAttribute.Mode = IsCollectionType(properties[i].PropertyType) ?
-						                         PropertyImplementationMode.Singleton :
-						                         PropertyImplementationMode.Extension;
-					}
+						case PropertyImplementationMode.Default:
+							if(metadata.Type != null)
+							{
+								if(!properties[i].PropertyType.IsAssignableFrom(metadata.Type))
+									throw new InvalidOperationException($"The '{metadata.Type}' type of the '{properties[i].Name}' PropertyAttribute does not implement '{properties[i].PropertyType}' interface or class.");
 
-					if(field == null)
-					{
-						if(propertyAttribute.Mode == PropertyImplementationMode.Singleton)
-							field = builder.DefineField("$" + properties[i].Name, properties[i].PropertyType, FieldAttributes.Private);
+								fieldType = metadata.Type;
+							}
+
+							break;
+						case PropertyImplementationMode.Singleton:
+							if(metadata.Type != null && !properties[i].SingletonFactoryEnabled)
+							{
+								if(metadata.Type.IsValueType)
+									throw new InvalidOperationException($"The {metadata.Type} type of singleton cannot be a value type.");
+
+								if(!properties[i].PropertyType.IsAssignableFrom(metadata.Type))
+									throw new InvalidOperationException($"The '{metadata.Type}' type of the '{properties[i].Name}' PropertyAttribute does not implement '{properties[i].PropertyType}' interface or class.");
+
+								fieldType = metadata.Type;
+							}
+
+							break;
+						case PropertyImplementationMode.Extension:
+							if(metadata.Type == null)
+								throw new InvalidOperationException($"Missing type of the '{properties[i].Name}' property attribute.");
+
+							break;
 					}
 				}
+
+				if(properties[i].CanWrite || properties[i].HasDefaultValue ||
+				  (metadata != null && metadata.Mode == PropertyImplementationMode.Singleton))
+					field = properties[i].Field = builder.DefineField(properties[i].GetFieldName(), fieldType, FieldAttributes.Private);
+
+				var property = properties[i].Builder = builder.DefineProperty(
+					properties[i].GetName(),
+					PropertyAttributes.None,
+					properties[i].PropertyType,
+					null);
 
 				//获取当前属性的所有自定义标签
 				var customAttributes = properties[i].GetCustomAttributesData();
@@ -260,14 +307,24 @@ namespace Zongsoft.Data
 					}
 				}
 
-				var getter = builder.DefineMethod("get_" + properties[i].Name, MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.NewSlot, properties[i].PropertyType, Type.EmptyTypes);
-				var generator = getter.GetILGenerator();
-				property.SetGetMethod(getter);
+				//定义属性的获取器方法
+				var getter = builder.DefineMethod(properties[i].GetGetterName(),
+					(properties[i].IsExplicitImplementation ? MethodAttributes.Private : MethodAttributes.Public) | MethodAttributes.SpecialName | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.NewSlot,
+					properties[i].PropertyType,
+					Type.EmptyTypes);
 
-				if(propertyAttribute == null)
+				//如果当前属性需要显式实现，则定义其方法覆盖元数据
+				if(properties[i].IsExplicitImplementation)
+					builder.DefineMethodOverride(getter, properties[i].GetMethod);
+
+				property.SetGetMethod(getter);
+				var generator = getter.GetILGenerator();
+
+				if(metadata == null || metadata.Mode == PropertyImplementationMode.Default)
 				{
 					if(field == null)
 					{
+						//抛出“NotSupportedException”异常
 						generator.Emit(OpCodes.Newobj, typeof(NotSupportedException).GetConstructor(Type.EmptyTypes));
 						generator.Emit(OpCodes.Throw);
 					}
@@ -278,13 +335,16 @@ namespace Zongsoft.Data
 						generator.Emit(OpCodes.Ret);
 					}
 				}
-				else if(propertyAttribute.Mode == PropertyImplementationMode.Extension)
+				else if(metadata.Mode == PropertyImplementationMode.Extension)
 				{
-					var method = propertyAttribute.Type.GetMethod("Get" + properties[i].Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static, null, new Type[] { properties[i].DeclaringType, properties[i].PropertyType }, null) ??
-								 propertyAttribute.Type.GetMethod("Get" + properties[i].Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static, null, new Type[] { properties[i].DeclaringType }, null);
+					var method = metadata.Type.GetMethod("Get" + properties[i].Name, BindingFlags.Public | BindingFlags.Static, null, new Type[] { properties[i].DeclaringType, properties[i].PropertyType }, null) ??
+								 metadata.Type.GetMethod("Get" + properties[i].Name, BindingFlags.Public | BindingFlags.Static, null, new Type[] { properties[i].DeclaringType }, null);
 
 					if(method == null)
-						throw new InvalidOperationException($"Not found the extension method of the {properties[i].Name} property in the {propertyAttribute.Type.FullName} extension type.");
+						throw new InvalidOperationException($"Not found the extension method of the {properties[i].Name} property in the {metadata.Type.FullName} extension type.");
+
+					if(method.ReturnType == null || method.ReturnType == typeof(void) || !properties[i].PropertyType.IsAssignableFrom(method.ReturnType))
+						throw new InvalidOperationException($"The return type of the '{method}' extension method is missing or invalid.");
 
 					generator.Emit(OpCodes.Ldarg_0);
 
@@ -302,74 +362,100 @@ namespace Zongsoft.Data
 					generator.Emit(OpCodes.Call, method);
 					generator.Emit(OpCodes.Ret);
 				}
-				else if(propertyAttribute.Mode == PropertyImplementationMode.Singleton)
+				else if(metadata.Mode == PropertyImplementationMode.Singleton)
 				{
-					if(propertyAttribute.Type != null && !Zongsoft.Common.TypeExtension.IsAssignableFrom(field.FieldType, propertyAttribute.Type))
-						throw new InvalidOperationException($"The '{propertyAttribute.Type}' type of the '{properties[i].Name}' property does not implement '{field.FieldType}' interface or class.");
+					if(properties[i].HasDefaultValue)
+					{
+						generator.Emit(OpCodes.Ldarg_0);
+						generator.Emit(OpCodes.Ldfld, field);
+						generator.Emit(OpCodes.Ret);
+					}
+					else
+					{
+						properties[i].Synchrolock = builder.DefineField(properties[i].GetFieldName("@LOCK"), typeof(object), FieldAttributes.Private | FieldAttributes.InitOnly);
+						ConstructorInfo ctor = null;
 
-					var implementationType = GetCollectionImplementationType(propertyAttribute.Type ?? field.FieldType);
-					var ctor = implementationType.GetConstructor(Type.EmptyTypes);
+						if(!properties[i].SingletonFactoryEnabled)
+						{
+							var implementationType = GetCollectionImplementationType(metadata.Type ?? field.FieldType);
+							ctor = implementationType.GetConstructor(Type.EmptyTypes);
 
-					if(ctor == null)
-						throw new InvalidOperationException($"The '{implementationType}' type of the '{properties[i].Name}' property is missing the default constructor.");
+							if(ctor == null)
+								throw new InvalidOperationException($"The '{implementationType}' type of the '{properties[i].Name}' property is missing the default constructor.");
+						}
 
-					generator.DeclareLocal(field.DeclaringType);
-					generator.DeclareLocal(typeof(bool));
+						generator.DeclareLocal(typeof(object)); // for synchrolock variable
+						generator.DeclareLocal(typeof(bool));
 
-					var SETTER_EXIT_LABEL = generator.DefineLabel();
-					var SETTER_LEAVE_LABEL = generator.DefineLabel();
-					var SETTER_FINALLY_LABEL = generator.DefineLabel();
+						var SETTER_EXIT_LABEL = generator.DefineLabel();
+						var SETTER_LEAVE_LABEL = generator.DefineLabel();
+						var SETTER_FINALLY_LABEL = generator.DefineLabel();
 
-					// if($Field == null)
-					generator.Emit(OpCodes.Ldarg_0);
-					generator.Emit(OpCodes.Ldfld, field);
-					generator.Emit(OpCodes.Brtrue_S, SETTER_EXIT_LABEL);
+						// if($Field == null)
+						generator.Emit(OpCodes.Ldarg_0);
+						generator.Emit(OpCodes.Ldfld, field);
+						generator.Emit(OpCodes.Brtrue_S, SETTER_EXIT_LABEL);
 
-					generator.Emit(OpCodes.Ldarg_0);
-					generator.Emit(OpCodes.Stloc_0);
-					generator.Emit(OpCodes.Ldc_I4_0);
-					generator.Emit(OpCodes.Stloc_1);
+						generator.Emit(OpCodes.Ldarg_0);
+						generator.Emit(OpCodes.Ldfld, properties[i].Synchrolock);
+						generator.Emit(OpCodes.Stloc_0);
+						generator.Emit(OpCodes.Ldc_I4_0);
+						generator.Emit(OpCodes.Stloc_1);
 
-					// try begin
-					generator.BeginExceptionBlock();
+						// try begin
+						generator.BeginExceptionBlock();
 
-					// lock(this)
-					generator.Emit(OpCodes.Ldloc_0);
-					generator.Emit(OpCodes.Ldloca_S, 1);
-					generator.Emit(OpCodes.Call, typeof(Monitor).GetMethod("Enter", new Type[] { typeof(object), typeof(bool).MakeByRefType() }));
+						// lock(Synchrolock)
+						generator.Emit(OpCodes.Ldloc_0);
+						generator.Emit(OpCodes.Ldloca_S, 1);
+						generator.Emit(OpCodes.Call, typeof(Monitor).GetMethod("Enter", new Type[] { typeof(object), typeof(bool).MakeByRefType() }));
 
-					// if($Field != null)
-					generator.Emit(OpCodes.Ldarg_0);
-					generator.Emit(OpCodes.Ldfld, field);
-					generator.Emit(OpCodes.Brtrue_S, SETTER_LEAVE_LABEL);
+						// if($Field != null)
+						generator.Emit(OpCodes.Ldarg_0);
+						generator.Emit(OpCodes.Ldfld, field);
+						generator.Emit(OpCodes.Brtrue_S, SETTER_LEAVE_LABEL);
 
-					// $Field = new XXXX();
-					generator.Emit(OpCodes.Ldarg_0);
-					generator.Emit(OpCodes.Newobj, ctor);
-					generator.Emit(OpCodes.Stfld, field);
+						if(ctor != null)
+						{
+							// $Field = new XXXX();
+							generator.Emit(OpCodes.Ldarg_0);
+							generator.Emit(OpCodes.Newobj, ctor);
+							generator.Emit(OpCodes.Stfld, field);
+						}
+						else // $Field = FactoryClass.GetProperty(...);
+						{
+							var factory = properties[i].GetSingletonFactory();
 
-					// try end
-					generator.MarkLabel(SETTER_LEAVE_LABEL);
+							generator.Emit(OpCodes.Ldarg_0);
+							if(factory.GetParameters().Length > 0)
+								generator.Emit(OpCodes.Ldarg_0);
+							generator.Emit(OpCodes.Call, factory);
+							generator.Emit(OpCodes.Stfld, field);
+						}
 
-					// finally begin
-					generator.BeginFinallyBlock();
+						// try end
+						generator.MarkLabel(SETTER_LEAVE_LABEL);
 
-					generator.Emit(OpCodes.Ldloc_1);
-					generator.Emit(OpCodes.Brfalse_S, SETTER_FINALLY_LABEL);
+						// finally begin
+						generator.BeginFinallyBlock();
 
-					generator.Emit(OpCodes.Ldarg_0);
-					generator.Emit(OpCodes.Call, typeof(Monitor).GetMethod("Exit", new Type[] { typeof(object) }));
+						generator.Emit(OpCodes.Ldloc_1);
+						generator.Emit(OpCodes.Brfalse_S, SETTER_FINALLY_LABEL);
 
-					// finally end
-					generator.MarkLabel(SETTER_FINALLY_LABEL);
-					generator.EndExceptionBlock();
+						generator.Emit(OpCodes.Ldloc_0);
+						generator.Emit(OpCodes.Call, typeof(Monitor).GetMethod("Exit", new Type[] { typeof(object) }));
 
-					generator.MarkLabel(SETTER_EXIT_LABEL);
+						// finally end
+						generator.MarkLabel(SETTER_FINALLY_LABEL);
+						generator.EndExceptionBlock();
 
-					// return this.$Field;
-					generator.Emit(OpCodes.Ldarg_0);
-					generator.Emit(OpCodes.Ldfld, field);
-					generator.Emit(OpCodes.Ret);
+						generator.MarkLabel(SETTER_EXIT_LABEL);
+
+						// return this.$Field;
+						generator.Emit(OpCodes.Ldarg_0);
+						generator.Emit(OpCodes.Ldfld, field);
+						generator.Emit(OpCodes.Ret);
+					}
 				}
 
 				//生成获取属性字段的方法
@@ -395,14 +481,22 @@ namespace Zongsoft.Data
 
 				if(properties[i].CanWrite)
 				{
-					var setter = builder.DefineMethod("set_" + properties[i].Name, MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.NewSlot, null, new Type[] { properties[i].PropertyType });
-					property.SetSetMethod(setter);
+					//定义属性的设置器方法
+					var setter = builder.DefineMethod(properties[i].GetSetterName(),
+						(properties[i].IsExplicitImplementation ? MethodAttributes.Private : MethodAttributes.Public) | MethodAttributes.SpecialName | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.NewSlot,
+						null,
+						new Type[] { properties[i].PropertyType });
+
+					//如果当前属性需要显式实现，则定义其方法覆盖元数据
+					if(properties[i].IsExplicitImplementation)
+						builder.DefineMethodOverride(setter, properties[i].SetMethod);
 
 					setter.DefineParameter(1, ParameterAttributes.None, "value");
+					property.SetSetMethod(setter);
 					generator = setter.GetILGenerator();
 					var exit = generator.DefineLabel();
 
-					if(propertyAttribute == null)
+					if(metadata == null || metadata.Mode == PropertyImplementationMode.Default)
 					{
 						if(propertyChangedField != null)
 						{
@@ -410,9 +504,9 @@ namespace Zongsoft.Data
 							GeneratePropertyValueChangeChecker(generator, property, field, exit);
 						}
 					}
-					else
+					else if(metadata.Mode == PropertyImplementationMode.Extension)
 					{
-						var method = propertyAttribute.Type.GetMethod("Set" + properties[i].Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static, null, new Type[] { properties[i].DeclaringType, properties[i].PropertyType }, null);
+						var method = metadata.Type.GetMethod("Set" + properties[i].Name, BindingFlags.Public | BindingFlags.Static, null, new Type[] { properties[i].DeclaringType, properties[i].PropertyType }, null);
 
 						if(method == null)
 						{
@@ -433,6 +527,12 @@ namespace Zongsoft.Data
 							generator.Emit(OpCodes.Brfalse_S, exit);
 						}
 					}
+					else if(metadata.Mode == PropertyImplementationMode.Singleton)
+					{
+						//抛出“NotSupportedException”异常
+						generator.Emit(OpCodes.Newobj, typeof(NotSupportedException).GetConstructor(Type.EmptyTypes));
+						generator.Emit(OpCodes.Throw);
+					}
 
 					generator.Emit(OpCodes.Ldarg_0);
 					generator.Emit(OpCodes.Ldarg_1);
@@ -446,40 +546,40 @@ namespace Zongsoft.Data
 
 					if(countWritable <= 8)
 					{
-						generator.Emit(OpCodes.Ldc_I4, (int)Math.Pow(2, i - countReadOnly));
+						generator.Emit(OpCodes.Ldc_I4, (int)Math.Pow(2, i - timesReadOnly));
 						generator.Emit(OpCodes.Or);
 						generator.Emit(OpCodes.Conv_U1);
 						generator.Emit(OpCodes.Stfld, mask);
 					}
 					else if(countWritable <= 16)
 					{
-						generator.Emit(OpCodes.Ldc_I4, (int)Math.Pow(2, i - countReadOnly));
+						generator.Emit(OpCodes.Ldc_I4, (int)Math.Pow(2, i - timesReadOnly));
 						generator.Emit(OpCodes.Or);
 						generator.Emit(OpCodes.Conv_U2);
 						generator.Emit(OpCodes.Stfld, mask);
 					}
 					else if(countWritable <= 32)
 					{
-						generator.Emit(OpCodes.Ldc_I4, (uint)Math.Pow(2, i - countReadOnly));
+						generator.Emit(OpCodes.Ldc_I4, (uint)Math.Pow(2, i - timesReadOnly));
 						generator.Emit(OpCodes.Or);
 						generator.Emit(OpCodes.Conv_U4);
 						generator.Emit(OpCodes.Stfld, mask);
 					}
 					else if(countWritable <= 64)
 					{
-						generator.Emit(OpCodes.Ldc_I8, (long)Math.Pow(2, i - countReadOnly));
+						generator.Emit(OpCodes.Ldc_I8, (long)Math.Pow(2, i - timesReadOnly));
 						generator.Emit(OpCodes.Or);
 						generator.Emit(OpCodes.Conv_U8);
 						generator.Emit(OpCodes.Stfld, mask);
 					}
 					else
 					{
-						generator.Emit(OpCodes.Ldc_I4, (i - countReadOnly) / 8);
+						generator.Emit(OpCodes.Ldc_I4, (i - timesReadOnly) / 8);
 						generator.Emit(OpCodes.Ldelema, typeof(byte));
 						generator.Emit(OpCodes.Dup);
 						generator.Emit(OpCodes.Ldind_U1);
 
-						switch((i - countReadOnly) % 8)
+						switch((i - timesReadOnly) % 8)
 						{
 							case 0:
 								generator.Emit(OpCodes.Ldc_I4_1);
@@ -560,7 +660,7 @@ namespace Zongsoft.Data
 				}
 				else
 				{
-					countReadOnly++;
+					timesReadOnly++;
 				}
 
 				//将委托方法保存到方法标记数组元素中
@@ -672,14 +772,14 @@ namespace Zongsoft.Data
 			}
 		}
 
-		private static void GenerateTypeInitializer(TypeBuilder builder, IList<PropertyInfo> properties, MethodToken[] methods, out FieldBuilder names, out FieldBuilder tokens)
+		private static void GenerateTypeInitializer(TypeBuilder builder, IList<PropertyMetadata> properties, MethodToken[] methods, out FieldBuilder names, out FieldBuilder tokens)
 		{
 			names = builder.DefineField(PROPERTY_NAMES_VARIABLE, typeof(string[]), FieldAttributes.Private | FieldAttributes.Static | FieldAttributes.InitOnly);
 			tokens = builder.DefineField(PROPERTY_TOKENS_VARIABLE, typeof(Dictionary<,>).MakeGenericType(typeof(string), PROPERTY_TOKEN_TYPE), FieldAttributes.Private | FieldAttributes.Static | FieldAttributes.InitOnly);
 			var entityType = _module.GetType(builder.UnderlyingSystemType.FullName);
 
 			//定义只读属性的递增数量
-			var countReadOnly = 0;
+			var timesReadOnly = 0;
 			//定义可写属性的总数量
 			var countWritable = properties.Count(p => p.CanWrite);
 
@@ -693,12 +793,12 @@ namespace Zongsoft.Data
 				//忽略只读属性
 				if(!properties[i].CanWrite)
 				{
-					countReadOnly++;
+					timesReadOnly++;
 					continue;
 				}
 
 				generator.Emit(OpCodes.Dup);
-				generator.Emit(OpCodes.Ldc_I4, i - countReadOnly);
+				generator.Emit(OpCodes.Ldc_I4, i - timesReadOnly);
 				generator.Emit(OpCodes.Ldstr, properties[i].Name);
 				generator.Emit(OpCodes.Stelem_Ref);
 			}
@@ -706,7 +806,7 @@ namespace Zongsoft.Data
 			generator.Emit(OpCodes.Stsfld, names);
 
 			//重置只读属性的递增量
-			countReadOnly = 0;
+			timesReadOnly = 0;
 
 			var DictionaryAddMethod = tokens.FieldType.GetMethod("Add");
 			generator.Emit(OpCodes.Newobj, tokens.FieldType.GetConstructor(Type.EmptyTypes));
@@ -715,7 +815,7 @@ namespace Zongsoft.Data
 			{
 				generator.Emit(OpCodes.Dup);
 				generator.Emit(OpCodes.Ldstr, properties[i].Name);
-				generator.Emit(OpCodes.Ldc_I4, methods[i].SetMethod == null ? -1 : i - countReadOnly);
+				generator.Emit(OpCodes.Ldc_I4, methods[i].SetMethod == null ? -1 : i - timesReadOnly);
 
 				generator.Emit(OpCodes.Ldnull);
 				if(methods[i].GetMethod != null)
@@ -732,7 +832,7 @@ namespace Zongsoft.Data
 				}
 				else
 				{
-					countReadOnly++;
+					timesReadOnly++;
 				}
 
 				generator.Emit(OpCodes.Newobj, PROPERTY_TOKEN_CONSTRUCTOR);
@@ -745,21 +845,8 @@ namespace Zongsoft.Data
 			generator.Emit(OpCodes.Ret);
 		}
 
-		private static ConstructorBuilder GenerateConstructor(TypeBuilder builder, int count, out FieldBuilder mask)
+		private static ConstructorBuilder GenerateConstructor(TypeBuilder builder, int count, FieldBuilder mask, IEnumerable<PropertyMetadata> properties)
 		{
-			mask = null;
-
-			if(count <= 8)
-				mask = builder.DefineField(MASK_VARIABLE, typeof(byte), FieldAttributes.Private);
-			else if(count <= 16)
-				mask = builder.DefineField(MASK_VARIABLE, typeof(UInt16), FieldAttributes.Private);
-			else if(count <= 32)
-				mask = builder.DefineField(MASK_VARIABLE, typeof(UInt32), FieldAttributes.Private);
-			else if(count <= 64)
-				mask = builder.DefineField(MASK_VARIABLE, typeof(UInt64), FieldAttributes.Private);
-			else
-				mask = builder.DefineField(MASK_VARIABLE, typeof(byte[]), FieldAttributes.Private);
-
 			var constructor = builder.DefineConstructor(MethodAttributes.Public, CallingConventions.HasThis, null);
 			var generator = constructor.GetILGenerator();
 
@@ -774,9 +861,96 @@ namespace Zongsoft.Data
 				generator.Emit(OpCodes.Stfld, mask);
 			}
 
+			//初始化必要的属性
+			GenerateInitializer(generator, properties);
+
 			generator.Emit(OpCodes.Ret);
 
 			return constructor;
+		}
+
+		private static void GenerateInitializer(ILGenerator generator, IEnumerable<PropertyMetadata> properties)
+		{
+			object value;
+			Type valueType;
+
+			foreach(var property in properties)
+			{
+				if(property.Synchrolock != null)
+				{
+					generator.Emit(OpCodes.Ldarg_0);
+					generator.Emit(OpCodes.Newobj, typeof(object).GetConstructor(Type.EmptyTypes));
+					generator.Emit(OpCodes.Stfld, property.Synchrolock);
+				}
+
+				if(property.HasDefaultValue)
+				{
+					valueType = property.DefaultValueAttribute.Value as Type;
+
+					if(property.CanWrite)
+					{
+						if(valueType != null && property.PropertyType != typeof(Type))
+						{
+							if(!valueType.IsClass || valueType.IsAbstract)
+								throw new InvalidOperationException($"The specified '{valueType.FullName}' type must be a non-abstract class when generate a default value via DefaultValueAttribute of the '{property.Name}' property.");
+
+							if(!property.Field.FieldType.IsAssignableFrom(valueType))
+								throw new InvalidOperationException($"The specified '{valueType}' default value type cannot be converted to the '{property.Field.FieldType}' type of property.");
+
+							generator.Emit(OpCodes.Ldarg_0);
+							generator.Emit(OpCodes.Newobj, valueType.GetConstructor(Type.EmptyTypes));
+							generator.Emit(OpCodes.Call, property.Builder.SetMethod);
+						}
+						else
+						{
+							if(!Common.Convert.TryConvertValue(property.DefaultValueAttribute.Value, property.PropertyType, out value))
+								throw new InvalidOperationException($"The '{property.DefaultValueAttribute.Value}' default value cannot be converted to the '{property.PropertyType}' type of property.");
+
+							generator.Emit(OpCodes.Ldarg_0);
+							LoadDefaultValue(generator, property.PropertyType, value);
+							generator.Emit(OpCodes.Call, property.Builder.SetMethod);
+						}
+					}
+					else if(property.Field != null)
+					{
+						if(valueType != null && property.Field.FieldType != typeof(Type))
+						{
+							if(property.SingletonFactoryEnabled)
+							{
+								var factory = property.GetSingletonFactory();
+
+								//$Field=FactoryClass.GetProperty(...);
+								generator.Emit(OpCodes.Ldarg_0);
+								if(factory.GetParameters().Length > 0)
+									generator.Emit(OpCodes.Ldnull);
+								generator.Emit(OpCodes.Call, factory);
+								generator.Emit(OpCodes.Stfld, property.Field);
+							}
+							else
+							{
+								if(!valueType.IsClass || valueType.IsAbstract)
+									throw new InvalidOperationException($"The specified '{valueType.FullName}' type must be a non-abstract class when generate a default value via DefaultValueAttribute of the '{property.Name}' property.");
+
+								if(!property.Field.FieldType.IsAssignableFrom(valueType))
+									throw new InvalidOperationException($"The specified '{valueType}' default value type cannot be converted to the '{property.Field.FieldType}' type of field.");
+
+								generator.Emit(OpCodes.Ldarg_0);
+								generator.Emit(OpCodes.Newobj, valueType.GetConstructor(Type.EmptyTypes));
+								generator.Emit(OpCodes.Stfld, property.Field);
+							}
+						}
+						else
+						{
+							if(!Common.Convert.TryConvertValue(property.DefaultValueAttribute.Value, property.Field.FieldType, out value))
+								throw new InvalidOperationException($"The '{property.DefaultValueAttribute.Value}' default value cannot be converted to the '{property.Field.FieldType}' type of field.");
+
+							generator.Emit(OpCodes.Ldarg_0);
+							LoadDefaultValue(generator, property.Field.FieldType, value);
+							generator.Emit(OpCodes.Stfld, property.Field);
+						}
+					}
+				}
+			}
 		}
 
 		private static void GenerateHasChangesMethod(TypeBuilder builder, FieldBuilder mask, FieldBuilder names, FieldBuilder tokens)
@@ -1413,11 +1587,14 @@ namespace Zongsoft.Data
 			return field;
 		}
 
-		private static IList<PropertyInfo> MakeInterfaces(Type type, TypeBuilder builder, out FieldBuilder propertyChanged)
+		private static IList<PropertyMetadata> MakeInterfaces(Type type, TypeBuilder builder, out FieldBuilder propertyChanged)
 		{
 			propertyChanged = null;
-			var properties = new List<PropertyInfo>(type.GetProperties());
 			var queue = new Queue<Type>(type.GetInterfaces());
+			var result = new List<PropertyMetadata>();
+
+			//首先将当前类型的属性信息加入到结果集中
+			result.AddRange(type.GetProperties().Select(p => new PropertyMetadata(p)));
 
 			while(queue.Count > 0)
 			{
@@ -1437,7 +1614,7 @@ namespace Zongsoft.Data
 				}
 				else
 				{
-					properties.AddRange(interfaceType.GetProperties());
+					result.AddRange(interfaceType.GetProperties().Select(p => new PropertyMetadata(p)));
 
 					//获取当前接口的父接口
 					var baseInterfaces = interfaceType.GetInterfaces();
@@ -1452,81 +1629,197 @@ namespace Zongsoft.Data
 				}
 			}
 
-			return properties;
+			return result;
 		}
 
-		private static void LoadDefaultValue(ILGenerator generator, Type type)
+		private static void LoadDefaultValue(ILGenerator generator, Type type, object value = null)
 		{
+			if(type.IsValueType && type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+			{
+				if(value == null)
+					generator.Emit(OpCodes.Ldnull);
+				else
+					LoadDefaultValue(generator, Nullable.GetUnderlyingType(type), value);
+
+				return;
+			}
+
+			if(type.IsEnum)
+			{
+				LoadDefaultValue(generator, Enum.GetUnderlyingType(type), Convert.ChangeType(value, Enum.GetUnderlyingType(type)));
+				return;
+			}
+
 			switch(Type.GetTypeCode(type))
 			{
 				case TypeCode.Boolean:
-					generator.Emit(OpCodes.Ldc_I4_0);
-					break;
+					if(value != null && (bool)Convert.ChangeType(value, typeof(bool)))
+						generator.Emit(OpCodes.Ldc_I4_1);
+					else
+						generator.Emit(OpCodes.Ldc_I4_0);
+					return;
 				case TypeCode.Byte:
-					generator.Emit(OpCodes.Ldc_I4_0);
+					if(value == null || (byte)Convert.ChangeType(value, TypeCode.Byte) == 0)
+						generator.Emit(OpCodes.Ldc_I4_0);
+					else
+						generator.Emit(OpCodes.Ldc_I4, (byte)Convert.ChangeType(value, TypeCode.Byte));
+
 					generator.Emit(OpCodes.Conv_U1);
-					break;
+					return;
 				case TypeCode.SByte:
-					generator.Emit(OpCodes.Ldc_I4_0);
+					if(value == null || (sbyte)Convert.ChangeType(value, TypeCode.SByte) == 0)
+						generator.Emit(OpCodes.Ldc_I4_0);
+					else
+						generator.Emit(OpCodes.Ldc_I4, (sbyte)Convert.ChangeType(value, TypeCode.SByte));
+
 					generator.Emit(OpCodes.Conv_I1);
-					break;
+					return;
 				case TypeCode.Single:
-					generator.Emit(OpCodes.Ldc_R4, 0);
-					break;
+					generator.Emit(OpCodes.Ldc_R4, value == null ? 0 : (float)Convert.ChangeType(value, TypeCode.Single));
+					return;
 				case TypeCode.Double:
-					generator.Emit(OpCodes.Ldc_R8, 0);
-					break;
+					generator.Emit(OpCodes.Ldc_R8, value == null ? 0 : (double)Convert.ChangeType(value, TypeCode.Double));
+					return;
 				case TypeCode.Int16:
-					generator.Emit(OpCodes.Ldc_I4_0);
+					if(value == null || (short)Convert.ChangeType(value, TypeCode.Int16) == 0)
+						generator.Emit(OpCodes.Ldc_I4_0);
+					else
+						generator.Emit(OpCodes.Ldc_I4, (short)Convert.ChangeType(value, TypeCode.Int16));
+
 					generator.Emit(OpCodes.Conv_I2);
-					break;
+					return;
 				case TypeCode.Int32:
-					generator.Emit(OpCodes.Ldc_I4_0);
-					break;
+					if(value == null || (int)Convert.ChangeType(value, TypeCode.Int32) == 0)
+						generator.Emit(OpCodes.Ldc_I4_0);
+					else
+						generator.Emit(OpCodes.Ldc_I4, (int)Convert.ChangeType(value, TypeCode.Int32));
+					return;
 				case TypeCode.Int64:
-					generator.Emit(OpCodes.Ldc_I4_0);
-					generator.Emit(OpCodes.Conv_I8);
-					break;
+					if(value == null || (long)Convert.ChangeType(value, TypeCode.Int64) == 0)
+					{
+						generator.Emit(OpCodes.Ldc_I4_0);
+						generator.Emit(OpCodes.Conv_I8);
+					}
+					else
+						generator.Emit(OpCodes.Ldc_I8, (long)Convert.ChangeType(value, TypeCode.Int64));
+
+					return;
 				case TypeCode.UInt16:
-					generator.Emit(OpCodes.Ldc_I4_0);
+					if(value == null || (ushort)Convert.ChangeType(value, TypeCode.UInt16) == 0)
+						generator.Emit(OpCodes.Ldc_I4_0);
+					else
+						generator.Emit(OpCodes.Ldc_I4, (ushort)Convert.ChangeType(value, TypeCode.UInt16));
+
 					generator.Emit(OpCodes.Conv_U2);
-					break;
+					return;
 				case TypeCode.UInt32:
-					generator.Emit(OpCodes.Ldc_I4_0);
+					if(value == null || (uint)Convert.ChangeType(value, TypeCode.UInt32) == 0)
+						generator.Emit(OpCodes.Ldc_I4_0);
+					else
+						generator.Emit(OpCodes.Ldc_I4, (uint)Convert.ChangeType(value, TypeCode.UInt32));
+
 					generator.Emit(OpCodes.Conv_U4);
-					break;
+					return;
 				case TypeCode.UInt64:
-					generator.Emit(OpCodes.Ldc_I4_0);
+					if(value == null || (ulong)Convert.ChangeType(value, TypeCode.UInt64) == 0)
+						generator.Emit(OpCodes.Ldc_I4_0);
+					else
+						generator.Emit(OpCodes.Ldc_I8, (ulong)Convert.ChangeType(value, TypeCode.UInt64));
+
 					generator.Emit(OpCodes.Conv_U8);
-					break;
+					return;
 				case TypeCode.String:
-					generator.Emit(OpCodes.Ldnull);
-					break;
+					if(value == null)
+						generator.Emit(OpCodes.Ldnull);
+					else
+						generator.Emit(OpCodes.Ldstr, value.ToString());
+
+					return;
 				case TypeCode.Char:
-					generator.Emit(OpCodes.Ldsfld, typeof(Char).GetField("MinValue", BindingFlags.Public | BindingFlags.Static));
-					break;
+					if(value == null || (char)Convert.ChangeType(value, TypeCode.Char) == '\0')
+						generator.Emit(OpCodes.Ldsfld, typeof(Char).GetField("MinValue", BindingFlags.Public | BindingFlags.Static));
+					else
+						generator.Emit(OpCodes.Ldc_I4_S, (char)Convert.ChangeType(value, TypeCode.Char));
+					return;
 				case TypeCode.DateTime:
-					generator.Emit(OpCodes.Ldsfld, typeof(DateTime).GetField("MinValue", BindingFlags.Public | BindingFlags.Static));
-					break;
+					if(value == null || (DateTime)Convert.ChangeType(value, TypeCode.DateTime) == DateTime.MinValue)
+						generator.Emit(OpCodes.Ldsfld, typeof(DateTime).GetField("MinValue", BindingFlags.Public | BindingFlags.Static));
+					else
+					{
+						generator.Emit(OpCodes.Ldc_I8, ((DateTime)Convert.ChangeType(value, TypeCode.DateTime)).Ticks);
+						generator.Emit(OpCodes.Newobj, typeof(DateTime).GetConstructor(new Type[] { typeof(long) }));
+					}
+
+					return;
+				case TypeCode.Decimal:
+					if(value == null)
+						generator.Emit(OpCodes.Ldsfld, typeof(Decimal).GetField("Zero", BindingFlags.Public | BindingFlags.Static));
+					else
+					{
+						switch(Type.GetTypeCode(value.GetType()))
+						{
+							case TypeCode.Single:
+								generator.Emit(OpCodes.Ldc_R4, (float)Convert.ChangeType(value, typeof(float)));
+								generator.Emit(OpCodes.Newobj, typeof(Decimal).GetConstructor(new Type[] { typeof(float) }));
+								break;
+							case TypeCode.Double:
+								generator.Emit(OpCodes.Ldc_R8, (double)Convert.ChangeType(value, typeof(double)));
+								generator.Emit(OpCodes.Newobj, typeof(Decimal).GetConstructor(new Type[] { typeof(double) }));
+								break;
+							case TypeCode.Decimal:
+								var bits = Decimal.GetBits((decimal)Convert.ChangeType(value, TypeCode.Decimal));
+								generator.Emit(OpCodes.Ldc_I4_S, bits.Length);
+								generator.Emit(OpCodes.Newarr, typeof(int));
+
+								for(int i = 0; i < bits.Length; i++)
+								{
+									generator.Emit(OpCodes.Dup);
+									generator.Emit(OpCodes.Ldc_I4_S, i);
+									generator.Emit(OpCodes.Ldc_I4, bits[i]);
+									generator.Emit(OpCodes.Stelem_I4);
+								}
+
+								generator.Emit(OpCodes.Newobj, typeof(Decimal).GetConstructor(new Type[] { typeof(int[]) }));
+
+								break;
+							case TypeCode.SByte:
+							case TypeCode.Int16:
+							case TypeCode.Int32:
+								generator.Emit(OpCodes.Ldc_I4, (int)Convert.ChangeType(value, typeof(int)));
+								generator.Emit(OpCodes.Newobj, typeof(Decimal).GetConstructor(new Type[] { typeof(int) }));
+								break;
+							case TypeCode.Int64:
+								generator.Emit(OpCodes.Ldc_I8, (long)Convert.ChangeType(value, typeof(long)));
+								generator.Emit(OpCodes.Newobj, typeof(Decimal).GetConstructor(new Type[] { typeof(long) }));
+								break;
+							case TypeCode.Byte:
+							case TypeCode.Char:
+							case TypeCode.UInt16:
+							case TypeCode.UInt32:
+								generator.Emit(OpCodes.Ldc_I4, (int)Convert.ChangeType(value, typeof(int)));
+								generator.Emit(OpCodes.Conv_U4);
+								generator.Emit(OpCodes.Newobj, typeof(Decimal).GetConstructor(new Type[] { typeof(uint) }));
+								break;
+							case TypeCode.UInt64:
+								generator.Emit(OpCodes.Ldc_I8, (long)Convert.ChangeType(value, typeof(long)));
+								generator.Emit(OpCodes.Conv_U8);
+								generator.Emit(OpCodes.Newobj, typeof(Decimal).GetConstructor(new Type[] { typeof(ulong) }));
+								break;
+							default:
+								throw new InvalidOperationException($"Unable to convert '{value.GetType()}' type to decimal type.");
+						}
+					}
+
+					return;
 				case TypeCode.DBNull:
 					generator.Emit(OpCodes.Ldsfld, typeof(DBNull).GetField("Value", BindingFlags.Public | BindingFlags.Static));
-					break;
-				case TypeCode.Decimal:
-					generator.Emit(OpCodes.Ldsfld, typeof(Decimal).GetField("Zero", BindingFlags.Public | BindingFlags.Static));
-					break;
+					return;
 			}
 
 			if(type.IsValueType)
-			{
-				if(type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
-					generator.Emit(OpCodes.Ldnull);
-				else
-					generator.Emit(OpCodes.Newobj, type.GetConstructor(Type.EmptyTypes));
-			}
+				generator.Emit(OpCodes.Initobj, type);
 			else
-			{
 				generator.Emit(OpCodes.Ldnull);
-			}
 		}
 
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
@@ -1593,8 +1886,8 @@ namespace Zongsoft.Data
 		/// </summary>
 		public enum PropertyImplementationMode
 		{
-			/// <summary>自动，由动态编译器根据实体属性的定义选择最佳实现方式。</summary>
-			Auto,
+			/// <summary>默认实现方式。</summary>
+			Default,
 
 			/// <summary>以类似扩展方法的方式实现属性。</summary>
 			Extension,
@@ -1612,27 +1905,24 @@ namespace Zongsoft.Data
 			#region 构造函数
 			public PropertyAttribute()
 			{
-				this.Mode = PropertyImplementationMode.Singleton;
+				this.Mode = PropertyImplementationMode.Default;
 			}
 
-			public PropertyAttribute(Type type) : this(type, PropertyImplementationMode.Auto)
+			public PropertyAttribute(PropertyImplementationMode mode, Type type = null)
 			{
-			}
-
-			public PropertyAttribute(Type type, PropertyImplementationMode mode)
-			{
-				this.Type = type ?? throw new ArgumentNullException(nameof(type));
 				this.Mode = mode;
+				this.Type = type;
 			}
 			#endregion
 
 			#region 公共属性
 			/// <summary>
-			/// 获取扩展实现的类型或属性类型为集合接口的具体类型，具体含义由<see cref="Mode"/>属性值确定。
+			/// 获取或获取扩展实现的类型或属性的具体类型，具体含义由<see cref="Mode"/>属性值确定。
 			/// </summary>
 			public Type Type
 			{
 				get;
+				set;
 			}
 
 			/// <summary>
@@ -1642,6 +1932,207 @@ namespace Zongsoft.Data
 			{
 				get;
 				set;
+			}
+
+			/// <summary>
+			/// 获取或设置属性是否以显式实现方式生成。
+			/// </summary>
+			public bool IsExplicitImplementation
+			{
+				get;
+				set;
+			}
+			#endregion
+		}
+
+		private class PropertyMetadata
+		{
+			#region 私有变量
+			private readonly PropertyInfo _property;
+			private readonly PropertyAttribute _metadata;
+			private readonly DefaultValueAttribute _defaultAttribute;
+			#endregion
+
+			#region 公共字段
+			public PropertyBuilder Builder;
+			public FieldBuilder Field;
+			public FieldBuilder Synchrolock;
+			public bool IsExplicitImplementation;
+			#endregion
+
+			#region 构造函数
+			public PropertyMetadata(PropertyInfo property)
+			{
+				_property = property ?? throw new ArgumentNullException(nameof(property));
+				_metadata = property.GetCustomAttribute<PropertyAttribute>(true);
+				_defaultAttribute = _property.GetCustomAttribute<DefaultValueAttribute>(true);
+
+				if(_metadata != null)
+					this.IsExplicitImplementation = _metadata.IsExplicitImplementation;
+			}
+			#endregion
+
+			#region 公共属性
+			public bool IsReadOnly
+			{
+				get
+				{
+					return _property.CanRead && !_property.CanWrite;
+				}
+			}
+
+			public bool CanRead
+			{
+				get
+				{
+					return _property.CanRead;
+				}
+			}
+
+			public bool CanWrite
+			{
+				get
+				{
+					return _property.CanWrite;
+				}
+			}
+
+			public string Name
+			{
+				get
+				{
+					return _property.Name;
+				}
+			}
+
+			public Type DeclaringType
+			{
+				get
+				{
+					return _property.DeclaringType;
+				}
+			}
+
+			public Type PropertyType
+			{
+				get
+				{
+					return _property.PropertyType;
+				}
+			}
+
+			public MethodInfo GetMethod
+			{
+				get
+				{
+					return _property.GetMethod;
+				}
+			}
+
+			public MethodInfo SetMethod
+			{
+				get
+				{
+					return _property.SetMethod;
+				}
+			}
+
+			public PropertyAttribute Metadata
+			{
+				get
+				{
+					return _metadata;
+				}
+			}
+
+			public bool SingletonFactoryEnabled
+			{
+				get
+				{
+					//当条件满足以下条件之一则返回真，否则返回假：
+					//1. 属性有 DefaultValueAttribute 自定义标签，且它的 Value 是 Type，且指定的 Type 是一个静态类；
+					//2. 属性有 PropertyAttribute 元数据标签，且实现方式是单例模式，且它的 Type 指定的是一个静态类。
+					return (_defaultAttribute != null &&
+					        _defaultAttribute.Value is Type type &&
+					        type.IsAbstract && type.IsSealed) ||
+					       (_metadata != null && _metadata.Mode == PropertyImplementationMode.Singleton &&
+					        _metadata.Type != null && _metadata.Type.IsAbstract && _metadata.Type.IsSealed);
+				}
+			}
+
+			public bool HasDefaultValue
+			{
+				get
+				{
+					return _defaultAttribute != null;
+				}
+			}
+
+			public DefaultValueAttribute DefaultValueAttribute
+			{
+				get
+				{
+					return _defaultAttribute;
+				}
+			}
+			#endregion
+
+			#region 公共方法
+			public string GetName()
+			{
+				return this.IsExplicitImplementation ?
+				       _property.DeclaringType.FullName + "." + _property.Name :
+				       _property.Name;
+			}
+
+			public string GetFieldName(string suffix = null)
+			{
+				return "$" + (this.IsExplicitImplementation ?
+					   _property.DeclaringType.FullName + "." + _property.Name :
+					   _property.Name) + suffix;
+			}
+
+			public string GetGetterName()
+			{
+				return this.IsExplicitImplementation ?
+				       _property.DeclaringType.FullName + "." + _property.GetMethod.Name :
+				       _property.GetMethod.Name;
+			}
+
+			public string GetSetterName()
+			{
+				return this.IsExplicitImplementation ?
+				       _property.DeclaringType.FullName + "." + _property.SetMethod.Name :
+				       _property.SetMethod.Name;
+			}
+
+			public MethodInfo GetSingletonFactory()
+			{
+				Type factoryType = null;
+
+				if(_defaultAttribute != null && _defaultAttribute.Value is Type type && type.IsAbstract && type.IsSealed)
+					factoryType = type;
+				else if(_metadata != null && _metadata.Mode == PropertyImplementationMode.Singleton && _metadata.Type != null && _metadata.Type.IsAbstract && _metadata.Type.IsSealed)
+					factoryType = _metadata.Type;
+
+				if(factoryType == null)
+					return null;
+
+				var method = factoryType.GetMethod("Get" + _property.Name, BindingFlags.Public | BindingFlags.Static, null, new Type[] { _property.DeclaringType }, null) ??
+				             factoryType.GetMethod("Get" + _property.Name, BindingFlags.Public | BindingFlags.Static, null, Type.EmptyTypes, null);
+
+				if(method == null)
+					throw new InvalidOperationException($"Not found the 'Get{_property.Name}(...)' factory method in the '{factoryType}' extension class.");
+
+				if(method.ReturnType == null || method.ReturnType == typeof(void) || !_property.PropertyType.IsAssignableFrom(method.ReturnType))
+					throw new InvalidOperationException($"The return type of the 'Get{_property.Name}(...)' factory method in the '{factoryType}' extension class is missing or invliad.");
+
+				return method;
+			}
+
+			public IList<CustomAttributeData> GetCustomAttributesData()
+			{
+				return _property.GetCustomAttributesData();
 			}
 			#endregion
 		}

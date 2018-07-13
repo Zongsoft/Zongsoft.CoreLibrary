@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Collections.Generic;
 
 namespace Zongsoft.Samples.Entities.Models
@@ -12,7 +13,7 @@ namespace Zongsoft.Samples.Entities.Models
 			get; set;
 		}
 
-		[System.ComponentModel.DefaultValue("Zongsoft")]
+		//[DefaultValue("Zongsoft")]
 		string Namespace
 		{
 			get; set;
@@ -28,24 +29,28 @@ namespace Zongsoft.Samples.Entities.Models
 			get; set;
 		}
 
-		[Zongsoft.Data.Entity.Property(typeof(UserExtension))]
+		//[Zongsoft.Data.Entity.Property(Data.Entity.PropertyImplementationMode.Extension, typeof(UserExtension))]
 		string Avatar
 		{
 			get; set;
 		}
 
-		[Zongsoft.Data.Entity.Property(typeof(UserExtension))]
+		//[DefaultValue("xoxo")]
+		[Zongsoft.Data.Entity.Property(Data.Entity.PropertyImplementationMode.Extension, typeof(UserExtension))]
 		string AvatarUrl
 		{
 			get;
 		}
 
-		[Zongsoft.Data.Entity.Property()]
-		ICollection<string> Assets
+		//[DefaultValue(typeof(List<object>))]
+		//[DefaultValue(typeof(UserExtension))]
+		//[Zongsoft.Data.Entity.Property(Data.Entity.PropertyImplementationMode.Singleton, typeof(UserExtension))]
+		ICollection<object> Assets
 		{
 			get;
 		}
 
+		//[Zongsoft.Data.Entity.Property(IsExplicitImplementation = true)]
 		byte Status
 		{
 			get; set;

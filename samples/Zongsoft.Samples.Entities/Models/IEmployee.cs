@@ -12,13 +12,15 @@ namespace Zongsoft.Samples.Entities.Models
 			set;
 		}
 
-		DateTime? Birthdate
+		[System.ComponentModel.DefaultValue("2015-3-21")]
+		DateTime Birthdate
 		{
 			get;
 			set;
 		}
 
-		uint TenantId
+		[System.ComponentModel.DefaultValue(15000)]
+		decimal Salary
 		{
 			get;
 			set;
