@@ -15,7 +15,7 @@ namespace Zongsoft.Samples.Entities.Models
 		//	return true;
 		//}
 
-		public static string GetAvatarUrl(IUserEntity user)
+		public static string GetAvatarUrl(IUserEntity user, string value = null)
 		{
 			var avatar = user.Avatar;
 
@@ -23,6 +23,11 @@ namespace Zongsoft.Samples.Entities.Models
 				return string.Empty;
 
 			return Zongsoft.IO.FileSystem.GetUrl(avatar);
+		}
+
+		public static ICollection<object> GetAssets(IUserEntity user)
+		{
+			return new System.Collections.ObjectModel.ObservableCollection<object>();
 		}
 	}
 }

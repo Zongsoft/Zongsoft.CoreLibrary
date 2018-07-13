@@ -26,6 +26,11 @@ namespace Zongsoft.Samples.Entities
 
 		private static void BuildTest()
 		{
+			//Data.Entity.GetCreator<Models.IEmployee>();
+			//Data.Entity.Save();
+
+			//return;
+
 			var person = Data.Entity.Build<Models.IPerson>();
 			var person1 = Data.Entity.Build<Models.IPerson>();
 			var user = Data.Entity.Build<Models.IUserEntity>();
