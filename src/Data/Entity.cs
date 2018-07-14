@@ -73,24 +73,24 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 公共方法
-		public static T Build<T>() where T : IEntity
+		public static T Build<T>()
 		{
-			return (T)GetCreator<T>()();
+			return (T)GetCreator(typeof(T))();
 		}
 
-		public static T Build<T>(Action<T> map) where T : IEntity
+		public static T Build<T>(Action<T> map)
 		{
-			var entity = (T)GetCreator<T>()();
+			var entity = (T)GetCreator(typeof(T))();
 			map?.Invoke(entity);
 			return entity;
 		}
 
-		public static IEnumerable<T> Build<T>(int count, Action<T, int> map = null) where T : IEntity
+		public static IEnumerable<T> Build<T>(int count, Action<T, int> map = null)
 		{
 			if(count < 1)
 				throw new ArgumentOutOfRangeException(nameof(count));
 
-			var creator = GetCreator<T>();
+			var creator = GetCreator(typeof(T));
 
 			if(map == null)
 			{
@@ -109,12 +109,54 @@ namespace Zongsoft.Data
 				}
 			}
 		}
+
+		public static object Build(Type type)
+		{
+			return GetCreator(type)();
+		}
+
+		public static object Build(Type type, Action<object> map)
+		{
+			var entity = GetCreator(type)();
+			map?.Invoke(entity);
+			return entity;
+		}
+
+		public static IEnumerable Build(Type type, int count, Action<object, int> map = null)
+		{
+			if(count < 1)
+				throw new ArgumentOutOfRangeException(nameof(count));
+
+			var creator = GetCreator(type);
+
+			if(map == null)
+			{
+				for(int i = 0; i < count; i++)
+				{
+					yield return creator();
+				}
+			}
+			else
+			{
+				for(int i = 0; i < count; i++)
+				{
+					var entity = creator();
+					map(entity, i);
+					yield return entity;
+				}
+			}
+		}
 		#endregion
 
 		#region 私有方法
-		public static Func<object> GetCreator<T>()
+		public static Func<object> GetCreator(Type type)
 		{
-			var type = typeof(T);
+			_locker.EnterReadLock();
+			var existed = _cache.TryGetValue(type, out var creator);
+			_locker.ExitReadLock();
+
+			if(existed)
+				return creator;
 
 			if(!type.IsInterface)
 				throw new ArgumentException($"The '{type.FullName}' type must be an interface.");
@@ -124,13 +166,6 @@ namespace Zongsoft.Data
 
 			if(type.GetMethods().Length > type.GetProperties().Length * 2)
 				throw new ArgumentException($"The '{type.FullName}' interface cannot define any methods.");
-
-			_locker.EnterReadLock();
-			var existed = _cache.TryGetValue(type, out var creator);
-			_locker.ExitReadLock();
-
-			if(existed)
-				return creator;
 
 			try
 			{

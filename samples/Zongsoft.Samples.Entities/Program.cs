@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Diagnostics;
 
 namespace Zongsoft.Samples.Entities
@@ -162,7 +163,7 @@ namespace Zongsoft.Samples.Entities
 
 		private static void PerformanceDynamic(int count)
 		{
-			var creator = Data.Entity.GetCreator<Models.IUserEntity>(); //预先编译
+			var creator = Data.Entity.GetCreator(typeof(Models.IUserEntity)); //预先编译
 			Data.Entity.Build<Models.IUserEntity>(); //预热（预先编译）
 
 			var stopwatch = new Stopwatch();
@@ -183,7 +184,7 @@ namespace Zongsoft.Samples.Entities
 				user.CreatedTime = DateTime.Now;
 			}
 
-			//var entities = DataEntity.Build<Models.IUserEntity>(count, (entity, index) =>
+			//var entities = Data.Entity.Build<Models.IUserEntity>(count, (entity, index) =>
 			//{
 			//	entity.UserId = (uint)index;
 			//	entity.Avatar = ":smile:";
@@ -200,7 +201,7 @@ namespace Zongsoft.Samples.Entities
 			//}
 
 			//int index = 0;
-			//var entities = DataEntity.Build<Models.IUserEntity>(count);
+			//var entities = Data.Entity.Build<Models.IUserEntity>(count);
 
 			//foreach(var user in entities)
 			//{
@@ -215,11 +216,6 @@ namespace Zongsoft.Samples.Entities
 			//}
 
 			//var iterator = entities.GetEnumerator();
-
-			//while(iterator.MoveNext())
-			//{
-			//}
-
 			//while(iterator.MoveNext())
 			//{
 			//	var user = iterator.Current;
@@ -233,7 +229,7 @@ namespace Zongsoft.Samples.Entities
 			//	user.StatusTimestamp = (index % 11 == 0) ? DateTime.Now : DateTime.MinValue;
 			//	user.CreatedTime = DateTime.Now;
 
-			//	//index++;
+			//	index++;
 			//}
 
 			Console.WriteLine($"Dynamic Entity: {stopwatch.ElapsedMilliseconds}");
