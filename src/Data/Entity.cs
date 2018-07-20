@@ -146,9 +146,7 @@ namespace Zongsoft.Data
 				}
 			}
 		}
-		#endregion
 
-		#region 私有方法
 		public static Func<object> GetCreator(Type type)
 		{
 			_locker.EnterReadLock();
@@ -186,7 +184,9 @@ namespace Zongsoft.Data
 		{
 			_assembly.Save(ASSEMBLY_NAME + ".dll");
 		}
+		#endregion
 
+		#region 私有方法
 		private static Func<object> Compile(Type type)
 		{
 			ILGenerator generator;
