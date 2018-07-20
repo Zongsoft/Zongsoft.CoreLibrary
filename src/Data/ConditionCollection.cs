@@ -25,13 +25,13 @@
  */
 
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Zongsoft.Data
 {
-	public class ConditionCollection : System.Collections.ObjectModel.Collection<ICondition>, IConditional
+	public class ConditionCollection : System.Collections.ObjectModel.Collection<ICondition>, ICondition
 	{
 		#region 成员字段
 		private ConditionCombination _conditionCombination;
@@ -91,7 +91,7 @@ namespace Zongsoft.Data
 		public static ConditionCollection operator +(Condition condition, ConditionCollection conditions)
 		{
 			if(conditions == null)
-				throw new ArgumentNullException("conditions");
+				throw new ArgumentNullException(nameof(conditions));
 
 			if(condition == null)
 				return conditions;
@@ -102,7 +102,7 @@ namespace Zongsoft.Data
 		public static ConditionCollection operator +(ConditionCollection conditions, Condition condition)
 		{
 			if(conditions == null)
-				throw new ArgumentNullException("conditions");
+				throw new ArgumentNullException(nameof(conditions));
 
 			if(condition == null)
 				return conditions;
@@ -240,33 +240,10 @@ namespace Zongsoft.Data
 		#region 公共方法
 		public bool Contains(string name)
 		{
-			return this.Contains(this, name);
-		}
-
-		public ICondition[] Find(string name)
-		{
 			if(string.IsNullOrWhiteSpace(name))
-				return null;
+				return false;
 
-			var list = new List<ICondition>();
-
-			foreach(var item in this.Items)
-			{
-				if(item is Condition condition)
-				{
-					if(string.Equals(condition.Name, name, StringComparison.OrdinalIgnoreCase))
-						list.Add(condition);
-				}
-				else if(item is IConditional conditional)
-				{
-					var array = conditional.Find(name);
-
-					if(array != null && array.Length > 0)
-						list.AddRange(array);
-				}
-			}
-
-			return list.ToArray();
+			return this.Contains(this, name);
 		}
 
 		/// <summary>
@@ -347,9 +324,6 @@ namespace Zongsoft.Data
 		#region 私有方法
 		private bool Contains(IEnumerable<ICondition> conditions, string name)
 		{
-			if(conditions == null || string.IsNullOrWhiteSpace(name))
-				return false;
-
 			foreach(var condition in conditions)
 			{
 				if(condition is Condition c)
@@ -357,9 +331,9 @@ namespace Zongsoft.Data
 					if(string.Equals(c.Name, name, StringComparison.OrdinalIgnoreCase))
 						return true;
 				}
-				else if(condition is IConditional cc)
+				else if(condition is ConditionCollection cs)
 				{
-					if(cc.Contains(name))
+					if(this.Contains(cs, name))
 						return true;
 				}
 			}

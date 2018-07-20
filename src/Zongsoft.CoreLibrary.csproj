@@ -120,6 +120,7 @@
     <Compile Include="ComponentModel\SchemaCategoryCollection.cs" />
     <Compile Include="ComponentModel\SchemaCollection.cs" />
     <Compile Include="Data\ConditionalBehaviors.cs" />
+    <Compile Include="Data\Conditional.cs" />
     <Compile Include="Data\DataAccessAttribute.cs" />
     <Compile Include="Data\DataAccessProviderBase.cs" />
     <Compile Include="Data\Entity.cs" />
@@ -167,7 +168,6 @@
     <Compile Include="Expressions\TokenType.cs" />
     <Compile Include="ComponentModel\EncodingConverter.cs" />
     <Compile Include="Data\Condition.cs" />
-    <Compile Include="Data\Conditional.cs" />
     <Compile Include="Data\ConditionalAttribute.cs" />
     <Compile Include="Data\ConditionalConverter.cs" />
     <Compile Include="Data\ConditionalConverterContext.cs" />

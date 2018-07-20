@@ -224,7 +224,7 @@ namespace Zongsoft.Data
 		/// </summary>
 		/// <typeparam name="T">指定的实体类型。</typeparam>
 		/// <returns>返回一个特定类型的条件构建器。</returns>
-		public static IConditionBuilder<T> Get<T>()
+		public static IConditionBuilder<T> GetBuilder<T>()
 		{
 			return ConditionBuilder.Get<T>();
 		}
