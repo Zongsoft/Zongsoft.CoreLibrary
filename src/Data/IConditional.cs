@@ -25,14 +25,13 @@
  */
 
 using System;
-using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
 	/// <summary>
 	/// 表示条件设置实体的接口。
 	/// </summary>
-	public interface IConditional : ICondition, IEnumerable<ICondition>
+	public interface IConditional : IEntity
 	{
 		/// <summary>
 		/// 获取或设置条件的组合方式。
@@ -42,19 +41,5 @@ namespace Zongsoft.Data
 			get;
 			set;
 		}
-
-		/// <summary>
-		/// 判断是否包含某个名称的成员。
-		/// </summary>
-		/// <param name="name">指定的成员名称。</param>
-		/// <returns>如果包含指定名称的成员则返回真(True)，否则返回假(False)。</returns>
-		bool Contains(string name);
-
-		/// <summary>
-		/// 查找指定名称的所有成员。
-		/// </summary>
-		/// <param name="name">指定的成员名称。</param>
-		/// <returns>返回指定名称的成员数组。</returns>
-		ICondition[] Find(string name);
 	}
 }

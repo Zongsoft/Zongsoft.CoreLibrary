@@ -10,69 +10,52 @@ namespace Zongsoft.Data
 		[Fact]
 		public void Test()
 		{
-			var conditional = new DummyConditional();
+			var conditional = Entity.Build<IDummyConditional>();
 
 			Assert.Null(conditional.CorporationId);
 			Assert.Null(conditional.DepartmentId);
 			Assert.Null(conditional.Name);
 			Assert.Null(conditional.CreatedTime);
 
+			Assert.Null(conditional.ToCondition());
+			Assert.Null(conditional.ToConditions());
+
 			conditional.CorporationId = 0;
 			conditional.DepartmentId = null;
 			Assert.NotNull(conditional.CorporationId);
 			Assert.Null(conditional.DepartmentId);
 			Assert.Equal(0, conditional.CorporationId);
+
+			conditional.CreatedTime = new ConditionalRange<DateTime>(new DateTime(2010, 1, 1), null);
+			Assert.NotNull(conditional.CreatedTime);
+			Assert.Equal(new DateTime(2010, 1, 1), conditional.CreatedTime.From);
+
+			var conditions = conditional.ToConditions();
+			Assert.NotNull(conditions);
+			Assert.True(conditions.Count > 0);
 		}
 
-		public class DummyConditional : Conditional
+		public interface IDummyConditional : IConditional
 		{
-			public int? CorporationId
+			int? CorporationId
 			{
-				get
-				{
-					return this.GetPropertyValue(() => this.CorporationId);
-				}
-				set
-				{
-					this.SetPropertyValue(() => this.CorporationId, value);
-				}
+				get; set;
 			}
 
-			public short? DepartmentId
+			short? DepartmentId
 			{
-				get
-				{
-					return this.GetPropertyValue(() => this.DepartmentId);
-				}
-				set
-				{
-					this.SetPropertyValue(() => this.DepartmentId, value);
-				}
+				get; set;
 			}
 
 			[Conditional("Name", "PinYin")]
-			public string Name
+			string Name
 			{
-				get
-				{
-					return this.GetPropertyValue(() => this.Name);
-				}
-				set
-				{
-					this.SetPropertyValue(() => this.Name, value);
-				}
+				get; set;
 			}
 
-			public ConditionalRange<DateTime> CreatedTime
+			ConditionalRange<DateTime> CreatedTime
 			{
-				get
-				{
-					return this.GetPropertyValue(() => this.CreatedTime);
-				}
-				set
-				{
-					this.SetPropertyValue(() => this.CreatedTime, value);
-				}
+				get; set;
 			}
 		}
 	}

@@ -1,8 +1,15 @@
 ﻿/*
- * Authors:
- *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
+ *   _____                                ______
+ *  /_   /  ____  ____  ____  _________  / __/ /_
+ *    / /  / __ \/ __ \/ __ \/ ___/ __ \/ /_/ __/
+ *   / /__/ /_/ / / / / /_/ /\_ \/ /_/ / __/ /_
+ *  /____/\____/_/ /_/\__  /____/\____/_/  \__/
+ *                   /____/
  *
- * Copyright (C) 2016 Zongsoft Corporation <http://www.zongsoft.com>
+ * Authors:
+ *   钟峰(Popeye Zhong) <zongsoft@qq.com>
+ *
+ * Copyright (C) 2016-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,101 +32,31 @@
  */
 
 using System;
+using System.Linq;
 using System.Reflection;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 
 namespace Zongsoft.Data
 {
 	/// <summary>
-	/// 表示数据过滤条件的组合实体。
+	/// 提供条件转换的静态类。
 	/// </summary>
-	public abstract class Conditional : Zongsoft.Common.ModelBase, IConditional
+	public static class Conditional
 	{
 		#region 静态变量
 		private static readonly ConcurrentDictionary<Type, ConditionalDescriptor> _cache = new ConcurrentDictionary<Type, ConditionalDescriptor>();
 		#endregion
 
-		#region 成员字段
-		private ConditionCombination _combination;
-		private ConditionalBehaviors _defaultBehaviors;
-		#endregion
-
-		#region 构造函数
-		protected Conditional()
-		{
-			_defaultBehaviors = ConditionalBehaviors.None;
-			_combination = ConditionCombination.And;
-		}
-
-		protected Conditional(ConditionalBehaviors defaultBehaviors)
-		{
-			_defaultBehaviors = defaultBehaviors;
-			_combination = ConditionCombination.And;
-		}
-		#endregion
-
-		#region 保护属性
-		protected ConditionCombination Combination
-		{
-			get
-			{
-				return _combination;
-			}
-			set
-			{
-				_combination = value;
-			}
-		}
-
-		protected ConditionalBehaviors DefaultBehaviors
-		{
-			get
-			{
-				return _defaultBehaviors;
-			}
-			set
-			{
-				_defaultBehaviors = value;
-			}
-		}
-		#endregion
-
-		#region 显式属性
-		ConditionCombination IConditional.Combination
-		{
-			get
-			{
-				return this.Combination;
-			}
-			set
-			{
-				this.Combination = value;
-			}
-		}
-		#endregion
-
-		#region 符号重写
-		public static implicit operator ConditionCollection(Conditional conditional)
+		#region 公共方法
+		public static ICondition ToCondition(this IConditional conditional)
 		{
 			if(conditional == null)
 				return null;
 
-			return conditional.ToConditions();
-		}
+			var changes = conditional.GetChanges();
 
-		public static ConditionCollection operator &(Condition condition, Conditional conditional)
-		{
-			if(conditional == null)
-				return null;
-
-			return condition & conditional.ToConditions();
-		}
-
-		public static ConditionCollection operator &(Conditional conditional, Condition condition)
-		{
-			if(conditional == null)
+			if(changes == null || changes.Count == 0)
 				return null;
 
 			return conditional.ToConditions() & condition;
@@ -141,64 +78,37 @@ namespace Zongsoft.Data
 			if(conditional == null)
 				return null;
 
-			return condition | conditional.ToConditions();
+			var descriptor = _cache.GetOrAdd(conditional.GetType(), type => new ConditionalDescriptor(type));
+			return GenerateCondition(conditional, descriptor.Properties[changes.First().Key]);
 		}
 
-		public static ConditionCollection operator |(Conditional conditional, Condition condition)
+		public static ConditionCollection ToConditions(this IConditional conditional)
 		{
 			if(conditional == null)
 				return null;
 
-			return conditional.ToConditions() | condition;
-		}
-
-		public static ConditionCollection operator |(Conditional left, Conditional right)
-		{
-			if(left == null)
-				return right;
-
-			if(right == null)
-				return left;
-
-			return left.ToConditions() | right.ToConditions();
+			return ToConditions(conditional, conditional.GetChanges());
 		}
 		#endregion
 
-		#region 公共方法
-		public bool Contains(string name)
+		#region 私有方法
+		private static ConditionCollection ToConditions(IConditional conditional, IDictionary<string, object> changes)
 		{
-			return this.HasChanges(name);
-		}
-
-		public ICondition[] Find(string name)
-		{
-			if(string.IsNullOrWhiteSpace(name))
+			if(changes == null || changes.Count == 0)
 				return null;
 
-			var conditions = this.ToConditions();
-
-			if(conditions != null && conditions.Count > 0)
-				return conditions.Find(name);
-
-			return null;
-		}
-		#endregion
-
-		#region 虚拟方法
-		protected virtual ConditionCollection ToConditions()
-		{
 			ConditionCollection conditions = null;
-			var descriptor = _cache.GetOrAdd(this.GetType(), type => new ConditionalDescriptor(type));
+			var descriptor = _cache.GetOrAdd(conditional.GetType(), type => new ConditionalDescriptor(type));
 
-			//只遍历基类属性字典中的属性（即显式设置过的属性）
-			foreach(var property in this.GetChangedProperties())
+			//处理已经被更改过的属性
+			foreach(var change in changes)
 			{
-				var condition = this.GenerateCondition(descriptor.Properties[property.Key]);
+				var condition = GenerateCondition(conditional, descriptor.Properties[change.Key]);
 
 				if(condition != null)
 				{
 					if(conditions == null)
-						conditions = new ConditionCollection(this.Combination);
+						conditions = new ConditionCollection(conditional.Combination);
 
 					conditions.Add(condition);
 				}
@@ -206,44 +116,23 @@ namespace Zongsoft.Data
 
 			return conditions;
 		}
-		#endregion
 
-		#region 重写方法
-		public override string ToString()
-		{
-			var conditions = this.ToConditions();
-
-			if(conditions == null || conditions.Count == 0)
-				return string.Empty;
-
-			return conditions.ToString();
-		}
-		#endregion
-
-		#region 枚举遍历
-		public IEnumerator<ICondition> GetEnumerator()
-		{
-			return this.ToConditions().GetEnumerator();
-		}
-
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return this.ToConditions().GetEnumerator();
-		}
-		#endregion
-
-		#region 私有方法
-		private ICondition GenerateCondition(ConditionalPropertyDescripor property)
+		private static ICondition GenerateCondition(IConditional conditional, ConditionalPropertyDescripor property)
 		{
 			//如果当前属性值为默认值，则忽略它
 			if(property == null)
 				return null;
 
 			//获取当前属性对应的条件命列表
-			var names = this.GetConditionNames(property);
+			var names = GetConditionNames(property);
 
 			//创建转换器上下文
-			var context = new ConditionalConverterContext(this, property.Attribute == null ? _defaultBehaviors : property.Attribute.Behaviors, names, property.PropertyType, property.GetValue(this), property.Operator);
+			var context = new ConditionalConverterContext(conditional,
+				property.Attribute == null ? ConditionalBehaviors.None : property.Attribute.Behaviors,
+				names,
+				property.PropertyType,
+				property.GetValue(conditional),
+				property.Operator);
 
 			//如果当前属性指定了特定的转换器，则使用该转换器来处理
 			if(property.Converter != null)
@@ -253,7 +142,7 @@ namespace Zongsoft.Data
 			return ConditionalConverter.Default.Convert(context);
 		}
 
-		private string[] GetConditionNames(ConditionalPropertyDescripor property)
+		private static string[] GetConditionNames(ConditionalPropertyDescripor property)
 		{
 			if(property.Attribute != null && property.Attribute.Names != null && property.Attribute.Names.Length > 0)
 				return property.Attribute.Names;
@@ -273,7 +162,7 @@ namespace Zongsoft.Data
 				this.Type = type;
 
 				var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
-				this.Properties = new ConcurrentDictionary<string, ConditionalPropertyDescripor>();
+				this.Properties = new Dictionary<string, ConditionalPropertyDescripor>();
 
 				foreach(var property in properties)
 				{
@@ -294,13 +183,13 @@ namespace Zongsoft.Data
 		{
 			public readonly string Name;
 			public readonly Type PropertyType;
-			public readonly PropertyInfo Info;
+			public readonly PropertyInfo PropertyInfo;
 			public readonly ConditionalAttribute Attribute;
 			public readonly IConditionalConverter Converter;
 
 			public ConditionalPropertyDescripor(PropertyInfo property, ConditionalAttribute attribute)
 			{
-				this.Info = property;
+				this.PropertyInfo = property;
 				this.Attribute = attribute;
 				this.Name = property.Name;
 				this.PropertyType = property.PropertyType;
@@ -319,7 +208,7 @@ namespace Zongsoft.Data
 
 			public object GetValue(object target)
 			{
-				return this.Info.GetValue(target);
+				return this.PropertyInfo.GetValue(target);
 			}
 		}
 		#endregion
