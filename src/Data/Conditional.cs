@@ -59,24 +59,8 @@ namespace Zongsoft.Data
 			if(changes == null || changes.Count == 0)
 				return null;
 
-			return conditional.ToConditions() & condition;
-		}
-
-		public static ConditionCollection operator &(Conditional left, Conditional right)
-		{
-			if(left == null)
-				return right;
-
-			if(right == null)
-				return left;
-
-			return left.ToConditions() & right.ToConditions();
-		}
-
-		public static ConditionCollection operator |(Condition condition, Conditional conditional)
-		{
-			if(conditional == null)
-				return null;
+			if(changes.Count > 1)
+				return ToConditions(conditional, changes);
 
 			var descriptor = _cache.GetOrAdd(conditional.GetType(), type => new ConditionalDescriptor(type));
 			return GenerateCondition(conditional, descriptor.Properties[changes.First().Key]);
