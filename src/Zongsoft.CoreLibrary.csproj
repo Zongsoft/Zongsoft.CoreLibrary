@@ -274,6 +274,15 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Reflection\Expressions\ConstantExpression.cs" />
+    <Compile Include="Reflection\Expressions\IdentifierExpression.cs" />
+    <Compile Include="Reflection\Expressions\IMemberPathExpression.cs" />
+    <Compile Include="Reflection\Expressions\IndexerExpression.cs" />
+    <Compile Include="Reflection\Expressions\MemberPath.cs" />
+    <Compile Include="Reflection\Expressions\MemberPathExpression.cs" />
+    <Compile Include="Reflection\Expressions\MemberPathExpressionExtension.cs" />
+    <Compile Include="Reflection\Expressions\MemberPathExpressionType.cs" />
+    <Compile Include="Reflection\Expressions\MethodExpression.cs" />
     <Compile Include="Reflection\MemberToken.cs" />
     <Compile Include="Reflection\MemberTokenCollection.cs" />
     <Compile Include="Reflection\MemberKind.cs" />
@@ -285,6 +294,7 @@
     <Compile Include="Reflection\FieldInfoExtension.cs" />
     <Compile Include="Reflection\MemberSettingContext.cs" />
     <Compile Include="Reflection\MemberPathSegment.cs" />
+    <Compile Include="Reflection\Reflector.cs" />
     <Compile Include="Runtime\Caching\BufferManager.cs" />
     <Compile Include="Runtime\Caching\BufferManagerBase.cs" />
     <Compile Include="Runtime\Caching\BufferManagerSelector.cs" />
