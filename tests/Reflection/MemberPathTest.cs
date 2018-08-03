@@ -14,7 +14,6 @@ namespace Zongsoft.Reflection.Expressions.Tests
 			Test2();
 			Test3();
 			Test4();
-			Test5();
 		}
 
 		[Fact]
@@ -551,13 +550,6 @@ namespace Zongsoft.Reflection.Expressions.Tests
 			Assert.Equal(1, method.Parameters.Count);
 			Assert.Equal(MemberPathExpressionType.Identifier, method.Parameters[0].ExpressionType);
 			Assert.Equal("xyz", ((IdentifierExpression)method.Parameters[0]).Name);
-		}
-
-		[Fact]
-		public void Test5()
-		{
-			IMemberPathExpression expression;
-
 		}
 	}
 }
