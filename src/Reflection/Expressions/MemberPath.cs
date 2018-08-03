@@ -32,7 +32,9 @@ namespace Zongsoft.Reflection.Expressions
 	public class MemberPath
 	{
 		#region 常量定义
-		private const string UNKNOWN_EXCEPTION_MESSAGE = "An unknown error occurred in the parser.";
+		private const string EXCEPTION_UNKNOWN_MESSAGE = "An unknown error occurred in the parser.";
+		private const string EXCEPTION_ILLEGAL_CHARACTER_MESSAGE = "The '{0}' character at the {1} is an illegal character.";
+		private const string EXCEPTION_IDENTIFIER_WHITESPACE_MESSAGE = "Contains illegal whitespace characters before the {0} character in the identifier.";
 		#endregion
 
 		#region 公共方法
@@ -62,47 +64,47 @@ namespace Zongsoft.Reflection.Expressions
 				switch(context.State)
 				{
 					case State.None:
-						if(!OnNone(context))
+						if(!OnNone(context, i))
 							return null;
 
 						break;
 					case State.Gutter:
-						if(!OnGutter(context))
+						if(!OnGutter(context, i))
 							return null;
 
 						break;
 					case State.Separator:
-						if(!OnSeparator(context))
+						if(!OnSeparator(context, i))
 							return null;
 
 						break;
 					case State.Identifier:
-						if(!OnIdentifier(context))
+						if(!OnIdentifier(context, i))
 							return null;
 
 						break;
 					case State.Method:
-						if(!OnMethod(context))
+						if(!OnMethod(context, i))
 							return null;
 
 						break;
 					case State.Indexer:
-						if(!OnIndexer(context))
+						if(!OnIndexer(context, i))
 							return null;
 
 						break;
 					case State.Parameter:
-						if(!OnParameter(context))
+						if(!OnParameter(context, i))
 							return null;
 
 						break;
 					case State.Number:
-						if(!OnNumber(context))
+						if(!OnNumber(context, i))
 							return null;
 
 						break;
 					case State.String:
-						if(!OnString(context))
+						if(!OnString(context, i))
 							return null;
 
 						break;
@@ -115,7 +117,7 @@ namespace Zongsoft.Reflection.Expressions
 		#endregion
 
 		#region 状态处理
-		private static bool OnNone(StateContext context)
+		private static bool OnNone(StateContext context, int position)
 		{
 			if(context.IsWhitespace())
 				return true;
@@ -134,11 +136,11 @@ namespace Zongsoft.Reflection.Expressions
 				return true;
 			}
 
-			context.OnError($"");
+			context.OnError(GetIllegalCharacterExceptionMessage(context.Character, position));
 			return false;
 		}
 
-		private static bool OnGutter(StateContext context)
+		private static bool OnGutter(StateContext context, int position)
 		{
 			switch(context.Character)
 			{
@@ -149,7 +151,6 @@ namespace Zongsoft.Reflection.Expressions
 					context.State = State.Indexer;
 
 					//追加索引器表达式，并将索引器加入到递归栈中
-					//AppendIndexer(context.Stack, ref context.Head);
 					context.AppendIndexer();
 
 					return true;
@@ -157,12 +158,12 @@ namespace Zongsoft.Reflection.Expressions
 					if(context.IsWhitespace())
 						return true;
 
-					context.OnError($"");
+					context.OnError(GetIllegalCharacterExceptionMessage(context.Character, position));
 					return false;
 			}
 		}
 
-		private static bool OnSeparator(StateContext context)
+		private static bool OnSeparator(StateContext context, int position)
 		{
 			if(context.IsWhitespace())
 				return true;
@@ -174,43 +175,33 @@ namespace Zongsoft.Reflection.Expressions
 				return true;
 			}
 
-			context.OnError($"");
+			context.OnError(GetIllegalCharacterExceptionMessage(context.Character, position));
 			return false;
 		}
 
-		private static bool OnIdentifier(StateContext context)
+		private static bool OnIdentifier(StateContext context, int position)
 		{
 			switch(context.Character)
 			{
 				case '.':
 					context.State = State.Separator;
 
-					//AppendIdentifier(context.Peek(), buffer, ref position, ref head, isJoining);
 					context.AppendIdentifier(context.Peek());
-
 					context.Flags.IsAttaching(true);
 
 					break;
 				case '[':
 					context.State = State.Indexer;
 
-					//AppendIdentifier(stack.Count > 0 ? stack.Peek() : null, buffer, ref position, ref head, isJoining);
 					context.AppendIdentifier(context.Peek());
-
-					//追加索引器表达式，并将索引器加入到递归栈中
-					//AppendIndexer(stack, ref head);
 					context.AppendIndexer();
-
 					context.Flags.IsAttaching(false);
 
 					break;
 				case '(':
 					context.State = State.Method;
 
-					//追加方法表达式，并将索引器加入到递归栈中
-					//AppendMethod(stack, buffer, ref position, ref head);
 					context.AppendMethod();
-
 					context.Flags.IsAttaching(false);
 
 					break;
@@ -221,26 +212,22 @@ namespace Zongsoft.Reflection.Expressions
 						context.State = ownerState;
 					else
 					{
-						context.OnError($"");
+						context.OnError(GetIllegalCharacterExceptionMessage(context.Character, position));
 						return false;
 					}
 
-					//AppendIdentifier(stack.Peek(), buffer, ref position, isJoining);
 					context.AppendIdentifier(context.Peek());
-
 					context.Flags.IsAttaching(false);
 
 					break;
 				case ']':
 					if(context.GetOwnerState() != State.Indexer)
 					{
-						context.OnError($"");
+						context.OnError(GetIllegalCharacterExceptionMessage(context.Character, position));
 						return false;
 					}
 
-					//AppendIdentifier(stack.Pop(), buffer, ref position, isJoining);
 					context.AppendIdentifier(context.Stack.Pop());
-
 					context.Flags.IsAttaching(false);
 
 					//重置状态
@@ -250,13 +237,11 @@ namespace Zongsoft.Reflection.Expressions
 				case ')':
 					if(context.GetOwnerState() != State.Method)
 					{
-						context.OnError($"");
+						context.OnError(GetIllegalCharacterExceptionMessage(context.Character, position));
 						return false;
 					}
 
-					//AppendIdentifier(stack.Pop(), buffer, ref position, isJoining);
 					context.AppendIdentifier(context.Stack.Pop());
-
 					context.Flags.IsAttaching(false);
 
 					//重置状态
@@ -269,7 +254,7 @@ namespace Zongsoft.Reflection.Expressions
 						//判断标识表达式中间是否含有空白字符
 						if(context.Flags.HasWhitespace())
 						{
-							context.OnError($"");
+							context.OnError(string.Format(EXCEPTION_IDENTIFIER_WHITESPACE_MESSAGE, position));
 							return false;
 						}
 
@@ -277,7 +262,7 @@ namespace Zongsoft.Reflection.Expressions
 					}
 					else if(!context.IsWhitespace())
 					{
-						context.OnError($"");
+						context.OnError(GetIllegalCharacterExceptionMessage(context.Character, position));
 						return false;
 					}
 
@@ -290,7 +275,7 @@ namespace Zongsoft.Reflection.Expressions
 			return true;
 		}
 
-		private static bool OnMethod(StateContext context)
+		private static bool OnMethod(StateContext context, int position)
 		{
 			if(context.IsWhitespace())
 				return true;
@@ -320,8 +305,6 @@ namespace Zongsoft.Reflection.Expressions
 
 			if(context.Character == '[')
 			{
-				//追加索引器表达式，并将索引器加入到递归栈中
-				//AppendIndexer(stack, ref head);
 				context.AppendIndexer();
 				return true;
 			}
@@ -333,11 +316,11 @@ namespace Zongsoft.Reflection.Expressions
 				return true;
 			}
 
-			context.OnError($"");
+			context.OnError(GetIllegalCharacterExceptionMessage(context.Character, position));
 			return false;
 		}
 
-		private static bool OnIndexer(StateContext context)
+		private static bool OnIndexer(StateContext context, int position)
 		{
 			if(context.IsWhitespace())
 				return true;
@@ -367,17 +350,15 @@ namespace Zongsoft.Reflection.Expressions
 
 			if(context.Character == '[')
 			{
-				//追加索引器表达式，并将索引器加入到递归栈中
-				//AppendIndexer(stack, ref head);
 				context.AppendIndexer();
 				return true;
 			}
 
-			context.OnError($"");
+			context.OnError(GetIllegalCharacterExceptionMessage(context.Character, position));
 			return false;
 		}
 
-		private static bool OnParameter(StateContext context)
+		private static bool OnParameter(StateContext context, int position)
 		{
 			if(context.IsWhitespace())
 				return true;
@@ -386,40 +367,38 @@ namespace Zongsoft.Reflection.Expressions
 			{
 				case ',':
 					context.State = context.GetOwnerState();
-					return true;
+					break;
 				case ']':
 					if(context.GetOwnerState() != State.Indexer)
 					{
-						context.OnError($"");
+						context.OnError(GetIllegalCharacterExceptionMessage(context.Character, position));
 						return false;
 					}
 
 					context.Stack.Pop();
-
-					//重置状态
 					context.ResetState();
 
-					return true;
+					break;
 				case ')':
 					if(context.GetOwnerState() != State.Method)
 					{
-						context.OnError($"");
+						context.OnError(GetIllegalCharacterExceptionMessage(context.Character, position));
 						return false;
 					}
 
 					context.Stack.Pop();
-
-					//重置状态
 					context.ResetState();
 
-					return true;
+					break;
 				default:
-					context.OnError($"");
+					context.OnError(GetIllegalCharacterExceptionMessage(context.Character, position));
 					return false;
 			}
+
+			return true;
 		}
 
-		private static bool OnNumber(StateContext context)
+		private static bool OnNumber(StateContext context, int position)
 		{
 			switch(context.Character)
 			{
@@ -428,44 +407,33 @@ namespace Zongsoft.Reflection.Expressions
 
 					if(ownerState != State.Indexer && ownerState != State.Method)
 					{
-						context.OnError($"");
+						context.OnError(EXCEPTION_UNKNOWN_MESSAGE);
 						return false;
 					}
 
 					context.State = ownerState;
-
-					//将当前数字常量加入到父表达式的参数列表中
-					//AppendParameter(stack.Peek(), numberType, buffer, ref position);
 					context.AppendParameterConstant(context.Stack.Peek());
 
 					break;
 				case ']':
 					if(context.GetOwnerState() != State.Indexer)
 					{
-						context.OnError($"");
+						context.OnError(GetIllegalCharacterExceptionMessage(context.Character, position));
 						return false;
 					}
 
-					//将当前数字常量加入到索引器的参数列表中
-					//AppendParameter(stack.Pop(), numberType, buffer, ref position);
 					context.AppendParameterConstant(context.Stack.Pop());
-
-					//重置状态
 					context.ResetState();
 
 					break;
 				case ')':
 					if(context.GetOwnerState() != State.Method)
 					{
-						context.OnError($"");
+						context.OnError(GetIllegalCharacterExceptionMessage(context.Character, position));
 						return false;
 					}
 
-					//将当前数字常量加入到方法表达式的参数列表中
-					//AppendParameter(stack.Pop(), numberType, buffer, ref position);
 					context.AppendParameterConstant(context.Stack.Pop());
-
-					//重置状态
 					context.ResetState();
 
 					break;
@@ -474,7 +442,7 @@ namespace Zongsoft.Reflection.Expressions
 
 					if(numberType == TypeCode.Double || numberType == TypeCode.Single || numberType == TypeCode.Decimal)
 					{
-						context.OnError($"");
+						context.OnError(GetIllegalCharacterExceptionMessage(context.Character, position));
 						return false;
 					}
 
@@ -485,9 +453,6 @@ namespace Zongsoft.Reflection.Expressions
 				case 'L':
 					context.State = State.Parameter;
 					context.Flags.SetConstantType(TypeCode.Int64);
-
-					//将当前数字常量加入到父表达式的参数列表中
-					//AppendParameter(stack.Peek(), numberType, buffer, ref position);
 					context.AppendParameterConstant(context.Stack.Peek());
 
 					break;
@@ -495,9 +460,6 @@ namespace Zongsoft.Reflection.Expressions
 				case 'F':
 					context.State = State.Parameter;
 					context.Flags.SetConstantType(TypeCode.Single);
-
-					//将当前数字常量加入到父表达式的参数列表中
-					//AppendParameter(stack.Peek(), numberType, buffer, ref position);
 					context.AppendParameterConstant(context.Stack.Peek());
 
 					break;
@@ -505,9 +467,6 @@ namespace Zongsoft.Reflection.Expressions
 				case 'M':
 					context.State = State.Parameter;
 					context.Flags.SetConstantType(TypeCode.Decimal);
-
-					//将当前数字常量加入到父表达式的参数列表中
-					//AppendParameter(stack.Peek(), numberType, buffer, ref position);
 					context.AppendParameterConstant(context.Stack.Peek());
 
 					break;
@@ -519,14 +478,11 @@ namespace Zongsoft.Reflection.Expressions
 					else if(context.IsWhitespace())
 					{
 						context.State = State.Parameter;
-
-						//将当前数字常量加入到父表达式的参数列表中
-						//AppendParameter(stack.Peek(), numberType, buffer, ref position);
 						context.AppendParameterConstant(context.Stack.Peek());
 					}
 					else
 					{
-						context.OnError($"");
+						context.OnError(GetIllegalCharacterExceptionMessage(context.Character, position));
 						return false;
 					}
 
@@ -536,7 +492,7 @@ namespace Zongsoft.Reflection.Expressions
 			return true;
 		}
 
-		private static bool OnString(StateContext context)
+		private static bool OnString(StateContext context, int position)
 		{
 			if(context.Flags.IsEscaping())
 			{
@@ -552,9 +508,6 @@ namespace Zongsoft.Reflection.Expressions
 				else if(context.Character == context.Flags.GetStringQuote())
 				{
 					context.State = State.Parameter;
-
-					//将当前字符串常量加入到父表达式的参数列表中
-					//AppendParameter(stack.Peek(), TypeCode.String, buffer, ref position);
 					context.AppendParameterConstant(context.Stack.Peek());
 				}
 				else
@@ -568,6 +521,7 @@ namespace Zongsoft.Reflection.Expressions
 		#endregion
 
 		#region 私有方法
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 		private static char Escape(char chr)
 		{
 			switch(chr)
@@ -591,6 +545,12 @@ namespace Zongsoft.Reflection.Expressions
 				default:
 					return chr;
 			}
+		}
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		private static string GetIllegalCharacterExceptionMessage(char chr, int position)
+		{
+			return string.Format(EXCEPTION_ILLEGAL_CHARACTER_MESSAGE, chr, position);
 		}
 		#endregion
 
@@ -672,7 +632,7 @@ namespace Zongsoft.Reflection.Expressions
 			public void AppendParameterConstant(IMemberPathExpression owner)
 			{
 				if(owner == null)
-					throw new InvalidOperationException(UNKNOWN_EXCEPTION_MESSAGE);
+					throw new InvalidOperationException(EXCEPTION_UNKNOWN_MESSAGE);
 
 				void Add(ICollection<IMemberPathExpression> parameters)
 				{
@@ -689,7 +649,7 @@ namespace Zongsoft.Reflection.Expressions
 				else if(owner is MethodExpression method)
 					Add(method.Parameters);
 				else
-					throw new InvalidOperationException(UNKNOWN_EXCEPTION_MESSAGE);
+					throw new InvalidOperationException(EXCEPTION_UNKNOWN_MESSAGE);
 			}
 
 			public IdentifierExpression AppendIdentifier(IMemberPathExpression owner)
@@ -711,7 +671,7 @@ namespace Zongsoft.Reflection.Expressions
 					if(Flags.IsAttaching())
 					{
 						if(indexer.Parameters.Count == 0 || indexer.Parameters[indexer.Parameters.Count - 1].ExpressionType != MemberPathExpressionType.Identifier)
-							throw new InvalidOperationException(UNKNOWN_EXCEPTION_MESSAGE);
+							throw new InvalidOperationException(EXCEPTION_UNKNOWN_MESSAGE);
 
 						return ((MemberPathExpression)((IdentifierExpression)indexer.Parameters[indexer.Parameters.Count - 1]).Last()).Append(current);
 					}
@@ -724,7 +684,7 @@ namespace Zongsoft.Reflection.Expressions
 					if(Flags.IsAttaching())
 					{
 						if(method.Parameters.Count == 0 || method.Parameters[method.Parameters.Count - 1].ExpressionType != MemberPathExpressionType.Identifier)
-							throw new InvalidOperationException(UNKNOWN_EXCEPTION_MESSAGE);
+							throw new InvalidOperationException(EXCEPTION_UNKNOWN_MESSAGE);
 
 						return ((MemberPathExpression)((IdentifierExpression)method.Parameters[method.Parameters.Count - 1]).Last()).Append(current);
 					}
@@ -733,7 +693,7 @@ namespace Zongsoft.Reflection.Expressions
 					return current;
 				}
 
-				throw new InvalidOperationException(UNKNOWN_EXCEPTION_MESSAGE);
+				throw new InvalidOperationException(EXCEPTION_UNKNOWN_MESSAGE);
 			}
 
 			public IndexerExpression AppendIndexer()
@@ -753,7 +713,7 @@ namespace Zongsoft.Reflection.Expressions
 					else if(owner is MethodExpression method)
 						method.Parameters.Add(expression);
 					else
-						throw new InvalidOperationException(UNKNOWN_EXCEPTION_MESSAGE);
+						throw new InvalidOperationException(EXCEPTION_UNKNOWN_MESSAGE);
 				}
 
 				Stack.Push(expression);
@@ -772,7 +732,6 @@ namespace Zongsoft.Reflection.Expressions
 					else
 						Head = Head.Append(current);
 
-					//始终将方法表达式压栈（以便后续的参数处理）
 					Stack.Push(current);
 
 					return current;
@@ -786,7 +745,7 @@ namespace Zongsoft.Reflection.Expressions
 				else if(owner is MethodExpression method)
 					method.Parameters.Add(expression);
 				else
-					throw new InvalidOperationException(UNKNOWN_EXCEPTION_MESSAGE);
+					throw new InvalidOperationException(EXCEPTION_UNKNOWN_MESSAGE);
 
 				Stack.Push(expression);
 
@@ -818,9 +777,6 @@ namespace Zongsoft.Reflection.Expressions
 
 			public IMemberPathExpression GetResult()
 			{
-				if(State == State.None)
-					return null;
-
 				switch(State)
 				{
 					case State.None:
