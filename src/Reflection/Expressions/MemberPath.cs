@@ -64,47 +64,47 @@ namespace Zongsoft.Reflection.Expressions
 				switch(context.State)
 				{
 					case State.None:
-						if(!OnNone(context, i))
+						if(!DoNone(context, i))
 							return null;
 
 						break;
 					case State.Gutter:
-						if(!OnGutter(context, i))
+						if(!DoGutter(context, i))
 							return null;
 
 						break;
 					case State.Separator:
-						if(!OnSeparator(context, i))
+						if(!DoSeparator(context, i))
 							return null;
 
 						break;
 					case State.Identifier:
-						if(!OnIdentifier(context, i))
+						if(!DoIdentifier(context, i))
 							return null;
 
 						break;
 					case State.Method:
-						if(!OnMethod(context, i))
+						if(!DoMethod(context, i))
 							return null;
 
 						break;
 					case State.Indexer:
-						if(!OnIndexer(context, i))
+						if(!DoIndexer(context, i))
 							return null;
 
 						break;
 					case State.Parameter:
-						if(!OnParameter(context, i))
+						if(!DoParameter(context, i))
 							return null;
 
 						break;
 					case State.Number:
-						if(!OnNumber(context, i))
+						if(!DoNumber(context, i))
 							return null;
 
 						break;
 					case State.String:
-						if(!OnString(context, i))
+						if(!DoString(context, i))
 							return null;
 
 						break;
@@ -117,7 +117,7 @@ namespace Zongsoft.Reflection.Expressions
 		#endregion
 
 		#region 状态处理
-		private static bool OnNone(StateContext context, int position)
+		private static bool DoNone(StateContext context, int position)
 		{
 			if(context.IsWhitespace())
 				return true;
@@ -140,7 +140,7 @@ namespace Zongsoft.Reflection.Expressions
 			return false;
 		}
 
-		private static bool OnGutter(StateContext context, int position)
+		private static bool DoGutter(StateContext context, int position)
 		{
 			switch(context.Character)
 			{
@@ -163,7 +163,7 @@ namespace Zongsoft.Reflection.Expressions
 			}
 		}
 
-		private static bool OnSeparator(StateContext context, int position)
+		private static bool DoSeparator(StateContext context, int position)
 		{
 			if(context.IsWhitespace())
 				return true;
@@ -179,7 +179,7 @@ namespace Zongsoft.Reflection.Expressions
 			return false;
 		}
 
-		private static bool OnIdentifier(StateContext context, int position)
+		private static bool DoIdentifier(StateContext context, int position)
 		{
 			switch(context.Character)
 			{
@@ -275,7 +275,7 @@ namespace Zongsoft.Reflection.Expressions
 			return true;
 		}
 
-		private static bool OnMethod(StateContext context, int position)
+		private static bool DoMethod(StateContext context, int position)
 		{
 			if(context.IsWhitespace())
 				return true;
@@ -320,7 +320,7 @@ namespace Zongsoft.Reflection.Expressions
 			return false;
 		}
 
-		private static bool OnIndexer(StateContext context, int position)
+		private static bool DoIndexer(StateContext context, int position)
 		{
 			if(context.IsWhitespace())
 				return true;
@@ -358,7 +358,7 @@ namespace Zongsoft.Reflection.Expressions
 			return false;
 		}
 
-		private static bool OnParameter(StateContext context, int position)
+		private static bool DoParameter(StateContext context, int position)
 		{
 			if(context.IsWhitespace())
 				return true;
@@ -398,7 +398,7 @@ namespace Zongsoft.Reflection.Expressions
 			return true;
 		}
 
-		private static bool OnNumber(StateContext context, int position)
+		private static bool DoNumber(StateContext context, int position)
 		{
 			switch(context.Character)
 			{
@@ -492,7 +492,7 @@ namespace Zongsoft.Reflection.Expressions
 			return true;
 		}
 
-		private static bool OnString(StateContext context, int position)
+		private static bool DoString(StateContext context, int position)
 		{
 			if(context.Flags.IsEscaping())
 			{
@@ -588,9 +588,9 @@ namespace Zongsoft.Reflection.Expressions
 			public StateContext(int length, Action<string> onError)
 			{
 				_onError = onError;
+				_buffer = new char[length];
 
 				this.State = State.None;
-				this._buffer = new char[length];
 				this.Stack = new Stack<MemberPathExpression>();
 			}
 			#endregion
@@ -639,7 +639,7 @@ namespace Zongsoft.Reflection.Expressions
 					parameters.Add
 					(
 						MemberPathExpression.Constant(
-							GetContent(),
+							GetBufferContent(),
 							Flags.GetConstantType())
 					);
 				};
@@ -654,7 +654,7 @@ namespace Zongsoft.Reflection.Expressions
 
 			public IdentifierExpression AppendIdentifier(IMemberPathExpression owner)
 			{
-				var current = MemberPathExpression.Identifier(GetContent());
+				var current = MemberPathExpression.Identifier(GetBufferContent());
 
 				if(owner == null)
 				{
@@ -725,7 +725,7 @@ namespace Zongsoft.Reflection.Expressions
 			{
 				if(Stack == null || Stack.Count == 0)
 				{
-					var current = MemberPathExpression.Method(GetContent());
+					var current = MemberPathExpression.Method(GetBufferContent());
 
 					if(Head == null)
 						Head = current;
@@ -737,7 +737,7 @@ namespace Zongsoft.Reflection.Expressions
 					return current;
 				}
 
-				var expression = MemberPathExpression.Method(GetContent());
+				var expression = MemberPathExpression.Method(GetBufferContent());
 				var owner = Stack.Peek();
 
 				if(owner is IndexerExpression indexer)
@@ -786,7 +786,7 @@ namespace Zongsoft.Reflection.Expressions
 					case State.Identifier:
 						if(Stack == null || Stack.Count == 0)
 						{
-							var identifier = MemberPathExpression.Identifier(GetContent());
+							var identifier = MemberPathExpression.Identifier(GetBufferContent());
 
 							if(Head == null)
 								return identifier;
@@ -804,7 +804,7 @@ namespace Zongsoft.Reflection.Expressions
 			#endregion
 
 			#region 私有方法
-			private string GetContent()
+			private string GetBufferContent()
 			{
 				var content = new string(_buffer, 0, _bufferIndex);
 				_bufferIndex = 0;

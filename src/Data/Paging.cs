@@ -151,6 +151,11 @@ namespace Zongsoft.Data
 		{
 			return new Paging(index, size);
 		}
+
+		public static bool IsDisabled(Paging paging)
+		{
+			return paging != null && paging.PageSize <= 0;
+		}
 		#endregion
 	}
 }
