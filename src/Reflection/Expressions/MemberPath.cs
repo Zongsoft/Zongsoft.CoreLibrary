@@ -837,32 +837,32 @@ namespace Zongsoft.Reflection.Expressions
 			#region 公共方法
 			public bool IsEscaping()
 			{
-				return IsEnabled(STRING_ESCAPING_FLAG);
+				return IsMarked(STRING_ESCAPING_FLAG);
 			}
 
 			public void IsEscaping(bool enabled)
 			{
-				Enable(STRING_ESCAPING_FLAG, enabled);
+				Mark(STRING_ESCAPING_FLAG, enabled);
 			}
 
 			public bool IsAttaching()
 			{
-				return IsEnabled(IDENTIFIER_ATTACHING_FLAG);
+				return IsMarked(IDENTIFIER_ATTACHING_FLAG);
 			}
 
 			public void IsAttaching(bool enabled)
 			{
-				Enable(IDENTIFIER_ATTACHING_FLAG, enabled);
+				Mark(IDENTIFIER_ATTACHING_FLAG, enabled);
 			}
 
 			public bool HasWhitespace()
 			{
-				return IsEnabled(IDENTIFIER_WHITESPACE_FLAG);
+				return IsMarked(IDENTIFIER_WHITESPACE_FLAG);
 			}
 
 			public void HasWhitespace(bool enabled)
 			{
-				Enable(IDENTIFIER_WHITESPACE_FLAG, enabled);
+				Mark(IDENTIFIER_WHITESPACE_FLAG, enabled);
 			}
 
 			public TypeCode GetConstantType()
@@ -887,48 +887,48 @@ namespace Zongsoft.Reflection.Expressions
 			public void SetConstantType(TypeCode type)
 			{
 				//首先，重置数字常量类型的比特区域
-				Enable(CONSTANT_TYPE_FLAG, false);
+				Mark(CONSTANT_TYPE_FLAG, false);
 
 				switch(type)
 				{
 					case TypeCode.Int32:
-						Enable(CONSTANT_TYPE_INT32_FLAG, true);
+						Mark(CONSTANT_TYPE_INT32_FLAG, true);
 						break;
 					case TypeCode.Int64:
-						Enable(CONSTANT_TYPE_INT64_FLAG, true);
+						Mark(CONSTANT_TYPE_INT64_FLAG, true);
 						break;
 					case TypeCode.Single:
-						Enable(CONSTANT_TYPE_SINGLE_FLAG, true);
+						Mark(CONSTANT_TYPE_SINGLE_FLAG, true);
 						break;
 					case TypeCode.Double:
-						Enable(CONSTANT_TYPE_DOUBLE_FLAG, true);
+						Mark(CONSTANT_TYPE_DOUBLE_FLAG, true);
 						break;
 					case TypeCode.Decimal:
-						Enable(CONSTANT_TYPE_DECIMAL_FLAG, true);
+						Mark(CONSTANT_TYPE_DECIMAL_FLAG, true);
 						break;
 				}
 			}
 
 			public char GetStringQuote()
 			{
-				return IsEnabled(STRING_QUOTATION_FLAG) ? '"' : '\'';
+				return IsMarked(STRING_QUOTATION_FLAG) ? '"' : '\'';
 			}
 
 			public void SetStringQuote(char chr)
 			{
-				Enable(STRING_QUOTATION_FLAG, chr == '"');
+				Mark(STRING_QUOTATION_FLAG, chr == '"');
 			}
 			#endregion
 
 			#region 私有方法
 			[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-			private bool IsEnabled(int bit)
+			private bool IsMarked(int bit)
 			{
 				return (_data & bit) == bit;
 			}
 
 			[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-			private void Enable(int bit, bool value)
+			private void Mark(int bit, bool value)
 			{
 				if(value)
 					_data |= bit;

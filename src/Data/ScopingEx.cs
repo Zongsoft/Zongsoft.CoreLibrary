@@ -69,6 +69,42 @@ namespace Zongsoft.Data
 		{
 			return ParseCore(this, scope, message => throw new InvalidOperationException(message));
 		}
+
+		public ScopingEx Resolve(Collections.NamedCollection<Segment> segments, Func<Segment, IEnumerable<Segment>> resolver)
+		{
+			if(resolver == null)
+				throw new ArgumentNullException(nameof(resolver));
+
+			var result = new Collections.NamedCollection<Segment>(p => p.Name, StringComparer.OrdinalIgnoreCase);
+
+			foreach(var segment in segments)
+			{
+				if(segment.Name != "*")
+					continue;
+
+				var items = resolver(segment);
+
+				if(items != null)
+				{
+					if(segment.Parent == null)
+					{
+						foreach(var item in items)
+						{
+							segments.Add(item);
+						}
+					}
+					else
+					{
+						foreach(var item in items)
+						{
+							segment.Parent.AddChild(item);
+						}
+					}
+				}
+			}
+
+			return this;
+		}
 		#endregion
 
 		#region 静态方法
@@ -225,35 +261,49 @@ namespace Zongsoft.Data
 
 		private static bool DoExclude(ref StateContext context)
 		{
-			if(context.Character == ',')
+			switch(context.Character)
 			{
-				context.Exclude();
-				context.State = State.None;
-				return true;
+				case ',':
+					context.Exclude();
+					context.State = State.None;
+					break;
+				case ')':
+					context.Exclude();
+					context.Pop();
+					context.State = State.None;
+					break;
+				default:
+					if(context.IsLetterOrDigitOrUnderscore())
+					{
+						//如果首字符是数字，则激发错误
+						if(char.IsDigit(context.Character) && !context.HasBuffer())
+						{
+							context.OnError("");
+							return false;
+						}
+
+						//判断标识中间是否含有空白字符
+						if(context.Flags.HasWhitespace())
+						{
+							context.OnError("");
+							return false;
+						}
+
+						context.Accept();
+					}
+					else if(!context.IsWhitespace())
+					{
+						context.OnError("");
+						return false;
+					}
+
+					break;
 			}
 
-			if(context.Character == ')')
-			{
-				context.Exclude();
-				context.Pop();
-				context.State = State.None;
-			}
+			//重置是否含有空格的标记
+			context.Flags.HasWhitespace(context.IsWhitespace());
 
-			if(context.IsLetterOrDigitOrUnderscore())
-			{
-				//如果首字符是数字，则激发错误
-				if(char.IsDigit(context.Character) && !context.HasBuffer())
-				{
-					context.OnError("");
-					return false;
-				}
-
-				context.Accept();
-				return true;
-			}
-
-			context.OnError("");
-			return false;
+			return true;
 		}
 
 		private static bool DoInclude(ref StateContext context)
@@ -263,35 +313,50 @@ namespace Zongsoft.Data
 				case ',':
 					context.Include();
 					context.State = State.None;
-					return true;
+					break;
 				case ':':
 					context.Include();
 					context.State = State.PagingCount;
-					return true;
+					break;
 				case '[':
 					context.Include();
 					context.State = State.SortingField;
-					return true;
+					break;
 				case '(':
 					context.Include();
 					context.Push();
 					context.State = State.None;
-					return true;
+					break;
 				case ')':
 					context.Include();
 					context.Pop();
 					context.State = State.None;
-					return true;
+					break;
 				default:
 					if(context.IsLetterOrDigitOrUnderscore())
 					{
+						//判断标识中间是否含有空白字符
+						if(context.Flags.HasWhitespace())
+						{
+							context.OnError("");
+							return false;
+						}
+
 						context.Accept();
-						return true;
+					}
+					else if(!context.IsWhitespace())
+					{
+						context.OnError("");
+						return false;
 					}
 
-					context.OnError("");
-					return false;
+					break;
 			}
+
+			//重置是否含有空格的标记
+			context.Flags.HasWhitespace(context.IsWhitespace());
+
+			return true;
 		}
 
 		private static bool DoPagingCount(ref StateContext context)
@@ -467,20 +532,24 @@ namespace Zongsoft.Data
 		public class Segment : IEquatable<Segment>
 		{
 			#region 静态字段
-			internal static readonly Segment All = new Segment("*");
+			internal static readonly Segment All = new Segment("*", false);
 			#endregion
 
 			#region 成员字段
-			private Collections.INamedCollection<Segment> _children;
+			private Collections.NamedCollection<Segment> _children;
 			#endregion
 
-			public readonly string Name;
-			public readonly Segment Parent;
-			public Paging Paging;
-			public Sorting[] Sortings;
-
 			#region 构造函数
-			public Segment(string name, bool isExclude = false)
+			public Segment(string name, object userToken = null)
+			{
+				if(string.IsNullOrEmpty(name))
+					throw new ArgumentNullException(nameof(name));
+
+				this.Name = name;
+				this.UserToken = userToken;
+			}
+
+			internal Segment(string name, bool isExclude)
 			{
 				if(string.IsNullOrEmpty(name))
 					throw new ArgumentNullException(nameof(name));
@@ -488,9 +557,41 @@ namespace Zongsoft.Data
 				this.Name = name;
 				this.IsExclude = isExclude;
 			}
+
+			internal Segment(string name, Segment parent)
+			{
+				if(string.IsNullOrEmpty(name))
+					throw new ArgumentNullException(nameof(name));
+
+				this.Name = name;
+				this.Parent = parent;
+			}
 			#endregion
 
 			#region 公共属性
+			public string Name
+			{
+				get;
+			}
+
+			public Segment Parent
+			{
+				get;
+				internal set;
+			}
+
+			public Paging Paging
+			{
+				get;
+				internal set;
+			}
+
+			public Sorting[] Sortings
+			{
+				get;
+				internal set;
+			}
+
 			public bool IsExclude
 			{
 				get;
@@ -504,15 +605,46 @@ namespace Zongsoft.Data
 				}
 			}
 
-			public Collections.INamedCollection<Segment> Children
+			public Collections.IReadOnlyNamedCollection<Segment> Children
 			{
 				get
 				{
-					if(_children == null)
-						_children = new Collections.NamedCollection<Segment>(child => child.Name);
-
 					return _children;
 				}
+			}
+
+			public object UserToken
+			{
+				get;
+				set;
+			}
+			#endregion
+
+			#region 内部方法
+			internal void AddChild(Segment child)
+			{
+				if(_children == null)
+					System.Threading.Interlocked.CompareExchange(ref _children, new Collections.NamedCollection<Segment>(segment => segment.Name), null);
+
+				_children.Add(child);
+			}
+
+			internal void AddChildren(IEnumerable<Segment> children)
+			{
+				foreach(var child in children)
+				{
+					_children.Add(child);
+				}
+			}
+
+			internal void RemoveChild(string name)
+			{
+				_children?.Remove(name);
+			}
+
+			internal void ClearChildren()
+			{
+				_children?.Clear();
 			}
 			#endregion
 
@@ -540,7 +672,8 @@ namespace Zongsoft.Data
 
 			public override string ToString()
 			{
-				var text = this.Name;
+				var index = 0;
+				var text = (this.IsExclude ? "!" : string.Empty) + this.Name;
 
 				if(this.Paging != null)
 				{
@@ -552,10 +685,29 @@ namespace Zongsoft.Data
 						        this.Paging.PageIndex.ToString() + "/" + this.Paging.PageSize.ToString();
 				}
 
+				if(this.Sortings != null && this.Sortings.Length > 0)
+				{
+					index = 0;
+					text += "[";
+
+					foreach(var sorting in this.Sortings)
+					{
+						if(index++ > 0)
+							text += ", ";
+
+						if(sorting.Mode == SortingMode.Ascending)
+							text += sorting.Name;
+						else
+							text += "!" + sorting.Name;
+					}
+
+					text += "]";
+				}
+
 				if(_children != null && _children.Count > 0)
 				{
+					index = 0;
 					text += "(";
-					int index = 0;
 
 					foreach(var child in _children)
 					{
@@ -588,6 +740,7 @@ namespace Zongsoft.Data
 			#region 公共字段
 			public State State;
 			public char Character;
+			public StateVector Flags;
 			#endregion
 
 			#region 构造函数
@@ -602,6 +755,7 @@ namespace Zongsoft.Data
 
 				this.Character = '\0';
 				this.State = State.None;
+				this.Flags = new StateVector();
 
 				_segments = segments ?? new Collections.NamedCollection<Segment>(item => item.Name, StringComparer.OrdinalIgnoreCase);
 			}
@@ -679,7 +833,7 @@ namespace Zongsoft.Data
 					if(parent == null)
 						_segments.Clear();
 					else if(parent.HasChildren)
-						parent.Children.Clear();
+						parent.ClearChildren();
 				}
 				else
 				{
@@ -691,9 +845,9 @@ namespace Zongsoft.Data
 					else
 					{
 						if(parent.HasChildren)
-							parent.Children.Remove(name);
+							parent.RemoveChild(name);
 
-						parent.Children.Add(new Segment(name, true));
+						parent.AddChild(new Segment(name, true));
 					}
 				}
 
@@ -704,7 +858,6 @@ namespace Zongsoft.Data
 			{
 				var parent = this.Peek();
 				Segment current;
-				Func<string, Segment> creator = identifier => identifier == "*" ? Segment.All : new Segment(identifier);
 
 				if(string.IsNullOrEmpty(name))
 				{
@@ -719,14 +872,14 @@ namespace Zongsoft.Data
 					if(_segments.TryGet(name, out current))
 						_current = current;
 					else
-						_segments.Add((_current = creator(name)));
+						_segments.Add((_current = new Segment(name, false)));
 				}
 				else
 				{
-					if(parent.Children.TryGet(name, out current))
+					if(parent.HasChildren && parent.Children.TryGet(name, out current))
 						_current = current;
 					else
-						parent.Children.Add((_current = creator(name)));
+						parent.AddChild((_current = new Segment(name, parent)));
 				}
 			}
 
@@ -864,6 +1017,46 @@ namespace Zongsoft.Data
 				{
 					return sorting.Name.ToLowerInvariant().GetHashCode();
 				}
+			}
+			#endregion
+		}
+
+		private struct StateVector
+		{
+			#region 常量定义
+			private const int IDENTIFIER_WHITESPACE_FLAG = 1; //标识中间是否出现空白字符(0:没有, 1:有)
+			#endregion
+
+			#region 成员变量
+			private int _data;
+			#endregion
+
+			#region 公共方法
+			public bool HasWhitespace()
+			{
+				return this.IsMarked(IDENTIFIER_WHITESPACE_FLAG);
+			}
+
+			public void HasWhitespace(bool enabled)
+			{
+				this.Mark(IDENTIFIER_WHITESPACE_FLAG, enabled);
+			}
+			#endregion
+
+			#region 私有方法
+			[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+			private bool IsMarked(int bit)
+			{
+				return (_data & bit) == bit;
+			}
+
+			[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+			private void Mark(int bit, bool value)
+			{
+				if(value)
+					_data |= bit;
+				else
+					_data &= ~bit;
 			}
 			#endregion
 		}
