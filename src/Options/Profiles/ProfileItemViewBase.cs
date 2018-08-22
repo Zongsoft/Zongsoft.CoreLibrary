@@ -54,6 +54,17 @@ namespace Zongsoft.Options.Profiles
 		#endregion
 
 		#region 公共属性
+		public T this[string name]
+		{
+			get
+			{
+				if(_innerDictionary.TryGetValue(name, out var result))
+					return result;
+
+				throw new KeyNotFoundException();
+			}
+		}
+
 		public int Count
 		{
 			get

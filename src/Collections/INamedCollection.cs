@@ -36,6 +36,14 @@ namespace Zongsoft.Collections
 	public interface INamedCollection<T> : ICollection<T>
 	{
 		/// <summary>
+		/// 只读索引器，获取指定名称的元素。
+		/// </summary>
+		/// <param name="name">指定要获取的元素名。</param>
+		/// <returns>返回指定名称的元素对象，如果没有找到则抛出<seealso cref="KeyNotFoundException"/>异常。</returns>
+		/// <exception cref="KeyNotFoundException">当指定<paramref name="name"/>名称的元素不存在则激发该异常。</exception>
+		T this[string name] { get; }
+
+		/// <summary>
 		/// 判断当前集合是否包含指定名称的元素。
 		/// </summary>
 		/// <param name="name">指定要判断的元素名。</param>
