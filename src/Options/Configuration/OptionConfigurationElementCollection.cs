@@ -255,6 +255,22 @@ namespace Zongsoft.Options.Configuration
 		#endregion
 
 		#region 显式实现
+		OptionConfigurationElement Collections.INamedCollection<OptionConfigurationElement>.this[string name]
+		{
+			get
+			{
+				if(name == null)
+					throw new ArgumentNullException(nameof(name));
+
+				OptionConfigurationElement element;
+
+				if(_dictionary.TryGetValue(name, out element))
+					return element;
+
+				throw new KeyNotFoundException();
+			}
+		}
+
 		OptionConfigurationElement Collections.INamedCollection<OptionConfigurationElement>.Get(string name)
 		{
 			if(name == null)
