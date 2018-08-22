@@ -34,6 +34,7 @@ namespace Zongsoft.Data
 	/// <summary>
 	/// 提供数据范围操作的类。
 	/// </summary>
+	[Obsolete("Please use the Scope class.")]
 	public class Scoping : ICollection<string>
 	{
 		#region 成员字段
