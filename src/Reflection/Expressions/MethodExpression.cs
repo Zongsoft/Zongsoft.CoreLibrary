@@ -29,29 +29,29 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Reflection.Expressions
 {
-	public class MethodExpression : MemberPathExpression
+	public class MethodExpression : MemberExpression
 	{
 		#region 构造函数
-		public MethodExpression(string name, IMemberPathExpression[] parameters = null)
+		public MethodExpression(string name, IMemberExpression[] arguments = null)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
 			this.Name = name;
 
-			if(parameters == null || parameters.Length == 0)
-				this.Parameters = new List<IMemberPathExpression>();
+			if(arguments == null || arguments.Length == 0)
+				this.Arguments = new List<IMemberExpression>();
 			else
-				this.Parameters = new List<IMemberPathExpression>(parameters);
+				this.Arguments = new List<IMemberExpression>(arguments);
 		}
 		#endregion
 
 		#region 公共属性
-		public override MemberPathExpressionType ExpressionType
+		public override MemberExpressionType ExpressionType
 		{
 			get
 			{
-				return MemberPathExpressionType.Method;
+				return MemberExpressionType.Method;
 			}
 		}
 
@@ -60,7 +60,7 @@ namespace Zongsoft.Reflection.Expressions
 			get;
 		}
 
-		public IList<IMemberPathExpression> Parameters
+		public IList<IMemberExpression> Arguments
 		{
 			get;
 		}

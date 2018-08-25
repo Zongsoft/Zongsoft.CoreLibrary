@@ -29,42 +29,35 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Reflection.Expressions
 {
-	public class IndexerExpression : MemberPathExpression
+	public class IndexerExpression : MemberExpression
 	{
-		#region 成员字段
-		private IList<IMemberPathExpression> _parameters;
-		#endregion
-
 		#region 构造函数
 		public IndexerExpression()
 		{
-			_parameters = new List<IMemberPathExpression>();
+			this.Arguments = new List<IMemberExpression>();
 		}
 
-		public IndexerExpression(IMemberPathExpression[] parameters)
+		public IndexerExpression(IMemberExpression[] arguments)
 		{
-			if(parameters == null || parameters.Length == 0)
-				_parameters = new List<IMemberPathExpression>();
+			if(arguments == null || arguments.Length == 0)
+				this.Arguments = new List<IMemberExpression>();
 			else
-				_parameters = new List<IMemberPathExpression>(parameters);
+				this.Arguments = new List<IMemberExpression>(arguments);
 		}
 		#endregion
 
 		#region 公共属性
-		public override MemberPathExpressionType ExpressionType
+		public override MemberExpressionType ExpressionType
 		{
 			get
 			{
-				return MemberPathExpressionType.Indexer;
+				return MemberExpressionType.Indexer;
 			}
 		}
 
-		public IList<IMemberPathExpression> Parameters
+		public IList<IMemberExpression> Arguments
 		{
-			get
-			{
-				return _parameters;
-			}
+			get;
 		}
 		#endregion
 	}

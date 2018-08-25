@@ -28,26 +28,29 @@ using System;
 
 namespace Zongsoft.Reflection.Expressions
 {
-	public abstract class MemberPathExpression : IMemberPathExpression
+	/// <summary>
+	/// 表示成员表达式元素的基类。
+	/// </summary>
+	public abstract class MemberExpression : IMemberExpression
 	{
 		#region 成员字段
-		private IMemberPathExpression _previous;
-		private IMemberPathExpression _next;
+		private IMemberExpression _previous;
+		private IMemberExpression _next;
 		#endregion
 
 		#region 构造函数
-		protected MemberPathExpression()
+		protected MemberExpression()
 		{
 		}
 		#endregion
 
 		#region 公共属性
-		public abstract MemberPathExpressionType ExpressionType
+		public abstract MemberExpressionType ExpressionType
 		{
 			get;
 		}
 
-		public IMemberPathExpression Previous
+		public IMemberExpression Previous
 		{
 			get
 			{
@@ -55,7 +58,7 @@ namespace Zongsoft.Reflection.Expressions
 			}
 		}
 
-		public IMemberPathExpression Next
+		public IMemberExpression Next
 		{
 			get
 			{
@@ -65,7 +68,7 @@ namespace Zongsoft.Reflection.Expressions
 		#endregion
 
 		#region 公共方法
-		public T Append<T>(T expression) where T : MemberPathExpression
+		public T Append<T>(T expression) where T : MemberExpression
 		{
 			if(expression == null)
 				throw new ArgumentNullException(nameof(expression));
@@ -75,7 +78,7 @@ namespace Zongsoft.Reflection.Expressions
 			return expression;
 		}
 
-		public T Prepend<T>(T expression) where T : MemberPathExpression
+		public T Prepend<T>(T expression) where T : MemberExpression
 		{
 			if(expression == null)
 				throw new ArgumentNullException(nameof(expression));
@@ -129,14 +132,14 @@ namespace Zongsoft.Reflection.Expressions
 			}
 		}
 
-		public static MethodExpression Method(string name, params IMemberPathExpression[] parameters)
+		public static MethodExpression Method(string name, params IMemberExpression[] arguments)
 		{
-			return new MethodExpression(name, parameters);
+			return new MethodExpression(name, arguments);
 		}
 
-		public static IndexerExpression Indexer(params IMemberPathExpression[] parameters)
+		public static IndexerExpression Indexer(params IMemberExpression[] arguments)
 		{
-			return new IndexerExpression(parameters);
+			return new IndexerExpression(arguments);
 		}
 
 		public static IdentifierExpression Identifier(string name)
