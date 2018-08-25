@@ -38,17 +38,17 @@ namespace Zongsoft.Reflection.Expressions
 		#endregion
 
 		#region 公共方法
-		public static bool TryParse(string text, out IMemberPathExpression expression)
+		public static bool TryParse(string text, out IMemberExpression expression)
 		{
 			return (expression = Parse(text, null)) != null;
 		}
 
-		public static IMemberPathExpression Parse(string text)
+		public static IMemberExpression Parse(string text)
 		{
 			return Parse(text, message => throw new InvalidOperationException(message));
 		}
 
-		public static IMemberPathExpression Parse(string text, Action<string> onError)
+		public static IMemberExpression Parse(string text, Action<string> onError)
 		{
 			if(string.IsNullOrEmpty(text))
 				return null;
@@ -132,7 +132,7 @@ namespace Zongsoft.Reflection.Expressions
 			if(context.Character == '[')
 			{
 				context.State = State.Indexer;
-				context.Stack.Push(context.Head = MemberPathExpression.Indexer());
+				context.Stack.Push(context.Head = MemberExpression.Indexer());
 				return true;
 			}
 
@@ -580,8 +580,8 @@ namespace Zongsoft.Reflection.Expressions
 			public State State;
 			public char Character;
 			public StateVector Flags;
-			public MemberPathExpression Head;
-			public readonly Stack<MemberPathExpression> Stack;
+			public MemberExpression Head;
+			public readonly Stack<MemberExpression> Stack;
 			#endregion
 
 			#region 构造函数
@@ -595,7 +595,7 @@ namespace Zongsoft.Reflection.Expressions
 				this.Head = null;
 				this.Flags = new StateVector();
 				this.State = State.None;
-				this.Stack = new Stack<MemberPathExpression>();
+				this.Stack = new Stack<MemberExpression>();
 			}
 			#endregion
 
@@ -610,7 +610,7 @@ namespace Zongsoft.Reflection.Expressions
 				_onError?.Invoke(message);
 			}
 
-			public MemberPathExpression Peek()
+			public MemberExpression Peek()
 			{
 				return Stack.Count > 0 ? Stack.Peek() : null;
 			}
@@ -633,27 +633,27 @@ namespace Zongsoft.Reflection.Expressions
 				       (Character >= '0' && Character <= '9') || Character == '_';
 			}
 
-			public void AppendParameterConstant(IMemberPathExpression owner)
+			public void AppendParameterConstant(IMemberExpression owner)
 			{
 				if(owner == null)
 					throw new InvalidOperationException(EXCEPTION_UNKNOWN_MESSAGE);
 
-				void Add(ICollection<IMemberPathExpression> parameters, string content, TypeCode type)
+				void Add(ICollection<IMemberExpression> parameters, string content, TypeCode type)
 				{
-					parameters.Add(MemberPathExpression.Constant(content, type));
+					parameters.Add(MemberExpression.Constant(content, type));
 				};
 
 				if(owner is IndexerExpression indexer)
-					Add(indexer.Parameters, GetBufferContent(), Flags.GetConstantType());
+					Add(indexer.Arguments, GetBufferContent(), Flags.GetConstantType());
 				else if(owner is MethodExpression method)
-					Add(method.Parameters, GetBufferContent(), Flags.GetConstantType());
+					Add(method.Arguments, GetBufferContent(), Flags.GetConstantType());
 				else
 					throw new InvalidOperationException(EXCEPTION_UNKNOWN_MESSAGE);
 			}
 
-			public IdentifierExpression AppendIdentifier(IMemberPathExpression owner)
+			public IdentifierExpression AppendIdentifier(IMemberExpression owner)
 			{
-				var current = MemberPathExpression.Identifier(GetBufferContent());
+				var current = MemberExpression.Identifier(GetBufferContent());
 
 				if(owner == null)
 				{
@@ -669,26 +669,26 @@ namespace Zongsoft.Reflection.Expressions
 				{
 					if(Flags.IsAttaching())
 					{
-						if(indexer.Parameters.Count == 0 || indexer.Parameters[indexer.Parameters.Count - 1].ExpressionType != MemberPathExpressionType.Identifier)
+						if(indexer.Arguments.Count == 0 || indexer.Arguments[indexer.Arguments.Count - 1].ExpressionType != MemberExpressionType.Identifier)
 							throw new InvalidOperationException(EXCEPTION_UNKNOWN_MESSAGE);
 
-						return ((MemberPathExpression)((IdentifierExpression)indexer.Parameters[indexer.Parameters.Count - 1]).Last()).Append(current);
+						return ((MemberExpression)((IdentifierExpression)indexer.Arguments[indexer.Arguments.Count - 1]).Last()).Append(current);
 					}
 
-					indexer.Parameters.Add(current);
+					indexer.Arguments.Add(current);
 					return current;
 				}
 				else if(owner is MethodExpression method)
 				{
 					if(Flags.IsAttaching())
 					{
-						if(method.Parameters.Count == 0 || method.Parameters[method.Parameters.Count - 1].ExpressionType != MemberPathExpressionType.Identifier)
+						if(method.Arguments.Count == 0 || method.Arguments[method.Arguments.Count - 1].ExpressionType != MemberExpressionType.Identifier)
 							throw new InvalidOperationException(EXCEPTION_UNKNOWN_MESSAGE);
 
-						return ((MemberPathExpression)((IdentifierExpression)method.Parameters[method.Parameters.Count - 1]).Last()).Append(current);
+						return ((MemberExpression)((IdentifierExpression)method.Arguments[method.Arguments.Count - 1]).Last()).Append(current);
 					}
 
-					method.Parameters.Add(current);
+					method.Arguments.Add(current);
 					return current;
 				}
 
@@ -697,7 +697,7 @@ namespace Zongsoft.Reflection.Expressions
 
 			public IndexerExpression AppendIndexer()
 			{
-				var expression = MemberPathExpression.Indexer();
+				var expression = MemberExpression.Indexer();
 
 				if(Stack.Count == 0)
 				{
@@ -708,9 +708,9 @@ namespace Zongsoft.Reflection.Expressions
 					var owner = Stack.Peek();
 
 					if(owner is IndexerExpression indexer)
-						indexer.Parameters.Add(expression);
+						indexer.Arguments.Add(expression);
 					else if(owner is MethodExpression method)
-						method.Parameters.Add(expression);
+						method.Arguments.Add(expression);
 					else
 						throw new InvalidOperationException(EXCEPTION_UNKNOWN_MESSAGE);
 				}
@@ -724,7 +724,7 @@ namespace Zongsoft.Reflection.Expressions
 			{
 				if(Stack == null || Stack.Count == 0)
 				{
-					var current = MemberPathExpression.Method(GetBufferContent());
+					var current = MemberExpression.Method(GetBufferContent());
 
 					if(Head == null)
 						Head = current;
@@ -736,13 +736,13 @@ namespace Zongsoft.Reflection.Expressions
 					return current;
 				}
 
-				var expression = MemberPathExpression.Method(GetBufferContent());
+				var expression = MemberExpression.Method(GetBufferContent());
 				var owner = Stack.Peek();
 
 				if(owner is IndexerExpression indexer)
-					indexer.Parameters.Add(expression);
+					indexer.Arguments.Add(expression);
 				else if(owner is MethodExpression method)
-					method.Parameters.Add(expression);
+					method.Arguments.Add(expression);
 				else
 					throw new InvalidOperationException(EXCEPTION_UNKNOWN_MESSAGE);
 
@@ -774,7 +774,7 @@ namespace Zongsoft.Reflection.Expressions
 					State = State.Parameter;
 			}
 
-			public IMemberPathExpression GetResult()
+			public IMemberExpression GetResult()
 			{
 				switch(State)
 				{
@@ -785,7 +785,7 @@ namespace Zongsoft.Reflection.Expressions
 					case State.Identifier:
 						if(Stack == null || Stack.Count == 0)
 						{
-							var identifier = MemberPathExpression.Identifier(GetBufferContent());
+							var identifier = MemberExpression.Identifier(GetBufferContent());
 
 							if(Head == null)
 								return identifier;

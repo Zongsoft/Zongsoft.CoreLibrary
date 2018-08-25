@@ -28,21 +28,21 @@ using System;
 
 namespace Zongsoft.Reflection.Expressions
 {
-	public interface IMemberPathExpression
+	/// <summary>
+	/// 表示成员表达式类型的枚举。
+	/// </summary>
+	public enum MemberExpressionType
 	{
-		MemberPathExpressionType ExpressionType
-		{
-			get;
-		}
+		/// <summary>常量表达式</summary>
+		Constant,
 
-		IMemberPathExpression Previous
-		{
-			get;
-		}
+		/// <summary>标识表达式</summary>
+		Identifier,
 
-		IMemberPathExpression Next
-		{
-			get;
-		}
+		/// <summary>索引器表达式</summary>
+		Indexer,
+
+		/// <summary>方法调用表达式</summary>
+		Method,
 	}
 }

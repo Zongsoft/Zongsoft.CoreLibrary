@@ -28,32 +28,33 @@ using System;
 
 namespace Zongsoft.Reflection.Expressions
 {
-	public static class MemberPathExpressionExtension
+	/// <summary>
+	/// 表示表达式元素(节点)的接口。
+	/// </summary>
+	public interface IMemberExpression
 	{
-		public static IMemberPathExpression First(this IMemberPathExpression expression)
+		/// <summary>
+		/// 获取一个值，指示表达式的种类。
+		/// </summary>
+		MemberExpressionType ExpressionType
 		{
-			if(expression == null)
-				return null;
-
-			while(expression.Previous != null)
-			{
-				expression = expression.Previous;
-			}
-
-			return expression;
+			get;
 		}
 
-		public static IMemberPathExpression Last(this IMemberPathExpression expression)
+		/// <summary>
+		/// 获取上一个表达式。
+		/// </summary>
+		IMemberExpression Previous
 		{
-			if(expression == null)
-				return null;
+			get;
+		}
 
-			while(expression.Next != null)
-			{
-				expression = expression.Next;
-			}
-
-			return expression;
+		/// <summary>
+		/// 获取下一个表达式。
+		/// </summary>
+		IMemberExpression Next
+		{
+			get;
 		}
 	}
 }

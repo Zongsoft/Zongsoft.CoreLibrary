@@ -277,12 +277,12 @@
     </Compile>
     <Compile Include="Reflection\Expressions\ConstantExpression.cs" />
     <Compile Include="Reflection\Expressions\IdentifierExpression.cs" />
-    <Compile Include="Reflection\Expressions\IMemberPathExpression.cs" />
+    <Compile Include="Reflection\Expressions\IMemberExpression.cs" />
     <Compile Include="Reflection\Expressions\IndexerExpression.cs" />
     <Compile Include="Reflection\Expressions\MemberPath.cs" />
-    <Compile Include="Reflection\Expressions\MemberPathExpression.cs" />
-    <Compile Include="Reflection\Expressions\MemberPathExpressionExtension.cs" />
-    <Compile Include="Reflection\Expressions\MemberPathExpressionType.cs" />
+    <Compile Include="Reflection\Expressions\MemberExpression.cs" />
+    <Compile Include="Reflection\Expressions\MemberExpressionExtension.cs" />
+    <Compile Include="Reflection\Expressions\MemberExpressionType.cs" />
     <Compile Include="Reflection\Expressions\MethodExpression.cs" />
     <Compile Include="Reflection\MemberToken.cs" />
     <Compile Include="Reflection\MemberTokenCollection.cs" />

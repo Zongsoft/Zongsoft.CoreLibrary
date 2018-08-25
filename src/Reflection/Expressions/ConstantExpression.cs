@@ -28,7 +28,7 @@ using System;
 
 namespace Zongsoft.Reflection.Expressions
 {
-	public class ConstantExpression : MemberPathExpression
+	public class ConstantExpression : MemberExpression
 	{
 		#region 构造函数
 		public ConstantExpression(object value)
@@ -38,11 +38,11 @@ namespace Zongsoft.Reflection.Expressions
 		#endregion
 
 		#region 公共属性
-		public override MemberPathExpressionType ExpressionType
+		public override MemberExpressionType ExpressionType
 		{
 			get
 			{
-				return MemberPathExpressionType.Constant;
+				return MemberExpressionType.Constant;
 			}
 		}
 
