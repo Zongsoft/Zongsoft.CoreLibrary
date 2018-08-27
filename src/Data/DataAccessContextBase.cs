@@ -25,6 +25,7 @@
  */
 
 using System;
+using System.ComponentModel;
 using System.Collections.Generic;
 
 namespace Zongsoft.Data
@@ -32,8 +33,12 @@ namespace Zongsoft.Data
 	/// <summary>
 	/// 表示数据访问的上下文基类。
 	/// </summary>
-	public abstract class DataAccessContextBase
+	public abstract class DataAccessContextBase : System.ComponentModel.INotifyPropertyChanged
 	{
+		#region 事件定义
+		public event PropertyChangedEventHandler PropertyChanged;
+		#endregion
+
 		#region 成员字段
 		private string _name;
 		private DataAccessMethod _method;
@@ -143,6 +148,13 @@ namespace Zongsoft.Data
 
 				return _states;
 			}
+		}
+		#endregion
+
+		#region 虚拟方法
+		protected virtual void OnPropertyChanged(string propertyName)
+		{
+			this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 		}
 		#endregion
 	}
