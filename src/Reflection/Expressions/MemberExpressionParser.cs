@@ -29,7 +29,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Reflection.Expressions
 {
-	public class MemberPath
+	internal static class MemberExpressionParser
 	{
 		#region 常量定义
 		private const string EXCEPTION_UNKNOWN_MESSAGE = "An unknown error occurred in the parser.";
