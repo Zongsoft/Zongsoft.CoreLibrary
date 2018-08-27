@@ -25,30 +25,29 @@
  */
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
-	public static class Scope
+	internal static class ScopeParser
 	{
 		#region 公共方法
-		public static bool TryResolve(string text, out Collections.IReadOnlyNamedCollection<Segment> result, Func<SegmentToken, IEnumerable<Segment>> mapper)
+		public static bool TryParse<T>(string text, out Collections.IReadOnlyNamedCollection<T> result, Func<ScopeBase.Token, IEnumerable<T>> mapper) where T : ScopeBase
 		{
-			return (result = Resolve(text, mapper, null)) != null;
+			return (result = Parse(text, mapper, null)) != null;
 		}
 
-		public static Collections.IReadOnlyNamedCollection<Segment> Resolve(string text, Func<SegmentToken, IEnumerable<Segment>> mapper)
+		public static Collections.IReadOnlyNamedCollection<T> Parse<T>(string text, Func<ScopeBase.Token, IEnumerable<T>> mapper) where T : ScopeBase
 		{
-			return Resolve(text, mapper, message => throw new InvalidOperationException(message));
+			return Parse(text, mapper, message => throw new InvalidOperationException(message));
 		}
 
-		public static Collections.IReadOnlyNamedCollection<Segment> Resolve(string text, Func<SegmentToken, IEnumerable<Segment>> mapper, Action<string> onError)
+		public static Collections.IReadOnlyNamedCollection<T> Parse<T>(string text, Func<ScopeBase.Token, IEnumerable<T>> mapper, Action<string> onError) where T : ScopeBase
 		{
 			if(string.IsNullOrEmpty(text))
 				return null;
 
-			var context = new StateContext(text.Length, mapper, onError);
+			var context = new StateContext<T>(text.Length, mapper, onError);
 
 			for(int i = 0; i < text.Length; i++)
 			{
@@ -100,14 +99,14 @@ namespace Zongsoft.Data
 			}
 
 			if(context.Complete(out var segments))
-				return (Collections.IReadOnlyNamedCollection<Segment>)segments;
+				return (Collections.IReadOnlyNamedCollection<T>)segments;
 
 			return null;
 		}
 		#endregion
 
 		#region 状态处理
-		private static bool DoNone(ref StateContext context)
+		private static bool DoNone<T>(ref StateContext<T> context) where T : ScopeBase
 		{
 			if(context.IsWhitespace())
 				return true;
@@ -136,7 +135,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		private static bool DoAsterisk(ref StateContext context)
+		private static bool DoAsterisk<T>(ref StateContext<T> context) where T : ScopeBase
 		{
 			switch(context.Character)
 			{
@@ -155,7 +154,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		private static bool DoExclude(ref StateContext context)
+		private static bool DoExclude<T>(ref StateContext<T> context) where T : ScopeBase
 		{
 			switch(context.Character)
 			{
@@ -202,7 +201,7 @@ namespace Zongsoft.Data
 			return true;
 		}
 
-		private static bool DoInclude(ref StateContext context)
+		private static bool DoInclude<T>(ref StateContext<T> context) where T : ScopeBase
 		{
 			switch(context.Character)
 			{
@@ -255,7 +254,7 @@ namespace Zongsoft.Data
 			return true;
 		}
 
-		private static bool DoPagingCount(ref StateContext context)
+		private static bool DoPagingCount<T>(ref StateContext<T> context) where T : ScopeBase
 		{
 			string buffer;
 
@@ -325,7 +324,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		private static bool DoPagingSize(ref StateContext context)
+		private static bool DoPagingSize<T>(ref StateContext<T> context) where T : ScopeBase
 		{
 			string buffer;
 
@@ -388,7 +387,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		private static bool DoSortingField(ref StateContext context)
+		private static bool DoSortingField<T>(ref StateContext<T> context) where T : ScopeBase
 		{
 			switch(context.Character)
 			{
@@ -430,7 +429,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		private static bool DoSortingGutter(ref StateContext context)
+		private static bool DoSortingGutter<T>(ref StateContext<T> context) where T : ScopeBase
 		{
 			if(context.IsWhitespace())
 				return true;
@@ -448,219 +447,16 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 嵌套子类
-		public class Segment : IEquatable<Segment>
-		{
-			#region 单例字段
-			internal static readonly Segment Ignore = new Segment("?");
-			#endregion
-
-			#region 成员字段
-			private Segment _parent;
-			private Sorting[] _sortingArray;
-			private HashSet<Sorting> _sortings;
-			private Collections.NamedCollection<Segment> _children;
-			#endregion
-
-			#region 构造函数
-			public Segment(string name)
-			{
-				if(string.IsNullOrEmpty(name))
-					throw new ArgumentNullException(nameof(name));
-
-				this.Name = name;
-			}
-			#endregion
-
-			#region 公共属性
-			public string Name
-			{
-				get;
-			}
-
-			public Paging Paging
-			{
-				get;
-				internal set;
-			}
-
-			public Sorting[] Sortings
-			{
-				get
-				{
-					return _sortingArray;
-				}
-			}
-
-			public Segment Parent
-			{
-				get
-				{
-					return _parent;
-				}
-			}
-
-			public bool HasChildren
-			{
-				get
-				{
-					return _children != null && _children.Count > 0;
-				}
-			}
-
-			public Collections.IReadOnlyNamedCollection<Segment> Children
-			{
-				get
-				{
-					return _children;
-				}
-			}
-
-			public Segment this[string name]
-			{
-				get
-				{
-					if(_children != null && _children.TryGet(name, out var child))
-						return child;
-
-					return null;
-				}
-			}
-			#endregion
-
-			#region 内部方法
-			internal void AddSorting(Sorting sorting)
-			{
-				if(_sortings == null)
-					System.Threading.Interlocked.CompareExchange(ref _sortings, new HashSet<Sorting>(SortingComparer.Instance), null);
-
-				if(_sortings.Add(sorting))
-				{
-					var array = new Sorting[_sortings.Count];
-					_sortings.CopyTo(array);
-					_sortingArray = array;
-				}
-			}
-
-			internal void AddChild(Segment child)
-			{
-				if(_children == null)
-					System.Threading.Interlocked.CompareExchange(ref _children, new Collections.NamedCollection<Segment>(segment => segment.Name), null);
-
-				_children.Add(child);
-				child._parent = this;
-			}
-
-			internal void RemoveChild(string name)
-			{
-				_children?.Remove(name);
-			}
-
-			internal void ClearChildren()
-			{
-				_children?.Clear();
-			}
-			#endregion
-
-			#region 重写方法
-			public bool Equals(Segment other)
-			{
-				if(other == null)
-					return false;
-
-				return string.Equals(this.Name, other.Name, StringComparison.OrdinalIgnoreCase);
-			}
-
-			public override bool Equals(object obj)
-			{
-				if(obj == null || obj.GetType() != typeof(Segment))
-					return false;
-
-				return this.Equals((Segment)obj);
-			}
-
-			public override int GetHashCode()
-			{
-				return this.Name.GetHashCode();
-			}
-
-			public override string ToString()
-			{
-				var index = 0;
-				var text = this.Name;
-
-				if(this.Paging != null)
-				{
-					if(Paging.IsDisabled(this.Paging))
-						text += ":*";
-					else
-						text += ":" + (this.Paging.PageIndex == 1 ?
-						               this.Paging.PageSize.ToString() :
-						               this.Paging.PageIndex.ToString() + "/" + this.Paging.PageSize.ToString());
-				}
-
-				if(this.Sortings != null && this.Sortings.Length > 0)
-				{
-					index = 0;
-					text += "[";
-
-					foreach(var sorting in this.Sortings)
-					{
-						if(index++ > 0)
-							text += ", ";
-
-						if(sorting.Mode == SortingMode.Ascending)
-							text += sorting.Name;
-						else
-							text += "~" + sorting.Name;
-					}
-
-					text += "]";
-				}
-
-				if(_children != null && _children.Count > 0)
-				{
-					index = 0;
-					text += "(";
-
-					foreach(var child in _children)
-					{
-						if(index++ > 0)
-							text += ", ";
-
-						text += child.ToString();
-					}
-
-					text += ")";
-				}
-
-				return text;
-			}
-			#endregion
-		}
-
-		public struct SegmentToken
-		{
-			public readonly string Name;
-			public readonly Segment Parent;
-
-			internal SegmentToken(string name, Segment parent)
-			{
-				this.Name = name;
-				this.Parent = parent;
-			}
-		}
-
-		private struct StateContext
+		private struct StateContext<T> where T : ScopeBase
 		{
 			#region 私有变量
 			private int _bufferIndex;
 			private readonly char[] _buffer;
 			private readonly Action<string> _onError;
-			private readonly Func<SegmentToken, IEnumerable<Segment>> _mapper;
-			private Segment _current;
-			private State _state;
-			private Stack<Segment> _stack;
-			private Collections.INamedCollection<Segment> _segments;
+			private readonly Func<ScopeBase.Token, IEnumerable<T>> _mapper;
+			private ScopeBase _current;
+			private Stack<ScopeBase> _stack;
+			private Collections.INamedCollection<T> _segments;
 			#endregion
 
 			#region 公共字段
@@ -670,26 +466,25 @@ namespace Zongsoft.Data
 			#endregion
 
 			#region 构造函数
-			public StateContext(int length, Func<SegmentToken, IEnumerable<Segment>> mapper, Action<string> onError)
+			public StateContext(int length, Func<ScopeBase.Token, IEnumerable<T>> mapper, Action<string> onError)
 			{
 				_bufferIndex = 0;
 				_buffer = new char[length];
-				_state = State.None;
 				_current = null;
 				_mapper = mapper;
 				_onError = onError;
-				_stack = new Stack<Segment>();
+				_stack = new Stack<ScopeBase>();
 
 				this.Character = '\0';
 				this.State = State.None;
 				this.Flags = new StateVector();
 
-				_segments = new Collections.NamedCollection<Segment>(item => item.Name, StringComparer.OrdinalIgnoreCase);
+				_segments = new Collections.NamedCollection<T>(item => item.Name, StringComparer.OrdinalIgnoreCase);
 			}
 			#endregion
 
 			#region 公共属性
-			public Segment Current
+			public ScopeBase Current
 			{
 				get
 				{
@@ -709,12 +504,12 @@ namespace Zongsoft.Data
 				_onError?.Invoke(message);
 			}
 
-			public Segment Peek()
+			public ScopeBase Peek()
 			{
 				return _stack.Count > 0 ? _stack.Peek() : null;
 			}
 
-			public Segment Pop()
+			public ScopeBase Pop()
 			{
 				if(_stack == null || _stack.Count == 0)
 				{
@@ -727,7 +522,7 @@ namespace Zongsoft.Data
 
 			public void Push()
 			{
-				_stack.Push(_current ?? Segment.Ignore);
+				_stack.Push(_current ?? ScopeBase.Ignore);
 			}
 
 			public bool IsWhitespace()
@@ -776,7 +571,7 @@ namespace Zongsoft.Data
 			public void Include(string name = null)
 			{
 				var parent = this.Peek();
-				Segment current;
+				T current;
 
 				if(string.IsNullOrEmpty(name))
 				{
@@ -791,18 +586,18 @@ namespace Zongsoft.Data
 					if(_segments.TryGet(name, out current))
 						_current = current;
 					else
-						this.Map(new SegmentToken(name, null));
+						this.Map(new ScopeBase.Token(name, null));
 				}
 				else
 				{
 					//如果是忽略段则不需要进行子集和映射处理
-					if(object.ReferenceEquals(parent, Segment.Ignore))
+					if(object.ReferenceEquals(parent, ScopeBase.Ignore))
 						return;
 
-					if(parent.HasChildren && parent.Children.TryGet(name, out current))
-						_current = current;
+					if(parent.TryGetChild(name, out var child))
+						_current = child;
 					else
-						this.Map(new SegmentToken(name, parent));
+						this.Map(new ScopeBase.Token(name, parent));
 				}
 			}
 
@@ -868,7 +663,7 @@ namespace Zongsoft.Data
 				return true;
 			}
 
-			public bool Complete(out Collections.INamedCollection<Segment> segments)
+			public bool Complete(out Collections.INamedCollection<T> segments)
 			{
 				segments = null;
 
@@ -927,7 +722,7 @@ namespace Zongsoft.Data
 			#endregion
 
 			#region 私有方法
-			private void Map(SegmentToken token)
+			private void Map(ScopeBase.Token token)
 			{
 				//重置当前段
 				_current = null;
@@ -944,14 +739,14 @@ namespace Zongsoft.Data
 						if(_segments.Contains(segment.Name))
 							_current = segment;
 						else
-							_segments.Add(_current = segment);
+							_segments.Add((T)(_current = segment));
 					}
 				}
 				else
 				{
 					foreach(var segment in segments)
 					{
-						if(token.Parent.HasChildren && token.Parent.Children.Contains(segment.Name))
+						if(token.Parent.ContainsChild(segment.Name))
 							_current = segment;
 						else
 							token.Parent.AddChild(_current = segment);
@@ -1011,25 +806,6 @@ namespace Zongsoft.Data
 			PagingSize,
 			SortingField,
 			SortingGutter,
-		}
-
-		private sealed class SortingComparer : IEqualityComparer<Sorting>
-		{
-			public static readonly SortingComparer Instance = new SortingComparer();
-
-			private SortingComparer()
-			{
-			}
-
-			public bool Equals(Sorting x, Sorting y)
-			{
-				return string.Equals(x.Name, y.Name, StringComparison.OrdinalIgnoreCase);
-			}
-
-			public int GetHashCode(Sorting sorting)
-			{
-				return sorting.Name.ToLowerInvariant().GetHashCode();
-			}
 		}
 		#endregion
 	}

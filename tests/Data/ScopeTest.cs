@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 
 using Xunit;
+using Zongsoft.Collections;
 
 namespace Zongsoft.Data
 {
@@ -11,74 +12,73 @@ namespace Zongsoft.Data
 		[Fact]
 		public void Test1()
 		{
-			Collections.IReadOnlyNamedCollection<Scope.Segment> segments;
+			Collections.IReadOnlyNamedCollection<Scope> scopes;
 
-			segments = Scope.Resolve(null, token => null);
-			Assert.Null(segments);
+			scopes = Scope.Parse(null);
+			Assert.Null(scopes);
 
-			segments = Scope.Resolve(" \t ", token => null);
-			Assert.Null(segments);
+			scopes = Scope.Parse(" \t ");
+			Assert.Null(scopes);
 
-			segments = Scope.Resolve("*", token => Resolve(token));
-			Assert.Equal(6, segments.Count);
-			Assert.True(segments.Contains("a"));
-			Assert.True(segments.Contains("b"));
-			Assert.True(segments.Contains("c"));
-			Assert.True(segments.Contains("d"));
-			Assert.True(segments.Contains("e"));
-			Assert.True(segments.Contains("f"));
+			scopes = Scope.Parse("*");
+			Assert.Equal(6, scopes.Count);
+			Assert.True(scopes.Contains("a"));
+			Assert.True(scopes.Contains("b"));
+			Assert.True(scopes.Contains("c"));
+			Assert.True(scopes.Contains("d"));
+			Assert.True(scopes.Contains("e"));
+			Assert.True(scopes.Contains("f"));
 
-			segments = Scope.Resolve("*, !", token => Resolve(token));
-			Assert.Equal(0, segments.Count);
+			scopes = Scope.Parse("*, !");
+			Assert.Equal(0, scopes.Count);
 
-			segments = Scope.Resolve("*, !a, !c, !f, c", token => Resolve(token));
-			Assert.Equal(4, segments.Count);
-			Assert.False(segments.Contains("a"));
-			Assert.True(segments.Contains("b"));
-			Assert.True(segments.Contains("c"));
-			Assert.True(segments.Contains("d"));
-			Assert.True(segments.Contains("e"));
-			Assert.False(segments.Contains("f"));
-
+			scopes = Scope.Parse("*, !a, !c, !f, c");
+			Assert.Equal(4, scopes.Count);
+			Assert.False(scopes.Contains("a"));
+			Assert.True(scopes.Contains("b"));
+			Assert.True(scopes.Contains("c"));
+			Assert.True(scopes.Contains("d"));
+			Assert.True(scopes.Contains("e"));
+			Assert.False(scopes.Contains("f"));
 		}
 
 		[Fact]
 		public void Test2()
 		{
-			Collections.IReadOnlyNamedCollection<Scope.Segment> segments;
+			Collections.IReadOnlyNamedCollection<Scope> scopes;
 
-			segments = Scope.Resolve("*, !, a, !b, c, a, forums:100/2(*, !, a, !b, f, moderator(name, avatar))", token => Resolve(token));
-			Assert.NotEmpty(segments);
-			Assert.Equal(3, segments.Count);
+			scopes = Scope.Parse("*, !, a, !b, c, a, forums:100/2(*, !, a, !b, f, moderator(name, avatar))");
+			Assert.NotEmpty(scopes);
+			Assert.Equal(3, scopes.Count);
 
-			Assert.True(segments.Contains("a"));
-			Assert.Null(segments["a"].Parent);
-			Assert.Null(segments["a"].Paging);
-			Assert.Null(segments["a"].Sortings);
-			Assert.False(segments["a"].HasChildren);
+			Assert.True(scopes.Contains("a"));
+			Assert.Null(scopes["a"].Parent);
+			Assert.Null(scopes["a"].Paging);
+			Assert.Null(scopes["a"].Sortings);
+			Assert.False(scopes["a"].HasChildren);
 
-			Assert.True(segments.Contains("c"));
-			Assert.Null(segments["c"].Parent);
-			Assert.Null(segments["c"].Paging);
-			Assert.Null(segments["c"].Sortings);
-			Assert.False(segments["c"].HasChildren);
+			Assert.True(scopes.Contains("c"));
+			Assert.Null(scopes["c"].Parent);
+			Assert.Null(scopes["c"].Paging);
+			Assert.Null(scopes["c"].Sortings);
+			Assert.False(scopes["c"].HasChildren);
 
-			Assert.True(segments.Contains("forums"));
-			Assert.Null(segments["forums"].Parent);
-			Assert.Null(segments["forums"].Sortings);
-			Assert.NotNull(segments["forums"].Paging);
-			Assert.Equal(100, segments["forums"].Paging.PageIndex);
-			Assert.Equal(2, segments["forums"].Paging.PageSize);
-			Assert.True(segments["forums"].HasChildren);
-			Assert.Equal(3, segments["forums"].Children.Count);
+			Assert.True(scopes.Contains("forums"));
+			Assert.Null(scopes["forums"].Parent);
+			Assert.Null(scopes["forums"].Sortings);
+			Assert.NotNull(scopes["forums"].Paging);
+			Assert.Equal(100, scopes["forums"].Paging.PageIndex);
+			Assert.Equal(2, scopes["forums"].Paging.PageSize);
+			Assert.True(scopes["forums"].HasChildren);
+			Assert.Equal(3, scopes["forums"].Children.Count);
 
-			var forums = segments["forums"];
+			var forums = (Scope)scopes["forums"];
 			Assert.True(forums.HasChildren);
 			Assert.True(forums.Children.Contains("a"));
 			Assert.True(forums.Children.Contains("f"));
 			Assert.True(forums.Children.Contains("moderator"));
 
-			var moderator = forums["moderator"];
+			var moderator = (Scope)forums["moderator"];
 			Assert.NotNull(moderator.Parent);
 			Assert.True(moderator.HasChildren);
 			Assert.True(moderator.Children.Contains("name"));
@@ -88,45 +88,45 @@ namespace Zongsoft.Data
 		[Fact]
 		public void Test3()
 		{
-			Collections.IReadOnlyNamedCollection<Scope.Segment> segments;
+			Collections.IReadOnlyNamedCollection<Scope> scopes;
 
-			segments = Scope.Resolve("*, !, a, !b, c, a, forums:100/2[~timestamp, id](*, !, a, !b, f, moderator[name](name, avatar))", token => Resolve(token));
-			Assert.NotEmpty(segments);
-			Assert.Equal(3, segments.Count);
+			scopes = Scope.Parse("*, !, a, !b, c, a, forums:100/2[~timestamp, id](*, !, a, !b, f, moderator[name](name, avatar))");
+			Assert.NotEmpty(scopes);
+			Assert.Equal(3, scopes.Count);
 
-			Assert.True(segments.Contains("a"));
-			Assert.Null(segments["a"].Parent);
-			Assert.Null(segments["a"].Paging);
-			Assert.Null(segments["a"].Sortings);
-			Assert.False(segments["a"].HasChildren);
+			Assert.True(scopes.Contains("a"));
+			Assert.Null(scopes["a"].Parent);
+			Assert.Null(scopes["a"].Paging);
+			Assert.Null(scopes["a"].Sortings);
+			Assert.False(scopes["a"].HasChildren);
 
-			Assert.True(segments.Contains("c"));
-			Assert.Null(segments["c"].Parent);
-			Assert.Null(segments["c"].Paging);
-			Assert.Null(segments["c"].Sortings);
-			Assert.False(segments["c"].HasChildren);
+			Assert.True(scopes.Contains("c"));
+			Assert.Null(scopes["c"].Parent);
+			Assert.Null(scopes["c"].Paging);
+			Assert.Null(scopes["c"].Sortings);
+			Assert.False(scopes["c"].HasChildren);
 
-			Assert.True(segments.Contains("forums"));
-			Assert.Null(segments["forums"].Parent);
-			Assert.NotNull(segments["forums"].Paging);
-			Assert.Equal(100, segments["forums"].Paging.PageIndex);
-			Assert.Equal(2, segments["forums"].Paging.PageSize);
-			Assert.NotNull(segments["forums"].Sortings);
-			Assert.Equal(2, segments["forums"].Sortings.Length);
-			Assert.Equal("timestamp", segments["forums"].Sortings[0].Name);
-			Assert.Equal(SortingMode.Descending, segments["forums"].Sortings[0].Mode);
-			Assert.Equal("id", segments["forums"].Sortings[1].Name);
-			Assert.Equal(SortingMode.Ascending, segments["forums"].Sortings[1].Mode);
-			Assert.True(segments["forums"].HasChildren);
-			Assert.Equal(3, segments["forums"].Children.Count);
+			Assert.True(scopes.Contains("forums"));
+			Assert.Null(scopes["forums"].Parent);
+			Assert.NotNull(scopes["forums"].Paging);
+			Assert.Equal(100, scopes["forums"].Paging.PageIndex);
+			Assert.Equal(2, scopes["forums"].Paging.PageSize);
+			Assert.NotNull(scopes["forums"].Sortings);
+			Assert.Equal(2, scopes["forums"].Sortings.Length);
+			Assert.Equal("timestamp", scopes["forums"].Sortings[0].Name);
+			Assert.Equal(SortingMode.Descending, scopes["forums"].Sortings[0].Mode);
+			Assert.Equal("id", scopes["forums"].Sortings[1].Name);
+			Assert.Equal(SortingMode.Ascending, scopes["forums"].Sortings[1].Mode);
+			Assert.True(scopes["forums"].HasChildren);
+			Assert.Equal(3, scopes["forums"].Children.Count);
 
-			var forums = segments["forums"];
+			var forums = scopes["forums"];
 			Assert.True(forums.HasChildren);
 			Assert.True(forums.Children.Contains("a"));
 			Assert.True(forums.Children.Contains("f"));
 			Assert.True(forums.Children.Contains("moderator"));
 
-			var moderator = forums["moderator"];
+			var moderator = (Scope)forums["moderator"];
 			Assert.True(moderator.HasChildren);
 			Assert.NotNull(moderator.Parent);
 			Assert.Null(moderator.Paging);
@@ -138,27 +138,71 @@ namespace Zongsoft.Data
 			Assert.True(moderator.Children.Contains("avatar"));
 		}
 
-		#region 私有方法
-		private IEnumerable<Scope.Segment> Resolve(Scope.SegmentToken token)
+		#region 嵌套子类
+		public class Scope : Zongsoft.Data.ScopeBase
 		{
-			if(string.IsNullOrWhiteSpace(token.Name))
-				throw new InvalidOperationException();
-
-			switch(token.Name)
+			#region 构造函数
+			public Scope(string name) : base(name)
 			{
-				case "*":
-					return new Scope.Segment[]
-					{
-						new Scope.Segment("a"),
-						new Scope.Segment("b"),
-						new Scope.Segment("c"),
-						new Scope.Segment("d"),
-						new Scope.Segment("e"),
-						new Scope.Segment("f"),
-					};
+			}
+			#endregion
+
+			#region 公共属性
+			public Scope Parent
+			{
+				get
+				{
+					return (Scope)base.GetParent();
+				}
 			}
 
-			return new Scope.Segment[] { new Scope.Segment(token.Name) };
+			public Scope this[string name]
+			{
+				get
+				{
+					if(this.HasChildren && this.Children.TryGet(name, out var child))
+						return (Scope)child;
+
+					return null;
+				}
+			}
+			#endregion
+
+			#region 解析方法
+			public static Collections.IReadOnlyNamedCollection<Scope> Parse(string text)
+			{
+				return ScopeBase.Parse(text, token => Resolve(token));
+			}
+
+			public static Collections.IReadOnlyNamedCollection<Scope> Parse(string text, Action<string> onError)
+			{
+				return ScopeBase.Parse(text, token => Resolve(token), onError);
+			}
+			#endregion
+
+			#region 私有方法
+			private static IEnumerable<Scope> Resolve(Token token)
+			{
+				if(string.IsNullOrWhiteSpace(token.Name))
+					throw new InvalidOperationException();
+
+				switch(token.Name)
+				{
+					case "*":
+						return new Scope[]
+						{
+							new Scope("a"),
+							new Scope("b"),
+							new Scope("c"),
+							new Scope("d"),
+							new Scope("e"),
+							new Scope("f"),
+						};
+				}
+
+				return new Scope[] { new Scope(token.Name) };
+			}
+			#endregion
 		}
 		#endregion
 	}
