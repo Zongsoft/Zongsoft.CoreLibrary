@@ -89,6 +89,23 @@ namespace Zongsoft.Reflection.Expressions
 		}
 		#endregion
 
+		#region 解析方法
+		public static bool TryParse(string text, out IMemberExpression expression)
+		{
+			return (expression = MemberExpressionParser.Parse(text, null)) != null;
+		}
+
+		public static IMemberExpression Parse(string text)
+		{
+			return MemberExpressionParser.Parse(text, message => throw new InvalidOperationException(message));
+		}
+
+		public static IMemberExpression Parse(string text, Action<string> onError)
+		{
+			return MemberExpressionParser.Parse(text, onError);
+		}
+		#endregion
+
 		#region 静态方法
 		public static ConstantExpression Constant(object value)
 		{
