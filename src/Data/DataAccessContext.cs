@@ -58,7 +58,11 @@ namespace Zongsoft.Data
 			}
 			set
 			{
+				if(_result == value)
+					return;
+
 				_result = value;
+				this.OnPropertyChanged(nameof(Result));
 			}
 		}
 
@@ -73,7 +77,11 @@ namespace Zongsoft.Data
 			}
 			set
 			{
+				if(_condition == value)
+					return;
+
 				_condition = value;
+				this.OnPropertyChanged(nameof(Condition));
 			}
 		}
 
@@ -88,7 +96,11 @@ namespace Zongsoft.Data
 			}
 			set
 			{
+				if(_includes == value)
+					return;
+
 				_includes = value;
+				this.OnPropertyChanged(nameof(Includes));
 			}
 		}
 		#endregion
@@ -117,7 +129,11 @@ namespace Zongsoft.Data
 			}
 			set
 			{
+				if(_condition == value)
+					return;
+
 				_condition = value;
+				this.OnPropertyChanged(nameof(Condition));
 			}
 		}
 
@@ -129,7 +145,11 @@ namespace Zongsoft.Data
 			}
 			set
 			{
+				if(_result == value)
+					return;
+
 				_result = value;
+				this.OnPropertyChanged(nameof(Result));
 			}
 		}
 		#endregion
@@ -181,10 +201,11 @@ namespace Zongsoft.Data
 			}
 			set
 			{
-				if(value == null)
-					throw new ArgumentNullException();
+				if(_resultType == value)
+					return;
 
-				_resultType = value;
+				_resultType = value ?? throw new ArgumentNullException();
+				this.OnPropertyChanged(nameof(ResultType));
 			}
 		}
 
@@ -199,7 +220,11 @@ namespace Zongsoft.Data
 			}
 			set
 			{
+				if(_result == value)
+					return;
+
 				_result = value;
+				this.OnPropertyChanged(nameof(Result));
 			}
 		}
 
@@ -225,7 +250,11 @@ namespace Zongsoft.Data
 			}
 			set
 			{
+				if(_outParameters == value)
+					return;
+
 				_outParameters = value;
+				this.OnPropertyChanged(nameof(OutParameters));
 			}
 		}
 		#endregion
@@ -267,7 +296,11 @@ namespace Zongsoft.Data
 				if(string.IsNullOrWhiteSpace(value))
 					throw new ArgumentNullException();
 
+				if(_member == value)
+					return;
+
 				_member = value;
+				this.OnPropertyChanged(nameof(Member));
 			}
 		}
 
@@ -279,10 +312,11 @@ namespace Zongsoft.Data
 			}
 			set
 			{
-				if(value == null)
-					throw new ArgumentNullException();
+				if(_condition == value)
+					return;
 
-				_condition = value;
+				_condition = value ?? throw new ArgumentNullException();
+				this.OnPropertyChanged(nameof(Condition));
 			}
 		}
 
@@ -294,7 +328,11 @@ namespace Zongsoft.Data
 			}
 			set
 			{
+				if(_interval == value)
+					return;
+
 				_interval = value;
+				this.OnPropertyChanged(nameof(Interval));
 			}
 		}
 
@@ -306,7 +344,11 @@ namespace Zongsoft.Data
 			}
 			set
 			{
+				if(_result == value)
+					return;
+
 				_result = value;
+				this.OnPropertyChanged(nameof(Result));
 			}
 		}
 		#endregion
@@ -378,11 +420,12 @@ namespace Zongsoft.Data
 			}
 			set
 			{
-				if(value == null)
-					throw new ArgumentNullException();
+				if(_result == value)
+					return;
 
-				_result = value;
+				_result = value ?? throw new ArgumentNullException();
 				_filteringResult = null;
+				this.OnPropertyChanged(nameof(Result));
 			}
 		}
 
@@ -397,8 +440,12 @@ namespace Zongsoft.Data
 			}
 			set
 			{
+				if(_resultFilter == value)
+					return;
+
 				_resultFilter = value;
 				_filteringResult = null;
+				this.OnPropertyChanged(nameof(ResultFilter));
 			}
 		}
 
@@ -413,37 +460,11 @@ namespace Zongsoft.Data
 			}
 			set
 			{
+				if(_condition == value)
+					return;
+
 				_condition = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置查询操作的分组。
-		/// </summary>
-		public Grouping Grouping
-		{
-			get
-			{
-				return _grouping;
-			}
-			set
-			{
-				_grouping = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置查询操作的分页设置。
-		/// </summary>
-		public Paging Paging
-		{
-			get
-			{
-				return _paging;
-			}
-			set
-			{
-				_paging = value;
+				this.OnPropertyChanged(nameof(Condition));
 			}
 		}
 
@@ -458,7 +479,49 @@ namespace Zongsoft.Data
 			}
 			set
 			{
+				if(_scope == value)
+					return;
+
 				_scope = value;
+				this.OnPropertyChanged(nameof(Scope));
+			}
+		}
+
+		/// <summary>
+		/// 获取或设置查询操作的分组。
+		/// </summary>
+		public Grouping Grouping
+		{
+			get
+			{
+				return _grouping;
+			}
+			set
+			{
+				if(_grouping == value)
+					return;
+
+				_grouping = value;
+				this.OnPropertyChanged(nameof(Grouping));
+			}
+		}
+
+		/// <summary>
+		/// 获取或设置查询操作的分页设置。
+		/// </summary>
+		public Paging Paging
+		{
+			get
+			{
+				return _paging;
+			}
+			set
+			{
+				if(_paging == value)
+					return;
+
+				_paging = value;
+				this.OnPropertyChanged(nameof(Paging));
 			}
 		}
 
@@ -473,7 +536,11 @@ namespace Zongsoft.Data
 			}
 			set
 			{
+				if(_sortings == value)
+					return;
+
 				_sortings = value;
+				this.OnPropertyChanged(nameof(Sortings));
 			}
 		}
 		#endregion
@@ -507,7 +574,11 @@ namespace Zongsoft.Data
 			}
 			set
 			{
+				if(_count == value)
+					return;
+
 				_count = value;
+				this.OnPropertyChanged(nameof(Count));
 			}
 		}
 
@@ -522,7 +593,11 @@ namespace Zongsoft.Data
 			}
 			set
 			{
+				if(_condition == value)
+					return;
+
 				_condition = value;
+				this.OnPropertyChanged(nameof(Condition));
 			}
 		}
 
@@ -537,7 +612,11 @@ namespace Zongsoft.Data
 			}
 			set
 			{
+				if(_cascades == value)
+					return;
+
 				_cascades = value;
+				this.OnPropertyChanged(nameof(Cascades));
 			}
 		}
 		#endregion
@@ -555,7 +634,7 @@ namespace Zongsoft.Data
 		#region 构造函数
 		protected DataInsertContextBase(IDataAccess dataAccess, string name, bool isMultiple, object data, string scope, object state = null) : base(dataAccess, name, DataAccessMethod.Insert, state)
 		{
-			_data = data;
+			_data = data ?? throw new ArgumentNullException(nameof(data));
 			_scope = scope;
 			_isMultiple = isMultiple;
 		}
@@ -584,7 +663,11 @@ namespace Zongsoft.Data
 			}
 			set
 			{
+				if(_count == value)
+					return;
+
 				_count = value;
+				this.OnPropertyChanged(nameof(Count));
 			}
 		}
 
@@ -599,7 +682,25 @@ namespace Zongsoft.Data
 			}
 			set
 			{
+				if(_data == value)
+					return;
+
 				_data = value;
+				this.OnPropertyChanged(nameof(Data));
+			}
+		}
+
+		/// <summary>
+		/// 获取插入数据的元素类型。
+		/// </summary>
+		public virtual Type ElementType
+		{
+			get
+			{
+				if(_isMultiple && _data is IEnumerable)
+					return Common.TypeExtension.GetElementType(_data.GetType());
+
+				return _data.GetType();
 			}
 		}
 
@@ -614,7 +715,11 @@ namespace Zongsoft.Data
 			}
 			set
 			{
+				if(_scope == value)
+					return;
+
 				_scope = value;
+				this.OnPropertyChanged(nameof(Scope));
 			}
 		}
 		#endregion
@@ -633,7 +738,7 @@ namespace Zongsoft.Data
 		#region 构造函数
 		protected DataUpdateContextBase(IDataAccess dataAccess, string name, bool isMultiple, object data, ICondition condition, string scope, object state = null) : base(dataAccess, name, DataAccessMethod.Update, state)
 		{
-			_data = data;
+			_data = data ?? throw new ArgumentNullException(nameof(data));
 			_condition = condition;
 			_scope = scope;
 			_isMultiple = isMultiple;
@@ -663,7 +768,11 @@ namespace Zongsoft.Data
 			}
 			set
 			{
+				if(_count == value)
+					return;
+
 				_count = value;
+				this.OnPropertyChanged(nameof(Count));
 			}
 		}
 
@@ -678,7 +787,25 @@ namespace Zongsoft.Data
 			}
 			set
 			{
+				if(_data == value)
+					return;
+
 				_data = value;
+				this.OnPropertyChanged(nameof(Data));
+			}
+		}
+
+		/// <summary>
+		/// 获取更新数据的元素类型。
+		/// </summary>
+		public virtual Type ElementType
+		{
+			get
+			{
+				if(_isMultiple && _data is IEnumerable)
+					return Common.TypeExtension.GetElementType(_data.GetType());
+
+				return _data.GetType();
 			}
 		}
 
@@ -693,7 +820,11 @@ namespace Zongsoft.Data
 			}
 			set
 			{
+				if(_condition == value)
+					return;
+
 				_condition = value;
+				this.OnPropertyChanged(nameof(Condition));
 			}
 		}
 
@@ -708,7 +839,11 @@ namespace Zongsoft.Data
 			}
 			set
 			{
+				if(_scope == value)
+					return;
+
 				_scope = value;
+				this.OnPropertyChanged(nameof(Scope));
 			}
 		}
 		#endregion
@@ -726,7 +861,7 @@ namespace Zongsoft.Data
 		#region 构造函数
 		protected DataUpsertContextBase(IDataAccess dataAccess, string name, bool isMultiple, object data, string scope, object state = null) : base(dataAccess, name, DataAccessMethod.Upsert, state)
 		{
-			_data = data;
+			_data = data ?? throw new ArgumentNullException(nameof(data));
 			_scope = scope;
 			_isMultiple = isMultiple;
 		}
@@ -755,7 +890,11 @@ namespace Zongsoft.Data
 			}
 			set
 			{
+				if(_count == value)
+					return;
+
 				_count = value;
+				this.OnPropertyChanged(nameof(Count));
 			}
 		}
 
@@ -770,7 +909,25 @@ namespace Zongsoft.Data
 			}
 			set
 			{
+				if(_data == value)
+					return;
+
 				_data = value;
+				this.OnPropertyChanged(nameof(Data));
+			}
+		}
+
+		/// <summary>
+		/// 获取操作数据的元素类型。
+		/// </summary>
+		public virtual Type ElementType
+		{
+			get
+			{
+				if(_isMultiple && _data is IEnumerable)
+					return Common.TypeExtension.GetElementType(_data.GetType());
+
+				return _data.GetType();
 			}
 		}
 
@@ -785,7 +942,11 @@ namespace Zongsoft.Data
 			}
 			set
 			{
+				if(_scope == value)
+					return;
+
 				_scope = value;
+				this.OnPropertyChanged(nameof(Scope));
 			}
 		}
 		#endregion
