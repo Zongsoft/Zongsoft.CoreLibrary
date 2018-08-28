@@ -29,20 +29,20 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
-	internal static class ScopeParser
+	internal static class SchemaParser
 	{
 		#region 公共方法
-		public static bool TryParse<T>(string text, out Collections.IReadOnlyNamedCollection<T> result, Func<ScopeBase.Token, IEnumerable<T>> mapper) where T : ScopeBase
+		public static bool TryParse<T>(string text, out Collections.IReadOnlyNamedCollection<T> result, Func<SchemaBase.Token, IEnumerable<T>> mapper) where T : SchemaBase
 		{
 			return (result = Parse(text, mapper, null)) != null;
 		}
 
-		public static Collections.IReadOnlyNamedCollection<T> Parse<T>(string text, Func<ScopeBase.Token, IEnumerable<T>> mapper) where T : ScopeBase
+		public static Collections.IReadOnlyNamedCollection<T> Parse<T>(string text, Func<SchemaBase.Token, IEnumerable<T>> mapper) where T : SchemaBase
 		{
 			return Parse(text, mapper, message => throw new InvalidOperationException(message));
 		}
 
-		public static Collections.IReadOnlyNamedCollection<T> Parse<T>(string text, Func<ScopeBase.Token, IEnumerable<T>> mapper, Action<string> onError) where T : ScopeBase
+		public static Collections.IReadOnlyNamedCollection<T> Parse<T>(string text, Func<SchemaBase.Token, IEnumerable<T>> mapper, Action<string> onError) where T : SchemaBase
 		{
 			if(string.IsNullOrEmpty(text))
 				return null;
@@ -106,7 +106,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 状态处理
-		private static bool DoNone<T>(ref StateContext<T> context) where T : ScopeBase
+		private static bool DoNone<T>(ref StateContext<T> context) where T : SchemaBase
 		{
 			if(context.IsWhitespace())
 				return true;
@@ -135,7 +135,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		private static bool DoAsterisk<T>(ref StateContext<T> context) where T : ScopeBase
+		private static bool DoAsterisk<T>(ref StateContext<T> context) where T : SchemaBase
 		{
 			switch(context.Character)
 			{
@@ -154,7 +154,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		private static bool DoExclude<T>(ref StateContext<T> context) where T : ScopeBase
+		private static bool DoExclude<T>(ref StateContext<T> context) where T : SchemaBase
 		{
 			switch(context.Character)
 			{
@@ -201,7 +201,7 @@ namespace Zongsoft.Data
 			return true;
 		}
 
-		private static bool DoInclude<T>(ref StateContext<T> context) where T : ScopeBase
+		private static bool DoInclude<T>(ref StateContext<T> context) where T : SchemaBase
 		{
 			switch(context.Character)
 			{
@@ -254,7 +254,7 @@ namespace Zongsoft.Data
 			return true;
 		}
 
-		private static bool DoPagingCount<T>(ref StateContext<T> context) where T : ScopeBase
+		private static bool DoPagingCount<T>(ref StateContext<T> context) where T : SchemaBase
 		{
 			string buffer;
 
@@ -324,7 +324,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		private static bool DoPagingSize<T>(ref StateContext<T> context) where T : ScopeBase
+		private static bool DoPagingSize<T>(ref StateContext<T> context) where T : SchemaBase
 		{
 			string buffer;
 
@@ -387,7 +387,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		private static bool DoSortingField<T>(ref StateContext<T> context) where T : ScopeBase
+		private static bool DoSortingField<T>(ref StateContext<T> context) where T : SchemaBase
 		{
 			switch(context.Character)
 			{
@@ -429,7 +429,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		private static bool DoSortingGutter<T>(ref StateContext<T> context) where T : ScopeBase
+		private static bool DoSortingGutter<T>(ref StateContext<T> context) where T : SchemaBase
 		{
 			if(context.IsWhitespace())
 				return true;
@@ -447,16 +447,16 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 嵌套子类
-		private struct StateContext<T> where T : ScopeBase
+		private struct StateContext<T> where T : SchemaBase
 		{
 			#region 私有变量
 			private int _bufferIndex;
 			private readonly char[] _buffer;
 			private readonly Action<string> _onError;
-			private readonly Func<ScopeBase.Token, IEnumerable<T>> _mapper;
-			private ScopeBase _current;
-			private Stack<ScopeBase> _stack;
-			private Collections.INamedCollection<T> _segments;
+			private readonly Func<SchemaBase.Token, IEnumerable<T>> _mapper;
+			private SchemaBase _current;
+			private Stack<SchemaBase> _stack;
+			private Collections.INamedCollection<T> _elements;
 			#endregion
 
 			#region 公共字段
@@ -466,25 +466,25 @@ namespace Zongsoft.Data
 			#endregion
 
 			#region 构造函数
-			public StateContext(int length, Func<ScopeBase.Token, IEnumerable<T>> mapper, Action<string> onError)
+			public StateContext(int length, Func<SchemaBase.Token, IEnumerable<T>> mapper, Action<string> onError)
 			{
 				_bufferIndex = 0;
 				_buffer = new char[length];
 				_current = null;
 				_mapper = mapper;
 				_onError = onError;
-				_stack = new Stack<ScopeBase>();
+				_stack = new Stack<SchemaBase>();
 
 				this.Character = '\0';
 				this.State = State.None;
 				this.Flags = new StateVector();
 
-				_segments = new Collections.NamedCollection<T>(item => item.Name, StringComparer.OrdinalIgnoreCase);
+				_elements = new Collections.NamedCollection<T>(item => item.Name, StringComparer.OrdinalIgnoreCase);
 			}
 			#endregion
 
 			#region 公共属性
-			public ScopeBase Current
+			public SchemaBase Current
 			{
 				get
 				{
@@ -504,12 +504,12 @@ namespace Zongsoft.Data
 				_onError?.Invoke(message);
 			}
 
-			public ScopeBase Peek()
+			public SchemaBase Peek()
 			{
 				return _stack.Count > 0 ? _stack.Peek() : null;
 			}
 
-			public ScopeBase Pop()
+			public SchemaBase Pop()
 			{
 				if(_stack == null || _stack.Count == 0)
 				{
@@ -522,7 +522,7 @@ namespace Zongsoft.Data
 
 			public void Push()
 			{
-				_stack.Push(_current ?? ScopeBase.Ignore);
+				_stack.Push(_current ?? SchemaBase.Ignores);
 			}
 
 			public bool IsWhitespace()
@@ -553,14 +553,14 @@ namespace Zongsoft.Data
 				if(string.IsNullOrEmpty(name) || name == "!" || name == "*")
 				{
 					if(parent == null)
-						_segments.Clear();
+						_elements.Clear();
 					else if(parent.HasChildren)
 						parent.ClearChildren();
 				}
 				else
 				{
 					if(parent == null)
-						_segments.Remove(name);
+						_elements.Remove(name);
 					else if(parent.HasChildren)
 						parent.RemoveChild(name);
 				}
@@ -583,21 +583,21 @@ namespace Zongsoft.Data
 
 				if(parent == null)
 				{
-					if(_segments.TryGet(name, out current))
+					if(_elements.TryGet(name, out current))
 						_current = current;
 					else
-						this.Map(new ScopeBase.Token(name, null));
+						this.Map(new SchemaBase.Token(name, null));
 				}
 				else
 				{
 					//如果是忽略段则不需要进行子集和映射处理
-					if(object.ReferenceEquals(parent, ScopeBase.Ignore))
+					if(object.ReferenceEquals(parent, SchemaBase.Ignores))
 						return;
 
 					if(parent.TryGetChild(name, out var child))
 						_current = child;
 					else
-						this.Map(new ScopeBase.Token(name, parent));
+						this.Map(new SchemaBase.Token(name, parent));
 				}
 			}
 
@@ -663,9 +663,9 @@ namespace Zongsoft.Data
 				return true;
 			}
 
-			public bool Complete(out Collections.INamedCollection<T> segments)
+			public bool Complete(out Collections.INamedCollection<T> elements)
 			{
-				segments = null;
+				elements = null;
 
 				if(_stack != null && _stack.Count > 0)
 				{
@@ -676,8 +676,8 @@ namespace Zongsoft.Data
 				switch(State)
 				{
 					case State.None:
-						if(_segments != null && _segments.Count > 0)
-							segments = _segments;
+						if(_elements != null && _elements.Count > 0)
+							elements = _elements;
 
 						return true;
 					case State.Asterisk:
@@ -716,40 +716,40 @@ namespace Zongsoft.Data
 						return false;
 				}
 
-				segments = _segments;
+				elements = _elements;
 				return true;
 			}
 			#endregion
 
 			#region 私有方法
-			private void Map(ScopeBase.Token token)
+			private void Map(SchemaBase.Token token)
 			{
 				//重置当前段
 				_current = null;
 
-				var segments = _mapper(token);
+				var items = _mapper(token);
 
-				if(segments == null)
+				if(items == null)
 					return;
 
 				if(token.Parent == null)
 				{
-					foreach(var segment in segments)
+					foreach(var item in items)
 					{
-						if(_segments.Contains(segment.Name))
-							_current = segment;
+						if(_elements.Contains(item.Name))
+							_current = item;
 						else
-							_segments.Add((T)(_current = segment));
+							_elements.Add((T)(_current = item));
 					}
 				}
 				else
 				{
-					foreach(var segment in segments)
+					foreach(var item in items)
 					{
-						if(token.Parent.ContainsChild(segment.Name))
-							_current = segment;
+						if(token.Parent.ContainsChild(item.Name))
+							_current = item;
 						else
-							token.Parent.AddChild(_current = segment);
+							token.Parent.AddChild(_current = item);
 					}
 				}
 			}

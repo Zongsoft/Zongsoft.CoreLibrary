@@ -119,30 +119,30 @@ namespace Zongsoft.Data
 		#region 插入方法
 		int Insert(object data);
 		int Insert(object data, object state);
-		int Insert(object data, string scope);
-		int Insert(object data, string scope, object state);
+		int Insert(object data, string schema);
+		int Insert(object data, string schema, object state);
 
 		int InsertMany(IEnumerable items);
 		int InsertMany(IEnumerable items, object state);
-		int InsertMany(IEnumerable items, string scope);
-		int InsertMany(IEnumerable items, string scope, object state);
+		int InsertMany(IEnumerable items, string schema);
+		int InsertMany(IEnumerable items, string schema, object state);
 		#endregion
 
 		#region 更新方法
 		int Update<TKey>(object data, TKey key, object state = null);
-		int Update<TKey>(object data, TKey key, string scope, object state = null);
+		int Update<TKey>(object data, TKey key, string schema, object state = null);
 		int Update<TKey1, TKey2>(object data, TKey1 key1, TKey2 key2, object state = null);
-		int Update<TKey1, TKey2>(object data, TKey1 key1, TKey2 key2, string scope, object state = null);
+		int Update<TKey1, TKey2>(object data, TKey1 key1, TKey2 key2, string schema, object state = null);
 		int Update<TKey1, TKey2, TKey3>(object data, TKey1 key1, TKey2 key2, TKey3 key3, object state = null);
-		int Update<TKey1, TKey2, TKey3>(object data, TKey1 key1, TKey2 key2, TKey3 key3, string scope, object state = null);
+		int Update<TKey1, TKey2, TKey3>(object data, TKey1 key1, TKey2 key2, TKey3 key3, string schema, object state = null);
 
 		int Update(object data, object state = null);
-		int Update(object data, string scope, object state = null);
+		int Update(object data, string schema, object state = null);
 		int Update(object data, ICondition condition, object state = null);
-		int Update(object data, ICondition condition, string scope, object state = null);
+		int Update(object data, ICondition condition, string schema, object state = null);
 
 		int UpdateMany(IEnumerable items, object state = null);
-		int UpdateMany(IEnumerable items, string scope, object state = null);
+		int UpdateMany(IEnumerable items, string schema, object state = null);
 		#endregion
 
 		#region 查询方法
@@ -150,57 +150,57 @@ namespace Zongsoft.Data
 		object Search(string keyword, object state, params Sorting[] sortings);
 		object Search(string keyword, Paging paging, params Sorting[] sortings);
 		object Search(string keyword, Paging paging, object state, params Sorting[] sortings);
-		object Search(string keyword, Paging paging, string scope, params Sorting[] sortings);
-		object Search(string keyword, Paging paging, string scope, object state, params Sorting[] sortings);
-		object Search(string keyword, string scope, params Sorting[] sortings);
-		object Search(string keyword, string scope, object state, params Sorting[] sortings);
-		object Search(string keyword, string scope, Paging paging, params Sorting[] sortings);
-		object Search(string keyword, string scope, Paging paging, object state, params Sorting[] sortings);
+		object Search(string keyword, Paging paging, string schema, params Sorting[] sortings);
+		object Search(string keyword, Paging paging, string schema, object state, params Sorting[] sortings);
+		object Search(string keyword, string schema, params Sorting[] sortings);
+		object Search(string keyword, string schema, object state, params Sorting[] sortings);
+		object Search(string keyword, string schema, Paging paging, params Sorting[] sortings);
+		object Search(string keyword, string schema, Paging paging, object state, params Sorting[] sortings);
 
 		object Get<TKey>(TKey key, params Sorting[] sortings);
 		object Get<TKey>(TKey key, object state, params Sorting[] sortings);
 		object Get<TKey>(TKey key, Paging paging, params Sorting[] sortings);
 		object Get<TKey>(TKey key, Paging paging, object state, params Sorting[] sortings);
-		object Get<TKey>(TKey key, Paging paging, string scope, params Sorting[] sortings);
-		object Get<TKey>(TKey key, Paging paging, string scope, object state, params Sorting[] sortings);
-		object Get<TKey>(TKey key, string scope, params Sorting[] sortings);
-		object Get<TKey>(TKey key, string scope, object state, params Sorting[] sortings);
-		object Get<TKey>(TKey key, string scope, Paging paging, params Sorting[] sortings);
-		object Get<TKey>(TKey key, string scope, Paging paging, object state, params Sorting[] sortings);
+		object Get<TKey>(TKey key, Paging paging, string schema, params Sorting[] sortings);
+		object Get<TKey>(TKey key, Paging paging, string schema, object state, params Sorting[] sortings);
+		object Get<TKey>(TKey key, string schema, params Sorting[] sortings);
+		object Get<TKey>(TKey key, string schema, object state, params Sorting[] sortings);
+		object Get<TKey>(TKey key, string schema, Paging paging, params Sorting[] sortings);
+		object Get<TKey>(TKey key, string schema, Paging paging, object state, params Sorting[] sortings);
 
 		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, params Sorting[] sortings);
 		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, object state, params Sorting[] sortings);
 		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, Paging paging, params Sorting[] sortings);
 		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, Paging paging, object state, params Sorting[] sortings);
-		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, Paging paging, string scope, params Sorting[] sortings);
-		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, Paging paging, string scope, object state, params Sorting[] sortings);
-		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string scope, params Sorting[] sortings);
-		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string scope, object state, params Sorting[] sortings);
-		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string scope, Paging paging, params Sorting[] sortings);
-		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string scope, Paging paging, object state, params Sorting[] sortings);
+		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, Paging paging, string schema, params Sorting[] sortings);
+		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, Paging paging, string schema, object state, params Sorting[] sortings);
+		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string schema, params Sorting[] sortings);
+		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string schema, object state, params Sorting[] sortings);
+		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string schema, Paging paging, params Sorting[] sortings);
+		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string schema, Paging paging, object state, params Sorting[] sortings);
 
 		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, params Sorting[] sortings);
 		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, object state, params Sorting[] sortings);
 		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, Paging paging, params Sorting[] sortings);
 		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, Paging paging, object state, params Sorting[] sortings);
-		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, Paging paging, string scope, params Sorting[] sortings);
-		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, Paging paging, string scope, object state, params Sorting[] sortings);
-		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string scope, params Sorting[] sortings);
-		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string scope, object state, params Sorting[] sortings);
-		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string scope, Paging paging, params Sorting[] sortings);
-		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string scope, Paging paging, object state, params Sorting[] sortings);
+		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, Paging paging, string schema, params Sorting[] sortings);
+		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, Paging paging, string schema, object state, params Sorting[] sortings);
+		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string schema, params Sorting[] sortings);
+		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string schema, object state, params Sorting[] sortings);
+		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string schema, Paging paging, params Sorting[] sortings);
+		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string schema, Paging paging, object state, params Sorting[] sortings);
 
 		IEnumerable Select(object state = null, params Sorting[] sortings);
 		IEnumerable Select(ICondition condition, params Sorting[] sortings);
 		IEnumerable Select(ICondition condition, object state, params Sorting[] sortings);
 		IEnumerable Select(ICondition condition, Paging paging, params Sorting[] sortings);
 		IEnumerable Select(ICondition condition, Paging paging, object state, params Sorting[] sortings);
-		IEnumerable Select(ICondition condition, Paging paging, string scope, params Sorting[] sortings);
-		IEnumerable Select(ICondition condition, Paging paging, string scope, object state, params Sorting[] sortings);
-		IEnumerable Select(ICondition condition, string scope, params Sorting[] sortings);
-		IEnumerable Select(ICondition condition, string scope, object state, params Sorting[] sortings);
-		IEnumerable Select(ICondition condition, string scope, Paging paging, params Sorting[] sortings);
-		IEnumerable Select(ICondition condition, string scope, Paging paging, object state, params Sorting[] sortings);
+		IEnumerable Select(ICondition condition, Paging paging, string schema, params Sorting[] sortings);
+		IEnumerable Select(ICondition condition, Paging paging, string schema, object state, params Sorting[] sortings);
+		IEnumerable Select(ICondition condition, string schema, params Sorting[] sortings);
+		IEnumerable Select(ICondition condition, string schema, object state, params Sorting[] sortings);
+		IEnumerable Select(ICondition condition, string schema, Paging paging, params Sorting[] sortings);
+		IEnumerable Select(ICondition condition, string schema, Paging paging, object state, params Sorting[] sortings);
 
 		//IEnumerable<T> Select<T>(Grouping grouping, object state = null, params Sorting[] sortings);
 		//IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, params Sorting[] sortings);
@@ -210,14 +210,14 @@ namespace Zongsoft.Data
 
 		IEnumerable<T> Select<T>(Grouping grouping, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(Grouping grouping, object state, params Sorting[] sortings);
-		IEnumerable<T> Select<T>(Grouping grouping, string scope, object state = null, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(Grouping grouping, string schema, object state = null, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(Grouping grouping, Paging paging, object state = null, params Sorting[] sortings);
-		IEnumerable<T> Select<T>(Grouping grouping, string scope, Paging paging, object state = null, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(Grouping grouping, string schema, Paging paging, object state = null, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, object state, params Sorting[] sortings);
-		IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, string scope, object state = null, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, string schema, object state = null, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, Paging paging, object state = null, params Sorting[] sortings);
-		IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, string scope, Paging paging, object state = null, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, string schema, Paging paging, object state = null, params Sorting[] sortings);
 		#endregion
 	}
 }

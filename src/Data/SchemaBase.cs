@@ -29,25 +29,25 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
-	public class ScopeBase
+	public class SchemaBase
 	{
 		#region 单例字段
-		internal static readonly ScopeBase Ignore = new ScopeBase("?");
+		internal static readonly SchemaBase Ignores = new SchemaBase("?");
 		#endregion
 
 		#region 成员字段
-		private ScopeBase _parent;
+		private SchemaBase _parent;
 		private Sorting[] _sortingArray;
 		private HashSet<Sorting> _sortings;
-		private Collections.NamedCollection<ScopeBase> _children;
+		private Collections.NamedCollection<SchemaBase> _children;
 		#endregion
 
 		#region 构造函数
-		protected ScopeBase()
+		protected SchemaBase()
 		{
 		}
 
-		protected ScopeBase(string name)
+		protected SchemaBase(string name)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
@@ -84,7 +84,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public Collections.IReadOnlyNamedCollection<ScopeBase> Children
+		public Collections.IReadOnlyNamedCollection<SchemaBase> Children
 		{
 			get
 			{
@@ -94,7 +94,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 保护属性
-		protected ScopeBase GetParent()
+		protected SchemaBase GetParent()
 		{
 			return _parent;
 		}
@@ -114,7 +114,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		internal bool TryGetChild(string name, out ScopeBase child)
+		internal bool TryGetChild(string name, out SchemaBase child)
 		{
 			child = null;
 
@@ -129,10 +129,10 @@ namespace Zongsoft.Data
 			return _children != null && _children.Contains(name);
 		}
 
-		internal void AddChild(ScopeBase child)
+		internal void AddChild(SchemaBase child)
 		{
 			if(_children == null)
-				System.Threading.Interlocked.CompareExchange(ref _children, new Collections.NamedCollection<ScopeBase>(segment => segment.Name), null);
+				System.Threading.Interlocked.CompareExchange(ref _children, new Collections.NamedCollection<SchemaBase>(segment => segment.Name), null);
 
 			_children.Add(child);
 			child._parent = this;
@@ -150,7 +150,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 重写方法
-		public bool Equals(ScopeBase other)
+		public bool Equals(SchemaBase other)
 		{
 			if(other == null)
 				return false;
@@ -160,10 +160,10 @@ namespace Zongsoft.Data
 
 		public override bool Equals(object obj)
 		{
-			if(obj == null || obj.GetType() != typeof(ScopeBase))
+			if(obj == null || obj.GetType() != typeof(SchemaBase))
 				return false;
 
-			return this.Equals((ScopeBase)obj);
+			return this.Equals((SchemaBase)obj);
 		}
 
 		public override int GetHashCode()
@@ -226,19 +226,19 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 解析方法
-		protected static bool TryParse<T>(string text, out Collections.IReadOnlyNamedCollection<T> result, Func<Token, IEnumerable<T>> mapper) where T : ScopeBase
+		protected static bool TryParse<T>(string text, out Collections.IReadOnlyNamedCollection<T> result, Func<Token, IEnumerable<T>> mapper) where T : SchemaBase
 		{
-			return (result = ScopeParser.Parse(text, mapper, null)) != null;
+			return (result = SchemaParser.Parse(text, mapper, null)) != null;
 		}
 
-		protected static Collections.IReadOnlyNamedCollection<T> Parse<T>(string text, Func<Token, IEnumerable<T>> mapper) where T : ScopeBase
+		protected static Collections.IReadOnlyNamedCollection<T> Parse<T>(string text, Func<Token, IEnumerable<T>> mapper) where T : SchemaBase
 		{
-			return ScopeParser.Parse(text, mapper, message => throw new InvalidOperationException(message));
+			return SchemaParser.Parse(text, mapper, message => throw new InvalidOperationException(message));
 		}
 
-		protected static Collections.IReadOnlyNamedCollection<T> Parse<T>(string text, Func<Token, IEnumerable<T>> mapper, Action<string> onError) where T : ScopeBase
+		protected static Collections.IReadOnlyNamedCollection<T> Parse<T>(string text, Func<Token, IEnumerable<T>> mapper, Action<string> onError) where T : SchemaBase
 		{
-			return ScopeParser.Parse(text, mapper, onError);
+			return SchemaParser.Parse(text, mapper, onError);
 		}
 		#endregion
 
@@ -246,9 +246,9 @@ namespace Zongsoft.Data
 		internal protected struct Token
 		{
 			public readonly string Name;
-			public readonly ScopeBase Parent;
+			public readonly SchemaBase Parent;
 
-			internal Token(string name, ScopeBase parent)
+			internal Token(string name, SchemaBase parent)
 			{
 				this.Name = name;
 				this.Parent = parent;
