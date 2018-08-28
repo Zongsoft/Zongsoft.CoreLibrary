@@ -262,58 +262,58 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 删除方法
-		public virtual int Delete<TKey>(TKey key, params string[] cascades)
+		public virtual int Delete<TKey>(TKey key, string schema = null)
 		{
 			bool singleton;
-			return this.Delete(this.ConvertKey(key, out singleton), null, cascades);
+			return this.OnDelete(this.ConvertKey(key, out singleton), schema, null);
 		}
 
-		public virtual int Delete<TKey>(TKey key, object state, params string[] cascades)
+		public virtual int Delete<TKey>(TKey key, string schema, object state)
 		{
 			bool singleton;
-			return this.Delete(this.ConvertKey(key, out singleton), state, cascades);
+			return this.OnDelete(this.ConvertKey(key, out singleton), schema, state);
 		}
 
-		public virtual int Delete<TKey1, TKey2>(TKey1 key1, TKey2 key2, params string[] cascades)
+		public virtual int Delete<TKey1, TKey2>(TKey1 key1, TKey2 key2, string schema = null)
 		{
 			bool singleton;
-			return this.Delete(this.ConvertKey(key1, key2, out singleton), null, cascades);
+			return this.OnDelete(this.ConvertKey(key1, key2, out singleton), schema, null);
 		}
 
-		public virtual int Delete<TKey1, TKey2>(TKey1 key1, TKey2 key2, object state, params string[] cascades)
+		public virtual int Delete<TKey1, TKey2>(TKey1 key1, TKey2 key2, string schema, object state)
 		{
 			bool singleton;
-			return this.Delete(this.ConvertKey(key1, key2, out singleton), state, cascades);
+			return this.OnDelete(this.ConvertKey(key1, key2, out singleton), schema, state);
 		}
 
-		public virtual int Delete<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, params string[] cascades)
+		public virtual int Delete<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string schema = null)
 		{
 			bool singleton;
-			return this.Delete(this.ConvertKey(key1, key2, key3, out singleton), null, cascades);
+			return this.OnDelete(this.ConvertKey(key1, key2, key3, out singleton), schema, null);
 		}
 
-		public virtual int Delete<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, object state, params string[] cascades)
+		public virtual int Delete<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string schema, object state)
 		{
 			bool singleton;
-			return this.Delete(this.ConvertKey(key1, key2, key3, out singleton), state, cascades);
+			return this.OnDelete(this.ConvertKey(key1, key2, key3, out singleton), schema, state);
 		}
 
-		public int Delete(ICondition condition, params string[] cascades)
+		public int Delete(ICondition condition, string schema = null)
 		{
-			return this.OnDelete(condition, cascades, null);
+			return this.OnDelete(condition, schema, null);
 		}
 
-		public int Delete(ICondition condition, object state, params string[] cascades)
+		public int Delete(ICondition condition, string schema, object state)
 		{
-			return this.OnDelete(condition, cascades, state);
+			return this.OnDelete(condition, schema, state);
 		}
 
-		protected virtual int OnDelete(ICondition condition, string[] cascades, object state)
+		protected virtual int OnDelete(ICondition condition, string schema, object state)
 		{
 			if(condition == null)
 				throw new NotSupportedException("The condition cann't is null on delete operation.");
 
-			return this.DataAccess.Delete(this.Name, condition, state, cascades, ctx => this.OnDeleting(ctx), ctx => this.OnDeleted(ctx));
+			return this.DataAccess.Delete(this.Name, condition, schema, state, ctx => this.OnDeleting(ctx), ctx => this.OnDeleted(ctx));
 		}
 		#endregion
 

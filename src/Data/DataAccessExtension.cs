@@ -35,6 +35,7 @@ using System.Reflection;
 
 namespace Zongsoft.Data
 {
+	[Obsolete]
 	public static class DataAccessExtension
 	{
 		#region 扩展方法
