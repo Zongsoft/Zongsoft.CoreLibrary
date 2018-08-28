@@ -143,13 +143,13 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 删除方法
-		int Delete<T>(ICondition condition, params string[] cascades);
-		int Delete<T>(ICondition condition, object state, params string[] cascades);
-		int Delete<T>(ICondition condition, object state, string[] cascades, Func<DataDeleteContextBase, bool> deleting = null, Action<DataDeleteContextBase> deleted = null);
+		int Delete<T>(ICondition condition, string schema = null);
+		int Delete<T>(ICondition condition, object state);
+		int Delete<T>(ICondition condition, string schema, object state, Func<DataDeleteContextBase, bool> deleting = null, Action<DataDeleteContextBase> deleted = null);
 
-		int Delete(string name, ICondition condition, params string[] cascades);
-		int Delete(string name, ICondition condition, object state, params string[] cascades);
-		int Delete(string name, ICondition condition, object state, string[] cascades, Func<DataDeleteContextBase, bool> deleting = null, Action<DataDeleteContextBase> deleted = null);
+		int Delete(string name, ICondition condition, string schema = null);
+		int Delete(string name, ICondition condition, object state);
+		int Delete(string name, ICondition condition, string schema, object state, Func<DataDeleteContextBase, bool> deleting = null, Action<DataDeleteContextBase> deleted = null);
 		#endregion
 
 		#region 插入方法

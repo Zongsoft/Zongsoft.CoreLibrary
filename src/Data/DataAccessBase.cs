@@ -481,41 +481,38 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 删除方法
-		public int Delete<T>(ICondition condition, params string[] cascades)
+		public int Delete<T>(ICondition condition, string schema = null)
 		{
-			return this.Delete(this.GetName<T>(), condition, null, cascades, null, null);
+			return this.Delete(this.GetName<T>(), condition, schema, null, null, null);
 		}
 
-		public int Delete<T>(ICondition condition, object state, params string[] cascades)
+		public int Delete<T>(ICondition condition, object state)
 		{
-			return this.Delete(this.GetName<T>(), condition, state, cascades, null, null);
+			return this.Delete(this.GetName<T>(), condition, null, state, null, null);
 		}
 
-		public int Delete<T>(ICondition condition, object state, string[] cascades, Func<DataDeleteContextBase, bool> deleting = null, Action<DataDeleteContextBase> deleted = null)
+		public int Delete<T>(ICondition condition, string schema, object state, Func<DataDeleteContextBase, bool> deleting = null, Action<DataDeleteContextBase> deleted = null)
 		{
-			return this.Delete(this.GetName<T>(), condition, state, cascades, deleting, deleted);
+			return this.Delete(this.GetName<T>(), condition, schema, state, deleting, deleted);
 		}
 
-		public int Delete(string name, ICondition condition, params string[] cascades)
+		public int Delete(string name, ICondition condition, string schema = null)
 		{
-			return this.Delete(name, condition, null, cascades, null, null);
+			return this.Delete(name, condition, schema, null, null, null);
 		}
 
-		public int Delete(string name, ICondition condition, object state, params string[] cascades)
+		public int Delete(string name, ICondition condition, object state)
 		{
-			return this.Delete(name, condition, state, cascades, null, null);
+			return this.Delete(name, condition, null, state, null, null);
 		}
 
-		public int Delete(string name, ICondition condition, object state, string[] cascades, Func<DataDeleteContextBase, bool> deleting = null, Action<DataDeleteContextBase> deleted = null)
+		public int Delete(string name, ICondition condition, string schema, object state, Func<DataDeleteContextBase, bool> deleting = null, Action<DataDeleteContextBase> deleted = null)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
-			if(cascades != null && cascades.Length == 1)
-				cascades = cascades[0].Split(',', ';');
-
 			//创建数据访问上下文对象
-			var context = this.CreateDeleteContext(name, condition, cascades, state);
+			var context = this.CreateDeleteContext(name, condition, schema, state);
 
 			//处理数据访问操作前的回调
 			if(deleting != null && deleting(context))
@@ -1209,7 +1206,7 @@ namespace Zongsoft.Data
 		protected abstract DataExistContextBase CreateExistContext(string name, ICondition condition, object state);
 		protected abstract DataExecuteContextBase CreateExecuteContext(string name, bool isScalar, Type resultType, IDictionary<string, object> inParameters, object state);
 		protected abstract DataIncrementContextBase CreateIncrementContext(string name, string member, ICondition condition, int interval, object state);
-		protected abstract DataDeleteContextBase CreateDeleteContext(string name, ICondition condition, string[] cascades, object state);
+		protected abstract DataDeleteContextBase CreateDeleteContext(string name, ICondition condition, string schema, object state);
 		protected abstract DataInsertContextBase CreateInsertContext(string name, bool isMultiple, object data, string schema, object state);
 		protected abstract DataUpsertContextBase CreateUpsertContext(string name, bool isMultiple, object data, string schema, object state);
 		protected abstract DataUpdateContextBase CreateUpdateContext(string name, bool isMultiple, object data, ICondition condition, string schema, object state);

@@ -551,14 +551,14 @@ namespace Zongsoft.Data
 		#region 成员字段
 		private int _count;
 		private ICondition _condition;
-		private string[] _cascades;
+		private string _schema;
 		#endregion
 
 		#region 构造函数
-		protected DataDeleteContextBase(IDataAccess dataAccess, string name, ICondition condition, string[] cascades, object state = null) : base(dataAccess, name, DataAccessMethod.Delete, state)
+		protected DataDeleteContextBase(IDataAccess dataAccess, string name, ICondition condition, string schema, object state = null) : base(dataAccess, name, DataAccessMethod.Delete, state)
 		{
 			_condition = condition;
-			_cascades = cascades;
+			_schema = schema;
 		}
 		#endregion
 
@@ -602,21 +602,21 @@ namespace Zongsoft.Data
 		}
 
 		/// <summary>
-		/// 获取或设置删除操作的关联成员。
+		/// 获取或设置删除操作的数据模式（即删除数据的形状结构）。
 		/// </summary>
-		public string[] Cascades
+		public string Schema
 		{
 			get
 			{
-				return _cascades;
+				return _schema;
 			}
 			set
 			{
-				if(_cascades == value)
+				if(_schema == value)
 					return;
 
-				_cascades = value;
-				this.OnPropertyChanged(nameof(Cascades));
+				_schema = value;
+				this.OnPropertyChanged(nameof(Schema));
 			}
 		}
 		#endregion

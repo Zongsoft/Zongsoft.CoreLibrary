@@ -105,15 +105,15 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 删除方法
-		int Delete<TKey>(TKey key, params string[] cascades);
-		int Delete<TKey>(TKey key, object state, params string[] cascades);
-		int Delete<TKey1, TKey2>(TKey1 key1, TKey2 key2, params string[] cascades);
-		int Delete<TKey1, TKey2>(TKey1 key1, TKey2 key2, object state, params string[] cascades);
-		int Delete<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, params string[] cascades);
-		int Delete<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, object state, params string[] cascades);
+		int Delete<TKey>(TKey key, string schema = null);
+		int Delete<TKey>(TKey key, string schema, object state);
+		int Delete<TKey1, TKey2>(TKey1 key1, TKey2 key2, string schema = null);
+		int Delete<TKey1, TKey2>(TKey1 key1, TKey2 key2, string schema, object state);
+		int Delete<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string schema = null);
+		int Delete<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string schema, object state);
 
-		int Delete(ICondition condition, params string[] cascades);
-		int Delete(ICondition condition, object state, params string[] cascades);
+		int Delete(ICondition condition, string schema = null);
+		int Delete(ICondition condition, string schema, object state);
 		#endregion
 
 		#region 插入方法
