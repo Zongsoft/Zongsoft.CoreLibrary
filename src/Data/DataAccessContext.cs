@@ -361,7 +361,7 @@ namespace Zongsoft.Data
 		private IEnumerable _result;
 		private IEnumerable _filteringResult;
 		private ICondition _condition;
-		private string _scope;
+		private string _schema;
 		private Paging _paging;
 		private Grouping _grouping;
 		private Sorting[] _sortings;
@@ -369,12 +369,12 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		protected DataSelectContextBase(IDataAccess dataAccess, string name, Type elementType, Grouping grouping, ICondition condition, string scope, Paging paging, Sorting[] sortings, object state = null) : base(dataAccess, name, DataAccessMethod.Select, state)
+		protected DataSelectContextBase(IDataAccess dataAccess, string name, Type elementType, Grouping grouping, ICondition condition, string schema, Paging paging, Sorting[] sortings, object state = null) : base(dataAccess, name, DataAccessMethod.Select, state)
 		{
 			_elementType = elementType ?? typeof(object);
 			_grouping = grouping;
 			_condition = condition;
-			_scope = scope;
+			_schema = schema;
 			_paging = paging;
 			_sortings = sortings;
 		}
@@ -469,21 +469,21 @@ namespace Zongsoft.Data
 		}
 
 		/// <summary>
-		/// 获取或设置查询操作的包含成员。
+		/// 获取或设置查询操作的结果数据模式（即查询结果的形状结构）。
 		/// </summary>
-		public string Scope
+		public string Schema
 		{
 			get
 			{
-				return _scope;
+				return _schema;
 			}
 			set
 			{
-				if(_scope == value)
+				if(_schema == value)
 					return;
 
-				_scope = value;
-				this.OnPropertyChanged(nameof(Scope));
+				_schema = value;
+				this.OnPropertyChanged(nameof(Schema));
 			}
 		}
 
@@ -627,15 +627,15 @@ namespace Zongsoft.Data
 		#region 成员字段
 		private int _count;
 		private object _data;
-		private string _scope;
+		private string _schema;
 		private bool _isMultiple;
 		#endregion
 
 		#region 构造函数
-		protected DataInsertContextBase(IDataAccess dataAccess, string name, bool isMultiple, object data, string scope, object state = null) : base(dataAccess, name, DataAccessMethod.Insert, state)
+		protected DataInsertContextBase(IDataAccess dataAccess, string name, bool isMultiple, object data, string schema, object state = null) : base(dataAccess, name, DataAccessMethod.Insert, state)
 		{
 			_data = data ?? throw new ArgumentNullException(nameof(data));
-			_scope = scope;
+			_schema = schema;
 			_isMultiple = isMultiple;
 		}
 		#endregion
@@ -705,21 +705,21 @@ namespace Zongsoft.Data
 		}
 
 		/// <summary>
-		/// 获取或设置插入操作的包含成员。
+		/// 获取或设置插入操作的数据模式（即插入的数据形状结构）。
 		/// </summary>
-		public string Scope
+		public string Schema
 		{
 			get
 			{
-				return _scope;
+				return _schema;
 			}
 			set
 			{
-				if(_scope == value)
+				if(_schema == value)
 					return;
 
-				_scope = value;
-				this.OnPropertyChanged(nameof(Scope));
+				_schema = value;
+				this.OnPropertyChanged(nameof(Schema));
 			}
 		}
 		#endregion
@@ -731,16 +731,16 @@ namespace Zongsoft.Data
 		private int _count;
 		private object _data;
 		private ICondition _condition;
-		private string _scope;
+		private string _schema;
 		private bool _isMultiple;
 		#endregion
 
 		#region 构造函数
-		protected DataUpdateContextBase(IDataAccess dataAccess, string name, bool isMultiple, object data, ICondition condition, string scope, object state = null) : base(dataAccess, name, DataAccessMethod.Update, state)
+		protected DataUpdateContextBase(IDataAccess dataAccess, string name, bool isMultiple, object data, ICondition condition, string schema, object state = null) : base(dataAccess, name, DataAccessMethod.Update, state)
 		{
 			_data = data ?? throw new ArgumentNullException(nameof(data));
 			_condition = condition;
-			_scope = scope;
+			_schema = schema;
 			_isMultiple = isMultiple;
 		}
 		#endregion
@@ -829,21 +829,21 @@ namespace Zongsoft.Data
 		}
 
 		/// <summary>
-		/// 获取或设置更新操作的包含成员。
+		/// 获取或设置更新操作的数据模式（即更新的数据形状结构）。
 		/// </summary>
-		public string Scope
+		public string Schema
 		{
 			get
 			{
-				return _scope;
+				return _schema;
 			}
 			set
 			{
-				if(_scope == value)
+				if(_schema == value)
 					return;
 
-				_scope = value;
-				this.OnPropertyChanged(nameof(Scope));
+				_schema = value;
+				this.OnPropertyChanged(nameof(Schema));
 			}
 		}
 		#endregion
@@ -854,15 +854,15 @@ namespace Zongsoft.Data
 		#region 成员字段
 		private int _count;
 		private object _data;
-		private string _scope;
+		private string _schema;
 		private bool _isMultiple;
 		#endregion
 
 		#region 构造函数
-		protected DataUpsertContextBase(IDataAccess dataAccess, string name, bool isMultiple, object data, string scope, object state = null) : base(dataAccess, name, DataAccessMethod.Upsert, state)
+		protected DataUpsertContextBase(IDataAccess dataAccess, string name, bool isMultiple, object data, string schema, object state = null) : base(dataAccess, name, DataAccessMethod.Upsert, state)
 		{
 			_data = data ?? throw new ArgumentNullException(nameof(data));
-			_scope = scope;
+			_schema = schema;
 			_isMultiple = isMultiple;
 		}
 		#endregion
@@ -932,21 +932,21 @@ namespace Zongsoft.Data
 		}
 
 		/// <summary>
-		/// 获取或设置操作的包含成员。
+		/// 获取或设置操作的数据模式（即更新或新增的数据形状结构）。
 		/// </summary>
-		public string Scope
+		public string Schema
 		{
 			get
 			{
-				return _scope;
+				return _schema;
 			}
 			set
 			{
-				if(_scope == value)
+				if(_schema == value)
 					return;
 
-				_scope = value;
-				this.OnPropertyChanged(nameof(Scope));
+				_schema = value;
+				this.OnPropertyChanged(nameof(Schema));
 			}
 		}
 		#endregion

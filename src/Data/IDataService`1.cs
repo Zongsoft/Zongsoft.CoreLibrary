@@ -47,12 +47,12 @@ namespace Zongsoft.Data
 		new IEnumerable<TEntity> Select(ICondition condition, object state, params Sorting[] sortings);
 		new IEnumerable<TEntity> Select(ICondition condition, Paging paging, params Sorting[] sortings);
 		new IEnumerable<TEntity> Select(ICondition condition, Paging paging, object state, params Sorting[] sortings);
-		new IEnumerable<TEntity> Select(ICondition condition, Paging paging, string scope, params Sorting[] sortings);
-		new IEnumerable<TEntity> Select(ICondition condition, Paging paging, string scope, object state, params Sorting[] sortings);
-		new IEnumerable<TEntity> Select(ICondition condition, string scope, params Sorting[] sortings);
-		new IEnumerable<TEntity> Select(ICondition condition, string scope, object state, params Sorting[] sortings);
-		new IEnumerable<TEntity> Select(ICondition condition, string scope, Paging paging, params Sorting[] sortings);
-		new IEnumerable<TEntity> Select(ICondition condition, string scope, Paging paging, object state, params Sorting[] sortings);
+		new IEnumerable<TEntity> Select(ICondition condition, Paging paging, string schema, params Sorting[] sortings);
+		new IEnumerable<TEntity> Select(ICondition condition, Paging paging, string schema, object state, params Sorting[] sortings);
+		new IEnumerable<TEntity> Select(ICondition condition, string schema, params Sorting[] sortings);
+		new IEnumerable<TEntity> Select(ICondition condition, string schema, object state, params Sorting[] sortings);
+		new IEnumerable<TEntity> Select(ICondition condition, string schema, Paging paging, params Sorting[] sortings);
+		new IEnumerable<TEntity> Select(ICondition condition, string schema, Paging paging, object state, params Sorting[] sortings);
 		#endregion
 	}
 }

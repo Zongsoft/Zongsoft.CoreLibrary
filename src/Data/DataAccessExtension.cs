@@ -65,52 +65,52 @@ namespace Zongsoft.Data
 			return dataAccess.Delete(name, condition, ResolveScopeExpression(name, cascades, null, type => IsScalarType(type, dataAccess)));
 		}
 
-		public static int Delete(this IDataAccess dataAccess, string name, IDictionary<string, object> condition, string scope = null)
+		public static int Delete(this IDataAccess dataAccess, string name, IDictionary<string, object> condition, string schema = null)
 		{
 			if(dataAccess == null)
 				throw new ArgumentNullException("dataAccess");
 
-			return dataAccess.Delete(name, ResolveCondition(condition), scope);
+			return dataAccess.Delete(name, ResolveCondition(condition), schema);
 		}
 
-		public static int Delete(this IDataAccess dataAccess, string name, object condition, string scope = null)
+		public static int Delete(this IDataAccess dataAccess, string name, object condition, string schema = null)
 		{
 			if(dataAccess == null)
 				throw new ArgumentNullException("dataAccess");
 
-			return dataAccess.Delete(name, ResolveCondition(condition), scope);
+			return dataAccess.Delete(name, ResolveCondition(condition), schema);
 		}
 
-		public static int Update(this IDataAccess dataAccess, string name, object entity, IDictionary<string, object> condition, string scope = null)
+		public static int Update(this IDataAccess dataAccess, string name, object entity, IDictionary<string, object> condition, string schema = null)
 		{
 			if(dataAccess == null)
 				throw new ArgumentNullException("dataAccess");
 
-			return dataAccess.Update(name, entity, ResolveCondition(condition), scope);
+			return dataAccess.Update(name, entity, ResolveCondition(condition), schema);
 		}
 
-		public static int Update(this IDataAccess dataAccess, string name, object entity, object condition, string scope = null)
+		public static int Update(this IDataAccess dataAccess, string name, object entity, object condition, string schema = null)
 		{
 			if(dataAccess == null)
 				throw new ArgumentNullException("dataAccess");
 
-			return dataAccess.Update(name, entity, ResolveCondition(condition), scope);
+			return dataAccess.Update(name, entity, ResolveCondition(condition), schema);
 		}
 
-		public static int Update<T>(this IDataAccess dataAccess, string name, IEnumerable<T> entities, IDictionary<string, object> condition, string scope = null)
+		public static int Update<T>(this IDataAccess dataAccess, string name, IEnumerable<T> entities, IDictionary<string, object> condition, string schema = null)
 		{
 			if(dataAccess == null)
 				throw new ArgumentNullException("dataAccess");
 
-			return dataAccess.Update(name, entities, ResolveCondition(condition), scope);
+			return dataAccess.Update(name, entities, ResolveCondition(condition), schema);
 		}
 
-		public static int Update<T>(this IDataAccess dataAccess, string name, IEnumerable<T> entities, object condition, string scope = null)
+		public static int Update<T>(this IDataAccess dataAccess, string name, IEnumerable<T> entities, object condition, string schema = null)
 		{
 			if(dataAccess == null)
 				throw new ArgumentNullException("dataAccess");
 
-			return dataAccess.Update(name, entities, ResolveCondition(condition), scope);
+			return dataAccess.Update(name, entities, ResolveCondition(condition), schema);
 		}
 
 		public static int Update<T>(this IDataAccess dataAccess, string name, T data, ICondition condition, Expression<Func<T, object>> includes, Expression<Func<T, object>> excludes = null)

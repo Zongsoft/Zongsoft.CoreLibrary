@@ -565,20 +565,20 @@ namespace Zongsoft.Data
 			return this.Insert(this.GetName(data.GetType()), data, null, state, null, null);
 		}
 
-		public int Insert<T>(T data, string scope)
+		public int Insert<T>(T data, string schema)
 		{
 			if(data == null)
 				return 0;
 
-			return this.Insert(this.GetName(data.GetType()), data, scope, null, null, null);
+			return this.Insert(this.GetName(data.GetType()), data, schema, null, null, null);
 		}
 
-		public int Insert<T>(T data, string scope, object state, Func<DataInsertContextBase, bool> inserting = null, Action<DataInsertContextBase> inserted = null)
+		public int Insert<T>(T data, string schema, object state, Func<DataInsertContextBase, bool> inserting = null, Action<DataInsertContextBase> inserted = null)
 		{
 			if(data == null)
 				return 0;
 
-			return this.Insert(this.GetName(data.GetType()), data, scope, state, inserting, inserted);
+			return this.Insert(this.GetName(data.GetType()), data, schema, state, inserting, inserted);
 		}
 
 		public int Insert(string name, object data)
@@ -591,12 +591,12 @@ namespace Zongsoft.Data
 			return this.Insert(name, data, null, state, null, null);
 		}
 
-		public int Insert(string name, object data, string scope)
+		public int Insert(string name, object data, string schema)
 		{
-			return this.Insert(name, data, scope, null, null, null);
+			return this.Insert(name, data, schema, null, null, null);
 		}
 
-		public int Insert(string name, object data, string scope, object state, Func<DataInsertContextBase, bool> inserting = null, Action<DataInsertContextBase> inserted = null)
+		public int Insert(string name, object data, string schema, object state, Func<DataInsertContextBase, bool> inserting = null, Action<DataInsertContextBase> inserted = null)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
@@ -605,7 +605,7 @@ namespace Zongsoft.Data
 				return 0;
 
 			//创建数据访问上下文对象
-			var context = this.CreateInsertContext(name, false, data, scope, state);
+			var context = this.CreateInsertContext(name, false, data, schema, state);
 
 			//处理数据访问操作前的回调
 			if(inserting != null && inserting(context))
@@ -651,20 +651,20 @@ namespace Zongsoft.Data
 			return this.InsertMany(this.GetName<T>(), items, null, state, null, null);
 		}
 
-		public int InsertMany<T>(IEnumerable<T> items, string scope)
+		public int InsertMany<T>(IEnumerable<T> items, string schema)
 		{
 			if(items == null)
 				return 0;
 
-			return this.InsertMany(this.GetName<T>(), items, scope, null, null, null);
+			return this.InsertMany(this.GetName<T>(), items, schema, null, null, null);
 		}
 
-		public int InsertMany<T>(IEnumerable<T> items, string scope, object state, Func<DataInsertContextBase, bool> inserting = null, Action<DataInsertContextBase> inserted = null)
+		public int InsertMany<T>(IEnumerable<T> items, string schema, object state, Func<DataInsertContextBase, bool> inserting = null, Action<DataInsertContextBase> inserted = null)
 		{
 			if(items == null)
 				return 0;
 
-			return this.InsertMany(this.GetName<T>(), items, scope, state, inserting, inserted);
+			return this.InsertMany(this.GetName<T>(), items, schema, state, inserting, inserted);
 		}
 
 		public int InsertMany(string name, IEnumerable items)
@@ -677,12 +677,12 @@ namespace Zongsoft.Data
 			return this.InsertMany(name, items, null, state, null, null);
 		}
 
-		public int InsertMany(string name, IEnumerable items, string scope)
+		public int InsertMany(string name, IEnumerable items, string schema)
 		{
-			return this.InsertMany(name, items, scope, null, null, null);
+			return this.InsertMany(name, items, schema, null, null, null);
 		}
 
-		public int InsertMany(string name, IEnumerable items, string scope, object state, Func<DataInsertContextBase, bool> inserting = null, Action<DataInsertContextBase> inserted = null)
+		public int InsertMany(string name, IEnumerable items, string schema, object state, Func<DataInsertContextBase, bool> inserting = null, Action<DataInsertContextBase> inserted = null)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
@@ -691,7 +691,7 @@ namespace Zongsoft.Data
 				return 0;
 
 			//创建数据访问上下文对象
-			var context = this.CreateInsertContext(name, true, items, scope, state);
+			var context = this.CreateInsertContext(name, true, items, schema, state);
 
 			//处理数据访问操作前的回调
 			if(inserting != null && inserting(context))
@@ -741,20 +741,20 @@ namespace Zongsoft.Data
 			return this.Update(this.GetName(data.GetType()), data, null, string.Empty, state, null, null);
 		}
 
-		public int Update<T>(T data, string scope)
+		public int Update<T>(T data, string schema)
 		{
 			if(data == null)
 				return 0;
 
-			return this.Update(this.GetName(data.GetType()), data, null, scope, null, null, null);
+			return this.Update(this.GetName(data.GetType()), data, null, schema, null, null, null);
 		}
 
-		public int Update<T>(T data, string scope, object state)
+		public int Update<T>(T data, string schema, object state)
 		{
 			if(data == null)
 				return 0;
 
-			return this.Update(this.GetName(data.GetType()), data, null, scope, state, null, null);
+			return this.Update(this.GetName(data.GetType()), data, null, schema, state, null, null);
 		}
 
 		public int Update<T>(T data, ICondition condition)
@@ -773,28 +773,28 @@ namespace Zongsoft.Data
 			return this.Update(this.GetName(data.GetType()), data, condition, string.Empty, state, null, null);
 		}
 
-		public int Update<T>(T data, ICondition condition, string scope)
+		public int Update<T>(T data, ICondition condition, string schema)
 		{
 			if(data == null)
 				return 0;
 
-			return this.Update(this.GetName(data.GetType()), data, condition, scope, null, null, null);
+			return this.Update(this.GetName(data.GetType()), data, condition, schema, null, null, null);
 		}
 
-		public int Update<T>(T data, ICondition condition, string scope, object state)
+		public int Update<T>(T data, ICondition condition, string schema, object state)
 		{
 			if(data == null)
 				return 0;
 
-			return this.Update(this.GetName(data.GetType()), data, condition, scope, state, null, null);
+			return this.Update(this.GetName(data.GetType()), data, condition, schema, state, null, null);
 		}
 
-		public int Update<T>(T data, ICondition condition, string scope, object state, Func<DataUpdateContextBase, bool> updating = null, Action<DataUpdateContextBase> updated = null)
+		public int Update<T>(T data, ICondition condition, string schema, object state, Func<DataUpdateContextBase, bool> updating = null, Action<DataUpdateContextBase> updated = null)
 		{
 			if(data == null)
 				return 0;
 
-			return this.Update(this.GetName(data.GetType()), data, condition, scope, state, updating, updated);
+			return this.Update(this.GetName(data.GetType()), data, condition, schema, state, updating, updated);
 		}
 
 		public int Update(string name, object data)
@@ -807,14 +807,14 @@ namespace Zongsoft.Data
 			return this.Update(name, data, null, string.Empty, state, null, null);
 		}
 
-		public int Update(string name, object data, string scope)
+		public int Update(string name, object data, string schema)
 		{
-			return this.Update(name, data, null, scope, null, null, null);
+			return this.Update(name, data, null, schema, null, null, null);
 		}
 
-		public int Update(string name, object data, string scope, object state)
+		public int Update(string name, object data, string schema, object state)
 		{
-			return this.Update(name, data, null, scope, state, null, null);
+			return this.Update(name, data, null, schema, state, null, null);
 		}
 
 		public int Update(string name, object data, ICondition condition)
@@ -827,9 +827,9 @@ namespace Zongsoft.Data
 			return this.Update(name, data, condition, string.Empty, state, null, null);
 		}
 
-		public int Update(string name, object data, ICondition condition, string scope)
+		public int Update(string name, object data, ICondition condition, string schema)
 		{
-			return this.Update(name, data, condition, scope, null, null, null);
+			return this.Update(name, data, condition, schema, null, null, null);
 		}
 
 		/// <summary>
@@ -838,12 +838,12 @@ namespace Zongsoft.Data
 		/// <param name="name">指定的实体映射名。</param>
 		/// <param name="data">要更新的实体对象。</param>
 		/// <param name="condition">要更新的条件子句，如果为空(null)则根据实体的主键进行更新。</param>
-		/// <param name="scope">指定的要更新的和排除更新的属性名列表，如果指定的是多个属性则属性名之间使用逗号(,)分隔；要排除的属性以感叹号(!)打头，星号(*)表示所有属性，感叹号(!)表示排除所有属性；如果未指定该参数则默认只会更新所有单值属性而不会更新导航属性。</param>
+		/// <param name="schema">指定的要更新的数据模式。</param>
 		/// <param name="state">指定要传入的状态数据。</param>
 		/// <param name="updating">指定的更新前回调函数。</param>
 		/// <param name="updated">指定的更新后回调函数。</param>
 		/// <returns>返回受影响的记录行数，执行成功返回大于零的整数，失败则返回负数。</returns>
-		public int Update(string name, object data, ICondition condition, string scope, object state, Func<DataUpdateContextBase, bool> updating = null, Action<DataUpdateContextBase> updated = null)
+		public int Update(string name, object data, ICondition condition, string schema, object state, Func<DataUpdateContextBase, bool> updating = null, Action<DataUpdateContextBase> updated = null)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
@@ -852,7 +852,7 @@ namespace Zongsoft.Data
 				return 0;
 
 			//创建数据访问上下文对象
-			var context = this.CreateUpdateContext(name, false, data, condition, scope, state);
+			var context = this.CreateUpdateContext(name, false, data, condition, schema, state);
 
 			//处理数据访问操作前的回调
 			if(updating != null && updating(context))
@@ -892,14 +892,14 @@ namespace Zongsoft.Data
 			return this.UpdateMany(this.GetName<T>(), items, string.Empty, state, null, null);
 		}
 
-		public int UpdateMany<T>(IEnumerable<T> items, string scope)
+		public int UpdateMany<T>(IEnumerable<T> items, string schema)
 		{
-			return this.UpdateMany(this.GetName<T>(), items, scope, null, null, null);
+			return this.UpdateMany(this.GetName<T>(), items, schema, null, null, null);
 		}
 
-		public int UpdateMany<T>(IEnumerable<T> items, string scope, object state, Func<DataUpdateContextBase, bool> updating = null, Action<DataUpdateContextBase> updated = null)
+		public int UpdateMany<T>(IEnumerable<T> items, string schema, object state, Func<DataUpdateContextBase, bool> updating = null, Action<DataUpdateContextBase> updated = null)
 		{
-			return this.UpdateMany(this.GetName<T>(), items, scope, state, updating, updated);
+			return this.UpdateMany(this.GetName<T>(), items, schema, state, updating, updated);
 		}
 
 		public int UpdateMany(string name, IEnumerable items)
@@ -912,9 +912,9 @@ namespace Zongsoft.Data
 			return this.UpdateMany(name, items, string.Empty, state, null, null);
 		}
 
-		public int UpdateMany(string name, IEnumerable items, string scope)
+		public int UpdateMany(string name, IEnumerable items, string schema)
 		{
-			return this.UpdateMany(name, items, scope, null, null, null);
+			return this.UpdateMany(name, items, schema, null, null, null);
 		}
 
 		/// <summary>
@@ -922,12 +922,12 @@ namespace Zongsoft.Data
 		/// </summary>
 		/// <param name="name">指定的实体映射名。</param>
 		/// <param name="items">要更新的数据集。</param>
-		/// <param name="scope">指定的要更新的和排除更新的属性名列表，如果指定的是多个属性则属性名之间使用逗号(,)分隔；要排除的属性以感叹号(!)打头，星号(*)表示所有属性，感叹号(!)表示排除所有属性；如果未指定该参数则默认只会更新所有单值属性而不会更新导航属性。</param>
+		/// <param name="schema">指定的要更新的数据模式。</param>
 		/// <param name="state">指定要传入的状态数据。</param>
 		/// <param name="updating">可选的更新前回调委托参数。</param>
 		/// <param name="updated">可选的更新后回调委托参数。</param>
 		/// <returns>返回受影响的记录行数，执行成功返回大于零的整数，失败则返回负数。</returns>
-		public int UpdateMany(string name, IEnumerable items, string scope, object state, Func<DataUpdateContextBase, bool> updating = null, Action<DataUpdateContextBase> updated = null)
+		public int UpdateMany(string name, IEnumerable items, string schema, object state, Func<DataUpdateContextBase, bool> updating = null, Action<DataUpdateContextBase> updated = null)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
@@ -936,7 +936,7 @@ namespace Zongsoft.Data
 				return 0;
 
 			//创建数据访问上下文对象
-			var context = this.CreateUpdateContext(name, true, items, null, scope, state);
+			var context = this.CreateUpdateContext(name, true, items, null, schema, state);
 
 			//处理数据访问操作前的回调
 			if(updating != null && updating(context))
@@ -995,39 +995,39 @@ namespace Zongsoft.Data
 			return this.Select<T>(this.GetName<T>(), condition, null, paging, state, sortings, null, null);
 		}
 
-		public IEnumerable<T> Select<T>(ICondition condition, Paging paging, string scope, params Sorting[] sortings)
+		public IEnumerable<T> Select<T>(ICondition condition, Paging paging, string schema, params Sorting[] sortings)
 		{
-			return this.Select<T>(this.GetName<T>(), condition, scope, paging, null, sortings, null, null);
+			return this.Select<T>(this.GetName<T>(), condition, schema, paging, null, sortings, null, null);
 		}
 
-		public IEnumerable<T> Select<T>(ICondition condition, Paging paging, string scope, object state, params Sorting[] sortings)
+		public IEnumerable<T> Select<T>(ICondition condition, Paging paging, string schema, object state, params Sorting[] sortings)
 		{
-			return this.Select<T>(this.GetName<T>(), condition, scope, paging, state, sortings, null, null);
+			return this.Select<T>(this.GetName<T>(), condition, schema, paging, state, sortings, null, null);
 		}
 
-		public IEnumerable<T> Select<T>(ICondition condition, string scope, params Sorting[] sortings)
+		public IEnumerable<T> Select<T>(ICondition condition, string schema, params Sorting[] sortings)
 		{
-			return this.Select<T>(this.GetName<T>(), condition, scope, null, null, sortings, null, null);
+			return this.Select<T>(this.GetName<T>(), condition, schema, null, null, sortings, null, null);
 		}
 
-		public IEnumerable<T> Select<T>(ICondition condition, string scope, object state, params Sorting[] sortings)
+		public IEnumerable<T> Select<T>(ICondition condition, string schema, object state, params Sorting[] sortings)
 		{
-			return this.Select<T>(this.GetName<T>(), condition, scope, null, state, sortings, null, null);
+			return this.Select<T>(this.GetName<T>(), condition, schema, null, state, sortings, null, null);
 		}
 
-		public IEnumerable<T> Select<T>(ICondition condition, string scope, Paging paging, params Sorting[] sortings)
+		public IEnumerable<T> Select<T>(ICondition condition, string schema, Paging paging, params Sorting[] sortings)
 		{
-			return this.Select<T>(this.GetName<T>(), condition, scope, paging, null, sortings, null, null);
+			return this.Select<T>(this.GetName<T>(), condition, schema, paging, null, sortings, null, null);
 		}
 
-		public IEnumerable<T> Select<T>(ICondition condition, string scope, Paging paging, object state, params Sorting[] sortings)
+		public IEnumerable<T> Select<T>(ICondition condition, string schema, Paging paging, object state, params Sorting[] sortings)
 		{
-			return this.Select<T>(this.GetName<T>(), condition, scope, paging, state, sortings, null, null);
+			return this.Select<T>(this.GetName<T>(), condition, schema, paging, state, sortings, null, null);
 		}
 
-		public IEnumerable<T> Select<T>(ICondition condition, string scope, Paging paging, object state, Sorting[] sortings, Func<DataSelectContextBase, bool> selecting, Action<DataSelectContextBase> selected)
+		public IEnumerable<T> Select<T>(ICondition condition, string schema, Paging paging, object state, Sorting[] sortings, Func<DataSelectContextBase, bool> selecting, Action<DataSelectContextBase> selected)
 		{
-			return this.Select<T>(this.GetName<T>(), condition, scope, paging, state, sortings, selecting, selected);
+			return this.Select<T>(this.GetName<T>(), condition, schema, paging, state, sortings, selecting, selected);
 		}
 
 		public IEnumerable<T> Select<T>(string name, object state = null, params Sorting[] sortings)
@@ -1055,43 +1055,43 @@ namespace Zongsoft.Data
 			return this.Select<T>(name, condition, string.Empty, paging, state, sortings, null, null);
 		}
 
-		public IEnumerable<T> Select<T>(string name, ICondition condition, Paging paging, string scope, params Sorting[] sortings)
+		public IEnumerable<T> Select<T>(string name, ICondition condition, Paging paging, string schema, params Sorting[] sortings)
 		{
-			return this.Select<T>(name, condition, scope, paging, null, sortings, null, null);
+			return this.Select<T>(name, condition, schema, paging, null, sortings, null, null);
 		}
 
-		public IEnumerable<T> Select<T>(string name, ICondition condition, Paging paging, string scope, object state, params Sorting[] sortings)
+		public IEnumerable<T> Select<T>(string name, ICondition condition, Paging paging, string schema, object state, params Sorting[] sortings)
 		{
-			return this.Select<T>(name, condition, scope, paging, state, sortings, null, null);
+			return this.Select<T>(name, condition, schema, paging, state, sortings, null, null);
 		}
 
-		public IEnumerable<T> Select<T>(string name, ICondition condition, string scope, params Sorting[] sortings)
+		public IEnumerable<T> Select<T>(string name, ICondition condition, string schema, params Sorting[] sortings)
 		{
-			return this.Select<T>(name, condition, scope, null, null, sortings, null, null);
+			return this.Select<T>(name, condition, schema, null, null, sortings, null, null);
 		}
 
-		public IEnumerable<T> Select<T>(string name, ICondition condition, string scope, object state, params Sorting[] sortings)
+		public IEnumerable<T> Select<T>(string name, ICondition condition, string schema, object state, params Sorting[] sortings)
 		{
-			return this.Select<T>(name, condition, scope, null, state, sortings, null, null);
+			return this.Select<T>(name, condition, schema, null, state, sortings, null, null);
 		}
 
-		public IEnumerable<T> Select<T>(string name, ICondition condition, string scope, Paging paging, params Sorting[] sortings)
+		public IEnumerable<T> Select<T>(string name, ICondition condition, string schema, Paging paging, params Sorting[] sortings)
 		{
-			return this.Select<T>(name, condition, scope, paging, null, sortings, null, null);
+			return this.Select<T>(name, condition, schema, paging, null, sortings, null, null);
 		}
 
-		public IEnumerable<T> Select<T>(string name, ICondition condition, string scope, Paging paging, object state, params Sorting[] sortings)
+		public IEnumerable<T> Select<T>(string name, ICondition condition, string schema, Paging paging, object state, params Sorting[] sortings)
 		{
-			return this.Select<T>(name, condition, scope, paging, state, sortings, null, null);
+			return this.Select<T>(name, condition, schema, paging, state, sortings, null, null);
 		}
 
-		public IEnumerable<T> Select<T>(string name, ICondition condition, string scope, Paging paging, object state, Sorting[] sortings, Func<DataSelectContextBase, bool> selecting, Action<DataSelectContextBase> selected)
+		public IEnumerable<T> Select<T>(string name, ICondition condition, string schema, Paging paging, object state, Sorting[] sortings, Func<DataSelectContextBase, bool> selecting, Action<DataSelectContextBase> selected)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
 			//创建数据访问上下文对象
-			var context = this.CreateSelectContext(name, typeof(T), condition, null, scope, paging, sortings, state);
+			var context = this.CreateSelectContext(name, typeof(T), condition, null, schema, paging, sortings, state);
 
 			//执行查询方法
 			return this.Select<T>(context, selecting, selected);
@@ -1107,9 +1107,9 @@ namespace Zongsoft.Data
 			return this.Select<T>(name, grouping, null, string.Empty, null, state, sortings, null, null);
 		}
 
-		public IEnumerable<T> Select<T>(string name, Grouping grouping, string scope, object state = null, params Sorting[] sortings)
+		public IEnumerable<T> Select<T>(string name, Grouping grouping, string schema, object state = null, params Sorting[] sortings)
 		{
-			return this.Select<T>(name, grouping, null, scope, null, state, sortings, null, null);
+			return this.Select<T>(name, grouping, null, schema, null, state, sortings, null, null);
 		}
 
 		public IEnumerable<T> Select<T>(string name, Grouping grouping, Paging paging, object state = null, params Sorting[] sortings)
@@ -1117,9 +1117,9 @@ namespace Zongsoft.Data
 			return this.Select<T>(name, grouping, null, string.Empty, paging, state, sortings, null, null);
 		}
 
-		public IEnumerable<T> Select<T>(string name, Grouping grouping, string scope, Paging paging, object state = null, params Sorting[] sortings)
+		public IEnumerable<T> Select<T>(string name, Grouping grouping, string schema, Paging paging, object state = null, params Sorting[] sortings)
 		{
-			return this.Select<T>(name, grouping, null, scope, paging, state, sortings, null, null);
+			return this.Select<T>(name, grouping, null, schema, paging, state, sortings, null, null);
 		}
 
 		public IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, params Sorting[] sortings)
@@ -1132,9 +1132,9 @@ namespace Zongsoft.Data
 			return this.Select<T>(name, grouping, condition, string.Empty, null, state, sortings, null, null);
 		}
 
-		public IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, string scope, object state = null, params Sorting[] sortings)
+		public IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, string schema, object state = null, params Sorting[] sortings)
 		{
-			return this.Select<T>(name, grouping, condition, scope, null, state, sortings, null, null);
+			return this.Select<T>(name, grouping, condition, schema, null, state, sortings, null, null);
 		}
 
 		public IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, Paging paging, object state = null, params Sorting[] sortings)
@@ -1142,18 +1142,18 @@ namespace Zongsoft.Data
 			return this.Select<T>(name, grouping, condition, string.Empty, paging, state, sortings, null, null);
 		}
 
-		public IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, string scope, Paging paging, object state = null, params Sorting[] sortings)
+		public IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, string schema, Paging paging, object state = null, params Sorting[] sortings)
 		{
-			return this.Select<T>(name, grouping, condition, scope, paging, state, sortings, null, null);
+			return this.Select<T>(name, grouping, condition, schema, paging, state, sortings, null, null);
 		}
 
-		public IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, string scope, Paging paging, object state, Sorting[] sortings, Func<DataSelectContextBase, bool> selecting, Action<DataSelectContextBase> selected)
+		public IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, string schema, Paging paging, object state, Sorting[] sortings, Func<DataSelectContextBase, bool> selecting, Action<DataSelectContextBase> selected)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
 			//创建数据访问上下文对象
-			var context = this.CreateSelectContext(name, typeof(T), condition, grouping, scope, paging, sortings, state);
+			var context = this.CreateSelectContext(name, typeof(T), condition, grouping, schema, paging, sortings, state);
 
 			//执行查询方法
 			return this.Select<T>(context, selecting, selected);
@@ -1210,10 +1210,10 @@ namespace Zongsoft.Data
 		protected abstract DataExecuteContextBase CreateExecuteContext(string name, bool isScalar, Type resultType, IDictionary<string, object> inParameters, object state);
 		protected abstract DataIncrementContextBase CreateIncrementContext(string name, string member, ICondition condition, int interval, object state);
 		protected abstract DataDeleteContextBase CreateDeleteContext(string name, ICondition condition, string[] cascades, object state);
-		protected abstract DataInsertContextBase CreateInsertContext(string name, bool isMultiple, object data, string scope, object state);
-		protected abstract DataUpsertContextBase CreateUpsertContext(string name, bool isMultiple, object data, string scope, object state);
-		protected abstract DataUpdateContextBase CreateUpdateContext(string name, bool isMultiple, object data, ICondition condition, string scope, object state);
-		protected abstract DataSelectContextBase CreateSelectContext(string name, Type elementType, ICondition condition, Grouping grouping, string scope, Paging paging, Sorting[] sortings, object state);
+		protected abstract DataInsertContextBase CreateInsertContext(string name, bool isMultiple, object data, string schema, object state);
+		protected abstract DataUpsertContextBase CreateUpsertContext(string name, bool isMultiple, object data, string schema, object state);
+		protected abstract DataUpdateContextBase CreateUpdateContext(string name, bool isMultiple, object data, ICondition condition, string schema, object state);
+		protected abstract DataSelectContextBase CreateSelectContext(string name, Type elementType, ICondition condition, Grouping grouping, string schema, Paging paging, Sorting[] sortings, object state);
 		#endregion
 
 		#region 激发事件
