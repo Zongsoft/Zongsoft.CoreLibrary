@@ -1210,7 +1210,7 @@ namespace Zongsoft.Data
 		protected abstract DataInsertContextBase CreateInsertContext(string name, bool isMultiple, object data, string schema, object state);
 		protected abstract DataUpsertContextBase CreateUpsertContext(string name, bool isMultiple, object data, string schema, object state);
 		protected abstract DataUpdateContextBase CreateUpdateContext(string name, bool isMultiple, object data, ICondition condition, string schema, object state);
-		protected abstract DataSelectContextBase CreateSelectContext(string name, Type elementType, ICondition condition, Grouping grouping, string schema, Paging paging, Sorting[] sortings, object state);
+		protected abstract DataSelectContextBase CreateSelectContext(string name, Type entityType, ICondition condition, Grouping grouping, string schema, Paging paging, Sorting[] sortings, object state);
 		#endregion
 
 		#region 激发事件
