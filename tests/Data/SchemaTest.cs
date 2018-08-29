@@ -47,7 +47,7 @@ namespace Zongsoft.Data
 		{
 			Collections.IReadOnlyNamedCollection<Schema> schemas;
 
-			schemas = Schema.Parse("*, !, a, !b, c, a, forums:100/2(*, !, a, !b, f, moderator(name, avatar))");
+			schemas = Schema.Parse("*, !, a, !b, c, a, forums:100/2{*, !, a, !b, f, moderator{name, avatar}}");
 			Assert.NotEmpty(schemas);
 			Assert.Equal(3, schemas.Count);
 
@@ -90,7 +90,7 @@ namespace Zongsoft.Data
 		{
 			Collections.IReadOnlyNamedCollection<Schema> schemas;
 
-			schemas = Schema.Parse("*, !, a, !b, c, a, forums:100/2[~timestamp, id](*, !, a, !b, f, moderator[name](name, avatar))");
+			schemas = Schema.Parse(@"*, !, a, !b, c, a, forums:100/2(~timestamp, id){*, !, a, !b, f, moderator(name){name, avatar}}");
 			Assert.NotEmpty(schemas);
 			Assert.Equal(3, schemas.Count);
 
@@ -141,6 +141,11 @@ namespace Zongsoft.Data
 		#region 嵌套子类
 		public class Schema : SchemaBase
 		{
+			#region 成员字段
+			private Schema _parent;
+			private INamedCollection<Schema> _children;
+			#endregion
+
 			#region 构造函数
 			public Schema(string name) : base(name)
 			{
@@ -152,7 +157,7 @@ namespace Zongsoft.Data
 			{
 				get
 				{
-					return (Schema)base.GetParent();
+					return _parent;
 				}
 			}
 
@@ -165,6 +170,69 @@ namespace Zongsoft.Data
 
 					return null;
 				}
+			}
+
+			public override bool HasChildren
+			{
+				get
+				{
+					return _children != null && _children.Count > 0;
+				}
+			}
+
+			public IReadOnlyNamedCollection<Schema> Children
+			{
+				get
+				{
+					return (IReadOnlyNamedCollection<Schema>)_children;
+				}
+			}
+			#endregion
+
+			#region 重写方法
+			protected override SchemaBase GetParent()
+			{
+				return _parent;
+			}
+
+			protected override void SetParent(SchemaBase parent)
+			{
+				_parent = (parent as Schema) ?? throw new ArgumentException();
+			}
+
+			protected override bool TryGetChild(string name, out SchemaBase child)
+			{
+				child = null;
+
+				if(_children != null && _children.TryGet(name, out var schema))
+				{
+					child = schema;
+					return true;
+				}
+
+				return false;
+			}
+
+			protected override void AddChild(SchemaBase child)
+			{
+				if(!(child is Schema schema))
+					throw new ArgumentException();
+
+				if(_children == null)
+					System.Threading.Interlocked.CompareExchange(ref _children, new NamedCollection<Schema>(item => item.Name), null);
+
+				_children.Add(schema);
+				schema._parent = this;
+			}
+
+			protected override void RemoveChild(string name)
+			{
+				_children?.Remove(name);
+			}
+
+			protected override void ClearChildren()
+			{
+				_children?.Clear();
 			}
 			#endregion
 

@@ -29,17 +29,15 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
-	public class SchemaBase
+	public abstract class SchemaBase
 	{
 		#region 单例字段
-		internal static readonly SchemaBase Ignores = new SchemaBase("?");
+		internal static readonly SchemaBase Ignores = new EmptySchema();
 		#endregion
 
 		#region 成员字段
-		private SchemaBase _parent;
 		private Sorting[] _sortingArray;
 		private HashSet<Sorting> _sortings;
-		private Collections.NamedCollection<SchemaBase> _children;
 		#endregion
 
 		#region 构造函数
@@ -62,6 +60,37 @@ namespace Zongsoft.Data
 			get;
 		}
 
+		public string Path
+		{
+			get
+			{
+				var parent = this.GetParent();
+
+				if(parent == null)
+					return string.Empty;
+				else
+				{
+					if(string.IsNullOrEmpty(parent.Path))
+						return parent.Name;
+					else
+						return parent.Path + "." + parent.Name;
+				}
+			}
+		}
+
+		public string FullPath
+		{
+			get
+			{
+				var path = this.Path;
+
+				if(string.IsNullOrEmpty(path))
+					return this.Name;
+				else
+					return path + "." + this.Name;
+			}
+		}
+
 		public Paging Paging
 		{
 			get;
@@ -76,28 +105,20 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public bool HasChildren
+		public abstract bool HasChildren
 		{
-			get
-			{
-				return _children != null && _children.Count > 0;
-			}
-		}
-
-		public Collections.IReadOnlyNamedCollection<SchemaBase> Children
-		{
-			get
-			{
-				return _children;
-			}
+			get;
 		}
 		#endregion
 
-		#region 保护属性
-		protected SchemaBase GetParent()
-		{
-			return _parent;
-		}
+		#region 抽象方法
+		protected abstract SchemaBase GetParent();
+		protected abstract void SetParent(SchemaBase parent);
+
+		internal protected abstract bool TryGetChild(string name, out SchemaBase child);
+		internal protected abstract void AddChild(SchemaBase child);
+		internal protected abstract void RemoveChild(string name);
+		internal protected abstract void ClearChildren();
 		#endregion
 
 		#region 内部方法
@@ -112,40 +133,6 @@ namespace Zongsoft.Data
 				_sortings.CopyTo(array);
 				_sortingArray = array;
 			}
-		}
-
-		internal bool TryGetChild(string name, out SchemaBase child)
-		{
-			child = null;
-
-			if(_children != null)
-				return _children.TryGet(name, out child);
-
-			return false;
-		}
-
-		internal bool ContainsChild(string name)
-		{
-			return _children != null && _children.Contains(name);
-		}
-
-		internal void AddChild(SchemaBase child)
-		{
-			if(_children == null)
-				System.Threading.Interlocked.CompareExchange(ref _children, new Collections.NamedCollection<SchemaBase>(segment => segment.Name), null);
-
-			_children.Add(child);
-			child._parent = this;
-		}
-
-		internal void RemoveChild(string name)
-		{
-			_children?.Remove(name);
-		}
-
-		internal void ClearChildren()
-		{
-			_children?.Clear();
 		}
 		#endregion
 
@@ -173,55 +160,7 @@ namespace Zongsoft.Data
 
 		public override string ToString()
 		{
-			var index = 0;
-			var text = this.Name;
-
-			if(this.Paging != null)
-			{
-				if(Paging.IsDisabled(this.Paging))
-					text += ":*";
-				else
-					text += ":" + (this.Paging.PageIndex == 1 ?
-								   this.Paging.PageSize.ToString() :
-								   this.Paging.PageIndex.ToString() + "/" + this.Paging.PageSize.ToString());
-			}
-
-			if(this.Sortings != null && this.Sortings.Length > 0)
-			{
-				index = 0;
-				text += "[";
-
-				foreach(var sorting in this.Sortings)
-				{
-					if(index++ > 0)
-						text += ", ";
-
-					if(sorting.Mode == SortingMode.Ascending)
-						text += sorting.Name;
-					else
-						text += "~" + sorting.Name;
-				}
-
-				text += "]";
-			}
-
-			if(_children != null && _children.Count > 0)
-			{
-				index = 0;
-				text += "(";
-
-				foreach(var child in _children)
-				{
-					if(index++ > 0)
-						text += ", ";
-
-					text += child.ToString();
-				}
-
-				text += ")";
-			}
-
-			return text;
+			return this.FullPath;
 		}
 		#endregion
 
@@ -252,6 +191,39 @@ namespace Zongsoft.Data
 			{
 				this.Name = name;
 				this.Parent = parent;
+			}
+		}
+
+		private class EmptySchema : SchemaBase
+		{
+			public override string Name => "?";
+			public override bool HasChildren => false;
+
+			protected override SchemaBase GetParent()
+			{
+				return null;
+			}
+
+			protected override void SetParent(SchemaBase parent)
+			{
+			}
+
+			protected internal override void AddChild(SchemaBase child)
+			{
+			}
+
+			protected internal override void ClearChildren()
+			{
+			}
+
+			protected internal override void RemoveChild(string name)
+			{
+			}
+
+			protected internal override bool TryGetChild(string name, out SchemaBase child)
+			{
+				child = null;
+				return false;
 			}
 		}
 

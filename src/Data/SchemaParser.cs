@@ -120,7 +120,7 @@ namespace Zongsoft.Data
 				case '!':
 					context.State = State.Exclude;
 					return true;
-				case ')':
+				case '}':
 					return context.Pop() != null;
 				default:
 					if(context.IsLetterOrUnderscore())
@@ -143,7 +143,7 @@ namespace Zongsoft.Data
 					context.Include("*");
 					context.State = State.None;
 					return true;
-				case ')':
+				case '}':
 					context.Include("*");
 					context.Pop();
 					context.State = State.None;
@@ -162,7 +162,7 @@ namespace Zongsoft.Data
 					context.Exclude();
 					context.State = State.None;
 					break;
-				case ')':
+				case '}':
 					context.Exclude();
 					context.Pop();
 					context.State = State.None;
@@ -213,16 +213,16 @@ namespace Zongsoft.Data
 					context.Include();
 					context.State = State.PagingCount;
 					break;
-				case '[':
+				case '(':
 					context.Include();
 					context.State = State.SortingField;
 					break;
-				case '(':
+				case '{':
 					context.Include();
 					context.Push();
 					context.State = State.None;
 					break;
-				case ')':
+				case '}':
 					context.Include();
 					context.Pop();
 					context.State = State.None;
@@ -291,7 +291,7 @@ namespace Zongsoft.Data
 					context.State = State.PagingSize;
 
 					return true;
-				case '[':
+				case '(':
 					if(!context.TryGetBuffer(out buffer))
 					{
 						context.OnError("");
@@ -301,7 +301,7 @@ namespace Zongsoft.Data
 					context.Current.Paging = Paging.Page(1, int.Parse(buffer));
 					context.State = State.SortingField;
 					return true;
-				case '(':
+				case '{':
 					if(!context.TryGetBuffer(out buffer))
 					{
 						context.OnError("");
@@ -350,7 +350,7 @@ namespace Zongsoft.Data
 					context.Current.Paging.PageSize = int.Parse(buffer);
 					context.State = State.None;
 					return true;
-				case '[':
+				case '(':
 					if(!context.TryGetBuffer(out buffer))
 					{
 						context.OnError("");
@@ -362,7 +362,7 @@ namespace Zongsoft.Data
 
 					context.State = State.SortingField;
 					return true;
-				case '(':
+				case '{':
 					if(!context.TryGetBuffer(out buffer))
 					{
 						context.OnError("");
@@ -409,7 +409,7 @@ namespace Zongsoft.Data
 					}
 
 					return false;
-				case ']':
+				case ')':
 					if(context.AddSorting())
 					{
 						context.State = State.Include;
@@ -746,7 +746,7 @@ namespace Zongsoft.Data
 				{
 					foreach(var item in items)
 					{
-						if(token.Parent.ContainsChild(item.Name))
+						if(token.Parent.TryGetChild(item.Name, out _))
 							_current = item;
 						else
 							token.Parent.AddChild(_current = item);
