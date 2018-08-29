@@ -357,7 +357,7 @@ namespace Zongsoft.Data
 	public class DataSelectContextBase : DataAccessContextBase
 	{
 		#region 成员字段
-		private Type _elementType;
+		private Type _entityType;
 		private IEnumerable _result;
 		private IEnumerable _filteringResult;
 		private ICondition _condition;
@@ -369,9 +369,9 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		protected DataSelectContextBase(IDataAccess dataAccess, string name, Type elementType, Grouping grouping, ICondition condition, string schema, Paging paging, Sorting[] sortings, object state = null) : base(dataAccess, name, DataAccessMethod.Select, state)
+		protected DataSelectContextBase(IDataAccess dataAccess, string name, Type entityType, Grouping grouping, ICondition condition, string schema, Paging paging, Sorting[] sortings, object state = null) : base(dataAccess, name, DataAccessMethod.Select, state)
 		{
-			_elementType = elementType ?? typeof(object);
+			_entityType = entityType ?? typeof(object);
 			_grouping = grouping;
 			_condition = condition;
 			_schema = schema;
@@ -384,11 +384,11 @@ namespace Zongsoft.Data
 		/// <summary>
 		/// 获取查询要返回的结果集元素类型。
 		/// </summary>
-		public Type ElementType
+		public Type EntityType
 		{
 			get
 			{
-				return _elementType;
+				return _entityType;
 			}
 		}
 
@@ -410,7 +410,7 @@ namespace Zongsoft.Data
 					{
 						if(_filteringResult == null)
 						{
-							var type = typeof(DataFilterEnumerable<,>).MakeGenericType(this.GetType(), _elementType);
+							var type = typeof(DataFilterEnumerable<,>).MakeGenericType(this.GetType(), _entityType);
 							_filteringResult = (IEnumerable)System.Activator.CreateInstance(type, new object[] { this, _result, _resultFilter });
 						}
 					}
@@ -693,7 +693,7 @@ namespace Zongsoft.Data
 		/// <summary>
 		/// 获取插入数据的元素类型。
 		/// </summary>
-		public virtual Type ElementType
+		public virtual Type EntityType
 		{
 			get
 			{
@@ -798,7 +798,7 @@ namespace Zongsoft.Data
 		/// <summary>
 		/// 获取更新数据的元素类型。
 		/// </summary>
-		public virtual Type ElementType
+		public virtual Type EntityType
 		{
 			get
 			{
@@ -920,7 +920,7 @@ namespace Zongsoft.Data
 		/// <summary>
 		/// 获取操作数据的元素类型。
 		/// </summary>
-		public virtual Type ElementType
+		public virtual Type EntityType
 		{
 			get
 			{
