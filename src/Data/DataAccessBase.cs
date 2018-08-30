@@ -1382,7 +1382,7 @@ namespace Zongsoft.Data
 		}
 
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
-		private void InvokeFilters(DataAccessContextBase context, Action<IDataAccessFilter, DataAccessContextBase> invoke)
+		private void InvokeFilters(IDataAccessContextBase context, Action<IDataAccessFilter, IDataAccessContextBase> invoke)
 		{
 			foreach(var filter in _filters)
 			{

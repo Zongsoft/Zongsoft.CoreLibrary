@@ -126,6 +126,7 @@
     <Compile Include="Data\Entity.cs" />
     <Compile Include="Data\DataUpsertedEventArgs.cs" />
     <Compile Include="Data\DataUpseringEventArgs.cs" />
+    <Compile Include="Data\IDataAccessContextBase.cs" />
     <Compile Include="Data\IDataAccessProvider.cs" />
     <Compile Include="Data\IEntity.cs" />
     <Compile Include="Data\Range.cs" />

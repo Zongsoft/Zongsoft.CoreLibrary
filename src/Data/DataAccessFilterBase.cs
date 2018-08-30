@@ -29,7 +29,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
-	public abstract class DataAccessFilterBase : IDataAccessFilter, Zongsoft.Services.IPredication<DataAccessContextBase>
+	public abstract class DataAccessFilterBase : IDataAccessFilter, Zongsoft.Services.IPredication<IDataAccessContextBase>
 	{
 		#region 成员字段
 		private readonly int _flags;
@@ -92,7 +92,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 过滤方法
-		protected virtual void OnFiltered(DataAccessContextBase context)
+		protected virtual void OnFiltered(IDataAccessContextBase context)
 		{
 			switch(context.Method)
 			{
@@ -126,7 +126,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		protected virtual void OnFiltering(DataAccessContextBase context)
+		protected virtual void OnFiltering(IDataAccessContextBase context)
 		{
 			switch(context.Method)
 			{
@@ -160,12 +160,12 @@ namespace Zongsoft.Data
 			}
 		}
 
-		void IDataAccessFilter.OnFiltered(DataAccessContextBase context)
+		void IDataAccessFilter.OnFiltered(IDataAccessContextBase context)
 		{
 			this.OnFiltered(context);
 		}
 
-		void IDataAccessFilter.OnFiltering(DataAccessContextBase context)
+		void IDataAccessFilter.OnFiltering(IDataAccessContextBase context)
 		{
 			this.OnFiltering(context);
 		}
@@ -246,7 +246,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 断言方法
-		public virtual bool Predicate(DataAccessContextBase context)
+		public virtual bool Predicate(IDataAccessContextBase context)
 		{
 			if(_flags != 0)
 			{
@@ -264,7 +264,7 @@ namespace Zongsoft.Data
 
 		bool Zongsoft.Services.IPredication.Predicate(object parameter)
 		{
-			var context = parameter as DataAccessContextBase;
+			var context = parameter as IDataAccessContextBase;
 
 			if(context == null)
 				return false;
