@@ -28,7 +28,7 @@ using System;
 
 namespace Zongsoft.Data
 {
-	public class DataAccessEventArgs<TContext> : EventArgs where TContext : DataAccessContextBase
+	public class DataAccessEventArgs<TContext> : EventArgs where TContext : IDataAccessContextBase
 	{
 		#region 成员字段
 		private TContext _context;

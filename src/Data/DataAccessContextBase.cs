@@ -33,7 +33,7 @@ namespace Zongsoft.Data
 	/// <summary>
 	/// 表示数据访问的上下文基类。
 	/// </summary>
-	public abstract class DataAccessContextBase : System.ComponentModel.INotifyPropertyChanged
+	public abstract class DataAccessContextBase : IDataAccessContextBase, System.ComponentModel.INotifyPropertyChanged
 	{
 		#region 事件定义
 		public event PropertyChangedEventHandler PropertyChanged;

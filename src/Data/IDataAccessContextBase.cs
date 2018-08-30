@@ -25,16 +25,54 @@
  */
 
 using System;
+using System.ComponentModel;
 using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
 	/// <summary>
-	/// 表示数据访问过滤器的接口。
+	/// 表示数据访问的上下文的基本接口。
 	/// </summary>
-	public interface IDataAccessFilter
+	public interface IDataAccessContextBase
 	{
-		void OnFiltered(IDataAccessContextBase context);
-		void OnFiltering(IDataAccessContextBase context);
+		/// <summary>
+		/// 获取数据访问的名称。
+		/// </summary>
+		string Name
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取数据访问的方法。
+		/// </summary>
+		DataAccessMethod Method
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取当前上下文关联的数据访问器。
+		/// </summary>
+		IDataAccess DataAccess
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取一个值，指示当前上下文是否含有附加的状态数据。
+		/// </summary>
+		bool HasStates
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取当前上下文的附加状态数据集。
+		/// </summary>
+		IDictionary<string, object> States
+		{
+			get;
+		}
 	}
 }

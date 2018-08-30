@@ -953,7 +953,7 @@ namespace Zongsoft.Data
 	}
 
 	#region 过滤遍历器类
-	internal class DataFilterEnumerable<TContext, TEntity> : IEnumerable<TEntity> where TContext : DataAccessContextBase
+	internal class DataFilterEnumerable<TContext, TEntity> : IEnumerable<TEntity> where TContext : IDataAccessContextBase
 	{
 		private TContext _context;
 		private IEnumerable _source;
