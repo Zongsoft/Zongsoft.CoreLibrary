@@ -32,22 +32,22 @@ namespace Zongsoft.Data
 	internal static class SchemaParser
 	{
 		#region 公共方法
-		public static bool TryParse<T>(string text, out Collections.IReadOnlyNamedCollection<T> result, Func<SchemaBase.Token, IEnumerable<T>> mapper) where T : SchemaBase
+		public static bool TryParse<T>(string text, out Collections.IReadOnlyNamedCollection<T> result, Func<SchemaBase.Token, IEnumerable<T>> mapper, object data) where T : SchemaBase
 		{
-			return (result = Parse(text, mapper, null)) != null;
+			return (result = Parse(text, mapper, null, data)) != null;
 		}
 
-		public static Collections.IReadOnlyNamedCollection<T> Parse<T>(string text, Func<SchemaBase.Token, IEnumerable<T>> mapper) where T : SchemaBase
+		public static Collections.IReadOnlyNamedCollection<T> Parse<T>(string text, Func<SchemaBase.Token, IEnumerable<T>> mapper, object data) where T : SchemaBase
 		{
-			return Parse(text, mapper, message => throw new InvalidOperationException(message));
+			return Parse(text, mapper, message => throw new InvalidOperationException(message), data);
 		}
 
-		public static Collections.IReadOnlyNamedCollection<T> Parse<T>(string text, Func<SchemaBase.Token, IEnumerable<T>> mapper, Action<string> onError) where T : SchemaBase
+		public static Collections.IReadOnlyNamedCollection<T> Parse<T>(string text, Func<SchemaBase.Token, IEnumerable<T>> mapper, Action<string> onError, object data) where T : SchemaBase
 		{
 			if(string.IsNullOrEmpty(text))
 				return null;
 
-			var context = new StateContext<T>(text.Length, mapper, onError);
+			var context = new StateContext<T>(text.Length, mapper, onError, data);
 
 			for(int i = 0; i < text.Length; i++)
 			{
@@ -454,6 +454,7 @@ namespace Zongsoft.Data
 			private readonly char[] _buffer;
 			private readonly Action<string> _onError;
 			private readonly Func<SchemaBase.Token, IEnumerable<T>> _mapper;
+			private object _data;
 			private SchemaBase _current;
 			private Stack<SchemaBase> _stack;
 			private Collections.INamedCollection<T> _elements;
@@ -466,13 +467,14 @@ namespace Zongsoft.Data
 			#endregion
 
 			#region 构造函数
-			public StateContext(int length, Func<SchemaBase.Token, IEnumerable<T>> mapper, Action<string> onError)
+			public StateContext(int length, Func<SchemaBase.Token, IEnumerable<T>> mapper, Action<string> onError, object data)
 			{
 				_bufferIndex = 0;
 				_buffer = new char[length];
 				_current = null;
 				_mapper = mapper;
 				_onError = onError;
+				_data = data;
 				_stack = new Stack<SchemaBase>();
 
 				this.Character = '\0';
@@ -727,7 +729,9 @@ namespace Zongsoft.Data
 				//重置当前段
 				_current = null;
 
+				token.Data = _data;
 				var items = _mapper(token);
+				_data = token.Data;
 
 				if(items == null)
 					return;
