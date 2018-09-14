@@ -32,17 +32,17 @@ namespace Zongsoft.Data
 	internal static class SchemaParser
 	{
 		#region 公共方法
-		public static bool TryParse<T>(string text, out Collections.IReadOnlyNamedCollection<T> result, Func<SchemaBase.Token, IEnumerable<T>> mapper, object data) where T : SchemaBase
+		public static bool TryParse<T>(string text, out Collections.IReadOnlyNamedCollection<T> result, Func<SchemaBase.Token<T>, IEnumerable<T>> mapper, object data) where T : SchemaBase
 		{
 			return (result = Parse(text, mapper, null, data)) != null;
 		}
 
-		public static Collections.IReadOnlyNamedCollection<T> Parse<T>(string text, Func<SchemaBase.Token, IEnumerable<T>> mapper, object data) where T : SchemaBase
+		public static Collections.IReadOnlyNamedCollection<T> Parse<T>(string text, Func<SchemaBase.Token<T>, IEnumerable<T>> mapper, object data) where T : SchemaBase
 		{
 			return Parse(text, mapper, message => throw new InvalidOperationException(message), data);
 		}
 
-		public static Collections.IReadOnlyNamedCollection<T> Parse<T>(string text, Func<SchemaBase.Token, IEnumerable<T>> mapper, Action<string> onError, object data) where T : SchemaBase
+		public static Collections.IReadOnlyNamedCollection<T> Parse<T>(string text, Func<SchemaBase.Token<T>, IEnumerable<T>> mapper, Action<string> onError, object data) where T : SchemaBase
 		{
 			if(string.IsNullOrEmpty(text))
 				return null;
@@ -453,8 +453,8 @@ namespace Zongsoft.Data
 			private int _bufferIndex;
 			private readonly char[] _buffer;
 			private readonly Action<string> _onError;
-			private readonly Func<SchemaBase.Token, IEnumerable<T>> _mapper;
-			private object _data;
+			private readonly Func<SchemaBase.Token<T>, IEnumerable<T>> _mapper;
+			private readonly SchemaBase.Token<T> _token;
 			private SchemaBase _current;
 			private Stack<SchemaBase> _stack;
 			private Collections.INamedCollection<T> _elements;
@@ -467,14 +467,14 @@ namespace Zongsoft.Data
 			#endregion
 
 			#region 构造函数
-			public StateContext(int length, Func<SchemaBase.Token, IEnumerable<T>> mapper, Action<string> onError, object data)
+			public StateContext(int length, Func<SchemaBase.Token<T>, IEnumerable<T>> mapper, Action<string> onError, object data)
 			{
 				_bufferIndex = 0;
 				_buffer = new char[length];
 				_current = null;
 				_mapper = mapper;
 				_onError = onError;
-				_data = data;
+				_token = new SchemaBase.Token<T>(data);
 				_stack = new Stack<SchemaBase>();
 
 				this.Character = '\0';
@@ -588,7 +588,7 @@ namespace Zongsoft.Data
 					if(_elements.TryGet(name, out current))
 						_current = current;
 					else
-						this.Map(new SchemaBase.Token(name, null));
+						this.Map(name, null);
 				}
 				else
 				{
@@ -599,7 +599,7 @@ namespace Zongsoft.Data
 					if(parent.TryGetChild(name, out var child))
 						_current = child;
 					else
-						this.Map(new SchemaBase.Token(name, parent));
+						this.Map(name, parent);
 				}
 			}
 
@@ -724,19 +724,20 @@ namespace Zongsoft.Data
 			#endregion
 
 			#region 私有方法
-			private void Map(SchemaBase.Token token)
+			private void Map(string name, SchemaBase parent)
 			{
 				//重置当前段
 				_current = null;
 
-				token.Data = _data;
-				var items = _mapper(token);
-				_data = token.Data;
+				_token.Name = name;
+				_token.Parent = (T)parent;
+
+				var items = _mapper(_token);
 
 				if(items == null)
 					return;
 
-				if(token.Parent == null)
+				if(_token.Parent == null)
 				{
 					foreach(var item in items)
 					{
@@ -750,10 +751,10 @@ namespace Zongsoft.Data
 				{
 					foreach(var item in items)
 					{
-						if(token.Parent.TryGetChild(item.Name, out _))
+						if(_token.Parent.TryGetChild(item.Name, out _))
 							_current = item;
 						else
-							token.Parent.AddChild(_current = item);
+							_token.Parent.AddChild(_current = item);
 					}
 				}
 			}

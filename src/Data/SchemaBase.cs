@@ -165,43 +165,61 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 解析方法
-		protected static bool TryParse<T>(string text, out Collections.IReadOnlyNamedCollection<T> result, Func<Token, IEnumerable<T>> mapper, object data = null) where T : SchemaBase
+		protected static bool TryParse<T>(string text, out Collections.IReadOnlyNamedCollection<T> result, Func<Token<T>, IEnumerable<T>> mapper, object data = null) where T : SchemaBase
 		{
 			return (result = SchemaParser.Parse(text, mapper, null, data)) != null;
 		}
 
-		protected static Collections.IReadOnlyNamedCollection<T> Parse<T>(string text, Func<Token, IEnumerable<T>> mapper, object data = null) where T : SchemaBase
+		protected static Collections.IReadOnlyNamedCollection<T> Parse<T>(string text, Func<Token<T>, IEnumerable<T>> mapper, object data = null) where T : SchemaBase
 		{
 			return SchemaParser.Parse(text, mapper, message => throw new InvalidOperationException(message), data);
 		}
 
-		protected static Collections.IReadOnlyNamedCollection<T> Parse<T>(string text, Func<Token, IEnumerable<T>> mapper, Action<string> onError, object data = null) where T : SchemaBase
+		protected static Collections.IReadOnlyNamedCollection<T> Parse<T>(string text, Func<Token<T>, IEnumerable<T>> mapper, Action<string> onError, object data = null) where T : SchemaBase
 		{
 			return SchemaParser.Parse(text, mapper, onError, data);
 		}
 		#endregion
 
 		#region 嵌套子类
-		internal protected struct Token
+		/// <summary>
+		/// 表示数据模式解析中的元素描述类。
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		internal protected class Token<T> where T : SchemaBase
 		{
-			#region 公共字段
-			public readonly string Name;
-			public readonly SchemaBase Parent;
-			#endregion
-
 			#region 构造函数
-			internal Token(string name, SchemaBase parent)
+			internal Token(object data)
 			{
-				this.Name = name;
-				this.Parent = parent;
-				this.Data = null;
+				this.Data = data;
 			}
 			#endregion
 
 			#region 公共属性
 			/// <summary>
+			/// 获取当前元素的名称。
+			/// </summary>
+			public string Name
+			{
+				get;
+				internal set;
+			}
+
+			/// <summary>
+			/// 获取当前元素的父元素。
+			/// </summary>
+			public T Parent
+			{
+				get;
+				internal set;
+			}
+
+			/// <summary>
 			/// 获取或设置用户自定义数据。
 			/// </summary>
+			/// <remarks>
+			///		<para>设置的用户自定义数据，会传给下一个元素解析描述。</para>
+			/// </remarks>
 			public object Data
 			{
 				get;

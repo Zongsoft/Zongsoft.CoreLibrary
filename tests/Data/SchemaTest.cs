@@ -239,17 +239,17 @@ namespace Zongsoft.Data
 			#region 解析方法
 			public static Collections.IReadOnlyNamedCollection<Schema> Parse(string text)
 			{
-				return SchemaBase.Parse(text, token => Resolve(token));
+				return SchemaBase.Parse<Schema>(text, token => Resolve(token));
 			}
 
 			public static Collections.IReadOnlyNamedCollection<Schema> Parse(string text, Action<string> onError)
 			{
-				return SchemaBase.Parse(text, token => Resolve(token), onError);
+				return SchemaBase.Parse<Schema>(text, token => Resolve(token), onError);
 			}
 			#endregion
 
 			#region 私有方法
-			private static IEnumerable<Schema> Resolve(Token token)
+			private static IEnumerable<Schema> Resolve(Token<Schema> token)
 			{
 				if(string.IsNullOrWhiteSpace(token.Name))
 					throw new InvalidOperationException();
