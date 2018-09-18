@@ -32,5 +32,52 @@ namespace Zongsoft.Reflection
 {
 	public static class Reflector
 	{
+		public static object GetValue(this MemberInfo member, object target)
+		{
+			switch(member.MemberType)
+			{
+				case MemberTypes.Field:
+					return GetValue((FieldInfo)member, target);
+				case MemberTypes.Property:
+					return GetValue((PropertyInfo)member, target);
+				default:
+					throw new NotSupportedException("Invalid member type.");
+			}
+		}
+
+		public static object GetValue(this FieldInfo field, object target)
+		{
+			throw new NotImplementedException();
+		}
+
+		public static object GetValue(this PropertyInfo property, object target)
+		{
+			throw new NotImplementedException();
+		}
+
+		public static void SetValue(this MemberInfo member, object target, object value)
+		{
+			switch(member.MemberType)
+			{
+				case MemberTypes.Field:
+					SetValue((FieldInfo)member, target, value);
+					break;
+				case MemberTypes.Property:
+					SetValue((PropertyInfo)member, target, value);
+					break;
+				default:
+					throw new NotSupportedException("Invalid member type.");
+			}
+		}
+
+		public static void SetValue(this FieldInfo field, object target, object value)
+		{
+			throw new NotImplementedException();
+		}
+
+		public static void SetValue(this PropertyInfo property, object target, object value)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }
