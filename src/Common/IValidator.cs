@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
@@ -39,8 +39,8 @@ namespace Zongsoft.Common
 		/// 验证指定的数据是否有效。
 		/// </summary>
 		/// <param name="data">指定的待验证的数据。</param>
-		/// <param name="failure">当内部验证失败的回调处理函数。该回调函数返回一个布尔值（真或假）作为整个验证方法的返回值，空(null)表示继续后续的验证环节。</param>
+		/// <param name="failure">当内部验证失败的回调处理函数，传入的字符串参数表示验证失败的消息文本。</param>
 		/// <returns>如果验证通过则返回真(True)，否则返回假(False)。</returns>
-		bool Validate(T data, Func<string, string, bool?> failure = null);
+		bool Validate(T data, Action<string> failure = null);
 	}
 }
