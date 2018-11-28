@@ -161,6 +161,26 @@ namespace Zongsoft.Data
 				return Zongsoft.ComponentModel.ApplicationContextBase.Current.Principal as Zongsoft.Security.CredentialPrincipal;
 			}
 		}
+
+		protected virtual bool CanDelete
+		{
+			get => true;
+		}
+
+		protected virtual bool CanInsert
+		{
+			get => true;
+		}
+
+		protected virtual bool CanUpdate
+		{
+			get => true;
+		}
+
+		protected virtual bool CanUpsert
+		{
+			get => true;
+		}
 		#endregion
 
 		#region 执行方法
@@ -264,47 +284,71 @@ namespace Zongsoft.Data
 		#region 删除方法
 		public virtual int Delete<TKey>(TKey key, string schema = null)
 		{
+			//确认是否可以执行该操作
+			this.EnsureDelete();
+
 			bool singleton;
 			return this.OnDelete(this.ConvertKey(key, out singleton), schema, null);
 		}
 
 		public virtual int Delete<TKey>(TKey key, string schema, object state)
 		{
+			//确认是否可以执行该操作
+			this.EnsureDelete();
+
 			bool singleton;
 			return this.OnDelete(this.ConvertKey(key, out singleton), schema, state);
 		}
 
 		public virtual int Delete<TKey1, TKey2>(TKey1 key1, TKey2 key2, string schema = null)
 		{
+			//确认是否可以执行该操作
+			this.EnsureDelete();
+
 			bool singleton;
 			return this.OnDelete(this.ConvertKey(key1, key2, out singleton), schema, null);
 		}
 
 		public virtual int Delete<TKey1, TKey2>(TKey1 key1, TKey2 key2, string schema, object state)
 		{
+			//确认是否可以执行该操作
+			this.EnsureDelete();
+
 			bool singleton;
 			return this.OnDelete(this.ConvertKey(key1, key2, out singleton), schema, state);
 		}
 
 		public virtual int Delete<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string schema = null)
 		{
+			//确认是否可以执行该操作
+			this.EnsureDelete();
+
 			bool singleton;
 			return this.OnDelete(this.ConvertKey(key1, key2, key3, out singleton), schema, null);
 		}
 
 		public virtual int Delete<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string schema, object state)
 		{
+			//确认是否可以执行该操作
+			this.EnsureDelete();
+
 			bool singleton;
 			return this.OnDelete(this.ConvertKey(key1, key2, key3, out singleton), schema, state);
 		}
 
 		public int Delete(ICondition condition, string schema = null)
 		{
+			//确认是否可以执行该操作
+			this.EnsureDelete();
+
 			return this.OnDelete(condition, schema, null);
 		}
 
 		public int Delete(ICondition condition, string schema, object state)
 		{
+			//确认是否可以执行该操作
+			this.EnsureDelete();
+
 			return this.OnDelete(condition, schema, state);
 		}
 
@@ -320,21 +364,33 @@ namespace Zongsoft.Data
 		#region 插入方法
 		public int Insert(object data)
 		{
+			//确认是否可以执行该操作
+			this.EnsureInsert();
+
 			return this.Insert(data, null, null);
 		}
 
 		public int Insert(object data, object state)
 		{
+			//确认是否可以执行该操作
+			this.EnsureInsert();
+
 			return this.Insert(data, null, state);
 		}
 
 		public int Insert(object data, string schema)
 		{
+			//确认是否可以执行该操作
+			this.EnsureInsert();
+
 			return this.Insert(data, schema, null);
 		}
 
 		public int Insert(object data, string schema, object state)
 		{
+			//确认是否可以执行该操作
+			this.EnsureInsert();
+
 			if(data == null)
 				return 0;
 
@@ -349,21 +405,33 @@ namespace Zongsoft.Data
 
 		public int InsertMany(IEnumerable data)
 		{
+			//确认是否可以执行该操作
+			this.EnsureInsert();
+
 			return this.InsertMany(data, null, null);
 		}
 
 		public int InsertMany(IEnumerable data, object state)
 		{
+			//确认是否可以执行该操作
+			this.EnsureInsert();
+
 			return this.InsertMany(data, null, state);
 		}
 
 		public int InsertMany(IEnumerable data, string schema)
 		{
+			//确认是否可以执行该操作
+			this.EnsureInsert();
+
 			return this.InsertMany(data, schema, null);
 		}
 
 		public int InsertMany(IEnumerable data, string schema, object state)
 		{
+			//确认是否可以执行该操作
+			this.EnsureInsert();
+
 			if(data == null)
 				return 0;
 
@@ -449,6 +517,9 @@ namespace Zongsoft.Data
 
 		public int Update(object data, ICondition condition, string schema, object state = null)
 		{
+			//确认是否可以执行该操作
+			this.EnsureUpdate();
+
 			return this.OnUpdate(DataDictionary.GetDictionary(data), condition, schema, state);
 		}
 
@@ -459,6 +530,9 @@ namespace Zongsoft.Data
 
 		public int UpdateMany(IEnumerable items, string schema, object state = null)
 		{
+			//确认是否可以执行该操作
+			this.EnsureUpdate();
+
 			return this.OnUpdateMany(DataDictionary.GetDictionaries(items), schema, state);
 		}
 
@@ -1183,6 +1257,34 @@ namespace Zongsoft.Data
 			}
 
 			return condition;
+		}
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		private void EnsureDelete()
+		{
+			if(!this.CanDelete)
+				throw new InvalidOperationException("The delete operation is not allowed.");
+		}
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		private void EnsureInsert()
+		{
+			if(!this.CanInsert)
+				throw new InvalidOperationException("The insert operation is not allowed.");
+		}
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		private void EnsureUpdate()
+		{
+			if(!this.CanUpdate)
+				throw new InvalidOperationException("The update operation is not allowed.");
+		}
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		private void EnsureUpsert()
+		{
+			if(!this.CanUpsert)
+				throw new InvalidOperationException("The upsert operation is not allowed.");
 		}
 		#endregion
 
