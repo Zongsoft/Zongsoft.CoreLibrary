@@ -175,7 +175,18 @@ namespace Zongsoft.Data
 				return new Condition(name, value, ConditionOperator.Like);
 		}
 
-		public static Condition Between<T>(string name, T begin, T end) where T : IComparable<T>
+		public static Condition Between<T>(string name, Range<T> range) where T : struct, IComparable<T>
+		{
+			if(range.IsEmpty)
+				return null;
+
+			if(range.Minimum.HasValue)
+				return range.Maximum.HasValue ? new Condition(name, new T[] { range.Minimum.Value, range.Maximum.Value }, ConditionOperator.Between) : Condition.GreaterThanEqual(name, range.Minimum.Value);
+			else
+				return range.Maximum.HasValue ? Condition.LessThanEqual(name, range.Maximum.Value) : null;
+		}
+
+		public static Condition Between<T>(string name, T begin, T end) where T : struct, IComparable<T>
 		{
 			return new Condition(name, new T[] { begin, end }, ConditionOperator.Between);
 		}
@@ -450,7 +461,12 @@ namespace Zongsoft.Data
 				return Condition.Like(name, value);
 			}
 
-			public static Condition Between<TValue>(string name, TValue begin, TValue end) where TValue : IComparable<TValue>
+			public static Condition Between<TValue>(string name, Range<TValue> range) where TValue : struct, IComparable<TValue>
+			{
+				return Condition.Between<TValue>(name, range);
+			}
+
+			public static Condition Between<TValue>(string name, TValue begin, TValue end) where TValue : struct, IComparable<TValue>
 			{
 				return Condition.Between<TValue>(name, begin, end);
 			}
@@ -517,12 +533,17 @@ namespace Zongsoft.Data
 				return Condition.Like(Common.ExpressionUtility.GetMemberName(member), value);
 			}
 
-			public static Condition Between<TValue>(Expression<Func<T, TValue>> member, TValue? begin, TValue? end) where TValue : struct, IComparable<TValue>
+			public static Condition Between<TValue>(Expression<Func<T, TValue>> member, Range<TValue> range) where TValue : struct, IComparable<TValue>
+			{
+				return Condition.Between<TValue>(Common.ExpressionUtility.GetMemberName(member), range);
+			}
+
+			public static Condition Between<TValue>(Expression<Func<T, TValue>> member, TValue begin, TValue end) where TValue : struct, IComparable<TValue>
 			{
 				return Condition.Between(Common.ExpressionUtility.GetMemberName(member), begin, end);
 			}
 
-			public static Condition Between<TValue>(Expression<Func<T, TValue>> member, TValue begin, TValue end) where TValue : IComparable<TValue>
+			public static Condition Between<TValue>(Expression<Func<T, TValue>> member, TValue? begin, TValue? end) where TValue : struct, IComparable<TValue>
 			{
 				return Condition.Between(Common.ExpressionUtility.GetMemberName(member), begin, end);
 			}
