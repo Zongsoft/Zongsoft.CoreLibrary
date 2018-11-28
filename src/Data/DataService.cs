@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2016-2017 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2016-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -339,7 +339,7 @@ namespace Zongsoft.Data
 				return 0;
 
 			//将当前插入数据实体对象转换成数据字典
-			var dictionary = DataDictionary<TEntity>.GetDataDictionary(data);
+			var dictionary = DataDictionary.GetDictionary(data);
 
 			//尝试递增注册的递增键值
 			DataSequence.Increments(this, dictionary);
@@ -368,7 +368,7 @@ namespace Zongsoft.Data
 				return 0;
 
 			//将当前插入数据实体集合对象转换成数据字典集合
-			var dictionares = DataDictionary<TEntity>.GetDataDictionaries(data);
+			var dictionares = DataDictionary.GetDictionaries(data);
 
 			foreach(var dictionary in dictionares)
 			{
@@ -379,7 +379,7 @@ namespace Zongsoft.Data
 			return this.OnInsertMany(dictionares, schema, state);
 		}
 
-		protected virtual int OnInsert(DataDictionary<TEntity> data, string schema, object state)
+		protected virtual int OnInsert(IDataDictionary data, string schema, object state)
 		{
 			if(data == null || data.Data == null)
 				return 0;
@@ -388,7 +388,7 @@ namespace Zongsoft.Data
 			return this.DataAccess.Insert(this.Name, data, schema, state, ctx => this.OnInserting(ctx), ctx => this.OnInserted(ctx));
 		}
 
-		protected virtual int OnInsertMany(IEnumerable<DataDictionary<TEntity>> items, string schema, object state)
+		protected virtual int OnInsertMany(IEnumerable<IDataDictionary> items, string schema, object state)
 		{
 			if(items == null)
 				return 0;
@@ -449,7 +449,7 @@ namespace Zongsoft.Data
 
 		public int Update(object data, ICondition condition, string schema, object state = null)
 		{
-			return this.OnUpdate(DataDictionary<TEntity>.GetDataDictionary(data), condition, schema, state);
+			return this.OnUpdate(DataDictionary.GetDictionary(data), condition, schema, state);
 		}
 
 		public int UpdateMany(IEnumerable items, object state = null)
@@ -459,10 +459,10 @@ namespace Zongsoft.Data
 
 		public int UpdateMany(IEnumerable items, string schema, object state = null)
 		{
-			return this.OnUpdateMany(DataDictionary<TEntity>.GetDataDictionaries(items), schema, state);
+			return this.OnUpdateMany(DataDictionary.GetDictionaries(items), schema, state);
 		}
 
-		protected virtual int OnUpdate(DataDictionary<TEntity> data, ICondition condition, string schema, object state)
+		protected virtual int OnUpdate(IDataDictionary data, ICondition condition, string schema, object state)
 		{
 			if(data == null || data.Data == null)
 				return 0;
@@ -470,7 +470,7 @@ namespace Zongsoft.Data
 			return this.DataAccess.Update(this.Name, data, condition, schema, state, ctx => this.OnUpdating(ctx), ctx => this.OnUpdated(ctx));
 		}
 
-		protected virtual int OnUpdateMany(IEnumerable<DataDictionary<TEntity>> items, string schema, object state)
+		protected virtual int OnUpdateMany(IEnumerable<IDataDictionary> items, string schema, object state)
 		{
 			if(items == null)
 				return 0;
@@ -1135,14 +1135,14 @@ namespace Zongsoft.Data
 
 			//如果主键成员只有一个则返回单个条件
 			if(primaryKey.Length == 1)
-				return Condition.Equal(primaryKey[0], values[0]);
+				return Data.Condition.Equal(primaryKey[0], values[0]);
 
 			//创建返回的条件集（AND组合）
 			var conditions = ConditionCollection.And();
 
 			for(int i = 0; i < primaryKey.Length; i++)
 			{
-				conditions.Add(Condition.Equal(primaryKey[i], values[i]));
+				conditions.Add(Data.Condition.Equal(primaryKey[i], values[i]));
 			}
 
 			return conditions;
@@ -1187,6 +1187,15 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 嵌套子类
+		public sealed class Condition : Zongsoft.Data.Condition.Builder<TEntity>
+		{
+			#region 私有构造
+			private Condition()
+			{
+			}
+			#endregion
+		}
+
 		private static class DataSequence
 		{
 			#region 常量定义
@@ -1229,7 +1238,7 @@ namespace Zongsoft.Data
 				return _cache.TryAdd(dataService, tokens);
 			}
 
-			public static void Increments(DataService<TEntity> dataService, DataDictionary<TEntity> data)
+			public static void Increments(DataService<TEntity> dataService, IDataDictionary data)
 			{
 				DataSequenceToken[] tokens;
 
@@ -1242,7 +1251,7 @@ namespace Zongsoft.Data
 						if(sequenceKey != null && sequenceKey.Length > 0)
 						{
 							//确保只有当序号字段未指定值或值为零时，才使用增量的序号值
-							data.Set(token.Attribute.Keys[token.Attribute.Keys.Length - 1],
+							data.SetValue(token.Attribute.Keys[token.Attribute.Keys.Length - 1],
 									 () => token.Sequence.Increment(sequenceKey, 1, token.Attribute.Seed),
 									 value => value == null || (ulong)System.Convert.ChangeType(value, typeof(ulong)) == 0);
 						}
@@ -1252,7 +1261,7 @@ namespace Zongsoft.Data
 			#endregion
 
 			#region 私有方法
-			private static string GetSequenceKey(DataDictionary<TEntity> data, DataSequenceAttribute attribute)
+			private static string GetSequenceKey(IDataDictionary data, DataSequenceAttribute attribute)
 			{
 				var result = SEQUENCE_KEY_PREFIX;
 
@@ -1261,7 +1270,7 @@ namespace Zongsoft.Data
 
 				for(int i = 0; i < attribute.Keys.Length - 1; i++)
 				{
-					var value = data.Get(attribute.Keys[i]);
+					var value = data.GetValue(attribute.Keys[i]);
 
 					if(value != null)
 						result += ":" + value.ToString().ToLowerInvariant();

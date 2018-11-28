@@ -123,11 +123,14 @@
     <Compile Include="Data\Conditional.cs" />
     <Compile Include="Data\DataAccessAttribute.cs" />
     <Compile Include="Data\DataAccessProviderBase.cs" />
+    <Compile Include="Data\DataDictionaries.cs" />
     <Compile Include="Data\Entity.cs" />
     <Compile Include="Data\DataUpsertedEventArgs.cs" />
     <Compile Include="Data\DataUpseringEventArgs.cs" />
     <Compile Include="Data\IDataAccessContextBase.cs" />
     <Compile Include="Data\IDataAccessProvider.cs" />
+    <Compile Include="Data\IDataDictionary.cs" />
+    <Compile Include="Data\IDataDictionary`1.cs" />
     <Compile Include="Data\IEntity.cs" />
     <Compile Include="Data\Range.cs" />
     <Compile Include="Data\Range`1.cs" />
@@ -175,7 +178,6 @@
     <Compile Include="Data\ConditionalConverter.cs" />
     <Compile Include="Data\ConditionalConverterContext.cs" />
     <Compile Include="Data\ConditionalRange.cs" />
-    <Compile Include="Data\ConditionBuilder.cs" />
     <Compile Include="Data\ConditionCollection.cs" />
     <Compile Include="Data\ConditionCombination.cs" />
     <Compile Include="Data\ConditionOperator.cs" />
@@ -184,8 +186,6 @@
     <Compile Include="Data\DataCountingEventArgs.cs" />
     <Compile Include="Data\DataDeletedEventArgs.cs" />
     <Compile Include="Data\DataDeletingEventArgs.cs" />
-    <Compile Include="Data\DataDictionary`1.cs" />
-    <Compile Include="Data\DataDictionary.cs" />
     <Compile Include="Data\DataException.cs" />
     <Compile Include="Data\DataExecutedEventArgs.cs" />
     <Compile Include="Data\DataExecutingEventArgs.cs" />
@@ -198,7 +198,6 @@
     <Compile Include="Data\DataUpdatedEventArgs.cs" />
     <Compile Include="Data\DataUpdatingEventArgs.cs" />
     <Compile Include="Data\IConditionalConverter.cs" />
-    <Compile Include="Data\IConditionBuilder.cs" />
     <Compile Include="Data\DataAccessBase.cs" />
     <Compile Include="Data\DataService.cs" />
     <Compile Include="Data\Grouping.cs" />

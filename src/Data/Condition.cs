@@ -27,6 +27,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace Zongsoft.Data
@@ -219,16 +220,6 @@ namespace Zongsoft.Data
 			return new Condition(name, values, ConditionOperator.NotIn);
 		}
 
-		/// <summary>
-		/// 获取指定类型的条件构建器。
-		/// </summary>
-		/// <typeparam name="T">指定的实体类型。</typeparam>
-		/// <returns>返回一个特定类型的条件构建器。</returns>
-		public static IConditionBuilder<T> GetBuilder<T>()
-		{
-			return ConditionBuilder.Get<T>();
-		}
-
 		public static bool GetBetween(Condition condition, out object begin, out object end)
 		{
 			begin = end = null;
@@ -411,6 +402,151 @@ namespace Zongsoft.Data
 			}
 
 			return "\"" + value.ToString() + "\"";
+		}
+		#endregion
+
+		#region 嵌套子类
+		public class Builder<T>
+		{
+			#region 构造函数
+			protected Builder()
+			{
+			}
+			#endregion
+
+			#region 文本版本
+			public static Condition Equal(string name, object value)
+			{
+				return Condition.Equal(name, value);
+			}
+
+			public static Condition NotEqual(string name, object value)
+			{
+				return Condition.NotEqual(name, value);
+			}
+
+			public static Condition GreaterThan(string name, object value)
+			{
+				return Condition.GreaterThan(name, value);
+			}
+
+			public static Condition GreaterThanEqual(string name, object value)
+			{
+				return Condition.GreaterThanEqual(name, value);
+			}
+
+			public static Condition LessThan(string name, object value)
+			{
+				return Condition.LessThan(name, value);
+			}
+
+			public static Condition LessThanEqual(string name, object value)
+			{
+				return Condition.LessThanEqual(name, value);
+			}
+
+			public static Condition Like(string name, string value)
+			{
+				return Condition.Like(name, value);
+			}
+
+			public static Condition Between<TValue>(string name, TValue begin, TValue end) where TValue : IComparable<TValue>
+			{
+				return Condition.Between<TValue>(name, begin, end);
+			}
+
+			public static Condition Between<TValue>(string name, TValue? begin, TValue? end) where TValue : struct, IComparable<TValue>
+			{
+				return Condition.Between<TValue>(name, begin, end);
+			}
+
+			public static Condition In<TValue>(string name, IEnumerable<TValue> values) where TValue : IEquatable<TValue>
+			{
+				return Condition.In<TValue>(name, values);
+			}
+
+			public static Condition In<TValue>(string name, params TValue[] values) where TValue : IEquatable<TValue>
+			{
+				return Condition.In<TValue>(name, values);
+			}
+
+			public static Condition NotIn<TValue>(string name, IEnumerable<TValue> values) where TValue : IEquatable<TValue>
+			{
+				return Condition.NotIn<TValue>(name, values);
+			}
+
+			public static Condition NotIn<TValue>(string name, params TValue[] values) where TValue : IEquatable<TValue>
+			{
+				return Condition.NotIn<TValue>(name, values);
+			}
+			#endregion
+
+			#region 表达式版本
+			public static Condition Equal<TValue>(Expression<Func<T, TValue>> member, TValue value)
+			{
+				return Condition.Equal(Common.ExpressionUtility.GetMemberName(member), value);
+			}
+
+			public static Condition NotEqual<TValue>(Expression<Func<T, TValue>> member, TValue value)
+			{
+				return Condition.NotEqual(Common.ExpressionUtility.GetMemberName(member), value);
+			}
+
+			public static Condition GreaterThan<TValue>(Expression<Func<T, TValue>> member, TValue value)
+			{
+				return Condition.GreaterThan(Common.ExpressionUtility.GetMemberName(member), value);
+			}
+
+			public static Condition GreaterThanEqual<TValue>(Expression<Func<T, TValue>> member, TValue value)
+			{
+				return Condition.GreaterThanEqual(Common.ExpressionUtility.GetMemberName(member), value);
+			}
+
+			public static Condition LessThan<TValue>(Expression<Func<T, TValue>> member, TValue value)
+			{
+				return Condition.LessThan(Common.ExpressionUtility.GetMemberName(member), value);
+			}
+
+			public static Condition LessThanEqual<TValue>(Expression<Func<T, TValue>> member, TValue value)
+			{
+				return Condition.LessThanEqual(Common.ExpressionUtility.GetMemberName(member), value);
+			}
+
+			public static Condition Like(Expression<Func<T, string>> member, string value)
+			{
+				return Condition.Like(Common.ExpressionUtility.GetMemberName(member), value);
+			}
+
+			public static Condition Between<TValue>(Expression<Func<T, TValue>> member, TValue? begin, TValue? end) where TValue : struct, IComparable<TValue>
+			{
+				return Condition.Between(Common.ExpressionUtility.GetMemberName(member), begin, end);
+			}
+
+			public static Condition Between<TValue>(Expression<Func<T, TValue>> member, TValue begin, TValue end) where TValue : IComparable<TValue>
+			{
+				return Condition.Between(Common.ExpressionUtility.GetMemberName(member), begin, end);
+			}
+
+			public static Condition In<TValue>(Expression<Func<T, TValue>> member, params TValue[] values) where TValue : IEquatable<TValue>
+			{
+				return Condition.In(Common.ExpressionUtility.GetMemberName(member), values);
+			}
+
+			public static Condition In<TValue>(Expression<Func<T, TValue>> member, IEnumerable<TValue> values) where TValue : IEquatable<TValue>
+			{
+				return Condition.In(Common.ExpressionUtility.GetMemberName(member), values);
+			}
+
+			public static Condition NotIn<TValue>(Expression<Func<T, TValue>> member, params TValue[] values) where TValue : IEquatable<TValue>
+			{
+				return Condition.NotIn(Common.ExpressionUtility.GetMemberName(member), values);
+			}
+
+			public static Condition NotIn<TValue>(Expression<Func<T, TValue>> member, IEnumerable<TValue> values) where TValue : IEquatable<TValue>
+			{
+				return Condition.NotIn(Common.ExpressionUtility.GetMemberName(member), values);
+			}
+			#endregion
 		}
 		#endregion
 	}

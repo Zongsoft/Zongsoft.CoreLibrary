@@ -1403,33 +1403,6 @@ namespace Zongsoft.Data
 		{
 			return Collections.Enumerable.Enumerate<T>(result);
 		}
-
-		private static DataDictionary GetDataDictionary(object data)
-		{
-			if(data == null)
-				throw new ArgumentNullException("data");
-
-			return (data as DataDictionary) ?? new DataDictionary(data);
-		}
-
-		private static IEnumerable<DataDictionary> GetDataDictionaries(object data)
-		{
-			if(data == null)
-				throw new ArgumentNullException("data");
-
-			var items = data as IEnumerable;
-
-			if(items == null)
-				yield return (data as DataDictionary) ?? new DataDictionary(data);
-			else
-			{
-				foreach(var item in items)
-				{
-					if(item != null)
-						yield return (item as DataDictionary) ?? new DataDictionary(item);
-				}
-			}
-		}
 		#endregion
 	}
 }
