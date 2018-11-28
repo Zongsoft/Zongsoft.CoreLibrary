@@ -5,6 +5,11 @@ namespace Zongsoft.Data
 	public static class Range
 	{
 		#region 公共方法
+		public static Range<T> Create<T>(T minimum, T maximum) where T : struct, IComparable<T>
+		{
+			return new Range<T>(minimum, maximum);
+		}
+
 		public static bool IsRange(object target)
 		{
 			if(target == null)
@@ -32,16 +37,16 @@ namespace Zongsoft.Data
 			return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Range<>);
 		}
 
-		public static void GetRange(object target, out object minimum, out object maximum)
+		public static void Resolve(object target, out object minimum, out object maximum)
 		{
 			if(target == null)
 				throw new ArgumentNullException(nameof(target));
 
-			if(!TryGetRange(target, out minimum, out maximum))
+			if(!TryResolve(target, out minimum, out maximum))
 				throw new ArgumentException("The specified target is not a range.");
 		}
 
-		public static bool TryGetRange(object target, out object minimum, out object maximum)
+		public static bool TryResolve(object target, out object minimum, out object maximum)
 		{
 			minimum = null;
 			maximum = null;

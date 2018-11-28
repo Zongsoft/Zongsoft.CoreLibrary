@@ -29,7 +29,7 @@ using System.Linq;
 
 namespace Zongsoft.Data
 {
-	public struct Range<T> where T : struct, IComparable
+	public struct Range<T> where T : struct, IComparable<T>
 	{
 		#region 成员字段
 		private T? _minimum;
@@ -95,6 +95,16 @@ namespace Zongsoft.Data
 			get
 			{
 				return _minimum == null && _maximum == null;
+			}
+		}
+
+		[Runtime.Serialization.SerializationMember(Behavior = Runtime.Serialization.SerializationMemberBehavior.Ignored)]
+		public bool IsZero
+		{
+			get
+			{
+				return (_minimum == null || System.Collections.Generic.Comparer<T>.Default.Compare(_minimum.Value, default(T)) == 0) &&
+				       (_maximum == null || System.Collections.Generic.Comparer<T>.Default.Compare(_maximum.Value, default(T)) == 0);
 			}
 		}
 		#endregion
