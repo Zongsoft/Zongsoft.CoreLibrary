@@ -26,6 +26,7 @@
 
 using System;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
@@ -103,13 +104,31 @@ namespace Zongsoft.Data
 		{
 			get
 			{
-				return (_minimum == null || System.Collections.Generic.Comparer<T>.Default.Compare(_minimum.Value, default(T)) == 0) &&
-				       (_maximum == null || System.Collections.Generic.Comparer<T>.Default.Compare(_maximum.Value, default(T)) == 0);
+				return (_minimum == null || Comparer<T>.Default.Compare(_minimum.Value, default(T)) == 0) &&
+				       (_maximum == null || Comparer<T>.Default.Compare(_maximum.Value, default(T)) == 0);
 			}
 		}
 		#endregion
 
 		#region 公共方法
+		public bool Contains(T value)
+		{
+			if(_minimum.HasValue)
+			{
+				if(_maximum.HasValue)
+					return Comparer<T>.Default.Compare(value, _minimum.Value) >= 0 && Comparer<T>.Default.Compare(value, _maximum.Value) <= 0;
+				else
+					return Comparer<T>.Default.Compare(value, _minimum.Value) >= 0;
+			}
+			else
+			{
+				if(_maximum.HasValue)
+					return Comparer<T>.Default.Compare(value, _maximum.Value) <= 0;
+				else
+					return false;
+			}
+		}
+
 		public Condition ToCondition(string name)
 		{
 			if(_minimum == null)
