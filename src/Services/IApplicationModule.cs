@@ -1,8 +1,15 @@
 ﻿/*
- * Authors:
- *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
+ *   _____                                ______
+ *  /_   /  ____  ____  ____  _________  / __/ /_
+ *    / /  / __ \/ __ \/ __ \/ ___/ __ \/ /_/ __/
+ *   / /__/ /_/ / / / / /_/ /\_ \/ /_/ / __/ /_
+ *  /____/\____/_/ /_/\__  /____/\____/_/  \__/
+ *                   /____/
  *
- * Copyright (C) 2016 Zongsoft Corporation <http://www.zongsoft.com>
+ * Authors:
+ *   钟峰(Popeye Zhong) <zongsoft@qq.com>
+ *
+ * Copyright (C) 2016-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -27,16 +34,17 @@
 using System;
 using System.Collections.Generic;
 
-namespace Zongsoft.ComponentModel
+using Zongsoft.Options;
+
+namespace Zongsoft.Services
 {
 	/// <summary>
-	/// 向实现类提供应用扩展模块初始化机制的接口。
+	/// 表示应用模块（应用子系统）的接口。
 	/// </summary>
-	[Obsolete("Please use Zongsoft.Services.IApplicationInitializer interface.")]
 	public interface IApplicationModule
 	{
 		/// <summary>
-		/// 获取应用扩展模块名称。
+		/// 获取当前应用模块名称。
 		/// </summary>
 		string Name
 		{
@@ -44,10 +52,28 @@ namespace Zongsoft.ComponentModel
 		}
 
 		/// <summary>
-		/// 初始化应用扩展模块，并使其为处理请求做好准备。
+		/// 获取或设置当前应用模块的标题。
 		/// </summary>
-		/// <param name="context">一个上下文对象，它提供对模块处理应用程序内所有应用程序对象的公用的方法、属性和事件的访问。</param>
-		/// <remarks>使用 <c>Initialize</c> 将事件处理方法向具体事件进行注册等初始化操作。</remarks>
-		void Initialize(ApplicationContextBase context);
+		string Title
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// 获取当前应用模块的自定义设置提供程序。
+		/// </summary>
+		ISettingsProvider Settings
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取当前应用模块的服务容器。
+		/// </summary>
+		IServiceProvider Services
+		{
+			get;
+		}
 	}
 }

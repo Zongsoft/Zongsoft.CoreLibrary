@@ -32,6 +32,7 @@ using System.Security.Principal;
 
 namespace Zongsoft.ComponentModel
 {
+	[Obsolete("Please user Zongsoft.Services.ApplicationContext class.")]
 	public class ApplicationContextBase : INotifyPropertyChanged
 	{
 		#region 单例字段

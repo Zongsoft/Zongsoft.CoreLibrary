@@ -390,6 +390,11 @@
     <Compile Include="Security\SecretProvider.cs" />
     <Compile Include="Security\SecurityException.cs" />
     <Compile Include="Security\Membership\UserStatus.cs" />
+    <Compile Include="Services\ApplicationContext.cs" />
+    <Compile Include="Services\ApplicationModule.cs" />
+    <Compile Include="Services\IApplicationContext.cs" />
+    <Compile Include="Services\IApplicationInitializer.cs" />
+    <Compile Include="Services\IApplicationModule.cs" />
     <Compile Include="Services\CommandBase.cs" />
     <Compile Include="Services\CommandCompletionContext.cs" />
     <Compile Include="Services\CommandContext.cs" />
