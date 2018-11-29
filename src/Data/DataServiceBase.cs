@@ -64,7 +64,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataService(Zongsoft.Services.IServiceProvider serviceProvider)
+		protected DataService(Zongsoft.Services.IServiceProvider serviceProvider)
 		{
 			if(serviceProvider == null)
 				throw new ArgumentNullException("serviceProvider");
@@ -79,7 +79,7 @@ namespace Zongsoft.Data
 			DataSequence.Register(this);
 		}
 
-		public DataService(string name, Zongsoft.Services.IServiceProvider serviceProvider)
+		protected DataService(string name, Zongsoft.Services.IServiceProvider serviceProvider)
 		{
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException("name");
@@ -103,7 +103,7 @@ namespace Zongsoft.Data
 		{
 			get
 			{
-				if(string.IsNullOrWhiteSpace(_name))
+				if(string.IsNullOrEmpty(_name))
 				{
 					var dataAccess = this.DataAccess;
 

@@ -199,7 +199,7 @@
     <Compile Include="Data\DataUpdatingEventArgs.cs" />
     <Compile Include="Data\IConditionalConverter.cs" />
     <Compile Include="Data\DataAccessBase.cs" />
-    <Compile Include="Data\DataService.cs" />
+    <Compile Include="Data\DataServiceBase.cs" />
     <Compile Include="Data\Grouping.cs" />
     <Compile Include="Data\ICondition.cs" />
     <Compile Include="Data\IConditional.cs" />
