@@ -170,7 +170,7 @@ namespace Zongsoft.Diagnostics
 
 			if(filePath[0] == '/' || filePath[0] == '\\')
 			{
-				filePath = Path.Combine(Path.GetPathRoot(Zongsoft.ComponentModel.ApplicationContextBase.Current.ApplicationDirectory), filePath.Substring(1));
+				filePath = Path.Combine(Path.GetPathRoot(Services.ApplicationContext.Current.ApplicationDirectory), filePath.Substring(1));
 
 				if(!Directory.Exists(Path.GetDirectoryName(filePath)))
 					Directory.CreateDirectory(Path.GetDirectoryName(filePath));
@@ -181,9 +181,9 @@ namespace Zongsoft.Diagnostics
 			string directoryPath;
 
 			if(filePath.StartsWith("~/") || filePath.StartsWith("~\\"))
-				directoryPath = Zongsoft.ComponentModel.ApplicationContextBase.Current.EnsureDirectory(Path.GetDirectoryName(filePath.Substring(2)));
+				directoryPath = Services.ApplicationContext.Current.EnsureDirectory(Path.GetDirectoryName(filePath.Substring(2)));
 			else
-				directoryPath = Zongsoft.ComponentModel.ApplicationContextBase.Current.EnsureDirectory(Path.GetDirectoryName(filePath));
+				directoryPath = Services.ApplicationContext.Current.EnsureDirectory(Path.GetDirectoryName(filePath));
 
 			return Path.Combine(directoryPath, Path.GetFileName(filePath));
 		}

@@ -121,7 +121,7 @@ namespace Zongsoft.Data
 		{
 			get
 			{
-				return Zongsoft.ComponentModel.ApplicationContextBase.Current.Principal as Zongsoft.Security.CredentialPrincipal;
+				return Services.ApplicationContext.Current.Principal as Zongsoft.Security.CredentialPrincipal;
 			}
 		}
 

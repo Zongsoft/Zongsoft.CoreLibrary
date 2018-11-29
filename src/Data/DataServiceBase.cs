@@ -32,7 +32,7 @@ using System.Collections.Concurrent;
 
 namespace Zongsoft.Data
 {
-	public class DataService<TEntity> : IDataService<TEntity>
+	public class DataServiceBase<TEntity> : IDataService<TEntity>
 	{
 		#region 事件定义
 		public event EventHandler<DataGettedEventArgs<TEntity>> Getted;
@@ -64,7 +64,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		protected DataService(Zongsoft.Services.IServiceProvider serviceProvider)
+		protected DataServiceBase(Zongsoft.Services.IServiceProvider serviceProvider)
 		{
 			if(serviceProvider == null)
 				throw new ArgumentNullException("serviceProvider");
@@ -79,7 +79,7 @@ namespace Zongsoft.Data
 			DataSequence.Register(this);
 		}
 
-		protected DataService(string name, Zongsoft.Services.IServiceProvider serviceProvider)
+		protected DataServiceBase(string name, Zongsoft.Services.IServiceProvider serviceProvider)
 		{
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException("name");
@@ -158,7 +158,7 @@ namespace Zongsoft.Data
 		{
 			get
 			{
-				if(Zongsoft.ComponentModel.ApplicationContextBase.Current?.Principal is Zongsoft.Security.CredentialPrincipal principal && principal.Identity.IsAuthenticated)
+				if(Services.ApplicationContext.Current?.Principal is Zongsoft.Security.CredentialPrincipal principal && principal.Identity.IsAuthenticated)
 					return principal.Identity.Credential;
 
 				return null;
@@ -1363,11 +1363,11 @@ namespace Zongsoft.Data
 			#endregion
 
 			#region 静态缓存
-			private static readonly ConcurrentDictionary<DataService<TEntity>, DataSequenceToken[]> _cache = new ConcurrentDictionary<DataService<TEntity>, DataSequenceToken[]>();
+			private static readonly ConcurrentDictionary<DataServiceBase<TEntity>, DataSequenceToken[]> _cache = new ConcurrentDictionary<DataServiceBase<TEntity>, DataSequenceToken[]>();
 			#endregion
 
 			#region 公共方法
-			public static bool Register(DataService<TEntity> dataService)
+			public static bool Register(DataServiceBase<TEntity> dataService)
 			{
 				var attributes = (DataSequenceAttribute[])Attribute.GetCustomAttributes(dataService.GetType(), typeof(DataSequenceAttribute), true);
 
@@ -1398,7 +1398,7 @@ namespace Zongsoft.Data
 				return _cache.TryAdd(dataService, tokens);
 			}
 
-			public static void Increments(DataService<TEntity> dataService, IDataDictionary data)
+			public static void Increments(DataServiceBase<TEntity> dataService, IDataDictionary data)
 			{
 				DataSequenceToken[] tokens;
 
