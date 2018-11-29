@@ -177,13 +177,7 @@ namespace Zongsoft.Data
 
 		public static Condition Between<T>(string name, Range<T> range) where T : struct, IComparable<T>
 		{
-			if(range.IsEmpty)
-				return null;
-
-			if(range.Minimum.HasValue)
-				return range.Maximum.HasValue ? new Condition(name, new T[] { range.Minimum.Value, range.Maximum.Value }, ConditionOperator.Between) : Condition.GreaterThanEqual(name, range.Minimum.Value);
-			else
-				return range.Maximum.HasValue ? Condition.LessThanEqual(name, range.Maximum.Value) : null;
+			return range.ToCondition(name);
 		}
 
 		public static Condition Between<T>(string name, T begin, T end) where T : struct, IComparable<T>
