@@ -40,6 +40,8 @@ namespace Zongsoft.Data
 	{
 		bool Contains<TMember>(Expression<Func<T, TMember>> expression);
 
+		void Reset<TMember>(Expression<Func<T, TMember>> expression);
+
 		TValue GetValue<TValue>(Expression<Func<T, TValue>> expression);
 		TValue GetValue<TValue>(Expression<Func<T, TValue>> expression, TValue defaultValue);
 

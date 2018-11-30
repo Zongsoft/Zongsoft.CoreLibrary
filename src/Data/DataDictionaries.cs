@@ -253,6 +253,20 @@ namespace Zongsoft.Data
 			return _dictionary.Contains(name);
 		}
 
+		public void Reset(params string[] names)
+		{
+			if(names == null || names.Length == 0)
+			{
+				_dictionary.Clear();
+				return;
+			}
+
+			foreach(var name in names)
+			{
+				_dictionary.Remove(name);
+			}
+		}
+
 		public object GetValue(string name)
 		{
 			return _dictionary[name];
@@ -599,6 +613,11 @@ namespace Zongsoft.Data
 			return this.Contains(Common.ExpressionUtility.GetMemberName(expression));
 		}
 
+		public void Reset<TMember>(Expression<Func<T, TMember>> expression)
+		{
+			this.Reset(Common.ExpressionUtility.GetMemberName(expression));
+		}
+
 		public TValue GetValue<TValue>(Expression<Func<T, TValue>> expression)
 		{
 			return (TValue)this.GetValue(Common.ExpressionUtility.GetMemberName(expression));
@@ -691,6 +710,20 @@ namespace Zongsoft.Data
 		public bool Contains(string name)
 		{
 			return _dictionary.ContainsKey(name);
+		}
+
+		public void Reset(params string[] names)
+		{
+			if(names == null || names.Length == 0)
+			{
+				_dictionary.Clear();
+				return;
+			}
+
+			foreach(var name in names)
+			{
+				_dictionary.Remove(name);
+			}
 		}
 
 		public object GetValue(string name)
@@ -996,6 +1029,11 @@ namespace Zongsoft.Data
 			return this.Contains(Common.ExpressionUtility.GetMemberName(expression));
 		}
 
+		public void Reset<TMember>(Expression<Func<T, TMember>> expression)
+		{
+			this.Reset(Common.ExpressionUtility.GetMemberName(expression));
+		}
+
 		public TValue GetValue<TValue>(Expression<Func<T, TValue>> expression)
 		{
 			return (TValue)this.GetValue(Common.ExpressionUtility.GetMemberName(expression));
@@ -1106,6 +1144,11 @@ namespace Zongsoft.Data
 
 		#region 公共方法
 		public bool Contains(string name)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void Reset(params string[] names)
 		{
 			throw new NotImplementedException();
 		}
@@ -1370,6 +1413,11 @@ namespace Zongsoft.Data
 			return this.Contains(Common.ExpressionUtility.GetMemberName(expression));
 		}
 
+		public void Reset<TMember>(Expression<Func<T, TMember>> expression)
+		{
+			this.Reset(Common.ExpressionUtility.GetMemberName(expression));
+		}
+
 		public TValue GetValue<TValue>(Expression<Func<T, TValue>> expression)
 		{
 			return (TValue)this.GetValue(Common.ExpressionUtility.GetMemberName(expression));
@@ -1495,6 +1543,11 @@ namespace Zongsoft.Data
 		public bool HasChanges(params string[] names)
 		{
 			return _entity.HasChanges(names);
+		}
+
+		public void Reset(params string[] names)
+		{
+			throw new NotImplementedException();
 		}
 
 		public object GetValue(string name)
@@ -1802,6 +1855,11 @@ namespace Zongsoft.Data
 		public bool Contains<TMember>(Expression<Func<T, TMember>> expression)
 		{
 			return this.Contains(Common.ExpressionUtility.GetMemberName(expression));
+		}
+
+		public void Reset<TMember>(Expression<Func<T, TMember>> expression)
+		{
+			this.Reset(Common.ExpressionUtility.GetMemberName(expression));
 		}
 
 		public TValue GetValue<TValue>(Expression<Func<T, TValue>> expression)

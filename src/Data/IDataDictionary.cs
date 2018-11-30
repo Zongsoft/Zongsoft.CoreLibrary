@@ -46,6 +46,8 @@ namespace Zongsoft.Data
 
 		bool Contains(string name);
 
+		void Reset(params string[] names);
+
 		object GetValue(string name);
 		TValue GetValue<TValue>(string name, TValue defaultValue);
 
