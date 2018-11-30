@@ -29,10 +29,10 @@ using System;
 namespace Zongsoft.Data
 {
 	[AttributeUsage(AttributeTargets.Interface | AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false, Inherited = true)]
-	public class DataAccessAttribute : Attribute
+	public class EntityAttribute : Attribute
 	{
 		#region 构造函数
-		public DataAccessAttribute(string name)
+		public EntityAttribute(string name)
 		{
 			this.Name = name;
 		}
