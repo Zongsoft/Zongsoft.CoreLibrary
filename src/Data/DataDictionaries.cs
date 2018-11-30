@@ -268,8 +268,7 @@ namespace Zongsoft.Data
 
 		public void SetValue<TValue>(string name, TValue value, Func<TValue, bool> predicate = null)
 		{
-			if(predicate == null || predicate(value))
-				_dictionary[name] = value;
+			this.SetValue<TValue>(name, () => value, predicate);
 		}
 
 		public void SetValue<TValue>(string name, Func<TValue> valueFactory, Func<TValue, bool> predicate = null)
@@ -277,17 +276,18 @@ namespace Zongsoft.Data
 			if(valueFactory == null)
 				throw new ArgumentNullException(nameof(valueFactory));
 
-			if(predicate == null)
+			if(predicate != null)
 			{
-				_dictionary[name] = valueFactory();
-			}
-			else
-			{
-				var value = valueFactory();
+				object raw = null;
 
-				if(predicate(value))
-					_dictionary[name] = value;
+				if(_dictionary.Contains(name))
+					raw = _dictionary[name];
+
+				if(!predicate(raw == null ? default(TValue) : (TValue)raw))
+					return;
 			}
+
+			_dictionary[name] = valueFactory();
 		}
 
 		public bool TryGetValue<TValue>(string name, out TValue value)
@@ -334,13 +334,7 @@ namespace Zongsoft.Data
 
 		public bool TrySetValue<TValue>(string name, TValue value, Func<TValue, bool> predicate = null)
 		{
-			if(predicate == null || predicate(value))
-			{
-				_dictionary[name] = value;
-				return true;
-			}
-
-			return false;
+			return this.TrySetValue<TValue>(name, () => value, predicate);
 		}
 
 		public bool TrySetValue<TValue>(string name, Func<TValue> valueFactory, Func<TValue, bool> predicate = null)
@@ -348,21 +342,19 @@ namespace Zongsoft.Data
 			if(valueFactory == null)
 				throw new ArgumentNullException(nameof(valueFactory));
 
-			if(predicate == null)
+			if(predicate != null)
 			{
-				_dictionary[name] = valueFactory();
-				return true;
+				object raw = null;
+
+				if(_dictionary.Contains(name))
+					raw = _dictionary[name];
+
+				if(!predicate(raw == null ? default(TValue) : (TValue)raw))
+					return false;
 			}
 
-			var value = valueFactory();
-
-			if(predicate(value))
-			{
-				_dictionary[name] = value;
-				return true;
-			}
-
-			return false;
+			_dictionary[name] = valueFactory();
+			return true;
 		}
 		#endregion
 
@@ -716,8 +708,7 @@ namespace Zongsoft.Data
 
 		public void SetValue<TValue>(string name, TValue value, Func<TValue, bool> predicate = null)
 		{
-			if(predicate == null || predicate(value))
-				_dictionary[name] = value;
+			this.SetValue<TValue>(name, () => value, predicate);
 		}
 
 		public void SetValue<TValue>(string name, Func<TValue> valueFactory, Func<TValue, bool> predicate = null)
@@ -725,17 +716,15 @@ namespace Zongsoft.Data
 			if(valueFactory == null)
 				throw new ArgumentNullException(nameof(valueFactory));
 
-			if(predicate == null)
+			if(predicate != null)
 			{
-				_dictionary[name] = valueFactory();
-			}
-			else
-			{
-				var value = valueFactory();
+				_dictionary.TryGetValue(name, out var raw);
 
-				if(predicate(value))
-					_dictionary[name] = value;
+				if(!predicate(raw == null ? default(TValue) : (TValue)raw))
+					return;
 			}
+
+			_dictionary[name] = valueFactory();
 		}
 
 		public bool TryGetValue<TValue>(string name, out TValue value)
@@ -763,13 +752,7 @@ namespace Zongsoft.Data
 
 		public bool TrySetValue<TValue>(string name, TValue value, Func<TValue, bool> predicate = null)
 		{
-			if(predicate == null || predicate(value))
-			{
-				_dictionary[name] = value;
-				return true;
-			}
-
-			return false;
+			return this.TrySetValue<TValue>(name, () => value, predicate);
 		}
 
 		public bool TrySetValue<TValue>(string name, Func<TValue> valueFactory, Func<TValue, bool> predicate = null)
@@ -777,21 +760,16 @@ namespace Zongsoft.Data
 			if(valueFactory == null)
 				throw new ArgumentNullException(nameof(valueFactory));
 
-			if(predicate == null)
+			if(predicate != null)
 			{
-				_dictionary[name] = valueFactory();
-				return true;
+				_dictionary.TryGetValue(name, out var raw);
+
+				if(!predicate(raw == null ? default(TValue) : (TValue)raw))
+					return false;
 			}
 
-			var value = valueFactory();
-
-			if(predicate(value))
-			{
-				_dictionary[name] = value;
-				return true;
-			}
-
-			return false;
+			_dictionary[name] = valueFactory();
+			return true;
 		}
 		#endregion
 
@@ -1144,7 +1122,7 @@ namespace Zongsoft.Data
 
 		public void SetValue<TValue>(string name, TValue value, Func<TValue, bool> predicate = null)
 		{
-			throw new NotImplementedException();
+			this.SetValue<TValue>(name, () => value, predicate);
 		}
 
 		public void SetValue<TValue>(string name, Func<TValue> valueFactory, Func<TValue, bool> predicate = null)
@@ -1164,7 +1142,7 @@ namespace Zongsoft.Data
 
 		public bool TrySetValue<TValue>(string name, TValue value, Func<TValue, bool> predicate = null)
 		{
-			throw new NotImplementedException();
+			return this.TrySetValue<TValue>(name, () => value, predicate);
 		}
 
 		public bool TrySetValue<TValue>(string name, Func<TValue> valueFactory, Func<TValue, bool> predicate = null)
@@ -1537,11 +1515,7 @@ namespace Zongsoft.Data
 
 		public void SetValue<TValue>(string name, TValue value, Func<TValue, bool> predicate = null)
 		{
-			if(predicate == null || predicate(value))
-			{
-				if(!_entity.TrySetValue(name, value))
-					throw new KeyNotFoundException(string.Format(KEYNOTFOUND_EXCEPTION_MESSAGE, name));
-			}
+			this.SetValue<TValue>(name, () => value, predicate);
 		}
 
 		public void SetValue<TValue>(string name, Func<TValue> valueFactory, Func<TValue, bool> predicate = null)
@@ -1549,21 +1523,15 @@ namespace Zongsoft.Data
 			if(valueFactory == null)
 				throw new ArgumentNullException(nameof(valueFactory));
 
-			var succeed = false;
-
-			if(predicate == null)
+			if(predicate != null)
 			{
-				succeed = _entity.TrySetValue(name, valueFactory());
-			}
-			else
-			{
-				var value = valueFactory();
+				_entity.TryGetValue(name, out var raw);
 
-				if(predicate(value))
-					succeed = _entity.TrySetValue(name, value);
+				if(!predicate(raw == null ? default(TValue) : (TValue)raw))
+					return;
 			}
 
-			if(!succeed)
+			if(!_entity.TrySetValue(name, valueFactory()))
 				throw new KeyNotFoundException(string.Format(KEYNOTFOUND_EXCEPTION_MESSAGE, name));
 		}
 
@@ -1592,10 +1560,7 @@ namespace Zongsoft.Data
 
 		public bool TrySetValue<TValue>(string name, TValue value, Func<TValue, bool> predicate = null)
 		{
-			if(predicate == null || predicate(value))
-				return _entity.TrySetValue(name, value);
-
-			return false;
+			return this.TrySetValue<TValue>(name, () => value, predicate);
 		}
 
 		public bool TrySetValue<TValue>(string name, Func<TValue> valueFactory, Func<TValue, bool> predicate = null)
@@ -1603,15 +1568,15 @@ namespace Zongsoft.Data
 			if(valueFactory == null)
 				throw new ArgumentNullException(nameof(valueFactory));
 
-			if(predicate == null)
-				return _entity.TrySetValue(name, valueFactory());
+			if(predicate != null)
+			{
+				_entity.TryGetValue(name, out var raw);
 
-			var value = valueFactory();
+				if(!predicate(raw == null ? default(TValue) : (TValue)raw))
+					return false;
+			}
 
-			if(predicate(value))
-				return _entity.TrySetValue(name, value);
-			else
-				return false;
+			return _entity.TrySetValue(name, valueFactory());
 		}
 		#endregion
 
