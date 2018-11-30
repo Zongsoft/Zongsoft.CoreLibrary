@@ -32,6 +32,10 @@ namespace Zongsoft.Data
 {
 	public struct Range<T> where T : struct, IComparable<T>
 	{
+		#region 单例字段
+		public static readonly Range<T> Empty = new Range<T>();
+		#endregion
+
 		#region 成员字段
 		private T? _minimum;
 		private T? _maximum;
@@ -133,8 +137,14 @@ namespace Zongsoft.Data
 		{
 			if(_minimum == null)
 				return _maximum == null ? null : new Condition(name, _maximum, ConditionOperator.LessThanEqual);
+
+			if(_maximum == null)
+				return new Condition(name, _minimum, ConditionOperator.GreaterThanEqual);
+
+			if(Comparer<T>.Default.Compare(_minimum.Value, _maximum.Value) == 0)
+				return new Condition(name, _minimum, ConditionOperator.Equal);
 			else
-				return _maximum == null ? new Condition(name, _minimum, ConditionOperator.GreaterThanEqual) : new Condition(name, new object[] { _minimum, _maximum }, ConditionOperator.Between);
+				return new Condition(name, new object[] { _minimum, _maximum }, ConditionOperator.Between);
 		}
 		#endregion
 

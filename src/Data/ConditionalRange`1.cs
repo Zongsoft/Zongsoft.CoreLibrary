@@ -29,6 +29,7 @@ using System.Linq;
 
 namespace Zongsoft.Data
 {
+	[Obsolete("Please user Range<> class.")]
 	public class ConditionalRange<T> : IConditionalRange where T : struct, IComparable
 	{
 		#region 成员字段
