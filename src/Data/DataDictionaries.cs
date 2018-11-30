@@ -34,6 +34,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 
 namespace Zongsoft.Data
 {
@@ -68,6 +69,36 @@ namespace Zongsoft.Data
 			return new EntityDictionary(entity);
 		}
 
+		public static IDataDictionary<T> GetDictionary<T>(object data)
+		{
+			if(data == null)
+				throw new ArgumentNullException(nameof(data));
+
+			switch(data)
+			{
+				case IEntity entity:
+					return new EntityDictionary<T>(entity);
+				case IDataDictionary<T> dictionary:
+					return dictionary;
+				case IDataDictionary dictionary:
+					return GetDictionary<T>(dictionary.Data);
+				case IDictionary<string, object> dictionary:
+					return new GenericDictionary<T>(dictionary);
+				case IDictionary dictionary:
+					return new ClassicDictionary<T>(dictionary);
+			}
+
+			return new ObjectDictionary<T>(data);
+		}
+
+		public static IDataDictionary<T> GetDictionary<T>(IEntity entity)
+		{
+			if(entity == null)
+				throw new ArgumentNullException(nameof(entity));
+
+			return new EntityDictionary<T>(entity);
+		}
+
 		public static IEnumerable<IDataDictionary> GetDictionaries(IEnumerable items)
 		{
 			if(items == null)
@@ -89,6 +120,30 @@ namespace Zongsoft.Data
 			{
 				if(entity != null)
 					yield return GetDictionary(entity);
+			}
+		}
+
+		public static IEnumerable<IDataDictionary<T>> GetDictionaries<T>(IEnumerable items)
+		{
+			if(items == null)
+				throw new ArgumentNullException(nameof(items));
+
+			foreach(var item in items)
+			{
+				if(item != null)
+					yield return GetDictionary<T>(item);
+			}
+		}
+
+		public static IEnumerable<IDataDictionary<T>> GetDictionaries<T>(IEnumerable<IEntity> entities)
+		{
+			if(entities == null)
+				throw new ArgumentNullException(nameof(entities));
+
+			foreach(var entity in entities)
+			{
+				if(entity != null)
+					yield return GetDictionary<T>(entity);
 			}
 		}
 		#endregion
@@ -211,13 +266,13 @@ namespace Zongsoft.Data
 				return defaultValue;
 		}
 
-		public void SetValue(string name, object value, Func<object, bool> predicate = null)
+		public void SetValue<TValue>(string name, TValue value, Func<TValue, bool> predicate = null)
 		{
 			if(predicate == null || predicate(value))
 				_dictionary[name] = value;
 		}
 
-		public void SetValue(string name, Func<object> valueFactory, Func<object, bool> predicate = null)
+		public void SetValue<TValue>(string name, Func<TValue> valueFactory, Func<TValue, bool> predicate = null)
 		{
 			if(valueFactory == null)
 				throw new ArgumentNullException(nameof(valueFactory));
@@ -235,15 +290,15 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public bool TryGetValue(string name, out object value)
+		public bool TryGetValue<TValue>(string name, out TValue value)
 		{
-			value = null;
+			value = default(TValue);
 
 			if(_dictionary.Contains(name))
 			{
 				try
 				{
-					value = _dictionary[name];
+					value = Common.Convert.ConvertValue<TValue>(_dictionary[name]);
 					return true;
 				}
 				catch
@@ -255,7 +310,7 @@ namespace Zongsoft.Data
 			return false;
 		}
 
-		public bool TryGetValue(string name, Action<object> got)
+		public bool TryGetValue<TValue>(string name, Action<TValue> got)
 		{
 			object value;
 
@@ -270,14 +325,14 @@ namespace Zongsoft.Data
 					return false;
 				}
 
-				got?.Invoke(value);
+				got?.Invoke(Common.Convert.ConvertValue<TValue>(value));
 				return true;
 			}
 
 			return false;
 		}
 
-		public bool TrySetValue(string name, object value, Func<object, bool> predicate = null)
+		public bool TrySetValue<TValue>(string name, TValue value, Func<TValue, bool> predicate = null)
 		{
 			if(predicate == null || predicate(value))
 			{
@@ -288,7 +343,7 @@ namespace Zongsoft.Data
 			return false;
 		}
 
-		public bool TrySetValue(string name, Func<object> valueFactory, Func<object, bool> predicate = null)
+		public bool TrySetValue<TValue>(string name, Func<TValue> valueFactory, Func<TValue, bool> predicate = null)
 		{
 			if(valueFactory == null)
 				throw new ArgumentNullException(nameof(valueFactory));
@@ -460,6 +515,26 @@ namespace Zongsoft.Data
 			return existed;
 		}
 
+		bool IDictionary<string, object>.TryGetValue(string key, out object value)
+		{
+			value = null;
+
+			if(_dictionary.Contains(key))
+			{
+				try
+				{
+					value = _dictionary[key];
+					return true;
+				}
+				catch
+				{
+					return false;
+				}
+			}
+
+			return false;
+		}
+
 		void ICollection<KeyValuePair<string, object>>.Add(KeyValuePair<string, object> item)
 		{
 			_dictionary.Add(item.Key, item.Value);
@@ -514,6 +589,65 @@ namespace Zongsoft.Data
 		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return _dictionary.GetEnumerator();
+		}
+		#endregion
+	}
+
+	internal class ClassicDictionary<T> : ClassicDictionary, IDataDictionary<T>
+	{
+		#region 构造函数
+		public ClassicDictionary(IDictionary data) : base(data)
+		{
+		}
+		#endregion
+
+		#region 公共方法
+		public bool Contains<TMember>(Expression<Func<T, TMember>> expression)
+		{
+			return this.Contains(Common.ExpressionUtility.GetMemberName(expression));
+		}
+
+		public TValue GetValue<TValue>(Expression<Func<T, TValue>> expression)
+		{
+			return (TValue)this.GetValue(Common.ExpressionUtility.GetMemberName(expression));
+		}
+
+		public TValue GetValue<TValue>(Expression<Func<T, TValue>> expression, TValue defaultValue)
+		{
+			return this.GetValue(Common.ExpressionUtility.GetMemberName(expression), defaultValue);
+		}
+
+		public void SetValue<TValue>(Expression<Func<T, TValue>> expression, TValue value, Func<TValue, bool> predicate = null)
+		{
+			this.SetValue(Common.ExpressionUtility.GetMemberName(expression), value, predicate);
+		}
+
+		public void SetValue<TValue>(Expression<Func<T, TValue>> expression, Func<string, TValue> valueFactory, Func<TValue, bool> predicate = null)
+		{
+			var name = Common.ExpressionUtility.GetMemberName(expression);
+			this.SetValue(name, () => valueFactory(name), predicate);
+		}
+
+		public bool TryGetValue<TValue>(Expression<Func<T, TValue>> expression, out TValue value)
+		{
+			return this.TryGetValue(Common.ExpressionUtility.GetMemberName(expression), out value);
+		}
+
+		public bool TryGetValue<TValue>(Expression<Func<T, TValue>> expression, Action<string, TValue> got)
+		{
+			var name = Common.ExpressionUtility.GetMemberName(expression);
+			return this.TryGetValue<TValue>(name, value => got(name, value));
+		}
+
+		public bool TrySetValue<TValue>(Expression<Func<T, TValue>> expression, TValue value, Func<TValue, bool> predicate = null)
+		{
+			return this.TrySetValue(Common.ExpressionUtility.GetMemberName(expression), value, predicate);
+		}
+
+		public bool TrySetValue<TValue>(Expression<Func<T, TValue>> expression, Func<string, TValue> valueFactory, Func<TValue, bool> predicate = null)
+		{
+			var name = Common.ExpressionUtility.GetMemberName(expression);
+			return this.TrySetValue(name, () => valueFactory(name), predicate);
 		}
 		#endregion
 	}
@@ -580,13 +714,13 @@ namespace Zongsoft.Data
 			return defaultValue;
 		}
 
-		public void SetValue(string name, object value, Func<object, bool> predicate = null)
+		public void SetValue<TValue>(string name, TValue value, Func<TValue, bool> predicate = null)
 		{
 			if(predicate == null || predicate(value))
 				_dictionary[name] = value;
 		}
 
-		public void SetValue(string name, Func<object> valueFactory, Func<object, bool> predicate = null)
+		public void SetValue<TValue>(string name, Func<TValue> valueFactory, Func<TValue, bool> predicate = null)
 		{
 			if(valueFactory == null)
 				throw new ArgumentNullException(nameof(valueFactory));
@@ -604,23 +738,30 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public bool TryGetValue(string name, out object value)
+		public bool TryGetValue<TValue>(string name, out TValue value)
 		{
-			return _dictionary.TryGetValue(name, out value);
+			if(_dictionary.TryGetValue(name, out var obj))
+			{
+				value = Common.Convert.ConvertValue<TValue>(obj);
+				return true;
+			}
+
+			value = default(TValue);
+			return false;
 		}
 
-		public bool TryGetValue(string name, Action<object> got)
+		public bool TryGetValue<TValue>(string name, Action<TValue> got)
 		{
 			if(_dictionary.TryGetValue(name, out var value))
 			{
-				got?.Invoke(value);
+				got?.Invoke(Common.Convert.ConvertValue<TValue>(value));
 				return true;
 			}
 
 			return false;
 		}
 
-		public bool TrySetValue(string name, object value, Func<object, bool> predicate = null)
+		public bool TrySetValue<TValue>(string name, TValue value, Func<TValue, bool> predicate = null)
 		{
 			if(predicate == null || predicate(value))
 			{
@@ -631,7 +772,7 @@ namespace Zongsoft.Data
 			return false;
 		}
 
-		public bool TrySetValue(string name, Func<object> valueFactory, Func<object, bool> predicate = null)
+		public bool TrySetValue<TValue>(string name, Func<TValue> valueFactory, Func<TValue, bool> predicate = null)
 		{
 			if(valueFactory == null)
 				throw new ArgumentNullException(nameof(valueFactory));
@@ -811,6 +952,11 @@ namespace Zongsoft.Data
 			return _dictionary.Remove(key);
 		}
 
+		bool IDictionary<string, object>.TryGetValue(string key, out object value)
+		{
+			return _dictionary.TryGetValue(key, out value);
+		}
+
 		void ICollection<KeyValuePair<string, object>>.Add(KeyValuePair<string, object> item)
 		{
 			_dictionary.Add(item.Key, item.Value);
@@ -854,6 +1000,65 @@ namespace Zongsoft.Data
 		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return _dictionary.GetEnumerator();
+		}
+		#endregion
+	}
+
+	internal class GenericDictionary<T> : GenericDictionary, IDataDictionary<T>
+	{
+		#region 构造函数
+		public GenericDictionary(IDictionary<string, object> data) : base(data)
+		{
+		}
+		#endregion
+
+		#region 公共方法
+		public bool Contains<TMember>(Expression<Func<T, TMember>> expression)
+		{
+			return this.Contains(Common.ExpressionUtility.GetMemberName(expression));
+		}
+
+		public TValue GetValue<TValue>(Expression<Func<T, TValue>> expression)
+		{
+			return (TValue)this.GetValue(Common.ExpressionUtility.GetMemberName(expression));
+		}
+
+		public TValue GetValue<TValue>(Expression<Func<T, TValue>> expression, TValue defaultValue)
+		{
+			return this.GetValue(Common.ExpressionUtility.GetMemberName(expression), defaultValue);
+		}
+
+		public void SetValue<TValue>(Expression<Func<T, TValue>> expression, TValue value, Func<TValue, bool> predicate = null)
+		{
+			this.SetValue(Common.ExpressionUtility.GetMemberName(expression), value, predicate);
+		}
+
+		public void SetValue<TValue>(Expression<Func<T, TValue>> expression, Func<string, TValue> valueFactory, Func<TValue, bool> predicate = null)
+		{
+			var name = Common.ExpressionUtility.GetMemberName(expression);
+			this.SetValue(name, () => valueFactory(name), predicate);
+		}
+
+		public bool TryGetValue<TValue>(Expression<Func<T, TValue>> expression, out TValue value)
+		{
+			return this.TryGetValue(Common.ExpressionUtility.GetMemberName(expression), out value);
+		}
+
+		public bool TryGetValue<TValue>(Expression<Func<T, TValue>> expression, Action<string, TValue> got)
+		{
+			var name = Common.ExpressionUtility.GetMemberName(expression);
+			return this.TryGetValue<TValue>(name, value => got(name, value));
+		}
+
+		public bool TrySetValue<TValue>(Expression<Func<T, TValue>> expression, TValue value, Func<TValue, bool> predicate = null)
+		{
+			return this.TrySetValue(Common.ExpressionUtility.GetMemberName(expression), value, predicate);
+		}
+
+		public bool TrySetValue<TValue>(Expression<Func<T, TValue>> expression, Func<string, TValue> valueFactory, Func<TValue, bool> predicate = null)
+		{
+			var name = Common.ExpressionUtility.GetMemberName(expression);
+			return this.TrySetValue(name, () => valueFactory(name), predicate);
 		}
 		#endregion
 	}
@@ -937,32 +1142,32 @@ namespace Zongsoft.Data
 			throw new NotImplementedException();
 		}
 
-		public void SetValue(string name, object value, Func<object, bool> predicate = null)
+		public void SetValue<TValue>(string name, TValue value, Func<TValue, bool> predicate = null)
 		{
 			throw new NotImplementedException();
 		}
 
-		public void SetValue(string name, Func<object> valueFactory, Func<object, bool> predicate = null)
+		public void SetValue<TValue>(string name, Func<TValue> valueFactory, Func<TValue, bool> predicate = null)
 		{
 			throw new NotImplementedException();
 		}
 
-		public bool TryGetValue(string name, out object value)
+		public bool TryGetValue<TValue>(string name, out TValue value)
 		{
 			throw new NotImplementedException();
 		}
 
-		public bool TryGetValue(string name, Action<object> got)
+		public bool TryGetValue<TValue>(string name, Action<TValue> got)
 		{
 			throw new NotImplementedException();
 		}
 
-		public bool TrySetValue(string name, object value, Func<object, bool> predicate = null)
+		public bool TrySetValue<TValue>(string name, TValue value, Func<TValue, bool> predicate = null)
 		{
 			throw new NotImplementedException();
 		}
 
-		public bool TrySetValue(string name, Func<object> valueFactory, Func<object, bool> predicate = null)
+		public bool TrySetValue<TValue>(string name, Func<TValue> valueFactory, Func<TValue, bool> predicate = null)
 		{
 			throw new NotImplementedException();
 		}
@@ -1173,6 +1378,65 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
+	internal class ObjectDictionary<T> : ObjectDictionary, IDataDictionary<T>
+	{
+		#region 构造函数
+		public ObjectDictionary(object data) : base(data)
+		{
+		}
+		#endregion
+
+		#region 公共方法
+		public bool Contains<TMember>(Expression<Func<T, TMember>> expression)
+		{
+			return this.Contains(Common.ExpressionUtility.GetMemberName(expression));
+		}
+
+		public TValue GetValue<TValue>(Expression<Func<T, TValue>> expression)
+		{
+			return (TValue)this.GetValue(Common.ExpressionUtility.GetMemberName(expression));
+		}
+
+		public TValue GetValue<TValue>(Expression<Func<T, TValue>> expression, TValue defaultValue)
+		{
+			return this.GetValue(Common.ExpressionUtility.GetMemberName(expression), defaultValue);
+		}
+
+		public void SetValue<TValue>(Expression<Func<T, TValue>> expression, TValue value, Func<TValue, bool> predicate = null)
+		{
+			this.SetValue(Common.ExpressionUtility.GetMemberName(expression), value, predicate);
+		}
+
+		public void SetValue<TValue>(Expression<Func<T, TValue>> expression, Func<string, TValue> valueFactory, Func<TValue, bool> predicate = null)
+		{
+			var name = Common.ExpressionUtility.GetMemberName(expression);
+			this.SetValue(name, () => valueFactory(name), predicate);
+		}
+
+		public bool TryGetValue<TValue>(Expression<Func<T, TValue>> expression, out TValue value)
+		{
+			return this.TryGetValue(Common.ExpressionUtility.GetMemberName(expression), out value);
+		}
+
+		public bool TryGetValue<TValue>(Expression<Func<T, TValue>> expression, Action<string, TValue> got)
+		{
+			var name = Common.ExpressionUtility.GetMemberName(expression);
+			return this.TryGetValue<TValue>(name, value => got(name, value));
+		}
+
+		public bool TrySetValue<TValue>(Expression<Func<T, TValue>> expression, TValue value, Func<TValue, bool> predicate = null)
+		{
+			return this.TrySetValue(Common.ExpressionUtility.GetMemberName(expression), value, predicate);
+		}
+
+		public bool TrySetValue<TValue>(Expression<Func<T, TValue>> expression, Func<string, TValue> valueFactory, Func<TValue, bool> predicate = null)
+		{
+			var name = Common.ExpressionUtility.GetMemberName(expression);
+			return this.TrySetValue(name, () => valueFactory(name), predicate);
+		}
+		#endregion
+	}
+
 	internal class EntityDictionary : IDataDictionary
 	{
 		#region 私有常量
@@ -1271,7 +1535,7 @@ namespace Zongsoft.Data
 			return defaultValue;
 		}
 
-		public void SetValue(string name, object value, Func<object, bool> predicate = null)
+		public void SetValue<TValue>(string name, TValue value, Func<TValue, bool> predicate = null)
 		{
 			if(predicate == null || predicate(value))
 			{
@@ -1280,7 +1544,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public void SetValue(string name, Func<object> valueFactory, Func<object, bool> predicate = null)
+		public void SetValue<TValue>(string name, Func<TValue> valueFactory, Func<TValue, bool> predicate = null)
 		{
 			if(valueFactory == null)
 				throw new ArgumentNullException(nameof(valueFactory));
@@ -1303,23 +1567,30 @@ namespace Zongsoft.Data
 				throw new KeyNotFoundException(string.Format(KEYNOTFOUND_EXCEPTION_MESSAGE, name));
 		}
 
-		public bool TryGetValue(string name, out object value)
+		public bool TryGetValue<TValue>(string name, out TValue value)
 		{
-			return _entity.TryGetValue(name, out value);
+			if(_entity.TryGetValue(name, out var obj))
+			{
+				value = Common.Convert.ConvertValue<TValue>(obj);
+				return true;
+			}
+
+			value = default(TValue);
+			return false;
 		}
 
-		public bool TryGetValue(string name, Action<object> got)
+		public bool TryGetValue<TValue>(string name, Action<TValue> got)
 		{
 			if(_entity.TryGetValue(name, out var value))
 			{
-				got?.Invoke(value);
+				got?.Invoke(Common.Convert.ConvertValue<TValue>(value));
 				return true;
 			}
 
 			return false;
 		}
 
-		public bool TrySetValue(string name, object value, Func<object, bool> predicate = null)
+		public bool TrySetValue<TValue>(string name, TValue value, Func<TValue, bool> predicate = null)
 		{
 			if(predicate == null || predicate(value))
 				return _entity.TrySetValue(name, value);
@@ -1327,7 +1598,7 @@ namespace Zongsoft.Data
 			return false;
 		}
 
-		public bool TrySetValue(string name, Func<object> valueFactory, Func<object, bool> predicate = null)
+		public bool TrySetValue<TValue>(string name, Func<TValue> valueFactory, Func<TValue, bool> predicate = null)
 		{
 			if(valueFactory == null)
 				throw new ArgumentNullException(nameof(valueFactory));
@@ -1550,6 +1821,65 @@ namespace Zongsoft.Data
 		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return this.GetEnumerator();
+		}
+		#endregion
+	}
+
+	internal class EntityDictionary<T> : EntityDictionary, IDataDictionary<T>
+	{
+		#region 构造函数
+		public EntityDictionary(IEntity entity) : base(entity)
+		{
+		}
+		#endregion
+
+		#region 公共方法
+		public bool Contains<TMember>(Expression<Func<T, TMember>> expression)
+		{
+			return this.Contains(Common.ExpressionUtility.GetMemberName(expression));
+		}
+
+		public TValue GetValue<TValue>(Expression<Func<T, TValue>> expression)
+		{
+			return (TValue)this.GetValue(Common.ExpressionUtility.GetMemberName(expression));
+		}
+
+		public TValue GetValue<TValue>(Expression<Func<T, TValue>> expression, TValue defaultValue)
+		{
+			return this.GetValue(Common.ExpressionUtility.GetMemberName(expression), defaultValue);
+		}
+
+		public void SetValue<TValue>(Expression<Func<T, TValue>> expression, TValue value, Func<TValue, bool> predicate = null)
+		{
+			this.SetValue(Common.ExpressionUtility.GetMemberName(expression), value, predicate);
+		}
+
+		public void SetValue<TValue>(Expression<Func<T, TValue>> expression, Func<string, TValue> valueFactory, Func<TValue, bool> predicate = null)
+		{
+			var name = Common.ExpressionUtility.GetMemberName(expression);
+			this.SetValue(name, () => valueFactory(name), predicate);
+		}
+
+		public bool TryGetValue<TValue>(Expression<Func<T, TValue>> expression, out TValue value)
+		{
+			return this.TryGetValue(Common.ExpressionUtility.GetMemberName(expression), out value);
+		}
+
+		public bool TryGetValue<TValue>(Expression<Func<T, TValue>> expression, Action<string, TValue> got)
+		{
+			var name = Common.ExpressionUtility.GetMemberName(expression);
+			return this.TryGetValue<TValue>(name, value => got(name, value));
+		}
+
+		public bool TrySetValue<TValue>(Expression<Func<T, TValue>> expression, TValue value, Func<TValue, bool> predicate = null)
+		{
+			return this.TrySetValue(Common.ExpressionUtility.GetMemberName(expression), value, predicate);
+		}
+
+		public bool TrySetValue<TValue>(Expression<Func<T, TValue>> expression, Func<string, TValue> valueFactory, Func<TValue, bool> predicate = null)
+		{
+			var name = Common.ExpressionUtility.GetMemberName(expression);
+			return this.TrySetValue(name, () => valueFactory(name), predicate);
 		}
 		#endregion
 	}

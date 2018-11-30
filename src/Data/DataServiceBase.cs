@@ -221,20 +221,17 @@ namespace Zongsoft.Data
 
 		public virtual bool Exists<TKey>(TKey key, object state = null)
 		{
-			bool singleton;
-			return this.Exists(this.ConvertKey(key, out singleton), state);
+			return this.Exists(this.ConvertKey(key, out _), state);
 		}
 
 		public virtual bool Exists<TKey1, TKey2>(TKey1 key1, TKey2 key2, object state = null)
 		{
-			bool singleton;
-			return this.Exists(this.ConvertKey(key1, key2, out singleton), state);
+			return this.Exists(this.ConvertKey(key1, key2, out _), state);
 		}
 
 		public virtual bool Exists<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, object state = null)
 		{
-			bool singleton;
-			return this.Exists(this.ConvertKey(key1, key2, key3, out singleton), state);
+			return this.Exists(this.ConvertKey(key1, key2, key3, out _), state);
 		}
 		#endregion
 
@@ -399,7 +396,7 @@ namespace Zongsoft.Data
 				return 0;
 
 			//将当前插入数据对象转换成数据字典
-			var dictionary = DataDictionary.GetDictionary(data);
+			var dictionary = DataDictionary.GetDictionary<TEntity>(data);
 
 			//验证待新增的数据
 			this.OnValidate(DataAccessMethod.Insert, dictionary);
@@ -434,7 +431,7 @@ namespace Zongsoft.Data
 				return 0;
 
 			//将当前插入数据集合对象转换成数据字典集合
-			var dictionares = DataDictionary.GetDictionaries(items);
+			var dictionares = DataDictionary.GetDictionaries<TEntity>(items);
 
 			foreach(var dictionary in dictionares)
 			{
@@ -448,7 +445,7 @@ namespace Zongsoft.Data
 			return this.OnInsertMany(dictionares, schema, state);
 		}
 
-		protected virtual int OnInsert(IDataDictionary data, string schema, object state)
+		protected virtual int OnInsert(IDataDictionary<TEntity> data, string schema, object state)
 		{
 			if(data == null || data.Data == null)
 				return 0;
@@ -457,7 +454,7 @@ namespace Zongsoft.Data
 			return this.DataAccess.Insert(this.Name, data, schema, state, ctx => this.OnInserting(ctx), ctx => this.OnInserted(ctx));
 		}
 
-		protected virtual int OnInsertMany(IEnumerable<IDataDictionary> items, string schema, object state)
+		protected virtual int OnInsertMany(IEnumerable<IDataDictionary<TEntity>> items, string schema, object state)
 		{
 			if(items == null)
 				return 0;
@@ -522,7 +519,7 @@ namespace Zongsoft.Data
 			condition = this.OnValidate(DataAccessMethod.Update, condition);
 
 			//将当前更新数据对象转换成数据字典
-			var dictionary = DataDictionary.GetDictionary(data);
+			var dictionary = DataDictionary.GetDictionary<TEntity>(data);
 
 			//验证待更新的数据
 			this.OnValidate(DataAccessMethod.Update, dictionary);
@@ -545,7 +542,7 @@ namespace Zongsoft.Data
 				return 0;
 
 			//将当前更新数据集合对象转换成数据字典集合
-			var dictionares = DataDictionary.GetDictionaries(items);
+			var dictionares = DataDictionary.GetDictionaries<TEntity>(items);
 
 			foreach(var dictionary in dictionares)
 			{
@@ -556,7 +553,7 @@ namespace Zongsoft.Data
 			return this.OnUpdateMany(dictionares, schema, state);
 		}
 
-		protected virtual int OnUpdate(IDataDictionary data, ICondition condition, string schema, object state)
+		protected virtual int OnUpdate(IDataDictionary<TEntity> data, ICondition condition, string schema, object state)
 		{
 			if(data == null || data.Data == null)
 				return 0;
@@ -564,7 +561,7 @@ namespace Zongsoft.Data
 			return this.DataAccess.Update(this.Name, data, condition, schema, state, ctx => this.OnUpdating(ctx), ctx => this.OnUpdated(ctx));
 		}
 
-		protected virtual int OnUpdateMany(IEnumerable<IDataDictionary> items, string schema, object state)
+		protected virtual int OnUpdateMany(IEnumerable<IDataDictionary<TEntity>> items, string schema, object state)
 		{
 			if(items == null)
 				return 0;
@@ -1026,7 +1023,7 @@ namespace Zongsoft.Data
 			return condition;
 		}
 
-		protected virtual void OnValidate(DataAccessMethod method, IDataDictionary data)
+		protected virtual void OnValidate(DataAccessMethod method, IDataDictionary<TEntity> data)
 		{
 		}
 		#endregion

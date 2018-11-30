@@ -49,13 +49,13 @@ namespace Zongsoft.Data
 		object GetValue(string name);
 		TValue GetValue<TValue>(string name, TValue defaultValue);
 
-		void SetValue(string name, object value, Func<object, bool> predicate = null);
-		void SetValue(string name, Func<object> valueFactory, Func<object, bool> predicate = null);
+		void SetValue<TValue>(string name, TValue value, Func<TValue, bool> predicate = null);
+		void SetValue<TValue>(string name, Func<TValue> valueFactory, Func<TValue, bool> predicate = null);
 
-		//bool TryGetValue(string name, out object value);
-		bool TryGetValue(string name, Action<object> got);
+		bool TryGetValue<TValue>(string name, out TValue value);
+		bool TryGetValue<TValue>(string name, Action<TValue> got);
 
-		bool TrySetValue(string name, object value, Func<object, bool> predicate = null);
-		bool TrySetValue(string name, Func<object> valueFactory, Func<object, bool> predicate = null);
+		bool TrySetValue<TValue>(string name, TValue value, Func<TValue, bool> predicate = null);
+		bool TrySetValue<TValue>(string name, Func<TValue> valueFactory, Func<TValue, bool> predicate = null);
 	}
 }

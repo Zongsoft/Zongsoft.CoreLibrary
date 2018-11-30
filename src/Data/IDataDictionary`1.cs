@@ -38,18 +38,18 @@ namespace Zongsoft.Data
 {
 	public interface IDataDictionary<T> : IDataDictionary
 	{
-		//bool Contains<TMember>(Expression<Func<T, TMember>> expression);
+		bool Contains<TMember>(Expression<Func<T, TMember>> expression);
 
-		//TValue GetValue<TValue>(Expression<Func<T, TValue>> expression);
-		//TValue GetValue<TValue>(Expression<Func<T, TValue>> expression, TValue defaultValue);
+		TValue GetValue<TValue>(Expression<Func<T, TValue>> expression);
+		TValue GetValue<TValue>(Expression<Func<T, TValue>> expression, TValue defaultValue);
 
-		//void SetValue<TValue>(Expression<Func<T, TValue>> expression, TValue value, Func<TValue, bool> predicate = null);
-		//void SetValue<TValue>(Expression<Func<T, TValue>> expression, Func<string, TValue> valueFactory, Func<TValue, bool> predicate = null);
+		void SetValue<TValue>(Expression<Func<T, TValue>> expression, TValue value, Func<TValue, bool> predicate = null);
+		void SetValue<TValue>(Expression<Func<T, TValue>> expression, Func<string, TValue> valueFactory, Func<TValue, bool> predicate = null);
 
-		//bool TryGetValue<TValue>(Expression<Func<T, TValue>> expression, out TValue value);
-		//bool TryGetValue<TValue>(Expression<Func<T, TValue>> expression, Action<string, TValue> got);
+		bool TryGetValue<TValue>(Expression<Func<T, TValue>> expression, out TValue value);
+		bool TryGetValue<TValue>(Expression<Func<T, TValue>> expression, Action<string, TValue> got);
 
-		//bool TrySetValue<TValue>(Expression<Func<T, TValue>> expression, TValue value, Func<TValue, bool> predicate = null);
-		//bool TrySetValue<TValue>(Expression<Func<T, TValue>> expression, Func<string, TValue> valueFactory, Func<TValue, bool> predicate = null);
+		bool TrySetValue<TValue>(Expression<Func<T, TValue>> expression, TValue value, Func<TValue, bool> predicate = null);
+		bool TrySetValue<TValue>(Expression<Func<T, TValue>> expression, Func<string, TValue> valueFactory, Func<TValue, bool> predicate = null);
 	}
 }
