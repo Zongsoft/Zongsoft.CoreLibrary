@@ -64,7 +64,7 @@ namespace Zongsoft.Data
 		protected DataAccessBase(string name)
 		{
 			_name = name ?? string.Empty;
-			_naming = new DataAccessNaming(name);
+			_naming = new DataAccessNaming();
 			_filters = new List<IDataAccessFilter>();
 		}
 

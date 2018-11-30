@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2017 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -36,14 +36,12 @@ namespace Zongsoft.Data
 	public class DataAccessNaming : IDataAccessNaming, ICollection<KeyValuePair<Type, string>>
 	{
 		#region 成员字段
-		private readonly string _namespace;
 		private readonly IDictionary<Type, string> _mapping;
 		#endregion
 
 		#region 构造函数
-		public DataAccessNaming(string @namespace)
+		public DataAccessNaming()
 		{
-			_namespace = @namespace;
 			_mapping = new Dictionary<Type, string>();
 		}
 		#endregion
@@ -56,22 +54,6 @@ namespace Zongsoft.Data
 				return _mapping.Count;
 			}
 		}
-
-		public string Namespace
-		{
-			get
-			{
-				return _namespace;
-			}
-		}
-
-		bool ICollection<KeyValuePair<Type, string>>.IsReadOnly
-		{
-			get
-			{
-				return false;
-			}
-		}
 		#endregion
 
 		#region 公共方法
@@ -80,10 +62,7 @@ namespace Zongsoft.Data
 			if(type == null)
 				throw new ArgumentNullException(nameof(type));
 
-			if(string.IsNullOrWhiteSpace(name))
-				name = type.Name;
-
-			_mapping[type] = name.Trim();
+			_mapping[type] = string.IsNullOrEmpty(name) ? GetName(type) : name;
 		}
 
 		public void Map<T>(string name = null)
@@ -96,20 +75,11 @@ namespace Zongsoft.Data
 			if(type == null)
 				throw new ArgumentNullException(nameof(type));
 
-			string result;
-
-			if(_mapping.TryGetValue(type, out result))
-				return result;
-
-			var name = GetName(type);
-
-			if(string.IsNullOrEmpty(name))
-				throw new InvalidOperationException($"Missing data access mapping of the '{type.FullName}' type.");
+			if(_mapping.TryGetValue(type, out var name))
+				return name;
 
 			//将非空的名字注册到映射表中
-			_mapping[type] = name;
-
-			return name;
+			return _mapping[type] = GetName(type);
 		}
 
 		public string Get<T>()
@@ -119,7 +89,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 静态方法
-		internal static string GetName(Type type, string @namespace = null)
+		internal static string GetName(Type type)
 		{
 			//如果该类型应用了数据访问注解，则返回注解中声明的名字
 			if(TryGetNameFromAttribute(type, out var name))
@@ -147,15 +117,11 @@ namespace Zongsoft.Data
 			//处理接口命名的规范
 			if(type.IsInterface && name.Length > 1 && name[0] == 'I' && char.IsUpper(name[1]))
 				name = name.Substring(1);
-
 			//处理抽象类命名的规范
-			if(type.IsAbstract && name.Length > 4 && name.EndsWith("Base"))
+			else if(type.IsAbstract && name.Length > 4 && name.EndsWith("Base"))
 				name = name.Substring(0, name.Length - 4);
 
-			if(string.IsNullOrEmpty(@namespace))
-				return name;
-			else
-				return @namespace + "." + name;
+			return name;
 		}
 
 		private static bool TryGetNameFromAttribute(Type type, out string name)
@@ -164,7 +130,7 @@ namespace Zongsoft.Data
 
 			foreach(var attribute in type.CustomAttributes)
 			{
-				if(attribute.AttributeType == typeof(DataAccessAttribute))
+				if(attribute.AttributeType == typeof(EntityAttribute))
 				{
 					switch(attribute.ConstructorArguments.Count)
 					{
@@ -185,6 +151,14 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 集合成员
+		bool ICollection<KeyValuePair<Type, string>>.IsReadOnly
+		{
+			get
+			{
+				return false;
+			}
+		}
+
 		void ICollection<KeyValuePair<Type, string>>.Add(KeyValuePair<Type, string> item)
 		{
 			this.Map(item.Key, item.Value);
