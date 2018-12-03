@@ -46,6 +46,7 @@ namespace Zongsoft.Data
 
 		bool Contains(string name);
 
+		bool HasChanges(params string[] names);
 		void Reset(params string[] names);
 
 		object GetValue(string name);

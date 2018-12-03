@@ -253,6 +253,20 @@ namespace Zongsoft.Data
 			return _dictionary.Contains(name);
 		}
 
+		public bool HasChanges(params string[] names)
+		{
+			if(names == null || names.Length == 0)
+				return _dictionary.Count > 0;
+
+			foreach(var name in names)
+			{
+				if(_dictionary.Contains(name))
+					return true;
+			}
+
+			return false;
+		}
+
 		public void Reset(params string[] names)
 		{
 			if(names == null || names.Length == 0)
@@ -712,6 +726,20 @@ namespace Zongsoft.Data
 			return _dictionary.ContainsKey(name);
 		}
 
+		public bool HasChanges(params string[] names)
+		{
+			if(names == null || names.Length == 0)
+				return _dictionary.Count > 0;
+
+			foreach(var name in names)
+			{
+				if(_dictionary.ContainsKey(name))
+					return true;
+			}
+
+			return false;
+		}
+
 		public void Reset(params string[] names)
 		{
 			if(names == null || names.Length == 0)
@@ -1148,6 +1176,11 @@ namespace Zongsoft.Data
 			throw new NotImplementedException();
 		}
 
+		public bool HasChanges(params string[] names)
+		{
+			throw new NotImplementedException();
+		}
+
 		public void Reset(params string[] names)
 		{
 			throw new NotImplementedException();
@@ -1482,14 +1515,6 @@ namespace Zongsoft.Data
 
 		#region 公共属性
 		public object Data
-		{
-			get
-			{
-				return _entity;
-			}
-		}
-
-		public IEntity Entity
 		{
 			get
 			{
