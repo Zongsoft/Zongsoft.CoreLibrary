@@ -49,7 +49,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 公共方法
-		public static ICondition ToCondition(this IConditional conditional)
+		public static ICondition ToCondition(this IEntity conditional)
 		{
 			if(conditional == null)
 				return null;
@@ -66,7 +66,7 @@ namespace Zongsoft.Data
 			return GenerateCondition(conditional, descriptor.Properties[changes.First().Key]);
 		}
 
-		public static ConditionCollection ToConditions(this IConditional conditional)
+		public static ConditionCollection ToConditions(this IEntity conditional)
 		{
 			if(conditional == null)
 				return null;
@@ -76,7 +76,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 私有方法
-		private static ConditionCollection ToConditions(IConditional conditional, IDictionary<string, object> changes)
+		private static ConditionCollection ToConditions(IEntity conditional, IDictionary<string, object> changes)
 		{
 			if(changes == null || changes.Count == 0)
 				return null;
@@ -92,7 +92,7 @@ namespace Zongsoft.Data
 				if(condition != null)
 				{
 					if(conditions == null)
-						conditions = new ConditionCollection(conditional.Combination);
+						conditions = ConditionCollection.And();
 
 					conditions.Add(condition);
 				}
@@ -101,7 +101,7 @@ namespace Zongsoft.Data
 			return conditions;
 		}
 
-		private static ICondition GenerateCondition(IConditional conditional, ConditionalPropertyDescripor property)
+		private static ICondition GenerateCondition(IEntity conditional, ConditionalPropertyDescripor property)
 		{
 			//如果当前属性值为默认值，则忽略它
 			if(property == null)

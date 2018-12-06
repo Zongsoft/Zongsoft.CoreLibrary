@@ -31,6 +31,7 @@ namespace Zongsoft.Data
 	/// <summary>
 	/// 表示条件设置实体的接口。
 	/// </summary>
+	[Obsolete]
 	public interface IConditional : IEntity
 	{
 		/// <summary>
