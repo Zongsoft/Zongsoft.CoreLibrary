@@ -578,6 +578,38 @@ namespace Zongsoft.Data
 			return this.Insert(this.GetName(data.GetType()), data, schema, state, inserting, inserted);
 		}
 
+		public int Insert<T>(object data)
+		{
+			if(data == null)
+				return 0;
+
+			return this.Insert(this.GetName(typeof(T)), data, null, null, null, null);
+		}
+
+		public int Insert<T>(object data, object state)
+		{
+			if(data == null)
+				return 0;
+
+			return this.Insert(this.GetName(typeof(T)), data, null, state, null, null);
+		}
+
+		public int Insert<T>(object data, string schema)
+		{
+			if(data == null)
+				return 0;
+
+			return this.Insert(this.GetName(typeof(T)), data, schema, null, null, null);
+		}
+
+		public int Insert<T>(object data, string schema, object state, Func<DataInsertContextBase, bool> inserting = null, Action<DataInsertContextBase> inserted = null)
+		{
+			if(data == null)
+				return 0;
+
+			return this.Insert(this.GetName(typeof(T)), data, schema, state, inserting, inserted);
+		}
+
 		public int Insert(string name, object data)
 		{
 			return this.Insert(name, data, null, null, null, null);
@@ -657,6 +689,38 @@ namespace Zongsoft.Data
 		}
 
 		public int InsertMany<T>(IEnumerable<T> items, string schema, object state, Func<DataInsertContextBase, bool> inserting = null, Action<DataInsertContextBase> inserted = null)
+		{
+			if(items == null)
+				return 0;
+
+			return this.InsertMany(this.GetName<T>(), items, schema, state, inserting, inserted);
+		}
+
+		public int InsertMany<T>(IEnumerable items)
+		{
+			if(items == null)
+				return 0;
+
+			return this.InsertMany(this.GetName<T>(), items, null, null, null, null);
+		}
+
+		public int InsertMany<T>(IEnumerable items, object state)
+		{
+			if(items == null)
+				return 0;
+
+			return this.InsertMany(this.GetName<T>(), items, null, state, null, null);
+		}
+
+		public int InsertMany<T>(IEnumerable items, string schema)
+		{
+			if(items == null)
+				return 0;
+
+			return this.InsertMany(this.GetName<T>(), items, schema, null, null, null);
+		}
+
+		public int InsertMany<T>(IEnumerable items, string schema, object state, Func<DataInsertContextBase, bool> inserting = null, Action<DataInsertContextBase> inserted = null)
 		{
 			if(items == null)
 				return 0;
@@ -778,20 +842,76 @@ namespace Zongsoft.Data
 			return this.Update(this.GetName(data.GetType()), data, condition, schema, null, null, null);
 		}
 
-		public int Update<T>(T data, ICondition condition, string schema, object state)
-		{
-			if(data == null)
-				return 0;
-
-			return this.Update(this.GetName(data.GetType()), data, condition, schema, state, null, null);
-		}
-
 		public int Update<T>(T data, ICondition condition, string schema, object state, Func<DataUpdateContextBase, bool> updating = null, Action<DataUpdateContextBase> updated = null)
 		{
 			if(data == null)
 				return 0;
 
 			return this.Update(this.GetName(data.GetType()), data, condition, schema, state, updating, updated);
+		}
+
+		public int Update<T>(object data)
+		{
+			if(data == null)
+				return 0;
+
+			return this.Update(this.GetName(typeof(T)), data, null, string.Empty, null, null, null);
+		}
+
+		public int Update<T>(object data, object state)
+		{
+			if(data == null)
+				return 0;
+
+			return this.Update(this.GetName(typeof(T)), data, null, string.Empty, state, null, null);
+		}
+
+		public int Update<T>(object data, string schema)
+		{
+			if(data == null)
+				return 0;
+
+			return this.Update(this.GetName(typeof(T)), data, null, schema, null, null, null);
+		}
+
+		public int Update<T>(object data, string schema, object state)
+		{
+			if(data == null)
+				return 0;
+
+			return this.Update(this.GetName(typeof(T)), data, null, schema, state, null, null);
+		}
+
+		public int Update<T>(object data, ICondition condition)
+		{
+			if(data == null)
+				return 0;
+
+			return this.Update(this.GetName(typeof(T)), data, condition, string.Empty, null, null, null);
+		}
+
+		public int Update<T>(object data, ICondition condition, object state)
+		{
+			if(data == null)
+				return 0;
+
+			return this.Update(this.GetName(typeof(T)), data, condition, string.Empty, state, null, null);
+		}
+
+		public int Update<T>(object data, ICondition condition, string schema)
+		{
+			if(data == null)
+				return 0;
+
+			return this.Update(this.GetName(typeof(T)), data, condition, schema, null, null, null);
+		}
+
+		public int Update<T>(object data, ICondition condition, string schema, object state, Func<DataUpdateContextBase, bool> updating = null, Action<DataUpdateContextBase> updated = null)
+		{
+			if(data == null)
+				return 0;
+
+			return this.Update(this.GetName(typeof(T)), data, condition, schema, state, updating, updated);
 		}
 
 		public int Update(string name, object data)
@@ -895,6 +1015,26 @@ namespace Zongsoft.Data
 		}
 
 		public int UpdateMany<T>(IEnumerable<T> items, string schema, object state, Func<DataUpdateContextBase, bool> updating = null, Action<DataUpdateContextBase> updated = null)
+		{
+			return this.UpdateMany(this.GetName<T>(), items, schema, state, updating, updated);
+		}
+
+		public int UpdateMany<T>(IEnumerable items)
+		{
+			return this.UpdateMany(this.GetName<T>(), items, string.Empty, null, null, null);
+		}
+
+		public int UpdateMany<T>(IEnumerable items, object state)
+		{
+			return this.UpdateMany(this.GetName<T>(), items, string.Empty, state, null, null);
+		}
+
+		public int UpdateMany<T>(IEnumerable items, string schema)
+		{
+			return this.UpdateMany(this.GetName<T>(), items, schema, null, null, null);
+		}
+
+		public int UpdateMany<T>(IEnumerable items, string schema, object state, Func<DataUpdateContextBase, bool> updating = null, Action<DataUpdateContextBase> updated = null)
 		{
 			return this.UpdateMany(this.GetName<T>(), items, schema, state, updating, updated);
 		}
@@ -1376,6 +1516,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 私有方法
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 		private string GetName<T>()
 		{
 			return this.GetName(typeof(T));

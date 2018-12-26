@@ -158,6 +158,11 @@ namespace Zongsoft.Data
 		int Insert<T>(T data, string schema);
 		int Insert<T>(T data, string schema, object state, Func<DataInsertContextBase, bool> inserting = null, Action<DataInsertContextBase> inserted = null);
 
+		int Insert<T>(object data);
+		int Insert<T>(object data, object state);
+		int Insert<T>(object data, string schema);
+		int Insert<T>(object data, string schema, object state, Func<DataInsertContextBase, bool> inserting = null, Action<DataInsertContextBase> inserted = null);
+
 		int Insert(string name, object data);
 		int Insert(string name, object data, object state);
 		int Insert(string name, object data, string schema);
@@ -167,6 +172,11 @@ namespace Zongsoft.Data
 		int InsertMany<T>(IEnumerable<T> items, object state);
 		int InsertMany<T>(IEnumerable<T> items, string schema);
 		int InsertMany<T>(IEnumerable<T> items, string schema, object state, Func<DataInsertContextBase, bool> inserting = null, Action<DataInsertContextBase> inserted = null);
+
+		int InsertMany<T>(IEnumerable items);
+		int InsertMany<T>(IEnumerable items, object state);
+		int InsertMany<T>(IEnumerable items, string schema);
+		int InsertMany<T>(IEnumerable items, string schema, object state, Func<DataInsertContextBase, bool> inserting = null, Action<DataInsertContextBase> inserted = null);
 
 		int InsertMany(string name, IEnumerable items);
 		int InsertMany(string name, IEnumerable items, object state);
@@ -184,6 +194,15 @@ namespace Zongsoft.Data
 		int Update<T>(T data, ICondition condition, string schema);
 		int Update<T>(T data, ICondition condition, string schema, object state, Func<DataUpdateContextBase, bool> updating = null, Action<DataUpdateContextBase> updated = null);
 
+		int Update<T>(object data);
+		int Update<T>(object data, object state);
+		int Update<T>(object data, string schema);
+		int Update<T>(object data, string schema, object state);
+		int Update<T>(object data, ICondition condition);
+		int Update<T>(object data, ICondition condition, object state);
+		int Update<T>(object data, ICondition condition, string schema);
+		int Update<T>(object data, ICondition condition, string schema, object state, Func<DataUpdateContextBase, bool> updating = null, Action<DataUpdateContextBase> updated = null);
+
 		int Update(string name, object data);
 		int Update(string name, object data, object state);
 		int Update(string name, object data, string schema);
@@ -197,6 +216,11 @@ namespace Zongsoft.Data
 		int UpdateMany<T>(IEnumerable<T> items, object state);
 		int UpdateMany<T>(IEnumerable<T> items, string schema);
 		int UpdateMany<T>(IEnumerable<T> items, string schema, object state, Func<DataUpdateContextBase, bool> updating = null, Action<DataUpdateContextBase> updated = null);
+
+		int UpdateMany<T>(IEnumerable items);
+		int UpdateMany<T>(IEnumerable items, object state);
+		int UpdateMany<T>(IEnumerable items, string schema);
+		int UpdateMany<T>(IEnumerable items, string schema, object state, Func<DataUpdateContextBase, bool> updating = null, Action<DataUpdateContextBase> updated = null);
 
 		int UpdateMany(string name, IEnumerable items);
 		int UpdateMany(string name, IEnumerable items, object state);
