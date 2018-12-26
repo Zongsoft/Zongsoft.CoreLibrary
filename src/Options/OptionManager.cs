@@ -42,7 +42,7 @@ namespace Zongsoft.Options
 		#endregion
 
 		#region 单例实例
-		public static readonly OptionManager Default = new OptionManager();
+		public static readonly OptionManager Instance = new OptionManager();
 		#endregion
 
 		#region 私有变量
@@ -56,7 +56,7 @@ namespace Zongsoft.Options
 		#endregion
 
 		#region 构造函数
-		public OptionManager()
+		private OptionManager()
 		{
 			_root = new OptionNode();
 			_unloadedProviders = new HashSet<IOptionProvider>();
@@ -67,13 +67,13 @@ namespace Zongsoft.Options
 
 		#region 公共属性
 		/// <summary>
-		/// 获取选项管理的根节点。
+		/// 获取选项管理的节点集合。
 		/// </summary>
-		public OptionNode RootNode
+		public OptionNodeCollection Nodes
 		{
 			get
 			{
-				return _root;
+				return _root.Children;
 			}
 		}
 
