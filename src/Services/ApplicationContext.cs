@@ -40,6 +40,7 @@ using Zongsoft.Options.Configuration;
 
 namespace Zongsoft.Services
 {
+	[System.ComponentModel.DefaultProperty(nameof(Modules))]
 	public class ApplicationContext : IApplicationContext, IApplicationModule
 	{
 		#region 单例字段
@@ -50,16 +51,13 @@ namespace Zongsoft.Services
 		public event EventHandler Exiting;
 		public event EventHandler Starting;
 		public event EventHandler Started;
-		public event EventHandler Initializing;
-		public event EventHandler Initialized;
 		#endregion
 
 		#region 成员字段
 		private string _name;
 		private string _title;
-		private ISettingsProvider _settings;
 		private readonly IList<IApplicationModule> _modules;
-		private readonly IList<IApplicationInitializer> _initializers;
+		private readonly IList<IApplicationFilter> _filters;
 		private readonly IDictionary<string, object> _states;
 		#endregion
 
@@ -71,7 +69,7 @@ namespace Zongsoft.Services
 
 			_name = name.Trim();
 			_modules = new List<IApplicationModule>();
-			_initializers = new List<IApplicationInitializer>();
+			_filters = new List<IApplicationFilter>();
 			_states = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 		}
 		#endregion
@@ -107,49 +105,32 @@ namespace Zongsoft.Services
 
 		public virtual string ApplicationDirectory
 		{
-			get
-			{
-				return AppDomain.CurrentDomain.BaseDirectory;
-			}
+			get => AppDomain.CurrentDomain.BaseDirectory;
 		}
 
-		public ISettingsProvider Settings
+		public virtual ISettingsProvider Settings
 		{
-			get
-			{
-				if(_settings == null)
-					System.Threading.Interlocked.CompareExchange(ref _settings, OptionManager.Default.Settings, null);
-
-				return _settings;
-			}
-			protected set
-			{
-				_settings = value;
-			}
+			get => OptionManager.Instance.Settings;
 		}
 
-		public IOptionProvider Options
+		public virtual IOptionProvider Options
 		{
-			get
-			{
-				return OptionManager.Default;
-			}
+			get => OptionManager.Instance;
 		}
 
-		public OptionConfiguration Configuration
+		public virtual OptionConfiguration Configuration
 		{
 			get => null;
 		}
 
-		public IServiceProvider Services
+		public virtual IServiceProvider Services
 		{
 			get => ServiceProviderFactory.Instance.Default;
 		}
 
-		public System.Security.Principal.IPrincipal Principal
+		public virtual System.Security.Principal.IPrincipal Principal
 		{
-			get;
-			set;
+			get => System.Threading.Thread.CurrentPrincipal;
 		}
 
 		public ICollection<IApplicationModule> Modules
@@ -157,9 +138,9 @@ namespace Zongsoft.Services
 			get => _modules;
 		}
 
-		public ICollection<IApplicationInitializer> Initializers
+		public ICollection<IApplicationFilter> Filters
 		{
-			get => _initializers;
+			get => _filters;
 		}
 
 		public IDictionary<string, object> States
@@ -207,16 +188,6 @@ namespace Zongsoft.Services
 		protected virtual void OnStarted(EventArgs args)
 		{
 			this.Started?.Invoke(this, args);
-		}
-
-		protected virtual void OnInitializing(EventArgs args)
-		{
-			this.Initializing?.Invoke(this, args);
-		}
-
-		protected virtual void OnInitialized(EventArgs args)
-		{
-			this.Initialized?.Invoke(this, args);
 		}
 		#endregion
 

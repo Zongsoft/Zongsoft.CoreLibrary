@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2003-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -26,40 +26,48 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 
-namespace Zongsoft.ComponentModel
+namespace Zongsoft.Options.Configuration
 {
-	public class ApplicationEventArgs : EventArgs
+	public class FilterElementCollection : OptionConfigurationElementCollection
 	{
-		#region 成员变量
-		private string[] _args;
-		private ApplicationContextBase _applicationContext;
-		#endregion
-
 		#region 构造函数
-		public ApplicationEventArgs(ApplicationContextBase applicationContext, string[] args)
+		public FilterElementCollection() : base("filter")
 		{
-			_applicationContext = applicationContext;
-			_args = args ?? new string[0];
+		}
+
+		protected FilterElementCollection(string elementName) : base(elementName)
+		{
 		}
 		#endregion
 
 		#region 公共属性
-		public ApplicationContextBase ApplicationContext
+		public FilterElement this[int index]
 		{
 			get
 			{
-				return _applicationContext;
+				return (FilterElement)this.GetElement(index);
 			}
 		}
 
-		public string[] Arguments
+		public new FilterElement this[string name]
 		{
 			get
 			{
-				return _args;
+				return base.GetElement(name) as FilterElement;
 			}
+		}
+		#endregion
+
+		#region 重写方法
+		protected override OptionConfigurationElement CreateNewElement()
+		{
+			return new FilterElement();
+		}
+
+		protected override string GetElementKey(OptionConfigurationElement element)
+		{
+			return ((FilterElement)element).Name;
 		}
 		#endregion
 	}

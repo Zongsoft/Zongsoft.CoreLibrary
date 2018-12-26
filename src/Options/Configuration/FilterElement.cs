@@ -29,45 +29,59 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Options.Configuration
 {
-	public class ModuleElementCollection : OptionConfigurationElementCollection
+	public class FilterElement : OptionConfigurationElement
 	{
+		#region 常量定义
+		private const string XML_NAME_ATTRIBUTE = "name";
+		private const string XML_TYPE_ATTRIBUTE = "type";
+		#endregion
+
 		#region 构造函数
-		public ModuleElementCollection() : base("module")
+		internal FilterElement()
 		{
 		}
 
-		protected ModuleElementCollection(string elementName) : base(elementName)
+		internal FilterElement(string name, string type)
 		{
+			if(string.IsNullOrWhiteSpace(name))
+				throw new ArgumentNullException("name");
+
+			if(string.IsNullOrWhiteSpace(type))
+				throw new ArgumentNullException("type");
+
+			this.Name = name;
+			this.Type = type;
 		}
 		#endregion
 
 		#region 公共属性
-		public ModuleElement this[int index]
+		[OptionConfigurationProperty(XML_NAME_ATTRIBUTE, OptionConfigurationPropertyBehavior.IsKey)]
+		public string Name
 		{
 			get
 			{
-				return (ModuleElement)this.GetElement(index);
+				return (string)this[XML_NAME_ATTRIBUTE];
+			}
+			set
+			{
+				if(string.IsNullOrWhiteSpace(value))
+					throw new ArgumentNullException();
+
+				this[XML_NAME_ATTRIBUTE] = value.Trim();
 			}
 		}
 
-		public new ModuleElement this[string name]
+		[OptionConfigurationProperty(XML_TYPE_ATTRIBUTE, OptionConfigurationPropertyBehavior.IsRequired)]
+		public string Type
 		{
 			get
 			{
-				return base.GetElement(name) as ModuleElement;
+				return (string)this[XML_TYPE_ATTRIBUTE];
 			}
-		}
-		#endregion
-
-		#region 重写方法
-		protected override OptionConfigurationElement CreateNewElement()
-		{
-			return new ModuleElement();
-		}
-
-		protected override string GetElementKey(OptionConfigurationElement element)
-		{
-			return ((ModuleElement)element).Name;
+			set
+			{
+				this[XML_TYPE_ATTRIBUTE] = value;
+			}
 		}
 		#endregion
 	}

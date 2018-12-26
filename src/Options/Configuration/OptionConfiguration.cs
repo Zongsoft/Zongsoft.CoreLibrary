@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2013-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -75,8 +75,8 @@ namespace Zongsoft.Options.Configuration
 
 					if(original == null)
 					{
-						_declarations.Add("module", typeof(ModuleElement));
-						_declarations.Add("modules", typeof(ModuleElementCollection));
+						_declarations.Add("filter", typeof(FilterElement));
+						_declarations.Add("filters", typeof(FilterElementCollection));
 
 						_declarations.Add("setting", typeof(SettingElement));
 						_declarations.Add("settings", typeof(SettingElementCollection));

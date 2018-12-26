@@ -43,7 +43,6 @@ namespace Zongsoft.Services
 		#region 成员字段
 		private string _name;
 		private string _title;
-		private ISettingsProvider _settings;
 		#endregion
 
 		#region 构造函数
@@ -70,20 +69,10 @@ namespace Zongsoft.Services
 
 		public virtual ISettingsProvider Settings
 		{
-			get
-			{
-				if(_settings == null)
-					System.Threading.Interlocked.CompareExchange(ref _settings, OptionManager.Default.Settings, null);
-
-				return _settings;
-			}
-			protected set
-			{
-				_settings = value;
-			}
+			get => OptionManager.Instance.Settings;
 		}
 
-		public IServiceProvider Services
+		public virtual IServiceProvider Services
 		{
 			get => ServiceProviderFactory.Instance.GetProvider(_name);
 		}

@@ -37,12 +37,12 @@ using System.Collections.Generic;
 namespace Zongsoft.Services
 {
 	/// <summary>
-	/// 向实现类提供应用初始化机制的接口。
+	/// 向实现类提供应用事件处理机制的接口。
 	/// </summary>
-	public interface IApplicationInitializer
+	public interface IApplicationFilter
 	{
 		/// <summary>
-		/// 获取应用初始化器的名称。
+		/// 获取应用事件处理程序的名称。
 		/// </summary>
 		string Name
 		{

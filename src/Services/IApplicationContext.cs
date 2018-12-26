@@ -48,8 +48,6 @@ namespace Zongsoft.Services
 		event EventHandler Exiting;
 		event EventHandler Starting;
 		event EventHandler Started;
-		event EventHandler Initializing;
-		event EventHandler Initialized;
 		#endregion
 
 		#region 属性定义
@@ -78,12 +76,11 @@ namespace Zongsoft.Services
 		}
 
 		/// <summary>
-		/// 获取或设置当前应用程序的安全主体。
+		/// 获取当前应用程序的安全主体。
 		/// </summary>
 		System.Security.Principal.IPrincipal Principal
 		{
 			get;
-			set;
 		}
 
 		/// <summary>
@@ -95,9 +92,9 @@ namespace Zongsoft.Services
 		}
 
 		/// <summary>
-		/// 获取当前应用程序的初始化器集合。
+		/// 获取当前应用程序的事件处理程序集。
 		/// </summary>
-		ICollection<IApplicationInitializer> Initializers
+		ICollection<IApplicationFilter> Filters
 		{
 			get;
 		}

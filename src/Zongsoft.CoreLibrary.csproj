@@ -219,7 +219,7 @@
     <Compile Include="Diagnostics\LoggerHandler.cs" />
     <Compile Include="Diagnostics\LoggerHandlerCollection.cs" />
     <Compile Include="Diagnostics\LoggerHandlerPredication.cs" />
-    <Compile Include="Diagnostics\LoggerModule.cs" />
+    <Compile Include="Diagnostics\LoggerInitializer.cs" />
     <Compile Include="Diagnostics\LogLevel.cs" />
     <Compile Include="Diagnostics\TextFileLogger.cs" />
     <Compile Include="IO\DirectoryInfo.cs" />
@@ -250,8 +250,8 @@
     <Compile Include="Messaging\TopicSubscription.cs" />
     <Compile Include="Options\Configuration\ConnectionStringElement.cs" />
     <Compile Include="Options\Configuration\ConnectionStringElementCollection.cs" />
-    <Compile Include="Options\Configuration\ModuleElement.cs" />
-    <Compile Include="Options\Configuration\ModuleElementCollection.cs" />
+    <Compile Include="Options\Configuration\FilterElement.cs" />
+    <Compile Include="Options\Configuration\FilterElementCollection.cs" />
     <Compile Include="Options\Configuration\OptionConfigurationLoader.cs" />
     <Compile Include="Options\Configuration\OptionConfigurationManager.cs" />
     <Compile Include="Options\IOptionLoader.cs" />
@@ -393,7 +393,7 @@
     <Compile Include="Services\ApplicationContext.cs" />
     <Compile Include="Services\ApplicationModule.cs" />
     <Compile Include="Services\IApplicationContext.cs" />
-    <Compile Include="Services\IApplicationInitializer.cs" />
+    <Compile Include="Services\IApplicationFilter.cs" />
     <Compile Include="Services\IApplicationModule.cs" />
     <Compile Include="Services\CommandBase.cs" />
     <Compile Include="Services\CommandCompletionContext.cs" />
@@ -489,7 +489,6 @@
     <Compile Include="ComponentModel\GuidConverter.cs" />
     <Compile Include="Services\IPredication.cs" />
     <Compile Include="Resources\ResourceUtility.cs" />
-    <Compile Include="ComponentModel\ApplicationEventArgs.cs" />
     <Compile Include="ComponentModel\AliasAttribute.cs" />
     <Compile Include="Communication\IChannel.cs" />
     <Compile Include="Communication\ListenerBase.cs" />
@@ -520,8 +519,6 @@
     <Compile Include="Services\IServiceProviderFactory.cs" />
     <Compile Include="Services\IWorker.cs" />
     <Compile Include="Services\WorkerBase.cs" />
-    <Compile Include="ComponentModel\ApplicationContextBase.cs" />
-    <Compile Include="ComponentModel\IApplicationModule.cs" />
     <Compile Include="Communication\IReceiver.cs" />
     <Compile Include="Communication\ISender.cs" />
     <Compile Include="Communication\ReceivedEventArgs.cs" />
