@@ -29,45 +29,21 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Services
 {
-	public class ServiceProviderFactory : IServiceProviderFactory, ICollection<IServiceProvider>
+	public sealed class ServiceProviderFactory : IServiceProviderFactory, ICollection<IServiceProvider>
 	{
 		#region 单例字段
-		private static ServiceProviderFactory _instance;
+		public static readonly ServiceProviderFactory Instance = new ServiceProviderFactory();
 		#endregion
 
 		#region 成员字段
-		private string _defaultName;
+		private IServiceProvider _default;
 		private readonly IDictionary<string, IServiceProvider> _providers;
 		#endregion
 
 		#region 构造函数
-		protected ServiceProviderFactory()
+		private ServiceProviderFactory()
 		{
-			_defaultName = string.Empty;
 			_providers = new Dictionary<string, IServiceProvider>(StringComparer.OrdinalIgnoreCase);
-		}
-
-		protected ServiceProviderFactory(string defaultName)
-		{
-			_defaultName = string.IsNullOrWhiteSpace(defaultName) ? string.Empty : defaultName.Trim();
-			_providers = new Dictionary<string, IServiceProvider>(StringComparer.OrdinalIgnoreCase);
-		}
-		#endregion
-
-		#region 单例属性
-		public static ServiceProviderFactory Instance
-		{
-			get
-			{
-				if(_instance == null)
-					System.Threading.Interlocked.CompareExchange(ref _instance, new ServiceProviderFactory(), null);
-
-				return _instance;
-			}
-			set
-			{
-				_instance = value;
-			}
 		}
 		#endregion
 
@@ -80,31 +56,22 @@ namespace Zongsoft.Services
 			}
 		}
 
-		public virtual IServiceProvider Default
+		public IServiceProvider Default
 		{
 			get
 			{
-				return this.GetProvider(_defaultName);
+				return _default;
 			}
 			set
 			{
 				if(value == null)
 					throw new ArgumentNullException();
 
+				//将默认服务容器注册到容器集中
 				this.Register(value);
 
-				//更新默认服务名字
-				_defaultName = value.Name;
-			}
-		}
-		#endregion
-
-		#region 保护属性
-		protected string DefaultName
-		{
-			get
-			{
-				return _defaultName;
+				//更新默认服务容器
+				_default = value;
 			}
 		}
 		#endregion
@@ -144,7 +111,7 @@ namespace Zongsoft.Services
 		/// </summary>
 		/// <param name="name">待获取的服务供应程序名。</param>
 		/// <returns>如果指定名称的供应程序回存在则返它，否则返回空(null)。</returns>
-		public virtual IServiceProvider GetProvider(string name)
+		public IServiceProvider GetProvider(string name)
 		{
 			IServiceProvider result;
 
@@ -166,6 +133,9 @@ namespace Zongsoft.Services
 
 		void ICollection<IServiceProvider>.Add(IServiceProvider item)
 		{
+			if(item == null)
+				throw new ArgumentNullException(nameof(item));
+
 			_providers.Add(item.Name ?? string.Empty, item);
 		}
 
