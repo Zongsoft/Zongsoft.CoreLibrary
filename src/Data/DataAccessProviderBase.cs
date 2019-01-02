@@ -30,17 +30,16 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
-	public abstract class DataAccessProviderBase : IDataAccessProvider
+	public abstract class DataAccessProviderBase<TDataAccess> : IDataAccessProvider, ICollection<TDataAccess> where TDataAccess : IDataAccess
 	{
 		#region 成员字段
-		private IDataAccess _default;
-		private readonly Collections.INamedCollection<IDataAccess> _accesses;
+		private readonly Collections.INamedCollection<TDataAccess> _accesses;
 		#endregion
 
 		#region 构造函数
 		protected DataAccessProviderBase()
 		{
-			_accesses = new Collections.NamedCollection<IDataAccess>(p => p.Name, StringComparer.OrdinalIgnoreCase);
+			_accesses = new Collections.NamedCollection<TDataAccess>(p => p.Name, StringComparer.OrdinalIgnoreCase);
 		}
 		#endregion
 
@@ -50,18 +49,6 @@ namespace Zongsoft.Data
 			get
 			{
 				return _accesses.Count;
-			}
-		}
-
-		public IDataAccess Default
-		{
-			get
-			{
-				return _default;
-			}
-			set
-			{
-				_default = value ?? throw new ArgumentNullException();
 			}
 		}
 		#endregion
@@ -88,11 +75,11 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 抽象方法
-		protected abstract IDataAccess CreateAccessor(string name);
+		protected abstract TDataAccess CreateAccessor(string name);
 		#endregion
 
 		#region 集合接口
-		bool ICollection<IDataAccess>.IsReadOnly
+		bool ICollection<TDataAccess>.IsReadOnly
 		{
 			get
 			{
@@ -100,17 +87,20 @@ namespace Zongsoft.Data
 			}
 		}
 
-		void ICollection<IDataAccess>.Add(IDataAccess item)
+		void ICollection<TDataAccess>.Add(TDataAccess item)
 		{
-			_accesses.Add(item ?? throw new ArgumentNullException(nameof(item)));
+			if(item == null)
+				throw new ArgumentNullException(nameof(item));
+
+			_accesses.Add(item);
 		}
 
-		void ICollection<IDataAccess>.Clear()
+		void ICollection<TDataAccess>.Clear()
 		{
 			_accesses.Clear();
 		}
 
-		bool ICollection<IDataAccess>.Contains(IDataAccess item)
+		bool ICollection<TDataAccess>.Contains(TDataAccess item)
 		{
 			if(item == null)
 				return false;
@@ -118,19 +108,19 @@ namespace Zongsoft.Data
 			return _accesses.Contains(item);
 		}
 
-		void ICollection<IDataAccess>.CopyTo(IDataAccess[] array, int arrayIndex)
+		void ICollection<TDataAccess>.CopyTo(TDataAccess[] array, int arrayIndex)
 		{
 			_accesses.CopyTo(array, arrayIndex);
 		}
 
-		bool ICollection<IDataAccess>.Remove(IDataAccess item)
+		bool ICollection<TDataAccess>.Remove(TDataAccess item)
 		{
 			return _accesses.Remove(item);
 		}
 		#endregion
 
 		#region 枚举遍历
-		public IEnumerator<IDataAccess> GetEnumerator()
+		public IEnumerator<TDataAccess> GetEnumerator()
 		{
 			return _accesses.GetEnumerator();
 		}

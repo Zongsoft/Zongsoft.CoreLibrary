@@ -121,8 +121,8 @@
     <Compile Include="ComponentModel\SchemaCollection.cs" />
     <Compile Include="Data\ConditionalBehaviors.cs" />
     <Compile Include="Data\Conditional.cs" />
-    <Compile Include="Data\EntityAttribute.cs" />
     <Compile Include="Data\DataAccessProviderBase.cs" />
+    <Compile Include="Data\EntityAttribute.cs" />
     <Compile Include="Data\DataDictionaries.cs" />
     <Compile Include="Data\Entity.cs" />
     <Compile Include="Data\DataUpsertedEventArgs.cs" />

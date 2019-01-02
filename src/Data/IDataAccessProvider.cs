@@ -32,17 +32,8 @@ namespace Zongsoft.Data
 	/// <summary>
 	/// 表示数据访问提供程序的接口。
 	/// </summary>
-	public interface IDataAccessProvider : ICollection<IDataAccess>
+	public interface IDataAccessProvider
 	{
-		/// <summary>
-		/// 获取或设置宿主程序中默认的数据访问器。
-		/// </summary>
-		IDataAccess Default
-		{
-			get;
-			set;
-		}
-
 		/// <summary>
 		/// 获取或创建指定应用的数据访问器。
 		/// </summary>

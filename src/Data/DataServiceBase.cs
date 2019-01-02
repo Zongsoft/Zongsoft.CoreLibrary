@@ -126,14 +126,14 @@ namespace Zongsoft.Data
 		{
 			get
 			{
+				if(_dataAccess == null)
+					_dataAccess = _serviceProvider.Resolve<IDataAccess>();
+
 				return _dataAccess;
 			}
 			set
 			{
-				if(value == null)
-					throw new ArgumentNullException();
-
-				_dataAccess = value;
+				_dataAccess = value ?? throw new ArgumentNullException();
 			}
 		}
 
