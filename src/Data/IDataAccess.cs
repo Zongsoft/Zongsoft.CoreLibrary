@@ -76,6 +76,14 @@ namespace Zongsoft.Data
 		}
 
 		/// <summary>
+		/// 获取数据模式解析器。
+		/// </summary>
+		ISchemaParser Schema
+		{
+			get;
+		}
+
+		/// <summary>
 		/// 获取数据访问的过滤器集合。
 		/// </summary>
 		ICollection<IDataAccessFilter> Filters

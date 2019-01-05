@@ -56,6 +56,7 @@ namespace Zongsoft.Data
 
 		#region 成员字段
 		private string _name;
+		private ISchemaParser _schema;
 		private IDataAccessNaming _naming;
 		private ICollection<IDataAccessFilter> _filters;
 		#endregion
@@ -100,6 +101,20 @@ namespace Zongsoft.Data
 			get
 			{
 				return _naming;
+			}
+		}
+
+		/// <summary>
+		/// 获取数据模式解析器。
+		/// </summary>
+		public ISchemaParser Schema
+		{
+			get
+			{
+				if(_schema == null)
+					_schema = this.CreateSchema();
+
+				return _schema;
 			}
 		}
 
@@ -512,7 +527,7 @@ namespace Zongsoft.Data
 				throw new ArgumentNullException(nameof(name));
 
 			//创建数据访问上下文对象
-			var context = this.CreateDeleteContext(name, condition, schema, state);
+			var context = this.CreateDeleteContext(name, condition, this.Schema.Parse(name, schema), state);
 
 			//处理数据访问操作前的回调
 			if(deleting != null && deleting(context))
@@ -634,7 +649,7 @@ namespace Zongsoft.Data
 				return 0;
 
 			//创建数据访问上下文对象
-			var context = this.CreateInsertContext(name, false, data, schema, state);
+			var context = this.CreateInsertContext(name, false, data, this.Schema.Parse(name, schema, data.GetType()), state);
 
 			//处理数据访问操作前的回调
 			if(inserting != null && inserting(context))
@@ -752,7 +767,7 @@ namespace Zongsoft.Data
 				return 0;
 
 			//创建数据访问上下文对象
-			var context = this.CreateInsertContext(name, true, items, schema, state);
+			var context = this.CreateInsertContext(name, true, items, this.Schema.Parse(name, schema, Common.TypeExtension.GetElementType(items.GetType())), state);
 
 			//处理数据访问操作前的回调
 			if(inserting != null && inserting(context))
@@ -969,7 +984,7 @@ namespace Zongsoft.Data
 				return 0;
 
 			//创建数据访问上下文对象
-			var context = this.CreateUpdateContext(name, false, data, condition, schema, state);
+			var context = this.CreateUpdateContext(name, false, data, condition, this.Schema.Parse(name, schema, data.GetType()), state);
 
 			//处理数据访问操作前的回调
 			if(updating != null && updating(context))
@@ -1073,7 +1088,7 @@ namespace Zongsoft.Data
 				return 0;
 
 			//创建数据访问上下文对象
-			var context = this.CreateUpdateContext(name, true, items, null, schema, state);
+			var context = this.CreateUpdateContext(name, true, items, null, this.Schema.Parse(name, schema, Common.TypeExtension.GetElementType(items.GetType())), state);
 
 			//处理数据访问操作前的回调
 			if(updating != null && updating(context))
@@ -1228,7 +1243,7 @@ namespace Zongsoft.Data
 				throw new ArgumentNullException(nameof(name));
 
 			//创建数据访问上下文对象
-			var context = this.CreateSelectContext(name, typeof(T), condition, null, schema, paging, sortings, state);
+			var context = this.CreateSelectContext(name, typeof(T), condition, null, this.Schema.Parse(name, schema, typeof(T)), paging, sortings, state);
 
 			//执行查询方法
 			return this.Select<T>(context, selecting, selected);
@@ -1290,7 +1305,7 @@ namespace Zongsoft.Data
 				throw new ArgumentNullException(nameof(name));
 
 			//创建数据访问上下文对象
-			var context = this.CreateSelectContext(name, typeof(T), condition, grouping, schema, paging, sortings, state);
+			var context = this.CreateSelectContext(name, typeof(T), condition, grouping, this.Schema.Parse(name, schema, typeof(T)), paging, sortings, state);
 
 			//执行查询方法
 			return this.Select<T>(context, selecting, selected);
@@ -1342,15 +1357,16 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 抽象方法
-		protected abstract DataCountContextBase CreateCountContext(string name, ICondition condition, string includes, object state);
+		protected abstract ISchemaParser CreateSchema();
+		protected abstract DataCountContextBase CreateCountContext(string name, ICondition condition, string member, object state);
 		protected abstract DataExistContextBase CreateExistContext(string name, ICondition condition, object state);
 		protected abstract DataExecuteContextBase CreateExecuteContext(string name, bool isScalar, Type resultType, IDictionary<string, object> inParameters, object state);
 		protected abstract DataIncrementContextBase CreateIncrementContext(string name, string member, ICondition condition, int interval, object state);
-		protected abstract DataDeleteContextBase CreateDeleteContext(string name, ICondition condition, string schema, object state);
-		protected abstract DataInsertContextBase CreateInsertContext(string name, bool isMultiple, object data, string schema, object state);
-		protected abstract DataUpsertContextBase CreateUpsertContext(string name, bool isMultiple, object data, string schema, object state);
-		protected abstract DataUpdateContextBase CreateUpdateContext(string name, bool isMultiple, object data, ICondition condition, string schema, object state);
-		protected abstract DataSelectContextBase CreateSelectContext(string name, Type entityType, ICondition condition, Grouping grouping, string schema, Paging paging, Sorting[] sortings, object state);
+		protected abstract DataDeleteContextBase CreateDeleteContext(string name, ICondition condition, ISchema schema, object state);
+		protected abstract DataInsertContextBase CreateInsertContext(string name, bool isMultiple, object data, ISchema schema, object state);
+		protected abstract DataUpsertContextBase CreateUpsertContext(string name, bool isMultiple, object data, ISchema schema, object state);
+		protected abstract DataUpdateContextBase CreateUpdateContext(string name, bool isMultiple, object data, ICondition condition, ISchema schema, object state);
+		protected abstract DataSelectContextBase CreateSelectContext(string name, Type entityType, ICondition condition, Grouping grouping, ISchema schema, Paging paging, Sorting[] sortings, object state);
 		#endregion
 
 		#region 激发事件
