@@ -48,7 +48,7 @@ namespace Zongsoft.Data
 
 		void Clear();
 		bool Exists(string path);
-		void Include(string path);
-		void Exclude(string path);
+		ISchema Include(string path);
+		ISchema Exclude(string path);
 	}
 }
