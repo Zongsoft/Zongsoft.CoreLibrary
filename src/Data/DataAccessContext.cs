@@ -35,14 +35,14 @@ namespace Zongsoft.Data
 		#region 成员字段
 		private int _result;
 		private ICondition _condition;
-		private string _includes;
+		private string _member;
 		#endregion
 
 		#region 构造函数
-		protected DataCountContextBase(IDataAccess dataAccess, string name, ICondition condition, string includes, object state = null) : base(dataAccess, name, DataAccessMethod.Count, state)
+		protected DataCountContextBase(IDataAccess dataAccess, string name, ICondition condition, string member, object state = null) : base(dataAccess, name, DataAccessMethod.Count, state)
 		{
 			_condition = condition;
-			_includes = includes;
+			_member = member;
 		}
 		#endregion
 
@@ -88,19 +88,19 @@ namespace Zongsoft.Data
 		/// <summary>
 		/// 获取或设置计数操作的包含成员。
 		/// </summary>
-		public string Includes
+		public string Member
 		{
 			get
 			{
-				return _includes;
+				return _member;
 			}
 			set
 			{
-				if(_includes == value)
+				if(_member == value)
 					return;
 
-				_includes = value;
-				this.OnPropertyChanged(nameof(Includes));
+				_member = value;
+				this.OnPropertyChanged(nameof(Member));
 			}
 		}
 		#endregion

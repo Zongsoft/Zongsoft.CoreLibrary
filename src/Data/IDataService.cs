@@ -90,8 +90,8 @@ namespace Zongsoft.Data
 
 		#region 计数方法
 		int Count(ICondition condition, object state);
-		int Count(ICondition condition, string includes);
-		int Count(ICondition condition, string includes = null, object state = null);
+		int Count(ICondition condition, string member);
+		int Count(ICondition condition, string member = null, object state = null);
 		#endregion
 
 		#region 递增方法

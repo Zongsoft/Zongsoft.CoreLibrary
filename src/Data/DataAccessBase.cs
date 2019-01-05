@@ -298,14 +298,14 @@ namespace Zongsoft.Data
 			return this.Count(this.GetName<T>(), condition, string.Empty, state, null, null);
 		}
 
-		public int Count<T>(ICondition condition, string includes)
+		public int Count<T>(ICondition condition, string member)
 		{
-			return this.Count(this.GetName<T>(), condition, includes, null, null, null);
+			return this.Count(this.GetName<T>(), condition, member, null, null, null);
 		}
 
-		public int Count<T>(ICondition condition, string includes, object state, Func<DataCountContextBase, bool> counting = null, Action<DataCountContextBase> counted = null)
+		public int Count<T>(ICondition condition, string member, object state, Func<DataCountContextBase, bool> counting = null, Action<DataCountContextBase> counted = null)
 		{
-			return this.Count(this.GetName<T>(), condition, includes, state, counting, counted);
+			return this.Count(this.GetName<T>(), condition, member, state, counting, counted);
 		}
 
 		public int Count(string name, ICondition condition)
@@ -318,18 +318,18 @@ namespace Zongsoft.Data
 			return this.Count(name, condition, string.Empty, state, null, null);
 		}
 
-		public int Count(string name, ICondition condition, string includes)
+		public int Count(string name, ICondition condition, string member)
 		{
-			return this.Count(name, condition, includes, null, null, null);
+			return this.Count(name, condition, member, null, null, null);
 		}
 
-		public int Count(string name, ICondition condition, string includes, object state, Func<DataCountContextBase, bool> counting = null, Action<DataCountContextBase> counted = null)
+		public int Count(string name, ICondition condition, string member, object state, Func<DataCountContextBase, bool> counting = null, Action<DataCountContextBase> counted = null)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
 			//创建数据访问上下文对象
-			var context = this.CreateCountContext(name, condition, includes, state);
+			var context = this.CreateCountContext(name, condition, member, state);
 
 			//处理数据访问操作前的回调
 			if(counting != null && counting(context))

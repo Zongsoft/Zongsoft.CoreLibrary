@@ -241,17 +241,17 @@ namespace Zongsoft.Data
 			return this.Count(condition, string.Empty, state);
 		}
 
-		public int Count(ICondition condition, string includes)
+		public int Count(ICondition condition, string member)
 		{
-			return this.Count(condition, includes, null);
+			return this.Count(condition, member, null);
 		}
 
-		public virtual int Count(ICondition condition, string includes = null, object state = null)
+		public virtual int Count(ICondition condition, string member = null, object state = null)
 		{
 			//修整查询条件
 			condition = this.OnValidate(DataAccessMethod.Count, condition);
 
-			return this.DataAccess.Count(this.Name, condition, includes, state, ctx => this.OnCounting(ctx), ctx => this.OnCounted(ctx));
+			return this.DataAccess.Count(this.Name, condition, member, state, ctx => this.OnCounting(ctx), ctx => this.OnCounted(ctx));
 		}
 		#endregion
 

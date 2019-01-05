@@ -111,13 +111,13 @@ namespace Zongsoft.Data
 		#region 计数方法
 		int Count<T>(ICondition condition);
 		int Count<T>(ICondition condition, object state);
-		int Count<T>(ICondition condition, string includes);
-		int Count<T>(ICondition condition, string includes, object state, Func<DataCountContextBase, bool> counting = null, Action<DataCountContextBase> counted = null);
+		int Count<T>(ICondition condition, string member);
+		int Count<T>(ICondition condition, string member, object state, Func<DataCountContextBase, bool> counting = null, Action<DataCountContextBase> counted = null);
 
 		int Count(string name, ICondition condition);
 		int Count(string name, ICondition condition, object state);
-		int Count(string name, ICondition condition, string includes);
-		int Count(string name, ICondition condition, string includes, object state, Func<DataCountContextBase, bool> counting = null, Action<DataCountContextBase> counted = null);
+		int Count(string name, ICondition condition, string member);
+		int Count(string name, ICondition condition, string member, object state, Func<DataCountContextBase, bool> counting = null, Action<DataCountContextBase> counted = null);
 		#endregion
 
 		#region 递增方法
