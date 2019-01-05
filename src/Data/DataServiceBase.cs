@@ -890,10 +890,10 @@ namespace Zongsoft.Data
 			condition = this.OnValidate(DataAccessMethod.Select, condition);
 
 			//执行查询方法
-			return this.OnSelect(condition, schema, paging, sortings, state);
+			return this.OnSelect(condition, this.GetSchema(schema, typeof(TEntity)), paging, sortings, state);
 		}
 
-		protected virtual IEnumerable<TEntity> OnSelect(ICondition condition, string schema, Paging paging, Sorting[] sortings, object state)
+		protected virtual IEnumerable<TEntity> OnSelect(ICondition condition, ISchema schema, Paging paging, Sorting[] sortings, object state)
 		{
 			return this.DataAccess.Select<TEntity>(this.Name, condition, schema, paging, state, sortings, ctx => this.OnSelecting(ctx), ctx => this.OnSelected(ctx));
 		}
@@ -949,10 +949,10 @@ namespace Zongsoft.Data
 			condition = this.OnValidate(DataAccessMethod.Select, condition);
 
 			//执行查询方法
-			return this.OnSelect<T>(grouping, condition, schema, paging, sortings, state);
+			return this.OnSelect<T>(grouping, condition, this.GetSchema(schema, typeof(T)), paging, sortings, state);
 		}
 
-		protected virtual IEnumerable<T> OnSelect<T>(Grouping grouping, ICondition condition, string schema, Paging paging, Sorting[] sortings, object state)
+		protected virtual IEnumerable<T> OnSelect<T>(Grouping grouping, ICondition condition, ISchema schema, Paging paging, Sorting[] sortings, object state)
 		{
 			return this.DataAccess.Select<T>(this.Name, grouping, condition, schema, paging, state, sortings, ctx => this.OnSelecting(ctx), ctx => this.OnSelected(ctx));
 		}
