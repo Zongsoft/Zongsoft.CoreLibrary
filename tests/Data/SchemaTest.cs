@@ -12,15 +12,15 @@ namespace Zongsoft.Data
 		[Fact]
 		public void Test1()
 		{
-			Collections.IReadOnlyNamedCollection<Schema> schemas;
+			INamedCollection<SchemaEntry> schemas;
 
-			schemas = Schema.Parse(null);
+			schemas = SchemaParser.Instance.Parse(null);
 			Assert.Null(schemas);
 
-			schemas = Schema.Parse(" \t ");
+			schemas = SchemaParser.Instance.Parse(" \t ");
 			Assert.Null(schemas);
 
-			schemas = Schema.Parse("*");
+			schemas = SchemaParser.Instance.Parse("*");
 			Assert.Equal(6, schemas.Count);
 			Assert.True(schemas.Contains("a"));
 			Assert.True(schemas.Contains("b"));
@@ -29,10 +29,10 @@ namespace Zongsoft.Data
 			Assert.True(schemas.Contains("e"));
 			Assert.True(schemas.Contains("f"));
 
-			schemas = Schema.Parse("*, !");
+			schemas = SchemaParser.Instance.Parse("*, !");
 			Assert.Equal(0, schemas.Count);
 
-			schemas = Schema.Parse("*, !a, !c, !f, c");
+			schemas = SchemaParser.Instance.Parse("*, !a, !c, !f, c");
 			Assert.Equal(4, schemas.Count);
 			Assert.False(schemas.Contains("a"));
 			Assert.True(schemas.Contains("b"));
@@ -45,9 +45,9 @@ namespace Zongsoft.Data
 		[Fact]
 		public void Test2()
 		{
-			Collections.IReadOnlyNamedCollection<Schema> schemas;
+			INamedCollection<SchemaEntry> schemas;
 
-			schemas = Schema.Parse("*, !, a, !b, c, a, forums:100/2{*, !, a, !b, f, moderator{name, avatar}}");
+			schemas = SchemaParser.Instance.Parse("*, !, a, !b, c, a, forums:100/2{*, !, a, !b, f, moderator{name, avatar}}");
 			Assert.NotEmpty(schemas);
 			Assert.Equal(3, schemas.Count);
 
@@ -72,13 +72,13 @@ namespace Zongsoft.Data
 			Assert.True(schemas["forums"].HasChildren);
 			Assert.Equal(3, schemas["forums"].Children.Count);
 
-			var forums = (Schema)schemas["forums"];
+			var forums = schemas["forums"];
 			Assert.True(forums.HasChildren);
 			Assert.True(forums.Children.Contains("a"));
 			Assert.True(forums.Children.Contains("f"));
 			Assert.True(forums.Children.Contains("moderator"));
 
-			var moderator = (Schema)forums["moderator"];
+			var moderator = forums["moderator"];
 			Assert.NotNull(moderator.Parent);
 			Assert.True(moderator.HasChildren);
 			Assert.True(moderator.Children.Contains("name"));
@@ -88,9 +88,9 @@ namespace Zongsoft.Data
 		[Fact]
 		public void Test3()
 		{
-			Collections.IReadOnlyNamedCollection<Schema> schemas;
+			INamedCollection<SchemaEntry> schemas;
 
-			schemas = Schema.Parse(@"*, !, a, !b, c, a, forums:100/2(~timestamp, id){*, !, a, !b, f, moderator(name){name, avatar}}");
+			schemas = SchemaParser.Instance.Parse(@"*, !, a, !b, c, a, forums:100/2(~timestamp, id){*, !, a, !b, f, moderator(name){name, avatar}}");
 			Assert.NotEmpty(schemas);
 			Assert.Equal(3, schemas.Count);
 
@@ -126,7 +126,7 @@ namespace Zongsoft.Data
 			Assert.True(forums.Children.Contains("f"));
 			Assert.True(forums.Children.Contains("moderator"));
 
-			var moderator = (Schema)forums["moderator"];
+			var moderator = forums["moderator"];
 			Assert.True(moderator.HasChildren);
 			Assert.NotNull(moderator.Parent);
 			Assert.Null(moderator.Paging);
@@ -139,21 +139,21 @@ namespace Zongsoft.Data
 		}
 
 		#region 嵌套子类
-		public class Schema : SchemaBase
+		public class SchemaEntry : SchemaEntryBase
 		{
 			#region 成员字段
-			private Schema _parent;
-			private INamedCollection<Schema> _children;
+			private SchemaEntry _parent;
+			private INamedCollection<SchemaEntry> _children;
 			#endregion
 
 			#region 构造函数
-			public Schema(string name) : base(name)
+			public SchemaEntry(string name) : base(name)
 			{
 			}
 			#endregion
 
 			#region 公共属性
-			public Schema Parent
+			public SchemaEntry Parent
 			{
 				get
 				{
@@ -161,12 +161,12 @@ namespace Zongsoft.Data
 				}
 			}
 
-			public Schema this[string name]
+			public SchemaEntry this[string name]
 			{
 				get
 				{
 					if(this.HasChildren && this.Children.TryGet(name, out var child))
-						return (Schema)child;
+						return (SchemaEntry)child;
 
 					return null;
 				}
@@ -180,27 +180,27 @@ namespace Zongsoft.Data
 				}
 			}
 
-			public IReadOnlyNamedCollection<Schema> Children
+			public IReadOnlyNamedCollection<SchemaEntry> Children
 			{
 				get
 				{
-					return (IReadOnlyNamedCollection<Schema>)_children;
+					return (IReadOnlyNamedCollection<SchemaEntry>)_children;
 				}
 			}
 			#endregion
 
 			#region 重写方法
-			protected override SchemaBase GetParent()
+			protected override SchemaEntryBase GetParent()
 			{
 				return _parent;
 			}
 
-			protected override void SetParent(SchemaBase parent)
+			protected override void SetParent(SchemaEntryBase parent)
 			{
-				_parent = (parent as Schema) ?? throw new ArgumentException();
+				_parent = (parent as SchemaEntry) ?? throw new ArgumentException();
 			}
 
-			protected override bool TryGetChild(string name, out SchemaBase child)
+			protected override bool TryGetChild(string name, out SchemaEntryBase child)
 			{
 				child = null;
 
@@ -213,13 +213,13 @@ namespace Zongsoft.Data
 				return false;
 			}
 
-			protected override void AddChild(SchemaBase child)
+			protected override void AddChild(SchemaEntryBase child)
 			{
-				if(!(child is Schema schema))
+				if(!(child is SchemaEntry schema))
 					throw new ArgumentException();
 
 				if(_children == null)
-					System.Threading.Interlocked.CompareExchange(ref _children, new NamedCollection<Schema>(item => item.Name), null);
+					System.Threading.Interlocked.CompareExchange(ref _children, new NamedCollection<SchemaEntry>(item => item.Name), null);
 
 				_children.Add(schema);
 				schema._parent = this;
@@ -235,21 +235,34 @@ namespace Zongsoft.Data
 				_children?.Clear();
 			}
 			#endregion
+		}
+
+		public class SchemaParser : SchemaParserBase<SchemaEntry>
+		{
+			#region 单例字段
+			public static readonly SchemaParser Instance = new SchemaParser();
+			#endregion
+
+			#region 构造函数
+			private SchemaParser()
+			{
+			}
+			#endregion
 
 			#region 解析方法
-			public static Collections.IReadOnlyNamedCollection<Schema> Parse(string text)
+			public INamedCollection<SchemaEntry> Parse(string expression)
 			{
-				return SchemaBase.Parse<Schema>(text, token => Resolve(token));
+				return base.Parse(expression, token => Resolve(token));
 			}
 
-			public static Collections.IReadOnlyNamedCollection<Schema> Parse(string text, Action<string> onError)
+			public override ISchema<SchemaEntry> Parse(string name, string expression, Type entityType)
 			{
-				return SchemaBase.Parse<Schema>(text, token => Resolve(token), onError);
+				throw new NotImplementedException();
 			}
 			#endregion
 
 			#region 私有方法
-			private static IEnumerable<Schema> Resolve(Token<Schema> token)
+			private static IEnumerable<SchemaEntry> Resolve(SchemaEntryToken token)
 			{
 				if(string.IsNullOrWhiteSpace(token.Name))
 					throw new InvalidOperationException();
@@ -257,18 +270,18 @@ namespace Zongsoft.Data
 				switch(token.Name)
 				{
 					case "*":
-						return new Schema[]
+						return new SchemaEntry[]
 						{
-							new Schema("a"),
-							new Schema("b"),
-							new Schema("c"),
-							new Schema("d"),
-							new Schema("e"),
-							new Schema("f"),
+							new SchemaEntry("a"),
+							new SchemaEntry("b"),
+							new SchemaEntry("c"),
+							new SchemaEntry("d"),
+							new SchemaEntry("e"),
+							new SchemaEntry("f"),
 						};
 				}
 
-				return new Schema[] { new Schema(token.Name) };
+				return new SchemaEntry[] { new SchemaEntry(token.Name) };
 			}
 			#endregion
 		}

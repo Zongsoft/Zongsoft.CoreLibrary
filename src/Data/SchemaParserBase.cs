@@ -29,25 +29,35 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
-	internal static class SchemaParser
+	public abstract class SchemaParserBase<TEntry> : ISchemaParser, ISchemaParser<TEntry> where TEntry : SchemaEntryBase
 	{
-		#region 公共方法
-		public static bool TryParse<T>(string text, out Collections.IReadOnlyNamedCollection<T> result, Func<SchemaBase.Token<T>, IEnumerable<T>> mapper, object data) where T : SchemaBase
+		#region 构造函数
+		protected SchemaParserBase()
+		{
+		}
+		#endregion
+
+		#region 抽象方法
+		public abstract ISchema<TEntry> Parse(string name, string expression, Type entityType);
+		#endregion
+
+		#region 保护方法
+		protected bool TryParse(string text, out Collections.INamedCollection<TEntry> result, Func<SchemaEntryToken, IEnumerable<TEntry>> mapper, object data = null)
 		{
 			return (result = Parse(text, mapper, null, data)) != null;
 		}
 
-		public static Collections.IReadOnlyNamedCollection<T> Parse<T>(string text, Func<SchemaBase.Token<T>, IEnumerable<T>> mapper, object data) where T : SchemaBase
+		protected Collections.INamedCollection<TEntry> Parse(string text, Func<SchemaEntryToken, IEnumerable<TEntry>> mapper, object data = null)
 		{
 			return Parse(text, mapper, message => throw new InvalidOperationException(message), data);
 		}
 
-		public static Collections.IReadOnlyNamedCollection<T> Parse<T>(string text, Func<SchemaBase.Token<T>, IEnumerable<T>> mapper, Action<string> onError, object data) where T : SchemaBase
+		protected Collections.INamedCollection<TEntry> Parse(string text, Func<SchemaEntryToken, IEnumerable<TEntry>> mapper, Action<string> onError, object data = null)
 		{
 			if(string.IsNullOrEmpty(text))
 				return null;
 
-			var context = new StateContext<T>(text.Length, mapper, onError, data);
+			var context = new StateContext(text.Length, mapper, onError, data);
 
 			for(int i = 0; i < text.Length; i++)
 			{
@@ -99,14 +109,14 @@ namespace Zongsoft.Data
 			}
 
 			if(context.Complete(out var segments))
-				return (Collections.IReadOnlyNamedCollection<T>)segments;
+				return segments;
 
 			return null;
 		}
 		#endregion
 
 		#region 状态处理
-		private static bool DoNone<T>(ref StateContext<T> context) where T : SchemaBase
+		private static bool DoNone(ref StateContext context)
 		{
 			if(context.IsWhitespace())
 				return true;
@@ -135,7 +145,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		private static bool DoAsterisk<T>(ref StateContext<T> context) where T : SchemaBase
+		private static bool DoAsterisk(ref StateContext context)
 		{
 			switch(context.Character)
 			{
@@ -154,7 +164,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		private static bool DoExclude<T>(ref StateContext<T> context) where T : SchemaBase
+		private static bool DoExclude(ref StateContext context)
 		{
 			switch(context.Character)
 			{
@@ -201,7 +211,7 @@ namespace Zongsoft.Data
 			return true;
 		}
 
-		private static bool DoInclude<T>(ref StateContext<T> context) where T : SchemaBase
+		private static bool DoInclude(ref StateContext context)
 		{
 			switch(context.Character)
 			{
@@ -254,7 +264,7 @@ namespace Zongsoft.Data
 			return true;
 		}
 
-		private static bool DoPagingCount<T>(ref StateContext<T> context) where T : SchemaBase
+		private static bool DoPagingCount(ref StateContext context)
 		{
 			string buffer;
 
@@ -324,7 +334,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		private static bool DoPagingSize<T>(ref StateContext<T> context) where T : SchemaBase
+		private static bool DoPagingSize(ref StateContext context)
 		{
 			string buffer;
 
@@ -387,7 +397,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		private static bool DoSortingField<T>(ref StateContext<T> context) where T : SchemaBase
+		private static bool DoSortingField(ref StateContext context)
 		{
 			switch(context.Character)
 			{
@@ -429,7 +439,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		private static bool DoSortingGutter<T>(ref StateContext<T> context) where T : SchemaBase
+		private static bool DoSortingGutter(ref StateContext context)
 		{
 			if(context.IsWhitespace())
 				return true;
@@ -446,18 +456,70 @@ namespace Zongsoft.Data
 		}
 		#endregion
 
+		#region 显式实现
+		ISchema ISchemaParser.Parse(string name, string expression, Type entityType)
+		{
+			return this.Parse(name, expression, entityType);
+		}
+		#endregion
+
 		#region 嵌套子类
-		private struct StateContext<T> where T : SchemaBase
+		/// <summary>
+		/// 表示数据模式解析中的元素描述类。
+		/// </summary>
+		protected class SchemaEntryToken
+		{
+			#region 构造函数
+			internal SchemaEntryToken(object data)
+			{
+				this.Data = data;
+			}
+			#endregion
+
+			#region 公共属性
+			/// <summary>
+			/// 获取当前元素的名称。
+			/// </summary>
+			public string Name
+			{
+				get;
+				internal set;
+			}
+
+			/// <summary>
+			/// 获取当前元素的父元素。
+			/// </summary>
+			public TEntry Parent
+			{
+				get;
+				internal set;
+			}
+
+			/// <summary>
+			/// 获取或设置用户自定义数据。
+			/// </summary>
+			/// <remarks>
+			///		<para>设置的用户自定义数据，会传给下一个元素解析描述。</para>
+			/// </remarks>
+			public object Data
+			{
+				get;
+				set;
+			}
+			#endregion
+		}
+
+		private struct StateContext
 		{
 			#region 私有变量
 			private int _bufferIndex;
 			private readonly char[] _buffer;
 			private readonly Action<string> _onError;
-			private readonly Func<SchemaBase.Token<T>, IEnumerable<T>> _mapper;
-			private readonly SchemaBase.Token<T> _token;
-			private SchemaBase _current;
-			private Stack<SchemaBase> _stack;
-			private Collections.INamedCollection<T> _elements;
+			private readonly Func<SchemaEntryToken, IEnumerable<TEntry>> _mapper;
+			private readonly SchemaEntryToken _token;
+			private SchemaEntryBase _current;
+			private Stack<SchemaEntryBase> _stack;
+			private Collections.INamedCollection<TEntry> _elements;
 			#endregion
 
 			#region 公共字段
@@ -467,26 +529,26 @@ namespace Zongsoft.Data
 			#endregion
 
 			#region 构造函数
-			public StateContext(int length, Func<SchemaBase.Token<T>, IEnumerable<T>> mapper, Action<string> onError, object data)
+			public StateContext(int length, Func<SchemaEntryToken, IEnumerable<TEntry>> mapper, Action<string> onError, object data)
 			{
 				_bufferIndex = 0;
 				_buffer = new char[length];
 				_current = null;
 				_mapper = mapper;
 				_onError = onError;
-				_token = new SchemaBase.Token<T>(data);
-				_stack = new Stack<SchemaBase>();
+				_token = new SchemaEntryToken(data);
+				_stack = new Stack<SchemaEntryBase>();
 
 				this.Character = '\0';
 				this.State = State.None;
 				this.Flags = new StateVector();
 
-				_elements = new Collections.NamedCollection<T>(item => item.Name, StringComparer.OrdinalIgnoreCase);
+				_elements = new Collections.NamedCollection<TEntry>(item => item.Name, StringComparer.OrdinalIgnoreCase);
 			}
 			#endregion
 
 			#region 公共属性
-			public SchemaBase Current
+			public SchemaEntryBase Current
 			{
 				get
 				{
@@ -506,12 +568,12 @@ namespace Zongsoft.Data
 				_onError?.Invoke(message);
 			}
 
-			public SchemaBase Peek()
+			public SchemaEntryBase Peek()
 			{
 				return _stack.Count > 0 ? _stack.Peek() : null;
 			}
 
-			public SchemaBase Pop()
+			public SchemaEntryBase Pop()
 			{
 				if(_stack == null || _stack.Count == 0)
 				{
@@ -524,7 +586,7 @@ namespace Zongsoft.Data
 
 			public void Push()
 			{
-				_stack.Push(_current ?? SchemaBase.Ignores);
+				_stack.Push(_current ?? SchemaEntryBase.Ignores);
 			}
 
 			public bool IsWhitespace()
@@ -573,7 +635,7 @@ namespace Zongsoft.Data
 			public void Include(string name = null)
 			{
 				var parent = this.Peek();
-				T current;
+				TEntry current;
 
 				if(string.IsNullOrEmpty(name))
 				{
@@ -593,7 +655,7 @@ namespace Zongsoft.Data
 				else
 				{
 					//如果是忽略段则不需要进行子集和映射处理
-					if(object.ReferenceEquals(parent, SchemaBase.Ignores))
+					if(object.ReferenceEquals(parent, SchemaEntryBase.Ignores))
 						return;
 
 					if(parent.TryGetChild(name, out var child))
@@ -665,7 +727,7 @@ namespace Zongsoft.Data
 				return true;
 			}
 
-			public bool Complete(out Collections.INamedCollection<T> elements)
+			public bool Complete(out Collections.INamedCollection<TEntry> elements)
 			{
 				elements = null;
 
@@ -724,13 +786,13 @@ namespace Zongsoft.Data
 			#endregion
 
 			#region 私有方法
-			private void Map(string name, SchemaBase parent)
+			private void Map(string name, SchemaEntryBase parent)
 			{
 				//重置当前段
 				_current = null;
 
 				_token.Name = name;
-				_token.Parent = (T)parent;
+				_token.Parent = (TEntry)parent;
 
 				var items = _mapper(_token);
 
@@ -744,7 +806,7 @@ namespace Zongsoft.Data
 						if(_elements.Contains(item.Name))
 							_current = item;
 						else
-							_elements.Add((T)(_current = item));
+							_elements.Add((TEntry)(_current = item));
 					}
 				}
 				else

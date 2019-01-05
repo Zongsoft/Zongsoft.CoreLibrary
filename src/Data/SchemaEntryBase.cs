@@ -29,10 +29,10 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
-	public abstract class SchemaBase
+	public abstract class SchemaEntryBase
 	{
 		#region 单例字段
-		internal static readonly SchemaBase Ignores = new EmptySchema();
+		internal static readonly SchemaEntryBase Ignores = new EmptySchema();
 		#endregion
 
 		#region 成员字段
@@ -41,11 +41,11 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		protected SchemaBase()
+		protected SchemaEntryBase()
 		{
 		}
 
-		protected SchemaBase(string name)
+		protected SchemaEntryBase(string name)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
@@ -112,11 +112,11 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 抽象方法
-		protected abstract SchemaBase GetParent();
-		protected abstract void SetParent(SchemaBase parent);
+		protected abstract SchemaEntryBase GetParent();
+		protected abstract void SetParent(SchemaEntryBase parent);
 
-		internal protected abstract bool TryGetChild(string name, out SchemaBase child);
-		internal protected abstract void AddChild(SchemaBase child);
+		internal protected abstract bool TryGetChild(string name, out SchemaEntryBase child);
+		internal protected abstract void AddChild(SchemaEntryBase child);
 		internal protected abstract void RemoveChild(string name);
 		internal protected abstract void ClearChildren();
 		#endregion
@@ -137,7 +137,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 重写方法
-		public bool Equals(SchemaBase other)
+		public bool Equals(SchemaEntryBase other)
 		{
 			if(other == null)
 				return false;
@@ -147,10 +147,10 @@ namespace Zongsoft.Data
 
 		public override bool Equals(object obj)
 		{
-			if(obj == null || obj.GetType() != typeof(SchemaBase))
+			if(obj == null || obj.GetType() != typeof(SchemaEntryBase))
 				return false;
 
-			return this.Equals((SchemaBase)obj);
+			return this.Equals((SchemaEntryBase)obj);
 		}
 
 		public override int GetHashCode()
@@ -164,85 +164,22 @@ namespace Zongsoft.Data
 		}
 		#endregion
 
-		#region 解析方法
-		protected static bool TryParse<T>(string text, out Collections.IReadOnlyNamedCollection<T> result, Func<Token<T>, IEnumerable<T>> mapper, object data = null) where T : SchemaBase
-		{
-			return (result = SchemaParser.Parse(text, mapper, null, data)) != null;
-		}
-
-		protected static Collections.IReadOnlyNamedCollection<T> Parse<T>(string text, Func<Token<T>, IEnumerable<T>> mapper, object data = null) where T : SchemaBase
-		{
-			return SchemaParser.Parse(text, mapper, message => throw new InvalidOperationException(message), data);
-		}
-
-		protected static Collections.IReadOnlyNamedCollection<T> Parse<T>(string text, Func<Token<T>, IEnumerable<T>> mapper, Action<string> onError, object data = null) where T : SchemaBase
-		{
-			return SchemaParser.Parse(text, mapper, onError, data);
-		}
-		#endregion
-
 		#region 嵌套子类
-		/// <summary>
-		/// 表示数据模式解析中的元素描述类。
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		internal protected class Token<T> where T : SchemaBase
-		{
-			#region 构造函数
-			internal Token(object data)
-			{
-				this.Data = data;
-			}
-			#endregion
-
-			#region 公共属性
-			/// <summary>
-			/// 获取当前元素的名称。
-			/// </summary>
-			public string Name
-			{
-				get;
-				internal set;
-			}
-
-			/// <summary>
-			/// 获取当前元素的父元素。
-			/// </summary>
-			public T Parent
-			{
-				get;
-				internal set;
-			}
-
-			/// <summary>
-			/// 获取或设置用户自定义数据。
-			/// </summary>
-			/// <remarks>
-			///		<para>设置的用户自定义数据，会传给下一个元素解析描述。</para>
-			/// </remarks>
-			public object Data
-			{
-				get;
-				set;
-			}
-			#endregion
-		}
-
-		private class EmptySchema : SchemaBase
+		private class EmptySchema : SchemaEntryBase
 		{
 			public override string Name => "?";
 			public override bool HasChildren => false;
 
-			protected override SchemaBase GetParent()
+			protected override SchemaEntryBase GetParent()
 			{
 				return null;
 			}
 
-			protected override void SetParent(SchemaBase parent)
+			protected override void SetParent(SchemaEntryBase parent)
 			{
 			}
 
-			protected internal override void AddChild(SchemaBase child)
+			protected internal override void AddChild(SchemaEntryBase child)
 			{
 			}
 
@@ -254,7 +191,7 @@ namespace Zongsoft.Data
 			{
 			}
 
-			protected internal override bool TryGetChild(string name, out SchemaBase child)
+			protected internal override bool TryGetChild(string name, out SchemaEntryBase child)
 			{
 				child = null;
 				return false;
