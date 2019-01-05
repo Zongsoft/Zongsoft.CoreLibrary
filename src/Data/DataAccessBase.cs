@@ -503,7 +503,7 @@ namespace Zongsoft.Data
 
 		public int Delete<T>(ICondition condition, object state)
 		{
-			return this.Delete(this.GetName<T>(), condition, null, state, null, null);
+			return this.Delete(this.GetName<T>(), condition, string.Empty, state, null, null);
 		}
 
 		public int Delete<T>(ICondition condition, string schema, object state, Func<DataDeleteContextBase, bool> deleting = null, Action<DataDeleteContextBase> deleted = null)
@@ -518,16 +518,21 @@ namespace Zongsoft.Data
 
 		public int Delete(string name, ICondition condition, object state)
 		{
-			return this.Delete(name, condition, null, state, null, null);
+			return this.Delete(name, condition, string.Empty, state, null, null);
 		}
 
 		public int Delete(string name, ICondition condition, string schema, object state, Func<DataDeleteContextBase, bool> deleting = null, Action<DataDeleteContextBase> deleted = null)
+		{
+			return this.Delete(name, condition, this.Schema.Parse(name, schema), state, deleting, deleted);
+		}
+
+		public int Delete(string name, ICondition condition, ISchema schema, object state, Func<DataDeleteContextBase, bool> deleting = null, Action<DataDeleteContextBase> deleted = null)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
 			//创建数据访问上下文对象
-			var context = this.CreateDeleteContext(name, condition, this.Schema.Parse(name, schema), state);
+			var context = this.CreateDeleteContext(name, condition, schema, state);
 
 			//处理数据访问操作前的回调
 			if(deleting != null && deleting(context))
@@ -566,7 +571,7 @@ namespace Zongsoft.Data
 			if(data == null)
 				return 0;
 
-			return this.Insert(this.GetName(data.GetType()), data, null, null, null, null);
+			return this.Insert(this.GetName(data.GetType()), data, string.Empty, null, null, null);
 		}
 
 		public int Insert<T>(T data, object state)
@@ -574,7 +579,7 @@ namespace Zongsoft.Data
 			if(data == null)
 				return 0;
 
-			return this.Insert(this.GetName(data.GetType()), data, null, state, null, null);
+			return this.Insert(this.GetName(data.GetType()), data, string.Empty, state, null, null);
 		}
 
 		public int Insert<T>(T data, string schema)
@@ -598,7 +603,7 @@ namespace Zongsoft.Data
 			if(data == null)
 				return 0;
 
-			return this.Insert(this.GetName(typeof(T)), data, null, null, null, null);
+			return this.Insert(this.GetName(typeof(T)), data, string.Empty, null, null, null);
 		}
 
 		public int Insert<T>(object data, object state)
@@ -606,7 +611,7 @@ namespace Zongsoft.Data
 			if(data == null)
 				return 0;
 
-			return this.Insert(this.GetName(typeof(T)), data, null, state, null, null);
+			return this.Insert(this.GetName(typeof(T)), data, string.Empty, state, null, null);
 		}
 
 		public int Insert<T>(object data, string schema)
@@ -627,12 +632,12 @@ namespace Zongsoft.Data
 
 		public int Insert(string name, object data)
 		{
-			return this.Insert(name, data, null, null, null, null);
+			return this.Insert(name, data, string.Empty, null, null, null);
 		}
 
 		public int Insert(string name, object data, object state)
 		{
-			return this.Insert(name, data, null, state, null, null);
+			return this.Insert(name, data, string.Empty, state, null, null);
 		}
 
 		public int Insert(string name, object data, string schema)
@@ -642,6 +647,11 @@ namespace Zongsoft.Data
 
 		public int Insert(string name, object data, string schema, object state, Func<DataInsertContextBase, bool> inserting = null, Action<DataInsertContextBase> inserted = null)
 		{
+			return this.Insert(name, data, this.Schema.Parse(name, schema, data.GetType()), state, inserting, inserted);
+		}
+
+		public int Insert(string name, object data, ISchema schema, object state, Func<DataInsertContextBase, bool> inserting = null, Action<DataInsertContextBase> inserted = null)
+		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
@@ -649,7 +659,7 @@ namespace Zongsoft.Data
 				return 0;
 
 			//创建数据访问上下文对象
-			var context = this.CreateInsertContext(name, false, data, this.Schema.Parse(name, schema, data.GetType()), state);
+			var context = this.CreateInsertContext(name, false, data, schema, state);
 
 			//处理数据访问操作前的回调
 			if(inserting != null && inserting(context))
@@ -684,7 +694,7 @@ namespace Zongsoft.Data
 			if(items == null)
 				return 0;
 
-			return this.InsertMany(this.GetName<T>(), items, null, null, null, null);
+			return this.InsertMany(this.GetName<T>(), items, string.Empty, null, null, null);
 		}
 
 		public int InsertMany<T>(IEnumerable<T> items, object state)
@@ -692,7 +702,7 @@ namespace Zongsoft.Data
 			if(items == null)
 				return 0;
 
-			return this.InsertMany(this.GetName<T>(), items, null, state, null, null);
+			return this.InsertMany(this.GetName<T>(), items, string.Empty, state, null, null);
 		}
 
 		public int InsertMany<T>(IEnumerable<T> items, string schema)
@@ -716,7 +726,7 @@ namespace Zongsoft.Data
 			if(items == null)
 				return 0;
 
-			return this.InsertMany(this.GetName<T>(), items, null, null, null, null);
+			return this.InsertMany(this.GetName<T>(), items, string.Empty, null, null, null);
 		}
 
 		public int InsertMany<T>(IEnumerable items, object state)
@@ -724,7 +734,7 @@ namespace Zongsoft.Data
 			if(items == null)
 				return 0;
 
-			return this.InsertMany(this.GetName<T>(), items, null, state, null, null);
+			return this.InsertMany(this.GetName<T>(), items, string.Empty, state, null, null);
 		}
 
 		public int InsertMany<T>(IEnumerable items, string schema)
@@ -745,12 +755,12 @@ namespace Zongsoft.Data
 
 		public int InsertMany(string name, IEnumerable items)
 		{
-			return this.InsertMany(name, items, null, null, null, null);
+			return this.InsertMany(name, items, string.Empty, null, null, null);
 		}
 
 		public int InsertMany(string name, IEnumerable items, object state)
 		{
-			return this.InsertMany(name, items, null, state, null, null);
+			return this.InsertMany(name, items, string.Empty, state, null, null);
 		}
 
 		public int InsertMany(string name, IEnumerable items, string schema)
@@ -760,6 +770,11 @@ namespace Zongsoft.Data
 
 		public int InsertMany(string name, IEnumerable items, string schema, object state, Func<DataInsertContextBase, bool> inserting = null, Action<DataInsertContextBase> inserted = null)
 		{
+			return this.InsertMany(name, items, this.Schema.Parse(name, schema, Common.TypeExtension.GetElementType(items.GetType())), state, inserting, inserted);
+		}
+
+		public int InsertMany(string name, IEnumerable items, ISchema schema, object state, Func<DataInsertContextBase, bool> inserting = null, Action<DataInsertContextBase> inserted = null)
+		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
@@ -767,7 +782,7 @@ namespace Zongsoft.Data
 				return 0;
 
 			//创建数据访问上下文对象
-			var context = this.CreateInsertContext(name, true, items, this.Schema.Parse(name, schema, Common.TypeExtension.GetElementType(items.GetType())), state);
+			var context = this.CreateInsertContext(name, true, items, schema, state);
 
 			//处理数据访问操作前的回调
 			if(inserting != null && inserting(context))
@@ -964,18 +979,12 @@ namespace Zongsoft.Data
 			return this.Update(name, data, condition, schema, null, null, null);
 		}
 
-		/// <summary>
-		/// 根据指定的条件将指定的实体更新到数据源。
-		/// </summary>
-		/// <param name="name">指定的实体映射名。</param>
-		/// <param name="data">要更新的实体对象。</param>
-		/// <param name="condition">要更新的条件子句，如果为空(null)则根据实体的主键进行更新。</param>
-		/// <param name="schema">指定的要更新的数据模式。</param>
-		/// <param name="state">指定要传入的状态数据。</param>
-		/// <param name="updating">指定的更新前回调函数。</param>
-		/// <param name="updated">指定的更新后回调函数。</param>
-		/// <returns>返回受影响的记录行数，执行成功返回大于零的整数，失败则返回负数。</returns>
 		public int Update(string name, object data, ICondition condition, string schema, object state, Func<DataUpdateContextBase, bool> updating = null, Action<DataUpdateContextBase> updated = null)
+		{
+			return this.Update(name, data, condition, this.Schema.Parse(name, schema, data.GetType()), state, updating, updated);
+		}
+
+		public int Update(string name, object data, ICondition condition, ISchema schema, object state, Func<DataUpdateContextBase, bool> updating = null, Action<DataUpdateContextBase> updated = null)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
@@ -984,7 +993,7 @@ namespace Zongsoft.Data
 				return 0;
 
 			//创建数据访问上下文对象
-			var context = this.CreateUpdateContext(name, false, data, condition, this.Schema.Parse(name, schema, data.GetType()), state);
+			var context = this.CreateUpdateContext(name, false, data, condition, schema, state);
 
 			//处理数据访问操作前的回调
 			if(updating != null && updating(context))
@@ -1069,17 +1078,12 @@ namespace Zongsoft.Data
 			return this.UpdateMany(name, items, schema, null, null, null);
 		}
 
-		/// <summary>
-		/// 根据指定的条件将指定的实体集更新到数据源。
-		/// </summary>
-		/// <param name="name">指定的实体映射名。</param>
-		/// <param name="items">要更新的数据集。</param>
-		/// <param name="schema">指定的要更新的数据模式。</param>
-		/// <param name="state">指定要传入的状态数据。</param>
-		/// <param name="updating">可选的更新前回调委托参数。</param>
-		/// <param name="updated">可选的更新后回调委托参数。</param>
-		/// <returns>返回受影响的记录行数，执行成功返回大于零的整数，失败则返回负数。</returns>
 		public int UpdateMany(string name, IEnumerable items, string schema, object state, Func<DataUpdateContextBase, bool> updating = null, Action<DataUpdateContextBase> updated = null)
+		{
+			return this.UpdateMany(name, items, this.Schema.Parse(name, schema, Common.TypeExtension.GetElementType(items.GetType())), state, updating, updated);
+		}
+
+		public int UpdateMany(string name, IEnumerable items, ISchema schema, object state, Func<DataUpdateContextBase, bool> updating = null, Action<DataUpdateContextBase> updated = null)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
@@ -1088,7 +1092,7 @@ namespace Zongsoft.Data
 				return 0;
 
 			//创建数据访问上下文对象
-			var context = this.CreateUpdateContext(name, true, items, null, this.Schema.Parse(name, schema, Common.TypeExtension.GetElementType(items.GetType())), state);
+			var context = this.CreateUpdateContext(name, true, items, null, schema, state);
 
 			//处理数据访问操作前的回调
 			if(updating != null && updating(context))
@@ -1139,12 +1143,12 @@ namespace Zongsoft.Data
 
 		public IEnumerable<T> Select<T>(ICondition condition, Paging paging, params Sorting[] sortings)
 		{
-			return this.Select<T>(this.GetName<T>(), condition, null, paging, null, sortings, null, null);
+			return this.Select<T>(this.GetName<T>(), condition, string.Empty, paging, null, sortings, null, null);
 		}
 
 		public IEnumerable<T> Select<T>(ICondition condition, Paging paging, object state, params Sorting[] sortings)
 		{
-			return this.Select<T>(this.GetName<T>(), condition, null, paging, state, sortings, null, null);
+			return this.Select<T>(this.GetName<T>(), condition, string.Empty, paging, state, sortings, null, null);
 		}
 
 		public IEnumerable<T> Select<T>(ICondition condition, Paging paging, string schema, params Sorting[] sortings)
@@ -1239,11 +1243,16 @@ namespace Zongsoft.Data
 
 		public IEnumerable<T> Select<T>(string name, ICondition condition, string schema, Paging paging, object state, Sorting[] sortings, Func<DataSelectContextBase, bool> selecting, Action<DataSelectContextBase> selected)
 		{
+			return this.Select<T>(name, condition, this.Schema.Parse(name, schema, typeof(T)), paging, state, sortings, selecting, selected);
+		}
+
+		public IEnumerable<T> Select<T>(string name, ICondition condition, ISchema schema, Paging paging, object state, Sorting[] sortings, Func<DataSelectContextBase, bool> selecting, Action<DataSelectContextBase> selected)
+		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
 			//创建数据访问上下文对象
-			var context = this.CreateSelectContext(name, typeof(T), condition, null, this.Schema.Parse(name, schema, typeof(T)), paging, sortings, state);
+			var context = this.CreateSelectContext(name, typeof(T), condition, null, schema, paging, sortings, state);
 
 			//执行查询方法
 			return this.Select<T>(context, selecting, selected);
@@ -1301,11 +1310,16 @@ namespace Zongsoft.Data
 
 		public IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, string schema, Paging paging, object state, Sorting[] sortings, Func<DataSelectContextBase, bool> selecting, Action<DataSelectContextBase> selected)
 		{
+			return this.Select<T>(name, grouping, condition, this.Schema.Parse(name, schema, typeof(T)), paging, state, sortings, selecting, selected);
+		}
+
+		public IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, ISchema schema, Paging paging, object state, Sorting[] sortings, Func<DataSelectContextBase, bool> selecting, Action<DataSelectContextBase> selected)
+		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
 			//创建数据访问上下文对象
-			var context = this.CreateSelectContext(name, typeof(T), condition, grouping, this.Schema.Parse(name, schema, typeof(T)), paging, sortings, state);
+			var context = this.CreateSelectContext(name, typeof(T), condition, grouping, schema, paging, sortings, state);
 
 			//执行查询方法
 			return this.Select<T>(context, selecting, selected);

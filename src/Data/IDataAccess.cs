@@ -158,6 +158,7 @@ namespace Zongsoft.Data
 		int Delete(string name, ICondition condition, string schema = null);
 		int Delete(string name, ICondition condition, object state);
 		int Delete(string name, ICondition condition, string schema, object state, Func<DataDeleteContextBase, bool> deleting = null, Action<DataDeleteContextBase> deleted = null);
+		int Delete(string name, ICondition condition, ISchema schema, object state, Func<DataDeleteContextBase, bool> deleting = null, Action<DataDeleteContextBase> deleted = null);
 		#endregion
 
 		#region 插入方法
@@ -175,6 +176,7 @@ namespace Zongsoft.Data
 		int Insert(string name, object data, object state);
 		int Insert(string name, object data, string schema);
 		int Insert(string name, object data, string schema, object state, Func<DataInsertContextBase, bool> inserting = null, Action<DataInsertContextBase> inserted = null);
+		int Insert(string name, object data, ISchema schema, object state, Func<DataInsertContextBase, bool> inserting = null, Action<DataInsertContextBase> inserted = null);
 
 		int InsertMany<T>(IEnumerable<T> items);
 		int InsertMany<T>(IEnumerable<T> items, object state);
@@ -190,6 +192,7 @@ namespace Zongsoft.Data
 		int InsertMany(string name, IEnumerable items, object state);
 		int InsertMany(string name, IEnumerable items, string schema);
 		int InsertMany(string name, IEnumerable items, string schema, object state, Func<DataInsertContextBase, bool> inserting = null, Action<DataInsertContextBase> inserted = null);
+		int InsertMany(string name, IEnumerable items, ISchema schema, object state, Func<DataInsertContextBase, bool> inserting = null, Action<DataInsertContextBase> inserted = null);
 		#endregion
 
 		#region 更新方法
@@ -219,6 +222,7 @@ namespace Zongsoft.Data
 		int Update(string name, object data, ICondition condition, object state);
 		int Update(string name, object data, ICondition condition, string schema);
 		int Update(string name, object data, ICondition condition, string schema, object state, Func<DataUpdateContextBase, bool> updating = null, Action<DataUpdateContextBase> updated = null);
+		int Update(string name, object data, ICondition condition, ISchema schema, object state, Func<DataUpdateContextBase, bool> updating = null, Action<DataUpdateContextBase> updated = null);
 
 		int UpdateMany<T>(IEnumerable<T> items);
 		int UpdateMany<T>(IEnumerable<T> items, object state);
@@ -234,6 +238,7 @@ namespace Zongsoft.Data
 		int UpdateMany(string name, IEnumerable items, object state);
 		int UpdateMany(string name, IEnumerable items, string schema);
 		int UpdateMany(string name, IEnumerable items, string schema, object state, Func<DataUpdateContextBase, bool> updating = null, Action<DataUpdateContextBase> updated = null);
+		int UpdateMany(string name, IEnumerable items, ISchema schema, object state, Func<DataUpdateContextBase, bool> updating = null, Action<DataUpdateContextBase> updated = null);
 		#endregion
 
 		#region 查询方法
@@ -262,10 +267,7 @@ namespace Zongsoft.Data
 		IEnumerable<T> Select<T>(string name, ICondition condition, string schema, Paging paging, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(string name, ICondition condition, string schema, Paging paging, object state, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(string name, ICondition condition, string schema, Paging paging, object state, Sorting[] sortings, Func<DataSelectContextBase, bool> selecting, Action<DataSelectContextBase> selected);
-
-		//IEnumerable<T> Select<T, TEntity>(Grouping<TEntity> grouping, ICondition condition = null, params Sorting[] sortings);
-		//IEnumerable<T> Select<T, TEntity>(Grouping<TEntity> grouping, ICondition condition = null, Paging paging = null, params Sorting[] sortings);
-		//IEnumerable<T> Select<T, TEntity>(Grouping<TEntity> grouping, ICondition condition, Paging paging, Sorting[] sortings, Func<DataSelectionContext, bool> selecting, Action<DataSelectionContext> selected);
+		IEnumerable<T> Select<T>(string name, ICondition condition, ISchema schema, Paging paging, object state, Sorting[] sortings, Func<DataSelectContextBase, bool> selecting, Action<DataSelectContextBase> selected);
 
 		IEnumerable<T> Select<T>(string name, Grouping grouping, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(string name, Grouping grouping, object state, params Sorting[] sortings);
@@ -278,6 +280,7 @@ namespace Zongsoft.Data
 		IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, Paging paging, object state = null, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, string schema, Paging paging, object state = null, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, string schema, Paging paging, object state, Sorting[] sortings, Func<DataSelectContextBase, bool> selecting, Action<DataSelectContextBase> selected);
+		IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, ISchema schema, Paging paging, object state, Sorting[] sortings, Func<DataSelectContextBase, bool> selecting, Action<DataSelectContextBase> selected);
 		#endregion
 	}
 }
