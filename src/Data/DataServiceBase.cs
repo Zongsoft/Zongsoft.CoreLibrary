@@ -308,7 +308,7 @@ namespace Zongsoft.Data
 			var condition = this.OnValidate(DataAccessMethod.Delete, this.ConvertKey(key, out _));
 
 			//执行删除操作
-			return this.OnDelete(condition, schema, state);
+			return this.OnDelete(condition, this.GetSchema(schema), state);
 		}
 
 		public virtual int Delete<TKey1, TKey2>(TKey1 key1, TKey2 key2, string schema = null)
@@ -325,7 +325,7 @@ namespace Zongsoft.Data
 			var condition = this.OnValidate(DataAccessMethod.Delete, this.ConvertKey(key1, key2, out _));
 
 			//执行删除操作
-			return this.OnDelete(condition, schema, state);
+			return this.OnDelete(condition, this.GetSchema(schema), state);
 		}
 
 		public virtual int Delete<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string schema = null)
@@ -342,7 +342,7 @@ namespace Zongsoft.Data
 			var condition = this.OnValidate(DataAccessMethod.Delete, this.ConvertKey(key1, key2, key3, out _));
 
 			//执行删除操作
-			return this.OnDelete(condition, schema, state);
+			return this.OnDelete(condition, this.GetSchema(schema), state);
 		}
 
 		public int Delete(ICondition condition, string schema = null)
@@ -359,10 +359,10 @@ namespace Zongsoft.Data
 			condition = this.OnValidate(DataAccessMethod.Delete, condition);
 
 			//执行删除操作
-			return this.OnDelete(condition, schema, state);
+			return this.OnDelete(condition, this.GetSchema(schema), state);
 		}
 
-		protected virtual int OnDelete(ICondition condition, string schema, object state)
+		protected virtual int OnDelete(ICondition condition, ISchema schema, object state)
 		{
 			if(condition == null)
 				throw new NotSupportedException("The condition cann't is null on delete operation.");
@@ -404,7 +404,7 @@ namespace Zongsoft.Data
 			//尝试递增注册的递增键值
 			DataSequence.Increments(this, dictionary);
 
-			return this.OnInsert(dictionary, schema, state);
+			return this.OnInsert(dictionary, this.GetSchema(schema, data.GetType()), state);
 		}
 
 		public int InsertMany(IEnumerable items)
@@ -442,10 +442,10 @@ namespace Zongsoft.Data
 				DataSequence.Increments(this, dictionary);
 			}
 
-			return this.OnInsertMany(dictionares, schema, state);
+			return this.OnInsertMany(dictionares, this.GetSchema(schema, Common.TypeExtension.GetElementType(items.GetType())), state);
 		}
 
-		protected virtual int OnInsert(IDataDictionary<TEntity> data, string schema, object state)
+		protected virtual int OnInsert(IDataDictionary<TEntity> data, ISchema schema, object state)
 		{
 			if(data == null || data.Data == null)
 				return 0;
@@ -454,7 +454,7 @@ namespace Zongsoft.Data
 			return this.DataAccess.Insert(this.Name, data, schema, state, ctx => this.OnInserting(ctx), ctx => this.OnInserted(ctx));
 		}
 
-		protected virtual int OnInsertMany(IEnumerable<IDataDictionary<TEntity>> items, string schema, object state)
+		protected virtual int OnInsertMany(IEnumerable<IDataDictionary<TEntity>> items, ISchema schema, object state)
 		{
 			if(items == null)
 				return 0;
@@ -525,7 +525,7 @@ namespace Zongsoft.Data
 			this.OnValidate(DataAccessMethod.Update, dictionary);
 
 			//执行更新操作
-			return this.OnUpdate(dictionary, condition, schema, state);
+			return this.OnUpdate(dictionary, condition, this.GetSchema(schema, data.GetType()), state);
 		}
 
 		public int UpdateMany(IEnumerable items, object state = null)
@@ -550,10 +550,10 @@ namespace Zongsoft.Data
 				this.OnValidate(DataAccessMethod.Update, dictionary);
 			}
 
-			return this.OnUpdateMany(dictionares, schema, state);
+			return this.OnUpdateMany(dictionares, this.GetSchema(schema, Common.TypeExtension.GetElementType(items.GetType())), state);
 		}
 
-		protected virtual int OnUpdate(IDataDictionary<TEntity> data, ICondition condition, string schema, object state)
+		protected virtual int OnUpdate(IDataDictionary<TEntity> data, ICondition condition, ISchema schema, object state)
 		{
 			if(data == null || data.Data == null)
 				return 0;
@@ -561,7 +561,7 @@ namespace Zongsoft.Data
 			return this.DataAccess.Update(this.Name, data, condition, schema, state, ctx => this.OnUpdating(ctx), ctx => this.OnUpdated(ctx));
 		}
 
-		protected virtual int OnUpdateMany(IEnumerable<IDataDictionary<TEntity>> items, string schema, object state)
+		protected virtual int OnUpdateMany(IEnumerable<IDataDictionary<TEntity>> items, ISchema schema, object state)
 		{
 			if(items == null)
 				return 0;
@@ -632,7 +632,7 @@ namespace Zongsoft.Data
 				condition = this.OnValidate(DataAccessMethod.Select, condition);
 
 				//执行单条查询方法
-				return this.OnGet(condition, schema, state);
+				return this.OnGet(condition, this.GetSchema(schema), state);
 			}
 
 			return this.Select(condition, schema, paging, state, sortings);
@@ -695,7 +695,7 @@ namespace Zongsoft.Data
 				condition = this.OnValidate(DataAccessMethod.Select, condition);
 
 				//执行单条查询方法
-				return this.OnGet(condition, schema, state);
+				return this.OnGet(condition, this.GetSchema(schema), state);
 			}
 
 			return this.Select(condition, schema, paging, state, sortings);
@@ -758,7 +758,7 @@ namespace Zongsoft.Data
 				condition = this.OnValidate(DataAccessMethod.Select, condition);
 
 				//执行单条查询方法
-				return this.OnGet(condition, schema, state);
+				return this.OnGet(condition, this.GetSchema(schema), state);
 			}
 
 			return this.Select(condition, schema, paging, state, sortings);
@@ -821,13 +821,13 @@ namespace Zongsoft.Data
 				condition = this.OnValidate(DataAccessMethod.Select, condition);
 
 				//执行单条查询方法
-				return this.OnGet(condition, schema, state);
+				return this.OnGet(condition, this.GetSchema(schema), state);
 			}
 
 			return this.Select(condition, schema, paging, state, sortings);
 		}
 
-		protected virtual TEntity OnGet(ICondition condition, string schema, object state)
+		protected virtual TEntity OnGet(ICondition condition, ISchema schema, object state)
 		{
 			return this.DataAccess.Select<TEntity>(this.Name, condition, schema, null, state, null, ctx => this.OnGetting(ctx), ctx => this.OnGetted(ctx)).FirstOrDefault();
 		}
@@ -1312,6 +1312,12 @@ namespace Zongsoft.Data
 			}
 
 			return condition;
+		}
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		private ISchema GetSchema(string expression, Type type = null)
+		{
+			return this.DataAccess.Schema.Parse(this.Name, expression, type);
 		}
 
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
