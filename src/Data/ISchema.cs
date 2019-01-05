@@ -46,6 +46,7 @@ namespace Zongsoft.Data
 			get;
 		}
 
+		void Clear();
 		bool Exists(string path);
 		void Include(string path);
 		void Exclude(string path);
