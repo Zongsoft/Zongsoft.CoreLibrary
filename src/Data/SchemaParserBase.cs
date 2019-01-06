@@ -42,26 +42,26 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 保护方法
-		protected bool TryParse(string text, out Collections.INamedCollection<TEntry> result, Func<SchemaEntryToken, IEnumerable<TEntry>> mapper, object data = null)
+		protected bool TryParse(string expression, out Collections.INamedCollection<TEntry> result, Func<SchemaEntryToken, IEnumerable<TEntry>> mapper, object data = null)
 		{
-			return (result = Parse(text, mapper, null, data)) != null;
+			return (result = this.Parse(expression, mapper, null, data)) != null;
 		}
 
-		protected Collections.INamedCollection<TEntry> Parse(string text, Func<SchemaEntryToken, IEnumerable<TEntry>> mapper, object data = null)
+		protected Collections.INamedCollection<TEntry> Parse(string expression, Func<SchemaEntryToken, IEnumerable<TEntry>> mapper, object data = null)
 		{
-			return Parse(text, mapper, message => throw new InvalidOperationException(message), data);
+			return this.Parse(expression, mapper, message => throw new InvalidOperationException(message), data);
 		}
 
-		protected Collections.INamedCollection<TEntry> Parse(string text, Func<SchemaEntryToken, IEnumerable<TEntry>> mapper, Action<string> onError, object data = null)
+		protected Collections.INamedCollection<TEntry> Parse(string expression, Func<SchemaEntryToken, IEnumerable<TEntry>> mapper, Action<string> onError, object data = null)
 		{
-			if(string.IsNullOrEmpty(text))
+			if(string.IsNullOrEmpty(expression))
 				return null;
 
-			var context = new StateContext(text.Length, mapper, onError, data);
+			var context = new StateContext(expression.Length, mapper, onError, data);
 
-			for(int i = 0; i < text.Length; i++)
+			for(int i = 0; i < expression.Length; i++)
 			{
-				context.Character = text[i];
+				context.Character = expression[i];
 
 				switch(context.State)
 				{
