@@ -45,7 +45,7 @@ namespace Zongsoft.Data
 		/// <summary>
 		/// 获取数据模式元素集合。
 		/// </summary>
-		ICollection<TEntry> Entries
+		Collections.INamedCollection<TEntry> Entries
 		{
 			get;
 		}
