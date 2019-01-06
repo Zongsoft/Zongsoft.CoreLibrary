@@ -42,9 +42,42 @@ namespace Zongsoft.Data
 	/// <typeparam name="TEntry">泛型参数，表示数据模式的成员类型。</typeparam>
 	public interface ISchema<TEntry> : ISchema where TEntry : SchemaEntryBase
 	{
+		/// <summary>
+		/// 获取数据模式元素集合。
+		/// </summary>
 		ICollection<TEntry> Entries
 		{
 			get;
 		}
+
+		/// <summary>
+		/// 添加一个元素到位于指定路径处的元素集中。
+		/// </summary>
+		/// <param name="path">指定要添加的元素路径。</param>
+		/// <returns>返回当前数据模式。</returns>
+		new ISchema<TEntry> Include(string path);
+
+		/// <summary>
+		/// 添加一个元素到位于指定路径处的元素集中。
+		/// </summary>
+		/// <param name="path">指定要添加的元素路径。</param>
+		/// <param name="entry">输出参数，返回添加成功后的数据模式元素；如果添加失败则返回空(null)。</param>
+		/// <returns>返回当前数据模式。</returns>
+		ISchema<TEntry> Include(string path, out TEntry entry);
+
+		/// <summary>
+		/// 从元素集中移除指定位置的元素。
+		/// </summary>
+		/// <param name="path">指定要移除的元素路径。</param>
+		/// <returns>返回当前数据模式。</returns>
+		new ISchema<TEntry> Exclude(string path);
+
+		/// <summary>
+		/// 从元素集中移除指定位置的元素。
+		/// </summary>
+		/// <param name="path">指定要移除的元素路径。</param>
+		/// <param name="entry">输出参数，返回移除成功后的数据模式元素；如果移除失败则返回空(null)。</param>
+		/// <returns>返回当前数据模式。</returns>
+		ISchema<TEntry> Exclude(string path, out TEntry entry);
 	}
 }
