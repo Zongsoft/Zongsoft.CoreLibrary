@@ -42,6 +42,22 @@ namespace Zongsoft.Data
 	public interface ISchema
 	{
 		/// <summary>
+		/// 获取数据模式的名称（对应数据访问操作的实体名）。
+		/// </summary>
+		string Name
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取数据模式的实体类型（对应数据访问操作关联的数据实体元素类型）。
+		/// </summary>
+		Type EntityType
+		{
+			get;
+		}
+
+		/// <summary>
 		/// 获取一个值，指示没有任何元素（即空模式）。
 		/// </summary>
 		bool IsEmpty
