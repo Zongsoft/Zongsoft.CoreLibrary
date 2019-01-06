@@ -32,7 +32,7 @@ namespace Zongsoft.Data
 			schemas = SchemaParser.Instance.Parse("*, !");
 			Assert.Equal(0, schemas.Count);
 
-			schemas = SchemaParser.Instance.Parse("*, !a, !c, !f, c");
+			schemas = SchemaParser.Instance.Parse(" ,  ,  *, ,,!a, !c, !f, c");
 			Assert.Equal(4, schemas.Count);
 			Assert.False(schemas.Contains("a"));
 			Assert.True(schemas.Contains("b"));
@@ -252,7 +252,7 @@ namespace Zongsoft.Data
 			#region 解析方法
 			public INamedCollection<SchemaEntry> Parse(string expression)
 			{
-				return base.Parse(expression, token => Resolve(token));
+				return base.Parse(expression, token => Resolve(token), null);
 			}
 
 			public override ISchema<SchemaEntry> Parse(string name, string expression, Type entityType)

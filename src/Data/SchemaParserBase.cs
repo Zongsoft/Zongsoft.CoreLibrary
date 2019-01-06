@@ -42,22 +42,22 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 保护方法
-		protected bool TryParse(string expression, out Collections.INamedCollection<TEntry> result, Func<SchemaEntryToken, IEnumerable<TEntry>> mapper, object data = null)
+		protected bool TryParse(string expression, out Collections.INamedCollection<TEntry> result, Func<SchemaEntryToken, IEnumerable<TEntry>> mapper, object data, Collections.INamedCollection<TEntry> entries = null)
 		{
-			return (result = this.Parse(expression, mapper, null, data)) != null;
+			return (result = this.Parse(expression, mapper, null, data, entries)) != null;
 		}
 
-		protected Collections.INamedCollection<TEntry> Parse(string expression, Func<SchemaEntryToken, IEnumerable<TEntry>> mapper, object data = null)
+		protected Collections.INamedCollection<TEntry> Parse(string expression, Func<SchemaEntryToken, IEnumerable<TEntry>> mapper, object data, Collections.INamedCollection<TEntry> entries = null)
 		{
-			return this.Parse(expression, mapper, message => throw new InvalidOperationException(message), data);
+			return this.Parse(expression, mapper, message => throw new InvalidOperationException(message), data, entries);
 		}
 
-		protected Collections.INamedCollection<TEntry> Parse(string expression, Func<SchemaEntryToken, IEnumerable<TEntry>> mapper, Action<string> onError, object data = null)
+		private Collections.INamedCollection<TEntry> Parse(string expression, Func<SchemaEntryToken, IEnumerable<TEntry>> mapper, Action<string> onError, object data, Collections.INamedCollection<TEntry> entries = null)
 		{
 			if(string.IsNullOrEmpty(expression))
 				return null;
 
-			var context = new StateContext(expression.Length, mapper, onError, data);
+			var context = new StateContext(expression.Length, mapper, onError, data, entries);
 
 			for(int i = 0; i < expression.Length; i++)
 			{
@@ -132,6 +132,8 @@ namespace Zongsoft.Data
 					return true;
 				case '}':
 					return context.Pop() != null;
+				case ',':
+					return true;
 				default:
 					if(context.IsLetterOrUnderscore())
 					{
@@ -519,7 +521,7 @@ namespace Zongsoft.Data
 			private readonly SchemaEntryToken _token;
 			private SchemaEntryBase _current;
 			private Stack<SchemaEntryBase> _stack;
-			private Collections.INamedCollection<TEntry> _elements;
+			private Collections.INamedCollection<TEntry> _entries;
 			#endregion
 
 			#region 公共字段
@@ -529,7 +531,7 @@ namespace Zongsoft.Data
 			#endregion
 
 			#region 构造函数
-			public StateContext(int length, Func<SchemaEntryToken, IEnumerable<TEntry>> mapper, Action<string> onError, object data)
+			public StateContext(int length, Func<SchemaEntryToken, IEnumerable<TEntry>> mapper, Action<string> onError, object data, Collections.INamedCollection<TEntry> entries)
 			{
 				_bufferIndex = 0;
 				_buffer = new char[length];
@@ -543,7 +545,7 @@ namespace Zongsoft.Data
 				this.State = State.None;
 				this.Flags = new StateVector();
 
-				_elements = new Collections.NamedCollection<TEntry>(item => item.Name, StringComparer.OrdinalIgnoreCase);
+				_entries = entries ?? new Collections.NamedCollection<TEntry>(item => item.Name, StringComparer.OrdinalIgnoreCase);
 			}
 			#endregion
 
@@ -617,14 +619,14 @@ namespace Zongsoft.Data
 				if(string.IsNullOrEmpty(name) || name == "!" || name == "*")
 				{
 					if(parent == null)
-						_elements.Clear();
+						_entries.Clear();
 					else if(parent.HasChildren)
 						parent.ClearChildren();
 				}
 				else
 				{
 					if(parent == null)
-						_elements.Remove(name);
+						_entries.Remove(name);
 					else if(parent.HasChildren)
 						parent.RemoveChild(name);
 				}
@@ -647,7 +649,7 @@ namespace Zongsoft.Data
 
 				if(parent == null)
 				{
-					if(_elements.TryGet(name, out current))
+					if(_entries.TryGet(name, out current))
 						_current = current;
 					else
 						this.Map(name, null);
@@ -727,9 +729,9 @@ namespace Zongsoft.Data
 				return true;
 			}
 
-			public bool Complete(out Collections.INamedCollection<TEntry> elements)
+			public bool Complete(out Collections.INamedCollection<TEntry> entries)
 			{
-				elements = null;
+				entries = null;
 
 				if(_stack != null && _stack.Count > 0)
 				{
@@ -740,8 +742,8 @@ namespace Zongsoft.Data
 				switch(State)
 				{
 					case State.None:
-						if(_elements != null && _elements.Count > 0)
-							elements = _elements;
+						if(_entries != null && _entries.Count > 0)
+							entries = _entries;
 
 						return true;
 					case State.Asterisk:
@@ -780,7 +782,7 @@ namespace Zongsoft.Data
 						return false;
 				}
 
-				elements = _elements;
+				entries = _entries;
 				return true;
 			}
 			#endregion
@@ -803,10 +805,10 @@ namespace Zongsoft.Data
 				{
 					foreach(var item in items)
 					{
-						if(_elements.Contains(item.Name))
+						if(_entries.Contains(item.Name))
 							_current = item;
 						else
-							_elements.Add((TEntry)(_current = item));
+							_entries.Add((TEntry)(_current = item));
 					}
 				}
 				else
