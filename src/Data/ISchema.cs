@@ -41,6 +41,7 @@ namespace Zongsoft.Data
 	/// </summary>
 	public interface ISchema
 	{
+		#region 属性定义
 		/// <summary>
 		/// 获取数据模式的名称（对应数据访问操作的实体名）。
 		/// </summary>
@@ -64,14 +65,9 @@ namespace Zongsoft.Data
 		{
 			get;
 		}
+		#endregion
 
-		/// <summary>
-		/// 判断是否包含指定路径的元素。
-		/// </summary>
-		/// <param name="path">指定的元素路径。</param>
-		/// <returns>如果包含指定路径的元素则返回真(True)，否则返回假(False)。</returns>
-		bool Contains(string path);
-
+		#region 方法定义
 		/// <summary>
 		/// 移除模式的所有元素。
 		/// </summary>
@@ -79,33 +75,25 @@ namespace Zongsoft.Data
 		void Clear();
 
 		/// <summary>
+		/// 判断是否包含指定路径的元素。
+		/// </summary>
+		/// <param name="path">指定的元素路径，路径是以句点或斜杠为分隔符而连接的成员名字符串。</param>
+		/// <returns>如果包含指定路径的元素则返回真(True)，否则返回假(False)。</returns>
+		bool Contains(string path);
+
+		/// <summary>
 		/// 添加一个元素到位于指定路径处的元素集中。
 		/// </summary>
-		/// <param name="path">指定要添加的元素路径。</param>
+		/// <param name="path">指定要添加的元素路径，路径是以句点或斜杠为分隔符而连接的成员名字符串。</param>
 		/// <returns>返回当前数据模式。</returns>
 		ISchema Include(string path);
 
 		/// <summary>
-		/// 添加一个元素到位于指定路径处的元素集中。
-		/// </summary>
-		/// <param name="path">指定要添加的元素路径。</param>
-		/// <param name="entry">输出参数，返回添加成功后的数据模式元素；如果添加失败则返回空(null)。</param>
-		/// <returns>返回当前数据模式。</returns>
-		ISchema Include(string path, out SchemaEntryBase entry);
-
-		/// <summary>
 		/// 从元素集中移除指定位置的元素。
 		/// </summary>
-		/// <param name="path">指定要移除的元素路径。</param>
+		/// <param name="path">指定要移除的元素路径，路径是以句点或斜杠为分隔符而连接的成员名字符串。</param>
 		/// <returns>返回当前数据模式。</returns>
 		ISchema Exclude(string path);
-
-		/// <summary>
-		/// 从元素集中移除指定位置的元素。
-		/// </summary>
-		/// <param name="path">指定要移除的元素路径。</param>
-		/// <param name="entry">输出参数，返回移除成功后的数据模式元素；如果移除失败则返回空(null)。</param>
-		/// <returns>返回当前数据模式。</returns>
-		ISchema Exclude(string path, out SchemaEntryBase entry);
+		#endregion
 	}
 }
