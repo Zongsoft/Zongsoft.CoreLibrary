@@ -271,16 +271,11 @@ namespace Zongsoft.Data
 
 		IEnumerable<T> Select<T>(string name, Grouping grouping, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(string name, Grouping grouping, object state, params Sorting[] sortings);
-		IEnumerable<T> Select<T>(string name, Grouping grouping, string schema, object state = null, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(string name, Grouping grouping, Paging paging, object state = null, params Sorting[] sortings);
-		IEnumerable<T> Select<T>(string name, Grouping grouping, string schema, Paging paging, object state = null, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, object state, params Sorting[] sortings);
-		IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, string schema, object state = null, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, Paging paging, object state = null, params Sorting[] sortings);
-		IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, string schema, Paging paging, object state = null, params Sorting[] sortings);
-		IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, string schema, Paging paging, object state, Sorting[] sortings, Func<DataSelectContextBase, bool> selecting, Action<DataSelectContextBase> selected);
-		IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, ISchema schema, Paging paging, object state, Sorting[] sortings, Func<DataSelectContextBase, bool> selecting, Action<DataSelectContextBase> selected);
+		IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, Paging paging, object state, Sorting[] sortings, Func<DataSelectContextBase, bool> selecting, Action<DataSelectContextBase> selected);
 		#endregion
 	}
 }

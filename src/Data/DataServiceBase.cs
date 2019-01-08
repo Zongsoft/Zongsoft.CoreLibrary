@@ -900,61 +900,37 @@ namespace Zongsoft.Data
 
 		public IEnumerable<T> Select<T>(Grouping grouping, params Sorting[] sortings)
 		{
-			return this.Select<T>(grouping, null, string.Empty, null, null, sortings);
+			return this.Select<T>(grouping, null, null, null, sortings);
 		}
 
 		public IEnumerable<T> Select<T>(Grouping grouping, object state, params Sorting[] sortings)
 		{
-			return this.Select<T>(grouping, null, string.Empty, null, state, sortings);
-		}
-
-		public IEnumerable<T> Select<T>(Grouping grouping, string schema, object state = null, params Sorting[] sortings)
-		{
-			return this.Select<T>(grouping, null, schema, null, state, sortings);
+			return this.Select<T>(grouping, null, null, state, sortings);
 		}
 
 		public IEnumerable<T> Select<T>(Grouping grouping, Paging paging, object state = null, params Sorting[] sortings)
 		{
-			return this.Select<T>(grouping, null, string.Empty, paging, state, sortings);
-		}
-
-		public IEnumerable<T> Select<T>(Grouping grouping, string schema, Paging paging, object state = null, params Sorting[] sortings)
-		{
-			return this.Select<T>(grouping, null, schema, paging, state, sortings);
+			return this.Select<T>(grouping, null, paging, state, sortings);
 		}
 
 		public IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, params Sorting[] sortings)
 		{
-			return this.Select<T>(grouping, condition, string.Empty, null, null, sortings);
+			return this.Select<T>(grouping, condition, null, null, sortings);
 		}
 
 		public IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, object state, params Sorting[] sortings)
 		{
-			return this.Select<T>(grouping, condition, string.Empty, null, state, sortings);
-		}
-
-		public IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, string schema, object state = null, params Sorting[] sortings)
-		{
-			return this.Select<T>(grouping, condition, schema, null, state, sortings);
+			return this.Select<T>(grouping, condition, null, state, sortings);
 		}
 
 		public IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, Paging paging, object state = null, params Sorting[] sortings)
 		{
-			return this.Select<T>(grouping, condition, string.Empty, paging, state, sortings);
+			return this.OnSelect<T>(grouping, condition, paging, sortings, state);
 		}
 
-		public IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, string schema, Paging paging, object state = null, params Sorting[] sortings)
+		protected virtual IEnumerable<T> OnSelect<T>(Grouping grouping, ICondition condition, Paging paging, Sorting[] sortings, object state)
 		{
-			//修整查询条件
-			condition = this.OnValidate(DataAccessMethod.Select, condition);
-
-			//执行查询方法
-			return this.OnSelect<T>(grouping, condition, this.GetSchema(schema, typeof(T)), paging, sortings, state);
-		}
-
-		protected virtual IEnumerable<T> OnSelect<T>(Grouping grouping, ICondition condition, ISchema schema, Paging paging, Sorting[] sortings, object state)
-		{
-			return this.DataAccess.Select<T>(this.Name, grouping, condition, schema, paging, state, sortings, ctx => this.OnSelecting(ctx), ctx => this.OnSelected(ctx));
+			return this.DataAccess.Select<T>(this.Name, grouping, condition, paging, state, sortings, ctx => this.OnSelecting(ctx), ctx => this.OnSelected(ctx));
 		}
 		#endregion
 
