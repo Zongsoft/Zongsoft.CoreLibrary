@@ -369,12 +369,20 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		protected DataSelectContextBase(IDataAccess dataAccess, string name, Type entityType, Grouping grouping, ICondition condition, ISchema schema, Paging paging, Sorting[] sortings, object state = null) : base(dataAccess, name, DataAccessMethod.Select, state)
+		protected DataSelectContextBase(IDataAccess dataAccess, string name, Type entityType, ICondition condition, ISchema schema, Paging paging, Sorting[] sortings, object state = null) : base(dataAccess, name, DataAccessMethod.Select, state)
+		{
+			_entityType = entityType ?? typeof(object);
+			_condition = condition;
+			_schema = schema;
+			_paging = paging;
+			_sortings = sortings;
+		}
+
+		protected DataSelectContextBase(IDataAccess dataAccess, string name, Type entityType, Grouping grouping, ICondition condition, Paging paging, Sorting[] sortings, object state = null) : base(dataAccess, name, DataAccessMethod.Select, state)
 		{
 			_entityType = entityType ?? typeof(object);
 			_grouping = grouping;
 			_condition = condition;
-			_schema = schema;
 			_paging = paging;
 			_sortings = sortings;
 		}
