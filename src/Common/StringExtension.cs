@@ -137,37 +137,37 @@ namespace Zongsoft.Common
 			return result;
 		}
 
-		public static string TrimString(this string text, string trimString)
+		public static string Trim(this string text, string trimString)
 		{
-			return TrimString(text, trimString, StringComparison.OrdinalIgnoreCase);
+			return Trim(text, trimString, StringComparison.OrdinalIgnoreCase);
 		}
 
-		public static string TrimString(this string text, string trimString, StringComparison comparisonType)
+		public static string Trim(this string text, string trimString, StringComparison comparisonType)
 		{
-			return TrimStringEnd(
-				TrimStringStart(text, trimString, comparisonType),
+			return TrimEnd(
+				TrimStart(text, trimString, comparisonType),
 				trimString,
 				comparisonType);
 		}
 
-		public static string TrimString(this string text, string prefix, string suffix)
+		public static string Trim(this string text, string prefix, string suffix)
 		{
-			return TrimString(text, prefix, suffix, StringComparison.OrdinalIgnoreCase);
+			return Trim(text, prefix, suffix, StringComparison.OrdinalIgnoreCase);
 		}
 
-		public static string TrimString(this string text, string prefix, string suffix, StringComparison comparisonType)
+		public static string Trim(this string text, string prefix, string suffix, StringComparison comparisonType)
 		{
 			return text
-					.TrimStringStart(prefix, comparisonType)
-					.TrimStringEnd(suffix, comparisonType);
+					.TrimStart(prefix, comparisonType)
+					.TrimEnd(suffix, comparisonType);
 		}
 
-		public static string TrimStringEnd(this string text, string trimString)
+		public static string TrimEnd(this string text, string trimString)
 		{
-			return TrimStringEnd(text, trimString, StringComparison.OrdinalIgnoreCase);
+			return TrimEnd(text, trimString, StringComparison.OrdinalIgnoreCase);
 		}
 
-		public static string TrimStringEnd(this string text, string trimString, StringComparison comparisonType)
+		public static string TrimEnd(this string text, string trimString, StringComparison comparisonType)
 		{
 			if(string.IsNullOrEmpty(text) || string.IsNullOrEmpty(trimString))
 				return text;
@@ -178,12 +178,12 @@ namespace Zongsoft.Common
 			return text;
 		}
 
-		public static string TrimStringStart(this string text, string trimString)
+		public static string TrimStart(this string text, string trimString)
 		{
-			return TrimStringStart(text, trimString, StringComparison.OrdinalIgnoreCase);
+			return TrimStart(text, trimString, StringComparison.OrdinalIgnoreCase);
 		}
 
-		public static string TrimStringStart(this string text, string trimString, StringComparison comparisonType)
+		public static string TrimStart(this string text, string trimString, StringComparison comparisonType)
 		{
 			if(string.IsNullOrEmpty(text) || string.IsNullOrEmpty(trimString))
 				return text;

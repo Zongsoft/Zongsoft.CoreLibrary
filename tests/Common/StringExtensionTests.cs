@@ -50,9 +50,9 @@ namespace Zongsoft.Common.Tests
 		[Fact]
 		public void TestTrimString()
 		{
-			Assert.Equal("ContentSuffix", Zongsoft.Common.StringExtension.TrimString("PrefixPrefixContentSuffix", "Prefix"));
-			Assert.Equal("PrefixPrefixContent", Zongsoft.Common.StringExtension.TrimString("PrefixPrefixContentSuffix", "Suffix"));
-			Assert.Equal("Content", Zongsoft.Common.StringExtension.TrimString("PrefixPrefixContentSuffix", "Prefix", "Suffix"));
+			Assert.Equal("ContentSuffix", Zongsoft.Common.StringExtension.Trim("PrefixPrefixContentSuffix", "Prefix"));
+			Assert.Equal("PrefixPrefixContent", Zongsoft.Common.StringExtension.Trim("PrefixPrefixContentSuffix", "Suffix"));
+			Assert.Equal("Content", Zongsoft.Common.StringExtension.Trim("PrefixPrefixContentSuffix", "Prefix", "Suffix"));
 		}
 	}
 }

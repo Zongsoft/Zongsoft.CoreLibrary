@@ -58,7 +58,7 @@ namespace Zongsoft.Services
 		{
 			_enabled = enabled;
 			_predication = null;
-			this.Name = string.IsNullOrWhiteSpace(name) ? Common.StringExtension.TrimStringEnd(this.GetType().Name, "Command", StringComparison.OrdinalIgnoreCase) : name;
+			this.Name = string.IsNullOrWhiteSpace(name) ? Common.StringExtension.TrimEnd(this.GetType().Name, "Command", StringComparison.OrdinalIgnoreCase) : name;
 		}
 		#endregion
 
