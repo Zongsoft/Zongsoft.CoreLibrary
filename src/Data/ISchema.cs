@@ -82,6 +82,13 @@ namespace Zongsoft.Data
 		bool Contains(string path);
 
 		/// <summary>
+		/// 查找指定路径的模式元素。
+		/// </summary>
+		/// <param name="path">指定要查找的元素路径，路径是以句点或斜杠为分隔符而连接的成员名字符串。</param>
+		/// <returns>返回找到的模式元素，如果查找失败则返回空(null)。</returns>
+		SchemaMemberBase Find(string path);
+
+		/// <summary>
 		/// 添加一个元素到位于指定路径处的元素集中。
 		/// </summary>
 		/// <param name="path">指定要添加的元素路径，路径是以句点或斜杠为分隔符而连接的成员名字符串。</param>
