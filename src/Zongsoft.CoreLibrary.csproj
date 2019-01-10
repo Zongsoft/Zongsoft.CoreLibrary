@@ -157,7 +157,7 @@
     <Compile Include="Data\DataIncrementedEventArgs.cs" />
     <Compile Include="Data\DataIncrementingEventArgs.cs" />
     <Compile Include="Data\IDataService`1.cs" />
-    <Compile Include="Data\SchemaEntryBase.cs" />
+    <Compile Include="Data\SchemaMemberBase.cs" />
     <Compile Include="Data\SchemaParserBase.cs" />
     <Compile Include="Data\Scoping.cs" />
     <Compile Include="Expressions\ITokenizer.cs" />

@@ -39,7 +39,7 @@ namespace Zongsoft.Data
 	/// <summary>
 	/// 表示数据模式解析器的接口。
 	/// </summary>
-	public interface ISchemaParser<TEntry> : ISchemaParser where TEntry : SchemaEntryBase
+	public interface ISchemaParser<TEntry> : ISchemaParser where TEntry : SchemaMemberBase
 	{
 		new ISchema<TEntry> Parse(string name, string expression, Type entityType = null);
 	}

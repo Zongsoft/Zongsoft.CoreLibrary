@@ -12,7 +12,7 @@ namespace Zongsoft.Data
 		[Fact]
 		public void Test1()
 		{
-			INamedCollection<SchemaEntry> schemas;
+			INamedCollection<SchemaMember> schemas;
 
 			schemas = SchemaParser.Instance.Parse(null);
 			Assert.Null(schemas);
@@ -45,7 +45,7 @@ namespace Zongsoft.Data
 		[Fact]
 		public void Test2()
 		{
-			INamedCollection<SchemaEntry> schemas;
+			INamedCollection<SchemaMember> schemas;
 
 			schemas = SchemaParser.Instance.Parse("*, !, a, !b, c, a, forums:100/2{*, !, a, !b, f, moderator{name, avatar}}");
 			Assert.NotEmpty(schemas);
@@ -88,7 +88,7 @@ namespace Zongsoft.Data
 		[Fact]
 		public void Test3()
 		{
-			INamedCollection<SchemaEntry> schemas;
+			INamedCollection<SchemaMember> schemas;
 
 			schemas = SchemaParser.Instance.Parse(@"*, !, a, !b, c, a, forums:100/2(~timestamp, id){*, !, a, !b, f, moderator(name){name, avatar}}");
 			Assert.NotEmpty(schemas);
@@ -139,21 +139,21 @@ namespace Zongsoft.Data
 		}
 
 		#region 嵌套子类
-		public class SchemaEntry : SchemaEntryBase
+		public class SchemaMember : SchemaMemberBase
 		{
 			#region 成员字段
-			private SchemaEntry _parent;
-			private INamedCollection<SchemaEntry> _children;
+			private SchemaMember _parent;
+			private INamedCollection<SchemaMember> _children;
 			#endregion
 
 			#region 构造函数
-			public SchemaEntry(string name) : base(name)
+			public SchemaMember(string name) : base(name)
 			{
 			}
 			#endregion
 
 			#region 公共属性
-			public SchemaEntry Parent
+			public SchemaMember Parent
 			{
 				get
 				{
@@ -161,12 +161,12 @@ namespace Zongsoft.Data
 				}
 			}
 
-			public SchemaEntry this[string name]
+			public SchemaMember this[string name]
 			{
 				get
 				{
 					if(this.HasChildren && this.Children.TryGet(name, out var child))
-						return (SchemaEntry)child;
+						return (SchemaMember)child;
 
 					return null;
 				}
@@ -180,27 +180,27 @@ namespace Zongsoft.Data
 				}
 			}
 
-			public IReadOnlyNamedCollection<SchemaEntry> Children
+			public IReadOnlyNamedCollection<SchemaMember> Children
 			{
 				get
 				{
-					return (IReadOnlyNamedCollection<SchemaEntry>)_children;
+					return (IReadOnlyNamedCollection<SchemaMember>)_children;
 				}
 			}
 			#endregion
 
 			#region 重写方法
-			protected override SchemaEntryBase GetParent()
+			protected override SchemaMemberBase GetParent()
 			{
 				return _parent;
 			}
 
-			protected override void SetParent(SchemaEntryBase parent)
+			protected override void SetParent(SchemaMemberBase parent)
 			{
-				_parent = (parent as SchemaEntry) ?? throw new ArgumentException();
+				_parent = (parent as SchemaMember) ?? throw new ArgumentException();
 			}
 
-			protected override bool TryGetChild(string name, out SchemaEntryBase child)
+			protected override bool TryGetChild(string name, out SchemaMemberBase child)
 			{
 				child = null;
 
@@ -213,13 +213,13 @@ namespace Zongsoft.Data
 				return false;
 			}
 
-			protected override void AddChild(SchemaEntryBase child)
+			protected override void AddChild(SchemaMemberBase child)
 			{
-				if(!(child is SchemaEntry schema))
+				if(!(child is SchemaMember schema))
 					throw new ArgumentException();
 
 				if(_children == null)
-					System.Threading.Interlocked.CompareExchange(ref _children, new NamedCollection<SchemaEntry>(item => item.Name), null);
+					System.Threading.Interlocked.CompareExchange(ref _children, new NamedCollection<SchemaMember>(item => item.Name), null);
 
 				_children.Add(schema);
 				schema._parent = this;
@@ -237,7 +237,7 @@ namespace Zongsoft.Data
 			#endregion
 		}
 
-		public class SchemaParser : SchemaParserBase<SchemaEntry>
+		public class SchemaParser : SchemaParserBase<SchemaMember>
 		{
 			#region 单例字段
 			public static readonly SchemaParser Instance = new SchemaParser();
@@ -250,19 +250,19 @@ namespace Zongsoft.Data
 			#endregion
 
 			#region 解析方法
-			public INamedCollection<SchemaEntry> Parse(string expression)
+			public INamedCollection<SchemaMember> Parse(string expression)
 			{
 				return base.Parse(expression, token => Resolve(token), null);
 			}
 
-			public override ISchema<SchemaEntry> Parse(string name, string expression, Type entityType)
+			public override ISchema<SchemaMember> Parse(string name, string expression, Type entityType)
 			{
 				throw new NotImplementedException();
 			}
 			#endregion
 
 			#region 私有方法
-			private static IEnumerable<SchemaEntry> Resolve(SchemaEntryToken token)
+			private static IEnumerable<SchemaMember> Resolve(SchemaEntryToken token)
 			{
 				if(string.IsNullOrWhiteSpace(token.Name))
 					throw new InvalidOperationException();
@@ -270,18 +270,18 @@ namespace Zongsoft.Data
 				switch(token.Name)
 				{
 					case "*":
-						return new SchemaEntry[]
+						return new SchemaMember[]
 						{
-							new SchemaEntry("a"),
-							new SchemaEntry("b"),
-							new SchemaEntry("c"),
-							new SchemaEntry("d"),
-							new SchemaEntry("e"),
-							new SchemaEntry("f"),
+							new SchemaMember("a"),
+							new SchemaMember("b"),
+							new SchemaMember("c"),
+							new SchemaMember("d"),
+							new SchemaMember("e"),
+							new SchemaMember("f"),
 						};
 				}
 
-				return new SchemaEntry[] { new SchemaEntry(token.Name) };
+				return new SchemaMember[] { new SchemaMember(token.Name) };
 			}
 			#endregion
 		}

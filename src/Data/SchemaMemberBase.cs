@@ -29,10 +29,10 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
-	public abstract class SchemaEntryBase
+	public abstract class SchemaMemberBase
 	{
 		#region 单例字段
-		internal static readonly SchemaEntryBase Ignores = new EmptySchema();
+		internal static readonly SchemaMemberBase Ignores = new EmptyMember();
 		#endregion
 
 		#region 成员字段
@@ -41,11 +41,11 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		protected SchemaEntryBase()
+		protected SchemaMemberBase()
 		{
 		}
 
-		protected SchemaEntryBase(string name)
+		protected SchemaMemberBase(string name)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
@@ -112,11 +112,11 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 抽象方法
-		protected abstract SchemaEntryBase GetParent();
-		protected abstract void SetParent(SchemaEntryBase parent);
+		protected abstract SchemaMemberBase GetParent();
+		protected abstract void SetParent(SchemaMemberBase parent);
 
-		internal protected abstract bool TryGetChild(string name, out SchemaEntryBase child);
-		internal protected abstract void AddChild(SchemaEntryBase child);
+		internal protected abstract bool TryGetChild(string name, out SchemaMemberBase child);
+		internal protected abstract void AddChild(SchemaMemberBase child);
 		internal protected abstract void RemoveChild(string name);
 		internal protected abstract void ClearChildren();
 		#endregion
@@ -137,7 +137,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 重写方法
-		public bool Equals(SchemaEntryBase other)
+		public bool Equals(SchemaMemberBase other)
 		{
 			if(other == null)
 				return false;
@@ -147,10 +147,10 @@ namespace Zongsoft.Data
 
 		public override bool Equals(object obj)
 		{
-			if(obj == null || obj.GetType() != typeof(SchemaEntryBase))
+			if(obj == null || obj.GetType() != typeof(SchemaMemberBase))
 				return false;
 
-			return this.Equals((SchemaEntryBase)obj);
+			return this.Equals((SchemaMemberBase)obj);
 		}
 
 		public override int GetHashCode()
@@ -165,21 +165,21 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 嵌套子类
-		private class EmptySchema : SchemaEntryBase
+		private class EmptyMember : SchemaMemberBase
 		{
 			public override string Name => "?";
 			public override bool HasChildren => false;
 
-			protected override SchemaEntryBase GetParent()
+			protected override SchemaMemberBase GetParent()
 			{
 				return null;
 			}
 
-			protected override void SetParent(SchemaEntryBase parent)
+			protected override void SetParent(SchemaMemberBase parent)
 			{
 			}
 
-			protected internal override void AddChild(SchemaEntryBase child)
+			protected internal override void AddChild(SchemaMemberBase child)
 			{
 			}
 
@@ -191,7 +191,7 @@ namespace Zongsoft.Data
 			{
 			}
 
-			protected internal override bool TryGetChild(string name, out SchemaEntryBase child)
+			protected internal override bool TryGetChild(string name, out SchemaMemberBase child)
 			{
 				child = null;
 				return false;

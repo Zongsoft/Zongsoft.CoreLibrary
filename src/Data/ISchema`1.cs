@@ -39,13 +39,13 @@ namespace Zongsoft.Data
 	/// <summary>
 	/// 表示数据模式的接口。
 	/// </summary>
-	/// <typeparam name="TEntry">泛型参数，表示数据模式的成员类型。</typeparam>
-	public interface ISchema<TEntry> : ISchema where TEntry : SchemaEntryBase
+	/// <typeparam name="TMember">泛型参数，表示数据模式的成员类型。</typeparam>
+	public interface ISchema<TMember> : ISchema where TMember : SchemaMemberBase
 	{
 		/// <summary>
 		/// 获取数据模式元素集合。
 		/// </summary>
-		Collections.INamedCollection<TEntry> Entries
+		Collections.INamedCollection<TMember> Members
 		{
 			get;
 		}
@@ -55,13 +55,13 @@ namespace Zongsoft.Data
 		/// </summary>
 		/// <param name="path">指定要添加的元素路径，路径是以句点或斜杠为分隔符而连接的成员名字符串。</param>
 		/// <returns>返回当前数据模式。</returns>
-		new ISchema<TEntry> Include(string path);
+		new ISchema<TMember> Include(string path);
 
 		/// <summary>
 		/// 从元素集中移除指定位置的元素。
 		/// </summary>
 		/// <param name="path">指定要移除的元素路径，路径是以句点或斜杠为分隔符而连接的成员名字符串。</param>
 		/// <returns>返回当前数据模式。</returns>
-		new ISchema<TEntry> Exclude(string path);
+		new ISchema<TMember> Exclude(string path);
 	}
 }
