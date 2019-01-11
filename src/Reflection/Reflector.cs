@@ -26,14 +26,16 @@
 
 using System;
 using System.Reflection;
-using System.Collections.Generic;
 
 namespace Zongsoft.Reflection
 {
 	public static class Reflector
 	{
-		public static object GetValue(this MemberInfo member, object target)
+		public static object GetValue(this MemberInfo member, object target =null)
 		{
+			if(member == null)
+				throw new ArgumentNullException(nameof(member));
+
 			switch(member.MemberType)
 			{
 				case MemberTypes.Field:
@@ -45,18 +47,21 @@ namespace Zongsoft.Reflection
 			}
 		}
 
-		public static object GetValue(this FieldInfo field, object target)
+		public static object GetValue(this FieldInfo field, object target = null)
 		{
-			throw new NotImplementedException();
+			return field.GetValue(target);
 		}
 
 		public static object GetValue(this PropertyInfo property, object target)
 		{
-			throw new NotImplementedException();
+			return property.GetValue(target);
 		}
 
 		public static void SetValue(this MemberInfo member, object target, object value)
 		{
+			if(member == null)
+				throw new ArgumentNullException(nameof(member));
+
 			switch(member.MemberType)
 			{
 				case MemberTypes.Field:
@@ -72,12 +77,12 @@ namespace Zongsoft.Reflection
 
 		public static void SetValue(this FieldInfo field, object target, object value)
 		{
-			throw new NotImplementedException();
+			field.SetValue(target, value);
 		}
 
 		public static void SetValue(this PropertyInfo property, object target, object value)
 		{
-			throw new NotImplementedException();
+			property.SetValue(target, value);
 		}
 	}
 }
