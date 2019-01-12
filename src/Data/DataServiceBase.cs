@@ -1293,7 +1293,7 @@ namespace Zongsoft.Data
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 		private ISchema GetSchema(string expression, Type type = null)
 		{
-			return this.DataAccess.Schema.Parse(this.Name, expression, type);
+			return this.DataAccess.Schema.Parse(this.Name, expression, type ?? typeof(TEntity));
 		}
 
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
