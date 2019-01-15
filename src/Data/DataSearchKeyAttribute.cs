@@ -72,10 +72,8 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 公共方法
-		public ICondition GetSearchKey(string keyword, string[] tags, out bool singleton)
+		public ICondition GetSearchKey(string keyword, string[] tags)
 		{
-			singleton = false;
-
 			DataSearchKey key;
 
 			if(tags == null || tags.Length == 0)
@@ -85,8 +83,6 @@ namespace Zongsoft.Data
 
 			if(key == null)
 				return null;
-
-			singleton = key.Singleton;
 
 			var conditions = ConditionCollection.Or(key.ToCondition(keyword));
 			return conditions.Count == 1 ? conditions[0] : conditions;

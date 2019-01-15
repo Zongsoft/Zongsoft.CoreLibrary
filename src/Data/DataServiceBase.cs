@@ -573,67 +573,43 @@ namespace Zongsoft.Data
 		#region 查询方法
 
 		#region 搜索方法
-		public object Search(string keyword, params Sorting[] sortings)
+		public IEnumerable Search(string keyword, params Sorting[] sortings)
 		{
 			return this.Search(keyword, string.Empty, null, null, sortings);
 		}
 
-		public object Search(string keyword, object state, params Sorting[] sortings)
+		public IEnumerable Search(string keyword, object state, params Sorting[] sortings)
 		{
 			return this.Search(keyword, string.Empty, null, state, sortings);
 		}
 
-		public object Search(string keyword, Paging paging, params Sorting[] sortings)
+		public IEnumerable Search(string keyword, Paging paging, params Sorting[] sortings)
 		{
 			return this.Search(keyword, string.Empty, paging, null, sortings);
 		}
 
-		public object Search(string keyword, Paging paging, object state, params Sorting[] sortings)
-		{
-			return this.Search(keyword, string.Empty, paging, state, sortings);
-		}
-
-		public object Search(string keyword, Paging paging, string schema, params Sorting[] sortings)
-		{
-			return this.Search(keyword, schema, paging, null, sortings);
-		}
-
-		public object Search(string keyword, Paging paging, string schema, object state, params Sorting[] sortings)
-		{
-			return this.Search(keyword, schema, paging, state, sortings);
-		}
-
-		public object Search(string keyword, string schema, params Sorting[] sortings)
+		public IEnumerable Search(string keyword, string schema, params Sorting[] sortings)
 		{
 			return this.Search(keyword, schema, null, null, sortings);
 		}
 
-		public object Search(string keyword, string schema, object state, params Sorting[] sortings)
+		public IEnumerable Search(string keyword, string schema, object state, params Sorting[] sortings)
 		{
 			return this.Search(keyword, schema, null, state, sortings);
 		}
 
-		public object Search(string keyword, string schema, Paging paging, params Sorting[] sortings)
+		public IEnumerable Search(string keyword, string schema, Paging paging, params Sorting[] sortings)
 		{
 			return this.Search(keyword, schema, paging, null, sortings);
 		}
 
-		public virtual object Search(string keyword, string schema, Paging paging, object state, params Sorting[] sortings)
+		public virtual IEnumerable Search(string keyword, string schema, Paging paging, object state, params Sorting[] sortings)
 		{
 			//获取搜索条件和搜索结果是否为单条数据
-			var condition = this.GetKey(keyword, out var singleton);
+			var condition = this.GetKey(keyword);
 
 			if(condition == null)
 				throw new ArgumentException($"The {this.Name} service does not supportd search operation or specified search key is invalid.");
-
-			if(singleton)
-			{
-				//修整查询条件
-				condition = this.OnValidate(DataAccessMethod.Select, condition);
-
-				//执行单条查询方法
-				return this.OnGet(condition, this.GetSchema(schema), state);
-			}
 
 			return this.Select(condition, schema, paging, state, sortings);
 		}
@@ -642,50 +618,40 @@ namespace Zongsoft.Data
 		#region 单键查询
 		public object Get<TKey>(TKey key, params Sorting[] sortings)
 		{
-			return this.Get<TKey>(key, string.Empty, null, null, sortings);
+			return this.Get<TKey>(key, string.Empty, null, null, out _, sortings);
 		}
 
 		public object Get<TKey>(TKey key, object state, params Sorting[] sortings)
 		{
-			return this.Get<TKey>(key, string.Empty, null, state, sortings);
+			return this.Get<TKey>(key, string.Empty, null, state, out _, sortings);
 		}
 
 		public object Get<TKey>(TKey key, Paging paging, params Sorting[] sortings)
 		{
-			return this.Get<TKey>(key, string.Empty, paging, null, sortings);
-		}
-
-		public object Get<TKey>(TKey key, Paging paging, object state, params Sorting[] sortings)
-		{
-			return this.Get<TKey>(key, string.Empty, paging, state, sortings);
-		}
-
-		public object Get<TKey>(TKey key, Paging paging, string schema, params Sorting[] sortings)
-		{
-			return this.Get<TKey>(key, schema, paging, null, sortings);
-		}
-
-		public object Get<TKey>(TKey key, Paging paging, string schema, object state, params Sorting[] sortings)
-		{
-			return this.Get<TKey>(key, schema, paging, state, sortings);
+			return this.Get<TKey>(key, string.Empty, paging, null, out _, sortings);
 		}
 
 		public object Get<TKey>(TKey key, string schema, params Sorting[] sortings)
 		{
-			return this.Get<TKey>(key, schema, null, null, sortings);
+			return this.Get<TKey>(key, schema, null, null, out _, sortings);
 		}
 
 		public object Get<TKey>(TKey key, string schema, object state, params Sorting[] sortings)
 		{
-			return this.Get<TKey>(key, schema, null, state, sortings);
+			return this.Get<TKey>(key, schema, null, state, out _, sortings);
 		}
 
 		public object Get<TKey>(TKey key, string schema, Paging paging, params Sorting[] sortings)
 		{
-			return this.Get<TKey>(key, schema, paging, null, sortings);
+			return this.Get<TKey>(key, schema, paging, null, out _, sortings);
 		}
 
-		public virtual object Get<TKey>(TKey key, string schema, Paging paging, object state, params Sorting[] sortings)
+		public object Get<TKey>(TKey key, string schema, Paging paging, object state, params Sorting[] sortings)
+		{
+			return this.Get(key, schema, paging, state, out _, sortings);
+		}
+
+		public virtual object Get<TKey>(TKey key, string schema, Paging paging, object state, out IPaginator paginator, params Sorting[] sortings)
 		{
 			var condition = this.ConvertKey(key, out var singleton);
 
@@ -695,60 +661,52 @@ namespace Zongsoft.Data
 				condition = this.OnValidate(DataAccessMethod.Select, condition);
 
 				//执行单条查询方法
-				return this.OnGet(condition, this.GetSchema(schema), state);
+				return this.OnGet(condition, this.GetSchema(schema), state, out paginator);
 			}
 
-			return this.Select(condition, schema, paging, state, sortings);
+			var result = this.Select(condition, schema, paging, state, sortings);
+			paginator = result as IPaginator;
+			return result;
 		}
 		#endregion
 
 		#region 双键查询
 		public object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, params Sorting[] sortings)
 		{
-			return this.Get<TKey1, TKey2>(key1, key2, string.Empty, null, null, sortings);
+			return this.Get<TKey1, TKey2>(key1, key2, string.Empty, null, null, out _, sortings);
 		}
 
 		public object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, object state, params Sorting[] sortings)
 		{
-			return this.Get<TKey1, TKey2>(key1, key2, string.Empty, null, state, sortings);
+			return this.Get<TKey1, TKey2>(key1, key2, string.Empty, null, state, out _, sortings);
 		}
 
 		public object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, Paging paging, params Sorting[] sortings)
 		{
-			return this.Get<TKey1, TKey2>(key1, key2, string.Empty, paging, null, sortings);
-		}
-
-		public object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, Paging paging, object state, params Sorting[] sortings)
-		{
-			return this.Get<TKey1, TKey2>(key1, key2, string.Empty, paging, state, sortings);
-		}
-
-		public object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, Paging paging, string schema, params Sorting[] sortings)
-		{
-			return this.Get<TKey1, TKey2>(key1, key2, schema, paging, null, sortings);
-		}
-
-		public object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, Paging paging, string schema, object state, params Sorting[] sortings)
-		{
-			return this.Get<TKey1, TKey2>(key1, key2, schema, paging, state, sortings);
+			return this.Get<TKey1, TKey2>(key1, key2, string.Empty, paging, null, out _, sortings);
 		}
 
 		public object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string schema, params Sorting[] sortings)
 		{
-			return this.Get<TKey1, TKey2>(key1, key2, schema, null, null, sortings);
+			return this.Get<TKey1, TKey2>(key1, key2, schema, null, null, out _, sortings);
 		}
 
 		public object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string schema, object state, params Sorting[] sortings)
 		{
-			return this.Get<TKey1, TKey2>(key1, key2, schema, null, state, sortings);
+			return this.Get<TKey1, TKey2>(key1, key2, schema, null, state, out _, sortings);
 		}
 
 		public object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string schema, Paging paging, params Sorting[] sortings)
 		{
-			return this.Get<TKey1, TKey2>(key1, key2, schema, paging, null, sortings);
+			return this.Get<TKey1, TKey2>(key1, key2, schema, paging, null, out _, sortings);
 		}
 
-		public virtual object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string schema, Paging paging, object state, params Sorting[] sortings)
+		public object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string schema, Paging paging, object state, params Sorting[] sortings)
+		{
+			return this.Get(key1, key2, schema, paging, state, out _, sortings);
+		}
+
+		public virtual object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string schema, Paging paging, object state, out IPaginator paginator, params Sorting[] sortings)
 		{
 			var condition = this.ConvertKey(key1, key2, out var singleton);
 
@@ -758,60 +716,52 @@ namespace Zongsoft.Data
 				condition = this.OnValidate(DataAccessMethod.Select, condition);
 
 				//执行单条查询方法
-				return this.OnGet(condition, this.GetSchema(schema), state);
+				return this.OnGet(condition, this.GetSchema(schema), state, out paginator);
 			}
 
-			return this.Select(condition, schema, paging, state, sortings);
+			var result = this.Select(condition, schema, paging, state, sortings);
+			paginator = result as IPaginator;
+			return result;
 		}
 		#endregion
 
 		#region 三键查询
 		public object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, params Sorting[] sortings)
 		{
-			return this.Get(key1, key2, key3, string.Empty, null, null, sortings);
+			return this.Get(key1, key2, key3, string.Empty, null, null, out _, sortings);
 		}
 
 		public object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, object state, params Sorting[] sortings)
 		{
-			return this.Get(key1, key2, key3, string.Empty, null, state, sortings);
+			return this.Get(key1, key2, key3, string.Empty, null, state, out _, sortings);
 		}
 
 		public object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, Paging paging, params Sorting[] sortings)
 		{
-			return this.Get(key1, key2, key3, string.Empty, paging, null, sortings);
-		}
-
-		public object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, Paging paging, object state, params Sorting[] sortings)
-		{
-			return this.Get(key1, key2, key3, string.Empty, paging, state, sortings);
-		}
-
-		public object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, Paging paging, string schema, params Sorting[] sortings)
-		{
-			return this.Get(key1, key2, key3, schema, paging, null, sortings);
-		}
-
-		public object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, Paging paging, string schema, object state, params Sorting[] sortings)
-		{
-			return this.Get(key1, key2, key3, schema, paging, state, sortings);
+			return this.Get(key1, key2, key3, string.Empty, paging, null, out _, sortings);
 		}
 
 		public object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string schema, params Sorting[] sortings)
 		{
-			return this.Get(key1, key2, key3, schema, null, null, sortings);
+			return this.Get(key1, key2, key3, schema, null, null, out _, sortings);
 		}
 
 		public object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string schema, object state, params Sorting[] sortings)
 		{
-			return this.Get(key1, key2, key3, schema, null, state, sortings);
+			return this.Get(key1, key2, key3, schema, null, state, out _, sortings);
 		}
 
 		public object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string schema, Paging paging, params Sorting[] sortings)
 		{
-			return this.Get(key1, key2, key3, schema, paging, null, sortings);
+			return this.Get(key1, key2, key3, schema, paging, null, out _, sortings);
 		}
 
-		public virtual object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string schema, Paging paging, object state, params Sorting[] sortings)
+		public object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string schema, Paging paging, object state, params Sorting[] sortings)
+		{
+			return this.Get(key1, key2, key3, schema, paging, state, out _, sortings);
+		}
+
+		public virtual object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string schema, Paging paging, object state, out IPaginator paginator, params Sorting[] sortings)
 		{
 			var condition = this.ConvertKey(key1, key2, key3, out var singleton);
 
@@ -821,15 +771,19 @@ namespace Zongsoft.Data
 				condition = this.OnValidate(DataAccessMethod.Select, condition);
 
 				//执行单条查询方法
-				return this.OnGet(condition, this.GetSchema(schema), state);
+				return this.OnGet(condition, this.GetSchema(schema), state, out paginator);
 			}
 
-			return this.Select(condition, schema, paging, state, sortings);
+			var result = this.Select(condition, schema, paging, state, sortings);
+			paginator = result as IPaginator;
+			return result;
 		}
 
-		protected virtual TEntity OnGet(ICondition condition, ISchema schema, object state)
+		protected virtual TEntity OnGet(ICondition condition, ISchema schema, object state, out IPaginator paginator)
 		{
-			return this.DataAccess.Select<TEntity>(this.Name, condition, schema, null, state, null, ctx => this.OnGetting(ctx), ctx => this.OnGetted(ctx)).FirstOrDefault();
+			var result = this.DataAccess.Select<TEntity>(this.Name, condition, schema, null, state, null, ctx => this.OnGetting(ctx), ctx => this.OnGetted(ctx));
+			paginator = result as IPaginator;
+			return result.FirstOrDefault();
 		}
 		#endregion
 
@@ -1191,24 +1145,21 @@ namespace Zongsoft.Data
 		/// 根据指定的搜索关键字获取对应的<see cref="ICondition"/>条件。
 		/// </summary>
 		/// <param name="keyword">指定的搜索关键字。</param>
-		/// <param name="singleton">输出一个值，指示返回的搜索条件执行后的结果是否为单个对象。</param>
 		/// <returns>返回对应的搜索<see cref="ICondition"/>条件。</returns>
-		protected virtual ICondition GetKey(string keyword, out bool singleton)
+		protected virtual ICondition GetKey(string keyword)
 		{
-			singleton = false;
-
 			if(_searchKey == null || string.IsNullOrWhiteSpace(keyword))
 				return null;
 
 			var index = keyword.IndexOf(':');
 
 			if(index < 1)
-				return _searchKey.GetSearchKey(keyword, null, out singleton);
+				return _searchKey.GetSearchKey(keyword, null);
 
 			var tag = keyword.Substring(0, index);
 			var value = index < keyword.Length - 1 ? keyword.Substring(index + 1) : null;
 
-			return _searchKey.GetSearchKey(value, new string[] { tag }, out singleton);
+			return _searchKey.GetSearchKey(value, new string[] { tag });
 		}
 
 		/// <summary>

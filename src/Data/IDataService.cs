@@ -146,49 +146,40 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 查询方法
-		object Search(string keyword, params Sorting[] sortings);
-		object Search(string keyword, object state, params Sorting[] sortings);
-		object Search(string keyword, Paging paging, params Sorting[] sortings);
-		object Search(string keyword, Paging paging, object state, params Sorting[] sortings);
-		object Search(string keyword, Paging paging, string schema, params Sorting[] sortings);
-		object Search(string keyword, Paging paging, string schema, object state, params Sorting[] sortings);
-		object Search(string keyword, string schema, params Sorting[] sortings);
-		object Search(string keyword, string schema, object state, params Sorting[] sortings);
-		object Search(string keyword, string schema, Paging paging, params Sorting[] sortings);
-		object Search(string keyword, string schema, Paging paging, object state, params Sorting[] sortings);
-
 		object Get<TKey>(TKey key, params Sorting[] sortings);
 		object Get<TKey>(TKey key, object state, params Sorting[] sortings);
 		object Get<TKey>(TKey key, Paging paging, params Sorting[] sortings);
-		object Get<TKey>(TKey key, Paging paging, object state, params Sorting[] sortings);
-		object Get<TKey>(TKey key, Paging paging, string schema, params Sorting[] sortings);
-		object Get<TKey>(TKey key, Paging paging, string schema, object state, params Sorting[] sortings);
 		object Get<TKey>(TKey key, string schema, params Sorting[] sortings);
 		object Get<TKey>(TKey key, string schema, object state, params Sorting[] sortings);
 		object Get<TKey>(TKey key, string schema, Paging paging, params Sorting[] sortings);
 		object Get<TKey>(TKey key, string schema, Paging paging, object state, params Sorting[] sortings);
+		object Get<TKey>(TKey key, string schema, Paging paging, object state, out IPaginator paginator, params Sorting[] sortings);
 
 		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, params Sorting[] sortings);
 		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, object state, params Sorting[] sortings);
 		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, Paging paging, params Sorting[] sortings);
-		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, Paging paging, object state, params Sorting[] sortings);
-		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, Paging paging, string schema, params Sorting[] sortings);
-		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, Paging paging, string schema, object state, params Sorting[] sortings);
 		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string schema, params Sorting[] sortings);
 		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string schema, object state, params Sorting[] sortings);
 		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string schema, Paging paging, params Sorting[] sortings);
 		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string schema, Paging paging, object state, params Sorting[] sortings);
+		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string schema, Paging paging, object state, out IPaginator paginator, params Sorting[] sortings);
 
 		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, params Sorting[] sortings);
 		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, object state, params Sorting[] sortings);
 		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, Paging paging, params Sorting[] sortings);
-		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, Paging paging, object state, params Sorting[] sortings);
-		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, Paging paging, string schema, params Sorting[] sortings);
-		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, Paging paging, string schema, object state, params Sorting[] sortings);
 		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string schema, params Sorting[] sortings);
 		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string schema, object state, params Sorting[] sortings);
 		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string schema, Paging paging, params Sorting[] sortings);
 		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string schema, Paging paging, object state, params Sorting[] sortings);
+		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string schema, Paging paging, object state, out IPaginator paginator, params Sorting[] sortings);
+
+		IEnumerable Search(string keyword, params Sorting[] sortings);
+		IEnumerable Search(string keyword, object state, params Sorting[] sortings);
+		IEnumerable Search(string keyword, Paging paging, params Sorting[] sortings);
+		IEnumerable Search(string keyword, string schema, params Sorting[] sortings);
+		IEnumerable Search(string keyword, string schema, object state, params Sorting[] sortings);
+		IEnumerable Search(string keyword, string schema, Paging paging, params Sorting[] sortings);
+		IEnumerable Search(string keyword, string schema, Paging paging, object state, params Sorting[] sortings);
 
 		IEnumerable Select(object state = null, params Sorting[] sortings);
 		IEnumerable Select(ICondition condition, params Sorting[] sortings);
