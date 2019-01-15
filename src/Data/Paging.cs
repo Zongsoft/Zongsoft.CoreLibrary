@@ -140,6 +140,16 @@ namespace Zongsoft.Data
 		}
 		#endregion
 
+		#region 重写方法
+		public override string ToString()
+		{
+			if(_pageSize < 1)
+				return $"{_pageIndex.ToString()}/{this.PageCount.ToString()}";
+			else
+				return $"{_pageIndex.ToString()}/{this.PageCount.ToString()}({_pageSize.ToString()})";
+		}
+		#endregion
+
 		#region 静态方法
 		/// <summary>
 		/// 以指定的页号及大小创建一个分页设置对象。
@@ -152,6 +162,11 @@ namespace Zongsoft.Data
 			return new Paging(index, size);
 		}
 
+		/// <summary>
+		/// 获取指定的设置项是否禁用了分页。
+		/// </summary>
+		/// <param name="paging">待判断的分页设置。</param>
+		/// <returns>如果指定的分页设置的页大小于或等于零，则返回真(True)否则返回假(False)。</returns>
 		public static bool IsDisabled(Paging paging)
 		{
 			return paging != null && paging.PageSize <= 0;
