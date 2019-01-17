@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Samples.Entities.Models
 {
-	[Zongsoft.Data.DataAccess("Employee")]
+	[Zongsoft.Data.Entity("Employee")]
 	public interface IEmployee : IUserEntity
 	{
 		bool? Gender

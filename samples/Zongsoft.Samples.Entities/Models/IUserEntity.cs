@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Samples.Entities.Models
 {
-	[Zongsoft.Data.DataAccess("Security.User")]
+	[Zongsoft.Data.Entity("Security.User")]
 	public interface IUserEntity : IPerson
 	{
 		[Zongsoft.Data.Conditional(ConverterType = typeof(object))]

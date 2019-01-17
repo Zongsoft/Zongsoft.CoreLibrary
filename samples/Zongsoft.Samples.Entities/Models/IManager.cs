@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Samples.Entities.Models
 {
-	[Zongsoft.Data.DataAccess("Manager")]
+	[Zongsoft.Data.Entity("Manager")]
 	public interface IManager : IEmployee
 	{
 		bool IsAdvance

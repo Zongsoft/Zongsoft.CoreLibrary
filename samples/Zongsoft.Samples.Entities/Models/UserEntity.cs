@@ -10,18 +10,18 @@ namespace Zongsoft.Samples.Entities.Models
 		private static readonly string[] __NAMES__ = new string[] { "UserId", "Namespace", "Name", "FullName", "Email", "PhoneNumber", "Avatar", "Status", "StatusTimestamp", "PrincipalId", "CreatedTime", "Description" };
 		private static readonly Dictionary<string, PropertyToken<UserEntity>> __TOKENS__ = new Dictionary<string, PropertyToken<UserEntity>>()
 		{
-			{ "UserId", new PropertyToken<UserEntity>(0, target => target._userId, (target, value) => target.UserId = (uint) value) },
-			{ "Namespace", new PropertyToken<UserEntity>(1, target => target._namespace, (target, value) => target.Namespace = (string) value) },
-			{ "Name", new PropertyToken<UserEntity>(2, target => target._name, (target, value) => target.Name = (string) value) },
-			{ "FullName", new PropertyToken<UserEntity>(3, target => target._fullName, (target, value) => target.FullName = (string) value) },
-			{ "Email", new PropertyToken<UserEntity>(4, target => target._email, (target, value) => target.Email = (string) value) },
-			{ "PhoneNumber", new PropertyToken<UserEntity>(5, target => target._phoneNumber, (target, value) => target.PhoneNumber = (string) value) },
-			{ "Avatar", new PropertyToken<UserEntity>(6, target => target._avatar, (target, value) => target.Avatar = (string) value) },
-			{ "Status", new PropertyToken<UserEntity>(7, target => target._status, (target, value) => target.Status = (byte) value) },
-			{ "StatusTimestamp", new PropertyToken<UserEntity>(8, target => target._statusTimestamp, (target, value) => target.StatusTimestamp = (DateTime?) value) },
-			{ "PrincipalId", new PropertyToken<UserEntity>(9, target => target._principalId, (target, value) => target.PrincipalId = (string) value) },
-			{ "CreatedTime", new PropertyToken<UserEntity>(10, target => target._createdTime, (target, value) => target.CreatedTime = (DateTime) value) },
-			{ "Description", new PropertyToken<UserEntity>(11, target => target._description, (target, value) => target.Description = (string) value) },
+			{ "UserId", new PropertyToken<UserEntity>(0, target => target._userId, (target, value) => target.UserId = (uint)Convert.ChangeType(value, typeof(uint))) },
+			{ "Namespace", new PropertyToken<UserEntity>(1, target => target._namespace, (target, value) => target.Namespace = (string)value) },
+			{ "Name", new PropertyToken<UserEntity>(2, target => target._name, (target, value) => target.Name = (string)value) },
+			{ "FullName", new PropertyToken<UserEntity>(3, target => target._fullName, (target, value) => target.FullName = (string)value) },
+			{ "Email", new PropertyToken<UserEntity>(4, target => target._email, (target, value) => target.Email = (string)value) },
+			{ "PhoneNumber", new PropertyToken<UserEntity>(5, target => target._phoneNumber, (target, value) => target.PhoneNumber = (string)value) },
+			{ "Avatar", new PropertyToken<UserEntity>(6, target => target._avatar, (target, value) => target.Avatar = (string)value) },
+			{ "Status", new PropertyToken<UserEntity>(7, target => target._status, (target, value) => target.Status = (byte)value) },
+			{ "StatusTimestamp", new PropertyToken<UserEntity>(8, target => target._statusTimestamp, (target, value) => target.StatusTimestamp = (DateTime?)value) },
+			{ "PrincipalId", new PropertyToken<UserEntity>(9, target => target._principalId, (target, value) => target.PrincipalId = (string)value) },
+			{ "CreatedTime", new PropertyToken<UserEntity>(10, target => target._createdTime, (target, value) => target.CreatedTime = (DateTime)value) },
+			{ "Description", new PropertyToken<UserEntity>(11, target => target._description, (target, value) => target.Description = (string)value) },
 		};
 		#endregion
 
