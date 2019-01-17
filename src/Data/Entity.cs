@@ -684,10 +684,14 @@ namespace Zongsoft.Data
 
 					generator = setMethod.GetILGenerator();
 					generator.Emit(OpCodes.Ldarg_0);
-					//generator.Emit(OpCodes.Castclass, field.DeclaringType);
 					generator.Emit(OpCodes.Ldarg_1);
 					if(properties[i].PropertyType.IsValueType)
+					{
+						generator.Emit(OpCodes.Ldtoken, properties[i].PropertyType);
+						generator.Emit(OpCodes.Call, typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle), BindingFlags.Static | BindingFlags.Public));
+						generator.Emit(OpCodes.Call, typeof(Convert).GetMethod(nameof(Convert.ChangeType), new[] { typeof(object), typeof(Type) }));
 						generator.Emit(OpCodes.Unbox_Any, properties[i].PropertyType);
+					}
 					else
 						generator.Emit(OpCodes.Castclass, properties[i].PropertyType);
 					generator.Emit(OpCodes.Call, setter);
