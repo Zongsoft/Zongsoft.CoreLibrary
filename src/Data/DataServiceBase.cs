@@ -779,11 +779,18 @@ namespace Zongsoft.Data
 			return result;
 		}
 
-		protected virtual TEntity OnGet(ICondition condition, ISchema schema, object state, out IPaginator paginator)
+		protected virtual object OnGet(ICondition condition, ISchema schema, object state, out IPaginator paginator)
 		{
 			var result = this.DataAccess.Select<TEntity>(this.Name, condition, schema, null, state, null, ctx => this.OnGetting(ctx), ctx => this.OnGetted(ctx));
 			paginator = result as IPaginator;
-			return result.FirstOrDefault();
+
+			using(var iterator = result.GetEnumerator())
+			{
+				if(iterator.MoveNext())
+					return iterator.Current;
+				else
+					return null;
+			}
 		}
 		#endregion
 
