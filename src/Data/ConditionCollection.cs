@@ -240,10 +240,26 @@ namespace Zongsoft.Data
 		#region 公共方法
 		public bool Contains(string name)
 		{
-			if(string.IsNullOrWhiteSpace(name))
+			if(string.IsNullOrEmpty(name))
 				return false;
 
 			return this.Contains(this, name);
+		}
+
+		public bool Remove(params string[] names)
+		{
+			if(names == null || names.Length == 0)
+				return false;
+
+			var found = false;
+
+			foreach(var name in names)
+			{
+				if(!string.IsNullOrEmpty(name))
+					found = found || this.Remove(this, name);
+			}
+
+			return found;
 		}
 
 		/// <summary>
@@ -339,6 +355,27 @@ namespace Zongsoft.Data
 			}
 
 			return false;
+		}
+
+		private bool Remove(ICollection<ICondition> conditions, string name)
+		{
+			var found = false;
+
+			foreach(var condition in conditions)
+			{
+				if(condition is Condition c)
+				{
+					if(string.Equals(c.Name, name, StringComparison.OrdinalIgnoreCase))
+						found = conditions.Remove(condition);
+				}
+				else if(condition is ConditionCollection cs)
+				{
+					if(this.Remove(cs, name))
+						found = true;
+				}
+			}
+
+			return found;
 		}
 		#endregion
 	}
