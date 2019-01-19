@@ -149,6 +149,9 @@ namespace Zongsoft.Data
 
 		private static bool DoAsterisk(ref StateContext context)
 		{
+			if(context.IsWhitespace())
+				return true;
+
 			switch(context.Character)
 			{
 				case ',':
@@ -161,7 +164,7 @@ namespace Zongsoft.Data
 					context.State = State.None;
 					return true;
 				default:
-					context.OnError("");
+					context.OnError($"Illegal character '{context.Character}' in the schema.");
 					return false;
 			}
 		}
