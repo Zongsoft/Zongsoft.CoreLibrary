@@ -60,13 +60,12 @@
     <Compile Include="Common\BufferTests.cs" />
     <Compile Include="Common\ConvertTests.cs" />
     <Compile Include="Common\EnumUtilityTests.cs" />
-    <Compile Include="Data\ConditionalRangeTest.cs" />
+    <Compile Include="Data\RangeTest.cs" />
     <Compile Include="Data\ConditionalTest.cs" />
     <Compile Include="Data\ConditionCollectionTest.cs" />
     <Compile Include="Data\ConditionTest.cs" />
     <Compile Include="Data\EntityTest.cs" />
     <Compile Include="Data\SchemaTest.cs" />
-    <Compile Include="Data\ScopingTest.cs" />
     <Compile Include="Data\SortingTest.cs" />
     <Compile Include="Expressions\LexerTest.cs" />
     <Compile Include="Common\ObjectReferenceTests.cs" />
