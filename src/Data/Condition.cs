@@ -47,7 +47,7 @@ namespace Zongsoft.Data
 		public Condition(Condition condition)
 		{
 			if(condition == null)
-				throw new ArgumentNullException("condition");
+				throw new ArgumentNullException(nameof(condition));
 
 			_name = condition.Name;
 			_value = condition.Value;
@@ -57,7 +57,7 @@ namespace Zongsoft.Data
 		public Condition(string name, object value, ConditionOperator @operator = ConditionOperator.Equal)
 		{
 			if(string.IsNullOrWhiteSpace(name))
-				throw new ArgumentNullException("name");
+				throw new ArgumentNullException(nameof(name));
 
 			_name = name.Trim();
 			_value = value;
@@ -67,13 +67,20 @@ namespace Zongsoft.Data
 
 		#region 公共属性
 		/// <summary>
-		/// 获取条件项的名称。
+		/// 获取或设置条件项的名称。
 		/// </summary>
 		public string Name
 		{
 			get
 			{
 				return _name;
+			}
+			set
+			{
+				if(string.IsNullOrWhiteSpace(value))
+					throw new ArgumentNullException();
+
+				_name = value.Trim();
 			}
 		}
 
@@ -407,6 +414,13 @@ namespace Zongsoft.Data
 			}
 
 			return "\"" + value.ToString() + "\"";
+		}
+		#endregion
+
+		#region 显式实现
+		bool ICondition.Contains(string name)
+		{
+			return string.Equals(name, _name, StringComparison.OrdinalIgnoreCase);
 		}
 		#endregion
 

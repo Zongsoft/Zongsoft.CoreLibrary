@@ -34,5 +34,6 @@ namespace Zongsoft.Data
 	/// </summary>
 	public interface ICondition
 	{
+		bool Contains(string name);
 	}
 }
