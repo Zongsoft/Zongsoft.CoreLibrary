@@ -57,6 +57,30 @@ namespace Zongsoft.Reflection
 			return property.GetValue(target);
 		}
 
+		public static object GetValue(object target, string path)
+		{
+			if(target == null)
+				throw new ArgumentNullException(nameof(target));
+
+			if(string.IsNullOrEmpty(path))
+				throw new ArgumentNullException(nameof(path));
+
+			var members = target.GetType().GetMember(path, MemberTypes.Property | MemberTypes.Field, BindingFlags.Public | BindingFlags.Instance);
+
+			if(members == null || members.Length == 0)
+				throw new ArgumentException();
+
+			switch(members[0].MemberType)
+			{
+				case MemberTypes.Field:
+					return ((FieldInfo)members[0]).GetValue(target);
+				case MemberTypes.Property:
+					return ((PropertyInfo)members[0]).GetValue(target);
+			}
+
+			return null;
+		}
+
 		public static void SetValue(this MemberInfo member, object target, object value)
 		{
 			if(member == null)
@@ -83,6 +107,17 @@ namespace Zongsoft.Reflection
 		public static void SetValue(this PropertyInfo property, object target, object value)
 		{
 			property.SetValue(target, value);
+		}
+
+		public static object SetValue(object target, string path, object value)
+		{
+			if(target == null)
+				throw new ArgumentNullException(nameof(target));
+
+			if(string.IsNullOrEmpty(path))
+				throw new ArgumentNullException(nameof(path));
+
+			throw new NotImplementedException();
 		}
 	}
 }
