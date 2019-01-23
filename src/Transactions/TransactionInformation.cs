@@ -25,7 +25,7 @@
  */
 
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 
 namespace Zongsoft.Transactions
 {
@@ -34,7 +34,7 @@ namespace Zongsoft.Transactions
 		#region 成员字段
 		private Guid _transactionId;
 		private Transaction _transaction;
-		private IDictionary<string, object> _parameters;
+		private ConcurrentDictionary<string, object> _parameters;
 		#endregion
 
 		#region 构造函数
@@ -107,12 +107,12 @@ namespace Zongsoft.Transactions
 		/// <summary>
 		/// 获取当前事务的环境参数。
 		/// </summary>
-		public IDictionary<string, object> Parameters
+		public ConcurrentDictionary<string, object> Parameters
 		{
 			get
 			{
 				if(_parameters == null)
-					System.Threading.Interlocked.CompareExchange(ref _parameters, new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase), null);
+					System.Threading.Interlocked.CompareExchange(ref _parameters, new ConcurrentDictionary<string, object>(StringComparer.OrdinalIgnoreCase), null);
 
 				return _parameters;
 			}
