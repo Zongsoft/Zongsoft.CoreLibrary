@@ -13,9 +13,9 @@ namespace Zongsoft.Security
 		public CredentialTest()
 		{
 			_credential = new Credential("10012001", new Membership.User(101, "Popeye"), "Web", TimeSpan.FromHours(4), new DateTime(2015, 5, 15));
-			_credential.ExtendedProperties.Add("User.Avatar", ":001:");
-			_credential.ExtendedProperties.Add("User.Nickname", "钟少");
-			_credential.ExtendedProperties.Add("User.Gender", Zongsoft.Tests.Gender.Male);
+			_credential.Parameters.Add("User.Avatar", ":001:");
+			_credential.Parameters.Add("User.Nickname", "钟少");
+			_credential.Parameters.Add("User.Gender", Zongsoft.Tests.Gender.Male);
 		}
 
 		[Fact]

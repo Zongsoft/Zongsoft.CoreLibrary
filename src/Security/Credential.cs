@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2003-2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2003-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,9 +25,7 @@
  */
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 
 namespace Zongsoft.Security
 {
@@ -37,52 +35,41 @@ namespace Zongsoft.Security
 	[Serializable]
 	public class Credential
 	{
-		#region 常量定义
-		private const string EXTENDEDPROPERTIESPREFIX = "ExtendedProperties.";
-		#endregion
-
 		#region 成员字段
 		private string _credentialId;
 		private string _scene;
 		private DateTime _timestamp;
 		private DateTime _issuedTime;
 		private TimeSpan _duration;
-		private Membership.User _user;
-		private IDictionary<string, object> _extendedProperties;
+		private Membership.IUser _user;
+		private IDictionary<string, object> _parameters;
 		private Credential _innerCredential;
 		#endregion
 
 		#region 构造函数
-		public Credential(string credentialId, Membership.User user, string scene, TimeSpan duration)
-			: this(credentialId, user, scene, duration, DateTime.Now, null)
+		public Credential(string credentialId, Membership.IUser user, string scene, TimeSpan duration) : this(credentialId, user, scene, duration, DateTime.Now, null)
 		{
 		}
 
-		public Credential(string credentialId, Membership.User user, string scene, TimeSpan duration, DateTime issuedTime, IDictionary<string, object> extendedProperties = null)
+		public Credential(string credentialId, Membership.IUser user, string scene, TimeSpan duration, DateTime issuedTime, IDictionary<string, object> parameters = null)
 		{
 			if(string.IsNullOrWhiteSpace(credentialId))
-				throw new ArgumentNullException("credentialId");
+				throw new ArgumentNullException(nameof(credentialId));
 
-			if(user == null)
-				throw new ArgumentNullException("user");
-
-			_user = user;
 			_credentialId = credentialId.Trim();
+			_user = user ?? throw new ArgumentNullException(nameof(user));
 			_scene = scene == null ? null : scene.Trim();
 			_duration = duration;
 			_issuedTime = issuedTime;
 			_timestamp = issuedTime;
 
-			if(extendedProperties != null && extendedProperties.Count > 0)
-				_extendedProperties = new Dictionary<string, object>(extendedProperties, StringComparer.OrdinalIgnoreCase);
+			if(parameters != null && parameters.Count > 0)
+				_parameters = new Dictionary<string, object>(parameters, StringComparer.OrdinalIgnoreCase);
 		}
 
 		protected Credential(Credential innerCredential)
 		{
-			if(innerCredential == null)
-				throw new ArgumentNullException("innerCredential");
-
-			_innerCredential = innerCredential;
+			_innerCredential = innerCredential ?? throw new ArgumentNullException(nameof(innerCredential));
 		}
 		#endregion
 
@@ -133,7 +120,7 @@ namespace Zongsoft.Security
 		/// <summary>
 		/// 获取安全凭证对应的用户对象。
 		/// </summary>
-		public Membership.User User
+		public Membership.IUser User
 		{
 			get
 			{
@@ -240,169 +227,36 @@ namespace Zongsoft.Security
 		}
 
 		/// <summary>
-		/// 获取一个值，指示扩展属性集是否存在并且有值。
+		/// 获取一个值，指示参数集是否存在并且有值。
 		/// </summary>
 		[Zongsoft.Runtime.Serialization.SerializationMember(Runtime.Serialization.SerializationMemberBehavior.Ignored)]
-		public bool HasExtendedProperties
+		public bool HasParameters
 		{
 			get
 			{
 				if(_innerCredential != null)
-					return _innerCredential.HasExtendedProperties;
+					return _innerCredential.HasParameters;
 
-				return _extendedProperties != null && _extendedProperties.Count > 0;
+				return _parameters != null && _parameters.Count > 0;
 			}
 		}
 
 		/// <summary>
-		/// 获取安全凭证的扩展属性集。
+		/// 获取安全凭证的参数集。
 		/// </summary>
-		public IDictionary<string, object> ExtendedProperties
+		public IDictionary<string, object> Parameters
 		{
 			get
 			{
 				if(_innerCredential != null)
-					return _innerCredential.ExtendedProperties;
+					return _innerCredential.Parameters;
 
-				if(_extendedProperties == null)
-					System.Threading.Interlocked.CompareExchange(ref _extendedProperties, new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase), null);
+				if(_parameters == null)
+					System.Threading.Interlocked.CompareExchange(ref _parameters, new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase), null);
 
-				return _extendedProperties;
+				return _parameters;
 			}
 		}
-		#endregion
-
-		#region 公共方法
-		//public IDictionary<string, object> ToDictionary()
-		//{
-		//	var result = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
-		//	{
-		//		{"CertificationId", this.CertificationId},
-		//		{"Scene", this.Scene},
-		//		{"Duration", this.Duration},
-		//		{"IssuedTime", this.IssuedTime},
-		//		{"Timestamp", this.Timestamp},
-		//	};
-
-		//	if(_user != null)
-		//	{
-		//		result.Add(".User.Type", _user.GetType().AssemblyQualifiedName);
-
-		//		var properties = TypeDescriptor.GetProperties(_user.GetType());
-
-		//		foreach(PropertyDescriptor property in properties)
-		//		{
-		//			result.Add("User." + property.Name, property.GetValue(_user));
-		//		}
-		//	}
-
-		//	var extendedProperties = _extendedProperties;
-
-		//	if(extendedProperties != null && extendedProperties.Count > 0)
-		//	{
-		//		foreach(var extendedProperty in extendedProperties)
-		//		{
-		//			result.Add(EXTENDEDPROPERTIESPREFIX + extendedProperty.Key, extendedProperty.Value);
-		//		}
-		//	}
-
-		//	return result;
-		//}
-
-		//public static Certification FromDictionary(IDictionary dictionary)
-		//{
-		//	if(dictionary == null || dictionary.Count < 1)
-		//		return null;
-
-		//	var user = new Membership.User(Zongsoft.Common.Convert.ConvertValue<int>(dictionary["User.UserId"]),
-		//		Zongsoft.Common.Convert.ConvertValue<string>(dictionary["User.Name"]),
-		//		Zongsoft.Common.Convert.ConvertValue<string>(dictionary["User.Namespace"]));
-
-		//	var properties = TypeDescriptor.GetProperties(typeof(Membership.User));
-
-		//	foreach(PropertyDescriptor property in properties)
-		//	{
-		//		if(property.IsReadOnly)
-		//			continue;
-
-		//		property.SetValue(user, Zongsoft.Common.Convert.ConvertValue(dictionary["User." + property.Name], property.PropertyType));
-		//	}
-
-		//	var result = new Certification((string)dictionary["CertificationId"], user,
-		//		Zongsoft.Common.Convert.ConvertValue<string>(dictionary["Scene"]),
-		//		Zongsoft.Common.Convert.ConvertValue<TimeSpan>(dictionary["Duration"], TimeSpan.Zero),
-		//		Zongsoft.Common.Convert.ConvertValue<DateTime>(dictionary["IssuedTime"]))
-		//		{
-		//			Timestamp = Zongsoft.Common.Convert.ConvertValue<DateTime>(dictionary["Timestamp"]),
-		//		};
-
-		//	foreach(var key in dictionary.Keys)
-		//	{
-		//		if(key == null)
-		//			continue;
-
-		//		if(key.ToString().StartsWith(EXTENDEDPROPERTIESPREFIX))
-		//			result.ExtendedProperties[key.ToString().Substring(EXTENDEDPROPERTIESPREFIX.Length)] = dictionary[key];
-		//	}
-
-		//	return result;
-		//}
-
-		//public static Certification FromDictionary<TValue>(IDictionary<string, TValue> dictionary)
-		//{
-		//	if(dictionary == null || dictionary.Count < 1)
-		//		return null;
-
-		//	Certification result;
-		//	Membership.User user = null;
-		//	TValue certificationId, userId, userName, scene, timestamp, issuedTime, duration, @namespace;
-
-		//	if(dictionary.TryGetValue("User.UserId", out userId) && dictionary.TryGetValue("User.Name", out userName) && dictionary.TryGetValue("User.Namespace", out @namespace))
-		//	{
-		//		user = new Membership.User(Zongsoft.Common.Convert.ConvertValue<int>(userId),
-		//								   Zongsoft.Common.Convert.ConvertValue<string>(userName),
-		//								   Zongsoft.Common.Convert.ConvertValue<string>(@namespace));
-
-		//		var properties = TypeDescriptor.GetProperties(typeof(Membership.User));
-
-		//		foreach(PropertyDescriptor property in properties)
-		//		{
-		//			if(property.IsReadOnly)
-		//				continue;
-
-		//			property.SetValue(user, Zongsoft.Common.Convert.ConvertValue(dictionary["User." + property.Name], property.PropertyType));
-		//		}
-		//	}
-
-		//	if(dictionary.TryGetValue("CertificationId", out certificationId) && user != null)
-		//	{
-		//		dictionary.TryGetValue("Scene", out scene);
-		//		dictionary.TryGetValue("IssuedTime", out issuedTime);
-		//		dictionary.TryGetValue("Duration", out duration);
-		//		dictionary.TryGetValue("Timestamp", out timestamp);
-
-		//		result = new Certification(Zongsoft.Common.Convert.ConvertValue<string>(certificationId), user,
-		//									Zongsoft.Common.Convert.ConvertValue<string>(scene),
-		//									Zongsoft.Common.Convert.ConvertValue<TimeSpan>(duration),
-		//									Zongsoft.Common.Convert.ConvertValue<DateTime>(issuedTime))
-		//									{
-		//										Timestamp = Zongsoft.Common.Convert.ConvertValue<DateTime>(timestamp),
-		//									};
-		//	}
-		//	else
-		//		return null;
-
-		//	foreach(var key in dictionary.Keys)
-		//	{
-		//		if(key == null)
-		//			continue;
-
-		//		if(key.ToString().StartsWith(EXTENDEDPROPERTIESPREFIX))
-		//			result.ExtendedProperties[key.ToString().Substring(EXTENDEDPROPERTIESPREFIX.Length)] = dictionary[key];
-		//	}
-
-		//	return result;
-		//}
 		#endregion
 
 		#region 重写方法
