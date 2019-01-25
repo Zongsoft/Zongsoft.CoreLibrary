@@ -311,7 +311,7 @@ namespace Zongsoft.Data
 				if(_dictionary.Contains(name))
 					raw = _dictionary[name];
 
-				if(!predicate(raw == null ? default(TValue) : (TValue)Convert.ChangeType(raw, typeof(TValue))))
+				if(!predicate(raw == null ? default(TValue) : (typeof(TValue).IsPrimitive ? (TValue)Convert.ChangeType(raw, typeof(TValue)) : (TValue)raw)))
 					return;
 			}
 
@@ -377,7 +377,7 @@ namespace Zongsoft.Data
 				if(_dictionary.Contains(name))
 					raw = _dictionary[name];
 
-				if(!predicate(raw == null ? default(TValue) : (TValue)Convert.ChangeType(raw, typeof(TValue))))
+				if(!predicate(raw == null ? default(TValue) : (typeof(TValue).IsPrimitive ? (TValue)Convert.ChangeType(raw, typeof(TValue)) : (TValue)raw)))
 					return false;
 			}
 
@@ -781,7 +781,7 @@ namespace Zongsoft.Data
 			{
 				_dictionary.TryGetValue(name, out var raw);
 
-				if(!predicate(raw == null ? default(TValue) : (TValue)Convert.ChangeType(raw, typeof(TValue))))
+				if(!predicate(raw == null ? default(TValue) : (typeof(TValue).IsPrimitive ? (TValue)Convert.ChangeType(raw, typeof(TValue)) : (TValue)raw)))
 					return;
 			}
 
@@ -825,7 +825,7 @@ namespace Zongsoft.Data
 			{
 				_dictionary.TryGetValue(name, out var raw);
 
-				if(!predicate(raw == null ? default(TValue) : (TValue)Convert.ChangeType(raw, typeof(TValue))))
+				if(!predicate(raw == null ? default(TValue) : (typeof(TValue).IsPrimitive ? (TValue)Convert.ChangeType(raw, typeof(TValue)) : (TValue)raw)))
 					return false;
 			}
 
@@ -1605,7 +1605,7 @@ namespace Zongsoft.Data
 			{
 				_entity.TryGetValue(name, out var raw);
 
-				if(!predicate(raw == null ? default(TValue) : (TValue)Convert.ChangeType(raw, typeof(TValue))))
+				if(!predicate(raw == null ? default(TValue) : (typeof(TValue).IsPrimitive ? (TValue)Convert.ChangeType(raw, typeof(TValue)) : (TValue)raw)))
 					return;
 			}
 
@@ -1650,7 +1650,7 @@ namespace Zongsoft.Data
 			{
 				_entity.TryGetValue(name, out var raw);
 
-				if(!predicate(raw == null ? default(TValue) : (TValue)Convert.ChangeType(raw, typeof(TValue))))
+				if(!predicate(raw == null ? default(TValue) : (typeof(TValue).IsPrimitive ? (TValue)Convert.ChangeType(raw, typeof(TValue)) : (TValue)raw)))
 					return false;
 			}
 
