@@ -137,6 +137,7 @@
     <Compile Include="Data\ISchemaParser.cs" />
     <Compile Include="Data\ISchema`1.cs" />
     <Compile Include="Data\ISchema.cs" />
+    <Compile Include="Data\Paginator.cs" />
     <Compile Include="Data\PagingEventArgs.cs" />
     <Compile Include="Data\Range.cs" />
     <Compile Include="Data\Range`1.cs" />
