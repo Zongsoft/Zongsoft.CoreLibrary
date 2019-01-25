@@ -33,18 +33,18 @@ namespace Zongsoft.Security
 	public class CredentialRegisterEventArgs : EventArgs
 	{
 		#region 成员字段
-		private Membership.User _user;
+		private Membership.IUser _user;
 		private string _scene;
 		private Credential _credential;
-		private IDictionary<string, object> _extendedProperties;
+		private IDictionary<string, object> _parameters;
 		#endregion
 
 		#region 构造函数
-		public CredentialRegisterEventArgs(Membership.User user, string scene, IDictionary<string, object> extendedProperties = null)
+		public CredentialRegisterEventArgs(Membership.IUser user, string scene, IDictionary<string, object> parameters = null)
 		{
 			_user = user ?? throw new ArgumentNullException(nameof(user));
 			_scene = scene;
-			_extendedProperties = extendedProperties;
+			_parameters = parameters;
 		}
 
 		public CredentialRegisterEventArgs(Credential credential)
@@ -57,7 +57,7 @@ namespace Zongsoft.Security
 		/// <summary>
 		/// 获取注册的用户对象。
 		/// </summary>
-		public Membership.User User
+		public Membership.IUser User
 		{
 			get
 			{
@@ -92,24 +92,24 @@ namespace Zongsoft.Security
 		}
 
 		/// <summary>
-		/// 获取一个值，指示扩展属性集是否存在并且有值。
+		/// 获取一个值，指示参数集是否存在并且有值。
 		/// </summary>
-		public bool HasExtendedProperties
+		public bool HasParameters
 		{
 			get
 			{
-				return _extendedProperties != null && _extendedProperties.Count > 0;
+				return _parameters != null && _parameters.Count > 0;
 			}
 		}
 
 		/// <summary>
-		/// 获取注册操作传入的扩展属性集。
+		/// 获取注册操作传入的参数集。
 		/// </summary>
-		public IDictionary<string, object> ExtendedProperties
+		public IDictionary<string, object> Parameters
 		{
 			get
 			{
-				return _extendedProperties;
+				return _parameters;
 			}
 		}
 		#endregion

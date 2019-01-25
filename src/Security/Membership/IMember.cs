@@ -41,29 +41,11 @@ namespace Zongsoft.Security.Membership
 	public interface IMember
 	{
 		/// <summary>
-		/// 获取或设置成员编号。
-		/// </summary>
-		uint MemberId
-		{
-			get;
-			set;
-		}
-
-		/// <summary>
-		/// 获取成员类型。
-		/// </summary>
-		MemberType MemberType
-		{
-			get;
-		}
-
-		/// <summary>
 		/// 获取或设置成员名称。
 		/// </summary>
 		string Name
 		{
-			get;
-			set;
+			get; set;
 		}
 
 		/// <summary>
@@ -71,8 +53,7 @@ namespace Zongsoft.Security.Membership
 		/// </summary>
 		string FullName
 		{
-			get;
-			set;
+			get; set;
 		}
 
 		/// <summary>
@@ -80,17 +61,15 @@ namespace Zongsoft.Security.Membership
 		/// </summary>
 		string Namespace
 		{
-			get;
-			set;
+			get; set;
 		}
 
 		/// <summary>
-		/// 获取或设置成员的描述文本。
+		/// 获取或设置成员的描述信息。
 		/// </summary>
 		string Description
 		{
-			get;
-			set;
+			get; set;
 		}
 	}
 }

@@ -35,19 +35,9 @@ using System;
 
 namespace Zongsoft.Security.Membership
 {
-	public interface IUser : IMember
+	public interface IRole : IMember
 	{
-		uint UserId
-		{
-			get; set;
-		}
-
-		string Email
-		{
-			get; set;
-		}
-
-		string PhoneNumber
+		uint RoleId
 		{
 			get; set;
 		}

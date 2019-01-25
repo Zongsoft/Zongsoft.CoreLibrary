@@ -37,12 +37,12 @@ namespace Zongsoft.Security.Membership
 		private string _namespace;
 		private string _identity;
 		private string _scene;
-		private User _user;
+		private IUser _user;
 		private IDictionary<string, object> _parameters;
 		#endregion
 
 		#region 构造函数
-		public AuthenticatedEventArgs(string identity, string @namespace, User user, string scene, IDictionary<string, object> parameters = null)
+		public AuthenticatedEventArgs(string identity, string @namespace, IUser user, string scene, IDictionary<string, object> parameters = null)
 		{
 			_identity = identity;
 			_namespace = @namespace;
@@ -115,7 +115,7 @@ namespace Zongsoft.Security.Membership
 		/// <summary>
 		/// 获取或设置身份验证对应的用户对象。
 		/// </summary>
-		public User User
+		public IUser User
 		{
 			get
 			{

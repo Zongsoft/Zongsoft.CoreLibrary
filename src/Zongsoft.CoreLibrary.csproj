@@ -376,6 +376,7 @@
     <Compile Include="Security\Membership\AuthorizationEventArgs.cs" />
     <Compile Include="Security\Membership\IMember.cs" />
     <Compile Include="Security\Membership\IMemberProvider.cs" />
+    <Compile Include="Security\Membership\IRole.cs" />
     <Compile Include="Security\Membership\IUser.cs" />
     <Compile Include="Security\Membership\UserIdentityType.cs" />
     <Compile Include="Security\Membership\AuthenticationResult.cs" />

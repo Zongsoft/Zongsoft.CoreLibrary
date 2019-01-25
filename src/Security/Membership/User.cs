@@ -25,7 +25,6 @@
  */
 
 using System;
-using System.ComponentModel;
 
 namespace Zongsoft.Security.Membership
 {
@@ -45,11 +44,8 @@ namespace Zongsoft.Security.Membership
 		private string _name;
 		private string _fullName;
 		private string _namespace;
-		private string _avatar;
 		private string _email;
 		private string _phoneNumber;
-		private string _principalId;
-		private object _principal;
 		private UserStatus _status;
 		private DateTime? _statusTimestamp;
 		private string _description;
@@ -86,32 +82,6 @@ namespace Zongsoft.Security.Membership
 		#endregion
 
 		#region 公共属性
-		/// <summary>
-		/// 获取或设置成员编号，即用户编号。
-		/// </summary>
-		uint IMember.MemberId
-		{
-			get
-			{
-				return this.UserId;
-			}
-			set
-			{
-				this.UserId = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取成员类型，始终返回<see cref="MemberType.User"/>。
-		/// </summary>
-		MemberType IMember.MemberType
-		{
-			get
-			{
-				return MemberType.User;
-			}
-		}
-
 		/// <summary>
 		/// 获取或设置用户编号。
 		/// </summary>
@@ -214,65 +184,6 @@ namespace Zongsoft.Security.Membership
 			set
 			{
 				this.SetPropertyValue(nameof(Description), ref _description, value);
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置用户的头像标识(头像代码或头像图片的URL)。
-		/// </summary>
-		public string Avatar
-		{
-			get
-			{
-				return _avatar;
-			}
-			set
-			{
-				if(!string.IsNullOrWhiteSpace(value))
-				{
-					try
-					{
-						//获取头像值对应的访问地址
-						var url = Zongsoft.IO.FileSystem.GetUrl(value);
-
-						//如果头像访问地址不为空则将它设置为该地址
-						if(url != null && url.Length > 0 && !string.Equals(value, url))
-							value = url;
-					}
-					catch { }
-				}
-
-				this.SetPropertyValue(nameof(Avatar), ref _avatar, value);
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置用户对应的主体对象。
-		/// </summary>
-		public object Principal
-		{
-			get
-			{
-				return _principal;
-			}
-			set
-			{
-				this.SetPropertyValue(nameof(Principal), ref _principal, value);
-			}
-		}
-
-		/// <summary>
-		/// 获取或设置用户对应的主体标识。
-		/// </summary>
-		public string PrincipalId
-		{
-			get
-			{
-				return _principalId;
-			}
-			set
-			{
-				this.SetPropertyValue(nameof(PrincipalId), ref _principalId, value);
 			}
 		}
 

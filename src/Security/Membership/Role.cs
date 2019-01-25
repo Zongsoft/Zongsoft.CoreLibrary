@@ -80,32 +80,6 @@ namespace Zongsoft.Security.Membership
 
 		#region 公共属性
 		/// <summary>
-		/// 获取或设置成员编号，即角色编号。
-		/// </summary>
-		uint IMember.MemberId
-		{
-			get
-			{
-				return this.RoleId;
-			}
-			set
-			{
-				this.RoleId = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取成员类型，始终返回<see cref="MemberType.Role"/>。
-		/// </summary>
-		MemberType IMember.MemberType
-		{
-			get
-			{
-				return MemberType.Role;
-			}
-		}
-
-		/// <summary>
 		/// 获取或设置角色编号。
 		/// </summary>
 		public uint RoleId
