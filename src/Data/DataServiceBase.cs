@@ -122,6 +122,26 @@ namespace Zongsoft.Data
 			}
 		}
 
+		public virtual bool CanDelete
+		{
+			get => true;
+		}
+
+		public virtual bool CanInsert
+		{
+			get => true;
+		}
+
+		public virtual bool CanUpdate
+		{
+			get => true;
+		}
+
+		public virtual bool CanUpsert
+		{
+			get => true;
+		}
+
 		public IDataAccess DataAccess
 		{
 			get
@@ -163,26 +183,6 @@ namespace Zongsoft.Data
 
 				return null;
 			}
-		}
-
-		protected virtual bool CanDelete
-		{
-			get => true;
-		}
-
-		protected virtual bool CanInsert
-		{
-			get => true;
-		}
-
-		protected virtual bool CanUpdate
-		{
-			get => true;
-		}
-
-		protected virtual bool CanUpsert
-		{
-			get => true;
 		}
 		#endregion
 

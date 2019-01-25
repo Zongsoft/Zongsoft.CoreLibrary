@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015-2017 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -59,6 +59,38 @@ namespace Zongsoft.Data
 		/// 获取数据服务的名称，该名称亦为数据访问接口的调用名。
 		/// </summary>
 		string Name
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取一个值，指示是否支持删除操作。
+		/// </summary>
+		bool CanDelete
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取一个值，指示是否支持新增操作。
+		/// </summary>
+		bool CanInsert
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取一个值，指示是否支持修改操作。
+		/// </summary>
+		bool CanUpdate
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取一个值，指示是否支持增改操作。
+		/// </summary>
+		bool CanUpsert
 		{
 			get;
 		}
