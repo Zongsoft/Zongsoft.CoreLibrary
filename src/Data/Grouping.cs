@@ -92,6 +92,68 @@ namespace Zongsoft.Data
 		}
 		#endregion
 
+		#region 公共方法
+		public Grouping Count(string name, string alias = null)
+		{
+			_aggregates.Count(name, alias);
+			return this;
+		}
+
+		public Grouping Sum(string name, string alias = null)
+		{
+			_aggregates.Sum(name, alias);
+			return this;
+		}
+
+		public Grouping Average(string name, string alias = null)
+		{
+			_aggregates.Average(name, alias);
+			return this;
+		}
+
+		public Grouping Median(string name, string alias = null)
+		{
+			_aggregates.Median(name, alias);
+			return this;
+		}
+
+		public Grouping Maximum(string name, string alias = null)
+		{
+			_aggregates.Maximum(name, alias);
+			return this;
+		}
+
+		public Grouping Minimum(string name, string alias = null)
+		{
+			_aggregates.Minimum(name, alias);
+			return this;
+		}
+
+		public Grouping Deviation(string name, string alias = null)
+		{
+			_aggregates.Deviation(name, alias);
+			return this;
+		}
+
+		public Grouping DeviationPopulation(string name, string alias = null)
+		{
+			_aggregates.DeviationPopulation(name, alias);
+			return this;
+		}
+
+		public Grouping Variance(string name, string alias = null)
+		{
+			_aggregates.Variance(name, alias);
+			return this;
+		}
+
+		public Grouping VariancePopulation(string name, string alias = null)
+		{
+			_aggregates.VariancePopulation(name, alias);
+			return this;
+		}
+		#endregion
+
 		#region 静态方法
 		/// <summary>
 		/// 创建一个分组设置。
