@@ -48,6 +48,21 @@ namespace Zongsoft.Data
 			return new Range<T>(minimum, maximum);
 		}
 
+		public static Range<T> Create<T>(T? minimum, T? maximum) where T : struct, IComparable<T>
+		{
+			return new Range<T>(minimum, maximum);
+		}
+
+		public static Range<T> Minimum<T>(T minimum) where T : struct, IComparable<T>
+		{
+			return new Range<T>(minimum, null);
+		}
+
+		public static Range<T> Maximum<T>(T maximum) where T : struct, IComparable<T>
+		{
+			return new Range<T>(null, maximum);
+		}
+
 		public static bool IsRange(object target)
 		{
 			if(target == null)
