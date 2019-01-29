@@ -144,7 +144,7 @@ namespace Zongsoft.Data
 			if(Comparer<T>.Default.Compare(_minimum.Value, _maximum.Value) == 0)
 				return new Condition(name, _minimum, ConditionOperator.Equal);
 			else
-				return new Condition(name, new object[] { _minimum, _maximum }, ConditionOperator.Between);
+				return new Condition(name, this, ConditionOperator.Between);
 		}
 		#endregion
 
