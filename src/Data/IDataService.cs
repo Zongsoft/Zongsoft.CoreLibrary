@@ -228,9 +228,12 @@ namespace Zongsoft.Data
 		IEnumerable<T> Select<T>(Grouping grouping, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(Grouping grouping, object state, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(Grouping grouping, Paging paging, object state = null, params Sorting[] sortings);
-		IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, params Sorting[] sortings);
-		IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, object state, params Sorting[] sortings);
-		IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, Paging paging, object state = null, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(Grouping grouping, string schema, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(Grouping grouping, string schema, object state, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(Grouping grouping, string schema, Paging paging, object state = null, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, string schema, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, string schema, object state, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, string schema, Paging paging, object state = null, params Sorting[] sortings);
 		#endregion
 	}
 }
