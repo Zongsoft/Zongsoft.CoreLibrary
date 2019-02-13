@@ -278,7 +278,16 @@ namespace Zongsoft.Security
 
 		public override string ToString()
 		{
-			return string.Format("{0}:{1} {2}", this.CredentialId, this.Scene, this.User);
+			var user = this.User;
+			var text = "#" + this.CredentialId.ToString();
+
+			if(!string.IsNullOrEmpty(this.Scene))
+				text += ":" + this.Scene;
+
+			if(user == null)
+				return text;
+			else
+				return $"{text} <[{user.UserId.ToString()}]{user.Name}@{user.Namespace}>";
 		}
 		#endregion
 	}
