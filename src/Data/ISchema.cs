@@ -51,6 +51,14 @@ namespace Zongsoft.Data
 		}
 
 		/// <summary>
+		/// 获取数据模式的原始表达式文本。
+		/// </summary>
+		string Text
+		{
+			get;
+		}
+
+		/// <summary>
 		/// 获取数据模式的实体类型（对应数据访问操作关联的数据实体元素类型）。
 		/// </summary>
 		Type EntityType
