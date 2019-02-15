@@ -66,7 +66,7 @@ namespace Zongsoft.Data
 				return Zongsoft.Reflection.Reflector.GetValue(entity, path);
 			}
 
-			var elementType = typeof(TSource).GetProperty(path).PropertyType;
+			var elementType = typeof(TSource).GetProperty(path)?.PropertyType ?? typeof(TSource).GetField(path).FieldType;
 			var collectionType = typeof(MappedCollection<,>).MakeGenericType(typeof(TSource), elementType);
 			return (IEnumerable)Activator.CreateInstance(collectionType, new object[] { source, new Func<TSource, object>(Map) });
 		}
