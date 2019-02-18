@@ -131,6 +131,7 @@
     <Compile Include="Data\IDataAccessProvider.cs" />
     <Compile Include="Data\IDataDictionary.cs" />
     <Compile Include="Data\IDataDictionary`1.cs" />
+    <Compile Include="Data\IDataMutateContextBase.cs" />
     <Compile Include="Data\IEntity.cs" />
     <Compile Include="Data\IPaginator.cs" />
     <Compile Include="Data\ISchemaParser`1.cs" />

@@ -260,9 +260,10 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
-	public class DataIncrementContextBase : DataAccessContextBase
+	public class DataIncrementContextBase : DataAccessContextBase, IDataMutateContextBase
 	{
 		#region 成员字段
+		private int _count;
 		private string _member;
 		private ICondition _condition;
 		private int _interval;
@@ -285,6 +286,19 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 公共属性
+		public int Count
+		{
+			get => _count;
+			set
+			{
+				if(_count == value)
+					return;
+
+				_count = value;
+				this.OnPropertyChanged(nameof(Count));
+			}
+		}
+
 		public string Member
 		{
 			get
@@ -350,6 +364,19 @@ namespace Zongsoft.Data
 				_result = value;
 				this.OnPropertyChanged(nameof(Result));
 			}
+		}
+		#endregion
+
+		#region 显式实现
+		object IDataMutateContextBase.Data
+		{
+			get => this.Interval;
+			set => throw new NotSupportedException();
+		}
+
+		bool IDataMutateContextBase.IsMultiple
+		{
+			get => false;
 		}
 		#endregion
 	}
@@ -546,7 +573,7 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
-	public class DataDeleteContextBase : DataAccessContextBase
+	public class DataDeleteContextBase : DataAccessContextBase, IDataMutateContextBase
 	{
 		#region 成员字段
 		private int _count;
@@ -620,9 +647,22 @@ namespace Zongsoft.Data
 			}
 		}
 		#endregion
+
+		#region 显式实现
+		object IDataMutateContextBase.Data
+		{
+			get => null;
+			set => throw new NotSupportedException();
+		}
+
+		bool IDataMutateContextBase.IsMultiple
+		{
+			get => false;
+		}
+		#endregion
 	}
 
-	public class DataInsertContextBase : DataAccessContextBase
+	public class DataInsertContextBase : DataAccessContextBase, IDataMutateContextBase
 	{
 		#region 成员字段
 		private int _count;
@@ -725,7 +765,7 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
-	public class DataUpdateContextBase : DataAccessContextBase
+	public class DataUpdateContextBase : DataAccessContextBase, IDataMutateContextBase
 	{
 		#region 成员字段
 		private int _count;
@@ -849,7 +889,7 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
-	public class DataUpsertContextBase : DataAccessContextBase
+	public class DataUpsertContextBase : DataAccessContextBase, IDataMutateContextBase
 	{
 		#region 成员字段
 		private int _count;
