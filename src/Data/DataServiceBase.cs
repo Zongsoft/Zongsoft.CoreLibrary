@@ -1362,7 +1362,7 @@ namespace Zongsoft.Data
 							//确保只有当序号字段未指定值或值为零时，才使用增量的序号值
 							data.SetValue(token.Attribute.Keys[token.Attribute.Keys.Length - 1],
 									 () => token.Sequence.Increment(sequenceKey, 1, token.Attribute.Seed),
-									 value => value == null || (ulong)System.Convert.ChangeType(value, typeof(ulong)) == 0);
+									 value => (ulong)System.Convert.ChangeType(value, typeof(ulong)) == 0);
 						}
 					}
 				}
