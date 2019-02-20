@@ -116,14 +116,14 @@ namespace Zongsoft.Security
 		/// </summary>
 		/// <param name="password">待散列(哈希)的口令明文。</param>
 		/// <param name="passwordSalt">对密码进行散列操作的随机值。</param>
-		/// <param name="hashAlgorithm">进行散列算法的名称，默认为SHA1。</param>
+		/// <param name="algorithm">进行散列算法的名称，默认为SHA1。</param>
 		/// <returns>散列后的口令值。</returns>
-		public static byte[] HashPassword(string password, byte[] passwordSalt, string hashAlgorithm = "SHA1")
+		public static byte[] HashPassword(string password, byte[] passwordSalt, string algorithm = "SHA1")
 		{
-			if(string.IsNullOrWhiteSpace(hashAlgorithm))
-				hashAlgorithm = "SHA1";
+			if(string.IsNullOrWhiteSpace(algorithm))
+				algorithm = "SHA1";
 
-			using(HashAlgorithm hash = HashAlgorithm.Create(hashAlgorithm))
+			using(HashAlgorithm cryptor = HashAlgorithm.Create(algorithm))
 			{
 				var passwordBuffer = System.Text.Encoding.UTF8.GetBytes(password);
 
@@ -134,10 +134,10 @@ namespace Zongsoft.Security
 					Buffer.BlockCopy(passwordBuffer, 0, buffer, 0, passwordBuffer.Length);
 					Buffer.BlockCopy(passwordSalt, 0, buffer, passwordBuffer.Length, passwordSalt.Length);
 
-					return hash.ComputeHash(buffer);
+					return cryptor.ComputeHash(buffer);
 				}
 
-				return hash.ComputeHash(passwordBuffer);
+				return cryptor.ComputeHash(passwordBuffer);
 			}
 		}
 
@@ -151,7 +151,7 @@ namespace Zongsoft.Security
 		/// <returns>验证成功则返回真，否则返回假。</returns>
 		public static bool VerifyPassword(string password, byte[] storedPassword, long storedPasswordSalt, string hashAlgorithm = "SHA1")
 		{
-			return VerifyPassword(password, storedPassword, BitConverter.GetBytes(storedPasswordSalt), hashAlgorithm);
+			return VerifyPassword(password, storedPassword, (storedPasswordSalt == 0 ? null : BitConverter.GetBytes(storedPasswordSalt)), hashAlgorithm);
 		}
 
 		/// <summary>
@@ -164,10 +164,10 @@ namespace Zongsoft.Security
 		/// <returns>验证成功则返回真，否则返回假。</returns>
 		public static bool VerifyPassword(string password, byte[] storedPassword, byte[] storedPasswordSalt, string hashAlgorithm = "SHA1")
 		{
-			if(password == null || password.Length == 0)
+			if(string.IsNullOrEmpty(password))
 			{
 				return (storedPassword == null || storedPassword.Length == 0) &&
-					   (storedPasswordSalt == null || storedPasswordSalt.Length == 0);
+				       (storedPasswordSalt == null || storedPasswordSalt.Length == 0);
 			}
 
 			//计算密码与对应的随机值的哈希值
