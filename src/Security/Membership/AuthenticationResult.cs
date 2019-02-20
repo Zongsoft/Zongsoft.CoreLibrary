@@ -36,17 +36,17 @@ namespace Zongsoft.Security.Membership
 	public class AuthenticationResult
 	{
 		#region 成员字段
-		private IUser _user;
+		private IUserIdentity _user;
 		private string _scene;
 		private IDictionary<string, object> _parameters;
 		#endregion
 
 		#region 构造函数
-		public AuthenticationResult(IUser user, string scene) : this(user, scene, null)
+		public AuthenticationResult(IUserIdentity user, string scene) : this(user, scene, null)
 		{
 		}
 
-		public AuthenticationResult(IUser user, string scene, IDictionary<string, object> parameters)
+		public AuthenticationResult(IUserIdentity user, string scene, IDictionary<string, object> parameters)
 		{
 			if(user == null)
 				throw new ArgumentNullException(nameof(user));
@@ -63,7 +63,7 @@ namespace Zongsoft.Security.Membership
 		/// <summary>
 		/// 获取验证通过后的用户对象，如果验证失败则返回空(null)。
 		/// </summary>
-		public IUser User
+		public IUserIdentity User
 		{
 			get
 			{

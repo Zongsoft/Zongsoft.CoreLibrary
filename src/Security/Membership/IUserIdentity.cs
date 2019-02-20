@@ -32,26 +32,24 @@
  */
 
 using System;
-using System.Collections.Generic;
 
 namespace Zongsoft.Security.Membership
 {
 	/// <summary>
-	/// 表示权限系统角色的实体接口。
+	/// 表示权限系统用户标识的接口。
 	/// </summary>
-	[Zongsoft.Data.Entity("Security.Role")]
-	public interface IRole
+	public interface IUserIdentity
 	{
 		/// <summary>
-		/// 获取或设置角色编号。
+		/// 获取或设置用户编号。
 		/// </summary>
-		uint RoleId
+		uint UserId
 		{
 			get; set;
 		}
 
 		/// <summary>
-		/// 获取或设置角色名称。
+		/// 获取或设置用户名称。
 		/// </summary>
 		string Name
 		{
@@ -59,7 +57,7 @@ namespace Zongsoft.Security.Membership
 		}
 
 		/// <summary>
-		/// 获取或设置角色全称。
+		/// 获取或设置用户全称。
 		/// </summary>
 		string FullName
 		{
@@ -67,7 +65,7 @@ namespace Zongsoft.Security.Membership
 		}
 
 		/// <summary>
-		/// 获取或设置角色所属的命名空间。
+		/// 获取或设置用户所属的命名空间。
 		/// </summary>
 		string Namespace
 		{
@@ -75,17 +73,9 @@ namespace Zongsoft.Security.Membership
 		}
 
 		/// <summary>
-		/// 获取或设置角色的描述信息。
+		/// 获取或设置用户的描述信息。
 		/// </summary>
 		string Description
-		{
-			get; set;
-		}
-
-		/// <summary>
-		/// 获取或设置角色成员集。
-		/// </summary>
-		IEnumerable<Member> Members
 		{
 			get; set;
 		}

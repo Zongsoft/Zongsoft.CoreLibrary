@@ -25,11 +25,11 @@
  */
 
 using System;
-using System.Collections.Generic;
 
 namespace Zongsoft.Security.Membership
 {
-	public struct PermissionFilter
+	[Zongsoft.Data.Entity("Security.PermissionFilter")]
+	public struct PermissionFilter : IEquatable<PermissionFilter>
 	{
 		#region 成员变量
 		private string _schemaId;
@@ -38,7 +38,7 @@ namespace Zongsoft.Security.Membership
 		#endregion
 
 		#region 构造函数
-		public PermissionFilter(string schemaId, string actionId, string filter)
+		public PermissionFilter(uint memberId, MemberType memberType, string schemaId, string actionId, string filter)
 		{
 			if(string.IsNullOrEmpty(schemaId))
 				throw new ArgumentNullException(nameof(schemaId));
@@ -47,6 +47,9 @@ namespace Zongsoft.Security.Membership
 			if(string.IsNullOrEmpty(filter))
 				throw new ArgumentNullException(nameof(filter));
 
+			this.MemberId = memberId;
+			this.MemberType = memberType;
+
 			_schemaId = schemaId.Trim();
 			_actionId = actionId.Trim();
 			_filter = filter.Trim();
@@ -54,6 +57,16 @@ namespace Zongsoft.Security.Membership
 		#endregion
 
 		#region 公共属性
+		public uint MemberId
+		{
+			get; set;
+		}
+
+		public MemberType MemberType
+		{
+			get; set;
+		}
+
 		public string SchemaId
 		{
 			get
@@ -101,26 +114,29 @@ namespace Zongsoft.Security.Membership
 		#endregion
 
 		#region 重写方法
+		public bool Equals(PermissionFilter other)
+		{
+			return this.MemberId == other.MemberId && this.MemberType == other.MemberType &&
+			       string.Equals(_schemaId, other._schemaId, StringComparison.OrdinalIgnoreCase) &&
+			       string.Equals(_actionId, other._actionId, StringComparison.OrdinalIgnoreCase);
+		}
+
 		public override bool Equals(object obj)
 		{
 			if(obj == null || obj.GetType() != this.GetType())
 				return false;
 
-			var other = (PermissionFilter)obj;
-
-			return string.Equals(_schemaId, other._schemaId, StringComparison.OrdinalIgnoreCase) &&
-			       string.Equals(_actionId, other._actionId, StringComparison.OrdinalIgnoreCase) &&
-			       string.Equals(_filter, other._filter, StringComparison.OrdinalIgnoreCase);
+			return this.Equals((PermissionFilter)obj);
 		}
 
 		public override int GetHashCode()
 		{
-			return (_schemaId + ":" + _actionId + ":" + _filter).ToLowerInvariant().GetHashCode();
+			return (int)this.MemberId ^ this.MemberType.GetHashCode() ^ (_schemaId + ":" + _actionId).ToLowerInvariant().GetHashCode();
 		}
 
 		public override string ToString()
 		{
-			return string.Format("{0}:{1}\r\n{2}", _schemaId, _actionId, _filter);
+			return $"{this.MemberType.ToString()}:{this.MemberId.ToString()}-{this.SchemaId}-{this.ActionId}" + Environment.NewLine + this.Filter;
 		}
 		#endregion
 	}

@@ -35,19 +35,56 @@ using System;
 
 namespace Zongsoft.Security.Membership
 {
-	public interface IUser : IMember
+	/// <summary>
+	/// 表示权限系统用户实体的接口。
+	/// </summary>
+	[Zongsoft.Data.Entity("Security.User")]
+	public interface IUser : IUserIdentity
 	{
-		uint UserId
-		{
-			get; set;
-		}
-
+		/// <summary>
+		/// 获取或设置用户的邮箱标识。
+		/// </summary>
 		string Email
 		{
 			get; set;
 		}
 
+		/// <summary>
+		/// 获取或设置用户的电话标识。
+		/// </summary>
 		string PhoneNumber
+		{
+			get; set;
+		}
+
+		/// <summary>
+		/// 获取或设置用户状态。
+		/// </summary>
+		UserStatus Status
+		{
+			get; set;
+		}
+
+		/// <summary>
+		/// 获取或设置用户状态变更时间。
+		/// </summary>
+		DateTime? StatusTimestamp
+		{
+			get; set;
+		}
+
+		/// <summary>
+		/// 获取或设置创建时间。
+		/// </summary>
+		DateTime Creation
+		{
+			get; set;
+		}
+
+		/// <summary>
+		/// 获取或设置最后修改时间。
+		/// </summary>
+		DateTime? Modification
 		{
 			get; set;
 		}

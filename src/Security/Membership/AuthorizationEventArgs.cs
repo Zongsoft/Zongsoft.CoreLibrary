@@ -74,20 +74,6 @@ namespace Zongsoft.Security.Membership
 		}
 
 		/// <summary>
-		/// 获取待授权的用户编号。
-		/// </summary>
-		public uint UserId
-		{
-			get
-			{
-				if(_principal != null && _principal.Identity != null && _principal.Identity.Credential != null)
-					return _principal.Identity.Credential.UserId;
-
-				return _userId;
-			}
-		}
-
-		/// <summary>
 		/// 获取待授权的资源标识。
 		/// </summary>
 		public string SchemaId

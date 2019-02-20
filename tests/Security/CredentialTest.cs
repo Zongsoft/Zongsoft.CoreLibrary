@@ -12,7 +12,7 @@ namespace Zongsoft.Security
 
 		public CredentialTest()
 		{
-			_credential = new Credential("10012001", new Membership.User(101, "Popeye"), "Web", TimeSpan.FromHours(4), new DateTime(2015, 5, 15));
+			_credential = new Credential("10012001", Zongsoft.Data.Entity.Build<Membership.IUser>( p => { p.UserId = 101; p.Name = "Popeye"; }), "Web", TimeSpan.FromHours(4), new DateTime(2015, 5, 15));
 			_credential.Parameters.Add("User.Avatar", ":001:");
 			_credential.Parameters.Add("User.Nickname", "钟少");
 			_credential.Parameters.Add("User.Gender", Zongsoft.Tests.Gender.Male);

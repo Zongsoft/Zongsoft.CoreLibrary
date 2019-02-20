@@ -41,17 +41,17 @@ namespace Zongsoft.Security
 		private DateTime _timestamp;
 		private DateTime _issuedTime;
 		private TimeSpan _duration;
-		private Membership.IUser _user;
+		private Membership.IUserIdentity _user;
 		private IDictionary<string, object> _parameters;
 		private Credential _innerCredential;
 		#endregion
 
 		#region 构造函数
-		public Credential(string credentialId, Membership.IUser user, string scene, TimeSpan duration) : this(credentialId, user, scene, duration, DateTime.Now, null)
+		public Credential(string credentialId, Membership.IUserIdentity user, string scene, TimeSpan duration) : this(credentialId, user, scene, duration, DateTime.Now, null)
 		{
 		}
 
-		public Credential(string credentialId, Membership.IUser user, string scene, TimeSpan duration, DateTime issuedTime, IDictionary<string, object> parameters = null)
+		public Credential(string credentialId, Membership.IUserIdentity user, string scene, TimeSpan duration, DateTime issuedTime, IDictionary<string, object> parameters = null)
 		{
 			if(string.IsNullOrWhiteSpace(credentialId))
 				throw new ArgumentNullException(nameof(credentialId));
@@ -120,7 +120,7 @@ namespace Zongsoft.Security
 		/// <summary>
 		/// 获取安全凭证对应的用户对象。
 		/// </summary>
-		public Membership.IUser User
+		public Membership.IUserIdentity User
 		{
 			get
 			{
@@ -128,22 +128,6 @@ namespace Zongsoft.Security
 					return _innerCredential.User;
 
 				return _user;
-			}
-		}
-
-		/// <summary>
-		/// 获取安全凭证对应的用户编号。
-		/// </summary>
-		[Zongsoft.Runtime.Serialization.SerializationMember(Runtime.Serialization.SerializationMemberBehavior.Ignored)]
-		public uint UserId
-		{
-			get
-			{
-				if(_innerCredential != null)
-					return _innerCredential.UserId;
-
-				var user = _user;
-				return user == null ? 0 : user.UserId;
 			}
 		}
 
@@ -287,7 +271,7 @@ namespace Zongsoft.Security
 			if(user == null)
 				return text;
 			else
-				return $"{text} <[{user.UserId.ToString()}]{user.Name}@{user.Namespace}>";
+				return $"{text} [{user.Name}@{user.Namespace}]";
 		}
 		#endregion
 	}

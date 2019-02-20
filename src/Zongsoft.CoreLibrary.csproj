@@ -375,10 +375,11 @@
     <Compile Include="Security\Membership\AuthorizationException.cs" />
     <Compile Include="Security\Membership\AuthorizationMode.cs" />
     <Compile Include="Security\Membership\AuthorizationEventArgs.cs" />
-    <Compile Include="Security\Membership\IMember.cs" />
+    <Compile Include="Security\Membership\IUserIdentity.cs" />
     <Compile Include="Security\Membership\IMemberProvider.cs" />
     <Compile Include="Security\Membership\IRole.cs" />
     <Compile Include="Security\Membership\IUser.cs" />
+    <Compile Include="Security\Membership\Member.cs" />
     <Compile Include="Security\Membership\UserIdentityType.cs" />
     <Compile Include="Security\Membership\AuthenticationResult.cs" />
     <Compile Include="Security\Membership\AuthorizationAttribute.cs" />
@@ -394,8 +395,6 @@
     <Compile Include="Security\Membership\MemberType.cs" />
     <Compile Include="Security\Membership\Permission.cs" />
     <Compile Include="Security\Membership\PermissionFilter.cs" />
-    <Compile Include="Security\Membership\Role.cs" />
-    <Compile Include="Security\Membership\User.cs" />
     <Compile Include="Security\PasswordUtility.cs" />
     <Compile Include="Security\SecretProvider.cs" />
     <Compile Include="Security\SecurityException.cs" />

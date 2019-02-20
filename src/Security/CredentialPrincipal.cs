@@ -41,17 +41,16 @@ namespace Zongsoft.Security
 
 		#region 成员字段
 		private CredentialIdentity _identity;
-		private string[] _roles;
+		private ISet<string> _roles;
 		#endregion
 
 		#region 构造函数
 		public CredentialPrincipal(CredentialIdentity identity, params string[] roles)
 		{
-			if(identity == null)
-				throw new ArgumentNullException("identity");
+			_identity = identity ?? throw new ArgumentNullException(nameof(identity));
 
-			_identity = identity;
-			_roles = roles;
+			if(roles != null && roles.Length > 0)
+				_roles = new HashSet<string>(roles, StringComparer.OrdinalIgnoreCase);
 		}
 		#endregion
 
@@ -62,6 +61,16 @@ namespace Zongsoft.Security
 			{
 				return _identity ?? CredentialIdentity.Empty;
 			}
+		}
+		#endregion
+
+		#region 公共方法
+		public bool InRole(string roleName)
+		{
+			if(string.IsNullOrEmpty(roleName) || _roles == null || _roles.Count == 0)
+				return false;
+
+			return _roles.Contains(roleName);
 		}
 		#endregion
 
@@ -76,19 +85,7 @@ namespace Zongsoft.Security
 
 		bool IPrincipal.IsInRole(string roleName)
 		{
-			if(string.IsNullOrWhiteSpace(roleName))
-				throw new ArgumentNullException("roleName");
-
-			if(_roles == null || _roles.Length < 1)
-				return false;
-
-			foreach(var role in _roles)
-			{
-				if(string.Equals(role, roleName, StringComparison.OrdinalIgnoreCase))
-					return true;
-			}
-
-			return false;
+			return this.InRole(roleName);
 		}
 		#endregion
 

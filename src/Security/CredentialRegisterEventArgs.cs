@@ -33,14 +33,14 @@ namespace Zongsoft.Security
 	public class CredentialRegisterEventArgs : EventArgs
 	{
 		#region 成员字段
-		private Membership.IUser _user;
+		private Membership.IUserIdentity _user;
 		private string _scene;
 		private Credential _credential;
 		private IDictionary<string, object> _parameters;
 		#endregion
 
 		#region 构造函数
-		public CredentialRegisterEventArgs(Membership.IUser user, string scene, IDictionary<string, object> parameters = null)
+		public CredentialRegisterEventArgs(Membership.IUserIdentity user, string scene, IDictionary<string, object> parameters = null)
 		{
 			_user = user ?? throw new ArgumentNullException(nameof(user));
 			_scene = scene;
@@ -57,7 +57,7 @@ namespace Zongsoft.Security
 		/// <summary>
 		/// 获取注册的用户对象。
 		/// </summary>
-		public Membership.IUser User
+		public Membership.IUserIdentity User
 		{
 			get
 			{

@@ -82,7 +82,6 @@
     <Compile Include="Runtime\Caching\MemoryCacheTest.cs" />
     <Compile Include="Runtime\Serialization\DictionarySerializerTest.cs" />
     <Compile Include="Security\CredentialTest.cs" />
-    <Compile Include="Security\UserTest.cs" />
     <Compile Include="Services\CommandExpressionTest.cs" />
     <Compile Include="Services\CommandTreeNodeCollectionTests.cs" />
     <Compile Include="Services\ServiceProviderTest.cs" />

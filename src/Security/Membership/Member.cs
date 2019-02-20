@@ -35,41 +35,57 @@ using System;
 
 namespace Zongsoft.Security.Membership
 {
-	/// <summary>
-	/// 表示权限系统成员（用户或角色）的接口。
-	/// </summary>
-	public interface IMember
+	[Zongsoft.Data.Entity("Security.Member")]
+	public struct Member : IEquatable<Member>
 	{
-		/// <summary>
-		/// 获取或设置成员名称。
-		/// </summary>
-		string Name
+		#region 成员字段
+		public uint RoleId;
+		public uint MemberId;
+		public MemberType MemberType;
+
+		public IRole Role;
+		public IRole MemberRole;
+		public IUser MemberUser;
+		#endregion
+
+		#region 构造函数
+		public Member(uint roleId, uint memberId, MemberType memberType)
 		{
-			get; set;
+			this.RoleId = roleId;
+			this.MemberId = memberId;
+			this.MemberType = memberType;
+
+			this.Role = null;
+			this.MemberRole = null;
+			this.MemberUser = null;
+		}
+		#endregion
+
+		#region 重写方法
+		public bool Equals(Member other)
+		{
+			return this.RoleId == other.RoleId &&
+			       this.MemberId == other.MemberId &&
+			       this.MemberType == other.MemberType;
 		}
 
-		/// <summary>
-		/// 获取或设置成员全称。
-		/// </summary>
-		string FullName
+		public override bool Equals(object obj)
 		{
-			get; set;
+			if(obj == null || obj.GetType() != this.GetType())
+				return false;
+
+			return base.Equals((Member)obj);
 		}
 
-		/// <summary>
-		/// 获取或设置成员所属的命令空间。
-		/// </summary>
-		string Namespace
+		public override int GetHashCode()
 		{
-			get; set;
+			return (int)(this.RoleId ^ this.MemberId ^ (int)this.MemberType);
 		}
 
-		/// <summary>
-		/// 获取或设置成员的描述信息。
-		/// </summary>
-		string Description
+		public override string ToString()
 		{
-			get; set;
+			return $"{this.RoleId.ToString()}-{this.MemberType.ToString()}:{this.MemberId.ToString()}";
 		}
+		#endregion
 	}
 }
