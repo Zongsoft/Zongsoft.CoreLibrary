@@ -108,7 +108,7 @@ namespace Zongsoft.Security
 		/// <returns>散列后的口令值。</returns>
 		public static byte[] HashPassword(string password, long passwordSalt, string hashAlgorithm = "SHA1")
 		{
-			return HashPassword(password, BitConverter.GetBytes(passwordSalt), hashAlgorithm);
+			return HashPassword(password, (passwordSalt == 0 ? null : BitConverter.GetBytes(passwordSalt)), hashAlgorithm);
 		}
 
 		/// <summary>
