@@ -33,6 +33,7 @@ namespace Zongsoft.Security
 	public class SecretProvider : ISecretProvider
 	{
 		#region 常量定义
+		private const string NULL_VALUE = "*";
 		private static readonly DateTime EPOCH = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 		#endregion
 
@@ -46,7 +47,7 @@ namespace Zongsoft.Security
 		public SecretProvider()
 		{
 			//设置属性的默认值
-			_expiry = TimeSpan.FromMinutes(10);
+			_expiry = TimeSpan.FromMinutes(30);
 			_period = TimeSpan.FromSeconds(60);
 		}
 
@@ -56,7 +57,7 @@ namespace Zongsoft.Security
 			_cache = cache ?? throw new ArgumentNullException(nameof(cache));
 
 			//设置属性的默认值
-			_expiry = TimeSpan.FromMinutes(10);
+			_expiry = TimeSpan.FromMinutes(30);
 			_period = TimeSpan.FromSeconds(60);
 		}
 		#endregion
@@ -138,24 +139,24 @@ namespace Zongsoft.Security
 			//修复秘密名（转换成小写并剔除收尾空格）
 			name = name.ToLowerInvariant().Trim();
 
+			//从缓存容器中获取对应的内容
+			var text = cache.GetValue<string>(name);
+
+			if(text != null)
+			{
+				//验证成功：则必须等待有效期过后才能重新生成
+				if(text.Length == 0 || text == NULL_VALUE)
+					throw new InvalidOperationException("The secret generate operation called too frequently.");
+
+				//尚未验证：则必须确保在最小时间间隔之后才能重新生成
+				if(_period > TimeSpan.Zero &&
+				   this.Unpack(text, out var cachedSecret, out var timestamp, out var cachedExtra) &&
+				   DateTime.UtcNow - timestamp < _period)
+					throw new InvalidOperationException("The secret generate operation called too frequently.");
+			}
+
 			//根据指定的模式生成或获取秘密（验证码）
 			var secret = this.GenerateSecret(name, pattern);
-
-			if(_period > TimeSpan.Zero)
-			{
-				//从缓存容器中获取对应的内容
-				var cacheValue = cache.GetValue<string>(name);
-
-				if(this.Unpack(cacheValue, out var cacheSecret, out var timestamp, out var cacheExtra))
-				{
-					if(DateTime.UtcNow - timestamp < _period)
-						throw new InvalidOperationException("The secret generate operation called too frequently.");
-
-					//重新使用原来的内容（可选）
-					secret = cacheSecret;
-					extra = cacheExtra;
-				}
-			}
 
 			//将秘密内容保存到缓存容器中（如果指定的过期时长为零则采用默认过期时长）
 			if(!cache.SetValue(name, this.Pack(secret, extra), expiry > TimeSpan.Zero ? expiry : _expiry))
@@ -193,11 +194,14 @@ namespace Zongsoft.Security
 			var cacheValue = cache.GetValue<string>(name);
 
 			//从缓存内容解析出对应的秘密值并且比对秘密内容成功
-			if(this.Unpack(cacheValue, out var cacheSecret, out var timestamp, out extra) &&
-			   string.Equals(secret, cacheSecret, StringComparison.OrdinalIgnoreCase))
+			if(this.Unpack(cacheValue, out var cachedSecret, out var timestamp, out extra) &&
+			   string.Equals(secret, cachedSecret, StringComparison.OrdinalIgnoreCase))
 			{
-				//删除缓存项
-				cache.Remove(name);
+				/*
+				 * 注意：不删除缓存项，只设置其内容为空或特定文本！ 
+				 * 因为需要利用缓存项的过期时间来判定频繁的生成验证码。
+				 */
+				cache.SetValue(name, NULL_VALUE);
 
 				//返回校验成功
 				return true;
@@ -238,43 +242,49 @@ namespace Zongsoft.Security
 			var timestamp = (ulong)(DateTime.UtcNow - EPOCH).TotalSeconds;
 
 			if(string.IsNullOrEmpty(extra))
-				return secret + ":" + timestamp.ToString();
-
-			return secret + ":" + timestamp.ToString() + "|" + extra;
+				return secret + "|" + timestamp.ToString();
+			else
+				return secret + "|" + timestamp.ToString() + "|" + extra;
 		}
 
-		protected virtual bool Unpack(string value, out string secret, out DateTime timestamp, out string extra)
+		protected virtual bool Unpack(string text, out string secret, out DateTime timestamp, out string extra)
 		{
 			secret = null;
 			extra = null;
 			timestamp = EPOCH;
 
-			if(string.IsNullOrEmpty(value))
+			if(string.IsNullOrEmpty(text))
 				return false;
 
-			//首先查找附加文本的分隔符位置
-			var index = value.IndexOf('|');
+			var index = 0;
+			var last = 0;
+			ulong number;
 
-			if(index > 0)
+			for(int i = 0; i < text.Length; i++)
 			{
-				extra = value.Substring(index + 1);
-				value = value.Substring(0, index);
+				if(text[i] == '|')
+				{
+					switch(index++)
+					{
+						case 0:
+							secret = text.Substring(0, i);
+							break;
+						case 1:
+							if(ulong.TryParse(text.Substring(last, i - last), out number))
+								timestamp = EPOCH.AddSeconds(number);
+
+							if(i < text.Length - 1)
+								extra = text.Substring(i + 1);
+
+							return true;
+					}
+
+					last = i + 1;
+				}
 			}
 
-			//继而查找生成时间戳的分隔符位置
-			index = value.LastIndexOf(':');
-
-			if(index > 0)
-			{
-				if(ulong.TryParse(value.Substring(index + 1), out var seconds) && seconds > 0)
-					timestamp = EPOCH.AddSeconds(seconds);
-
-				secret = value.Substring(0, index);
-			}
-			else
-			{
-				secret = value;
-			}
+			if(last < text.Length && ulong.TryParse(text.Substring(last), out number))
+				timestamp = EPOCH.AddSeconds(number);
 
 			return !string.IsNullOrEmpty(secret);
 		}

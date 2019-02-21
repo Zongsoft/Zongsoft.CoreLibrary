@@ -76,14 +76,14 @@ namespace Zongsoft.Security
 		/// <param name="expires">指定验证码的过期时长。</param>
 		/// <returns>返回生成成功的验证码，关于验证码的生成规则由<paramref name="pattern"/>参数定义。</returns>
 		/// <remarks>
-		///		<para>参数<paramref name="pattern"/>用来定义生成验证码的模式，如果为空(null)或空字符串则由特定实现版本自行定义（建议生成6位数字的验证码）；也可以表示生成验证码的规则，基本模式定义如下：</para>
-		///		<list type="bullet">
-		///			<item>guid|uuid，表示生成一个GUID值</item>
-		///			<item>#{number}，表示生成{number}个的数字字符，譬如：#4</item>
-		///			<item>?{number}，表示生成{number}个的含有字母或数字的字符，譬如：?8</item>
-		///			<item>*{number}，完全等同于?{number}。</item>
-		///		</list>
-		///		<para>注：如果<paramref name="pattern"/>参数不匹配模式定义，则表示其即为要生成的秘密（验证码）值，这样的固定秘密（验证码）应只由字母和数字组成，不要包含其他符号。</para>
+		/// 	<para>参数<paramref name="pattern"/>用来定义生成验证码的模式，如果为空(null)或空字符串则由特定实现版本自行定义（建议生成6位数字的验证码）；也可以表示生成验证码的规则，基本模式定义如下：</para>
+		/// 	<list type="bullet">
+		/// 		<item>guid|uuid，表示生成一个GUID值</item>
+		/// 		<item>#{number}，表示生成{number}个的数字字符，譬如：#4</item>
+		/// 		<item>?{number}，表示生成{number}个的含有字母或数字的字符，譬如：?8</item>
+		/// 		<item>*{number}，完全等同于?{number}。</item>
+		/// 	</list>
+		/// 	<para>注：如果<paramref name="pattern"/>参数不匹配模式定义，则表示其即为要生成的秘密（验证码）值，这样的固定秘密（验证码）应只由字母和数字组成，不要包含其他符号。</para>
 		/// </remarks>
 		string Generate(string name, string pattern, string extra, TimeSpan expires);
 
