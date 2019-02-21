@@ -202,7 +202,8 @@ namespace Zongsoft.Security.Membership
 		/// <param name="newPassword">重置后的新密码。</param>
 		/// <returns>如果密码重置成功则返回真(True)，否则返回假(False)。</returns>
 		/// <remarks>
-		///		<para>本重置方法通常由Web请求的方式进行，请求的URL大致如下：<c><![CDATA[http://zongsoft.com/security/user/resetpassword?userId=xxx&secret=xxxxxx]]></c></para>
+		/// 	<para>本重置方法通常由Web请求的方式进行，请求的URL大致如下：<c>
+		/// 	<![CDATA[http://zongsoft.com/security/user/resetpassword?userId=xxx&secret=xxxxxx]]></c></para>
 		/// </remarks>
 		bool ResetPassword(uint userId, string secret, string newPassword = null);
 
