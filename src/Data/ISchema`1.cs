@@ -70,5 +70,13 @@ namespace Zongsoft.Data
 		/// <param name="path">指定要移除的元素路径，路径是以句点或斜杠为分隔符而连接的成员名字符串。</param>
 		/// <returns>返回当前数据模式。</returns>
 		new ISchema<TMember> Exclude(string path);
+
+		/// <summary>
+		/// 从元素集中移除指定位置的元素。
+		/// </summary>
+		/// <param name="path">指定要移除的元素路径，路径是以句点或斜杠为分隔符而连接的成员名字符串。</param>
+		/// <param name="succeed">输出参数，指示是否被移除成功。</param>
+		/// <returns>返回当前数据模式。</returns>
+		new ISchema<TMember> Exclude(string path, out bool succeed);
 	}
 }
