@@ -1205,12 +1205,27 @@ namespace Zongsoft.Data
 			if(primaryKey == null || primaryKey.Length == 0 || primaryKey.Length != values.Length)
 				return null;
 
-			//匹配主键，故输出参数值为真
+			//匹配主键，故查询结果为单一项
 			singleton = true;
 
 			//如果主键成员只有一个则返回单个条件
 			if(primaryKey.Length == 1)
-				return Data.Condition.Equal(primaryKey[0], values[0]);
+			{
+				if(values[0] is string text && text != null && text.Length > 0)
+				{
+					var parts = text.Split(',').Select(p => p.Trim()).Where(p => p.Length > 0).ToArray();
+
+					if(parts.Length > 1)
+					{
+						singleton = false;
+						return Condition.In(primaryKey[0], parts);
+					}
+
+					return Condition.Equal(primaryKey[0], parts[0]);
+				}
+
+				return Condition.Equal(primaryKey[0], values[0]);
+			}
 
 			//创建返回的条件集（AND组合）
 			var conditions = ConditionCollection.And();
