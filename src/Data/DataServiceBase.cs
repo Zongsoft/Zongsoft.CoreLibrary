@@ -515,11 +515,11 @@ namespace Zongsoft.Data
 			//确认是否可以执行该操作
 			this.EnsureUpdate();
 
-			//修整过滤条件
-			condition = this.OnValidate(DataAccessMethod.Update, condition);
-
 			//将当前更新数据对象转换成数据字典
 			var dictionary = DataDictionary.GetDictionary<TEntity>(data);
+
+			//修整过滤条件
+			condition = this.OnValidate(DataAccessMethod.Update, condition ?? this.EnsureUpdateCondition(dictionary));
 
 			//验证待更新的数据
 			this.OnValidate(DataAccessMethod.Update, dictionary);
@@ -1279,6 +1279,23 @@ namespace Zongsoft.Data
 		private ISchema GetSchema(string expression, Type type = null)
 		{
 			return this.DataAccess.Schema.Parse(this.Name, expression, type ?? typeof(TEntity));
+		}
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		private ICondition EnsureUpdateCondition(IDataDictionary dictionary)
+		{
+			var keys = this.DataAccess.GetKey(this.Name);
+			var requires = new ICondition[keys.Length];
+
+			for(int i = 0; i < keys.Length; i++)
+			{
+				if(dictionary.TryGetValue(keys[i], out var value))
+					requires[i] = Condition.Equal(keys[i], value);
+				else
+					throw new DataException($"No required primary key field value is specified for the update '{this.Name}' entity data.");
+			}
+
+			return requires.Length > 1 ? ConditionCollection.And(requires) : requires[0];
 		}
 
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
