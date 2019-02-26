@@ -114,9 +114,9 @@ namespace Zongsoft.Data
 		/// 从元素集中移除指定位置的元素。
 		/// </summary>
 		/// <param name="path">指定要移除的元素路径，路径是以句点或斜杠为分隔符而连接的成员名字符串。</param>
-		/// <param name="succeed">输出参数，指示是否被移除成功。</param>
-		/// <returns>返回当前数据模式。</returns>
-		ISchema Exclude(string path, out bool succeed);
+		/// <param name="member">输出参数，如果排除成功则返回被排除的模式成员。</param>
+		/// <returns>返回一个值指示是否排除成功，如果为真(True)则表示成功，否则为失败。</returns>
+		bool Exclude(string path, out SchemaMemberBase member);
 		#endregion
 	}
 }
