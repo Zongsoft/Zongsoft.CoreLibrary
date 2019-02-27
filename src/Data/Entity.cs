@@ -530,6 +530,7 @@ namespace Zongsoft.Data
 					property.SetSetMethod(setter);
 					generator = setter.GetILGenerator();
 					var exit = generator.DefineLabel();
+					MethodInfo extensionMethod = null;
 
 					if(metadata == null || metadata.Mode == PropertyImplementationMode.Default)
 					{
@@ -541,9 +542,10 @@ namespace Zongsoft.Data
 					}
 					else if(metadata.Mode == PropertyImplementationMode.Extension)
 					{
-						var method = metadata.Type.GetMethod("Set" + properties[i].Name, BindingFlags.Public | BindingFlags.Static, null, new Type[] { properties[i].DeclaringType, properties[i].PropertyType }, null);
+						extensionMethod = metadata.Type.GetMethod("Set" + properties[i].Name, BindingFlags.Public | BindingFlags.Static, null, new Type[] { properties[i].DeclaringType, properties[i].PropertyType, properties[i].PropertyType, properties[i].PropertyType.MakeByRefType() }, null) ??
+						                  metadata.Type.GetMethod("Set" + properties[i].Name, BindingFlags.Public | BindingFlags.Static, null, new Type[] { properties[i].DeclaringType, properties[i].PropertyType, properties[i].PropertyType.MakeByRefType() }, null);
 
-						if(method == null)
+						if(extensionMethod == null)
 						{
 							if(propertyChangedField != null)
 							{
@@ -553,12 +555,35 @@ namespace Zongsoft.Data
 						}
 						else
 						{
-							if(method.ReturnType != typeof(bool))
-								throw new InvalidOperationException($"Invalid '{method}' extension method, it's return type must be boolean type.");
+							if(extensionMethod.ReturnType != typeof(bool))
+								throw new InvalidOperationException($"Invalid '{extensionMethod}' extension method, it's return type must be boolean type.");
 
+							//定义扩展方法的输出参数类型(即当前属性类型)的本地变量
+							generator.DeclareLocal(properties[i].PropertyType);
+
+							//加载扩展方法的第一个参数值(this)
 							generator.Emit(OpCodes.Ldarg_0);
+
+							//加载扩展方法的第二个参数值(_memberField)
+							if(extensionMethod.GetParameters().Length == 4)
+							{
+								if(field == null)
+									LoadDefaultValue(generator, properties[i].PropertyType);
+								else
+								{
+									generator.Emit(OpCodes.Ldarg_0);
+									generator.Emit(OpCodes.Ldfld, field);
+								}
+							}
+
+							//加载扩展方法的第二或第三哥参数值(value)
 							generator.Emit(OpCodes.Ldarg_1);
-							generator.Emit(OpCodes.Call, method);
+
+							//加载扩展方法的最后一个参数（输出参数）
+							generator.Emit(OpCodes.Ldloca_S, 0);
+
+							//调用扩展方法
+							generator.Emit(OpCodes.Call, extensionMethod);
 							generator.Emit(OpCodes.Brfalse_S, exit);
 						}
 					}
@@ -570,7 +595,12 @@ namespace Zongsoft.Data
 					}
 
 					generator.Emit(OpCodes.Ldarg_0);
-					generator.Emit(OpCodes.Ldarg_1);
+
+					if(extensionMethod != null)
+						generator.Emit(OpCodes.Ldloc_0);
+					else
+						generator.Emit(OpCodes.Ldarg_1);
+
 					generator.Emit(OpCodes.Stfld, field);
 
 					if(countWritable <= 64)
