@@ -10,10 +10,17 @@ namespace Zongsoft.Samples.Entities.Models
 			return value;
 		}
 
-		//public static bool SetAvatar(IUserEntity user, string value)
-		//{
-		//	return true;
-		//}
+		public static bool SetAvatar(IUserEntity user, string value, out string result)
+		{
+			result = value;
+			return true;
+		}
+
+		public static bool SetAvatar(IUserEntity user, string oldValue, string newValue, out string result)
+		{
+			result = newValue;
+			return true;
+		}
 
 		public static string GetAvatarUrl(IUserEntity user, string value = null)
 		{

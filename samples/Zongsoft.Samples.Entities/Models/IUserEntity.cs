@@ -29,7 +29,7 @@ namespace Zongsoft.Samples.Entities.Models
 			get; set;
 		}
 
-		//[Zongsoft.Data.Entity.Property(Data.Entity.PropertyImplementationMode.Extension, typeof(UserExtension))]
+		[Zongsoft.Data.Entity.Property(Data.Entity.PropertyImplementationMode.Extension, typeof(UserExtension))]
 		string Avatar
 		{
 			get; set;

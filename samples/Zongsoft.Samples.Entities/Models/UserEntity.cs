@@ -131,8 +131,11 @@ namespace Zongsoft.Samples.Entities.Models
 			get => _avatar;
 			set
 			{
-				_avatar = value;
-				_MASK_ |= 64;
+				if(UserExtension.SetAvatar(this, _avatar, value, out var result))
+				{
+					_avatar = result;
+					_MASK_ |= 64;
+				}
 			}
 		}
 
