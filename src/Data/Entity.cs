@@ -1047,7 +1047,6 @@ namespace Zongsoft.Data
 			var BODY_LABEL = generator.DefineLabel();
 			var LOOP_BODY_LABEL = generator.DefineLabel();
 			var LOOP_TEST_LABEL = generator.DefineLabel();
-			var LOOP_INITIATE_LABEL = generator.DefineLabel();
 			var LOOP_INCREASE_LABEL = generator.DefineLabel();
 
 			//定义本地变量(count)
@@ -1064,9 +1063,6 @@ namespace Zongsoft.Data
 				//定义本地变量(i)，即for循环
 				generator.DeclareLocal(typeof(int));
 
-				//循环初始化
-				generator.MarkLabel(LOOP_INITIATE_LABEL);
-
 				//for(i=0; ...)
 				generator.Emit(OpCodes.Ldc_I4_0);
 				generator.Emit(OpCodes.Stloc_2);
@@ -1075,7 +1071,7 @@ namespace Zongsoft.Data
 				//循环内容区开始
 				generator.MarkLabel(LOOP_BODY_LABEL);
 
-				//mark=_MASK_[i];
+				//mark=$MASK$[i];
 				generator.Emit(OpCodes.Ldarg_0);
 				generator.Emit(OpCodes.Ldfld, mask);
 				generator.Emit(OpCodes.Ldloc_2);
@@ -1091,27 +1087,27 @@ namespace Zongsoft.Data
 				//定义本地变量(mask)
 				generator.DeclareLocal(mask.FieldType);
 
-				//mark=_MASK_;
+				//mark=$MASK$;
 				generator.Emit(OpCodes.Ldarg_0);
 				generator.Emit(OpCodes.Ldfld, mask);
 				generator.Emit(OpCodes.Stloc_1);
 
-				//if(_MASK_ == 0) return count;
+				//if($MASK$ == 0) return count;
 				generator.Emit(OpCodes.Ldloc_1);
 				generator.Emit(OpCodes.Brtrue_S, BODY_LABEL);
 
 				generator.Emit(OpCodes.Ldc_I4_0);
 				generator.Emit(OpCodes.Ret);
+
+				generator.MarkLabel(BODY_LABEL);
 			}
 
-			generator.MarkLabel(BODY_LABEL);
-
-			var length = 4;//GetMaskLength(mask);
+			var length = GetMaskLength(mask);
 			var labels = new Label[length - 1];
 
 			for(int i = 0; i < length; i++)
 			{
-				var value = Math.Pow(2, i);
+				var number = Math.Pow(2, i);
 
 				if(i < length - 1)
 					labels[i] = generator.DefineLabel();
@@ -1121,44 +1117,10 @@ namespace Zongsoft.Data
 
 				//if((mask & X) == X)
 				generator.Emit(OpCodes.Ldloc_1);
-				//generator.Emit(length == 64 ? OpCodes.Ldc_I8 : OpCodes.Ldc_I4, value);
-				if(length == 64)
-					generator.Emit(OpCodes.Ldc_I8, (long)value);
-				else if(length == 16)
-				{
-					generator.Emit(OpCodes.Ldc_I4, (short)value);
-					generator.Emit(OpCodes.Conv_U2);
-				}
-				else if(length == 8)
-				{
-					generator.Emit(OpCodes.Ldc_I4, (byte)value);
-					generator.Emit(OpCodes.Conv_U1);
-				}
-				else
-					generator.Emit(OpCodes.Ldc_I4, (int)value);
+				EmitLoadInteger(generator, length, number);
 				generator.Emit(OpCodes.And);
-				//generator.Emit(length == 64 ? OpCodes.Ldc_I8 : OpCodes.Ldc_I4, value);
-				if(length == 64)
-					generator.Emit(OpCodes.Ldc_I8, (long)value);
-				else if(length == 16)
-				{
-					generator.Emit(OpCodes.Ldc_I4, (short)value);
-					generator.Emit(OpCodes.Conv_U2);
-				}
-				else if(length == 8)
-				{
-					generator.Emit(OpCodes.Ldc_I4, (byte)value);
-					generator.Emit(OpCodes.Conv_U1);
-				}
-				else
-					generator.Emit(OpCodes.Ldc_I4, (int)value);
-				//generator.Emit(OpCodes.Bne_Un, i < length - 1 ? labels[i] : (mask.FieldType.IsArray ? LOOP_INCREASE_LABEL : EXIT_LABEL));
-				if(i < length - 1)
-					generator.Emit(OpCodes.Bne_Un_S, labels[i]);
-				else if(mask.FieldType.IsArray)
-					generator.Emit(OpCodes.Bne_Un_S, LOOP_INCREASE_LABEL);
-				else
-					generator.Emit(OpCodes.Bne_Un_S, EXIT_LABEL);
+				EmitLoadInteger(generator, length, number);
+				generator.Emit(OpCodes.Bne_Un_S, i < length - 1 ? labels[i] : (mask.FieldType.IsArray ? LOOP_INCREASE_LABEL : EXIT_LABEL));
 
 				//count++;
 				generator.Emit(OpCodes.Ldloc_0);
@@ -1187,8 +1149,8 @@ namespace Zongsoft.Data
 				generator.Emit(OpCodes.Conv_I4);
 				generator.Emit(OpCodes.Blt_S, LOOP_BODY_LABEL);
 			}
-
-			generator.MarkLabel(EXIT_LABEL);
+			else
+				generator.MarkLabel(EXIT_LABEL);
 
 			//return count;
 			generator.Emit(OpCodes.Ldloc_0);
@@ -2085,6 +2047,35 @@ namespace Zongsoft.Data
 				generator.Emit(OpCodes.Initobj, type);
 			else
 				generator.Emit(OpCodes.Ldnull);
+		}
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		private static void EmitLoadInteger(ILGenerator generator, int bits, double number)
+		{
+			switch(bits)
+			{
+				case 64:
+					if((ulong)number > 0x7F_FF_FF_FF_FF_FF_FF_FF)
+					{
+						generator.Emit(OpCodes.Ldc_R8, number);
+						generator.Emit(OpCodes.Conv_U8);
+					}
+					else
+						generator.Emit(OpCodes.Ldc_I8, (long)number);
+					break;
+				case 16:
+					generator.Emit(OpCodes.Ldc_I4, (ushort)number);
+					break;
+				case 8:
+					if(number > 0x7F)
+						generator.Emit(OpCodes.Ldc_I4, (int)number);
+					else
+						generator.Emit(OpCodes.Ldc_I4_S, (byte)number);
+					break;
+				default:
+					generator.Emit(OpCodes.Ldc_I4, (uint)number);
+					break;
+			}
 		}
 
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]

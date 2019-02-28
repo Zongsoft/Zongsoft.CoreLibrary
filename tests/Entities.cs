@@ -751,6 +751,11 @@ namespace Zongsoft.Tests
 		#endregion
 
 		#region 接口实现
+		public int Count()
+		{
+			return 0;
+		}
+
 		bool Zongsoft.Data.IEntity.HasChanges(params string[] names)
 		{
 			return this.HasChanges(names);
@@ -1893,6 +1898,11 @@ namespace Zongsoft.Tests
 		#endregion
 
 		#region 接口实现
+		public int Count()
+		{
+			return 0;
+		}
+
 		bool Zongsoft.Data.IEntity.HasChanges(params string[] names)
 		{
 			PropertyToken<SpecialEmployee> property;
