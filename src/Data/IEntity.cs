@@ -42,19 +42,24 @@ namespace Zongsoft.Data
 	public interface IEntity
 	{
 		/*
-		 * int Count();
 		 * bool Reset(string name);
 		 * bool Reset(string name, out object value);
 		 * bool Reset(params string[] names);
 		 */
 
 		/// <summary>
+		/// 获取实体中变更的属性数。
+		/// </summary>
+		/// <returns>返回变更的属性数。</returns>
+		int Count();
+
+		/// <summary>
 		/// 判断指定的属性或任意属性是否被变更过。
 		/// </summary>
 		/// <param name="names">指定要判断的属性名数组，如果为空或空数组则表示判断任意属性。</param>
 		/// <returns>
-		///		<para>如果指定的<paramref name="names"/>参数有值，当只有参数中指定的属性发生过更改则返回真(True)，否则返回假(False)；</para>
-		///		<para>如果指定的<paramref name="names"/>参数为空(null)或空数组，当实体中任意属性发生过更改则返回真(True)，否则返回假(False)。</para>
+		/// 	<para>如果指定的<paramref name="names"/>参数有值，当只有参数中指定的属性发生过更改则返回真(True)，否则返回假(False)；</para>
+		/// 	<para>如果指定的<paramref name="names"/>参数为空(null)或空数组，当实体中任意属性发生过更改则返回真(True)，否则返回假(False)。</para>
 		/// </returns>
 		bool HasChanges(params string[] names);
 

@@ -235,6 +235,9 @@ namespace Zongsoft.Data
 			//生成静态构造函数
 			GenerateTypeInitializer(builder, properties, methods, out var names, out var tokens);
 
+			//生成“Count”方法
+			GenerateCountMethod(builder, mask);
+
 			//生成“HasChanges”方法
 			GenerateHasChangesMethod(builder, mask, names, tokens);
 
@@ -576,10 +579,10 @@ namespace Zongsoft.Data
 								}
 							}
 
-							//加载扩展方法的第二或第三哥参数值(value)
+							//加载扩展方法的第二或第三个参数值(value)
 							generator.Emit(OpCodes.Ldarg_1);
 
-							//加载扩展方法的最后一个参数（输出参数）
+							//加载扩展方法的最后一个输出参数(out result)
 							generator.Emit(OpCodes.Ldloca_S, 0);
 
 							//调用扩展方法
@@ -1026,15 +1029,204 @@ namespace Zongsoft.Data
 			}
 		}
 
+		private static void GenerateCountMethod(TypeBuilder builder, FieldBuilder mask)
+		{
+			var method = builder.DefineMethod(typeof(Zongsoft.Data.IEntity).FullName + "." + nameof(IEntity.Count),
+				MethodAttributes.Private | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.NewSlot,
+				typeof(int),
+				Type.EmptyTypes);
+
+			//添加方法的实现标记
+			builder.DefineMethodOverride(method, typeof(Zongsoft.Data.IEntity).GetMethod(nameof(IEntity.Count)));
+
+			//获取代码生成器
+			var generator = method.GetILGenerator();
+
+			//定义标签
+			var EXIT_LABEL = generator.DefineLabel();
+			var BODY_LABEL = generator.DefineLabel();
+			var LOOP_BODY_LABEL = generator.DefineLabel();
+			var LOOP_TEST_LABEL = generator.DefineLabel();
+			var LOOP_INITIATE_LABEL = generator.DefineLabel();
+			var LOOP_INCREASE_LABEL = generator.DefineLabel();
+
+			//定义本地变量(count)
+			generator.DeclareLocal(typeof(int));
+
+			//count = 0;
+			generator.Emit(OpCodes.Ldc_I4_0);
+			generator.Emit(OpCodes.Stloc_0);
+
+			if(mask.FieldType.IsArray)
+			{
+				//定义本地变量(mask)
+				generator.DeclareLocal(typeof(byte));
+				//定义本地变量(i)，即for循环
+				generator.DeclareLocal(typeof(int));
+
+				//循环初始化
+				generator.MarkLabel(LOOP_INITIATE_LABEL);
+
+				//for(i=0; ...)
+				generator.Emit(OpCodes.Ldc_I4_0);
+				generator.Emit(OpCodes.Stloc_2);
+				generator.Emit(OpCodes.Br_S, LOOP_TEST_LABEL);
+
+				//循环内容区开始
+				generator.MarkLabel(LOOP_BODY_LABEL);
+
+				//mark=_MASK_[i];
+				generator.Emit(OpCodes.Ldarg_0);
+				generator.Emit(OpCodes.Ldfld, mask);
+				generator.Emit(OpCodes.Ldloc_2);
+				generator.Emit(OpCodes.Ldelem_U1);
+				generator.Emit(OpCodes.Stloc_1);
+
+				//if(mark==0) continue;
+				generator.Emit(OpCodes.Ldloc_1);
+				generator.Emit(OpCodes.Brfalse_S, LOOP_INCREASE_LABEL);
+			}
+			else
+			{
+				//定义本地变量(mask)
+				generator.DeclareLocal(mask.FieldType);
+
+				//mark=_MASK_;
+				generator.Emit(OpCodes.Ldarg_0);
+				generator.Emit(OpCodes.Ldfld, mask);
+				generator.Emit(OpCodes.Stloc_1);
+
+				//if(_MASK_ == 0) return count;
+				generator.Emit(OpCodes.Ldloc_1);
+				generator.Emit(OpCodes.Brtrue_S, BODY_LABEL);
+
+				generator.Emit(OpCodes.Ldc_I4_0);
+				generator.Emit(OpCodes.Ret);
+			}
+
+			generator.MarkLabel(BODY_LABEL);
+
+			var length = 4;//GetMaskLength(mask);
+			var labels = new Label[length - 1];
+
+			for(int i = 0; i < length; i++)
+			{
+				var value = Math.Pow(2, i);
+
+				if(i < length - 1)
+					labels[i] = generator.DefineLabel();
+
+				if(i > 0)
+					generator.MarkLabel(labels[i - 1]);
+
+				//if((mask & X) == X)
+				generator.Emit(OpCodes.Ldloc_1);
+				//generator.Emit(length == 64 ? OpCodes.Ldc_I8 : OpCodes.Ldc_I4, value);
+				if(length == 64)
+					generator.Emit(OpCodes.Ldc_I8, (long)value);
+				else if(length == 16)
+				{
+					generator.Emit(OpCodes.Ldc_I4, (short)value);
+					generator.Emit(OpCodes.Conv_U2);
+				}
+				else if(length == 8)
+				{
+					generator.Emit(OpCodes.Ldc_I4, (byte)value);
+					generator.Emit(OpCodes.Conv_U1);
+				}
+				else
+					generator.Emit(OpCodes.Ldc_I4, (int)value);
+				generator.Emit(OpCodes.And);
+				//generator.Emit(length == 64 ? OpCodes.Ldc_I8 : OpCodes.Ldc_I4, value);
+				if(length == 64)
+					generator.Emit(OpCodes.Ldc_I8, (long)value);
+				else if(length == 16)
+				{
+					generator.Emit(OpCodes.Ldc_I4, (short)value);
+					generator.Emit(OpCodes.Conv_U2);
+				}
+				else if(length == 8)
+				{
+					generator.Emit(OpCodes.Ldc_I4, (byte)value);
+					generator.Emit(OpCodes.Conv_U1);
+				}
+				else
+					generator.Emit(OpCodes.Ldc_I4, (int)value);
+				//generator.Emit(OpCodes.Bne_Un, i < length - 1 ? labels[i] : (mask.FieldType.IsArray ? LOOP_INCREASE_LABEL : EXIT_LABEL));
+				if(i < length - 1)
+					generator.Emit(OpCodes.Bne_Un_S, labels[i]);
+				else if(mask.FieldType.IsArray)
+					generator.Emit(OpCodes.Bne_Un_S, LOOP_INCREASE_LABEL);
+				else
+					generator.Emit(OpCodes.Bne_Un_S, EXIT_LABEL);
+
+				//count++;
+				generator.Emit(OpCodes.Ldloc_0);
+				generator.Emit(OpCodes.Ldc_I4_1);
+				generator.Emit(OpCodes.Add);
+				generator.Emit(OpCodes.Stloc_0);
+			}
+
+			if(mask.FieldType.IsArray)
+			{
+				generator.MarkLabel(LOOP_INCREASE_LABEL);
+
+				//for(...; ...; i++)
+				generator.Emit(OpCodes.Ldloc_2);
+				generator.Emit(OpCodes.Ldc_I4_1);
+				generator.Emit(OpCodes.Add);
+				generator.Emit(OpCodes.Stloc_2);
+
+				generator.MarkLabel(LOOP_TEST_LABEL);
+
+				//for(...; i<_MASK_.Length; ...)
+				generator.Emit(OpCodes.Ldloc_2);
+				generator.Emit(OpCodes.Ldarg_0);
+				generator.Emit(OpCodes.Ldfld, mask);
+				generator.Emit(OpCodes.Ldlen);
+				generator.Emit(OpCodes.Conv_I4);
+				generator.Emit(OpCodes.Blt_S, LOOP_BODY_LABEL);
+			}
+
+			generator.MarkLabel(EXIT_LABEL);
+
+			//return count;
+			generator.Emit(OpCodes.Ldloc_0);
+			generator.Emit(OpCodes.Ret);
+
+			int GetMaskLength(FieldInfo maskField)
+			{
+				var type = maskField.FieldType.IsArray? maskField.FieldType.GetElementType() : maskField.FieldType;
+
+				switch(Type.GetTypeCode(type))
+				{
+					case TypeCode.Byte:
+					case TypeCode.SByte:
+						return 8;
+					case TypeCode.Int16:
+					case TypeCode.UInt16:
+						return 16;
+					case TypeCode.Int32:
+					case TypeCode.UInt32:
+						return 32;
+					case TypeCode.Int64:
+					case TypeCode.UInt64:
+						return 64;
+				}
+
+				return 0;
+			}
+		}
+
 		private static void GenerateHasChangesMethod(TypeBuilder builder, FieldBuilder mask, FieldBuilder names, FieldBuilder tokens)
 		{
-			var method = builder.DefineMethod(typeof(Zongsoft.Data.IEntity).FullName + ".HasChanges",
+			var method = builder.DefineMethod(typeof(Zongsoft.Data.IEntity).FullName + "." + nameof(IEntity.HasChanges),
 				MethodAttributes.Private | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.NewSlot,
 				typeof(bool),
 				new Type[] { typeof(string[]) });
 
 			//添加方法的实现标记
-			builder.DefineMethodOverride(method, typeof(Zongsoft.Data.IEntity).GetMethod("HasChanges"));
+			builder.DefineMethodOverride(method, typeof(Zongsoft.Data.IEntity).GetMethod(nameof(IEntity.HasChanges)));
 
 			//定义方法参数
 			method.DefineParameter(1, ParameterAttributes.None, "names");
@@ -1215,13 +1407,13 @@ namespace Zongsoft.Data
 
 		private static void GenerateGetChangesMethod(TypeBuilder builder, FieldBuilder mask, FieldBuilder names, FieldBuilder tokens)
 		{
-			var method = builder.DefineMethod(typeof(Zongsoft.Data.IEntity).FullName + ".GetChanges",
+			var method = builder.DefineMethod(typeof(Zongsoft.Data.IEntity).FullName + "." + nameof(IEntity.GetChanges),
 				MethodAttributes.Private | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.NewSlot,
 				typeof(IDictionary<string, object>),
 				Type.EmptyTypes);
 
 			//添加方法的实现标记
-			builder.DefineMethodOverride(method, typeof(Zongsoft.Data.IEntity).GetMethod("GetChanges"));
+			builder.DefineMethodOverride(method, typeof(Zongsoft.Data.IEntity).GetMethod(nameof(IEntity.GetChanges)));
 
 			//获取代码生成器
 			var generator = method.GetILGenerator();
@@ -1360,13 +1552,13 @@ namespace Zongsoft.Data
 
 		private static void GenerateTryGetValueMethod(TypeBuilder builder, FieldBuilder mask, FieldBuilder tokens)
 		{
-			var method = builder.DefineMethod(typeof(Zongsoft.Data.IEntity).FullName + ".TryGetValue",
+			var method = builder.DefineMethod(typeof(Zongsoft.Data.IEntity).FullName + "." + nameof(IEntity.TryGetValue),
 				MethodAttributes.Private | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.NewSlot,
 				typeof(bool),
 				new Type[] { typeof(string), typeof(object).MakeByRefType() });
 
 			//添加方法的实现标记
-			builder.DefineMethodOverride(method, typeof(Zongsoft.Data.IEntity).GetMethod("TryGetValue"));
+			builder.DefineMethodOverride(method, typeof(Zongsoft.Data.IEntity).GetMethod(nameof(IEntity.TryGetValue)));
 
 			//定义方法参数
 			method.DefineParameter(1, ParameterAttributes.None, "name");
@@ -1461,13 +1653,13 @@ namespace Zongsoft.Data
 
 		private static void GenerateTrySetValueMethod(TypeBuilder builder, FieldBuilder tokens)
 		{
-			var method = builder.DefineMethod(typeof(Zongsoft.Data.IEntity).FullName + ".TrySetValue",
+			var method = builder.DefineMethod(typeof(Zongsoft.Data.IEntity).FullName + "." + nameof(IEntity.TrySetValue),
 				MethodAttributes.Private | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.NewSlot,
 				typeof(bool),
 				new Type[] { typeof(string), typeof(object) });
 
 			//添加方法的实现标记
-			builder.DefineMethodOverride(method, typeof(Zongsoft.Data.IEntity).GetMethod("TrySetValue"));
+			builder.DefineMethodOverride(method, typeof(Zongsoft.Data.IEntity).GetMethod(nameof(IEntity.TrySetValue)));
 
 			//定义方法参数
 			method.DefineParameter(1, ParameterAttributes.None, "name");
