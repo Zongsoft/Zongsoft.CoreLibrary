@@ -238,6 +238,9 @@ namespace Zongsoft.Data
 			//生成“Count”方法
 			GenerateCountMethod(builder, mask);
 
+			//生成“Reset”方法
+			GenerateResetMethod(builder, mask, tokens);
+
 			//生成“HasChanges”方法
 			GenerateHasChangesMethod(builder, mask, names, tokens);
 
@@ -1180,6 +1183,85 @@ namespace Zongsoft.Data
 			}
 		}
 
+		private static void GenerateResetMethod(TypeBuilder builder, FieldBuilder mask, FieldBuilder tokens)
+		{
+			var method = builder.DefineMethod(typeof(Zongsoft.Data.IEntity).FullName + "." + nameof(IEntity.Reset),
+				MethodAttributes.Private | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.NewSlot,
+				null,
+				new Type[] { typeof(string[]) });
+
+			//添加方法的实现标记
+			builder.DefineMethodOverride(method, typeof(Zongsoft.Data.IEntity).GetMethod(nameof(IEntity.Reset)));
+
+			//定义方法参数
+			method.DefineParameter(1, ParameterAttributes.None, "names").SetCustomAttribute(typeof(ParamArrayAttribute).GetConstructor(Type.EmptyTypes), new byte[0]);
+
+			//获取代码生成器
+			var generator = method.GetILGenerator();
+
+			//定义标签
+			var EXIT_LABEL = generator.DefineLabel();
+			var MASKING_LABEL = generator.DefineLabel();
+			var LOOP_INITIATE_LABEL = generator.DefineLabel();
+			var LOOP_INCREASE_LABEL = generator.DefineLabel();
+			var LOOP_BODY_LABEL = generator.DefineLabel();
+			var LOOP_TEST_LABEL = generator.DefineLabel();
+
+			//声明本地变量
+			generator.DeclareLocal(PROPERTY_TOKEN_TYPE);
+			generator.DeclareLocal(typeof(int));
+
+			generator.Emit(OpCodes.Ldarg_1);
+			generator.Emit(OpCodes.Brfalse_S, EXIT_LABEL);
+
+			generator.Emit(OpCodes.Ldarg_1);
+			generator.Emit(OpCodes.Ldlen);
+			generator.Emit(OpCodes.Brtrue_S, LOOP_INITIATE_LABEL);
+
+			generator.MarkLabel(EXIT_LABEL);
+
+			if(mask.FieldType.IsArray)
+			{
+				generator.Emit(OpCodes.Ldc_I4_0);
+				generator.Emit(OpCodes.Stloc_1);
+
+				//$MASK[i]=0;
+				generator.MarkLabel(LOOP_BODY_LABEL);
+				generator.Emit(OpCodes.Ldarg_0);
+				generator.Emit(OpCodes.Ldfld, mask);
+				generator.Emit(OpCodes.Ldloc_1);
+				generator.Emit(OpCodes.Ldc_I4_0);
+				generator.Emit(OpCodes.Stelem_I1);
+
+				//for(;;i++)
+				generator.MarkLabel(LOOP_INCREASE_LABEL);
+				generator.Emit(OpCodes.Ldloc_1);
+				generator.Emit(OpCodes.Ldc_I4_1);
+				generator.Emit(OpCodes.Add);
+				generator.Emit(OpCodes.Stloc_1);
+
+				//for(;i<$MASK.Length$;)
+				generator.MarkLabel(LOOP_TEST_LABEL);
+				generator.Emit(OpCodes.Ldloc_1);
+				generator.Emit(OpCodes.Ldarg_0);
+				generator.Emit(OpCodes.Ldfld, mask);
+				generator.Emit(OpCodes.Ldlen);
+				generator.Emit(OpCodes.Conv_I4);
+				generator.Emit(OpCodes.Blt_S, LOOP_BODY_LABEL);
+			}
+			else
+			{
+				generator.Emit(OpCodes.Ldarg_0);
+				generator.Emit(OpCodes.Ldc_I4_0);
+				generator.Emit(OpCodes.Stfld, mask);
+				generator.Emit(OpCodes.Ret);
+			}
+
+			generator.MarkLabel(LOOP_INITIATE_LABEL);
+
+			generator.Emit(OpCodes.Ret);
+		}
+
 		private static void GenerateHasChangesMethod(TypeBuilder builder, FieldBuilder mask, FieldBuilder names, FieldBuilder tokens)
 		{
 			var method = builder.DefineMethod(typeof(Zongsoft.Data.IEntity).FullName + "." + nameof(IEntity.HasChanges),
@@ -2068,12 +2150,21 @@ namespace Zongsoft.Data
 					break;
 				case 8:
 					if(number > 0x7F)
-						generator.Emit(OpCodes.Ldc_I4, (int)number);
+					{
+						generator.Emit(OpCodes.Ldc_I4_S, (byte)number);
+						generator.Emit(OpCodes.Conv_U1);
+					}
 					else
 						generator.Emit(OpCodes.Ldc_I4_S, (byte)number);
 					break;
 				default:
-					generator.Emit(OpCodes.Ldc_I4, (uint)number);
+					if(number > 0x7F_FF_FF_FF)
+					{
+						generator.Emit(OpCodes.Ldc_I8, (long)number);
+						generator.Emit(OpCodes.Conv_U4);
+					}
+					else
+						generator.Emit(OpCodes.Ldc_I4, (uint)number);
 					break;
 			}
 		}
