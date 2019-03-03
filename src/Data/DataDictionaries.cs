@@ -267,6 +267,24 @@ namespace Zongsoft.Data
 			return false;
 		}
 
+		public bool Reset(string name, out object value)
+		{
+			value = null;
+
+			if(name != null && _dictionary.Contains(name))
+			{
+				try
+				{
+					value = _dictionary[name];
+					_dictionary.Remove(name);
+					return true;
+				}
+				catch {}
+			}
+
+			return false;
+		}
+
 		public void Reset(params string[] names)
 		{
 			if(names == null || names.Length == 0)
@@ -627,9 +645,17 @@ namespace Zongsoft.Data
 			return this.Contains(Common.ExpressionUtility.GetMemberName(expression));
 		}
 
-		public void Reset<TMember>(Expression<Func<T, TMember>> expression)
+		public bool Reset<TValue>(Expression<Func<T, TValue>> expression, out TValue value)
 		{
-			this.Reset(Common.ExpressionUtility.GetMemberName(expression));
+			value = default(TValue);
+
+			if(this.Reset(Common.ExpressionUtility.GetMemberName(expression), out var result))
+			{
+				value = (TValue)result;
+				return true;
+			}
+
+			return false;
 		}
 
 		public TValue GetValue<TValue>(Expression<Func<T, TValue>> expression)
@@ -736,6 +762,16 @@ namespace Zongsoft.Data
 				if(_dictionary.ContainsKey(name))
 					return true;
 			}
+
+			return false;
+		}
+
+		public bool Reset(string name, out object value)
+		{
+			value = null;
+
+			if(name != null && _dictionary.TryGetValue(name, out value))
+				return _dictionary.Remove(name);
 
 			return false;
 		}
@@ -1057,9 +1093,17 @@ namespace Zongsoft.Data
 			return this.Contains(Common.ExpressionUtility.GetMemberName(expression));
 		}
 
-		public void Reset<TMember>(Expression<Func<T, TMember>> expression)
+		public bool Reset<TValue>(Expression<Func<T, TValue>> expression, out TValue value)
 		{
-			this.Reset(Common.ExpressionUtility.GetMemberName(expression));
+			value = default(TValue);
+
+			if(this.Reset(Common.ExpressionUtility.GetMemberName(expression), out var result))
+			{
+				value = (TValue)result;
+				return true;
+			}
+
+			return false;
 		}
 
 		public TValue GetValue<TValue>(Expression<Func<T, TValue>> expression)
@@ -1177,6 +1221,11 @@ namespace Zongsoft.Data
 		}
 
 		public bool HasChanges(params string[] names)
+		{
+			throw new NotImplementedException();
+		}
+
+		public bool Reset(string name, out object value)
 		{
 			throw new NotImplementedException();
 		}
@@ -1446,9 +1495,17 @@ namespace Zongsoft.Data
 			return this.Contains(Common.ExpressionUtility.GetMemberName(expression));
 		}
 
-		public void Reset<TMember>(Expression<Func<T, TMember>> expression)
+		public bool Reset<TValue>(Expression<Func<T, TValue>> expression, out TValue value)
 		{
-			this.Reset(Common.ExpressionUtility.GetMemberName(expression));
+			value = default(TValue);
+
+			if(this.Reset(Common.ExpressionUtility.GetMemberName(expression), out var result))
+			{
+				value = (TValue)result;
+				return true;
+			}
+
+			return false;
 		}
 
 		public TValue GetValue<TValue>(Expression<Func<T, TValue>> expression)
@@ -1526,7 +1583,7 @@ namespace Zongsoft.Data
 		{
 			get
 			{
-				return _entity.GetChanges().Count;
+				return _entity.Count();
 			}
 		}
 
@@ -1570,9 +1627,14 @@ namespace Zongsoft.Data
 			return _entity.HasChanges(names);
 		}
 
+		public bool Reset(string name, out object value)
+		{
+			return _entity.Reset(name, out value);
+		}
+
 		public void Reset(params string[] names)
 		{
-			throw new NotImplementedException();
+			_entity.Reset(names);
 		}
 
 		public object GetValue(string name)
@@ -1882,9 +1944,17 @@ namespace Zongsoft.Data
 			return this.Contains(Common.ExpressionUtility.GetMemberName(expression));
 		}
 
-		public void Reset<TMember>(Expression<Func<T, TMember>> expression)
+		public bool Reset<TValue>(Expression<Func<T, TValue>> expression, out TValue value)
 		{
-			this.Reset(Common.ExpressionUtility.GetMemberName(expression));
+			value = default(TValue);
+
+			if(this.Reset(Common.ExpressionUtility.GetMemberName(expression), out var result))
+			{
+				value = (TValue)result;
+				return true;
+			}
+
+			return false;
 		}
 
 		public TValue GetValue<TValue>(Expression<Func<T, TValue>> expression)

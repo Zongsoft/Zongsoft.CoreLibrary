@@ -48,6 +48,7 @@ namespace Zongsoft.Data
 
 		bool HasChanges(params string[] names);
 		void Reset(params string[] names);
+		bool Reset(string name, out object value);
 
 		object GetValue(string name);
 		TValue GetValue<TValue>(string name, TValue defaultValue);
