@@ -41,15 +41,19 @@ namespace Zongsoft.Data
 	/// </summary>
 	public interface IEntity
 	{
-		/*
-		 * bool Reset(string name, out object value);
-		 */
-
 		/// <summary>
 		/// 获取实体中变更的属性数。
 		/// </summary>
 		/// <returns>返回变更的属性数。</returns>
 		int Count();
+
+		/// <summary>
+		/// 重置变更属性，并获取重置之前的值。
+		/// </summary>
+		/// <param name="name">指定要重置的属性名，如果为空(null)或空字符串则返回假(False)。</param>
+		/// <param name="value">输出参数，如果重置成功则返回重置之前的值否则输出空(null)。</param>
+		/// <returns>如果指定要重置的属性名是存在并且发生过变更则返回真(True)，否则返回假(False)。</returns>
+		bool Reset(string name, out object value);
 
 		/// <summary>
 		/// 重置变更属性。

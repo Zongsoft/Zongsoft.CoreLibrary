@@ -240,6 +240,7 @@ namespace Zongsoft.Data
 
 			//生成“Reset”方法
 			GenerateResetMethod(builder, mask, tokens);
+			GenerateResetManyMethod(builder, mask, tokens);
 
 			//生成“HasChanges”方法
 			GenerateHasChangesMethod(builder, mask, names, tokens);
@@ -1187,11 +1188,176 @@ namespace Zongsoft.Data
 		{
 			var method = builder.DefineMethod(typeof(Zongsoft.Data.IEntity).FullName + "." + nameof(IEntity.Reset),
 				MethodAttributes.Private | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.NewSlot,
+				typeof(bool),
+				new Type[] { typeof(string), typeof(object).MakeByRefType() });
+
+			//添加方法的实现标记
+			builder.DefineMethodOverride(method, typeof(Zongsoft.Data.IEntity).GetMethod(nameof(IEntity.Reset), new[] { typeof(string), typeof(object).MakeByRefType() }));
+
+			//定义方法参数
+			method.DefineParameter(1, ParameterAttributes.None, "name");
+			method.DefineParameter(2, ParameterAttributes.Out, "value");
+
+			//获取代码生成器
+			var generator = method.GetILGenerator();
+
+			//定义标签
+			var BODY_LABEL = generator.DefineLabel();
+			var EXIT1_LABEL = generator.DefineLabel();
+			var EXIT2_LABEL = generator.DefineLabel();
+
+			//声明本地变量
+			generator.DeclareLocal(PROPERTY_TOKEN_TYPE);
+
+			//value=null;
+			generator.Emit(OpCodes.Ldarg_2);
+			generator.Emit(OpCodes.Ldnull);
+			generator.Emit(OpCodes.Stind_Ref);
+
+			//if(name==null || name.Length == 0)
+			generator.Emit(OpCodes.Ldarg_1);
+			generator.Emit(OpCodes.Brfalse_S, EXIT1_LABEL);
+
+			generator.Emit(OpCodes.Ldarg_1);
+			generator.Emit(OpCodes.Call, typeof(string).GetProperty(nameof(string.Length)).GetMethod);
+			generator.Emit(OpCodes.Brtrue_S, BODY_LABEL);
+
+			generator.MarkLabel(EXIT1_LABEL);
+
+			//return false
+			generator.Emit(OpCodes.Ldc_I4_0);
+			generator.Emit(OpCodes.Ret);
+
+			generator.MarkLabel(BODY_LABEL);
+
+			//if(_TOKENS_.TryGetValue(name, out var token) && ...)
+			generator.Emit(OpCodes.Ldsfld, tokens);
+			generator.Emit(OpCodes.Ldarg_1);
+			generator.Emit(OpCodes.Ldloca_S, 0);
+			generator.Emit(OpCodes.Call, tokens.FieldType.GetMethod("TryGetValue", BindingFlags.Public | BindingFlags.Instance));
+			generator.Emit(OpCodes.Brfalse_S, EXIT2_LABEL);
+
+			if(mask.FieldType.IsArray)
+			{
+				//if(... && (($MASK$[token.Ordinal / 8] >> (token.Ordinal % 8)) & 1) == 1)
+				generator.Emit(OpCodes.Ldarg_0);
+				generator.Emit(OpCodes.Ldfld, mask);
+				generator.Emit(OpCodes.Ldloc_0);
+				generator.Emit(OpCodes.Ldfld, PROPERTY_TOKEN_ORDINAL_FIELD);
+				generator.Emit(OpCodes.Ldc_I4_8);
+				generator.Emit(OpCodes.Div);
+				generator.Emit(OpCodes.Ldelem_U1);
+				generator.Emit(OpCodes.Ldloc_0);
+				generator.Emit(OpCodes.Ldfld, PROPERTY_TOKEN_ORDINAL_FIELD);
+				generator.Emit(OpCodes.Ldc_I4_8);
+				generator.Emit(OpCodes.Rem);
+				generator.Emit(OpCodes.Shr);
+				generator.Emit(OpCodes.Ldc_I4_1);
+				if(mask.FieldType == typeof(ulong))
+					generator.Emit(OpCodes.Conv_I8);
+				generator.Emit(OpCodes.And);
+				generator.Emit(OpCodes.Ldc_I4_1);
+				if(mask.FieldType == typeof(ulong))
+					generator.Emit(OpCodes.Conv_I8);
+				generator.Emit(OpCodes.Bne_Un_S, EXIT2_LABEL);
+
+				//value=token.Getter.Invoke(this)
+				generator.Emit(OpCodes.Ldarg_2);
+				generator.Emit(OpCodes.Ldloc_0);
+				generator.Emit(OpCodes.Ldfld, PROPERTY_TOKEN_GETTER_FIELD);
+				generator.Emit(OpCodes.Ldarg_0);
+				generator.Emit(OpCodes.Call, PROPERTY_TOKEN_GETTER_FIELD.FieldType.GetMethod("Invoke"));
+				generator.Emit(OpCodes.Stind_Ref);
+
+				//$MASK$[token.Ordianal / 8] = $MASK$[token.Ordianal / 8] & (byte)~(1 << (token.Ordinal % 8));
+				generator.Emit(OpCodes.Ldarg_0);
+				generator.Emit(OpCodes.Ldfld, mask);
+				generator.Emit(OpCodes.Ldloc_0);
+				generator.Emit(OpCodes.Ldfld, PROPERTY_TOKEN_ORDINAL_FIELD);
+				generator.Emit(OpCodes.Ldc_I4_8);
+				generator.Emit(OpCodes.Div);
+
+				generator.Emit(OpCodes.Ldarg_0);
+				generator.Emit(OpCodes.Ldfld, mask);
+				generator.Emit(OpCodes.Ldloc_0);
+				generator.Emit(OpCodes.Ldfld, PROPERTY_TOKEN_ORDINAL_FIELD);
+				generator.Emit(OpCodes.Ldc_I4_8);
+				generator.Emit(OpCodes.Div);
+				generator.Emit(OpCodes.Ldelem_U1);
+
+				generator.Emit(OpCodes.Ldc_I4_1);
+				generator.Emit(OpCodes.Ldloc_0);
+				generator.Emit(OpCodes.Ldfld, PROPERTY_TOKEN_ORDINAL_FIELD);
+				generator.Emit(OpCodes.Ldc_I4_8);
+				generator.Emit(OpCodes.Rem);
+				generator.Emit(OpCodes.Shl);
+				generator.Emit(OpCodes.Not);
+				generator.Emit(OpCodes.And);
+				generator.Emit(OpCodes.Conv_U1);
+				generator.Emit(OpCodes.Stelem_I1);
+			}
+			else
+			{
+				//if(... && ($MASK$ >> token.Ordinal & 1) == 1)
+				generator.Emit(OpCodes.Ldarg_0);
+				generator.Emit(OpCodes.Ldfld, mask);
+				generator.Emit(OpCodes.Ldloc_0);
+				generator.Emit(OpCodes.Ldfld, PROPERTY_TOKEN_ORDINAL_FIELD);
+				generator.Emit(OpCodes.Shr);
+				generator.Emit(OpCodes.Ldc_I4_1);
+				if(mask.FieldType == typeof(ulong))
+					generator.Emit(OpCodes.Conv_I8);
+				generator.Emit(OpCodes.And);
+				generator.Emit(OpCodes.Ldc_I4_1);
+				if(mask.FieldType == typeof(ulong))
+					generator.Emit(OpCodes.Conv_I8);
+				generator.Emit(OpCodes.Bne_Un_S, EXIT2_LABEL);
+
+				//value=token.Getter.Invoke(this)
+				generator.Emit(OpCodes.Ldarg_2);
+				generator.Emit(OpCodes.Ldloc_0);
+				generator.Emit(OpCodes.Ldfld, PROPERTY_TOKEN_GETTER_FIELD);
+				generator.Emit(OpCodes.Ldarg_0);
+				generator.Emit(OpCodes.Call, PROPERTY_TOKEN_GETTER_FIELD.FieldType.GetMethod("Invoke"));
+				generator.Emit(OpCodes.Stind_Ref);
+
+				//$MASK$ = $MASK$ & (type)~(1 << token.Ordinal);
+				generator.Emit(OpCodes.Ldarg_0);
+				generator.Emit(OpCodes.Ldarg_0);
+				generator.Emit(OpCodes.Ldfld, mask);
+				generator.Emit(OpCodes.Ldc_I4_1);
+				generator.Emit(OpCodes.Ldloc_0);
+				generator.Emit(OpCodes.Ldfld, PROPERTY_TOKEN_ORDINAL_FIELD);
+				generator.Emit(OpCodes.Shl);
+				generator.Emit(OpCodes.Not);
+				if(mask.FieldType == typeof(ulong))
+					generator.Emit(OpCodes.Conv_I8);
+				generator.Emit(OpCodes.And);
+				if(mask.FieldType == typeof(ulong))
+					generator.Emit(OpCodes.Conv_I8);
+				generator.Emit(OpCodes.Stfld, mask);
+			}
+
+			//return true
+			generator.Emit(OpCodes.Ldc_I4_1);
+			generator.Emit(OpCodes.Ret);
+
+			generator.MarkLabel(EXIT2_LABEL);
+
+			//return false
+			generator.Emit(OpCodes.Ldc_I4_0);
+			generator.Emit(OpCodes.Ret);
+		}
+
+		private static void GenerateResetManyMethod(TypeBuilder builder, FieldBuilder mask, FieldBuilder tokens)
+		{
+			var method = builder.DefineMethod(typeof(Zongsoft.Data.IEntity).FullName + "." + nameof(IEntity.Reset),
+				MethodAttributes.Private | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.NewSlot,
 				null,
 				new Type[] { typeof(string[]) });
 
 			//添加方法的实现标记
-			builder.DefineMethodOverride(method, typeof(Zongsoft.Data.IEntity).GetMethod(nameof(IEntity.Reset)));
+			builder.DefineMethodOverride(method, typeof(Zongsoft.Data.IEntity).GetMethod(nameof(IEntity.Reset), new[] { typeof(string[]) }));
 
 			//定义方法参数
 			method.DefineParameter(1, ParameterAttributes.None, "names").SetCustomAttribute(typeof(ParamArrayAttribute).GetConstructor(Type.EmptyTypes), new byte[0]);
@@ -1342,7 +1508,7 @@ namespace Zongsoft.Data
 				generator.Emit(OpCodes.Ldfld, mask);
 				generator.Emit(OpCodes.Ldloc_0);
 				generator.Emit(OpCodes.Ldfld, PROPERTY_TOKEN_ORDINAL_FIELD);
-				generator.Emit(OpCodes.Shr_Un);
+				generator.Emit(OpCodes.Shr);
 				generator.Emit(OpCodes.Ldc_I4_1);
 				if(mask.FieldType == typeof(ulong))
 					generator.Emit(OpCodes.Conv_I8);
