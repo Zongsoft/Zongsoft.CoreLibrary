@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="Models\IEmployee.cs" />
     <Compile Include="Models\IManager.cs" />
+    <Compile Include="Models\IMyEntity.cs" />
     <Compile Include="Models\IPerson.cs" />
     <Compile Include="Models\IUserEntity.cs" />
     <Compile Include="Models\User.cs" />

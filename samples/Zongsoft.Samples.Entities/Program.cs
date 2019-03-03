@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace Zongsoft.Samples.Entities
 {
-	class Program
+	public class Program
 	{
 		private const int COUNT = 10000 * 100;
 
@@ -27,7 +27,7 @@ namespace Zongsoft.Samples.Entities
 
 		private static void BuildTest()
 		{
-			//Data.Entity.GetCreator<Models.IEmployee>();
+			//Data.Entity.Build<Models.IManager>();
 			//Data.Entity.Save();
 
 			//return;
@@ -35,10 +35,14 @@ namespace Zongsoft.Samples.Entities
 			var person = Data.Entity.Build<Models.IPerson>();
 			var person1 = Data.Entity.Build<Models.IPerson>();
 			var user = Data.Entity.Build<Models.IUserEntity>();
+			var myentity = Data.Entity.Build<Models.IMyEntity>();
 			var employee = Data.Entity.Build<Models.IEmployee>();
 			var manager = Data.Entity.Build<Models.IManager>();
 
 			Data.Entity.Save();
+
+			//验证实体属性变更计数方法
+			TestCount();
 
 			var property = user.GetType().GetProperty("Namespace");
 
@@ -266,6 +270,74 @@ namespace Zongsoft.Samples.Entities
 			foreach(var entry in entity.GetChanges())
 			{
 				Console.WriteLine($"\t[{++index}] {entry.Key} = {entry.Value}");
+			}
+		}
+
+		private static void TestCount()
+		{
+			var result = Data.Entity.Build<Models.IMyEntity>(entity =>
+			{
+				entity.P1 = 100;
+				entity.P2 = "xxx";
+				entity.P3 = "xxx";
+				entity.P4 = "xxx";
+				entity.P5 = "xxx";
+				entity.P6 = "xxx";
+				entity.P7 = "xxx";
+				entity.P8 = "xxx";
+				entity.P9 = "xxx";
+				entity.P10 = "xxx";
+				entity.P11 = "xxx";
+				entity.P12 = "xxx";
+				entity.P13 = "xxx";
+				entity.P14 = "xxx";
+				entity.P15 = "xxx";
+				entity.P16 = "xxx";
+				entity.P17 = "xxx";
+				entity.P18 = "xxx";
+				entity.P19 = "xxx";
+				entity.P20 = "xxx";
+				entity.P21 = "xxx";
+				entity.P22 = "xxx";
+				entity.P23 = "xxx";
+				entity.P24 = "xxx";
+				entity.P25 = "xxx";
+				entity.P26 = "xxx";
+				entity.P27 = "xxx";
+				entity.P28 = "xxx";
+				entity.P29 = "xxx";
+				entity.P30 = "xxx";
+				entity.P31 = "xxx";
+				entity.P32 = "xxx";
+			});
+
+			if(result.Count() != 32)
+			{
+				Console.WriteLine();
+				Console.WriteLine($"***** The Count method of the '{result.GetType().Name}' entity is validation failed. *****");
+				Console.WriteLine();
+			}
+
+			result.Reset("P10", "No exists");
+			if(result.Count() != 31)
+			{
+				Console.WriteLine();
+				Console.WriteLine($"***** The Reset method of the '{result.GetType().Name}' entity is validation failed. *****");
+				Console.WriteLine();
+			}
+
+			if(!result.Reset("P1", out var value))
+			{
+				Console.WriteLine();
+				Console.WriteLine($"***** The Reset method of the '{result.GetType().Name}' entity is validation failed. *****");
+				Console.WriteLine();
+			}
+
+			if(value == null || (int)value != 100)
+			{
+				Console.WriteLine();
+				Console.WriteLine($"***** The Reset method of the '{result.GetType().Name}' entity is validation failed. *****");
+				Console.WriteLine();
 			}
 		}
 

@@ -30,7 +30,7 @@ namespace Zongsoft.Samples.Entities.Models
 		#endregion
 
 		#region 标记变量
-		private ulong _MASK_;
+		private ushort _MASK_;
 		private readonly byte[] _flags_;
 		#endregion
 
@@ -126,14 +126,15 @@ namespace Zongsoft.Samples.Entities.Models
 			}
 		}
 
+		[Zongsoft.Data.Entity.Property(Data.Entity.PropertyImplementationMode.Extension, typeof(UserExtension))]
 		public string Avatar
 		{
 			get => _avatar;
 			set
 			{
-				if(UserExtension.SetAvatar(this, _avatar, value, out var result))
+				//if(UserExtension.SetAvatar(this, _avatar, value, out var result))
 				{
-					_avatar = result;
+					_avatar = value;
 					_MASK_ |= 64;
 				}
 			}
@@ -229,6 +230,199 @@ namespace Zongsoft.Samples.Entities.Models
 		#endregion
 
 		#region 接口方法
+		public int Count()
+		{
+			int count = 0;
+			var mask = _MASK_;
+
+			if(_MASK_ == 0)
+				return 0;
+
+			//for(int i = 0; i < 64; i++)
+			//{
+			//	if((_MASK_ >> i & 1) == 1)
+			//		count++;
+			//}
+
+			if((mask & 1UL) == 1UL) //bit 1
+				count++;
+			if((mask & 2UL) == 2UL) //bit 2
+				count++;
+			if((mask & 4UL) == 4UL) //bit 3
+				count++;
+			if((mask & 8UL) == 8UL) //bit 4
+				count++;
+			if((mask & 0x10) == 0x10) //bit 5
+				count++;
+			if((mask & 0x20) == 0x20) //bit 6
+				count++;
+			if((mask & 0x40) == 0x40) //bit 7
+				count++;
+			if((mask & 0x80) == 0x80) //bit 8
+				count++;
+			if((mask & 0x100) == 0x100) //bit 9
+				count++;
+			if((mask & 0x200) == 0x200) //bit 10
+				count++;
+			if((mask & 0x400) == 0x400) //bit 11
+				count++;
+			if((mask & 0x800) == 0x800) //bit 12
+				count++;
+			if((mask & 0x1000) == 0x1000) //bit 13
+				count++;
+			if((mask & 0x2000) == 0x2000) //bit 14
+				count++;
+			if((mask & 0x4000) == 0x4000) //bit 15
+				count++;
+			if((mask & 0x8000) == 0x8000) //bit 16
+				count++;
+			//if((mask & 0x10000) == 0x10000) //bit 17
+			//	count++;
+			//if((mask & 0x20000) == 0x20000) //bit 18
+			//	count++;
+			//if((mask & 0x40000) == 0x40000) //bit 19
+			//	count++;
+			//if((mask & 0x80000) == 0x80000) //bit 20
+			//	count++;
+			//if((mask & 0x100000) == 0x100000) //bit 21
+			//	count++;
+			//if((mask & 0x200000) == 0x200000) //bit 22
+			//	count++;
+			//if((mask & 0x400000) == 0x400000) //bit 23
+			//	count++;
+			//if((mask & 0x800000) == 0x800000) //bit 24
+			//	count++;
+			//if((mask & 0x1000000) == 0x1000000) //bit 25
+			//	count++;
+			//if((mask & 0x2000000) == 0x2000000) //bit 26
+			//	count++;
+			//if((mask & 0x4000000) == 0x4000000) //bit 27
+			//	count++;
+			//if((mask & 0x8000000) == 0x8000000) //bit 28
+			//	count++;
+			//if((mask & 0x10000000) == 0x10000000) //bit 29
+			//	count++;
+			//if((mask & 0x20000000) == 0x20000000) //bit 30
+			//	count++;
+			//if((mask & 0x40000000) == 0x40000000) //bit 31
+			//	count++;
+			//if((mask & 0x80000000) == 0x80000000) //bit 32
+			//	count++;
+			//if((mask & 0x100000000) == 0x100000000) //bit 33
+			//	count++;
+			//if((mask & 0x200000000) == 0x200000000) //bit 34
+			//	count++;
+			//if((mask & 0x400000000) == 0x400000000) //bit 35
+			//	count++;
+			//if((mask & 0x800000000UL) == 0x800000000UL) //bit 36
+			//	count++;
+
+			return count;
+		}
+
+		public int CountArray()
+		{
+			int count = 0;
+			byte flag = 0;
+
+			for(int i = 0; i < _flags_.Length; i++)
+			{
+				flag = _flags_[i];
+
+				if(flag == 0)
+					continue;
+
+				if((flag & 1) == 1)
+					count++;
+				if((flag & 2) == 2)
+					count++;
+				if((flag & 4) == 4)
+					count++;
+				if((flag & 8) == 8)
+					count++;
+				if((flag & 16) == 16)
+					count++;
+				if((flag & 32) == 32)
+					count++;
+				if((flag & 64) == 64)
+					count++;
+				if((flag & 128) == 128)
+					count++;
+			}
+
+			return count;
+		}
+
+		public bool Reset(string name, out object value)
+		{
+			value = null;
+
+			if(name == null || name.Length == 0)
+				return false;
+
+			if(__TOKENS__.TryGetValue(name, out var token) && (_MASK_ >> token.Ordinal & 1) == 1)
+			{
+				value = token.Getter.Invoke(this);
+				_MASK_ &= (ushort)~(1 << token.Ordinal);
+				return true;
+			}
+
+			return false;
+		}
+
+		public bool ResetArray(string name, out object value)
+		{
+			value = null;
+
+			if(name == null || name.Length == 0)
+				return false;
+
+			if(__TOKENS__.TryGetValue(name, out var token) && (_flags_[token.Ordinal / 8] >> (token.Ordinal % 8) & 1) == 1)
+			{
+				value = token.Getter.Invoke(this);
+				_flags_[token.Ordinal / 8] = (byte)(_flags_[token.Ordinal / 8] & ~(1 << (token.Ordinal % 8)));
+				return true;
+			}
+
+			return false;
+		}
+
+		public void Reset(params string[] names)
+		{
+			PropertyToken<UserEntity> token;
+
+			if(names == null || names.Length == 0)
+			{
+				_MASK_ = 0;
+				return;
+			}
+
+			for(int i = 0; i < names.Length; i++)
+			{
+				if(__TOKENS__.TryGetValue(names[i], out token) && (_MASK_ >> token.Ordinal & 1) == 1)
+					_MASK_ &= (ushort)~(1 << token.Ordinal);
+			}
+		}
+
+		public void ResetArray(params string[] names)
+		{
+			PropertyToken<UserEntity> token;
+
+			if(names == null || names.Length == 0)
+			{
+				for(int i = 0; i < _flags_.Length; i++)
+					_flags_[i] = 0;
+
+				return;
+			}
+
+			for(int i = 0; i < names.Length; i++)
+			{
+				if(__TOKENS__.TryGetValue(names[i], out token) && (_flags_[token.Ordinal / 8] >> (token.Ordinal % 8) & 1) == 1)
+					_flags_[token.Ordinal / 8] = (byte)(_flags_[token.Ordinal / 8] & ~(1 << (token.Ordinal % 8)));
+			}
+		}
+
 		private bool HasChanges(params string[] names)
 		{
 			PropertyToken<UserEntity> property;

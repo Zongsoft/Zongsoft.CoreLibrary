@@ -122,6 +122,21 @@ namespace Zongsoft.Samples.Entities.Models
 		#endregion
 
 		#region 公共方法
+		public int Count()
+		{
+			return 0;
+		}
+
+		public bool Reset(string name, out object value)
+		{
+			value = null;
+			return false;
+		}
+
+		public void Reset(params string[] names)
+		{
+		}
+
 		public bool HasChanges(params string[] names)
 		{
 			return false;
