@@ -1765,7 +1765,7 @@ namespace Zongsoft.Data
 		{
 			get
 			{
-				return this.Count;
+				return _entity.Count();
 			}
 		}
 
@@ -1820,12 +1820,15 @@ namespace Zongsoft.Data
 
 		void IDictionary.Clear()
 		{
-			throw new NotSupportedException();
+			_entity.Reset();
 		}
 
 		void IDictionary.Remove(object key)
 		{
-			throw new NotSupportedException();
+			if(key == null)
+				return;
+
+			_entity.Reset(key.ToString());
 		}
 
 		void ICollection.CopyTo(Array array, int arrayIndex)
@@ -1856,7 +1859,7 @@ namespace Zongsoft.Data
 
 		bool IDictionary<string, object>.Remove(string key)
 		{
-			throw new NotSupportedException();
+			return _entity.Reset(key, out _);
 		}
 
 		bool IDictionary<string, object>.TryGetValue(string key, out object value)
@@ -1871,7 +1874,7 @@ namespace Zongsoft.Data
 
 		void ICollection<KeyValuePair<string, object>>.Clear()
 		{
-			throw new NotSupportedException();
+			_entity.Reset();
 		}
 
 		bool ICollection<KeyValuePair<string, object>>.Contains(KeyValuePair<string, object> item)
@@ -1900,7 +1903,7 @@ namespace Zongsoft.Data
 
 		bool ICollection<KeyValuePair<string, object>>.Remove(KeyValuePair<string, object> item)
 		{
-			throw new NotSupportedException();
+			return _entity.Reset(item.Key, out _);
 		}
 
 		public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
