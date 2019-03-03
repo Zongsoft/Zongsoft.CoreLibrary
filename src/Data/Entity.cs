@@ -1201,8 +1201,7 @@ namespace Zongsoft.Data
 
 			//定义标签
 			var EXIT_LABEL = generator.DefineLabel();
-			var MASKING_LABEL = generator.DefineLabel();
-			var LOOP_INITIATE_LABEL = generator.DefineLabel();
+			var BODY_LABEL = generator.DefineLabel();
 			var LOOP_INCREASE_LABEL = generator.DefineLabel();
 			var LOOP_BODY_LABEL = generator.DefineLabel();
 			var LOOP_TEST_LABEL = generator.DefineLabel();
@@ -1216,48 +1215,174 @@ namespace Zongsoft.Data
 
 			generator.Emit(OpCodes.Ldarg_1);
 			generator.Emit(OpCodes.Ldlen);
-			generator.Emit(OpCodes.Brtrue_S, LOOP_INITIATE_LABEL);
+			generator.Emit(OpCodes.Brtrue_S, BODY_LABEL);
 
 			generator.MarkLabel(EXIT_LABEL);
 
 			if(mask.FieldType.IsArray)
 			{
+				//定义标签
+				var INNER_LOOP_INCREASE_LABEL = generator.DefineLabel();
+				var INNER_LOOP_BODY_LABEL = generator.DefineLabel();
+				var INNER_LOOP_TEST_LABEL = generator.DefineLabel();
+
+				//for(i=0;...;...)
 				generator.Emit(OpCodes.Ldc_I4_0);
 				generator.Emit(OpCodes.Stloc_1);
 
 				//$MASK[i]=0;
-				generator.MarkLabel(LOOP_BODY_LABEL);
+				generator.MarkLabel(INNER_LOOP_BODY_LABEL);
 				generator.Emit(OpCodes.Ldarg_0);
 				generator.Emit(OpCodes.Ldfld, mask);
 				generator.Emit(OpCodes.Ldloc_1);
 				generator.Emit(OpCodes.Ldc_I4_0);
 				generator.Emit(OpCodes.Stelem_I1);
 
-				//for(;;i++)
-				generator.MarkLabel(LOOP_INCREASE_LABEL);
+				//for(...;...;i++)
+				generator.MarkLabel(INNER_LOOP_INCREASE_LABEL);
 				generator.Emit(OpCodes.Ldloc_1);
 				generator.Emit(OpCodes.Ldc_I4_1);
 				generator.Emit(OpCodes.Add);
 				generator.Emit(OpCodes.Stloc_1);
 
-				//for(;i<$MASK.Length$;)
-				generator.MarkLabel(LOOP_TEST_LABEL);
+				//for(...;i<$MASK.Length$;...)
+				generator.MarkLabel(INNER_LOOP_TEST_LABEL);
 				generator.Emit(OpCodes.Ldloc_1);
 				generator.Emit(OpCodes.Ldarg_0);
 				generator.Emit(OpCodes.Ldfld, mask);
 				generator.Emit(OpCodes.Ldlen);
 				generator.Emit(OpCodes.Conv_I4);
-				generator.Emit(OpCodes.Blt_S, LOOP_BODY_LABEL);
+				generator.Emit(OpCodes.Blt_S, INNER_LOOP_BODY_LABEL);
+
+				//return
+				generator.Emit(OpCodes.Ret);
 			}
 			else
 			{
+				//$MASK$=0
 				generator.Emit(OpCodes.Ldarg_0);
 				generator.Emit(OpCodes.Ldc_I4_0);
 				generator.Emit(OpCodes.Stfld, mask);
 				generator.Emit(OpCodes.Ret);
 			}
 
-			generator.MarkLabel(LOOP_INITIATE_LABEL);
+			generator.MarkLabel(BODY_LABEL);
+
+			//for(i=0;...;...;)
+			generator.Emit(OpCodes.Ldc_I4_0);
+			generator.Emit(OpCodes.Stloc_1);
+			generator.Emit(OpCodes.Br_S, LOOP_TEST_LABEL);
+
+			generator.MarkLabel(LOOP_BODY_LABEL);
+
+			//if(_TOKENS_.TryGetValue(names[i], out var token) && ...)
+			generator.Emit(OpCodes.Ldsfld, tokens);
+			generator.Emit(OpCodes.Ldarg_1);
+			generator.Emit(OpCodes.Ldloc_1);
+			generator.Emit(OpCodes.Ldelem_Ref);
+			generator.Emit(OpCodes.Ldloca_S, 0);
+			generator.Emit(OpCodes.Call, tokens.FieldType.GetMethod("TryGetValue", BindingFlags.Public | BindingFlags.Instance));
+			generator.Emit(OpCodes.Brfalse_S, LOOP_INCREASE_LABEL);
+
+			if(mask.FieldType.IsArray)
+			{
+				//if(... && (($MASK$[token.Ordinal / 8] >> (token.Ordinal % 8)) & 1) == 1)
+				generator.Emit(OpCodes.Ldarg_0);
+				generator.Emit(OpCodes.Ldfld, mask);
+				generator.Emit(OpCodes.Ldloc_0);
+				generator.Emit(OpCodes.Ldfld, PROPERTY_TOKEN_ORDINAL_FIELD);
+				generator.Emit(OpCodes.Ldc_I4_8);
+				generator.Emit(OpCodes.Div);
+				generator.Emit(OpCodes.Ldelem_U1);
+				generator.Emit(OpCodes.Ldloc_0);
+				generator.Emit(OpCodes.Ldfld, PROPERTY_TOKEN_ORDINAL_FIELD);
+				generator.Emit(OpCodes.Ldc_I4_8);
+				generator.Emit(OpCodes.Rem);
+				generator.Emit(OpCodes.Shr);
+				generator.Emit(OpCodes.Ldc_I4_1);
+				if(mask.FieldType == typeof(ulong))
+					generator.Emit(OpCodes.Conv_I8);
+				generator.Emit(OpCodes.And);
+				generator.Emit(OpCodes.Ldc_I4_1);
+				if(mask.FieldType == typeof(ulong))
+					generator.Emit(OpCodes.Conv_I8);
+				generator.Emit(OpCodes.Bne_Un_S, LOOP_INCREASE_LABEL);
+
+				//$MASK$[token.Ordianal / 8] = $MASK$[token.Ordianal / 8] & (byte)~(1 << (token.Ordinal % 8));
+				generator.Emit(OpCodes.Ldarg_0);
+				generator.Emit(OpCodes.Ldfld, mask);
+				generator.Emit(OpCodes.Ldloc_0);
+				generator.Emit(OpCodes.Ldfld, PROPERTY_TOKEN_ORDINAL_FIELD);
+				generator.Emit(OpCodes.Ldc_I4_8);
+				generator.Emit(OpCodes.Div);
+
+				generator.Emit(OpCodes.Ldarg_0);
+				generator.Emit(OpCodes.Ldfld, mask);
+				generator.Emit(OpCodes.Ldloc_0);
+				generator.Emit(OpCodes.Ldfld, PROPERTY_TOKEN_ORDINAL_FIELD);
+				generator.Emit(OpCodes.Ldc_I4_8);
+				generator.Emit(OpCodes.Div);
+				generator.Emit(OpCodes.Ldelem_U1);
+
+				generator.Emit(OpCodes.Ldc_I4_1);
+				generator.Emit(OpCodes.Ldloc_0);
+				generator.Emit(OpCodes.Ldfld, PROPERTY_TOKEN_ORDINAL_FIELD);
+				generator.Emit(OpCodes.Ldc_I4_8);
+				generator.Emit(OpCodes.Rem);
+				generator.Emit(OpCodes.Shl);
+				generator.Emit(OpCodes.Not);
+				generator.Emit(OpCodes.And);
+				generator.Emit(OpCodes.Conv_U1);
+				generator.Emit(OpCodes.Stelem_I1);
+			}
+			else
+			{
+				//if(... && ($MASK$ >> token.Ordinal & 1) == 1)
+				generator.Emit(OpCodes.Ldarg_0);
+				generator.Emit(OpCodes.Ldfld, mask);
+				generator.Emit(OpCodes.Ldloc_0);
+				generator.Emit(OpCodes.Ldfld, PROPERTY_TOKEN_ORDINAL_FIELD);
+				generator.Emit(OpCodes.Shr_Un);
+				generator.Emit(OpCodes.Ldc_I4_1);
+				if(mask.FieldType == typeof(ulong))
+					generator.Emit(OpCodes.Conv_I8);
+				generator.Emit(OpCodes.And);
+				generator.Emit(OpCodes.Ldc_I4_1);
+				if(mask.FieldType == typeof(ulong))
+					generator.Emit(OpCodes.Conv_I8);
+				generator.Emit(OpCodes.Bne_Un_S, LOOP_INCREASE_LABEL);
+
+				//$MASK$ = $MASK$ & (type)~(1 << token.Ordinal);
+				generator.Emit(OpCodes.Ldarg_0);
+				generator.Emit(OpCodes.Ldarg_0);
+				generator.Emit(OpCodes.Ldfld, mask);
+				generator.Emit(OpCodes.Ldc_I4_1);
+				generator.Emit(OpCodes.Ldloc_0);
+				generator.Emit(OpCodes.Ldfld, PROPERTY_TOKEN_ORDINAL_FIELD);
+				generator.Emit(OpCodes.Shl);
+				generator.Emit(OpCodes.Not);
+				if(mask.FieldType == typeof(ulong))
+					generator.Emit(OpCodes.Conv_I8);
+				generator.Emit(OpCodes.And);
+				if(mask.FieldType == typeof(ulong))
+					generator.Emit(OpCodes.Conv_I8);
+				generator.Emit(OpCodes.Stfld, mask);
+			}
+
+			//for(...;...;i++)
+			generator.MarkLabel(LOOP_INCREASE_LABEL);
+			generator.Emit(OpCodes.Ldloc_1);
+			generator.Emit(OpCodes.Ldc_I4_1);
+			generator.Emit(OpCodes.Add);
+			generator.Emit(OpCodes.Stloc_1);
+
+			//for(...;i<names.Length;...)
+			generator.MarkLabel(LOOP_TEST_LABEL);
+			generator.Emit(OpCodes.Ldloc_1);
+			generator.Emit(OpCodes.Ldarg_1);
+			generator.Emit(OpCodes.Ldlen);
+			generator.Emit(OpCodes.Conv_I4);
+			generator.Emit(OpCodes.Blt_S, LOOP_BODY_LABEL);
 
 			generator.Emit(OpCodes.Ret);
 		}

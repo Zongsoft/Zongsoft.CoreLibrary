@@ -43,7 +43,6 @@ namespace Zongsoft.Data
 	{
 		/*
 		 * bool Reset(string name, out object value);
-		 * void Reset(params string[] names);
 		 */
 
 		/// <summary>
