@@ -236,7 +236,7 @@ namespace Zongsoft.Data
 			GenerateTypeInitializer(builder, properties, methods, out var names, out var tokens);
 
 			//生成“Count”方法
-			GenerateCountMethod(builder, mask);
+			GenerateCountMethod(builder, mask, countWritable);
 
 			//生成“Reset”方法
 			GenerateResetMethod(builder, mask, tokens);
@@ -1033,7 +1033,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		private static void GenerateCountMethod(TypeBuilder builder, FieldBuilder mask)
+		private static void GenerateCountMethod(TypeBuilder builder, FieldBuilder mask, int count)
 		{
 			var method = builder.DefineMethod(typeof(Zongsoft.Data.IEntity).FullName + "." + nameof(IEntity.Count),
 				MethodAttributes.Private | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.NewSlot,
@@ -1106,7 +1106,7 @@ namespace Zongsoft.Data
 				generator.MarkLabel(BODY_LABEL);
 			}
 
-			var length = GetMaskLength(mask);
+			var length = mask.FieldType.IsArray ? 8 : count;
 			var labels = new Label[length - 1];
 
 			for(int i = 0; i < length; i++)
@@ -1159,29 +1159,6 @@ namespace Zongsoft.Data
 			//return count;
 			generator.Emit(OpCodes.Ldloc_0);
 			generator.Emit(OpCodes.Ret);
-
-			int GetMaskLength(FieldInfo maskField)
-			{
-				var type = maskField.FieldType.IsArray? maskField.FieldType.GetElementType() : maskField.FieldType;
-
-				switch(Type.GetTypeCode(type))
-				{
-					case TypeCode.Byte:
-					case TypeCode.SByte:
-						return 8;
-					case TypeCode.Int16:
-					case TypeCode.UInt16:
-						return 16;
-					case TypeCode.Int32:
-					case TypeCode.UInt32:
-						return 32;
-					case TypeCode.Int64:
-					case TypeCode.UInt64:
-						return 64;
-				}
-
-				return 0;
-			}
 		}
 
 		private static void GenerateResetMethod(TypeBuilder builder, FieldBuilder mask, FieldBuilder tokens)
