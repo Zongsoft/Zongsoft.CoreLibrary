@@ -28,8 +28,7 @@ using System;
 
 namespace Zongsoft.Transitions
 {
-	[Obsolete]
-	public struct StateVector<T> where T : struct
+	public struct StateVector<T> : IEquatable<StateVector<T>> where T : struct
 	{
 		#region 构造函数
 		public StateVector(T origin, T destination)
@@ -45,9 +44,10 @@ namespace Zongsoft.Transitions
 		#endregion
 
 		#region 重写方法
-		public override string ToString()
+		public bool Equals(StateVector<T> other)
 		{
-			return this.Origin.ToString() + "->" + this.Destination.ToString();
+			return this.Origin.Equals(other.Origin) &&
+			       this.Destination.Equals(other.Destination);
 		}
 
 		public override bool Equals(object obj)
@@ -55,14 +55,17 @@ namespace Zongsoft.Transitions
 			if(obj == null || obj.GetType() != this.GetType())
 				return false;
 
-			var vector = (StateVector<T>)obj;
-
-			return this.Origin.Equals(vector.Origin) && this.Destination.Equals(vector.Destination);
+			return this.Equals((StateVector<T>)obj);
 		}
 
 		public override int GetHashCode()
 		{
 			return this.Origin.GetHashCode() ^ this.Destination.GetHashCode();
+		}
+
+		public override string ToString()
+		{
+			return this.Origin.ToString() + "->" + this.Destination.ToString();
 		}
 		#endregion
 	}
