@@ -33,6 +33,7 @@ namespace Zongsoft.Runtime.Serialization
 	public enum SerializationBehavior
 	{
 		None = 0,
-		IgnoreDefaultValue = 1,
+		IgnoreNullValue = 1,
+		IgnoreDefaultValue = 2,
 	}
 }
