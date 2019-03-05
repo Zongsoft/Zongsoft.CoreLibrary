@@ -422,6 +422,28 @@ namespace Zongsoft.Data
 		{
 			return string.Equals(name, _name, StringComparison.OrdinalIgnoreCase);
 		}
+
+		bool ICondition.Match(string name, Action<Condition> matched)
+		{
+			if(name != null && name.Length > 0 && string.Equals(name, _name, StringComparison.OrdinalIgnoreCase))
+			{
+				matched?.Invoke(this);
+				return true;
+			}
+
+			return false;
+		}
+
+		int ICondition.Matches(string name, Action<Condition> matched)
+		{
+			if(name != null && name.Length > 0 && string.Equals(name, _name, StringComparison.OrdinalIgnoreCase))
+			{
+				matched?.Invoke(this);
+				return 1;
+			}
+
+			return 0;
+		}
 		#endregion
 
 		#region 嵌套子类

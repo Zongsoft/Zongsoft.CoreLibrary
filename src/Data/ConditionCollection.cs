@@ -26,7 +26,6 @@
 
 using System;
 using System.Linq;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace Zongsoft.Data
@@ -243,23 +242,39 @@ namespace Zongsoft.Data
 			if(string.IsNullOrEmpty(name))
 				return false;
 
-			return this.Contains(this, name);
+			return this.Matches(this, name, condition => true) > 0;
 		}
 
-		public bool Remove(params string[] names)
+		public int Remove(params string[] names)
 		{
 			if(names == null || names.Length == 0)
-				return false;
+				return 0;
 
-			var found = false;
+			var count = 0;
 
 			foreach(var name in names)
 			{
 				if(!string.IsNullOrEmpty(name))
-					found = found || this.Remove(this, name);
+					count += this.Remove(this, name);
 			}
 
-			return found;
+			return count;
+		}
+
+		public bool Match(string name, Action<Condition> matched = null)
+		{
+			if(string.IsNullOrEmpty(name))
+				return false;
+
+			return this.Matches(this, name, condition => { matched?.Invoke(condition); return true; }) > 0;
+		}
+
+		public int Matches(string name, Action<Condition> matched = null)
+		{
+			if(string.IsNullOrEmpty(name))
+				return 0;
+
+			return this.Matches(this, name, condition => { matched?.Invoke(condition); return false; });
 		}
 
 		/// <summary>
@@ -338,44 +353,65 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 私有方法
-		private bool Contains(IEnumerable<ICondition> conditions, string name)
+		private int Remove(ICollection<ICondition> conditions, string name)
 		{
+			var count = 0;
+			IList<Condition> matches = null;
+
 			foreach(var condition in conditions)
 			{
 				if(condition is Condition c)
 				{
 					if(string.Equals(c.Name, name, StringComparison.OrdinalIgnoreCase))
-						return true;
+					{
+						count++;
+
+						if(matches == null)
+							matches = new List<Condition>();
+
+						matches.Add(c);
+					}
 				}
 				else if(condition is ConditionCollection cs)
 				{
-					if(this.Contains(cs, name))
-						return true;
+					count += this.Remove(cs, name);
 				}
 			}
 
-			return false;
+			if(matches != null && matches.Count > 0)
+			{
+				foreach(var match in matches)
+				{
+					conditions.Remove(match);
+				}
+			}
+
+			return count;
 		}
 
-		private bool Remove(ICollection<ICondition> conditions, string name)
+		private int Matches(ICollection<ICondition> conditions, string name, Predicate<Condition> matched)
 		{
-			var found = false;
+			int count = 0;
 
 			foreach(var condition in conditions)
 			{
 				if(condition is Condition c)
 				{
 					if(string.Equals(c.Name, name, StringComparison.OrdinalIgnoreCase))
-						found = conditions.Remove(condition);
+					{
+						count++;
+
+						if(matched != null && matched.Invoke(c))
+							return count;
+					}
 				}
 				else if(condition is ConditionCollection cs)
 				{
-					if(this.Remove(cs, name))
-						found = true;
+					this.Matches(cs, name, matched);
 				}
 			}
 
-			return found;
+			return count;
 		}
 		#endregion
 	}
