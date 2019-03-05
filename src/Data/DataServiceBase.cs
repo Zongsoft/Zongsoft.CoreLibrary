@@ -518,6 +518,16 @@ namespace Zongsoft.Data
 			//将当前更新数据对象转换成数据字典
 			var dictionary = DataDictionary.GetDictionary<TEntity>(data);
 
+			//如果指定了更新条件，则尝试将条件中的主键值同步设置到数据字典中
+			if(condition != null)
+			{
+				//遍历当前数据服务的实体主键名
+				foreach(var key in this.DataAccess.GetKey(this.Name))
+				{
+					condition.Match(key, c => dictionary.TrySetValue(c.Name, c.Value));
+				}
+			}
+
 			//修整过滤条件
 			condition = this.OnValidate(DataAccessMethod.Update, condition ?? this.EnsureUpdateCondition(dictionary));
 
@@ -1289,7 +1299,7 @@ namespace Zongsoft.Data
 
 			for(int i = 0; i < keys.Length; i++)
 			{
-				if(dictionary.TryGetValue(keys[i], out var value))
+				if(dictionary.TryGetValue(keys[i], out var value) && value != null)
 					requires[i] = Condition.Equal(keys[i], value);
 				else
 					throw new DataException($"No required primary key field value is specified for the update '{this.Name}' entity data.");
