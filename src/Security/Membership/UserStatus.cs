@@ -42,8 +42,5 @@ namespace Zongsoft.Security.Membership
 
 		/// <summary>已停用</summary>
 		Disabled,
-
-		/// <summary>被挂起，特指密码验证失败超过特定次数。</summary>
-		Suspended,
 	}
 }
