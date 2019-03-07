@@ -232,7 +232,7 @@
     <value>帐户已被封。</value>
   </data>
   <data name="Text.AuthenticationReason.AccountSuspended" xml:space="preserve">
-    <value>帐户被暂停。</value>
+    <value>帐户被暂停，可能是因为验证失败次数太多。</value>
   </data>
   <data name="Text.AuthenticationReason.AccountUnapproved" xml:space="preserve">
     <value>帐户尚未通过审核批准。</value>
