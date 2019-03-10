@@ -50,7 +50,8 @@ namespace Zongsoft.Data
 			{
 				foreach(var item in items)
 				{
-					this.Add(item);
+					if(item != null)
+						this.Add(item);
 				}
 			}
 		}
@@ -63,7 +64,8 @@ namespace Zongsoft.Data
 			{
 				foreach(var item in items)
 				{
-					this.Add(item);
+					if(item != null)
+						this.Add(item);
 				}
 			}
 		}
