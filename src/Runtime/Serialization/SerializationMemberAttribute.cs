@@ -31,11 +31,6 @@ namespace Zongsoft.Runtime.Serialization
 	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, Inherited = true)]
 	public class SerializationMemberAttribute : Attribute
 	{
-		#region 成员字段
-		private string _name;
-		private SerializationMemberBehavior _behavior;
-		#endregion
-
 		#region 构造函数
 		public SerializationMemberAttribute()
 		{
@@ -43,12 +38,12 @@ namespace Zongsoft.Runtime.Serialization
 
 		public SerializationMemberAttribute(string name)
 		{
-			_name = name == null ? string.Empty : name.Trim();
+			this.Name = name == null ? string.Empty : name.Trim();
 		}
 
 		public SerializationMemberAttribute(SerializationMemberBehavior behavior)
 		{
-			_behavior = behavior;
+			this.Behavior = behavior;
 		}
 		#endregion
 
@@ -58,14 +53,15 @@ namespace Zongsoft.Runtime.Serialization
 		/// </summary>
 		public string Name
 		{
-			get
-			{
-				return _name;
-			}
-			set
-			{
-				_name = value == null ? string.Empty : value.Trim();
-			}
+			get; set;
+		}
+
+		/// <summary>
+		/// 获取或设置成员序列化方向。
+		/// </summary>
+		public SerializationDirection Direction
+		{
+			get; set;
 		}
 
 		/// <summary>
@@ -73,14 +69,7 @@ namespace Zongsoft.Runtime.Serialization
 		/// </summary>
 		public SerializationMemberBehavior Behavior
 		{
-			get
-			{
-				return _behavior;
-			}
-			set
-			{
-				_behavior = value;
-			}
+			get; set;
 		}
 		#endregion
 	}
