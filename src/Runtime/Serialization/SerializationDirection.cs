@@ -34,6 +34,9 @@ namespace Zongsoft.Runtime.Serialization
 	/// </summary>
 	public enum SerializationDirection
 	{
+		/// <summary>未定义。</summary>
+		None,
+
 		/// <summary>输入，即反序列化调用。</summary>
 		Input,
 
