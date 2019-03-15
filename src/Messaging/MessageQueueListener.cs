@@ -47,12 +47,9 @@ namespace Zongsoft.Messaging
 
 		public MessageQueueListener(IMessageQueue queue) : base("MessageQueueListener")
 		{
-			if(queue == null)
-				throw new ArgumentNullException("queue");
+			_queue = queue ?? throw new ArgumentNullException(nameof(queue));
 
-			_queue = queue;
-
-			if(!string.IsNullOrWhiteSpace(queue.Name))
+			if(queue.Name != null && queue.Name.Length > 0)
 				base.Name = queue.Name;
 		}
 		#endregion
