@@ -84,6 +84,14 @@ namespace Zongsoft.Data
 		}
 
 		/// <summary>
+		/// 获取或设置数据序号提供程序。
+		/// </summary>
+		Common.ISequence Sequence
+		{
+			get; set;
+		}
+
+		/// <summary>
 		/// 获取数据访问的过滤器集合。
 		/// </summary>
 		ICollection<IDataAccessFilter> Filters
