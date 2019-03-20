@@ -57,6 +57,7 @@ namespace Zongsoft.Data
 		#region 成员字段
 		private string _name;
 		private ISchemaParser _schema;
+		private Common.ISequence _sequence;
 		private IDataAccessNaming _naming;
 		private ICollection<IDataAccessFilter> _filters;
 		#endregion
@@ -121,9 +122,16 @@ namespace Zongsoft.Data
 		/// <summary>
 		/// 获取或设置一个数据序号提供程序。
 		/// </summary>
-		public abstract Common.ISequence Sequence
+		public Common.ISequence Sequence
 		{
-			get; set;
+			get
+			{
+				return _sequence;
+			}
+			set
+			{
+				_sequence = this.CreateSequence(value);
+			}
 		}
 
 		/// <summary>
@@ -1370,6 +1378,11 @@ namespace Zongsoft.Data
 				throw new InvalidOperationException($"Missing data access name mapping of the '{type.FullName}' type.");
 
 			return name;
+		}
+
+		protected virtual Common.ISequence CreateSequence(Common.ISequence sequence)
+		{
+			return sequence;
 		}
 		#endregion
 
