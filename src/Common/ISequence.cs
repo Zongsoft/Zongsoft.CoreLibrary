@@ -29,6 +29,9 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Common
 {
+	/// <summary>
+	/// 提供序号递增(减)功能的接口。
+	/// </summary>
 	public interface ISequence
 	{
 		/// <summary>

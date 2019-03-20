@@ -53,8 +53,7 @@ namespace Zongsoft.Data
 		///		<para>参数<paramref name="keys"/>支持序号键前缀，其内容大致如此：</para>
 		///		<code>
 		///			[DataSequence("Community:FeedbackId", 100000)]
-		///			[DataSearchKey("Key:Subject")]
-		///			public class FeedbackService : ServiceBase&lt;Feedback&gt;
+		///			public class FeedbackService : DataServiceBase&lt;Feedback&gt;
 		///			{
 		///			}
 		///		</code>

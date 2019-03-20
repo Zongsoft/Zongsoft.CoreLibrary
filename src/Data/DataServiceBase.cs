@@ -1370,7 +1370,9 @@ namespace Zongsoft.Data
 				for(int i = 0; i < attributes.Length; i++)
 				{
 					var attribute = attributes[i];
-					var sequence = string.IsNullOrWhiteSpace(attribute.SequenceName) ? dataService.ServiceProvider.ResolveRequired<Common.ISequence>() : dataService.ServiceProvider.ResolveRequired(attribute.SequenceName) as Common.ISequence;
+					var sequence = string.IsNullOrWhiteSpace(attribute.SequenceName) ?
+						dataService.ServiceProvider.ResolveRequired<Common.ISequence>() :
+						dataService.ServiceProvider.ResolveRequired(attribute.SequenceName) as Common.ISequence;
 
 					if(sequence == null)
 						throw new InvalidOperationException($"Not found '{attribute.SequenceName}' sequence for the '{dataService.Name}' data service.");
