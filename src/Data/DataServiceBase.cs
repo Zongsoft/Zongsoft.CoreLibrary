@@ -66,35 +66,24 @@ namespace Zongsoft.Data
 		#region 构造函数
 		protected DataServiceBase(Zongsoft.Services.IServiceProvider serviceProvider)
 		{
-			if(serviceProvider == null)
-				throw new ArgumentNullException("serviceProvider");
-
-			_serviceProvider = serviceProvider;
+			_serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
 			_dataAccess = serviceProvider.ResolveRequired<IDataAccess>();
 
 			//获取当前数据搜索键
 			_searchKey = (DataSearchKeyAttribute)Attribute.GetCustomAttribute(this.GetType(), typeof(DataSearchKeyAttribute), true);
-
-			//注册数据递增键序列号
-			DataSequence.Register(this);
 		}
 
 		protected DataServiceBase(string name, Zongsoft.Services.IServiceProvider serviceProvider)
 		{
 			if(string.IsNullOrWhiteSpace(name))
-				throw new ArgumentNullException("name");
-			if(serviceProvider == null)
-				throw new ArgumentNullException("serviceProvider");
+				throw new ArgumentNullException(nameof(name));
 
 			_name = name.Trim();
-			_serviceProvider = serviceProvider;
+			_serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
 			_dataAccess = serviceProvider.ResolveRequired<IDataAccess>();
 
 			//获取当前数据搜索键
 			_searchKey = (DataSearchKeyAttribute)Attribute.GetCustomAttribute(this.GetType(), typeof(DataSearchKeyAttribute), true);
-
-			//注册数据递增键序列号
-			DataSequence.Register(this);
 		}
 		#endregion
 
@@ -401,9 +390,6 @@ namespace Zongsoft.Data
 			//验证待新增的数据
 			this.OnValidate(DataAccessMethod.Insert, dictionary);
 
-			//尝试递增注册的递增键值
-			DataSequence.Increments(this, dictionary);
-
 			return this.OnInsert(dictionary, this.GetSchema(schema, data.GetType()), state);
 		}
 
@@ -437,9 +423,6 @@ namespace Zongsoft.Data
 			{
 				//验证待新增的数据
 				this.OnValidate(DataAccessMethod.Insert, dictionary);
-
-				//尝试递增注册的递增键值
-				DataSequence.Increments(this, dictionary);
 			}
 
 			return this.OnInsertMany(dictionares, this.GetSchema(schema, Common.TypeExtension.GetElementType(items.GetType())), state);
@@ -1343,109 +1326,6 @@ namespace Zongsoft.Data
 			#region 私有构造
 			private Condition()
 			{
-			}
-			#endregion
-		}
-
-		private static class DataSequence
-		{
-			#region 常量定义
-			private const string SEQUENCE_KEY_PREFIX = "Zongsoft.Data.Sequence";
-			#endregion
-
-			#region 静态缓存
-			private static readonly ConcurrentDictionary<DataServiceBase<TEntity>, DataSequenceToken[]> _cache = new ConcurrentDictionary<DataServiceBase<TEntity>, DataSequenceToken[]>();
-			#endregion
-
-			#region 公共方法
-			public static bool Register(DataServiceBase<TEntity> dataService)
-			{
-				var attributes = (DataSequenceAttribute[])Attribute.GetCustomAttributes(dataService.GetType(), typeof(DataSequenceAttribute), true);
-
-				if(attributes == null || attributes.Length == 0)
-					return false;
-
-				var tokens = new DataSequenceToken[attributes.Length];
-
-				for(int i = 0; i < attributes.Length; i++)
-				{
-					var attribute = attributes[i];
-					var sequence = string.IsNullOrWhiteSpace(attribute.SequenceName) ?
-						dataService.ServiceProvider.ResolveRequired<Common.ISequence>() :
-						dataService.ServiceProvider.ResolveRequired(attribute.SequenceName) as Common.ISequence;
-
-					if(sequence == null)
-						throw new InvalidOperationException($"Not found '{attribute.SequenceName}' sequence for the '{dataService.Name}' data service.");
-
-					var property = typeof(TEntity).GetProperty(attribute.Keys[attribute.Keys.Length - 1], System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
-
-					if(property == null)
-						throw new InvalidOperationException($"The '{attribute.Keys[attribute.Keys.Length - 1]}' sequence property is not existed.");
-
-					if(!Zongsoft.Common.TypeExtension.IsNumeric(property.PropertyType))
-						throw new InvalidOperationException($"The '{property.Name}' sequence property type not is numeric.");
-
-					tokens[i] = new DataSequenceToken(sequence, attribute, property.PropertyType);
-				}
-
-				return _cache.TryAdd(dataService, tokens);
-			}
-
-			public static void Increments(DataServiceBase<TEntity> dataService, IDataDictionary data)
-			{
-				DataSequenceToken[] tokens;
-
-				if(_cache.TryGetValue(dataService, out tokens))
-				{
-					foreach(var token in tokens)
-					{
-						var sequenceKey = GetSequenceKey(data, token.Attribute);
-
-						if(sequenceKey != null && sequenceKey.Length > 0)
-						{
-							//确保只有当序号字段未指定值或值为零时，才使用增量的序号值
-							data.SetValue(token.Attribute.Keys[token.Attribute.Keys.Length - 1],
-									 () => token.Sequence.Increment(sequenceKey, 1, token.Attribute.Seed),
-									 value => (ulong)System.Convert.ChangeType(value, typeof(ulong)) == 0);
-						}
-					}
-				}
-			}
-			#endregion
-
-			#region 私有方法
-			private static string GetSequenceKey(IDataDictionary data, DataSequenceAttribute attribute)
-			{
-				var result = SEQUENCE_KEY_PREFIX;
-
-				if(!string.IsNullOrWhiteSpace(attribute.Prefix))
-					result += ":" + attribute.Prefix;
-
-				for(int i = 0; i < attribute.Keys.Length - 1; i++)
-				{
-					var value = data.GetValue(attribute.Keys[i]);
-
-					if(value != null)
-						result += ":" + value.ToString().ToLowerInvariant();
-				}
-
-				return result += ":" + attribute.Keys[attribute.Keys.Length - 1].ToLowerInvariant();
-			}
-			#endregion
-
-			#region 嵌套子类
-			private class DataSequenceToken
-			{
-				public readonly Common.ISequence Sequence;
-				public readonly DataSequenceAttribute Attribute;
-				public readonly Type Type;
-
-				public DataSequenceToken(Common.ISequence sequence, DataSequenceAttribute attribute, Type type)
-				{
-					this.Sequence = sequence;
-					this.Attribute = attribute;
-					this.Type = type;
-				}
 			}
 			#endregion
 		}
