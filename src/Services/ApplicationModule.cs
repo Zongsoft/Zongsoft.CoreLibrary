@@ -40,31 +40,40 @@ namespace Zongsoft.Services
 {
 	public class ApplicationModule : IApplicationModule
 	{
-		#region 成员字段
-		private string _name;
-		private string _title;
-		#endregion
-
 		#region 构造函数
 		public ApplicationModule(string name)
 		{
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException(nameof(name));
 
-			_name = name.Trim();
+			this.Name = this.Title = name.Trim();
+		}
+
+		public ApplicationModule(string name, string title, string description = null)
+		{
+			if(string.IsNullOrWhiteSpace(name))
+				throw new ArgumentNullException(nameof(name));
+
+			this.Name = name.Trim();
+			this.Title = title ?? this.Name;
+			this.Description = description;
 		}
 		#endregion
 
 		#region 公共属性
 		public string Name
 		{
-			get => _name;
+			get;
 		}
 
 		public string Title
 		{
-			get => _title;
-			set => _title = value;
+			get; set;
+		}
+
+		public string Description
+		{
+			get; set;
 		}
 
 		public virtual ISettingsProvider Settings
@@ -74,7 +83,7 @@ namespace Zongsoft.Services
 
 		public virtual IServiceProvider Services
 		{
-			get => ServiceProviderFactory.Instance.GetProvider(_name);
+			get => ServiceProviderFactory.Instance.GetProvider(this.Name);
 		}
 		#endregion
 	}

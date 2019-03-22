@@ -44,7 +44,7 @@ namespace Zongsoft.Services
 	public interface IApplicationModule
 	{
 		/// <summary>
-		/// 获取当前应用模块名称。
+		/// 获取应用模块名称。
 		/// </summary>
 		string Name
 		{
@@ -52,7 +52,7 @@ namespace Zongsoft.Services
 		}
 
 		/// <summary>
-		/// 获取或设置当前应用模块的标题。
+		/// 获取或设置应用模块的标题。
 		/// </summary>
 		string Title
 		{
@@ -61,7 +61,16 @@ namespace Zongsoft.Services
 		}
 
 		/// <summary>
-		/// 获取当前应用模块的自定义设置提供程序。
+		/// 获取或设置应用模块的描述文本。
+		/// </summary>
+		string Description
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// 获取应用模块的自定义设置提供程序。
 		/// </summary>
 		ISettingsProvider Settings
 		{
@@ -69,7 +78,7 @@ namespace Zongsoft.Services
 		}
 
 		/// <summary>
-		/// 获取当前应用模块的服务容器。
+		/// 获取应用模块的服务容器。
 		/// </summary>
 		IServiceProvider Services
 		{

@@ -54,8 +54,6 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 成员字段
-		private string _name;
-		private string _title;
 		private readonly IList<IApplicationModule> _modules;
 		private readonly IList<IApplicationFilter> _filters;
 		private readonly IDictionary<string, object> _states;
@@ -67,7 +65,7 @@ namespace Zongsoft.Services
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException(nameof(name));
 
-			_name = name.Trim();
+			this.Name = this.Title = name.Trim();
 			_modules = new List<IApplicationModule>();
 			_filters = new List<IApplicationFilter>();
 			_states = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
@@ -94,13 +92,17 @@ namespace Zongsoft.Services
 		#region 公共属性
 		public string Name
 		{
-			get => _name;
+			get;
 		}
 
 		public string Title
 		{
-			get => _title;
-			set => _title = value;
+			get; set;
+		}
+
+		public string Description
+		{
+			get; set;
 		}
 
 		public virtual string ApplicationDirectory
@@ -194,7 +196,10 @@ namespace Zongsoft.Services
 		#region 重写方法
 		public override string ToString()
 		{
-			return string.Format("[{0}] {1}", _name, _title);
+			if(string.IsNullOrEmpty(this.Title) || string.Equals(this.Name, this.Title))
+				return this.Name;
+			else
+				return string.Format("[{0}] {1}", this.Name, this.Title);
 		}
 		#endregion
 	}
