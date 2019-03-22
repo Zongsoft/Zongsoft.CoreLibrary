@@ -36,6 +36,7 @@ namespace Zongsoft.Collections
 	public abstract class HierarchicalNode
 	{
 		#region 公共常量
+		[Runtime.Serialization.SerializationMember(Runtime.Serialization.SerializationMemberBehavior.Ignored)]
 		public readonly char PathSeparatorChar = '/';
 		#endregion
 
@@ -185,13 +186,20 @@ namespace Zongsoft.Collections
 			if(string.IsNullOrWhiteSpace(path))
 				return this;
 
-			return this.FindNode(path.Split(PathSeparatorChar), onStep);
+			return this.FindNode(path, 0, 0, onStep);
 		}
 
-		internal protected HierarchicalNode FindNode(string[] paths, Func<HierarchicalNodeToken, HierarchicalNode> onStep = null)
+		internal protected HierarchicalNode FindNode(string path, int startIndex, int length = 0, Func<HierarchicalNodeToken, HierarchicalNode> onStep = null)
 		{
-			if(paths == null || paths.Length == 0)
-				return null;
+			if(startIndex < 0 || startIndex >= path.Length)
+				throw new ArgumentOutOfRangeException(nameof(startIndex));
+
+			if(length > 0 && length > path.Length - startIndex)
+				throw new ArgumentOutOfRangeException(nameof(length));
+
+			//注意：一定要确保空字符串路径是返回自身
+			if(path == null || path.Length == 0)
+				return this;
 
 			//确保当前子节点集合已经被加载过
 			this.EnsureChildren();
@@ -199,63 +207,70 @@ namespace Zongsoft.Collections
 			//当前节点默认为本节点
 			var current = this;
 
-			//如果第一个部分是空字符则表示路径是以斜杠(/)打头或第一个部分是以斜杠(/)打头则从根节点开始查找
-			if(string.IsNullOrWhiteSpace(paths[0]) || paths[0].Trim()[0] == PathSeparatorChar)
-				current = this.FindRoot();
+			int last = startIndex;
+			int spaces = 0;
+			int index = 0;
 
-			int pathIndex = 0, partIndex = 0;
-			string[] parts = null;
-
-			while(current != null && pathIndex < paths.Length)
+			for(int i = startIndex; i < (length > 0 ? length : path.Length - startIndex); i++)
 			{
-				var part = string.Empty;
-				HierarchicalNode parent = null;
-
-				if(parts == null && paths[pathIndex].Contains(PathSeparatorChar.ToString()))
+				if(path[i] == PathSeparatorChar)
 				{
-					parts = paths[pathIndex].Split(PathSeparatorChar);
-					partIndex = 0;
-				}
+					if(index++ == 0)
+					{
+						if(last == i)
+							current = this.FindRoot();
+					}
 
-				if(parts == null)
-					part = paths[pathIndex++].Trim();
+					if(i - last > spaces)
+					{
+						current = this.FindStep(current, index - 1, path, i, last, spaces, onStep);
+
+						if(current == null)
+							return null;
+					}
+
+					spaces = -1;
+					last = i + 1;
+				}
+				else if(char.IsWhiteSpace(path, i))
+				{
+					if(i == last)
+						last = i + 1;
+					else
+						spaces++;
+				}
 				else
 				{
-					if(partIndex < parts.Length)
-						part = parts[partIndex++].Trim();
-					else
-					{
-						parts = null;
-						pathIndex++;
-						continue;
-					}
-				}
-
-				switch(part)
-				{
-					case "":
-					case ".":
-						continue;
-					case "..":
-						current = current._parent;
-						parent = current != null ? current._parent : null;
-						break;
-					default:
-						parent = current;
-						current = current.GetChild(part);
-						break;
-				}
-
-				if(onStep != null)
-				{
-					current = onStep(new HierarchicalNodeToken(part, current, parent));
-
-					if(current == null)
-						return null;
+					spaces = 0;
 				}
 			}
 
+			if(last < path.Length - spaces - 1)
+				current = this.FindStep(current, index, path, path.Length, last, spaces, onStep);
+
 			return current;
+		}
+
+		internal protected HierarchicalNode FindNode(string[] paths, Func<HierarchicalNodeToken, HierarchicalNode> onStep = null)
+		{
+			if(paths == null || paths.Length == 0)
+				return null;
+
+			return this.FindNode(string.Join(PathSeparatorChar.ToString(), paths), onStep);
+		}
+
+		internal protected HierarchicalNode FindNode(string[] paths, int startIndex, int count = 0, Func<HierarchicalNodeToken, HierarchicalNode> onStep = null)
+		{
+			if(startIndex < 0 || startIndex >= paths.Length)
+				throw new ArgumentOutOfRangeException(nameof(startIndex));
+
+			if(count > 0 && count > paths.Length - startIndex)
+				throw new ArgumentOutOfRangeException(nameof(count));
+
+			if(paths == null || paths.Length == 0)
+				return null;
+
+			return this.FindNode(string.Join(PathSeparatorChar.ToString(), paths, startIndex, (count > 0 ? count : paths.Length - startIndex)), onStep);
 		}
 		#endregion
 
@@ -292,15 +307,47 @@ namespace Zongsoft.Collections
 		protected abstract HierarchicalNode GetChild(string name);
 		#endregion
 
+		#region 私有方法
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		private HierarchicalNode FindStep(HierarchicalNode current, int index, string path, int i, int last, int spaces, Func<HierarchicalNodeToken, HierarchicalNode> onStep)
+		{
+			var part = path.Substring(last, i - last - spaces);
+			HierarchicalNode parent = null;
+
+			switch(part)
+			{
+				case "":
+				case ".":
+					return current;
+				case "..":
+					if(current._parent != null)
+						current = current._parent;
+
+					break;
+				default:
+					parent = current;
+					current = parent.GetChild(part);
+					break;
+			}
+
+			if(onStep != null)
+				current = onStep(new HierarchicalNodeToken(index, part, current, parent));
+
+			return current;
+		}
+		#endregion
+
 		#region 嵌套子类
-		public class HierarchicalNodeToken
+		public struct HierarchicalNodeToken
 		{
 			public readonly string Name;
+			public readonly int Index;
 			public readonly HierarchicalNode Parent;
 			public readonly HierarchicalNode Current;
 
-			internal HierarchicalNodeToken(string name, HierarchicalNode current, HierarchicalNode parent = null)
+			internal HierarchicalNodeToken(int index, string name, HierarchicalNode current, HierarchicalNode parent = null)
 			{
+				this.Index = index;
 				this.Name = name;
 				this.Current = current;
 

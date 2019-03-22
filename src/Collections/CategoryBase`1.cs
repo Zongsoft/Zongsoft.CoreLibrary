@@ -129,12 +129,22 @@ namespace Zongsoft.Collections
 		#region 公共方法
 		public T Find(string path)
 		{
-			return (T)base.FindNode(path);
+			return (T)base.FindNode(path, 0, 0);
+		}
+
+		public T Find(string path, int startIndex, int length = 0)
+		{
+			return (T)base.FindNode(path, startIndex, length);
 		}
 
 		public T Find(string[] parts)
 		{
 			return (T)base.FindNode(parts);
+		}
+
+		public T Find(string[] parts, int startIndex, int count = 0)
+		{
+			return (T)base.FindNode(parts, startIndex, count);
 		}
 		#endregion
 	}

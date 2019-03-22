@@ -36,22 +36,22 @@ namespace Zongsoft.Collections.Tests
 		public void FindTest()
 		{
 			Assert.NotNull(_root.Find("File"));
-			Assert.NotNull(_root.Find("Edit"));
-			Assert.NotNull(_root.Find("Help"));
+			Assert.NotNull(_root.Find(" Edit"));
+			Assert.NotNull(_root.Find(" Help "));
 
-			Assert.NotNull(_root.Find("File/Save"));
-			Assert.NotNull(_root.Find("File/Recents"));
-			Assert.NotNull(_root.Find("File/Recents/Document-1"));
+			Assert.NotNull(_root.Find(" File / Save"));
+			Assert.NotNull(_root.Find(" File/ Recents"));
+			Assert.NotNull(_root.Find(" File /Recents / Document-1"));
 
-			Assert.NotNull(_root.Find("/File/Save"));
-			Assert.NotNull(_root.Find("/File/Recents"));
-			Assert.NotNull(_root.Find("/File/Recents/Document-2"));
+			Assert.NotNull(_root.Find(" /File/ Save"));
+			Assert.NotNull(_root.Find("/ File  /Recents"));
+			Assert.NotNull(_root.Find(" / File  /  Recents/Document-2"));
 
-			Assert.NotNull(_root.Find("File").Find("Open"));
-			Assert.NotNull(_root.Find("File").Find("./Recents"));
-			Assert.NotNull(_root.Find("File").Find("Recents").Find("Document-2"));
+			Assert.NotNull(_root.Find("File").Find(" Open"));
+			Assert.NotNull(_root.Find("File").Find("./ Recents"));
+			Assert.NotNull(_root.Find("File").Find("Recents").Find("Document-2  "));
 
-			var node = _root.Find("Edit").Find("../File/Save");
+			var node = _root.Find("Edit").Find(".. / File / Save");
 
 			Assert.NotNull(node);
 			Assert.Equal("Save", node.Name);
