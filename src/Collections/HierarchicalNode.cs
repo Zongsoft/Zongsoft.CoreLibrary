@@ -63,7 +63,7 @@ namespace Zongsoft.Collections
 				throw new ArgumentNullException("name");
 
 			if(name.Contains(pathSeparatorChar.ToString()))
-				throw new ArgumentException("The name contains path separator char.");
+				throw new ArgumentException("The name contains path separator character.");
 
 			if(Zongsoft.Common.StringExtension.ContainsCharacters(name, @"./\*?!@#$%^&"))
 				throw new ArgumentException("The name contains invalid character(s).");
@@ -309,9 +309,9 @@ namespace Zongsoft.Collections
 
 		#region 私有方法
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-		private HierarchicalNode FindStep(HierarchicalNode current, int index, string path, int i, int last, int spaces, Func<HierarchicalNodeToken, HierarchicalNode> onStep)
+		private HierarchicalNode FindStep(HierarchicalNode current, int index, string path, int position, int last, int spaces, Func<HierarchicalNodeToken, HierarchicalNode> onStep)
 		{
-			var part = path.Substring(last, i - last - spaces);
+			var part = path.Substring(last, position - last - spaces);
 			HierarchicalNode parent = null;
 
 			switch(part)
@@ -338,7 +338,7 @@ namespace Zongsoft.Collections
 		#endregion
 
 		#region 嵌套子类
-		public struct HierarchicalNodeToken
+		internal protected struct HierarchicalNodeToken
 		{
 			public readonly string Name;
 			public readonly int Index;
