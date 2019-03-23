@@ -123,8 +123,8 @@ namespace Zongsoft.Collections
 		/// <returns>如果指定键的缓存项是存在的则返回真(true)，否则返回假(false)。</returns>
 		public bool Contains(string name)
 		{
-			if(string.IsNullOrWhiteSpace(name))
-				throw new ArgumentNullException("name");
+			if(string.IsNullOrEmpty(name))
+				throw new ArgumentNullException(nameof(name));
 
 			var cache = _cache;
 
@@ -141,8 +141,8 @@ namespace Zongsoft.Collections
 		/// <returns>返回获取到的缓存项，如果返回值为空(null)则表示指定的缓存项不存在。</returns>
 		public T Get(string name)
 		{
-			if(string.IsNullOrWhiteSpace(name))
-				throw new ArgumentNullException("name");
+			if(string.IsNullOrEmpty(name))
+				throw new ArgumentNullException(nameof(name));
 
 			var cache = _cache;
 
@@ -165,11 +165,11 @@ namespace Zongsoft.Collections
 		/// <returns>返回获取到的或新加的缓存项，如果返回值为空(null)则表示<paramref name="valueFactory"/>参数指定的生成函数返回值为空。</returns>
 		public T Get(string name, Func<string, T> valueFactory)
 		{
-			if(string.IsNullOrWhiteSpace(name))
-				throw new ArgumentNullException("name");
+			if(string.IsNullOrEmpty(name))
+				throw new ArgumentNullException(nameof(name));
 
 			if(valueFactory == null)
-				throw new ArgumentNullException("valueFactory");
+				throw new ArgumentNullException(nameof(valueFactory));
 
 			var cache = _cache;
 
@@ -234,8 +234,8 @@ namespace Zongsoft.Collections
 		/// <returns>返回删除后的缓存项对象，如果删除失败则返回空(null)。</returns>
 		public T Remove(string name)
 		{
-			if(string.IsNullOrWhiteSpace(name))
-				throw new ArgumentNullException("name");
+			if(string.IsNullOrEmpty(name))
+				throw new ArgumentNullException(nameof(name));
 
 			var cache = _cache;
 
