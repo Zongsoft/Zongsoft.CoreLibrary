@@ -44,7 +44,7 @@ namespace Zongsoft.ComponentModel
 		#region 公共方法
 		public SchemaCategory Add(string name, string title, string description)
 		{
-			var category = new SchemaCategory(name, title, description, true);
+			var category = new SchemaCategory(name, title, description);
 			this.Add(category);
 			return category;
 		}

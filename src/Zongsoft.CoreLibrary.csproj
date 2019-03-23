@@ -49,7 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Collections\CategoryBase`1.cs" />
+    <Compile Include="Collections\HierarchicalNode`1.cs" />
     <Compile Include="Collections\Collection.cs" />
     <Compile Include="Collections\CollectionRemovedEventArgs.cs" />
     <Compile Include="Collections\CollectionRemovedReason.cs" />

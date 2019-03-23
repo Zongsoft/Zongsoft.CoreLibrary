@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2010-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,95 +25,39 @@
  */
 
 using System;
-using System.ComponentModel;
 
 using Zongsoft.Runtime.Serialization;
 
 namespace Zongsoft.Collections
 {
-	public abstract class CategoryBase<T> : HierarchicalNode where T : HierarchicalNode
+	public abstract class HierarchicalNode<T> : HierarchicalNode where T : HierarchicalNode
 	{
-		#region 成员字段
-		private string _title;
-		private string _description;
-		private string _tags;
-		private bool _visible;
-		#endregion
-
 		#region 构造函数
-		protected CategoryBase()
+		protected HierarchicalNode()
 		{
-			_title = base.PathSeparatorChar.ToString();
-			_visible = true;
+			this.Title = base.PathSeparatorChar.ToString();
 		}
 
-		protected CategoryBase(string name)
-			: this(name, name, string.Empty, true)
-		{
-		}
-
-		protected CategoryBase(string name, string title, string description)
-			: this(name, title, description, true)
+		protected HierarchicalNode(string name) : this(name, name, string.Empty)
 		{
 		}
 
-		protected CategoryBase(string name, string title, string description, bool visible)
-			: base(name)
+		protected HierarchicalNode(string name, string title, string description) : base(name)
 		{
-			_title = string.IsNullOrEmpty(title) ? name : title;
-			_description = description;
-			_visible = visible;
+			this.Title = string.IsNullOrEmpty(title) ? name : title;
+			this.Description = description;
 		}
 		#endregion
 
 		#region 公共属性
 		public string Title
 		{
-			get
-			{
-				return _title;
-			}
-			set
-			{
-				_title = value;
-			}
+			get; set;
 		}
 
 		public string Description
 		{
-			get
-			{
-				return _description;
-			}
-			set
-			{
-				_description = value;
-			}
-		}
-
-		public string Tags
-		{
-			get
-			{
-				return _tags;
-			}
-			set
-			{
-				_tags = value;
-			}
-		}
-
-		[DefaultValue(true)]
-		public bool Visible
-		{
-			get
-			{
-				return _visible;
-			}
-			set
-			{
-				_visible = value;
-			}
+			get; set;
 		}
 
 		[SerializationMember(SerializationMemberBehavior.Ignored)]

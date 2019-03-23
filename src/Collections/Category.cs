@@ -25,21 +25,23 @@
  */
 
 using System;
-using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Zongsoft.Collections
 {
 	[Serializable]
 	[System.ComponentModel.DefaultProperty("Children")]
-	public class Category : CategoryBase<Category>
+	public class Category : HierarchicalNode<Category>
 	{
 		#region 成员字段
+		private bool _visible;
 		private CategoryCollection _children;
 		#endregion
 
 		#region 构造函数
 		public Category()
 		{
+			_visible = true;
 		}
 
 		public Category(string name) : this(name, name, string.Empty, true)
@@ -50,12 +52,26 @@ namespace Zongsoft.Collections
 		{
 		}
 
-		public Category(string name, string title, string description, bool visible) : base(name, title, description, visible)
+		public Category(string name, string title, string description, bool visible) : base(name, title, description)
 		{
+			_visible = visible;
 		}
 		#endregion
 
 		#region 公共属性
+		[DefaultValue(true)]
+		public bool Visible
+		{
+			get
+			{
+				return _visible;
+			}
+			set
+			{
+				_visible = value;
+			}
+		}
+
 		public CategoryCollection Children
 		{
 			get

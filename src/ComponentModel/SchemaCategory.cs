@@ -30,7 +30,7 @@ using System.Collections.Generic;
 namespace Zongsoft.ComponentModel
 {
 	[System.ComponentModel.DefaultProperty("Schemas")]
-	public class SchemaCategory : Zongsoft.Collections.CategoryBase<SchemaCategory>
+	public class SchemaCategory : Zongsoft.Collections.HierarchicalNode<SchemaCategory>
 	{
 		#region 静态字段
 		public static readonly SchemaCategory Default = new SchemaCategory();
@@ -47,15 +47,12 @@ namespace Zongsoft.ComponentModel
 			_schemas = new SchemaCollection();
 		}
 
-		public SchemaCategory(string name) : this(name, name, string.Empty, true)
+		public SchemaCategory(string name) : base(name, name, string.Empty)
 		{
+			_schemas = new SchemaCollection();
 		}
 
-		public SchemaCategory(string name, string title, string description) : this(name, title, description, true)
-		{
-		}
-
-		public SchemaCategory(string name, string title, string description, bool visible) : base(name, title, description, visible)
+		public SchemaCategory(string name, string title, string description) : base(name, title, description)
 		{
 			_schemas = new SchemaCollection();
 		}
