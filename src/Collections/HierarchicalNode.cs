@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2013-2014 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2013-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -182,24 +182,20 @@ namespace Zongsoft.Collections
 		#region 保护方法
 		internal protected HierarchicalNode FindNode(string path, Func<HierarchicalNodeToken, HierarchicalNode> onStep = null)
 		{
-			//注意：一定要确保空字符串路径是返回自身
-			if(string.IsNullOrWhiteSpace(path))
-				return this;
-
 			return this.FindNode(path, 0, 0, onStep);
 		}
 
 		internal protected HierarchicalNode FindNode(string path, int startIndex, int length = 0, Func<HierarchicalNodeToken, HierarchicalNode> onStep = null)
 		{
+			//注意：一定要确保空字符串路径是返回自身
+			if(path == null || path.Length == 0)
+				return this;
+
 			if(startIndex < 0 || startIndex >= path.Length)
 				throw new ArgumentOutOfRangeException(nameof(startIndex));
 
 			if(length > 0 && length > path.Length - startIndex)
 				throw new ArgumentOutOfRangeException(nameof(length));
-
-			//注意：一定要确保空字符串路径是返回自身
-			if(path == null || path.Length == 0)
-				return this;
 
 			//确保当前子节点集合已经被加载过
 			this.EnsureChildren();
@@ -251,26 +247,26 @@ namespace Zongsoft.Collections
 			return current;
 		}
 
-		internal protected HierarchicalNode FindNode(string[] paths, Func<HierarchicalNodeToken, HierarchicalNode> onStep = null)
+		internal protected HierarchicalNode FindNode(string[] parts, Func<HierarchicalNodeToken, HierarchicalNode> onStep = null)
 		{
-			if(paths == null || paths.Length == 0)
+			if(parts == null || parts.Length == 0)
 				return null;
 
-			return this.FindNode(string.Join(PathSeparatorChar.ToString(), paths), onStep);
+			return this.FindNode(string.Join(PathSeparatorChar.ToString(), parts), onStep);
 		}
 
-		internal protected HierarchicalNode FindNode(string[] paths, int startIndex, int count = 0, Func<HierarchicalNodeToken, HierarchicalNode> onStep = null)
+		internal protected HierarchicalNode FindNode(string[] parts, int startIndex, int count = 0, Func<HierarchicalNodeToken, HierarchicalNode> onStep = null)
 		{
-			if(startIndex < 0 || startIndex >= paths.Length)
-				throw new ArgumentOutOfRangeException(nameof(startIndex));
-
-			if(count > 0 && count > paths.Length - startIndex)
-				throw new ArgumentOutOfRangeException(nameof(count));
-
-			if(paths == null || paths.Length == 0)
+			if(parts == null || parts.Length == 0)
 				return null;
 
-			return this.FindNode(string.Join(PathSeparatorChar.ToString(), paths, startIndex, (count > 0 ? count : paths.Length - startIndex)), onStep);
+			if(startIndex < 0 || startIndex >= parts.Length)
+				throw new ArgumentOutOfRangeException(nameof(startIndex));
+
+			if(count > 0 && count > parts.Length - startIndex)
+				throw new ArgumentOutOfRangeException(nameof(count));
+
+			return this.FindNode(string.Join(PathSeparatorChar.ToString(), parts, startIndex, (count > 0 ? count : parts.Length - startIndex)), onStep);
 		}
 		#endregion
 
