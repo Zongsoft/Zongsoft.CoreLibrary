@@ -14,6 +14,7 @@ namespace Zongsoft.Collections.Tests
 	{
 		private Category _root;
 
+		#region 构造函数
 		public CategoryTests()
 		{
 			_root = new Category();
@@ -31,7 +32,9 @@ namespace Zongsoft.Collections.Tests
 				new Category("Document-2")
 			);
 		}
+		#endregion
 
+		#region 测试方法
 		[Fact]
 		public void FindTest()
 		{
@@ -56,5 +59,6 @@ namespace Zongsoft.Collections.Tests
 			Assert.NotNull(node);
 			Assert.Equal("Save", node.Name);
 		}
+		#endregion
 	}
 }
