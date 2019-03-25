@@ -57,6 +57,7 @@ namespace Zongsoft.Services
 		private readonly IList<IApplicationModule> _modules;
 		private readonly IList<IApplicationFilter> _filters;
 		private readonly IDictionary<string, object> _states;
+		private readonly Collections.INamedCollection<ComponentModel.Schema> _schemas;
 		#endregion
 
 		#region 构造函数
@@ -69,6 +70,7 @@ namespace Zongsoft.Services
 			_modules = new List<IApplicationModule>();
 			_filters = new List<IApplicationFilter>();
 			_states = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+			_schemas = new ComponentModel.SchemaCollection();
 		}
 		#endregion
 
@@ -143,6 +145,14 @@ namespace Zongsoft.Services
 		public ICollection<IApplicationFilter> Filters
 		{
 			get => _filters;
+		}
+
+		public Collections.INamedCollection<ComponentModel.Schema> Schemas
+		{
+			get
+			{
+				return _schemas;
+			}
 		}
 
 		public IDictionary<string, object> States
