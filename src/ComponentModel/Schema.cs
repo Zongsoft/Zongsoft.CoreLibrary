@@ -132,6 +132,7 @@ namespace Zongsoft.ComponentModel
 			}
 		}
 
+		[Runtime.Serialization.SerializationMember(Runtime.Serialization.SerializationMemberBehavior.Ignored)]
 		public bool HasActions
 		{
 			get
