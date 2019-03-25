@@ -35,6 +35,8 @@ using System;
 using System.Collections.Generic;
 
 using Zongsoft.Options;
+using Zongsoft.ComponentModel;
+using Zongsoft.Collections;
 
 namespace Zongsoft.Services
 {
@@ -81,6 +83,14 @@ namespace Zongsoft.Services
 		/// 获取应用模块的服务容器。
 		/// </summary>
 		IServiceProvider Services
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取应用模块的授权目标集。
+		/// </summary>
+		INamedCollection<Schema> Schemas
 		{
 			get;
 		}

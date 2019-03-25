@@ -35,9 +35,12 @@ using System;
 using System.Collections.Generic;
 
 using Zongsoft.Options;
+using Zongsoft.ComponentModel;
+using Zongsoft.Collections;
 
 namespace Zongsoft.Services
 {
+	[System.ComponentModel.DefaultProperty(nameof(Schemas))]
 	public class ApplicationModule : IApplicationModule
 	{
 		#region 构造函数
@@ -47,6 +50,7 @@ namespace Zongsoft.Services
 				throw new ArgumentNullException(nameof(name));
 
 			this.Name = this.Title = name.Trim();
+			this.Schemas = new SchemaCollection();
 		}
 
 		public ApplicationModule(string name, string title, string description = null)
@@ -57,6 +61,7 @@ namespace Zongsoft.Services
 			this.Name = name.Trim();
 			this.Title = title ?? this.Name;
 			this.Description = description;
+			this.Schemas = new SchemaCollection();
 		}
 		#endregion
 
@@ -84,6 +89,21 @@ namespace Zongsoft.Services
 		public virtual IServiceProvider Services
 		{
 			get => ServiceProviderFactory.Instance.GetProvider(this.Name);
+		}
+
+		public INamedCollection<Schema> Schemas
+		{
+			get;
+		}
+		#endregion
+
+		#region 重写方法
+		public override string ToString()
+		{
+			if(string.IsNullOrEmpty(this.Title) || string.Equals(this.Name, this.Title))
+				return this.Name;
+			else
+				return string.Format("[{0}] {1}", this.Name, this.Title);
 		}
 		#endregion
 	}
