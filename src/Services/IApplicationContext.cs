@@ -86,7 +86,7 @@ namespace Zongsoft.Services
 		/// <summary>
 		/// 获取当前应用程序的模块集。
 		/// </summary>
-		ICollection<IApplicationModule> Modules
+		Collections.INamedCollection<IApplicationModule> Modules
 		{
 			get;
 		}
@@ -94,7 +94,7 @@ namespace Zongsoft.Services
 		/// <summary>
 		/// 获取当前应用程序的事件处理程序集。
 		/// </summary>
-		ICollection<IApplicationFilter> Filters
+		Collections.INamedCollection<IApplicationFilter> Filters
 		{
 			get;
 		}

@@ -54,10 +54,10 @@ namespace Zongsoft.Services
 		#endregion
 
 		#region 成员字段
-		private readonly IList<IApplicationModule> _modules;
-		private readonly IList<IApplicationFilter> _filters;
-		private readonly IDictionary<string, object> _states;
+		private readonly Collections.INamedCollection<IApplicationModule> _modules;
+		private readonly Collections.INamedCollection<IApplicationFilter> _filters;
 		private readonly Collections.INamedCollection<ComponentModel.Schema> _schemas;
+		private readonly IDictionary<string, object> _states;
 		#endregion
 
 		#region 构造函数
@@ -67,10 +67,10 @@ namespace Zongsoft.Services
 				throw new ArgumentNullException(nameof(name));
 
 			this.Name = this.Title = name.Trim();
-			_modules = new List<IApplicationModule>();
-			_filters = new List<IApplicationFilter>();
-			_states = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+			_modules = new Collections.NamedCollection<IApplicationModule>(p => p.Name);
+			_filters = new Collections.NamedCollection<IApplicationFilter>(p => p.Name);
 			_schemas = new ComponentModel.SchemaCollection();
+			_states = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 		}
 		#endregion
 
@@ -137,12 +137,12 @@ namespace Zongsoft.Services
 			get => System.Threading.Thread.CurrentPrincipal;
 		}
 
-		public ICollection<IApplicationModule> Modules
+		public Collections.INamedCollection<IApplicationModule> Modules
 		{
 			get => _modules;
 		}
 
-		public ICollection<IApplicationFilter> Filters
+		public Collections.INamedCollection<IApplicationFilter> Filters
 		{
 			get => _filters;
 		}
