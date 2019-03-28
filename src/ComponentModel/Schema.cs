@@ -30,7 +30,7 @@ using System.Collections.Generic;
 namespace Zongsoft.ComponentModel
 {
 	[System.ComponentModel.DefaultProperty("Actions")]
-	public class Schema
+	public class Schema : IEquatable<Schema>
 	{
 		#region 成员变量
 		private string _name;
@@ -154,14 +154,20 @@ namespace Zongsoft.ComponentModel
 		#endregion
 
 		#region 重写方法
-		public override bool Equals(object obj)
+		public bool Equals(Schema schema)
 		{
-			Schema target = obj as Schema;
-
-			if((target == null) && (this != null))
+			if(schema == null)
 				return false;
 
-			return string.Equals(_name, target.Name, StringComparison.OrdinalIgnoreCase);
+			return string.Equals(_name, schema.Name, StringComparison.OrdinalIgnoreCase);
+		}
+
+		public override bool Equals(object obj)
+		{
+			if(obj == null || obj.GetType() != this.GetType())
+				return false;
+
+			return string.Equals(_name, ((Schema)obj).Name, StringComparison.OrdinalIgnoreCase);
 		}
 
 		public override int GetHashCode()
