@@ -29,14 +29,13 @@ using System.Collections.Generic;
 
 namespace Zongsoft.ComponentModel
 {
-	public class SchemaAction
+	public class SchemaAction : IEquatable<SchemaAction>
 	{
 		#region 成员变量
 		private string _name;
 		private string _title;
 		private string _description;
 		private bool _visible;
-		private Schema _schema;
 		#endregion
 
 		#region 构造函数
@@ -51,7 +50,7 @@ namespace Zongsoft.ComponentModel
 		public SchemaAction(string name, string title, string description)
 		{
 			if(string.IsNullOrWhiteSpace(name))
-				throw new ArgumentNullException("name");
+				throw new ArgumentNullException(nameof(name));
 
 			_name = name.Trim();
 			_title = string.IsNullOrWhiteSpace(title) ? _name : title;
@@ -61,19 +60,6 @@ namespace Zongsoft.ComponentModel
 		#endregion
 
 		#region 公共属性
-		[Runtime.Serialization.SerializationMember(Runtime.Serialization.SerializationMemberBehavior.Ignored)]
-		public Schema Schema
-		{
-			get
-			{
-				return _schema;
-			}
-			internal protected set
-			{
-				_schema = value;
-			}
-		}
-
 		public string Name
 		{
 			get
@@ -127,14 +113,20 @@ namespace Zongsoft.ComponentModel
 		#endregion
 
 		#region 重写方法
-		public override bool Equals(object obj)
+		public bool Equals(SchemaAction action)
 		{
-			SchemaAction target = obj as SchemaAction;
-
-			if((target == null) && (this != null))
+			if(action == null)
 				return false;
 
-			return string.Equals(_name, target.Name, StringComparison.OrdinalIgnoreCase);
+			return string.Equals(_name, action.Name, StringComparison.OrdinalIgnoreCase);
+		}
+
+		public override bool Equals(object obj)
+		{
+			if(obj == null || obj.GetType() != this.GetType())
+				return false;
+
+			return string.Equals(_name, ((SchemaAction)obj).Name, StringComparison.OrdinalIgnoreCase);
 		}
 
 		public override int GetHashCode()

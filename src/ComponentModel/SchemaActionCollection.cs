@@ -26,16 +26,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 
 namespace Zongsoft.ComponentModel
 {
 	public class SchemaActionCollection : Zongsoft.Collections.NamedCollectionBase<SchemaAction>
 	{
-		#region 成员字段
-		private Schema _schema;
-		#endregion
-
 		#region 构造函数
 		public SchemaActionCollection() : base(StringComparer.OrdinalIgnoreCase)
 		{
@@ -43,10 +38,14 @@ namespace Zongsoft.ComponentModel
 
 		public SchemaActionCollection(Schema schema) : base(StringComparer.OrdinalIgnoreCase)
 		{
-			if(schema == null)
-				throw new ArgumentNullException(nameof(schema));
+			this.Schema = schema ?? throw new ArgumentNullException(nameof(schema));
+		}
+		#endregion
 
-			_schema = schema;
+		#region 公共属性
+		public Schema Schema
+		{
+			get;
 		}
 		#endregion
 
@@ -54,14 +53,6 @@ namespace Zongsoft.ComponentModel
 		protected override string GetKeyForItem(SchemaAction item)
 		{
 			return item.Name;
-		}
-
-		protected override void AddItem(SchemaAction item)
-		{
-			if(item != null)
-				item.Schema = _schema;
-
-			base.AddItem(item);
 		}
 		#endregion
 	}
