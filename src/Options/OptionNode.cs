@@ -29,6 +29,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Options
 {
+	[System.ComponentModel.DefaultProperty(nameof(Children))]
 	public class OptionNode : Zongsoft.Collections.HierarchicalNode
 	{
 		#region 成员变量

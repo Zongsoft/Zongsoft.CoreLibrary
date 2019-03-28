@@ -31,6 +31,7 @@ using System.Collections.ObjectModel;
 
 namespace Zongsoft.Options
 {
+	[System.ComponentModel.DefaultProperty(nameof(Nodes))]
 	public class OptionManager : IOptionProvider
 	{
 		#region 私有枚举
