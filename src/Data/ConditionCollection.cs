@@ -307,6 +307,18 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 重写方法
+		protected override void InsertItem(int index, ICondition item)
+		{
+			if(item != null)
+				base.InsertItem(index, item);
+		}
+
+		protected override void SetItem(int index, ICondition item)
+		{
+			if(item != null)
+				base.SetItem(index, item);
+		}
+
 		public override string ToString()
 		{
 			var combiner = _conditionCombination.ToString().ToUpperInvariant();
