@@ -32,6 +32,7 @@
  */
 
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -1158,13 +1159,15 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 成员字段
-		private readonly object _data;
+		private object _data;
+		private readonly Reflection.MemberTokenCollection _members;
 		#endregion
 
 		#region 构造函数
 		public ObjectDictionary(object data)
 		{
 			_data = data ?? throw new ArgumentNullException(nameof(data));
+			_members = Reflection.MemberTokenProvider.Default.GetMembers(_data.GetType());
 		}
 		#endregion
 
@@ -1181,7 +1184,7 @@ namespace Zongsoft.Data
 		{
 			get
 			{
-				return 0;
+				return _members.Count;
 			}
 		}
 
@@ -1201,7 +1204,7 @@ namespace Zongsoft.Data
 		{
 			get
 			{
-				throw new NotImplementedException();
+				return _members.Keys.ToArray();
 			}
 		}
 
@@ -1209,7 +1212,7 @@ namespace Zongsoft.Data
 		{
 			get
 			{
-				throw new NotImplementedException();
+				return _members.Values.Select(p => p.GetValue(ref _data)).ToArray();
 			}
 		}
 		#endregion
@@ -1217,12 +1220,21 @@ namespace Zongsoft.Data
 		#region 公共方法
 		public bool Contains(string name)
 		{
-			throw new NotImplementedException();
+			return _members.Contains(name);
 		}
 
 		public bool HasChanges(params string[] names)
 		{
-			throw new NotImplementedException();
+			if(names == null || names.Length == 0)
+				return _members.Count > 0;
+
+			foreach(var name in names)
+			{
+				if(name != null && name.Length > 0 && _members.Contains(name))
+					return true;
+			}
+
+			return false;
 		}
 
 		public bool Reset(string name, out object value)
@@ -1237,12 +1249,15 @@ namespace Zongsoft.Data
 
 		public object GetValue(string name)
 		{
-			throw new NotImplementedException();
+			return _members.Get(name).GetValue(ref _data);
 		}
 
 		public TValue GetValue<TValue>(string name, TValue defaultValue)
 		{
-			throw new NotImplementedException();
+			if(_members.TryGet(name, out var member))
+				return (TValue)Convert.ChangeType(member.GetValue(ref _data), typeof(TValue));
+
+			return defaultValue;
 		}
 
 		public void SetValue<TValue>(string name, TValue value, Func<TValue, bool> predicate = null)
@@ -1252,17 +1267,37 @@ namespace Zongsoft.Data
 
 		public void SetValue<TValue>(string name, Func<TValue> valueFactory, Func<TValue, bool> predicate = null)
 		{
-			throw new NotImplementedException();
+			if(valueFactory == null)
+				throw new ArgumentNullException(nameof(valueFactory));
+
+			if(!_members.TryGet(name, out var member))
+				throw new KeyNotFoundException($"The specified '{name}' is not a member of the '{_data.GetType().FullName}' type.");
+
+			if(predicate == null || predicate((TValue)Convert.ChangeType(member.GetValue(ref _data), typeof(TValue))))
+				member.SetValue(ref _data, valueFactory());
 		}
 
 		public bool TryGetValue<TValue>(string name, out TValue value)
 		{
-			throw new NotImplementedException();
+			if(_members.TryGet(name, out var member))
+			{
+				value = (TValue)Convert.ChangeType(member.GetValue(ref _data), typeof(TValue));
+				return true;
+			}
+
+			value = default(TValue);
+			return false;
 		}
 
 		public bool TryGetValue<TValue>(string name, Action<TValue> got)
 		{
-			throw new NotImplementedException();
+			if(_members.TryGet(name, out var member))
+			{
+				got?.Invoke((TValue)Convert.ChangeType(member.GetValue(ref _data), typeof(TValue)));
+				return true;
+			}
+
+			return false;
 		}
 
 		public bool TrySetValue<TValue>(string name, TValue value, Func<TValue, bool> predicate = null)
@@ -1272,7 +1307,19 @@ namespace Zongsoft.Data
 
 		public bool TrySetValue<TValue>(string name, Func<TValue> valueFactory, Func<TValue, bool> predicate = null)
 		{
-			throw new NotImplementedException();
+			if(valueFactory == null)
+				throw new ArgumentNullException(nameof(valueFactory));
+
+			if(_members.TryGet(name, out var member))
+			{
+				if(predicate == null || predicate((TValue)Convert.ChangeType(member.GetValue(ref _data), typeof(TValue))))
+				{
+					member.SetValue(ref _data, valueFactory());
+					return true;
+				}
+			}
+
+			return false;
 		}
 		#endregion
 
@@ -1376,12 +1423,13 @@ namespace Zongsoft.Data
 
 		void IDictionary.Clear()
 		{
-			throw new NotSupportedException();
+			this.Reset();
 		}
 
 		void IDictionary.Remove(object key)
 		{
-			throw new NotSupportedException();
+			if(key != null)
+				this.Reset(key.ToString());
 		}
 
 		void ICollection.CopyTo(Array array, int arrayIndex)
@@ -1402,7 +1450,7 @@ namespace Zongsoft.Data
 
 		bool IDictionary<string, object>.ContainsKey(string key)
 		{
-			throw new NotImplementedException();
+			return this.Contains(key);
 		}
 
 		void IDictionary<string, object>.Add(string key, object value)
@@ -1412,12 +1460,15 @@ namespace Zongsoft.Data
 
 		bool IDictionary<string, object>.Remove(string key)
 		{
-			throw new NotSupportedException();
+			if(key != null)
+				return this.Reset(key, out _);
+
+			return false;
 		}
 
 		bool IDictionary<string, object>.TryGetValue(string key, out object value)
 		{
-			throw new NotImplementedException();
+			return this.TryGetValue(key, out value);
 		}
 
 		void ICollection<KeyValuePair<string, object>>.Add(KeyValuePair<string, object> item)
@@ -1427,7 +1478,7 @@ namespace Zongsoft.Data
 
 		void ICollection<KeyValuePair<string, object>>.Clear()
 		{
-			throw new NotSupportedException();
+			this.Reset();
 		}
 
 		bool ICollection<KeyValuePair<string, object>>.Contains(KeyValuePair<string, object> item)
@@ -1435,7 +1486,7 @@ namespace Zongsoft.Data
 			if(item.Key == null)
 				return false;
 
-			throw new NotImplementedException();
+			return this.Contains(item.Key);
 		}
 
 		void ICollection<KeyValuePair<string, object>>.CopyTo(KeyValuePair<string, object>[] array, int arrayIndex)
@@ -1456,12 +1507,18 @@ namespace Zongsoft.Data
 
 		bool ICollection<KeyValuePair<string, object>>.Remove(KeyValuePair<string, object> item)
 		{
-			throw new NotSupportedException();
+			if(item.Key == null)
+				return false;
+
+			return this.Reset(item.Key, out _);
 		}
 
 		public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
 		{
-			throw new NotImplementedException();
+			foreach(var key in _members.Keys)
+			{
+				yield return new KeyValuePair<string, object>(key, _members.Get(key).GetValue(ref _data));
+			}
 		}
 
 		IDictionaryEnumerator IDictionary.GetEnumerator()
