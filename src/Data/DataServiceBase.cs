@@ -1339,7 +1339,7 @@ namespace Zongsoft.Data
 
 			private Method(string name, DataAccessMethod kind)
 			{
-				this.Name = name;
+				this.Name = name ?? kind.ToString();
 				this.Kind = kind;
 			}
 			#endregion
@@ -1375,9 +1375,12 @@ namespace Zongsoft.Data
 				return new Method(nameof(Decrement), DataAccessMethod.Increment);
 			}
 
-			public static Method Select()
+			public static Method Select(string name = null)
 			{
-				return new Method(DataAccessMethod.Select);
+				if(string.IsNullOrEmpty(name))
+					return new Method(DataAccessMethod.Select);
+				else
+					return new Method(name, DataAccessMethod.Select);
 			}
 
 			public static Method Delete()
