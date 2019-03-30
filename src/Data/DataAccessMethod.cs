@@ -34,14 +34,31 @@ namespace Zongsoft.Data
 	/// </summary>
 	public enum DataAccessMethod
 	{
+		/// <summary>计数方法</summary>
 		Count = 1,
+
+		/// <summary>是否存在</summary>
 		Exists,
+
+		/// <summary>执行方法</summary>
 		Execute,
+
+		/// <summary>递增递减</summary>
 		Increment,
+
+		/// <summary>查询方法</summary>
 		Select,
+
+		/// <summary>删除方法</summary>
 		Delete,
+
+		/// <summary>新增方法</summary>
 		Insert,
+
+		/// <summary>更新方法</summary>
 		Update,
+
+		/// <summary>新增或更新</summary>
 		Upsert,
 	}
 }
