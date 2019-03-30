@@ -202,7 +202,7 @@ namespace Zongsoft.Data
 		public virtual bool Exists(ICondition condition, object state = null)
 		{
 			//修整查询条件
-			condition = this.OnValidate(DataAccessMethod.Exists, condition);
+			condition = this.OnValidate(Method.Exists(), condition);
 
 			return this.DataAccess.Exists(this.Name, condition, state, ctx => this.OnExisting(ctx), ctx => this.OnExisted(ctx));
 		}
@@ -237,7 +237,7 @@ namespace Zongsoft.Data
 		public virtual int Count(ICondition condition, string member = null, object state = null)
 		{
 			//修整查询条件
-			condition = this.OnValidate(DataAccessMethod.Count, condition);
+			condition = this.OnValidate(Method.Count(), condition);
 
 			return this.DataAccess.Count(this.Name, condition, member, state, ctx => this.OnCounting(ctx), ctx => this.OnCounted(ctx));
 		}
@@ -257,7 +257,7 @@ namespace Zongsoft.Data
 		public virtual long Increment(string member, ICondition condition, int interval = 1, object state = null)
 		{
 			//修整查询条件
-			condition = this.OnValidate(DataAccessMethod.Increment, condition);
+			condition = this.OnValidate(Method.Increment(), condition);
 
 			return this.DataAccess.Increment(this.Name, member, condition, interval, state, ctx => this.OnIncrementing(ctx), ctx => this.OnIncremented(ctx));
 		}
@@ -275,7 +275,7 @@ namespace Zongsoft.Data
 		public virtual long Decrement(string member, ICondition condition, int interval = 1, object state = null)
 		{
 			//修整查询条件
-			condition = this.OnValidate(DataAccessMethod.Increment, condition);
+			condition = this.OnValidate(Method.Decrement(), condition);
 
 			return this.DataAccess.Decrement(this.Name, member, condition, interval, state, ctx => this.OnIncrementing(ctx), ctx => this.OnIncremented(ctx));
 		}
@@ -293,7 +293,7 @@ namespace Zongsoft.Data
 			this.EnsureDelete();
 
 			//将删除键转换成条件对象，并进行修整
-			var condition = this.OnValidate(DataAccessMethod.Delete, this.ConvertKey(key, out _));
+			var condition = this.OnValidate(Method.Delete(), this.ConvertKey(key, out _));
 
 			//执行删除操作
 			return this.OnDelete(condition, this.GetSchema(schema), state);
@@ -310,7 +310,7 @@ namespace Zongsoft.Data
 			this.EnsureDelete();
 
 			//将删除键转换成条件对象，并进行修整
-			var condition = this.OnValidate(DataAccessMethod.Delete, this.ConvertKey(key1, key2, out _));
+			var condition = this.OnValidate(Method.Delete(), this.ConvertKey(key1, key2, out _));
 
 			//执行删除操作
 			return this.OnDelete(condition, this.GetSchema(schema), state);
@@ -327,7 +327,7 @@ namespace Zongsoft.Data
 			this.EnsureDelete();
 
 			//将删除键转换成条件对象，并进行修整
-			var condition = this.OnValidate(DataAccessMethod.Delete, this.ConvertKey(key1, key2, key3, out _));
+			var condition = this.OnValidate(Method.Delete(), this.ConvertKey(key1, key2, key3, out _));
 
 			//执行删除操作
 			return this.OnDelete(condition, this.GetSchema(schema), state);
@@ -344,7 +344,7 @@ namespace Zongsoft.Data
 			this.EnsureDelete();
 
 			//修整删除条件
-			condition = this.OnValidate(DataAccessMethod.Delete, condition);
+			condition = this.OnValidate(Method.Delete(), condition);
 
 			//执行删除操作
 			return this.OnDelete(condition, this.GetSchema(schema), state);
@@ -387,7 +387,7 @@ namespace Zongsoft.Data
 			var dictionary = DataDictionary.GetDictionary<TEntity>(data);
 
 			//验证待新增的数据
-			this.OnValidate(DataAccessMethod.Insert, dictionary);
+			this.OnValidate(Method.Insert(), dictionary);
 
 			return this.OnInsert(dictionary, this.GetSchema(schema, data.GetType()), state);
 		}
@@ -421,7 +421,7 @@ namespace Zongsoft.Data
 			foreach(var dictionary in dictionares)
 			{
 				//验证待新增的数据
-				this.OnValidate(DataAccessMethod.Insert, dictionary);
+				this.OnValidate(Method.InsertMany(), dictionary);
 			}
 
 			return this.OnInsertMany(dictionares, this.GetSchema(schema, Common.TypeExtension.GetElementType(items.GetType())), state);
@@ -511,10 +511,10 @@ namespace Zongsoft.Data
 			}
 
 			//修整过滤条件
-			condition = this.OnValidate(DataAccessMethod.Update, condition ?? this.EnsureUpdateCondition(dictionary));
+			condition = this.OnValidate(Method.Update(), condition ?? this.EnsureUpdateCondition(dictionary));
 
 			//验证待更新的数据
-			this.OnValidate(DataAccessMethod.Update, dictionary);
+			this.OnValidate(Method.Update(), dictionary);
 
 			//执行更新操作
 			return this.OnUpdate(dictionary, condition, this.GetSchema(schema, data.GetType()), state);
@@ -539,7 +539,7 @@ namespace Zongsoft.Data
 			foreach(var dictionary in dictionares)
 			{
 				//验证待更新的数据
-				this.OnValidate(DataAccessMethod.Update, dictionary);
+				this.OnValidate(Method.UpdateMany(), dictionary);
 			}
 
 			return this.OnUpdateMany(dictionares, this.GetSchema(schema, Common.TypeExtension.GetElementType(items.GetType())), state);
@@ -650,7 +650,7 @@ namespace Zongsoft.Data
 			if(singleton)
 			{
 				//修整查询条件
-				condition = this.OnValidate(DataAccessMethod.Select, condition);
+				condition = this.OnValidate(Method.Get(), condition);
 
 				//执行单条查询方法
 				return this.OnGet(condition, this.GetSchema(schema), state, out paginator);
@@ -705,7 +705,7 @@ namespace Zongsoft.Data
 			if(singleton)
 			{
 				//修整查询条件
-				condition = this.OnValidate(DataAccessMethod.Select, condition);
+				condition = this.OnValidate(Method.Get(), condition);
 
 				//执行单条查询方法
 				return this.OnGet(condition, this.GetSchema(schema), state, out paginator);
@@ -760,7 +760,7 @@ namespace Zongsoft.Data
 			if(singleton)
 			{
 				//修整查询条件
-				condition = this.OnValidate(DataAccessMethod.Select, condition);
+				condition = this.OnValidate(Method.Get(), condition);
 
 				//执行单条查询方法
 				return this.OnGet(condition, this.GetSchema(schema), state, out paginator);
@@ -833,7 +833,7 @@ namespace Zongsoft.Data
 		public IEnumerable<TEntity> Select(ICondition condition, string schema, Paging paging, object state, params Sorting[] sortings)
 		{
 			//修整查询条件
-			condition = this.OnValidate(DataAccessMethod.Select, condition);
+			condition = this.OnValidate(Method.Select(), condition);
 
 			//执行查询方法
 			return this.OnSelect(condition, this.GetSchema(schema, typeof(TEntity)), paging, sortings, state);
@@ -887,7 +887,7 @@ namespace Zongsoft.Data
 		public IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, string schema, Paging paging, object state = null, params Sorting[] sortings)
 		{
 			//修整查询条件
-			condition = this.OnValidate(DataAccessMethod.Select, condition);
+			condition = this.OnValidate(Method.Select(), condition);
 
 			//执行查询方法
 			return this.OnSelect<T>(grouping, condition, this.GetSchema(schema, typeof(TEntity)), paging, sortings, state);
@@ -959,12 +959,12 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 校验方法
-		protected virtual ICondition OnValidate(DataAccessMethod method, ICondition condition)
+		protected virtual ICondition OnValidate(Method method, ICondition condition)
 		{
 			return condition;
 		}
 
-		protected virtual void OnValidate(DataAccessMethod method, IDataDictionary<TEntity> data)
+		protected virtual void OnValidate(Method method, IDataDictionary<TEntity> data)
 		{
 		}
 		#endregion
@@ -1320,6 +1320,128 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 嵌套子类
+		protected struct Method : IEquatable<Method>
+		{
+			#region 公共字段
+			/// <summary>方法的名称。</summary>
+			public readonly string Name;
+
+			/// <summary>对应的数据访问方法种类。</summary>
+			public readonly DataAccessMethod Kind;
+			#endregion
+
+			#region 构造函数
+			private Method(DataAccessMethod kind)
+			{
+				this.Kind = kind;
+				this.Name = kind.ToString();
+			}
+
+			private Method(string name, DataAccessMethod kind)
+			{
+				this.Name = name;
+				this.Kind = kind;
+			}
+			#endregion
+
+			#region 静态方法
+			public static Method Get()
+			{
+				return new Method(nameof(Get), DataAccessMethod.Select);
+			}
+
+			public static Method Count()
+			{
+				return new Method(DataAccessMethod.Count);
+			}
+
+			public static Method Exists()
+			{
+				return new Method(DataAccessMethod.Exists);
+			}
+
+			public static Method Execute()
+			{
+				return new Method(DataAccessMethod.Execute);
+			}
+
+			public static Method Increment()
+			{
+				return new Method(nameof(Increment), DataAccessMethod.Increment);
+			}
+
+			public static Method Decrement()
+			{
+				return new Method(nameof(Decrement), DataAccessMethod.Increment);
+			}
+
+			public static Method Select()
+			{
+				return new Method(DataAccessMethod.Select);
+			}
+
+			public static Method Delete()
+			{
+				return new Method(DataAccessMethod.Delete);
+			}
+
+			public static Method Insert()
+			{
+				return new Method(DataAccessMethod.Insert);
+			}
+
+			public static Method InsertMany()
+			{
+				return new Method(nameof(InsertMany), DataAccessMethod.Insert);
+			}
+
+			public static Method Update()
+			{
+				return new Method(DataAccessMethod.Update);
+			}
+
+			public static Method UpdateMany()
+			{
+				return new Method(nameof(UpdateMany), DataAccessMethod.Update);
+			}
+
+			public static Method Upsert()
+			{
+				return new Method(DataAccessMethod.Upsert);
+			}
+
+			public static Method UpsertMany()
+			{
+				return new Method(nameof(UpsertMany), DataAccessMethod.Upsert);
+			}
+			#endregion
+
+			#region 重写方法
+			public bool Equals(Method method)
+			{
+				return this.Kind == method.Kind && string.Equals(this.Name, method.Name);
+			}
+
+			public override bool Equals(object obj)
+			{
+				if(obj == null || obj.GetType() != typeof(Method))
+					return false;
+
+				return this.Equals((Method)obj);
+			}
+
+			public override int GetHashCode()
+			{
+				return this.Name.GetHashCode();
+			}
+
+			public override string ToString()
+			{
+				return this.Name;
+			}
+			#endregion
+		}
+
 		public sealed class Condition : Zongsoft.Data.Condition.Builder<TEntity>
 		{
 			#region 私有构造
