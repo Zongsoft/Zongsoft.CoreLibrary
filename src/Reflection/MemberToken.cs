@@ -34,11 +34,16 @@ namespace Zongsoft.Reflection
 	/// </summary>
 	public class MemberToken
 	{
+		#region 委托定义
+		public delegate void Setter(ref object target, object value);
+		#endregion
+
 		#region 成员字段
 		private string _name;
 		private Type _type;
 		private MemberKind _kind;
 		private Func<object, object> _getter;
+		private Setter _setter;
 		#endregion
 
 		#region 构造函数
@@ -53,6 +58,8 @@ namespace Zongsoft.Reflection
 
 			if(property.CanRead)
 				_getter = PropertyInfoExtension.GenerateGetter(property);
+			if(property.CanWrite)
+				_setter = PropertyInfoExtension.GenerateSetter(property);
 		}
 
 		public MemberToken(FieldInfo field)
@@ -65,6 +72,9 @@ namespace Zongsoft.Reflection
 			_kind = MemberKind.Field;
 
 			_getter = FieldInfoExtension.GenerateGetter(field);
+
+			if(!field.IsInitOnly)
+				_setter = FieldInfoExtension.GenerateSetter(field);
 		}
 		#endregion
 
@@ -104,12 +114,20 @@ namespace Zongsoft.Reflection
 		#endregion
 
 		#region 公共方法
-		public object GetValue(object target)
+		public object GetValue(ref object target)
 		{
 			if(_getter == null)
-				throw new NotSupportedException();
+				throw new NotSupportedException($"The '{this.Name}' {this.Kind.ToString()} can not be read.");
 
 			return _getter.Invoke(target);
+		}
+
+		public void SetValue(ref object target, object value)
+		{
+			if(_setter == null)
+				throw new NotSupportedException($"The '{this.Name}' {this.Kind.ToString()} is readonly.");
+
+			_setter.Invoke(ref target, value);
 		}
 		#endregion
 	}
