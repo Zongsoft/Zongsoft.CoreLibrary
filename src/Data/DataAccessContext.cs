@@ -652,7 +652,7 @@ namespace Zongsoft.Data
 		object IDataMutateContextBase.Data
 		{
 			get => null;
-			set => throw new NotSupportedException();
+			set { }
 		}
 
 		bool IDataMutateContextBase.IsMultiple
