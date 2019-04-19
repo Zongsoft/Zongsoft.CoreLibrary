@@ -282,18 +282,23 @@ namespace Zongsoft.Data
 			#region 内部结构
 			private struct ConditionToken
 			{
+				#region 公共字段
 				/// <summary>条件组合方式</summary>
 				public ConditionCombination Combination;
 
 				/// <summary>条件字段数组</summary>
 				public ConditionFieldToken[] Fields;
+				#endregion
 
+				#region 构造函数
 				public ConditionToken(ConditionFieldToken[] fields)
 				{
 					this.Fields = fields;
 					this.Combination = ConditionCombination.Or;
 				}
+				#endregion
 
+				#region 静态方法
 				public static ConditionToken Create(string[] fields)
 				{
 					if(fields == null || fields.Length == 0)
@@ -312,29 +317,61 @@ namespace Zongsoft.Data
 
 					return new ConditionToken(tokens.ToArray());
 				}
+				#endregion
+
+				#region 重写方法
+				public override string ToString()
+				{
+					var text = new System.Text.StringBuilder();
+
+					for(int i = 0; i < this.Fields.Length; i++)
+					{
+						if(i > 0)
+							text.Append(" " + this.Combination.ToString() + " ");
+
+						text.Append(this.Fields[i].ToString());
+					}
+
+					return text.ToString();
+				}
+				#endregion
 			}
 
 			private struct ConditionFieldToken
 			{
+				#region 公共字段
 				/// <summary>字段名称</summary>
 				public string Name;
 
 				/// <summary>是否精确匹配</summary>
 				public bool IsExactly;
+				#endregion
 
+				#region 构造函数
 				public ConditionFieldToken(string field)
 				{
 					if(string.IsNullOrWhiteSpace(field))
 						throw new ArgumentNullException(nameof(field));
 
 					field = field.Trim();
-					this.IsExactly = field[0] == '!' || field[field.Length - 1] == '!';
+					this.IsExactly = field[0] == '!' || field[field.Length - 1] == '!' || (field[0] != '?' && field[field.Length - 1] != '?');
 
 					if(this.IsExactly)
 						this.Name = field.Trim('!');
 					else
-						this.Name = field;
+						this.Name = field.Trim('?');
 				}
+				#endregion
+
+				#region 重写方法
+				public override string ToString()
+				{
+					if(this.IsExactly)
+						return this.Name;
+					else
+						return this.Name + "?";
+				}
+				#endregion
 			}
 			#endregion
 		}
