@@ -158,7 +158,6 @@
     <Compile Include="Data\DataExistedEventArgs.cs" />
     <Compile Include="Data\DataExistingEventArgs.cs" />
     <Compile Include="Data\DataRecordExtension.cs" />
-    <Compile Include="Data\DataSearchKeyAttribute.cs" />
     <Compile Include="Data\IConditionalRange.cs" />
     <Compile Include="Data\IDataAccessFilter.cs" />
     <Compile Include="Data\IDataAccessNaming.cs" />
