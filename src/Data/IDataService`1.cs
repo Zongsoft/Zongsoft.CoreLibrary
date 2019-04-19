@@ -37,9 +37,9 @@ using System.Collections.Generic;
 namespace Zongsoft.Data
 {
 	/// <summary>
-	/// 表示数据服务的接口。
+	/// 表示数据服务的泛型接口。
 	/// </summary>
-	/// <typeparam name="TEntity">关于本服务对应的数据实体类型。</typeparam>
+	/// <typeparam name="TEntity">关于数据服务对应的数据实体类型。</typeparam>
 	public interface IDataService<TEntity> : IDataService
 	{
 		#region 事件定义

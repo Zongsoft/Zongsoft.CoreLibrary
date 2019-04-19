@@ -813,7 +813,9 @@ namespace Zongsoft.Data
 		{
 			return this.DataAccess.Select<TEntity>(this.Name, condition, schema, paging, state, sortings, ctx => this.OnSelecting(ctx), ctx => this.OnSelected(ctx));
 		}
+		#endregion
 
+		#region 分组查询
 		public IEnumerable<T> Select<T>(Grouping grouping, params Sorting[] sortings)
 		{
 			return this.Select<T>(grouping, null, string.Empty, null, null, sortings);
