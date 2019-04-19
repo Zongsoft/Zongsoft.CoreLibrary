@@ -122,6 +122,8 @@
     <Compile Include="Data\ConditionalBehaviors.cs" />
     <Compile Include="Data\Conditional.cs" />
     <Compile Include="Data\DataAccessProviderBase.cs" />
+    <Compile Include="Data\DataSearcher.cs" />
+    <Compile Include="Data\DataSearcherAttribute.cs" />
     <Compile Include="Data\EntityAttribute.cs" />
     <Compile Include="Data\DataDictionaries.cs" />
     <Compile Include="Data\Entity.cs" />
@@ -132,6 +134,9 @@
     <Compile Include="Data\IDataDictionary.cs" />
     <Compile Include="Data\IDataDictionary`1.cs" />
     <Compile Include="Data\IDataMutateContextBase.cs" />
+    <Compile Include="Data\IDataSearcherConditioner.cs" />
+    <Compile Include="Data\IDataSearcher.cs" />
+    <Compile Include="Data\IDataSearcher`1.cs" />
     <Compile Include="Data\IEntity.cs" />
     <Compile Include="Data\IPaginator.cs" />
     <Compile Include="Data\ISchemaParser`1.cs" />
