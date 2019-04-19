@@ -1,6 +1,13 @@
 ﻿/*
+ *   _____                                ______
+ *  /_   /  ____  ____  ____  _________  / __/ /_
+ *    / /  / __ \/ __ \/ __ \/ ___/ __ \/ /_/ __/
+ *   / /__/ /_/ / / / / /_/ /\_ \/ /_/ / __/ /_
+ *  /____/\____/_/ /_/\__  /____/\____/_/  \__/
+ *                   /____/
+ *
  * Authors:
- *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
+ *   钟峰(Popeye Zhong) <zongsoft@qq.com>
  *
  * Copyright (C) 2016-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
@@ -58,21 +65,24 @@ namespace Zongsoft.Data
 		#region 成员字段
 		private string _name;
 		private IDataAccess _dataAccess;
-		private Zongsoft.Services.IServiceProvider _serviceProvider;
+		private IDataSearcher<TEntity> _searcher;
+		private Services.IServiceProvider _serviceProvider;
 		private DataSearchKeyAttribute _searchKey;
 		#endregion
 
 		#region 构造函数
-		protected DataServiceBase(Zongsoft.Services.IServiceProvider serviceProvider)
+		protected DataServiceBase(Services.IServiceProvider serviceProvider)
 		{
 			_serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
 			_dataAccess = serviceProvider.ResolveRequired<IDataAccess>();
+
+			_searcher = new InnerDataSearcher(this, (DataSearcherAttribute[])Attribute.GetCustomAttributes(this.GetType(), typeof(DataSearcherAttribute), true));
 
 			//获取当前数据搜索键
 			_searchKey = (DataSearchKeyAttribute)Attribute.GetCustomAttribute(this.GetType(), typeof(DataSearchKeyAttribute), true);
 		}
 
-		protected DataServiceBase(string name, Zongsoft.Services.IServiceProvider serviceProvider)
+		protected DataServiceBase(string name, Services.IServiceProvider serviceProvider)
 		{
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException(nameof(name));
@@ -80,6 +90,8 @@ namespace Zongsoft.Data
 			_name = name.Trim();
 			_serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
 			_dataAccess = serviceProvider.ResolveRequired<IDataAccess>();
+
+			_searcher = new InnerDataSearcher(this, (DataSearcherAttribute[])Attribute.GetCustomAttributes(this.GetType(), typeof(DataSearcherAttribute), true));
 
 			//获取当前数据搜索键
 			_searchKey = (DataSearchKeyAttribute)Attribute.GetCustomAttribute(this.GetType(), typeof(DataSearchKeyAttribute), true);
@@ -143,6 +155,12 @@ namespace Zongsoft.Data
 			{
 				_dataAccess = value ?? throw new ArgumentNullException();
 			}
+		}
+
+		public IDataSearcher<TEntity> Searcher
+		{
+			get => _searcher;
+			set => _searcher = value ?? throw new ArgumentNullException();
 		}
 
 		public Zongsoft.Services.IServiceProvider ServiceProvider
@@ -1452,6 +1470,28 @@ namespace Zongsoft.Data
 			{
 			}
 			#endregion
+		}
+
+		private sealed class InnerDataSearcher : DataSearcher<TEntity>
+		{
+			public InnerDataSearcher(DataServiceBase<TEntity> dataService, DataSearcherAttribute[] attributes) : base(dataService, attributes)
+			{
+			}
+
+			protected override ICondition Resolve(string method, string keyword, object state = null)
+			{
+				switch(method)
+				{
+					case nameof(this.Count):
+						return ((DataServiceBase<TEntity>)this.DataService).OnValidate(Method.Count(), base.Resolve(method, keyword, state));
+					case nameof(this.Exists):
+						return ((DataServiceBase<TEntity>)this.DataService).OnValidate(Method.Exists(), base.Resolve(method, keyword, state));
+					case nameof(this.Search):
+						return ((DataServiceBase<TEntity>)this.DataService).OnValidate(Method.Select(method), base.Resolve(method, keyword, state));
+				}
+
+				return base.Resolve(method, keyword, state);
+			}
 		}
 		#endregion
 	}

@@ -1,8 +1,15 @@
 ﻿/*
- * Authors:
- *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
+ *   _____                                ______
+ *  /_   /  ____  ____  ____  _________  / __/ /_
+ *    / /  / __ \/ __ \/ __ \/ ___/ __ \/ /_/ __/
+ *   / /__/ /_/ / / / / /_/ /\_ \/ /_/ / __/ /_
+ *  /____/\____/_/ /_/\__  /____/\____/_/  \__/
+ *                   /____/
  *
- * Copyright (C) 2015-2017 Zongsoft Corporation <http://www.zongsoft.com>
+ * Authors:
+ *   钟峰(Popeye Zhong) <zongsoft@qq.com>
+ *
+ * Copyright (C) 2016-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,7 +32,6 @@
  */
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace Zongsoft.Data
@@ -39,6 +45,16 @@ namespace Zongsoft.Data
 		#region 事件定义
 		event EventHandler<DataGettedEventArgs<TEntity>> Getted;
 		event EventHandler<DataGettingEventArgs<TEntity>> Getting;
+		#endregion
+
+		#region 属性定义
+		/// <summary>
+		/// 获取数据搜索器对象。
+		/// </summary>
+		IDataSearcher<TEntity> Searcher
+		{
+			get;
+		}
 		#endregion
 
 		#region 查询方法
