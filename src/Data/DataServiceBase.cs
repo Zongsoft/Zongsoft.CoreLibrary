@@ -67,7 +67,6 @@ namespace Zongsoft.Data
 		private IDataAccess _dataAccess;
 		private IDataSearcher<TEntity> _searcher;
 		private Services.IServiceProvider _serviceProvider;
-		private DataSearchKeyAttribute _searchKey;
 		#endregion
 
 		#region 构造函数
@@ -76,10 +75,8 @@ namespace Zongsoft.Data
 			_serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
 			_dataAccess = serviceProvider.ResolveRequired<IDataAccess>();
 
+			//创建数据搜索器
 			_searcher = new InnerDataSearcher(this, (DataSearcherAttribute[])Attribute.GetCustomAttributes(this.GetType(), typeof(DataSearcherAttribute), true));
-
-			//获取当前数据搜索键
-			_searchKey = (DataSearchKeyAttribute)Attribute.GetCustomAttribute(this.GetType(), typeof(DataSearchKeyAttribute), true);
 		}
 
 		protected DataServiceBase(string name, Services.IServiceProvider serviceProvider)
@@ -91,10 +88,8 @@ namespace Zongsoft.Data
 			_serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
 			_dataAccess = serviceProvider.ResolveRequired<IDataAccess>();
 
+			//创建数据搜索器
 			_searcher = new InnerDataSearcher(this, (DataSearcherAttribute[])Attribute.GetCustomAttributes(this.GetType(), typeof(DataSearcherAttribute), true));
-
-			//获取当前数据搜索键
-			_searchKey = (DataSearchKeyAttribute)Attribute.GetCustomAttribute(this.GetType(), typeof(DataSearchKeyAttribute), true);
 		}
 		#endregion
 
@@ -581,49 +576,6 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 查询方法
-
-		#region 搜索方法
-		public IEnumerable Search(string keyword, params Sorting[] sortings)
-		{
-			return this.Search(keyword, string.Empty, null, null, sortings);
-		}
-
-		public IEnumerable Search(string keyword, object state, params Sorting[] sortings)
-		{
-			return this.Search(keyword, string.Empty, null, state, sortings);
-		}
-
-		public IEnumerable Search(string keyword, Paging paging, params Sorting[] sortings)
-		{
-			return this.Search(keyword, string.Empty, paging, null, sortings);
-		}
-
-		public IEnumerable Search(string keyword, string schema, params Sorting[] sortings)
-		{
-			return this.Search(keyword, schema, null, null, sortings);
-		}
-
-		public IEnumerable Search(string keyword, string schema, object state, params Sorting[] sortings)
-		{
-			return this.Search(keyword, schema, null, state, sortings);
-		}
-
-		public IEnumerable Search(string keyword, string schema, Paging paging, params Sorting[] sortings)
-		{
-			return this.Search(keyword, schema, paging, null, sortings);
-		}
-
-		public virtual IEnumerable Search(string keyword, string schema, Paging paging, object state, params Sorting[] sortings)
-		{
-			//获取搜索条件和搜索结果是否为单条数据
-			var condition = this.GetKey(keyword);
-
-			if(condition == null)
-				throw new ArgumentException($"The {this.Name} service does not supportd search operation or specified search key is invalid.");
-
-			return this.Select(condition, schema, paging, state, sortings);
-		}
-		#endregion
 
 		#region 单键查询
 		public object Get<TKey>(TKey key, params Sorting[] sortings)
@@ -1170,27 +1122,6 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 键值操作
-		/// <summary>
-		/// 根据指定的搜索关键字获取对应的<see cref="ICondition"/>条件。
-		/// </summary>
-		/// <param name="keyword">指定的搜索关键字。</param>
-		/// <returns>返回对应的搜索<see cref="ICondition"/>条件。</returns>
-		protected virtual ICondition GetKey(string keyword)
-		{
-			if(_searchKey == null || string.IsNullOrWhiteSpace(keyword))
-				return null;
-
-			var index = keyword.IndexOf(':');
-
-			if(index < 1)
-				return _searchKey.GetSearchKey(keyword, null);
-
-			var tag = keyword.Substring(0, index);
-			var value = index < keyword.Length - 1 ? keyword.Substring(index + 1) : null;
-
-			return _searchKey.GetSearchKey(value, new string[] { tag });
-		}
-
 		/// <summary>
 		/// 根据指定的查询参数值获取对应的查询<see cref="ICondition"/>条件。
 		/// </summary>
