@@ -32,6 +32,7 @@
  */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Zongsoft.Data
@@ -125,49 +126,49 @@ namespace Zongsoft.Data
 
 		public IEnumerable<TEntity> Search(string keyword, string schema, Paging paging, object state, params Sorting[] sortings)
 		{
-			return this.Search<TEntity>(keyword, schema, paging, state, sortings);
+			return this.DataService.Select(
+				this.Resolve(nameof(Search), keyword, state),
+				schema,
+				paging,
+				state,
+				sortings);
+		}
+		#endregion
+
+		#region 显式实现
+		IEnumerable IDataSearcher.Search(string keyword, params Sorting[] sortings)
+		{
+			return this.Search(keyword, string.Empty, null, null, sortings);
 		}
 
-		public IEnumerable<T> Search<T>(string keyword, params Sorting[] sortings)
+		IEnumerable IDataSearcher.Search(string keyword, object state, params Sorting[] sortings)
 		{
-			return this.Search<T>(keyword, string.Empty, null, null, sortings);
+			return this.Search(keyword, string.Empty, null, state, sortings);
 		}
 
-		public IEnumerable<T> Search<T>(string keyword, object state, params Sorting[] sortings)
+		IEnumerable IDataSearcher.Search(string keyword, Paging paging, params Sorting[] sortings)
 		{
-			return this.Search<T>(keyword, string.Empty, null, state, sortings);
+			return this.Search(keyword, string.Empty, paging, null, sortings);
 		}
 
-		public IEnumerable<T> Search<T>(string keyword, Paging paging, params Sorting[] sortings)
+		IEnumerable IDataSearcher.Search(string keyword, string schema, params Sorting[] sortings)
 		{
-			return this.Search<T>(keyword, string.Empty, paging, null, sortings);
+			return this.Search(keyword, schema, null, null, sortings);
 		}
 
-		public IEnumerable<T> Search<T>(string keyword, string schema, params Sorting[] sortings)
+		IEnumerable IDataSearcher.Search(string keyword, string schema, object state, params Sorting[] sortings)
 		{
-			return this.Search<T>(keyword, schema, null, null, sortings);
+			return this.Search(keyword, schema, null, state, sortings);
 		}
 
-		public IEnumerable<T> Search<T>(string keyword, string schema, object state, params Sorting[] sortings)
+		IEnumerable IDataSearcher.Search(string keyword, string schema, Paging paging, params Sorting[] sortings)
 		{
-			return this.Search<T>(keyword, schema, null, state, sortings);
+			return this.Search(keyword, schema, paging, null, sortings);
 		}
 
-		public IEnumerable<T> Search<T>(string keyword, string schema, Paging paging, params Sorting[] sortings)
+		IEnumerable IDataSearcher.Search(string keyword, string schema, Paging paging, object state, params Sorting[] sortings)
 		{
-			return this.Search<T>(keyword, schema, paging, null, sortings);
-		}
-
-		public IEnumerable<T> Search<T>(string keyword, string schema, Paging paging, object state, params Sorting[] sortings)
-		{
-			return null;
-
-			//return this.DataService.Select<T>(
-			//	this.Resolve(nameof(Search), keyword, state),
-			//	schema,
-			//	paging,
-			//	state,
-			//	sortings);
+			return this.Search(keyword, schema, paging, state, sortings);
 		}
 		#endregion
 

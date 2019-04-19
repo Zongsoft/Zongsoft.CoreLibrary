@@ -32,17 +32,26 @@
  */
 
 using System;
-using System.Collections.Generic;
+using System.Collections;
 
 namespace Zongsoft.Data
 {
+	/// <summary>
+	/// 表示数据搜索器的接口。
+	/// </summary>
 	public interface IDataSearcher
 	{
+		/// <summary>
+		/// 获取数据搜索服务的名称，该名称亦为数据搜索接口的调用名。
+		/// </summary>
 		string Name
 		{
 			get;
 		}
 
+		/// <summary>
+		/// 获取数据搜索关键字的条件解析器。
+		/// </summary>
 		IDataSearcherConditioner Conditioner
 		{
 			get;
@@ -51,12 +60,12 @@ namespace Zongsoft.Data
 		int Count(string keyword, object state = null);
 		bool Exists(string keyword, object state = null);
 
-		IEnumerable<T> Search<T>(string keyword, params Sorting[] sortings);
-		IEnumerable<T> Search<T>(string keyword, object state, params Sorting[] sortings);
-		IEnumerable<T> Search<T>(string keyword, Paging paging, params Sorting[] sortings);
-		IEnumerable<T> Search<T>(string keyword, string schema, params Sorting[] sortings);
-		IEnumerable<T> Search<T>(string keyword, string schema, object state, params Sorting[] sortings);
-		IEnumerable<T> Search<T>(string keyword, string schema, Paging paging, params Sorting[] sortings);
-		IEnumerable<T> Search<T>(string keyword, string schema, Paging paging, object state, params Sorting[] sortings);
+		IEnumerable Search(string keyword, params Sorting[] sortings);
+		IEnumerable Search(string keyword, object state, params Sorting[] sortings);
+		IEnumerable Search(string keyword, Paging paging, params Sorting[] sortings);
+		IEnumerable Search(string keyword, string schema, params Sorting[] sortings);
+		IEnumerable Search(string keyword, string schema, object state, params Sorting[] sortings);
+		IEnumerable Search(string keyword, string schema, Paging paging, params Sorting[] sortings);
+		IEnumerable Search(string keyword, string schema, Paging paging, object state, params Sorting[] sortings);
 	}
 }

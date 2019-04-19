@@ -36,14 +36,18 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
+	/// <summary>
+	/// 表示数据搜索器的泛型接口。
+	/// </summary>
+	/// <typeparam name="TEntity">关于搜索服务对应的数据实体类型。</typeparam>
 	public interface IDataSearcher<TEntity> : IDataSearcher
 	{
-		IEnumerable<TEntity> Search(string keyword, params Sorting[] sortings);
-		IEnumerable<TEntity> Search(string keyword, object state, params Sorting[] sortings);
-		IEnumerable<TEntity> Search(string keyword, Paging paging, params Sorting[] sortings);
-		IEnumerable<TEntity> Search(string keyword, string schema, params Sorting[] sortings);
-		IEnumerable<TEntity> Search(string keyword, string schema, object state, params Sorting[] sortings);
-		IEnumerable<TEntity> Search(string keyword, string schema, Paging paging, params Sorting[] sortings);
-		IEnumerable<TEntity> Search(string keyword, string schema, Paging paging, object state, params Sorting[] sortings);
+		new IEnumerable<TEntity> Search(string keyword, params Sorting[] sortings);
+		new IEnumerable<TEntity> Search(string keyword, object state, params Sorting[] sortings);
+		new IEnumerable<TEntity> Search(string keyword, Paging paging, params Sorting[] sortings);
+		new IEnumerable<TEntity> Search(string keyword, string schema, params Sorting[] sortings);
+		new IEnumerable<TEntity> Search(string keyword, string schema, object state, params Sorting[] sortings);
+		new IEnumerable<TEntity> Search(string keyword, string schema, Paging paging, params Sorting[] sortings);
+		new IEnumerable<TEntity> Search(string keyword, string schema, Paging paging, object state, params Sorting[] sortings);
 	}
 }
