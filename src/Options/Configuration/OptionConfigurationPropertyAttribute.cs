@@ -29,6 +29,12 @@ using System.ComponentModel;
 
 namespace Zongsoft.Options.Configuration
 {
+	/// <summary>
+	/// 表示配置属性的标注类。
+	/// </summary>
+	/// <remarks>
+	/// 如果需要定义类型转换器，请加注 <seealso cref="System.ComponentModel.TypeConverterAttribute"/> 标注标记。
+	/// </remarks>
 	[AttributeUsage(AttributeTargets.Property)]
 	public class OptionConfigurationPropertyAttribute : Attribute
 	{
@@ -42,25 +48,24 @@ namespace Zongsoft.Options.Configuration
 		#endregion
 
 		#region 构造函数
-		public OptionConfigurationPropertyAttribute(string name) : this(name, null, null, OptionConfigurationPropertyBehavior.None, null)
+		public OptionConfigurationPropertyAttribute(string name) : this(name, null, null, OptionConfigurationPropertyBehavior.None)
 		{
 		}
 
-		public OptionConfigurationPropertyAttribute(string name, OptionConfigurationPropertyBehavior behavior) : this(name, null, null, behavior, null)
+		public OptionConfigurationPropertyAttribute(string name, OptionConfigurationPropertyBehavior behavior) : this(name, null, null, behavior)
 		{
 		}
 
-		public OptionConfigurationPropertyAttribute(string name, object defaultValue) : this(name, null, defaultValue, OptionConfigurationPropertyBehavior.None, null)
+		public OptionConfigurationPropertyAttribute(string name, object defaultValue, OptionConfigurationPropertyBehavior behavior = OptionConfigurationPropertyBehavior.None) : this(name, null, defaultValue, behavior)
 		{
 		}
 
-		public OptionConfigurationPropertyAttribute(string name, Type type, object defaultValue, OptionConfigurationPropertyBehavior behavior, TypeConverter converter)
+		public OptionConfigurationPropertyAttribute(string name, Type type, object defaultValue = null, OptionConfigurationPropertyBehavior behavior = OptionConfigurationPropertyBehavior.None)
 		{
 			_name = name == null ? string.Empty : name.Trim();
 			_type = type;
 			_defaultValue = defaultValue;
 			_behavior = behavior;
-			_converter = converter;
 		}
 		#endregion
 
@@ -121,18 +126,6 @@ namespace Zongsoft.Options.Configuration
 			set
 			{
 				_behavior = value;
-			}
-		}
-
-		public TypeConverter Converter
-		{
-			get
-			{
-				return _converter;
-			}
-			set
-			{
-				_converter = value;
 			}
 		}
 		#endregion

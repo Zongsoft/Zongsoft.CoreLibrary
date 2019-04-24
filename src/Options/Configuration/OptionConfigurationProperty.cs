@@ -26,7 +26,6 @@
 
 using System;
 using System.Reflection;
-using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace Zongsoft.Options.Configuration
@@ -43,33 +42,18 @@ namespace Zongsoft.Options.Configuration
 		#endregion
 
 		#region 构造函数
-		public OptionConfigurationProperty(string name, Type type) : this(name, type, null, OptionConfigurationPropertyBehavior.None, null)
-		{
-		}
-
 		public OptionConfigurationProperty(string name, string elementName, Type type) : this(name, type, null, OptionConfigurationPropertyBehavior.None, null)
 		{
 			if(string.IsNullOrWhiteSpace(elementName))
-				throw new ArgumentNullException("elementName");
+				throw new ArgumentNullException(nameof(elementName));
 
 			_elementName = elementName.Trim();
 		}
 
-		public OptionConfigurationProperty(string name, Type type, object defaultValue) : this(name, type, defaultValue, OptionConfigurationPropertyBehavior.None, null)
+		public OptionConfigurationProperty(string name, Type type, object defaultValue = null, OptionConfigurationPropertyBehavior behavior = OptionConfigurationPropertyBehavior.None, TypeConverter converter = null)
 		{
-		}
-
-		public OptionConfigurationProperty(string name, Type type, object defaultValue, OptionConfigurationPropertyBehavior behavior) : this(name, type, defaultValue, behavior, null)
-		{
-		}
-
-		public OptionConfigurationProperty(string name, Type type, object defaultValue, OptionConfigurationPropertyBehavior behavior, TypeConverter converter)
-		{
-			if(type == null)
-				throw new ArgumentNullException("type");
-
 			_name = name == null ? string.Empty : name.Trim();
-			_type = type;
+			_type = type ?? throw new ArgumentNullException(nameof(type));
 			_behavior = behavior;
 			_converter = converter;
 
@@ -80,17 +64,17 @@ namespace Zongsoft.Options.Configuration
 		internal OptionConfigurationProperty(PropertyInfo propertyInfo)
 		{
 			OptionConfigurationPropertyAttribute propertyAttribute = null;
-			System.ComponentModel.TypeConverterAttribute converterAttribute = null;
-			System.ComponentModel.DefaultValueAttribute defaultAttribute = null;
+			TypeConverterAttribute converterAttribute = null;
+			DefaultValueAttribute defaultAttribute = null;
 
 			foreach(var attribute in Attribute.GetCustomAttributes(propertyInfo))
 			{
 				if(attribute is OptionConfigurationPropertyAttribute)
 					propertyAttribute = (OptionConfigurationPropertyAttribute)attribute;
-				else if(attribute is System.ComponentModel.DefaultValueAttribute)
-					defaultAttribute = (System.ComponentModel.DefaultValueAttribute)attribute;
-				else if(attribute is System.ComponentModel.TypeConverterAttribute)
-					converterAttribute = (System.ComponentModel.TypeConverterAttribute)attribute;
+				else if(attribute is DefaultValueAttribute)
+					defaultAttribute = (DefaultValueAttribute)attribute;
+				else if(attribute is TypeConverterAttribute)
+					converterAttribute = (TypeConverterAttribute)attribute;
 			}
 
 			_name = propertyAttribute.Name;
@@ -98,17 +82,12 @@ namespace Zongsoft.Options.Configuration
 			_type = propertyAttribute.Type ?? propertyInfo.PropertyType;
 			_behavior = propertyAttribute.Behavior;
 
-			if(propertyAttribute.Converter != null)
-				_converter = propertyAttribute.Converter;
-			else
+			if(converterAttribute != null && !string.IsNullOrEmpty(converterAttribute.ConverterTypeName))
 			{
-				if(converterAttribute != null && !string.IsNullOrEmpty(converterAttribute.ConverterTypeName))
-				{
-					Type type = Type.GetType(converterAttribute.ConverterTypeName, false);
+				Type type = Type.GetType(converterAttribute.ConverterTypeName, false);
 
-					if(type != null)
-						_converter = Activator.CreateInstance(type, true) as TypeConverter;
-				}
+				if(type != null)
+					_converter = Activator.CreateInstance(type, true) as TypeConverter;
 			}
 
 			//注意：要最后设置默认属性的值
