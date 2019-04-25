@@ -90,6 +90,22 @@ namespace Zongsoft.Security.Membership
 		int SetNamespaces(string oldNamespace, string newNamespace);
 
 		/// <summary>
+		/// 设置指定编号的角色名称。
+		/// </summary>
+		/// <param name="roleId">要设置的角色编号。</param>
+		/// <param name="name">要设置的角色名称。</param>
+		/// <returns>如果设置成功则返回真(True)，否则返回假(False)。</returns>
+		bool SetName(uint roleId, string name);
+
+		/// <summary>
+		/// 设置指定编号的角色全称。
+		/// </summary>
+		/// <param name="roleId">要设置的角色编号。</param>
+		/// <param name="fullName">要设置的角色全称。</param>
+		/// <returns>如果设置成功则返回真(True)，否则返回假(False)。</returns>
+		bool SetFullName(uint roleId, string fullName);
+
+		/// <summary>
 		/// 设置指定编号的角色描述信息。
 		/// </summary>
 		/// <param name="roleId">要设置的角色编号。</param>
