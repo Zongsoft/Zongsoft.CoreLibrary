@@ -45,9 +45,9 @@ namespace Zongsoft.Security.Membership
 		/// 确定指定的角色名在指定的命名空间内是否已经存在。
 		/// </summary>
 		/// <param name="name">要确定的角色名。</param>
-		/// <param name="namespace">要确定的角色所属的命名空间。</param>
+		/// <param name="namespace">要确定的角色所属的命名空间，如果为空(null)或空字符串("")则表示当前用户所在命名空间。</param>
 		/// <returns>如果指定名称的角色在命名空间内已经存在则返回真(True)，否则返回假(False)。</returns>
-		bool Exists(string name, string @namespace);
+		bool Exists(string name, string @namespace = null);
 
 		/// <summary>
 		/// 获取指定编号对应的角色对象。
@@ -60,15 +60,15 @@ namespace Zongsoft.Security.Membership
 		/// 获取指定名称对应的角色对象。
 		/// </summary>
 		/// <param name="name">要查找的角色名称。</param>
-		/// <param name="namespace">要查找的角色所属的命名空间。</param>
+		/// <param name="namespace">要查找的角色所属的命名空间，如果为空(null)或空字符串("")则表示当前用户所在命名空间。</param>
 		/// <returns>返回找到的角色对象；如果在指定的命名空间内没有找到指定名称的角色则返回空(null)。</returns>
 		/// <exception cref="System.ArgumentNullException">当<paramref name="name"/>参数为空(null)或者全空格字符。</exception>
-		IRole GetRole(string name, string @namespace);
+		IRole GetRole(string name, string @namespace = null);
 
 		/// <summary>
 		/// 获取指定命名空间中的角色集。
 		/// </summary>
-		/// <param name="namespace">要获取的角色集所属的命名空间。如果为星号(*)则忽略命名空间即系统中的所有角色，如果为空(null)或空字符串("")则查找未设置命名空间的角色集。</param>
+		/// <param name="namespace">要获取的角色集所属的命名空间。如果为星号(*)则忽略命名空间即系统中的所有角色；如果为空(null)或空字符串("")则查找当前用户所在命名空间的角色集。</param>
 		/// <param name="paging">查询的分页设置，默认为第一页。</param>
 		/// <returns>返回当前命名空间中的所有角色对象集。</returns>
 		IEnumerable<IRole> GetRoles(string @namespace, Zongsoft.Data.Paging paging = null);

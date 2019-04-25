@@ -46,15 +46,15 @@ namespace Zongsoft.Security.Membership
 		/// 获取指定标识对应的用户对象。
 		/// </summary>
 		/// <param name="identity">要查找的用户标识，可以是 <seealso cref="IUserIdentity.Name"/>、<seealso cref="IUser.Email"/>或<seealso cref="IUser.PhoneNumber"/>。</param>
-		/// <param name="namespace">要查找的用户标识所属的命名空间。</param>
+		/// <param name="namespace">要查找的用户标识所属的命名空间，如果为空(null)或空字符串("")则表示当前用户所在命名空间。</param>
 		/// <returns>返回找到的用户对象；如果在指定的命名空间内没有找到指定标识的用户则返回空(null)。</returns>
 		/// <exception cref="System.ArgumentNullException">当<paramref name="identity"/>参数为空(null)或者全空格字符。</exception>
-		IUser GetUser(string identity, string @namespace);
+		IUser GetUser(string identity, string @namespace = null);
 
 		/// <summary>
 		/// 获取指定命名空间中的用户集。
 		/// </summary>
-		/// <param name="namespace">要获取的用户集所属的命名空间。如果为星号(*)则忽略命名空间即系统中的所有用户，如果为空(null)或空字符串("")则查找未设置命名空间的用户集。</param>
+		/// <param name="namespace">要获取的用户集所属的命名空间。如果为星号(*)则忽略命名空间即系统中的所有用户；如果为空(null)或空字符串("")则查找当前用户所在命名空间的用户集。</param>
 		/// <param name="paging">查询的分页设置，默认为第一页。</param>
 		/// <returns>返回当前命名空间中的所有用户对象集。</returns>
 		IEnumerable<IUser> GetUsers(string @namespace, Zongsoft.Data.Paging paging = null);
@@ -70,9 +70,9 @@ namespace Zongsoft.Security.Membership
 		/// 确定指定的用户标识在指定的命名空间内是否已经存在。
 		/// </summary>
 		/// <param name="identity">要确定的用户标识，可以是“用户名”或“邮箱地址”或“手机号码”。</param>
-		/// <param name="namespace">要确定的用户标识所属的命名空间。</param>
+		/// <param name="namespace">要确定的用户标识所属的命名空间，如果为空(null)或空字符串("")则表示当前用户所在命名空间。</param>
 		/// <returns>如果指定的用户标识在命名空间内已经存在则返回真(True)，否则返回假(False)。</returns>
-		bool Exists(string identity, string @namespace);
+		bool Exists(string identity, string @namespace = null);
 
 		/// <summary>
 		/// 设置指定编号的用户邮箱地址。
@@ -202,8 +202,9 @@ namespace Zongsoft.Security.Membership
 		/// <param name="newPassword">重置后的新密码。</param>
 		/// <returns>如果密码重置成功则返回真(True)，否则返回假(False)。</returns>
 		/// <remarks>
-		/// 	<para>本重置方法通常由Web请求的方式进行，请求的URL大致如下：<c>
-		/// 	<![CDATA[http://zongsoft.com/security/user/resetpassword?userId=xxx&secret=xxxxxx]]></c></para>
+		/// 	<para>本重置方法通常由Web请求的方式进行，请求的URL大致如下：
+		/// 	<c>https://api.zongsoft.com/security/users/{userId}/password/reset?secret=xxxxxx</c>
+		/// 	</para>
 		/// </remarks>
 		bool ResetPassword(uint userId, string secret, string newPassword = null);
 
