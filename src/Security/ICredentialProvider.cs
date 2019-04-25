@@ -58,8 +58,8 @@ namespace Zongsoft.Security
 		/// </summary>
 		/// <param name="user">指定的用户对象。</param>
 		/// <param name="scene">指定的应用场景，通常为“Web”、“Mobile”等。</param>
-		/// <param name="extendedProperties">扩展属性集合。</param>
-		Credential Register(Membership.IUserIdentity user, string scene, IDictionary<string, object> extendedProperties = null);
+		/// <param name="parameters">用户自定义的参数集，该参数集会与凭证一起被持久化到凭证缓存容器中。</param>
+		Credential Register(Membership.IUserIdentity user, string scene, IDictionary<string, object> parameters = null);
 
 		/// <summary>
 		/// 从安全凭证容器中注销指定的凭证。
