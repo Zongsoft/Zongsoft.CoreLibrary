@@ -40,14 +40,14 @@ namespace Zongsoft.Security
 		#endregion
 
 		#region 成员字段
-		private CredentialIdentity _identity;
-		private ISet<string> _roles;
+		private readonly CredentialIdentity _identity;
+		private readonly ISet<string> _roles;
 		#endregion
 
 		#region 构造函数
 		public CredentialPrincipal(CredentialIdentity identity, params string[] roles)
 		{
-			_identity = identity ?? throw new ArgumentNullException(nameof(identity));
+			_identity = identity ?? CredentialIdentity.Empty;
 
 			if(roles != null && roles.Length > 0)
 				_roles = new HashSet<string>(roles, StringComparer.OrdinalIgnoreCase);
@@ -55,11 +55,30 @@ namespace Zongsoft.Security
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取当前主体的标识对象。
+		/// </summary>
 		public virtual CredentialIdentity Identity
 		{
 			get
 			{
 				return _identity ?? CredentialIdentity.Empty;
+			}
+		}
+
+		/// <summary>
+		/// 获取当前主体是否为内置的系统管理员用户(Administrator)或隶属于系统管理员角色(Administrators)。
+		/// </summary>
+		public bool IsAdministrator
+		{
+			get
+			{
+				var identity = this.Identity;
+
+				if(identity != null && string.Equals(identity.Name, "Administrator", StringComparison.OrdinalIgnoreCase))
+					return true;
+
+				return _roles != null && _roles.Count > 0 && _roles.Contains("Administrators");
 			}
 		}
 		#endregion
