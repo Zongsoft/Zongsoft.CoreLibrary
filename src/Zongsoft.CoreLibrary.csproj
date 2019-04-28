@@ -121,6 +121,7 @@
     <Compile Include="ComponentModel\SchemaCollection.cs" />
     <Compile Include="Data\ConditionalBehaviors.cs" />
     <Compile Include="Data\Conditional.cs" />
+    <Compile Include="Data\DataAccessErrorEventArgs.cs" />
     <Compile Include="Data\DataAccessProviderBase.cs" />
     <Compile Include="Data\DataSearcher.cs" />
     <Compile Include="Data\DataSearcherAttribute.cs" />

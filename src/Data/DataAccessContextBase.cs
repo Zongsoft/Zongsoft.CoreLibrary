@@ -37,6 +37,7 @@ namespace Zongsoft.Data
 	{
 		#region 事件定义
 		public event PropertyChangedEventHandler PropertyChanged;
+		public event EventHandler<DataAccessErrorEventArgs> Error;
 		#endregion
 
 		#region 成员字段
@@ -152,6 +153,20 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 虚拟方法
+		protected virtual DataAccessErrorEventArgs OnError(Exception exception)
+		{
+			var error = this.Error;
+
+			if(error != null)
+			{
+				var args = new DataAccessErrorEventArgs(this, exception);
+				error(this, args);
+				return args;
+			}
+
+			return null;
+		}
+
 		protected virtual void OnPropertyChanged(string propertyName)
 		{
 			this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
