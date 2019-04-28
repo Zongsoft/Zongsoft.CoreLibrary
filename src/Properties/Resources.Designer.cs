@@ -358,6 +358,15 @@ namespace Zongsoft.Properties {
         }
         
         /// <summary>
+        ///   查找类似 数据冲突：数据项中 {0} 的 {1} 值重复了。 的本地化字符串。
+        /// </summary>
+        internal static string Text_DataConflictException_Message {
+            get {
+                return ResourceManager.GetString("Text.DataConflictException.Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 您确认是否要退出(输入Yes则退出)？ 的本地化字符串。
         /// </summary>
         internal static string Text_ExitCommand_Confirm {

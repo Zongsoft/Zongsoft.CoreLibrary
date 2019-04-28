@@ -25,17 +25,18 @@
  */
 
 using System;
+using System.Runtime.Serialization;
 
 namespace Zongsoft.Data
 {
 	public class DataConflictException : DataAccessException
 	{
 		#region 构造函数
-		public DataConflictException(string message) : base("", 0, message)
+		public DataConflictException(string message) : base(string.Empty, 0, message)
 		{
 		}
 
-		public DataConflictException(string message, Exception innerException) : base("", 0, message, innerException)
+		public DataConflictException(string message, Exception innerException) : base(string.Empty, 0, message, innerException)
 		{
 		}
 
@@ -53,6 +54,47 @@ namespace Zongsoft.Data
 
 		public DataConflictException(string driverName, int code, string message, Exception innerException) : base(driverName, code, message, innerException)
 		{
+		}
+
+		public DataConflictException(string driverName, int code, string key, string value) : base(driverName, code)
+		{
+			this.Key = key;
+			this.Value = value;
+		}
+
+		protected DataConflictException(SerializationInfo info, StreamingContext context) : base(info, context)
+		{
+			this.Key = info.GetString(nameof(Key));
+			this.Value = info.GetString(nameof(Value));
+		}
+		#endregion
+
+		#region 公共属性
+		/// <summary>
+		/// 获取或设置数据冲突的键名。
+		/// </summary>
+		public string Key
+		{
+			get; set;
+		}
+
+		/// <summary>
+		/// 获取或设置数据冲突的键值。
+		/// </summary>
+		public string Value
+		{
+			get; set;
+		}
+
+		/// <summary>
+		/// 获取数据冲突异常的消息文本。
+		/// </summary>
+		public override string Message
+		{
+			get
+			{
+				return string.Format(Properties.Resources.Text_DataConflictException_Message, this.Key, this.Value);
+			}
 		}
 		#endregion
 	}

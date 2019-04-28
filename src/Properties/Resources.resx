@@ -285,4 +285,7 @@
   <data name="Text.WorkerStopCommand.Name" xml:space="preserve">
     <value>停止</value>
   </data>
+  <data name="Text.DataConflictException.Message" xml:space="preserve">
+    <value>数据冲突：数据项中 {0} 的 {1} 值重复了。</value>
+  </data>
 </root>
