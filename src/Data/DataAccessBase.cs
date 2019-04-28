@@ -36,6 +36,7 @@ namespace Zongsoft.Data
 	public abstract class DataAccessBase : IDataAccess
 	{
 		#region 事件定义
+		public event EventHandler<DataAccessErrorEventArgs> Error;
 		public event EventHandler<DataCountedEventArgs> Counted;
 		public event EventHandler<DataCountingEventArgs> Counting;
 		public event EventHandler<DataExecutedEventArgs> Executed;
@@ -1400,6 +1401,11 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 激发事件
+		protected virtual void OnError(DataAccessErrorEventArgs args)
+		{
+			this.Error?.Invoke(this, args);
+		}
+
 		protected virtual void OnCounted(DataCountContextBase context)
 		{
 			var e = this.Counted;

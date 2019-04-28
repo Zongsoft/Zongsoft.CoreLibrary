@@ -42,11 +42,6 @@ namespace Zongsoft.Data
 	public interface IDataAccessContextBase
 	{
 		/// <summary>
-		/// 提供数据访问过程中的发生的错误事件。
-		/// </summary>
-		event EventHandler<DataAccessErrorEventArgs> Error;
-
-		/// <summary>
 		/// 获取数据访问的名称。
 		/// </summary>
 		string Name

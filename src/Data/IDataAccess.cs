@@ -47,6 +47,7 @@ namespace Zongsoft.Data
 	public interface IDataAccess
 	{
 		#region 事件定义
+		event EventHandler<DataAccessErrorEventArgs> Error;
 		event EventHandler<DataCountedEventArgs> Counted;
 		event EventHandler<DataCountingEventArgs> Counting;
 		event EventHandler<DataExecutedEventArgs> Executed;
