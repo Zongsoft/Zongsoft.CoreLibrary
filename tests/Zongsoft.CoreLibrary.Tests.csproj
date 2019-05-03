@@ -78,7 +78,7 @@
     <Compile Include="Common\RandomGeneratorTests.cs" />
     <Compile Include="PropertyToken.cs" />
     <Compile Include="Reflection\MemberAccessTest.cs" />
-    <Compile Include="Reflection\MemberPathTest.cs" />
+    <Compile Include="Reflection\MemberExpressionTest.cs" />
     <Compile Include="Runtime\Caching\MemoryCacheTest.cs" />
     <Compile Include="Runtime\Serialization\DictionarySerializerTest.cs" />
     <Compile Include="Security\CredentialTest.cs" />

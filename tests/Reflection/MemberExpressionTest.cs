@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Zongsoft.Reflection.Expressions.Tests
 {
-	public class MemberPathTest
+	public class MemberExpressionTest
 	{
 		[Fact]
 		public void Test()

@@ -52,7 +52,7 @@ namespace Zongsoft.Reflection
 			return field.GetValue(target);
 		}
 
-		public static object GetValue(this PropertyInfo property, object target)
+		public static object GetValue(this PropertyInfo property, object target = null)
 		{
 			return property.GetValue(target);
 		}
