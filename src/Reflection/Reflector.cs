@@ -1,4 +1,11 @@
 ﻿/*
+ *   _____                                ______
+ *  /_   /  ____  ____  ____  _________  / __/ /_
+ *    / /  / __ \/ __ \/ __ \/ ___/ __ \/ /_/ __/
+ *   / /__/ /_/ / / / / /_/ /\_ \/ /_/ / __/ /_
+ *  /____/\____/_/ /_/\__  /____/\____/_/  \__/
+ *                   /____/
+ *
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@qq.com>
  *
@@ -31,7 +38,7 @@ namespace Zongsoft.Reflection
 {
 	public static class Reflector
 	{
-		public static object GetValue(this MemberInfo member, object target =null)
+		public static object GetValue(this MemberInfo member, object target =null, params object[] parameters)
 		{
 			if(member == null)
 				throw new ArgumentNullException(nameof(member));
