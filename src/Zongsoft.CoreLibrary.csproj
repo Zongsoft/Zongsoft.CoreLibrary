@@ -292,6 +292,7 @@
     <Compile Include="Reflection\Expressions\IdentifierExpression.cs" />
     <Compile Include="Reflection\Expressions\IMemberExpression.cs" />
     <Compile Include="Reflection\Expressions\IndexerExpression.cs" />
+    <Compile Include="Reflection\Expressions\MemberExpressionEvaluator.cs" />
     <Compile Include="Reflection\Expressions\MemberExpressionParser.cs" />
     <Compile Include="Reflection\Expressions\MemberExpression.cs" />
     <Compile Include="Reflection\Expressions\MemberExpressionExtension.cs" />
