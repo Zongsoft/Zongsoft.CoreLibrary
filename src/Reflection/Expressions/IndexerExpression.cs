@@ -55,6 +55,11 @@ namespace Zongsoft.Reflection.Expressions
 			}
 		}
 
+		public bool HasArguments
+		{
+			get => this.Arguments != null && this.Arguments.Count > 0;
+		}
+
 		public IList<IMemberExpression> Arguments
 		{
 			get;
