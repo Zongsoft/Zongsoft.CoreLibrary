@@ -95,14 +95,29 @@ namespace Zongsoft.Reflection.Expressions
 			return (expression = MemberExpressionParser.Parse(text, null)) != null;
 		}
 
+		public static bool TryParse(string text, int start, int count, out IMemberExpression expression)
+		{
+			return (expression = MemberExpressionParser.Parse(text, start, count, null)) != null;
+		}
+
 		public static IMemberExpression Parse(string text)
 		{
 			return MemberExpressionParser.Parse(text, message => throw new InvalidOperationException(message));
 		}
 
+		public static IMemberExpression Parse(string text, int start, int count)
+		{
+			return MemberExpressionParser.Parse(text, start, count, message => throw new InvalidOperationException(message));
+		}
+
 		public static IMemberExpression Parse(string text, Action<string> onError)
 		{
 			return MemberExpressionParser.Parse(text, onError);
+		}
+
+		public static IMemberExpression Parse(string text, int start, int count, Action<string> onError)
+		{
+			return MemberExpressionParser.Parse(text, start, count, onError);
 		}
 		#endregion
 

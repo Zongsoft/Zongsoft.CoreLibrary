@@ -40,24 +40,47 @@ namespace Zongsoft.Reflection.Expressions
 		#region 公共方法
 		public static bool TryParse(string text, out IMemberExpression expression)
 		{
-			return (expression = Parse(text, null)) != null;
+			return (expression = Parse(text, 0, 0, null)) != null;
+		}
+
+		public static bool TryParse(string text, int start, int count, out IMemberExpression expression)
+		{
+			return (expression = Parse(text, start, count, null)) != null;
 		}
 
 		public static IMemberExpression Parse(string text)
 		{
-			return Parse(text, message => throw new InvalidOperationException(message));
+			return Parse(text, 0, 0, message => throw new InvalidOperationException(message));
+		}
+
+		public static IMemberExpression Parse(string text, int start, int count)
+		{
+			return Parse(text, start, count, message => throw new InvalidOperationException(message));
 		}
 
 		public static IMemberExpression Parse(string text, Action<string> onError)
 		{
+			return Parse(text, 0, 0, onError);
+		}
+
+		public static IMemberExpression Parse(string text, int start, int count, Action<string> onError)
+		{
 			if(string.IsNullOrEmpty(text))
 				return null;
+
+			if(start < 0 || start >= text.Length)
+				throw new ArgumentOutOfRangeException(nameof(start));
+
+			if(count < 1)
+				count = text.Length - start;
+			else if(count > text.Length - start)
+				throw new ArgumentOutOfRangeException(nameof(count));
 
 			//创建解析上下文对象
 			var context = new StateContext(text.Length, onError);
 
 			//状态迁移驱动
-			for(int i = 0; i < text.Length; i++)
+			for(int i = start; i < start + count; i++)
 			{
 				context.Character = text[i];
 
