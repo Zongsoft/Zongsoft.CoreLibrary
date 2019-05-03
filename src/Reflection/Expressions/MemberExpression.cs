@@ -121,6 +121,9 @@ namespace Zongsoft.Reflection.Expressions
 
 		public static ConstantExpression Constant(string literal, TypeCode type)
 		{
+			if(literal == null)
+				return ConstantExpression.Null;
+
 			switch(type)
 			{
 				case TypeCode.Boolean:
