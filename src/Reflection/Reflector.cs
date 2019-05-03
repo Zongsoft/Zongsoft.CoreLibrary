@@ -49,6 +49,8 @@ namespace Zongsoft.Reflection
 					return GetValue((FieldInfo)member, target);
 				case MemberTypes.Property:
 					return GetValue((PropertyInfo)member, target);
+				case MemberTypes.Event:
+					return ((EventInfo)member).EventHandlerType;
 				default:
 					throw new NotSupportedException("Invalid member type.");
 			}
@@ -59,9 +61,9 @@ namespace Zongsoft.Reflection
 			return field.GetValue(target);
 		}
 
-		public static object GetValue(this PropertyInfo property, object target = null)
+		public static object GetValue(this PropertyInfo property, object target = null, params object[] parameters)
 		{
-			return property.GetValue(target);
+			return property.GetValue(target, parameters);
 		}
 
 		public static object GetValue(object target, string path)
@@ -88,7 +90,7 @@ namespace Zongsoft.Reflection
 			return null;
 		}
 
-		public static void SetValue(this MemberInfo member, object target, object value)
+		public static void SetValue(this MemberInfo member, object target, object value, params object[] parameters)
 		{
 			if(member == null)
 				throw new ArgumentNullException(nameof(member));
