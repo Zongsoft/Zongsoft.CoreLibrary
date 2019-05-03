@@ -107,9 +107,16 @@ namespace Zongsoft.Reflection.Expressions
 		#endregion
 
 		#region 静态方法
+		public static bool IsNull(object value)
+		{
+			return value == null || (value is ConstantExpression constant && constant.Value == null);
+		}
+
 		public static ConstantExpression Constant(object value)
 		{
-			return new ConstantExpression(value);
+			return value == null ?
+			       ConstantExpression.Null :
+			       new ConstantExpression(value);
 		}
 
 		public static ConstantExpression Constant(string literal, TypeCode type)
@@ -144,6 +151,11 @@ namespace Zongsoft.Reflection.Expressions
 					return new ConstantExpression(sbyte.Parse(literal));
 				case TypeCode.DateTime:
 					return new ConstantExpression(DateTime.Parse(literal));
+				case TypeCode.Object:
+					if(string.IsNullOrEmpty(literal) || literal.Equals("null", StringComparison.OrdinalIgnoreCase))
+						return ConstantExpression.Null;
+					else
+						return new ConstantExpression(literal);
 				default:
 					return new ConstantExpression(literal);
 			}

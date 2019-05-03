@@ -30,10 +30,18 @@ namespace Zongsoft.Reflection.Expressions
 {
 	public class ConstantExpression : MemberExpression
 	{
+		#region 单例字段
+		public static readonly ConstantExpression Null = new ConstantExpression();
+		#endregion
+
 		#region 构造函数
+		private ConstantExpression()
+		{
+		}
+
 		public ConstantExpression(object value)
 		{
-			this.Value = value;
+			this.Value = value ?? throw new ArgumentNullException(nameof(value));
 		}
 		#endregion
 
