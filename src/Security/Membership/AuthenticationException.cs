@@ -35,28 +35,20 @@ namespace Zongsoft.Security.Membership
 	[Serializable]
 	public class AuthenticationException : System.ApplicationException
 	{
-		#region 成员变量
-		private AuthenticationReason _reason;
-		private string _message;
-		#endregion
-
 		#region 构造函数
 		public AuthenticationException()
 		{
-			_reason = AuthenticationReason.Unknown;
-			_message = this.GetMessage(null);
+			this.Reason = AuthenticationReason.Unknown;
 		}
 
 		public AuthenticationException(string message) : base(message, null)
 		{
-			_reason = AuthenticationReason.Unknown;
-			_message = this.GetMessage(message);
+			this.Reason = AuthenticationReason.Unknown;
 		}
 
 		public AuthenticationException(string message, Exception innerException) : base(message, innerException)
 		{
-			_reason = AuthenticationReason.Unknown;
-			_message = this.GetMessage(message);
+			this.Reason = AuthenticationReason.Unknown;
 		}
 
 		public AuthenticationException(AuthenticationReason reason) : this(reason, string.Empty, null)
@@ -69,13 +61,12 @@ namespace Zongsoft.Security.Membership
 
 		public AuthenticationException(AuthenticationReason reason, string message, Exception innerException) : base(message, innerException)
 		{
-			_reason = reason;
-			_message = this.GetMessage(message);
+			this.Reason = reason;
 		}
 
 		protected AuthenticationException(SerializationInfo info, StreamingContext context) : base(info, context)
 		{
-			_reason = (AuthenticationReason)info.GetInt32("Reason");
+			this.Reason = (AuthenticationReason)info.GetInt32(nameof(Reason));
 		}
 		#endregion
 
@@ -85,18 +76,7 @@ namespace Zongsoft.Security.Membership
 		/// </summary>
 		public AuthenticationReason Reason
 		{
-			get
-			{
-				return _reason;
-			}
-		}
-
-		public override string Message
-		{
-			get
-			{
-				return _message;
-			}
+			get;
 		}
 		#endregion
 
@@ -104,22 +84,7 @@ namespace Zongsoft.Security.Membership
 		public override void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
 		{
 			base.GetObjectData(info, context);
-			info.AddValue("Reason", _reason);
-		}
-		#endregion
-
-		#region 私有方法
-		private string GetMessage(string message)
-		{
-			if(string.IsNullOrWhiteSpace(message))
-			{
-				var entry = Zongsoft.Common.EnumUtility.GetEnumEntry(_reason);
-
-				if(entry != null)
-					return entry.Description;
-			}
-
-			return message;
+			info.AddValue(nameof(Reason), this.Reason);
 		}
 		#endregion
 	}
