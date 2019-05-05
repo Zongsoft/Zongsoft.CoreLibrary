@@ -27,7 +27,6 @@
 using System;
 using System.Reflection;
 using System.ComponentModel;
-using System.Collections.Generic;
 using System.Linq;
 
 using Zongsoft.ComponentModel;
@@ -50,30 +49,20 @@ namespace Zongsoft.Common
 			return null;
 		}
 
-		public static string Format(object value, string format)
+		public static string GetEnumAlias(this Enum enumValue)
 		{
-			if(value == null)
-				return string.Empty;
+			if(TryGetEnumAlias(enumValue, out var alias))
+				return alias;
 
-			var enumType = GetEnumType(value.GetType());
-
-			if(enumType != null)
-				return GetEnumEntry((Enum)value).ToString(format);
-
-			if(string.IsNullOrWhiteSpace(format))
-				return string.Format("{0}", value);
-			else
-				return string.Format("{0:" + format + "}", value);
+			return null;
 		}
 
-		/// <summary>
-		/// 获取指定枚举项对应的<see cref="EnumEntry"/>描述对象。
-		/// </summary>
-		/// <param name="enumValue">要获取的枚举项。</param>
-		/// <returns>返回指定枚举值对应的<seealso cref="EnumEntry"/>对象。</returns>
-		public static EnumEntry GetEnumEntry(this Enum enumValue)
+		public static string GetEnumDescription(this Enum enumValue)
 		{
-			return GetEnumEntry(enumValue, false);
+			if(TryGetEnumDescription(enumValue, out var description))
+				return description;
+
+			return null;
 		}
 
 		/// <summary>
@@ -82,23 +71,82 @@ namespace Zongsoft.Common
 		/// <param name="enumValue">要获取的枚举项。</param>
 		/// <param name="underlyingType">是否将生成的 <seealso cref="EnumEntry"/> 元素的 <seealso cref="EnumEntry.Value"/> 属性值置为 enumType 参数对应的枚举项基类型值。</param>
 		/// <returns>返回指定枚举值对应的<seealso cref="EnumEntry"/>对象。</returns>
-		public static EnumEntry GetEnumEntry(this Enum enumValue, bool underlyingType)
+		public static EnumEntry GetEnumEntry(this Enum enumValue, bool underlyingType = false)
 		{
 			if(enumValue == null)
 				throw new ArgumentNullException(nameof(enumValue));
 
+			if(TryGetEnumEntry(enumValue, underlyingType, out var entry))
+				return entry;
+
+			throw new ArgumentException($"The specified '{enumValue}' enumeration value is undefined.");
+		}
+
+		public static bool TryGetEnumAlias(this Enum enumValue, out string alias)
+		{
 			FieldInfo field = enumValue.GetType().GetField(enumValue.ToString());
 
+			if(field != null)
+			{
+				var attribute = (AliasAttribute)Attribute.GetCustomAttribute(field, typeof(AliasAttribute));
+
+				if(attribute != null && attribute.Alias != null)
+				{
+					alias = Zongsoft.Resources.ResourceUtility.GetString(attribute.Alias, field.DeclaringType.Assembly);
+					return true;
+				}
+			}
+
+			alias = null;
+			return false;
+		}
+
+		public static bool TryGetEnumDescription(this Enum enumValue, out string description)
+		{
+			FieldInfo field = enumValue.GetType().GetField(enumValue.ToString());
+
+			if(field != null)
+			{
+				var attribute = (DescriptionAttribute)Attribute.GetCustomAttribute(field, typeof(DescriptionAttribute));
+
+				if(attribute != null && attribute.Description != null)
+				{
+					description = Zongsoft.Resources.ResourceUtility.GetString(attribute.Description, field.DeclaringType.Assembly);
+					return true;
+				}
+			}
+
+			description = null;
+			return false;
+		}
+
+		public static bool TryGetEnumEntry(this Enum enumValue, out EnumEntry entry)
+		{
+			return TryGetEnumEntry(enumValue, false, out entry);
+		}
+
+		public static bool TryGetEnumEntry(this Enum enumValue, bool underlyingType, out EnumEntry entry)
+		{
+			FieldInfo field = null;
+
+			if(enumValue != null)
+				field = enumValue.GetType().GetField(enumValue.ToString());
+
 			if(field == null)
-				return null;
+			{
+				entry = new EnumEntry();
+				return false;
+			}
 
-			var alias = field.GetCustomAttributes(typeof(AliasAttribute), false).OfType<AliasAttribute>().FirstOrDefault();
-			var description = field.GetCustomAttributes(typeof(DescriptionAttribute), false).OfType<DescriptionAttribute>().FirstOrDefault();
+			var alias = (AliasAttribute)Attribute.GetCustomAttribute(field, typeof(AliasAttribute));
+			var description = (DescriptionAttribute)Attribute.GetCustomAttribute(field, typeof(DescriptionAttribute));
 
-			return new EnumEntry(enumValue.GetType(), field.Name,
-								underlyingType ? System.Convert.ChangeType(field.GetValue(null), Enum.GetUnderlyingType(enumValue.GetType())) : field.GetValue(null),
-								alias == null ? string.Empty : alias.Alias,
-								description == null ? string.Empty : Zongsoft.Resources.ResourceUtility.GetString(description.Description, enumValue.GetType().Assembly));
+			entry = new EnumEntry(field.DeclaringType, field.Name,
+								underlyingType ? System.Convert.ChangeType(enumValue, Enum.GetUnderlyingType(enumValue.GetType())) : enumValue,
+								alias == null ? null : alias.Alias,
+								description == null ? null : Zongsoft.Resources.ResourceUtility.GetString(description.Description, field.DeclaringType.Assembly));
+
+			return true;
 		}
 
 		/// <summary>
@@ -135,7 +183,7 @@ namespace Zongsoft.Common
 		public static EnumEntry[] GetEnumEntries(Type enumType, bool underlyingType, object nullValue, string nullText)
 		{
 			if(enumType == null)
-				throw new ArgumentNullException("enumType");
+				throw new ArgumentNullException(nameof(enumType));
 
 			Type underlyingTypeOfNullable = Nullable.GetUnderlyingType(enumType);
 			if(underlyingTypeOfNullable != null)

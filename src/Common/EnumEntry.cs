@@ -1,6 +1,6 @@
 /*
  * Authors:
- *   ÖÓ·å(Popeye Zhong) <zongsoft@gmail.com>
+ *   é’Ÿå³°(Popeye Zhong) <zongsoft@gmail.com>
  *
  * Copyright (C) 2008-2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
@@ -25,136 +25,117 @@
  */
 
 using System;
-using System.ComponentModel;
-using System.Reflection;
 
 namespace Zongsoft.Common
 {
 	/// <summary>
-	/// ±íÊ¾Ã¶¾ÙÏîµÄÃèÊö¡£
+	/// è¡¨ç¤ºæšä¸¾é¡¹çš„æè¿°ã€‚
 	/// </summary>
-	[Serializable]
-	public class EnumEntry : IFormattable, IFormatProvider
+	public struct EnumEntry : IFormattable, IFormatProvider, IEquatable<EnumEntry>
 	{
-		#region ³ÉÔ±±äÁ¿
-		private Type _type;
-		private string _name;
-		private object _value;
-		private string _alias;
-		private string _description;
-		#endregion
-
-		#region ¹¹Ôìº¯Êı
+		#region æ„é€ å‡½æ•°
 		public EnumEntry(Type type, string name, object value, string alias, string description)
 		{
-			_type = type;
-			_name = name;
-			_value = value;
-			_alias = alias ?? string.Empty;
-			_description = description ?? string.Empty;
+			this.Type = type ?? throw new ArgumentNullException(nameof(type));
+			this.Name = name;
+			this.Value = value;
+			this.Alias = alias;
+			this.Description = description;
 		}
 		#endregion
 
-		#region ¹«¹²ÊôĞÔ
+		#region å…¬å…±å­—æ®µ
 		/// <summary>
-		/// »ñÈ¡Ã¶¾ÙÏîµÄÃû³Æ¡£
+		/// è·å–æšä¸¾é¡¹çš„åç§°ã€‚
 		/// </summary>
-		public string Name
-		{
-			get
-			{
-				return _name;
-			}
-		}
+		public readonly string Name;
 
 		/// <summary>
-		/// »ñÈ¡Ã¶¾ÙµÄÀàĞÍ¡£
+		/// è·å–æšä¸¾çš„ç±»å‹ã€‚
 		/// </summary>
-		public Type Type
-		{
-			get
-			{
-				return _type;
-			}
-		}
+		public readonly Type Type;
 
 		/// <summary>
-		/// µ±Ç°ÃèÊöµÄÃ¶¾ÙÏîÖµ£¬¸ÃÖµÓĞ¿ÉÄÜÎªÃ¶¾ÙÏîµÄÖµÒ²¿ÉÄÜÊÇ¶ÔÓ¦µÄ»ùÔªÀàĞÍÖµ¡£
+		/// å½“å‰æè¿°çš„æšä¸¾é¡¹å€¼ï¼Œè¯¥å€¼æœ‰å¯èƒ½ä¸ºæšä¸¾é¡¹çš„å€¼ä¹Ÿå¯èƒ½æ˜¯å¯¹åº”çš„åŸºå…ƒç±»å‹å€¼ã€‚
 		/// </summary>
-		public object Value
-		{
-			get
-			{
-				return _value;
-			}
-		}
+		public readonly object Value;
 
 		/// <summary>
-		/// »ñÈ¡Ã¶¾ÙÏîµÄ±ğÃû£¬Èç¹ûÎ´¶¨Òå½¨Òé´´½¨ÕßÉèÖÃÎªÃ¶¾ÙÏîµÄÃû³Æ¡£
+		/// è·å–æšä¸¾é¡¹çš„åˆ«åï¼Œå¦‚æœæœªå®šä¹‰å»ºè®®åˆ›å»ºè€…è®¾ç½®ä¸ºæšä¸¾é¡¹çš„åç§°ã€‚
 		/// </summary>
-		/// <remarks>Ã¶¾ÙÏîµÄ±ğÃûÓÉ<seealso cref="Zongsoft.ComponentModel.AliasAttribute"/>×Ô¶¨ÒåÌØĞÔÖ¸¶¨¡£</remarks>
-		public string Alias
-		{
-			get
-			{
-				return _alias;
-			}
-		}
+		/// <remarks>æšä¸¾é¡¹çš„åˆ«åç”±<seealso cref="Zongsoft.ComponentModel.AliasAttribute"/>è‡ªå®šä¹‰ç‰¹æ€§æŒ‡å®šã€‚</remarks>
+		public readonly string Alias;
 
 		/// <summary>
-		/// µ±Ç°ÃèÊöÃ¶¾ÙÏîµÄÃèÊöÎÄ±¾£¬Èç¹ûÎ´¶¨Òå½¨Òé´´½¨ÕßÉèÖÃÎªÃ¶¾ÙÏîµÄÃû³Æ¡£
+		/// å½“å‰æè¿°æšä¸¾é¡¹çš„æè¿°æ–‡æœ¬ï¼Œå¦‚æœæœªå®šä¹‰å»ºè®®åˆ›å»ºè€…è®¾ç½®ä¸ºæšä¸¾é¡¹çš„åç§°ã€‚
 		/// </summary>
-		/// <remarks>Ã¶¾ÙÏîµÄÃèÊöÓÉ<seealso cref="System.ComponentModel.DescriptionAttribute"/>×Ô¶¨ÒåÌØĞÔÖ¸¶¨¡£</remarks>
-		public string Description
-		{
-			get
-			{
-				return _description;
-			}
-		}
+		/// <remarks>æšä¸¾é¡¹çš„æè¿°ç”±<seealso cref="System.ComponentModel.DescriptionAttribute"/>è‡ªå®šä¹‰ç‰¹æ€§æŒ‡å®šã€‚</remarks>
+		public readonly string Description;
 		#endregion
 
-		#region ÖØĞ´·½·¨
+		#region é‡å†™æ–¹æ³•
+		public bool Equals(EnumEntry entry)
+		{
+			return this.Type == entry.Type &&
+			       object.Equals(this.Value, entry.Value);
+		}
+
+		public override bool Equals(object obj)
+		{
+			if(obj == null || obj.GetType() != this.GetType())
+				return false;
+
+			return this.Equals((EnumEntry)obj);
+		}
+
+		public override int GetHashCode()
+		{
+			if(this.Type == null || this.Value == null || string.IsNullOrEmpty(this.Name))
+				return 0;
+
+			return this.Value.GetHashCode();
+		}
+
 		public override string ToString()
 		{
+			if(this.Type == null || this.Value == null || string.IsNullOrEmpty(this.Name))
+				return string.Empty;
+
 			string value;
 
-			if(_value.GetType().IsPrimitive)
-				value = _value.ToString();
+			if(this.Value.GetType().IsPrimitive)
+				value = this.Value.ToString();
 			else
-			{
-				FieldInfo field = _type.GetField(_name);
-				value = System.Convert.ChangeType(field.GetValue(null), Enum.GetUnderlyingType(_type)).ToString();
-			}
+				value = System.Convert.ChangeType(this.Value, Enum.GetUnderlyingType(this.Type)).ToString();
 
-			return string.Format("{0}.{1} = {2}", _type.FullName, _name, value);
+			return string.Format("{0}.{1}={2}", this.Type.Name, this.Name, value);
 		}
 		#endregion
 
-		#region ¸ñÊ½·½·¨
+		#region æ ¼å¼æ–¹æ³•
 		public string ToString(string format)
 		{
-			if(string.IsNullOrWhiteSpace(format))
-				return _value.ToString();
+			if(string.IsNullOrEmpty(format))
+				return this.ToString();
 
 			switch(format.Trim().ToLowerInvariant())
 			{
 				case "d":
 				case "description":
-					return _description;
+					return this.Description;
 				case "n":
 				case "name":
-					return _name;
+					return this.Name;
 				case "a":
 				case "alias":
-					return _alias;
+					return this.Alias;
 				case "f":
 				case "full":
 				case "fullname":
 					return this.ToString();
 			}
 
-			return _value.ToString();
+			return this.Value.ToString();
 		}
 
 		string IFormattable.ToString(string format, IFormatProvider formatProvider)
