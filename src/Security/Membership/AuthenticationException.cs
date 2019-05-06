@@ -78,10 +78,23 @@ namespace Zongsoft.Security.Membership
 		{
 			get;
 		}
+
+		public override string Message
+		{
+			get
+			{
+				var message = base.Message;
+
+				if(string.IsNullOrEmpty(message))
+					return Common.EnumUtility.GetEnumDescription(this.Reason);
+
+				return message;
+			}
+		}
 		#endregion
 
 		#region 重写方法
-		public override void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
+		public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
 			base.GetObjectData(info, context);
 			info.AddValue(nameof(Reason), this.Reason);
