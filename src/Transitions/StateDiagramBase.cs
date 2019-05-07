@@ -60,6 +60,11 @@ namespace Zongsoft.Transitions
 		#endregion
 
 		#region 显式实现
+		void IStateDiagram.Failed(StateContextBase context)
+		{
+			this.OnFailed(context as StateContext<TState>);
+		}
+
 		bool IStateDiagram.CanVectoring(State origin, State destination)
 		{
 			return this.CanVectoring(origin as TState, destination as TState);
@@ -80,6 +85,11 @@ namespace Zongsoft.Transitions
 		protected virtual bool OnTransfer(StateContext<TState> context)
 		{
 			return true;
+		}
+
+		protected virtual void OnFailed(StateContext<TState> context)
+		{
+			throw new InvalidOperationException($"Not supported state transfer from '{context.Origin}' to '{context.Destination}'.");
 		}
 		#endregion
 

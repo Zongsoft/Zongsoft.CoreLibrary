@@ -36,6 +36,8 @@ namespace Zongsoft.Transitions
 			get;
 		}
 
+		void Failed(StateContextBase context);
+
 		bool CanVectoring(State origin, State destination);
 		bool Transfer(StateContextBase context);
 

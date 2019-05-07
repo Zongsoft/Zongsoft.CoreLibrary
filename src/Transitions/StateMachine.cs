@@ -272,17 +272,19 @@ namespace Zongsoft.Transitions
 			if(isTransfered || origin.Equals(destination))
 				return null;
 
-			//如果流程图未定义当前的流转向量，则退出或抛出异常
-			if(!destination.Diagram.CanVectoring(origin, destination))
-			{
-				//如果是首次操作则抛出异常
-				if(isFirstStep)
-					throw new InvalidOperationException("Not supported state transfer.");
+			//如果流程图定义了当前的流转向量则返回新建的上下文对象
+			if(destination.Diagram.CanVectoring(origin, destination))
+				return this.CreateContext(isFirstStep, origin, destination, parameters);
 
-				//退出方法
-				return null;
-			}
+			//通知状态图失败
+			destination.Diagram.Failed(this.CreateContext(isFirstStep, origin, destination, parameters));
 
+			//返回空对象
+			return null;
+		}
+
+		private StateContextBase CreateContext(bool isFirstStep, State origin, State destination, IDictionary<string, object> parameters)
+		{
 			var contextType = typeof(StateContext<>).MakeGenericType(destination.GetType());
 			return (StateContextBase)Activator.CreateInstance(contextType, new object[] { this, isFirstStep, origin, destination, parameters });
 		}
