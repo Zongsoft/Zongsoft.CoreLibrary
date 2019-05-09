@@ -291,7 +291,7 @@ namespace Zongsoft.Data
 		IEnumerable<T> Select<T>(string name, Grouping grouping, string schema, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(string name, Grouping grouping, string schema, object state, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(string name, Grouping grouping, string schema, Paging paging, object state = null, params Sorting[] sortings);
-		IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, string schema, params Sorting[] sortings);
+		IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, string schema = null, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, string schema, object state, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, string schema, Paging paging, object state = null, params Sorting[] sortings);
 		IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, string schema, Paging paging, object state, Sorting[] sortings, Func<DataSelectContextBase, bool> selecting, Action<DataSelectContextBase> selected);
