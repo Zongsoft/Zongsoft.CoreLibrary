@@ -288,6 +288,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Reflection\Delegates.cs" />
     <Compile Include="Reflection\Expressions\ConstantExpression.cs" />
     <Compile Include="Reflection\Expressions\IdentifierExpression.cs" />
     <Compile Include="Reflection\Expressions\IMemberExpression.cs" />
