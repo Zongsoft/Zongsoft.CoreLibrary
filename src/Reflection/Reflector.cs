@@ -49,8 +49,6 @@ namespace Zongsoft.Reflection
 					return GetValue((FieldInfo)member, ref target);
 				case MemberTypes.Property:
 					return GetValue((PropertyInfo)member, ref target, parameters);
-				case MemberTypes.Event:
-					return ((EventInfo)member).EventHandlerType;
 				default:
 					throw new NotSupportedException($"The {member.MemberType.ToString()} of member that is not supported.");
 			}
