@@ -38,7 +38,7 @@ namespace Zongsoft.Reflection
 {
 	public static class Reflector
 	{
-		public static object GetValue(this MemberInfo member, object target =null, params object[] parameters)
+		public static object GetValue(this MemberInfo member, ref object target, params object[] parameters)
 		{
 			if(member == null)
 				throw new ArgumentNullException(nameof(member));
@@ -46,51 +46,46 @@ namespace Zongsoft.Reflection
 			switch(member.MemberType)
 			{
 				case MemberTypes.Field:
-					return GetValue((FieldInfo)member, target);
+					return GetValue((FieldInfo)member, ref target);
 				case MemberTypes.Property:
-					return GetValue((PropertyInfo)member, target);
+					return GetValue((PropertyInfo)member, ref target, parameters);
 				case MemberTypes.Event:
 					return ((EventInfo)member).EventHandlerType;
 				default:
-					throw new NotSupportedException("Invalid member type.");
+					throw new NotSupportedException($"The {member.MemberType.ToString()} of member that is not supported.");
 			}
 		}
 
-		public static object GetValue(this FieldInfo field, object target = null)
+		public static object GetValue(this FieldInfo field, ref object target)
 		{
-			return field.GetValue(target);
+			return field.GetGetter().Invoke(ref target);
 		}
 
-		public static object GetValue(this PropertyInfo property, object target = null, params object[] parameters)
+		public static object GetValue(this PropertyInfo property, ref object target, params object[] parameters)
 		{
-			return property.GetValue(target, parameters);
+			if(!property.CanRead)
+				throw new InvalidOperationException($"The '{property.Name}' property does not support reading.");
+
+			return property.GetGetter().Invoke(ref target, parameters);
 		}
 
-		public static object GetValue(object target, string path)
+		public static object GetValue(object target, string name, params object[] parameters)
 		{
 			if(target == null)
 				throw new ArgumentNullException(nameof(target));
 
-			if(string.IsNullOrEmpty(path))
-				throw new ArgumentNullException(nameof(path));
-
-			var members = target.GetType().GetMember(path, MemberTypes.Property | MemberTypes.Field, BindingFlags.Public | BindingFlags.Instance);
+			var type = (target as Type) ?? target.GetType();
+			var members = string.IsNullOrEmpty(name) ?
+				type.GetDefaultMembers() :
+				type.GetMember(name, MemberTypes.Property | MemberTypes.Field, BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static);
 
 			if(members == null || members.Length == 0)
-				throw new ArgumentException();
+				throw new ArgumentException($"A member named '{name}' does not exist in the '{type.FullName}' type.");
 
-			switch(members[0].MemberType)
-			{
-				case MemberTypes.Field:
-					return ((FieldInfo)members[0]).GetValue(target);
-				case MemberTypes.Property:
-					return ((PropertyInfo)members[0]).GetValue(target);
-			}
-
-			return null;
+			return GetValue(members[0], ref target, parameters);
 		}
 
-		public static void SetValue(this MemberInfo member, object target, object value, params object[] parameters)
+		public static void SetValue(this MemberInfo member, ref object target, object value, params object[] parameters)
 		{
 			if(member == null)
 				throw new ArgumentNullException(nameof(member));
@@ -98,35 +93,43 @@ namespace Zongsoft.Reflection
 			switch(member.MemberType)
 			{
 				case MemberTypes.Field:
-					SetValue((FieldInfo)member, target, value);
+					SetValue((FieldInfo)member, ref target, value);
 					break;
 				case MemberTypes.Property:
-					SetValue((PropertyInfo)member, target, value);
+					SetValue((PropertyInfo)member, ref target, value, parameters);
 					break;
 				default:
-					throw new NotSupportedException("Invalid member type.");
+					throw new NotSupportedException($"The {member.MemberType.ToString()} of member that is not supported.");
 			}
 		}
 
-		public static void SetValue(this FieldInfo field, object target, object value)
+		public static void SetValue(this FieldInfo field, ref object target, object value)
 		{
-			field.SetValue(target, value);
+			field.GetSetter().Invoke(ref target, value);
 		}
 
-		public static void SetValue(this PropertyInfo property, object target, object value)
+		public static void SetValue(this PropertyInfo property, ref object target, object value, params object[] parameters)
 		{
-			property.SetValue(target, value);
+			if(!property.CanWrite)
+				throw new InvalidOperationException($"The '{property.Name}' property does not support writing.");
+
+			property.GetSetter().Invoke(ref target, value, parameters);
 		}
 
-		public static object SetValue(object target, string path, object value)
+		public static void SetValue(ref object target, string name, object value, params object[] parameters)
 		{
 			if(target == null)
 				throw new ArgumentNullException(nameof(target));
 
-			if(string.IsNullOrEmpty(path))
-				throw new ArgumentNullException(nameof(path));
+			var type = (target as Type) ?? target.GetType();
+			var members = string.IsNullOrEmpty(name) ?
+				type.GetDefaultMembers() :
+				type.GetMember(name, MemberTypes.Property | MemberTypes.Field, BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static);
 
-			throw new NotImplementedException();
+			if(members == null || members.Length == 0)
+				throw new ArgumentException($"A member named '{name}' does not exist in the '{type.FullName}' type.");
+
+			SetValue(members[0], ref target, value, parameters);
 		}
 	}
 }
