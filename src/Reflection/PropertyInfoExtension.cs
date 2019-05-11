@@ -1,8 +1,15 @@
 ﻿/*
- * Authors:
- *   钟峰(Popeye Zhong) <9555843@qq.com>
+ *   _____                                ______
+ *  /_   /  ____  ____  ____  _________  / __/ /_
+ *    / /  / __ \/ __ \/ __ \/ ___/ __ \/ /_/ __/
+ *   / /__/ /_/ / / / / /_/ /\_ \/ /_/ / __/ /_
+ *  /____/\____/_/ /_/\__  /____/\____/_/  \__/
+ *                   /____/
  *
- * Copyright (C) 2010-2018 Zongsoft Corporation <http://www.zongsoft.com>
+ * Authors:
+ *   钟峰(Popeye Zhong) <zongsoft@qq.com>
+ *
+ * Copyright (C) 2010-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -27,12 +34,39 @@
 using System;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Collections.Concurrent;
 
 namespace Zongsoft.Reflection
 {
 	public static class PropertyInfoExtension
 	{
-		public static Func<object, object> GenerateGetter(this PropertyInfo property)
+		#region 委托定义
+		public delegate object Getter(ref object target, params object[] parameters);
+		public delegate void Setter(ref object target, object value, params object[] parameters);
+		#endregion
+
+		#region 缓存变量
+		private static readonly ConcurrentDictionary<PropertyInfo, PropertyToken> _properties = new ConcurrentDictionary<PropertyInfo, PropertyToken>();
+		#endregion
+
+		#region 公共方法
+		public static Getter GetGetter(this PropertyInfo property)
+		{
+			if(property == null)
+				throw new ArgumentNullException(nameof(property));
+
+			return _properties.GetOrAdd(property, info => new PropertyToken(info, GenerateGetter(info))).Getter;
+		}
+
+		public static Setter GetSetter(this PropertyInfo property)
+		{
+			if(property == null)
+				throw new ArgumentNullException(nameof(property));
+
+			return _properties.GetOrAdd(property, info => new PropertyToken(info, GenerateSetter(info))).Setter;
+		}
+
+		public static Getter GenerateGetter(this PropertyInfo property)
 		{
 			if(property == null)
 				throw new ArgumentNullException(nameof(property));
@@ -41,25 +75,74 @@ namespace Zongsoft.Reflection
 			if(!property.CanRead)
 				return null;
 
-			var method = new DynamicMethod("__Get" + property.Name, typeof(object), new Type[] { typeof(object) }, property.DeclaringType, true);
+			//获取当前属性获取方法是否为实例方法
+			var isInstance = !property.GetMethod.IsStatic;
+
+			var method = new DynamicMethod("dynamic:" + property.DeclaringType.FullName + "!Get" + property.Name, typeof(object), new Type[] { typeof(object).MakeByRefType(), typeof(object[]) }, typeof(PropertyInfoExtension), true);
 			var generator = method.GetILGenerator();
 
-			generator.Emit(OpCodes.Ldarg_0);
-			if(property.DeclaringType.IsValueType)
-				generator.Emit(OpCodes.Unbox_Any, property.DeclaringType);
-			else
-				generator.Emit(OpCodes.Castclass, property.DeclaringType);
-			generator.Emit(OpCodes.Callvirt, property.GetMethod);
+			if(isInstance)
+			{
+				generator.Emit(OpCodes.Ldarg_0);
+				generator.Emit(OpCodes.Ldind_Ref);
+				if(property.DeclaringType.IsValueType)
+					generator.Emit(OpCodes.Unbox_Any, property.DeclaringType);
+				else
+					generator.Emit(OpCodes.Castclass, property.DeclaringType);
+			}
+
+			//获取属性的索引器参数
+			var parameters = property.GetIndexParameters();
+			if(parameters != null && parameters.Length > 0)
+			{
+				var ERROR_LABEL = generator.DefineLabel();
+				var NORMAL_LABEL = generator.DefineLabel();
+
+				//if(parameters == null || ...)
+				generator.Emit(OpCodes.Ldarg_1);
+				generator.Emit(OpCodes.Brfalse_S, ERROR_LABEL);
+
+				//if(... || parameters.Length < x)
+				generator.Emit(OpCodes.Ldarg_1);
+				generator.Emit(OpCodes.Ldlen);
+				generator.Emit(OpCodes.Conv_I4);
+				generator.Emit(OpCodes.Ldc_I4, parameters.Length);
+				generator.Emit(OpCodes.Bge_S, NORMAL_LABEL);
+
+				//throw new ArgumentException("...");
+				generator.MarkLabel(ERROR_LABEL);
+				generator.Emit(OpCodes.Ldstr, $"The count of {property.Name} property indexer parameters is not enough.");
+				generator.Emit(OpCodes.Newobj, typeof(ArgumentException).GetConstructor(new Type[] { typeof(string) }));
+				generator.Emit(OpCodes.Throw);
+
+				generator.MarkLabel(NORMAL_LABEL);
+
+				//属性索引器获取方法的调用参数
+				for(int i = 0; i < parameters.Length; i++)
+				{
+					generator.Emit(OpCodes.Ldarg_1);
+					generator.Emit(OpCodes.Ldc_I4, i);
+					generator.Emit(OpCodes.Ldelem_Ref);
+
+					if(parameters[i].ParameterType.IsValueType)
+						generator.Emit(OpCodes.Unbox_Any, parameters[i].ParameterType);
+					else
+						generator.Emit(OpCodes.Castclass, parameters[i].ParameterType);
+				}
+			}
+
+			//调用属性的获取方法
+			generator.Emit(isInstance ? OpCodes.Callvirt : OpCodes.Call, property.GetMethod);
 
 			if(property.PropertyType.IsValueType)
 				generator.Emit(OpCodes.Box, property.PropertyType);
 
 			generator.Emit(OpCodes.Ret);
 
-			return (Func<object, object>)method.CreateDelegate(typeof(Func<object, object>));
+			return (Getter)method.CreateDelegate(typeof(Getter));
 		}
 
-		public static MemberToken.Setter GenerateSetter(this PropertyInfo property)
+		public static Setter GenerateSetter(this PropertyInfo property)
 		{
 			if(property == null)
 				throw new ArgumentNullException(nameof(property));
@@ -68,28 +151,76 @@ namespace Zongsoft.Reflection
 			if(!property.CanWrite)
 				return null;
 
-			var method = new DynamicMethod(property.DeclaringType.FullName + "_Set" + property.Name, null, new Type[] { typeof(object).MakeByRefType(), typeof(object) }, typeof(PropertyInfoExtension), true);
+			//获取当前属性设置方法是否为实例方法
+			var isInstance = !property.SetMethod.IsStatic;
+
+			var method = new DynamicMethod("dynamic:" + property.DeclaringType.FullName + "!Set" + property.Name, null, new Type[] { typeof(object).MakeByRefType(), typeof(object), typeof(object[]) }, typeof(PropertyInfoExtension), true);
 			var generator = method.GetILGenerator();
 
-			generator.DeclareLocal(property.DeclaringType);
+			if(isInstance)
+			{
+				generator.DeclareLocal(property.DeclaringType);
 
-			generator.Emit(OpCodes.Ldarg_0);
-			generator.Emit(OpCodes.Ldind_Ref);
-			if(property.DeclaringType.IsValueType)
-				generator.Emit(OpCodes.Unbox_Any, property.DeclaringType);
-			else
-				generator.Emit(OpCodes.Castclass, property.DeclaringType);
-			generator.Emit(OpCodes.Stloc_0);
+				generator.Emit(OpCodes.Ldarg_0);
+				generator.Emit(OpCodes.Ldind_Ref);
+				if(property.DeclaringType.IsValueType)
+					generator.Emit(OpCodes.Unbox_Any, property.DeclaringType);
+				else
+					generator.Emit(OpCodes.Castclass, property.DeclaringType);
+				generator.Emit(OpCodes.Stloc_0);
 
-			if(property.DeclaringType.IsValueType)
-				generator.Emit(OpCodes.Ldloca_S, 0);
-			else
-				generator.Emit(OpCodes.Ldloc_0);
+				if(property.DeclaringType.IsValueType)
+					generator.Emit(OpCodes.Ldloca_S, 0);
+				else
+					generator.Emit(OpCodes.Ldloc_0);
+			}
+
+			//获取属性的索引器参数
+			var parameters = property.GetIndexParameters();
+			if(parameters != null && parameters.Length > 0)
+			{
+				var ERROR_LABEL = generator.DefineLabel();
+				var NORMAL_LABEL = generator.DefineLabel();
+
+				//if(parameters == null || ...)
+				generator.Emit(OpCodes.Ldarg_2);
+				generator.Emit(OpCodes.Brfalse_S, ERROR_LABEL);
+
+				//if(... || parameters.Length < x)
+				generator.Emit(OpCodes.Ldarg_2);
+				generator.Emit(OpCodes.Ldlen);
+				generator.Emit(OpCodes.Conv_I4);
+				generator.Emit(OpCodes.Ldc_I4, parameters.Length);
+				generator.Emit(OpCodes.Bge_S, NORMAL_LABEL);
+
+				//throw new ArgumentException("...");
+				generator.MarkLabel(ERROR_LABEL);
+				generator.Emit(OpCodes.Ldstr, $"The count of {property.Name} property indexer parameters is not enough.");
+				generator.Emit(OpCodes.Newobj, typeof(ArgumentException).GetConstructor(new Type[] { typeof(string) }));
+				generator.Emit(OpCodes.Throw);
+
+				generator.MarkLabel(NORMAL_LABEL);
+
+				//属性索引器获取方法的调用参数
+				for(int i = 0; i < parameters.Length; i++)
+				{
+					generator.Emit(OpCodes.Ldarg_2);
+					generator.Emit(OpCodes.Ldc_I4, i);
+					generator.Emit(OpCodes.Ldelem_Ref);
+
+					if(parameters[i].ParameterType.IsValueType)
+						generator.Emit(OpCodes.Unbox_Any, parameters[i].ParameterType);
+					else
+						generator.Emit(OpCodes.Castclass, parameters[i].ParameterType);
+				}
+			}
 
 			generator.Emit(OpCodes.Ldarg_1);
 			if(property.PropertyType.IsValueType)
 			{
-				generator.Emit(OpCodes.Ldtoken, property.PropertyType);
+				var underlyingType = Nullable.GetUnderlyingType(property.PropertyType) ?? property.PropertyType;
+
+				generator.Emit(OpCodes.Ldtoken, underlyingType);
 				generator.Emit(OpCodes.Call, typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle), BindingFlags.Public | BindingFlags.Static));
 				generator.Emit(OpCodes.Call, typeof(Convert).GetMethod(nameof(Convert.ChangeType), new[] { typeof(object), typeof(Type) }));
 				generator.Emit(OpCodes.Unbox_Any, property.PropertyType);
@@ -97,9 +228,9 @@ namespace Zongsoft.Reflection
 			else
 				generator.Emit(OpCodes.Castclass, property.PropertyType);
 
-			generator.Emit(OpCodes.Callvirt, property.SetMethod);
+			generator.Emit(isInstance ? OpCodes.Callvirt : OpCodes.Call, property.SetMethod);
 
-			if(property.DeclaringType.IsValueType)
+			if(isInstance && property.DeclaringType.IsValueType)
 			{
 				generator.Emit(OpCodes.Ldarg_0);
 				generator.Emit(OpCodes.Ldloc_0);
@@ -109,7 +240,69 @@ namespace Zongsoft.Reflection
 
 			generator.Emit(OpCodes.Ret);
 
-			return (MemberToken.Setter)method.CreateDelegate(typeof(MemberToken.Setter));
+			return (Setter)method.CreateDelegate(typeof(Setter));
 		}
+		#endregion
+
+		#region 嵌套子类
+		private class PropertyToken
+		{
+			#region 成员字段
+			private PropertyInfo _property;
+			private Getter _getter;
+			private Setter _setter;
+			#endregion
+
+			#region 构造函数
+			public PropertyToken(PropertyInfo property, Getter getter)
+			{
+				_property = property;
+				_getter = getter;
+			}
+
+			public PropertyToken(PropertyInfo property, Setter setter)
+			{
+				_property = property;
+				_setter = setter;
+			}
+			#endregion
+
+			#region 公共属性
+			public Getter Getter
+			{
+				get
+				{
+					if(_getter == null)
+					{
+						lock(this)
+						{
+							if(_getter == null)
+								_getter = GenerateGetter(_property);
+						}
+					}
+
+					return _getter;
+				}
+			}
+
+			public Setter Setter
+			{
+				get
+				{
+					if(_setter == null)
+					{
+						lock(this)
+						{
+							if(_setter == null)
+								_setter = GenerateSetter(_property);
+						}
+					}
+
+					return _setter;
+				}
+			}
+			#endregion
+		}
+		#endregion
 	}
 }
