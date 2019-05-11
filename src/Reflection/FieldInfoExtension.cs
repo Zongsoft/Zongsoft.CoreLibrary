@@ -1,8 +1,15 @@
 ﻿/*
- * Authors:
- *   钟峰(Popeye Zhong) <9555843@qq.com>
+ *   _____                                ______
+ *  /_   /  ____  ____  ____  _________  / __/ /_
+ *    / /  / __ \/ __ \/ __ \/ ___/ __ \/ /_/ __/
+ *   / /__/ /_/ / / / / /_/ /\_ \/ /_/ / __/ /_
+ *  /____/\____/_/ /_/\__  /____/\____/_/  \__/
+ *                   /____/
  *
- * Copyright (C) 2010-2018 Zongsoft Corporation <http://www.zongsoft.com>
+ * Authors:
+ *   钟峰(Popeye Zhong) <zongsoft@qq.com>
+ *
+ * Copyright (C) 2010-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -27,22 +34,50 @@
 using System;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Collections.Concurrent;
 
 namespace Zongsoft.Reflection
 {
 	public static class FieldInfoExtension
 	{
-		public static Func<object, object> GenerateGetter(this FieldInfo field)
+		#region 委托定义
+		public delegate object Getter(ref object target);
+		public delegate void Setter(ref object target, object value);
+		#endregion
+
+		#region 缓存变量
+		private static readonly ConcurrentDictionary<FieldInfo, FieldToken> _fields = new ConcurrentDictionary<FieldInfo, FieldToken>();
+		#endregion
+
+		#region 公共方法
+		public static Getter GetGetter(this FieldInfo field)
 		{
 			if(field == null)
 				throw new ArgumentNullException(nameof(field));
 
-			var method = new DynamicMethod("__Get" + field.Name, typeof(object), new Type[] { typeof(object) }, field.DeclaringType, true);
+			return _fields.GetOrAdd(field, info => new FieldToken(info, GenerateGetter(info))).Getter;
+		}
+
+		public static Setter GetSetter(this FieldInfo field)
+		{
+			if(field == null)
+				throw new ArgumentNullException(nameof(field));
+
+			return _fields.GetOrAdd(field, info => new FieldToken(info, GenerateSetter(info))).Setter;
+		}
+
+		public static Getter GenerateGetter(this FieldInfo field)
+		{
+			if(field == null)
+				throw new ArgumentNullException(nameof(field));
+
+			var method = new DynamicMethod("dynamic:" + field.DeclaringType.FullName + "!Get" + field.Name, typeof(object), new Type[] { typeof(object).MakeByRefType() }, typeof(FieldInfoExtension), true);
 			var generator = method.GetILGenerator();
 
 			generator.DeclareLocal(field.DeclaringType);
 
 			generator.Emit(OpCodes.Ldarg_0);
+			generator.Emit(OpCodes.Ldind_Ref);
 			if(field.DeclaringType.IsValueType)
 				generator.Emit(OpCodes.Unbox_Any, field.DeclaringType);
 			else
@@ -55,10 +90,10 @@ namespace Zongsoft.Reflection
 
 			generator.Emit(OpCodes.Ret);
 
-			return (Func<object, object>)method.CreateDelegate(typeof(Func<object, object>));
+			return (Getter)method.CreateDelegate(typeof(Getter));
 		}
 
-		public static MemberToken.Setter GenerateSetter(this FieldInfo field)
+		public static Setter GenerateSetter(this FieldInfo field)
 		{
 			if(field == null)
 				throw new ArgumentNullException(nameof(field));
@@ -67,7 +102,7 @@ namespace Zongsoft.Reflection
 			if(field.IsInitOnly)
 				return null;
 
-			var method = new DynamicMethod(field.DeclaringType.FullName + "_Set" + field.Name, null, new Type[] { typeof(object).MakeByRefType(), typeof(object) }, typeof(FieldInfoExtension), true);
+			var method = new DynamicMethod("dynamic:" + field.DeclaringType.FullName + "!Set" + field.Name, null, new Type[] { typeof(object).MakeByRefType(), typeof(object) }, typeof(FieldInfoExtension), true);
 			var generator = method.GetILGenerator();
 
 			generator.DeclareLocal(field.DeclaringType);
@@ -88,7 +123,9 @@ namespace Zongsoft.Reflection
 			generator.Emit(OpCodes.Ldarg_1);
 			if(field.FieldType.IsValueType)
 			{
-				generator.Emit(OpCodes.Ldtoken, field.FieldType);
+				var underlyingType = Nullable.GetUnderlyingType(field.FieldType) ?? field.FieldType;
+
+				generator.Emit(OpCodes.Ldtoken, underlyingType);
 				generator.Emit(OpCodes.Call, typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle), BindingFlags.Public | BindingFlags.Static));
 				generator.Emit(OpCodes.Call, typeof(Convert).GetMethod(nameof(Convert.ChangeType), new[] { typeof(object), typeof(Type) }));
 				generator.Emit(OpCodes.Unbox_Any, field.FieldType);
@@ -108,7 +145,69 @@ namespace Zongsoft.Reflection
 
 			generator.Emit(OpCodes.Ret);
 
-			return (MemberToken.Setter)method.CreateDelegate(typeof(MemberToken.Setter));
+			return (Setter)method.CreateDelegate(typeof(Setter));
 		}
+		#endregion
+
+		#region 嵌套子类
+		private class FieldToken
+		{
+			#region 成员字段
+			private FieldInfo _field;
+			private Getter _getter;
+			private Setter _setter;
+			#endregion
+
+			#region 构造函数
+			public FieldToken(FieldInfo field, Getter getter)
+			{
+				_field = field;
+				_getter = getter;
+			}
+
+			public FieldToken(FieldInfo field, Setter setter)
+			{
+				_field = field;
+				_setter = setter;
+			}
+			#endregion
+
+			#region 公共属性
+			public Getter Getter
+			{
+				get
+				{
+					if(_getter == null)
+					{
+						lock(this)
+						{
+							if(_getter == null)
+								_getter = GenerateGetter(_field);
+						}
+					}
+
+					return _getter;
+				}
+			}
+
+			public Setter Setter
+			{
+				get
+				{
+					if(_setter == null)
+					{
+						lock(this)
+						{
+							if(_setter == null)
+								_setter = GenerateSetter(_field);
+						}
+					}
+
+					return _setter;
+				}
+			}
+			#endregion
+		}
+		#endregion
 	}
 }
