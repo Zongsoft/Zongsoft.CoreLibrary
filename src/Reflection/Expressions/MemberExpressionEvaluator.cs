@@ -74,7 +74,7 @@ namespace Zongsoft.Reflection.Expressions
 				{
 					object[] parameters = null;
 					var member = this.GetMember(expression, target, arguments => parameters = this.GetParameters(origin, arguments));
-					target = this.GetMemberValue(member, target, parameters);
+					target = this.GetMemberValue(member, ref target, parameters);
 				}
 
 				evaluate?.Invoke(context);
@@ -98,13 +98,13 @@ namespace Zongsoft.Reflection.Expressions
 			{
 				parameters = null;
 				member = this.GetMember(expression, target, arguments => parameters = this.GetParameters(origin, arguments));
-				target = this.GetMemberValue(member, target, parameters);
+				target = this.GetMemberValue(member, ref target, parameters);
 				expression = expression.Next;
 			}
 
 			parameters = null;
 			member = this.GetMember(expression, target, arguments => parameters = this.GetParameters(origin, arguments));
-			this.SetMemberValue(member, target, value, parameters);
+			this.SetMemberValue(member, ref target, value, parameters);
 		}
 		#endregion
 
@@ -179,17 +179,17 @@ namespace Zongsoft.Reflection.Expressions
 			if(context.Expression.ExpressionType == MemberExpressionType.Constant)
 				return ((ConstantExpression)context.Expression).Value;
 
-			return this.GetMemberValue(context.Member, context.Target, context.Parameters);
+			return this.GetMemberValue(context.Member, ref context.Target, context.Parameters);
 		}
 
-		protected virtual object GetMemberValue(MemberInfo member, object target, params object[] parameters)
+		protected virtual object GetMemberValue(MemberInfo member, ref object target, params object[] parameters)
 		{
-			return Reflector.GetValue(member, target, parameters);
+			return Reflector.GetValue(member, ref target, parameters);
 		}
 
-		protected virtual void SetMemberValue(MemberInfo member, object target, object value, params object[] parameters)
+		protected virtual void SetMemberValue(MemberInfo member, ref object target, object value, params object[] parameters)
 		{
-			Reflector.SetValue(member, target, value, parameters);
+			Reflector.SetValue(member, ref target, value, parameters);
 		}
 		#endregion
 
