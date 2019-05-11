@@ -33,9 +33,12 @@
 
 using System;
 using System.Linq;
+using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+
+using Zongsoft.Reflection;
 
 namespace Zongsoft.Data
 {
@@ -1160,14 +1163,27 @@ namespace Zongsoft.Data
 
 		#region 成员字段
 		private object _data;
-		private readonly Reflection.MemberTokenCollection _members;
+		private readonly IDictionary<string, MemberInfo> _members;
 		#endregion
 
 		#region 构造函数
 		public ObjectDictionary(object data)
 		{
 			_data = data ?? throw new ArgumentNullException(nameof(data));
-			_members = Reflection.MemberTokenProvider.Default.GetMembers(_data.GetType());
+			_members = new Dictionary<string, MemberInfo>(StringComparer.OrdinalIgnoreCase);
+
+			foreach(var field in data.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance))
+			{
+				_members.Add(field.Name, field);
+			}
+
+			foreach(var property in data.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
+			{
+				var parameters = property.GetIndexParameters();
+
+				if(parameters == null || parameters.Length == 0)
+					_members.Add(property.Name, property);
+			}
 		}
 		#endregion
 
@@ -1204,7 +1220,7 @@ namespace Zongsoft.Data
 		{
 			get
 			{
-				return _members.Keys.ToArray();
+				return _members.Keys;
 			}
 		}
 
@@ -1212,7 +1228,18 @@ namespace Zongsoft.Data
 		{
 			get
 			{
-				return _members.Values.Select(p => p.GetValue(ref _data)).ToArray();
+				return _members.Values.Select(member =>
+				{
+					switch(member.MemberType)
+					{
+						case MemberTypes.Field:
+							return ((FieldInfo)member).GetGetter().Invoke(ref _data);
+						case MemberTypes.Property:
+							return ((PropertyInfo)member).GetGetter().Invoke(ref _data);
+						default:
+							return null;
+					}
+				}).ToArray();
 			}
 		}
 		#endregion
@@ -1220,7 +1247,7 @@ namespace Zongsoft.Data
 		#region 公共方法
 		public bool Contains(string name)
 		{
-			return _members.Contains(name);
+			return _members.ContainsKey(name);
 		}
 
 		public bool HasChanges(params string[] names)
@@ -1230,7 +1257,7 @@ namespace Zongsoft.Data
 
 			foreach(var name in names)
 			{
-				if(name != null && name.Length > 0 && _members.Contains(name))
+				if(name != null && name.Length > 0 && _members.ContainsKey(name))
 					return true;
 			}
 
@@ -1249,12 +1276,12 @@ namespace Zongsoft.Data
 
 		public object GetValue(string name)
 		{
-			return _members.Get(name).GetValue(ref _data);
+			return _members[name].GetValue(ref _data);
 		}
 
 		public TValue GetValue<TValue>(string name, TValue defaultValue)
 		{
-			if(_members.TryGet(name, out var member))
+			if(_members.TryGetValue(name, out var member))
 				return (TValue)Convert.ChangeType(member.GetValue(ref _data), typeof(TValue));
 
 			return defaultValue;
@@ -1270,7 +1297,7 @@ namespace Zongsoft.Data
 			if(valueFactory == null)
 				throw new ArgumentNullException(nameof(valueFactory));
 
-			if(!_members.TryGet(name, out var member))
+			if(!_members.TryGetValue(name, out var member))
 				throw new KeyNotFoundException($"The specified '{name}' is not a member of the '{_data.GetType().FullName}' type.");
 
 			if(predicate == null || predicate((TValue)Convert.ChangeType(member.GetValue(ref _data), typeof(TValue))))
@@ -1279,7 +1306,7 @@ namespace Zongsoft.Data
 
 		public bool TryGetValue<TValue>(string name, out TValue value)
 		{
-			if(_members.TryGet(name, out var member))
+			if(_members.TryGetValue(name, out var member))
 			{
 				value = (TValue)Convert.ChangeType(member.GetValue(ref _data), typeof(TValue));
 				return true;
@@ -1291,7 +1318,7 @@ namespace Zongsoft.Data
 
 		public bool TryGetValue<TValue>(string name, Action<TValue> got)
 		{
-			if(_members.TryGet(name, out var member))
+			if(_members.TryGetValue(name, out var member))
 			{
 				got?.Invoke((TValue)Convert.ChangeType(member.GetValue(ref _data), typeof(TValue)));
 				return true;
@@ -1310,7 +1337,7 @@ namespace Zongsoft.Data
 			if(valueFactory == null)
 				throw new ArgumentNullException(nameof(valueFactory));
 
-			if(_members.TryGet(name, out var member))
+			if(_members.TryGetValue(name, out var member))
 			{
 				if(predicate == null || predicate((TValue)Convert.ChangeType(member.GetValue(ref _data), typeof(TValue))))
 				{
@@ -1517,7 +1544,7 @@ namespace Zongsoft.Data
 		{
 			foreach(var key in _members.Keys)
 			{
-				yield return new KeyValuePair<string, object>(key, _members.Get(key).GetValue(ref _data));
+				yield return new KeyValuePair<string, object>(key, _members[key].GetValue(ref _data));
 			}
 		}
 
