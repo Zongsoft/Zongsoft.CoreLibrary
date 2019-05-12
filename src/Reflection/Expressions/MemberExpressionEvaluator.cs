@@ -151,7 +151,9 @@ namespace Zongsoft.Reflection.Expressions
 				throw new ArgumentNullException(nameof(owner));
 
 			var type = (owner as Type) ?? owner.GetType();
-			var members = string.IsNullOrEmpty(name) ? type.GetDefaultMembers() : type.GetMember(name);
+			var members = string.IsNullOrEmpty(name) ?
+				type.GetDefaultMembers() :
+				type.GetMember(name, MemberTypes.Property | MemberTypes.Field | MemberTypes.Method, BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static);
 
 			if(members == null || members.Length == 0)
 			{
