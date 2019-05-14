@@ -79,6 +79,7 @@
     <Compile Include="PropertyToken.cs" />
     <Compile Include="Reflection\MemberAccessTest.cs" />
     <Compile Include="Reflection\MemberExpressionTest.cs" />
+    <Compile Include="Reflection\FieldInfoTest.cs" />
     <Compile Include="Reflection\PropertyInfoTest.cs" />
     <Compile Include="Runtime\Caching\MemoryCacheTest.cs" />
     <Compile Include="Runtime\Serialization\DictionarySerializerTest.cs" />
