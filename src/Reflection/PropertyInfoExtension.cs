@@ -75,20 +75,25 @@ namespace Zongsoft.Reflection
 			if(!property.CanRead)
 				return null;
 
-			//获取当前属性获取方法是否为实例方法
-			var isInstance = !property.GetMethod.IsStatic;
-
 			var method = new DynamicMethod("dynamic:" + property.DeclaringType.FullName + "!Get" + property.Name, typeof(object), new Type[] { typeof(object).MakeByRefType(), typeof(object[]) }, typeof(PropertyInfoExtension), true);
 			var generator = method.GetILGenerator();
 
-			if(isInstance)
+			if(!property.GetMethod.IsStatic)
 			{
+				generator.DeclareLocal(property.DeclaringType);
+
 				generator.Emit(OpCodes.Ldarg_0);
 				generator.Emit(OpCodes.Ldind_Ref);
 				if(property.DeclaringType.IsValueType)
 					generator.Emit(OpCodes.Unbox_Any, property.DeclaringType);
 				else
 					generator.Emit(OpCodes.Castclass, property.DeclaringType);
+				generator.Emit(OpCodes.Stloc_0);
+
+				if(property.DeclaringType.IsValueType)
+					generator.Emit(OpCodes.Ldloca_S, 0);
+				else
+					generator.Emit(OpCodes.Ldloc_0);
 			}
 
 			//获取属性的索引器参数
@@ -132,7 +137,10 @@ namespace Zongsoft.Reflection
 			}
 
 			//调用属性的获取方法
-			generator.Emit(isInstance ? OpCodes.Callvirt : OpCodes.Call, property.GetMethod);
+			if(property.DeclaringType.IsValueType || property.GetMethod.IsStatic)
+				generator.Emit(OpCodes.Call, property.GetMethod);
+			else
+				generator.Emit(OpCodes.Callvirt, property.GetMethod);
 
 			if(property.PropertyType.IsValueType)
 				generator.Emit(OpCodes.Box, property.PropertyType);
@@ -151,13 +159,10 @@ namespace Zongsoft.Reflection
 			if(!property.CanWrite)
 				return null;
 
-			//获取当前属性设置方法是否为实例方法
-			var isInstance = !property.SetMethod.IsStatic;
-
 			var method = new DynamicMethod("dynamic:" + property.DeclaringType.FullName + "!Set" + property.Name, null, new Type[] { typeof(object).MakeByRefType(), typeof(object), typeof(object[]) }, typeof(PropertyInfoExtension), true);
 			var generator = method.GetILGenerator();
 
-			if(isInstance)
+			if(!property.SetMethod.IsStatic)
 			{
 				generator.DeclareLocal(property.DeclaringType);
 
@@ -228,9 +233,13 @@ namespace Zongsoft.Reflection
 			else
 				generator.Emit(OpCodes.Castclass, property.PropertyType);
 
-			generator.Emit(isInstance ? OpCodes.Callvirt : OpCodes.Call, property.SetMethod);
+			//调用属性的设置方法
+			if(property.DeclaringType.IsValueType || property.SetMethod.IsStatic)
+				generator.Emit(OpCodes.Call, property.SetMethod);
+			else
+				generator.Emit(OpCodes.Callvirt, property.SetMethod);
 
-			if(isInstance && property.DeclaringType.IsValueType)
+			if(property.DeclaringType.IsValueType && (!property.SetMethod.IsStatic))
 			{
 				generator.Emit(OpCodes.Ldarg_0);
 				generator.Emit(OpCodes.Ldloc_0);
