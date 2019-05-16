@@ -75,7 +75,12 @@ namespace Zongsoft.Reflection
 			if(!property.CanRead)
 				return null;
 
-			var method = new DynamicMethod("dynamic:" + property.DeclaringType.FullName + "!Get" + property.Name, typeof(object), new Type[] { typeof(object).MakeByRefType(), typeof(object[]) }, typeof(PropertyInfoExtension), true);
+			var method = new DynamicMethod("dynamic:" + property.DeclaringType.FullName + "!Get" + property.Name,
+				typeof(object),
+				new Type[] { typeof(object).MakeByRefType(), typeof(object[]) },
+				typeof(PropertyInfoExtension),
+				true);
+
 			var generator = method.GetILGenerator();
 
 			if(!property.GetMethod.IsStatic)
@@ -159,7 +164,12 @@ namespace Zongsoft.Reflection
 			if(!property.CanWrite)
 				return null;
 
-			var method = new DynamicMethod("dynamic:" + property.DeclaringType.FullName + "!Set" + property.Name, null, new Type[] { typeof(object).MakeByRefType(), typeof(object), typeof(object[]) }, typeof(PropertyInfoExtension), true);
+			var method = new DynamicMethod("dynamic:" + property.DeclaringType.FullName + "!Set" + property.Name,
+				null,
+				new Type[] { typeof(object).MakeByRefType(), typeof(object), typeof(object[]) },
+				typeof(PropertyInfoExtension),
+				true);
+
 			var generator = method.GetILGenerator();
 
 			if(!property.SetMethod.IsStatic)

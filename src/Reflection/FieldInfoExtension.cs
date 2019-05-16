@@ -71,7 +71,12 @@ namespace Zongsoft.Reflection
 			if(field == null)
 				throw new ArgumentNullException(nameof(field));
 
-			var method = new DynamicMethod("dynamic:" + field.DeclaringType.FullName + "!Get" + field.Name, typeof(object), new Type[] { typeof(object).MakeByRefType() }, typeof(FieldInfoExtension), true);
+			var method = new DynamicMethod("dynamic:" + field.DeclaringType.FullName + "!Get" + field.Name,
+				typeof(object),
+				new Type[] { typeof(object).MakeByRefType() },
+				typeof(FieldInfoExtension),
+				true);
+
 			var generator = method.GetILGenerator();
 
 			generator.DeclareLocal(field.DeclaringType);
@@ -102,7 +107,12 @@ namespace Zongsoft.Reflection
 			if(field.IsInitOnly)
 				return null;
 
-			var method = new DynamicMethod("dynamic:" + field.DeclaringType.FullName + "!Set" + field.Name, null, new Type[] { typeof(object).MakeByRefType(), typeof(object) }, typeof(FieldInfoExtension), true);
+			var method = new DynamicMethod("dynamic:" + field.DeclaringType.FullName + "!Set" + field.Name,
+				null,
+				new Type[] { typeof(object).MakeByRefType(), typeof(object) },
+				typeof(FieldInfoExtension),
+				true);
+
 			var generator = method.GetILGenerator();
 
 			generator.DeclareLocal(field.DeclaringType);
