@@ -49,8 +49,7 @@ namespace Zongsoft.Reflection.Expressions
 			if(expression == null)
 				throw new ArgumentNullException(nameof(expression));
 
-			var target = origin;
-
+			var result = origin;
 			MemberContext context = new MemberContext(0, origin, origin, expression);
 
 			while(context != null)
@@ -61,50 +60,44 @@ namespace Zongsoft.Reflection.Expressions
 				if(!context.HasValue)
 					context.Value = this.GetMemberValue(context);
 
+				result = context.Value;
 				context = context.Next();
 			}
 
-			while(expression != null)
-			{
-				if(expression.ExpressionType == MemberExpressionType.Constant)
-				{
-					target = ((ConstantExpression)expression).Value;
-				}
-				else
-				{
-					object[] parameters = null;
-					var member = this.GetMember(expression, target, arguments => parameters = this.GetParameters(origin, arguments));
-					target = this.GetMemberValue(member, ref target, parameters);
-				}
-
-				evaluate?.Invoke(context);
-
-				expression = expression.Next;
-			}
-
-			return target;
+			return result;
 		}
 
-		public void SetValue(IMemberExpression expression, object origin, object value)
+		public void SetValue(IMemberExpression expression, object origin, object value, Action<MemberContext> evaluate = null)
+		{
+			this.SetValue(expression, origin, _ => value, evaluate);
+		}
+
+		public void SetValue(IMemberExpression expression, object origin, Func<MemberContext, object> valueFactory, Action<MemberContext> evaluate = null)
 		{
 			if(expression == null)
 				throw new ArgumentNullException(nameof(expression));
 
-			var target = origin;
-			object[] parameters = null;
-			MemberInfo member = null;
+			if(valueFactory == null)
+				throw new ArgumentNullException(nameof(valueFactory));
 
-			while(expression.Next != null)
+			var context = new MemberContext(0, origin, origin, expression);
+
+			while(context.HasNext)
 			{
-				parameters = null;
-				member = this.GetMember(expression, target, arguments => parameters = this.GetParameters(origin, arguments));
-				target = this.GetMemberValue(member, ref target, parameters);
-				expression = expression.Next;
+				context.Member = this.GetMember(context);
+				evaluate?.Invoke(context);
+
+				if(!context.HasValue)
+					context.Value = this.GetMemberValue(context);
+
+				context = context.Next();
 			}
 
-			parameters = null;
-			member = this.GetMember(expression, target, arguments => parameters = this.GetParameters(origin, arguments));
-			this.SetMemberValue(member, ref target, value, parameters);
+			context.Member = this.GetMember(context);
+			evaluate?.Invoke(context);
+			context.Value = valueFactory(context);
+
+			this.SetMemberValue(context);
 		}
 		#endregion
 
@@ -113,33 +106,16 @@ namespace Zongsoft.Reflection.Expressions
 		{
 			switch(context.Expression.ExpressionType)
 			{
+				case MemberExpressionType.Constant:
+					return null;
 				case MemberExpressionType.Identifier:
-					return this.GetMember(context.Target, ((IdentifierExpression)context.Expression).Name);
+					return this.GetMember(context.Owner, ((IdentifierExpression)context.Expression).Name);
 				case MemberExpressionType.Method:
 					var method = (MethodExpression)context.Expression;
-					return this.GetMember(context.Target, method.Name);
+					return this.GetMember(context.Owner, method.Name);
 				case MemberExpressionType.Indexer:
 					var indexer = (IndexerExpression)context.Expression;
-					return this.GetMember(context.Target, string.Empty);
-				default:
-					throw new NotSupportedException();
-			}
-		}
-
-		protected virtual MemberInfo GetMember(IMemberExpression expression, object target, Action<IList<IMemberExpression>> getParameters)
-		{
-			switch(expression.ExpressionType)
-			{
-				case MemberExpressionType.Identifier:
-					return this.GetMember(target, ((IdentifierExpression)expression).Name);
-				case MemberExpressionType.Method:
-					var method = (MethodExpression)expression;
-					getParameters?.Invoke(method.Arguments);
-					return this.GetMember(target, method.Name);
-				case MemberExpressionType.Indexer:
-					var indexer = (IndexerExpression)expression;
-					getParameters?.Invoke(indexer.Arguments);
-					return this.GetMember(target, string.Empty);
+					return this.GetMember(context.Owner, string.Empty);
 				default:
 					throw new NotSupportedException();
 			}
@@ -181,17 +157,12 @@ namespace Zongsoft.Reflection.Expressions
 			if(context.Expression.ExpressionType == MemberExpressionType.Constant)
 				return ((ConstantExpression)context.Expression).Value;
 
-			return this.GetMemberValue(context.Member, ref context.Target, context.Parameters);
+			return Reflector.GetValue(context.Member, ref context.Owner, context.Parameters);
 		}
 
-		protected virtual object GetMemberValue(MemberInfo member, ref object target, params object[] parameters)
+		protected virtual void SetMemberValue(MemberContext context)
 		{
-			return Reflector.GetValue(member, ref target, parameters);
-		}
-
-		protected virtual void SetMemberValue(MemberInfo member, ref object target, object value, params object[] parameters)
-		{
-			Reflector.SetValue(member, ref target, value, parameters);
+			Reflector.SetValue(context.Member, ref context.Owner, context.Value, context.Parameters);
 		}
 		#endregion
 
@@ -203,7 +174,7 @@ namespace Zongsoft.Reflection.Expressions
 
 			var parameters = new object[arguments.Count];
 
-			for(int i=0; i<arguments.Count; i++)
+			for(int i = 0; i < arguments.Count; i++)
 			{
 				parameters[i] = this.GetValue(arguments[i], origin);
 			}
@@ -218,7 +189,7 @@ namespace Zongsoft.Reflection.Expressions
 			public int Index;
 			public int Depth;
 			public object Origin;
-			public object Target;
+			public object Owner;
 			public object Value;
 			public MemberInfo Member;
 			public IMemberExpression Expression;
@@ -230,7 +201,7 @@ namespace Zongsoft.Reflection.Expressions
 				this.Depth = 0;
 				this.Index = index;
 				this.Origin = origin;
-				this.Target = target;
+				this.Owner = target;
 				this.Expression = expression;
 				this.Member = null;
 				this.Parameters = null;
@@ -251,13 +222,18 @@ namespace Zongsoft.Reflection.Expressions
 				get;
 			}
 
+			public bool HasNext
+			{
+				get => this.Expression.Next != null;
+			}
+
 			public MemberContext Next()
 			{
 				if(this.Expression.Next == null)
 					return null;
 
 				this.Index++;
-				this.Target = this.Value;
+				this.Owner = this.Value;
 				this.Value = null;
 				this.Member = null;
 				this.Expression = this.Expression.Next;
