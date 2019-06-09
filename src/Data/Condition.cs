@@ -189,15 +189,34 @@ namespace Zongsoft.Data
 
 		public static Condition Between<T>(string name, T begin, T end) where T : struct, IComparable<T>
 		{
-			return new Condition(name, new T[] { begin, end }, ConditionOperator.Between);
+			T[] value;
+
+			//如果起始值大于截止值，则进行交换赋值
+			if(begin.CompareTo(end) > 0)
+				value = new T[] { end, begin };
+			else
+				value = new T[] { begin, end };
+
+			return new Condition(name, value, ConditionOperator.Between);
 		}
 
 		public static Condition Between<T>(string name, T? begin, T? end) where T : struct, IComparable<T>
 		{
+			//如果两个参数都有值并且起始值大于截止值，则进行交换赋值
+			if(begin.HasValue && end.HasValue)
+			{
+				if(begin.Value.CompareTo(end.Value) > 0)
+					return new Condition(name, new T[] { end.Value, begin.Value }, ConditionOperator.Between);
+				else
+					return new Condition(name, new T[] { begin.Value, end.Value }, ConditionOperator.Between);
+			}
+
 			if(begin.HasValue)
-				return end.HasValue ? new Condition(name, new T[] { begin.Value, end.Value }, ConditionOperator.Between) : Condition.GreaterThanEqual(name, begin.Value);
-			else
-				return end.HasValue ? Condition.LessThanEqual(name, end.Value) : null;
+				return Condition.GreaterThanEqual(name, begin.Value);
+			else if(end.HasValue)
+				return Condition.LessThanEqual(name, end.Value);
+
+			return null;
 		}
 
 		public static Condition In<T>(string name, IEnumerable<T> values) where T : IEquatable<T>
