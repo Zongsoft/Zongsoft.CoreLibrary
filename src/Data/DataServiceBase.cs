@@ -175,11 +175,21 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 保护属性
-		protected virtual Zongsoft.Security.Credential Credential
+		protected virtual Security.CredentialPrincipal Principal
 		{
 			get
 			{
-				if(Services.ApplicationContext.Current?.Principal is Zongsoft.Security.CredentialPrincipal principal && principal.Identity.IsAuthenticated)
+				return Services.ApplicationContext.Current?.Principal as Zongsoft.Security.CredentialPrincipal;
+			}
+		}
+
+		protected virtual Security.Credential Credential
+		{
+			get
+			{
+				var principal = this.Principal;
+
+				if(principal != null && principal.Identity.IsAuthenticated)
 					return principal.Identity.Credential;
 
 				return null;
@@ -187,52 +197,85 @@ namespace Zongsoft.Data
 		}
 		#endregion
 
+		#region 授权验证
+		protected virtual void Authorize(Method method, object state)
+		{
+			var credential = this.Credential;
+
+			if(credential == null || credential.User == null)
+				throw new Security.Membership.AuthorizationException();
+		}
+		#endregion
+
 		#region 执行方法
 		public IEnumerable<T> Execute<T>(string name, IDictionary<string, object> inParameters, object state = null)
 		{
-			IDictionary<string, object> outParameters;
-			return this.Execute<T>(name, inParameters, out outParameters, state);
+			return this.Execute<T>(name, inParameters, out _, state);
 		}
 
-		public virtual IEnumerable<T> Execute<T>(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters, object state = null)
+		public IEnumerable<T> Execute<T>(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters, object state = null)
+		{
+			//进行授权验证
+			this.Authorize(Method.Execute(), state);
+
+			return this.OnExecute<T>(name, inParameters, out outParameters, state);
+		}
+
+		protected virtual IEnumerable<T> OnExecute<T>(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters, object state)
 		{
 			return this.DataAccess.Execute<T>(name, inParameters, out outParameters, state, ctx => this.OnExecuting(ctx), ctx => this.OnExecuted(ctx));
 		}
 
 		public object ExecuteScalar(string name, IDictionary<string, object> inParameters, object state = null)
 		{
-			IDictionary<string, object> outParameters;
-			return this.ExecuteScalar(name, inParameters, out outParameters, state);
+			return this.ExecuteScalar(name, inParameters, out _, state);
 		}
 
-		public virtual object ExecuteScalar(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters, object state = null)
+		public object ExecuteScalar(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters, object state = null)
+		{
+			//进行授权验证
+			this.Authorize(Method.Execute(), state);
+
+			return this.OnExecuteScalar(name, inParameters, out outParameters, state);
+		}
+
+		protected virtual object OnExecuteScalar(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters, object state)
 		{
 			return this.DataAccess.ExecuteScalar(name, inParameters, out outParameters, state, ctx => this.OnExecuting(ctx), ctx => this.OnExecuted(ctx));
 		}
 		#endregion
 
 		#region 存在方法
-		public virtual bool Exists(ICondition condition, object state = null)
-		{
-			//修整查询条件
-			condition = this.OnValidate(Method.Exists(), condition);
-
-			return this.DataAccess.Exists(this.Name, condition, state, ctx => this.OnExisting(ctx), ctx => this.OnExisted(ctx));
-		}
-
-		public virtual bool Exists<TKey>(TKey key, object state = null)
+		public bool Exists<TKey>(TKey key, object state = null)
 		{
 			return this.Exists(this.ConvertKey(key, out _), state);
 		}
 
-		public virtual bool Exists<TKey1, TKey2>(TKey1 key1, TKey2 key2, object state = null)
+		public bool Exists<TKey1, TKey2>(TKey1 key1, TKey2 key2, object state = null)
 		{
 			return this.Exists(this.ConvertKey(key1, key2, out _), state);
 		}
 
-		public virtual bool Exists<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, object state = null)
+		public bool Exists<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, object state = null)
 		{
 			return this.Exists(this.ConvertKey(key1, key2, key3, out _), state);
+		}
+
+		public bool Exists(ICondition condition, object state = null)
+		{
+			//进行授权验证
+			this.Authorize(Method.Exists(), state);
+
+			//修整查询条件
+			condition = this.OnValidate(Method.Exists(), condition);
+
+			//执行存在操作
+			return this.OnExists(condition, state);
+		}
+
+		protected virtual bool OnExists(ICondition condition, object state)
+		{
+			return this.DataAccess.Exists(this.Name, condition, state, ctx => this.OnExisting(ctx), ctx => this.OnExisted(ctx));
 		}
 		#endregion
 
@@ -247,34 +290,25 @@ namespace Zongsoft.Data
 			return this.Count(condition, member, null);
 		}
 
-		public virtual int Count(ICondition condition, string member = null, object state = null)
+		public int Count(ICondition condition, string member = null, object state = null)
 		{
+			//进行授权验证
+			this.Authorize(Method.Count(), state);
+
 			//修整查询条件
 			condition = this.OnValidate(Method.Count(), condition);
 
+			//执行计数操作
+			return this.OnCount(condition, member, state);
+		}
+
+		protected virtual int OnCount(ICondition condition, string member, object state)
+		{
 			return this.DataAccess.Count(this.Name, condition, member, state, ctx => this.OnCounting(ctx), ctx => this.OnCounted(ctx));
 		}
 		#endregion
 
 		#region 递增方法
-		public long Increment(string member, ICondition condition, object state)
-		{
-			return this.Increment(member, condition, 1, state);
-		}
-
-		public long Increment(string member, ICondition condition, int interval)
-		{
-			return this.Increment(member, condition, interval, null);
-		}
-
-		public virtual long Increment(string member, ICondition condition, int interval = 1, object state = null)
-		{
-			//修整查询条件
-			condition = this.OnValidate(Method.Increment(), condition);
-
-			return this.DataAccess.Increment(this.Name, member, condition, interval, state, ctx => this.OnIncrementing(ctx), ctx => this.OnIncremented(ctx));
-		}
-
 		public long Decrement(string member, ICondition condition, object state)
 		{
 			return this.Decrement(member, condition, 1, state);
@@ -285,25 +319,52 @@ namespace Zongsoft.Data
 			return this.Decrement(member, condition, interval, null);
 		}
 
-		public virtual long Decrement(string member, ICondition condition, int interval = 1, object state = null)
+		public long Decrement(string member, ICondition condition, int interval = 1, object state = null)
 		{
-			//修整查询条件
-			condition = this.OnValidate(Method.Decrement(), condition);
+			return this.Increment(member, condition, -interval, state);
+		}
 
-			return this.DataAccess.Decrement(this.Name, member, condition, interval, state, ctx => this.OnIncrementing(ctx), ctx => this.OnIncremented(ctx));
+		public long Increment(string member, ICondition condition, object state)
+		{
+			return this.Increment(member, condition, 1, state);
+		}
+
+		public long Increment(string member, ICondition condition, int interval)
+		{
+			return this.Increment(member, condition, interval, null);
+		}
+
+		public long Increment(string member, ICondition condition, int interval = 1, object state = null)
+		{
+			//进行授权验证
+			this.Authorize(Method.Increment(), state);
+
+			//修整查询条件
+			condition = this.OnValidate(Method.Increment(), condition);
+
+			//执行递增操作
+			return this.OnIncrement(member, condition, interval, state);
+		}
+
+		protected virtual long OnIncrement(string member, ICondition condition, int interval, object state)
+		{
+			return this.DataAccess.Increment(this.Name, member, condition, interval, state, ctx => this.OnIncrementing(ctx), ctx => this.OnIncremented(ctx));
 		}
 		#endregion
 
 		#region 删除方法
-		public virtual int Delete<TKey>(TKey key, string schema = null)
+		public int Delete<TKey>(TKey key, string schema = null)
 		{
 			return this.Delete<TKey>(key, schema, null);
 		}
 
-		public virtual int Delete<TKey>(TKey key, string schema, object state)
+		public int Delete<TKey>(TKey key, string schema, object state)
 		{
 			//确认是否可以执行该操作
 			this.EnsureDelete();
+
+			//进行授权验证
+			this.Authorize(Method.Delete(), state);
 
 			//将删除键转换成条件对象，并进行修整
 			var condition = this.OnValidate(Method.Delete(), this.ConvertKey(key, out _));
@@ -312,15 +373,18 @@ namespace Zongsoft.Data
 			return this.OnDelete(condition, this.GetSchema(schema), state);
 		}
 
-		public virtual int Delete<TKey1, TKey2>(TKey1 key1, TKey2 key2, string schema = null)
+		public int Delete<TKey1, TKey2>(TKey1 key1, TKey2 key2, string schema = null)
 		{
 			return this.Delete<TKey1, TKey2>(key1, key2, schema, null);
 		}
 
-		public virtual int Delete<TKey1, TKey2>(TKey1 key1, TKey2 key2, string schema, object state)
+		public int Delete<TKey1, TKey2>(TKey1 key1, TKey2 key2, string schema, object state)
 		{
 			//确认是否可以执行该操作
 			this.EnsureDelete();
+
+			//进行授权验证
+			this.Authorize(Method.Delete(), state);
 
 			//将删除键转换成条件对象，并进行修整
 			var condition = this.OnValidate(Method.Delete(), this.ConvertKey(key1, key2, out _));
@@ -329,15 +393,18 @@ namespace Zongsoft.Data
 			return this.OnDelete(condition, this.GetSchema(schema), state);
 		}
 
-		public virtual int Delete<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string schema = null)
+		public int Delete<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string schema = null)
 		{
 			return this.Delete<TKey1, TKey2, TKey3>(key1, key2, key3, schema, null);
 		}
 
-		public virtual int Delete<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string schema, object state)
+		public int Delete<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string schema, object state)
 		{
 			//确认是否可以执行该操作
 			this.EnsureDelete();
+
+			//进行授权验证
+			this.Authorize(Method.Delete(), state);
 
 			//将删除键转换成条件对象，并进行修整
 			var condition = this.OnValidate(Method.Delete(), this.ConvertKey(key1, key2, key3, out _));
@@ -355,6 +422,9 @@ namespace Zongsoft.Data
 		{
 			//确认是否可以执行该操作
 			this.EnsureDelete();
+
+			//进行授权验证
+			this.Authorize(Method.Delete(), state);
 
 			//修整删除条件
 			condition = this.OnValidate(Method.Delete(), condition);
@@ -393,6 +463,9 @@ namespace Zongsoft.Data
 			//确认是否可以执行该操作
 			this.EnsureInsert();
 
+			//进行授权验证
+			this.Authorize(Method.Insert(), state);
+
 			if(data == null)
 				return 0;
 
@@ -403,6 +476,15 @@ namespace Zongsoft.Data
 			this.OnValidate(Method.Insert(), dictionary);
 
 			return this.OnInsert(dictionary, this.GetSchema(schema, data.GetType()), state);
+		}
+
+		protected virtual int OnInsert(IDataDictionary<TEntity> data, ISchema schema, object state)
+		{
+			if(data == null || data.Data == null)
+				return 0;
+
+			//执行数据引擎的插入操作
+			return this.DataAccess.Insert(this.Name, data, schema, state, ctx => this.OnInserting(ctx), ctx => this.OnInserted(ctx));
 		}
 
 		public int InsertMany(IEnumerable items)
@@ -425,6 +507,9 @@ namespace Zongsoft.Data
 			//确认是否可以执行该操作
 			this.EnsureInsert();
 
+			//进行授权验证
+			this.Authorize(Method.InsertMany(), state);
+
 			if(items == null)
 				return 0;
 
@@ -438,15 +523,6 @@ namespace Zongsoft.Data
 			}
 
 			return this.OnInsertMany(dictionares, this.GetSchema(schema, Common.TypeExtension.GetElementType(items.GetType())), state);
-		}
-
-		protected virtual int OnInsert(IDataDictionary<TEntity> data, ISchema schema, object state)
-		{
-			if(data == null || data.Data == null)
-				return 0;
-
-			//执行数据引擎的插入操作
-			return this.DataAccess.Insert(this.Name, data, schema, state, ctx => this.OnInserting(ctx), ctx => this.OnInserted(ctx));
 		}
 
 		protected virtual int OnInsertMany(IEnumerable<IDataDictionary<TEntity>> items, ISchema schema, object state)
@@ -465,7 +541,7 @@ namespace Zongsoft.Data
 			return this.Update<TKey>(data, key, null, state);
 		}
 
-		public virtual int Update<TKey>(object data, TKey key, string schema, object state = null)
+		public int Update<TKey>(object data, TKey key, string schema, object state = null)
 		{
 			return this.Update(data, this.ConvertKey(key, out _), schema, state);
 		}
@@ -475,7 +551,7 @@ namespace Zongsoft.Data
 			return this.Update<TKey1, TKey2>(data, key1, key2, null, state);
 		}
 
-		public virtual int Update<TKey1, TKey2>(object data, TKey1 key1, TKey2 key2, string schema, object state = null)
+		public int Update<TKey1, TKey2>(object data, TKey1 key1, TKey2 key2, string schema, object state = null)
 		{
 			return this.Update(data, this.ConvertKey(key1, key2, out _), schema, state);
 		}
@@ -485,7 +561,7 @@ namespace Zongsoft.Data
 			return this.Update<TKey1, TKey2, TKey3>(data, key1, key2, key3, null, state);
 		}
 
-		public virtual int Update<TKey1, TKey2, TKey3>(object data, TKey1 key1, TKey2 key2, TKey3 key3, string schema, object state = null)
+		public int Update<TKey1, TKey2, TKey3>(object data, TKey1 key1, TKey2 key2, TKey3 key3, string schema, object state = null)
 		{
 			return this.Update(data, this.ConvertKey(key1, key2, key3, out _), schema, state);
 		}
@@ -510,6 +586,9 @@ namespace Zongsoft.Data
 			//确认是否可以执行该操作
 			this.EnsureUpdate();
 
+			//进行授权验证
+			this.Authorize(Method.Update(), state);
+
 			//将当前更新数据对象转换成数据字典
 			var dictionary = DataDictionary.GetDictionary<TEntity>(data);
 
@@ -533,6 +612,14 @@ namespace Zongsoft.Data
 			return this.OnUpdate(dictionary, condition, this.GetSchema(schema, data.GetType()), state);
 		}
 
+		protected virtual int OnUpdate(IDataDictionary<TEntity> data, ICondition condition, ISchema schema, object state)
+		{
+			if(data == null || data.Data == null)
+				return 0;
+
+			return this.DataAccess.Update(this.Name, data, condition, schema, state, ctx => this.OnUpdating(ctx), ctx => this.OnUpdated(ctx));
+		}
+
 		public int UpdateMany(IEnumerable items, object state = null)
 		{
 			return this.UpdateMany(items, null, state);
@@ -542,6 +629,9 @@ namespace Zongsoft.Data
 		{
 			//确认是否可以执行该操作
 			this.EnsureUpdate();
+
+			//进行授权验证
+			this.Authorize(Method.UpdateMany(), state);
 
 			if(items == null)
 				return 0;
@@ -556,14 +646,6 @@ namespace Zongsoft.Data
 			}
 
 			return this.OnUpdateMany(dictionares, this.GetSchema(schema, Common.TypeExtension.GetElementType(items.GetType())), state);
-		}
-
-		protected virtual int OnUpdate(IDataDictionary<TEntity> data, ICondition condition, ISchema schema, object state)
-		{
-			if(data == null || data.Data == null)
-				return 0;
-
-			return this.DataAccess.Update(this.Name, data, condition, schema, state, ctx => this.OnUpdating(ctx), ctx => this.OnUpdated(ctx));
 		}
 
 		protected virtual int OnUpdateMany(IEnumerable<IDataDictionary<TEntity>> items, ISchema schema, object state)
@@ -613,12 +695,15 @@ namespace Zongsoft.Data
 			return this.Get(key, schema, paging, state, out _, sortings);
 		}
 
-		public virtual object Get<TKey>(TKey key, string schema, Paging paging, object state, out IPaginator paginator, params Sorting[] sortings)
+		public object Get<TKey>(TKey key, string schema, Paging paging, object state, out IPaginator paginator, params Sorting[] sortings)
 		{
 			var condition = this.ConvertKey(key, out var singleton);
 
 			if(singleton)
 			{
+				//进行授权验证
+				this.Authorize(Method.Get(), state);
+
 				//修整查询条件
 				condition = this.OnValidate(Method.Get(), condition);
 
@@ -668,12 +753,15 @@ namespace Zongsoft.Data
 			return this.Get(key1, key2, schema, paging, state, out _, sortings);
 		}
 
-		public virtual object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string schema, Paging paging, object state, out IPaginator paginator, params Sorting[] sortings)
+		public object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string schema, Paging paging, object state, out IPaginator paginator, params Sorting[] sortings)
 		{
 			var condition = this.ConvertKey(key1, key2, out var singleton);
 
 			if(singleton)
 			{
+				//进行授权验证
+				this.Authorize(Method.Get(), state);
+
 				//修整查询条件
 				condition = this.OnValidate(Method.Get(), condition);
 
@@ -723,12 +811,15 @@ namespace Zongsoft.Data
 			return this.Get(key1, key2, key3, schema, paging, state, out _, sortings);
 		}
 
-		public virtual object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string schema, Paging paging, object state, out IPaginator paginator, params Sorting[] sortings)
+		public object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string schema, Paging paging, object state, out IPaginator paginator, params Sorting[] sortings)
 		{
 			var condition = this.ConvertKey(key1, key2, key3, out var singleton);
 
 			if(singleton)
 			{
+				//进行授权验证
+				this.Authorize(Method.Get(), state);
+
 				//修整查询条件
 				condition = this.OnValidate(Method.Get(), condition);
 
@@ -802,6 +893,9 @@ namespace Zongsoft.Data
 
 		public IEnumerable<TEntity> Select(ICondition condition, string schema, Paging paging, object state, params Sorting[] sortings)
 		{
+			//进行授权验证
+			this.Authorize(Method.Select(), state);
+
 			//修整查询条件
 			condition = this.OnValidate(Method.Select(), condition);
 
@@ -858,6 +952,9 @@ namespace Zongsoft.Data
 
 		public IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, string schema, Paging paging, object state = null, params Sorting[] sortings)
 		{
+			//进行授权验证
+			this.Authorize(Method.Select(), state);
+
 			//修整查询条件
 			condition = this.OnValidate(Method.Select(), condition);
 
