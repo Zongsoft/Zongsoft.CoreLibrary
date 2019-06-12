@@ -191,8 +191,8 @@ namespace Zongsoft.Data
 		{
 			T[] value;
 
-			//如果起始值大于截止值，则进行交换赋值
-			if(begin.CompareTo(end) > 0)
+			//如果起始值大于截止值则交换位置
+			if(Comparer<T>.Default.Compare(begin, end) > 0)
 				value = new T[] { end, begin };
 			else
 				value = new T[] { begin, end };
@@ -205,7 +205,7 @@ namespace Zongsoft.Data
 			//如果两个参数都有值并且起始值大于截止值，则进行交换赋值
 			if(begin.HasValue && end.HasValue)
 			{
-				if(begin.Value.CompareTo(end.Value) > 0)
+				if(Comparer<T>.Default.Compare(begin.Value, end.Value) > 0)
 					return new Condition(name, new T[] { end.Value, begin.Value }, ConditionOperator.Between);
 				else
 					return new Condition(name, new T[] { begin.Value, end.Value }, ConditionOperator.Between);
@@ -278,8 +278,8 @@ namespace Zongsoft.Data
 
 			if(Zongsoft.Common.TypeExtension.IsAssignableFrom(typeof(Tuple<,>), condition.Value.GetType()))
 			{
-				begin = Reflection.MemberAccess.GetMemberValue<object>(condition.Value, "Item1");
-				end = Reflection.MemberAccess.GetMemberValue<object>(condition.Value, "Item2");
+				begin = Reflection.Reflector.GetValue(condition.Value, "Item1");
+				end = Reflection.Reflector.GetValue(condition.Value, "Item2");
 
 				return true;
 			}

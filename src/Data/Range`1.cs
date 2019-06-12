@@ -45,7 +45,7 @@ namespace Zongsoft.Data
 		public Range(T? minimum, T? maximum)
 		{
 			//如果两个参数都有值并且起始值大于截止值，则进行交换赋值
-			if(minimum.HasValue && maximum.HasValue && minimum.Value.CompareTo(maximum.Value) > 0)
+			if(minimum.HasValue && maximum.HasValue && Comparer<T>.Default.Compare(minimum.Value, maximum.Value) > 0)
 			{
 				_minimum = maximum;
 				_maximum = minimum;
