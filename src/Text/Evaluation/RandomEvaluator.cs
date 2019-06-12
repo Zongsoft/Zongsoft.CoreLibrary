@@ -61,6 +61,7 @@ namespace Zongsoft.Text.Evaluation
 				case "int64":
 					return ((ulong)Zongsoft.Common.RandomGenerator.GenerateInt64()).ToString();
 				case "guid":
+				case "uuid":
 					return Guid.NewGuid().ToString("n");
 			}
 
