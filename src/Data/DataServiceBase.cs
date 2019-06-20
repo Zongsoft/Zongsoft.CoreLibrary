@@ -1467,6 +1467,36 @@ namespace Zongsoft.Data
 			}
 			#endregion
 
+			#region 公共方法
+			/// <summary>
+			/// 获取一个值，指示当前方法是否为读取方法(Count/Exists/Select)。
+			/// </summary>
+			public bool IsReading
+			{
+				get
+				{
+					return this.Kind == DataAccessMethod.Count ||
+						this.Kind == DataAccessMethod.Exists ||
+						this.Kind == DataAccessMethod.Select;
+				}
+			}
+
+			/// <summary>
+			/// 获取一个值，指示当前方法是否为修改方法(Incremnet/Decrement/Delete/Insert/Update/Upsert)。
+			/// </summary>
+			public bool IsWriting
+			{
+				get
+				{
+					return this.Kind == DataAccessMethod.Increment || 
+						this.Kind == DataAccessMethod.Delete ||
+						this.Kind == DataAccessMethod.Insert ||
+						this.Kind == DataAccessMethod.Update ||
+						this.Kind == DataAccessMethod.Upsert;
+				}
+			}
+			#endregion
+
 			#region 重写方法
 			public bool Equals(Method method)
 			{
