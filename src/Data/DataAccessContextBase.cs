@@ -33,7 +33,7 @@ namespace Zongsoft.Data
 	/// <summary>
 	/// 表示数据访问的上下文基类。
 	/// </summary>
-	public abstract class DataAccessContextBase : IDataAccessContextBase, System.ComponentModel.INotifyPropertyChanged
+	public abstract class DataAccessContextBase : IDataAccessContextBase, IDisposable, INotifyPropertyChanged
 	{
 		#region 事件定义
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -148,6 +148,21 @@ namespace Zongsoft.Data
 
 				return _states;
 			}
+		}
+		#endregion
+
+		#region 处置方法
+		public void Dispose()
+		{
+			this.Dispose(true);
+		}
+
+		protected virtual void Dispose(bool disposing)
+		{
+			var states = _states;
+
+			if(states != null)
+				states.Clear();
 		}
 		#endregion
 
