@@ -210,8 +210,13 @@ namespace Zongsoft.Data
 			//再次更新返回参数值
 			outParameters = context.OutParameters;
 
+			var result = this.ToEnumerable<T>(context.Result);
+
+			//处置上下文资源
+			context.Dispose();
+
 			//返回最终的结果
-			return this.ToEnumerable<T>(context.Result);
+			return result;
 		}
 
 		public object ExecuteScalar(string name, IDictionary<string, object> inParameters, object state = null, Func<DataExecuteContextBase, bool> executing = null, Action<DataExecuteContextBase> executed = null)
@@ -267,8 +272,13 @@ namespace Zongsoft.Data
 			//再次更新返回参数值
 			outParameters = context.OutParameters;
 
+			var result = context.Result;
+
+			//处置上下文资源
+			context.Dispose();
+
 			//返回最终的结果
-			return context.Result;
+			return result;
 		}
 
 		protected abstract void OnExecute(DataExecuteContextBase context);
@@ -312,8 +322,13 @@ namespace Zongsoft.Data
 			if(existed != null)
 				existed(context);
 
+			var result = context.Result;
+
+			//处置上下文资源
+			context.Dispose();
+
 			//返回最终的结果
-			return context.Result;
+			return result;
 		}
 
 		protected abstract void OnExists(DataExistContextBase context);
@@ -387,8 +402,13 @@ namespace Zongsoft.Data
 			if(counted != null)
 				counted(context);
 
+			var result = context.Result;
+
+			//处置上下文资源
+			context.Dispose();
+
 			//返回最终的结果
-			return context.Result;
+			return result;
 		}
 
 		protected abstract void OnCount(DataCountContextBase context);
@@ -465,8 +485,13 @@ namespace Zongsoft.Data
 			if(incremented != null)
 				incremented(context);
 
+			var result = context.Result;
+
+			//处置上下文资源
+			context.Dispose();
+
 			//返回最终的结果
-			return context.Result;
+			return result;
 		}
 
 		public long Decrement<T>(string member, ICondition condition)
@@ -575,8 +600,13 @@ namespace Zongsoft.Data
 			if(deleted != null)
 				deleted(context);
 
-			//返回最终结果
-			return context.Count;
+			var result = context.Count;
+
+			//处置上下文资源
+			context.Dispose();
+
+			//返回最终的结果
+			return result;
 		}
 
 		protected abstract void OnDelete(DataDeleteContextBase context);
@@ -702,8 +732,13 @@ namespace Zongsoft.Data
 			if(inserted != null)
 				inserted(context);
 
+			var result = context.Count;
+
+			//处置上下文资源
+			context.Dispose();
+
 			//返回最终的结果
-			return context.Count;
+			return result;
 		}
 
 		public int InsertMany<T>(IEnumerable<T> items)
@@ -825,8 +860,13 @@ namespace Zongsoft.Data
 			if(inserted != null)
 				inserted(context);
 
+			var result = context.Count;
+
+			//处置上下文资源
+			context.Dispose();
+
 			//返回最终的结果
-			return context.Count;
+			return result;
 		}
 
 		protected abstract void OnInsert(DataInsertContextBase context);
@@ -1036,8 +1076,13 @@ namespace Zongsoft.Data
 			if(updated != null)
 				updated(context);
 
+			var result = context.Count;
+
+			//处置上下文资源
+			context.Dispose();
+
 			//返回最终的结果
-			return context.Count;
+			return result;
 		}
 
 		public int UpdateMany<T>(IEnumerable<T> items)
@@ -1135,8 +1180,13 @@ namespace Zongsoft.Data
 			if(updated != null)
 				updated(context);
 
+			var result = context.Count;
+
+			//处置上下文资源
+			context.Dispose();
+
 			//返回最终的结果
-			return context.Count;
+			return result;
 		}
 
 		protected abstract void OnUpdate(DataUpdateContextBase context);
@@ -1363,8 +1413,13 @@ namespace Zongsoft.Data
 			if(selected != null)
 				selected(context);
 
+			var result = this.ToEnumerable<T>(context.Result);
+
+			//处置上下文资源
+			context.Dispose();
+
 			//返回最终的结果
-			return this.ToEnumerable<T>(context.Result);
+			return result;
 		}
 
 		protected abstract void OnSelect(DataSelectContextBase context);
