@@ -371,7 +371,11 @@ namespace Zongsoft.Data
 		object IDataMutateContextBase.Data
 		{
 			get => this.Interval;
-			set => throw new NotSupportedException();
+			set
+			{
+				if(Common.Convert.TryConvertValue<int>(value, out var interval))
+					this.Interval = interval;
+			}
 		}
 
 		bool IDataMutateContextBase.IsMultiple
