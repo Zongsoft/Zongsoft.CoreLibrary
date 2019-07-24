@@ -314,6 +314,7 @@
     <Compile Include="Runtime\Caching\CacheChangedEventArgs.cs" />
     <Compile Include="Runtime\Caching\CacheChangedReason.cs" />
     <Compile Include="Runtime\Caching\CacheEntry.cs" />
+    <Compile Include="Runtime\Caching\StorageBase.cs" />
     <Compile Include="Runtime\Caching\FileBufferManager.cs" />
     <Compile Include="Runtime\Caching\IBufferManager.cs" />
     <Compile Include="Runtime\Caching\IBufferManagerSelector.cs" />
