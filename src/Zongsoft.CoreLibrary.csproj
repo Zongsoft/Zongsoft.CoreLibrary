@@ -87,6 +87,8 @@
     <Compile Include="Common\IDisposableObject.cs" />
     <Compile Include="Common\IEventHandler.cs" />
     <Compile Include="Common\IEventHandler`1.cs" />
+    <Compile Include="Common\IExecutionFilter.cs" />
+    <Compile Include="Common\IExecutionFilter`1.cs" />
     <Compile Include="Common\IExecutionHandler.cs" />
     <Compile Include="Common\IExecutionHandler`1.cs" />
     <Compile Include="Common\IExecutionResult.cs" />
@@ -389,8 +391,8 @@
     <Compile Include="Security\Membership\AuthorizationState.cs" />
     <Compile Include="Security\Credential.cs" />
     <Compile Include="Security\CredentialException.cs" />
-    <Compile Include="Security\Membership\IAuthentication.cs" />
-    <Compile Include="Security\Membership\IAuthorization.cs" />
+    <Compile Include="Security\Membership\IAuthenticator.cs" />
+    <Compile Include="Security\Membership\IAuthorizer.cs" />
     <Compile Include="Security\ICredentialProvider.cs" />
     <Compile Include="Security\Membership\IPermissionProvider.cs" />
     <Compile Include="Security\Membership\IRoleProvider.cs" />

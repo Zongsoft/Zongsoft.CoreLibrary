@@ -30,10 +30,18 @@ using System.Collections.Generic;
 namespace Zongsoft.Security.Membership
 {
 	/// <summary>
-	/// 提供关于用户安全验证的接口。
+	/// 表示身份验证器的接口。
 	/// </summary>
-	public interface IAuthentication
+	public interface IAuthenticator
 	{
+		/// <summary>
+		/// 获取验证器的名称。
+		/// </summary>
+		string Name
+		{
+			get;
+		}
+
 		/// <summary>
 		/// 表示验证完成的事件。
 		/// </summary>

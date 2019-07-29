@@ -32,7 +32,7 @@ namespace Zongsoft.Security.Membership
 	/// <summary>
 	/// 提供关于用户授权相关功能的接口。
 	/// </summary>
-	public interface IAuthorization
+	public interface IAuthorizer
 	{
 		/// <summary>表示授权验证开始事件。</summary>
 		event EventHandler<AuthorizationEventArgs> Authorizing;
