@@ -421,6 +421,15 @@ namespace Zongsoft.Properties {
         }
         
         /// <summary>
+        ///   查找类似 验证码生成操作调用太频繁，请等待一会后再来。 的本地化字符串。
+        /// </summary>
+        internal static string Text_SecretGenerateTooFrequently_Message {
+            get {
+                return ResourceManager.GetString("Text.SecretGenerateTooFrequently.Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 通过系统Shell来执行外部命令。 的本地化字符串。
         /// </summary>
         internal static string Text_ShellCommand_Description {

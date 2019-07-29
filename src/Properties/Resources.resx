@@ -288,4 +288,7 @@
   <data name="Text.DataConflictException.Message" xml:space="preserve">
     <value>数据冲突：数据项中 {0} 的 {1} 值重复了。</value>
   </data>
+  <data name="Text.SecretGenerateTooFrequently.Message" xml:space="preserve">
+    <value>验证码生成操作调用太频繁，请等待一会后再来。</value>
+  </data>
 </root>

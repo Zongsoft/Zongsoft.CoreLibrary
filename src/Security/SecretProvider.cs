@@ -134,7 +134,7 @@ namespace Zongsoft.Security
 			var cache = this.Cache;
 
 			if(cache == null)
-				throw new InvalidOperationException("Missing cache for the secret generate operation.");
+				throw new InvalidOperationException("Missing a required cache for the secret generate operation.");
 
 			//修复秘密名（转换成小写并剔除收尾空格）
 			name = name.ToLowerInvariant().Trim();
@@ -146,13 +146,13 @@ namespace Zongsoft.Security
 			{
 				//验证成功：则必须等待有效期过后才能重新生成
 				if(text.Length == 0 || text == NULL_VALUE)
-					throw new InvalidOperationException("The secret generate operation called too frequently.");
+					throw new InvalidOperationException(Properties.Resources.Text_SecretGenerateTooFrequently_Message);
 
 				//尚未验证：则必须确保在最小时间间隔之后才能重新生成
 				if(_period > TimeSpan.Zero &&
 				   this.Unpack(text, out var cachedSecret, out var timestamp, out var cachedExtra) &&
 				   DateTime.UtcNow - timestamp < _period)
-					throw new InvalidOperationException("The secret generate operation called too frequently.");
+					throw new InvalidOperationException(Properties.Resources.Text_SecretGenerateTooFrequently_Message);
 			}
 
 			//根据指定的模式生成或获取秘密（验证码）
@@ -185,7 +185,7 @@ namespace Zongsoft.Security
 			var cache = this.Cache;
 
 			if(cache == null)
-				throw new InvalidOperationException("Missing cache for the secret verify operation.");
+				throw new InvalidOperationException("Missing a required cache for the secret verify operation.");
 
 			//修复秘密名（转换成小写并剔除收尾空格）
 			name = name.ToLowerInvariant().Trim();
