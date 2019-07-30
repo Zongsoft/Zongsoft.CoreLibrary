@@ -33,6 +33,6 @@ namespace Zongsoft.Security.Membership
 	{
 		Name,
 		Email,
-		PhoneNumber,
+		Phone,
 	}
 }

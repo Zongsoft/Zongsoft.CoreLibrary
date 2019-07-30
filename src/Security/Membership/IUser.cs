@@ -52,7 +52,7 @@ namespace Zongsoft.Security.Membership
 		/// <summary>
 		/// 获取或设置用户的电话标识。
 		/// </summary>
-		string PhoneNumber
+		string Phone
 		{
 			get; set;
 		}

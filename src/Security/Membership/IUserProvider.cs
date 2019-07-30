@@ -45,7 +45,7 @@ namespace Zongsoft.Security.Membership
 		/// <summary>
 		/// 获取指定标识对应的用户对象。
 		/// </summary>
-		/// <param name="identity">要查找的用户标识，可以是 <seealso cref="IUserIdentity.Name"/>、<seealso cref="IUser.Email"/>或<seealso cref="IUser.PhoneNumber"/>。</param>
+		/// <param name="identity">要查找的用户标识，可以是 <seealso cref="IUserIdentity.Name"/>、<seealso cref="IUser.Email"/>或<seealso cref="IUser.Phone"/>。</param>
 		/// <param name="namespace">要查找的用户标识所属的命名空间，如果为空(null)或空字符串("")则表示当前用户所在命名空间。</param>
 		/// <returns>返回找到的用户对象；如果在指定的命名空间内没有找到指定标识的用户则返回空(null)。</returns>
 		/// <exception cref="System.ArgumentNullException">当<paramref name="identity"/>参数为空(null)或者全空格字符。</exception>
