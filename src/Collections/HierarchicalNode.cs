@@ -35,6 +35,10 @@ namespace Zongsoft.Collections
 	[Serializable]
 	public abstract class HierarchicalNode
 	{
+		#region 静态常量
+		private static readonly char[] IllegalCharacters = new char[] { '.', '/', '\\', '*', '?', '!', '@', '#', '$', '%', '^', '&' };
+		#endregion
+
 		#region 公共常量
 		[Runtime.Serialization.SerializationMember(Runtime.Serialization.SerializationMemberBehavior.Ignored)]
 		public readonly char PathSeparatorChar = '/';
@@ -62,11 +66,8 @@ namespace Zongsoft.Collections
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException("name");
 
-			if(name.Contains(pathSeparatorChar.ToString()))
-				throw new ArgumentException("The name contains path separator character.");
-
-			if(Zongsoft.Common.StringExtension.ContainsCharacters(name, @"./\*?!@#$%^&"))
-				throw new ArgumentException("The name contains invalid character(s).");
+			if(name.IndexOfAny(IllegalCharacters) >= 0)
+				throw new ArgumentException("The name contains illegal character(s).");
 
 			_name = name.Trim();
 			_parent = parent;

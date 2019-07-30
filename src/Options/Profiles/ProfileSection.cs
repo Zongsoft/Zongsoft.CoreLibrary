@@ -31,6 +31,10 @@ namespace Zongsoft.Options.Profiles
 {
 	public class ProfileSection : ProfileItem, ISettingsProvider
 	{
+		#region 静态常量
+		private static readonly char[] IllegalCharacters = new char[] { '.', '/', '\\', '*', '?', '!', '@', '#', '$', '%', '^', '&' };
+		#endregion
+
 		#region 成员字段
 		private string _name;
 		private ProfileItemCollection _items;
@@ -43,10 +47,10 @@ namespace Zongsoft.Options.Profiles
 		public ProfileSection(string name, int lineNumber = -1) : base(lineNumber)
 		{
 			if(string.IsNullOrWhiteSpace(name))
-				throw new ArgumentNullException("name");
+				throw new ArgumentNullException(nameof(name));
 
-			if(Zongsoft.Common.StringExtension.ContainsCharacters(name, "/*?"))
-				throw new ArgumentException();
+			if(name.IndexOfAny(IllegalCharacters) >= 0)
+				throw new ArgumentException("The name contains illegal character(s).");
 
 			_name = name.Trim();
 			_items = new ProfileItemCollection(this);
