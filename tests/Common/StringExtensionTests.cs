@@ -25,34 +25,26 @@ namespace Zongsoft.Common.Tests
 			var text1 = System.Convert.ToBase64String(data1);
 			var text2 = System.Convert.ToBase64String(data2);
 
-			Assert.NotEqual(Zongsoft.Common.StringExtension.GetStringHashCode(text1),
-			                Zongsoft.Common.StringExtension.GetStringHashCode(text2));
+			Assert.NotEqual(StringExtension.GetStringHashCode(text1),
+			                StringExtension.GetStringHashCode(text2));
 			
 		}
 
 		[Fact]
-		public void TestContainsCharacters()
-		{
-			Assert.True(Zongsoft.Common.StringExtension.ContainsCharacters("abcdefghijk", "big"));
-			Assert.True(Zongsoft.Common.StringExtension.ContainsCharacters("abcdefghijk", "biger"));
-			Assert.False(Zongsoft.Common.StringExtension.ContainsCharacters("abcdefghijk", "xyz"));
-		}
-
-		[Fact]
-		public void TestRemoveCharacters()
+		public void TestRemoveAny()
 		{
 			const string TEXT = @"Read^me??.txt";
 
-			Assert.Equal("Read^me.txt", Zongsoft.Common.StringExtension.RemoveCharacters(TEXT, "?"));
-			Assert.Equal("Readme.txt", Zongsoft.Common.StringExtension.RemoveCharacters(TEXT, "?^"));
+			Assert.Equal("Read^me.txt", StringExtension.RemoveAny(TEXT, '?'));
+			Assert.Equal("Readme.txt", StringExtension.RemoveAny(TEXT, new[] { '?', '^' }));
 		}
 
 		[Fact]
 		public void TestTrimString()
 		{
-			Assert.Equal("ContentSuffix", Zongsoft.Common.StringExtension.Trim("PrefixPrefixContentSuffix", "Prefix"));
-			Assert.Equal("PrefixPrefixContent", Zongsoft.Common.StringExtension.Trim("PrefixPrefixContentSuffix", "Suffix"));
-			Assert.Equal("Content", Zongsoft.Common.StringExtension.Trim("PrefixPrefixContentSuffix", "Prefix", "Suffix"));
+			Assert.Equal("ContentSuffix", StringExtension.Trim("PrefixPrefixContentSuffix", "Prefix"));
+			Assert.Equal("PrefixPrefixContent", StringExtension.Trim("PrefixPrefixContentSuffix", "Suffix"));
+			Assert.Equal("Content", StringExtension.Trim("PrefixPrefixContentSuffix", "Prefix", "Suffix"));
 		}
 	}
 }

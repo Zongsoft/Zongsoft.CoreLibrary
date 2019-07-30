@@ -32,7 +32,7 @@ namespace Zongsoft.Common
 {
 	public static class StringExtension
 	{
-		public static readonly string InvalidCharacters = "`~!@#$%^&*()-+={}[]|\\/?:;'\"\t\r\n ";
+		public delegate bool TryParser<T>(string text, out T value);
 
 		public static int GetStringHashCode(string text)
 		{
@@ -65,74 +65,34 @@ namespace Zongsoft.Common
 			}
 		}
 
-		public static bool ContainsCharacters(this string text, string characters)
+		public static string RemoveAny(this string text, params char[] characters)
 		{
-			if(string.IsNullOrEmpty(text) || string.IsNullOrEmpty(characters))
-				return false;
-
-			return ContainsCharacters(text, characters.ToArray());
+			return RemoveAny(text, characters, 0, -1);
 		}
 
-		public static bool ContainsCharacters(this string text, params char[] characters)
+		public static string RemoveAny(this string text, char[] characters, int startIndex)
 		{
-			if(string.IsNullOrEmpty(text) || characters.Length < 1)
-				return false;
-
-			foreach(char character in characters)
-			{
-				foreach(char item in text)
-				{
-					if(character == item)
-						return true;
-				}
-			}
-
-			return false;
+			return RemoveAny(text, characters, startIndex, -1);
 		}
 
-		public static string RemoveCharacters(this string text, string invalidCharacters)
+		public static string RemoveAny(this string text, char[] characters, int startIndex, int count)
 		{
-			return RemoveCharacters(text, invalidCharacters, 0);
-		}
-
-		public static string RemoveCharacters(this string text, char[] invalidCharacters)
-		{
-			return RemoveCharacters(text, invalidCharacters, 0);
-		}
-
-		public static string RemoveCharacters(this string text, string invalidCharacters, int startIndex)
-		{
-			return RemoveCharacters(text, invalidCharacters, startIndex, -1);
-		}
-
-		public static string RemoveCharacters(this string text, char[] invalidCharacters, int startIndex)
-		{
-			return RemoveCharacters(text, invalidCharacters, startIndex, -1);
-		}
-
-		public static string RemoveCharacters(this string text, string invalidCharacters, int startIndex, int count)
-		{
-			return RemoveCharacters(text, invalidCharacters.ToCharArray(), startIndex, count);
-		}
-
-		public static string RemoveCharacters(this string text, char[] invalidCharacters, int startIndex, int count)
-		{
-			if(string.IsNullOrEmpty(text) || invalidCharacters.Length < 1)
+			if(string.IsNullOrEmpty(text) || characters == null || characters.Length < 1)
 				return text;
 
 			if(startIndex < 0)
-				throw new ArgumentOutOfRangeException("startIndex");
+				throw new ArgumentOutOfRangeException(nameof(startIndex));
 
 			if(count < 1)
-				count = invalidCharacters.Length - startIndex;
+				count = characters.Length - startIndex;
 
-			if(startIndex + count > invalidCharacters.Length)
-				throw new ArgumentOutOfRangeException("count");
+			if(startIndex + count > characters.Length)
+				throw new ArgumentOutOfRangeException(nameof(count));
 
 			string result = text;
 
 			for(int i = startIndex; i < startIndex + count; i++)
-				result = result.Replace(invalidCharacters[i].ToString(), "");
+				result = result.Replace(characters[i].ToString(), string.Empty);
 
 			return result;
 		}
@@ -200,6 +160,55 @@ namespace Zongsoft.Common
 				return false;
 
 			return collection.Any(item => string.Equals(item, text, comparisonType));
+		}
+
+		public static IEnumerable<T> Slice<T>(this string text, char separator, TryParser<T> parser)
+		{
+			return Slice(text, chr => chr == separator, parser);
+		}
+
+		public static IEnumerable<T> Slice<T>(this string text, char[] separators, TryParser<T> parser)
+		{
+			if(separators == null || separators.Length == 0)
+				return null;
+
+			return Slice(text, chr => separators.Contains(chr), parser);
+		}
+
+		public static IEnumerable<T> Slice<T>(this string text, Func<char, bool> separator, TryParser<T> parser)
+		{
+			if(separator == null)
+				throw new ArgumentNullException(nameof(separator));
+
+			if(parser == null)
+				throw new ArgumentNullException(nameof(parser));
+
+			if(string.IsNullOrEmpty(text))
+				yield break;
+
+			int index = -1;
+			string part = null;
+			T value = default(T);
+
+			for(int i = 0; i < text.Length; i++)
+			{
+				if(separator(text[i]))
+				{
+					part = text.Substring(++index, i - index);
+					index = i;
+
+					if(part.Length > 0 && parser(part, out value))
+						yield return value;
+				}
+			}
+
+			if(index < text.Length - 1)
+			{
+				part = text.Substring(++index);
+
+				if(parser(part, out value))
+					yield return value;
+			}
 		}
 	}
 }
