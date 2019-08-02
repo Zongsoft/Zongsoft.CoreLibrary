@@ -55,6 +55,8 @@ namespace Zongsoft.Data
 		event EventHandler<DataDeletingEventArgs> Deleting;
 		event EventHandler<DataInsertedEventArgs> Inserted;
 		event EventHandler<DataInsertingEventArgs> Inserting;
+		event EventHandler<DataUpsertedEventArgs> Upserted;
+		event EventHandler<DataUpsertingEventArgs> Upserting;
 		event EventHandler<DataUpdatedEventArgs> Updated;
 		event EventHandler<DataUpdatingEventArgs> Updating;
 		event EventHandler<DataSelectedEventArgs> Selected;
@@ -165,6 +167,18 @@ namespace Zongsoft.Data
 		int InsertMany(IEnumerable items, object state);
 		int InsertMany(IEnumerable items, string schema);
 		int InsertMany(IEnumerable items, string schema, object state);
+		#endregion
+
+		#region 复写方法
+		int Upsert(object data);
+		int Upsert(object data, object state);
+		int Upsert(object data, string schema);
+		int Upsert(object data, string schema, object state);
+
+		int UpsertMany(IEnumerable items);
+		int UpsertMany(IEnumerable items, object state);
+		int UpsertMany(IEnumerable items, string schema);
+		int UpsertMany(IEnumerable items, string schema, object state);
 		#endregion
 
 		#region 更新方法

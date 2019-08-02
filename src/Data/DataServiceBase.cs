@@ -56,6 +56,8 @@ namespace Zongsoft.Data
 		public event EventHandler<DataDeletingEventArgs> Deleting;
 		public event EventHandler<DataInsertedEventArgs> Inserted;
 		public event EventHandler<DataInsertingEventArgs> Inserting;
+		public event EventHandler<DataUpsertedEventArgs> Upserted;
+		public event EventHandler<DataUpsertingEventArgs> Upserting;
 		public event EventHandler<DataUpdatedEventArgs> Updated;
 		public event EventHandler<DataUpdatingEventArgs> Updating;
 		public event EventHandler<DataSelectedEventArgs> Selected;
@@ -532,6 +534,99 @@ namespace Zongsoft.Data
 
 			//执行数据引擎的插入操作
 			return this.DataAccess.InsertMany(this.Name, items, schema, state, ctx => this.OnInserting(ctx), ctx => this.OnInserted(ctx));
+		}
+		#endregion
+
+		#region 复写方法
+		public int Upsert(object data)
+		{
+			return this.Upsert(data, null, null);
+		}
+
+		public int Upsert(object data, object state)
+		{
+			return this.Upsert(data, null, state);
+		}
+
+		public int Upsert(object data, string schema)
+		{
+			return this.Upsert(data, schema, null);
+		}
+
+		public int Upsert(object data, string schema, object state)
+		{
+			//确认是否可以执行该操作
+			this.EnsureInsert();
+
+			//进行授权验证
+			this.Authorize(Method.Upsert(), state);
+
+			if(data == null)
+				return 0;
+
+			//将当前复写数据对象转换成数据字典
+			var dictionary = DataDictionary.GetDictionary<TEntity>(data);
+
+			//验证待复写的数据
+			this.OnValidate(Method.Upsert(), dictionary);
+
+			return this.OnUpsert(dictionary, this.GetSchema(schema, data.GetType()), state);
+		}
+
+		protected virtual int OnUpsert(IDataDictionary<TEntity> data, ISchema schema, object state)
+		{
+			if(data == null || data.Data == null)
+				return 0;
+
+			//执行数据引擎的复写操作
+			return this.DataAccess.Upsert(this.Name, data, schema, state, ctx => this.OnUpserting(ctx), ctx => this.OnUpserted(ctx));
+		}
+
+		public int UpsertMany(IEnumerable items)
+		{
+			return this.UpsertMany(items, null, null);
+		}
+
+		public int UpsertMany(IEnumerable items, object state)
+		{
+			return this.UpsertMany(items, null, state);
+		}
+
+		public int UpsertMany(IEnumerable items, string schema)
+		{
+			return this.UpsertMany(items, schema, null);
+		}
+
+		public int UpsertMany(IEnumerable items, string schema, object state)
+		{
+			//确认是否可以执行该操作
+			this.EnsureInsert();
+
+			//进行授权验证
+			this.Authorize(Method.UpsertMany(), state);
+
+			if(items == null)
+				return 0;
+
+			//将当前复写数据集合对象转换成数据字典集合
+			var dictionares = DataDictionary.GetDictionaries<TEntity>(items);
+
+			foreach(var dictionary in dictionares)
+			{
+				//验证待复写的数据
+				this.OnValidate(Method.UpsertMany(), dictionary);
+			}
+
+			return this.OnUpsertMany(dictionares, this.GetSchema(schema, Common.TypeExtension.GetElementType(items.GetType())), state);
+		}
+
+		protected virtual int OnUpsertMany(IEnumerable<IDataDictionary<TEntity>> items, ISchema schema, object state)
+		{
+			if(items == null)
+				return 0;
+
+			//执行数据引擎的复写操作
+			return this.DataAccess.UpsertMany(this.Name, items, schema, state, ctx => this.OnUpserting(ctx), ctx => this.OnUpserted(ctx));
 		}
 		#endregion
 
@@ -1041,10 +1136,7 @@ namespace Zongsoft.Data
 		#region 激发事件
 		protected virtual void OnGetted(DataSelectContextBase context)
 		{
-			var e = this.Getted;
-
-			if(e != null)
-				e(this, new DataGettedEventArgs<TEntity>(context));
+			this.Getted?.Invoke(this, new DataGettedEventArgs<TEntity>(context));
 		}
 
 		protected virtual bool OnGetting(DataSelectContextBase context)
@@ -1061,10 +1153,7 @@ namespace Zongsoft.Data
 
 		protected virtual void OnCounted(DataCountContextBase context)
 		{
-			var e = this.Counted;
-
-			if(e != null)
-				e(this, new DataCountedEventArgs(context));
+			this.Counted?.Invoke(this, new DataCountedEventArgs(context));
 		}
 
 		protected virtual bool OnCounting(DataCountContextBase context)
@@ -1081,10 +1170,7 @@ namespace Zongsoft.Data
 
 		protected virtual void OnExecuted(DataExecuteContextBase context)
 		{
-			var e = this.Executed;
-
-			if(e != null)
-				e(this, new DataExecutedEventArgs(context));
+			this.Executed?.Invoke(this, new DataExecutedEventArgs(context));
 		}
 
 		protected virtual bool OnExecuting(DataExecuteContextBase context)
@@ -1101,10 +1187,7 @@ namespace Zongsoft.Data
 
 		protected virtual void OnExisted(DataExistContextBase context)
 		{
-			var e = this.Existed;
-
-			if(e != null)
-				e(this, new DataExistedEventArgs(context));
+			this.Existed?.Invoke(this, new DataExistedEventArgs(context));
 		}
 
 		protected virtual bool OnExisting(DataExistContextBase context)
@@ -1121,10 +1204,7 @@ namespace Zongsoft.Data
 
 		protected virtual void OnIncremented(DataIncrementContextBase context)
 		{
-			var e = this.Incremented;
-
-			if(e != null)
-				e(this, new DataIncrementedEventArgs(context));
+			this.Incremented?.Invoke(this, new DataIncrementedEventArgs(context));
 		}
 
 		protected virtual bool OnIncrementing(DataIncrementContextBase context)
@@ -1141,10 +1221,7 @@ namespace Zongsoft.Data
 
 		protected virtual void OnDeleted(DataDeleteContextBase context)
 		{
-			var e = this.Deleted;
-
-			if(e != null)
-				e(this, new DataDeletedEventArgs(context));
+			this.Deleted?.Invoke(this, new DataDeletedEventArgs(context));
 		}
 
 		protected virtual bool OnDeleting(DataDeleteContextBase context)
@@ -1161,10 +1238,7 @@ namespace Zongsoft.Data
 
 		protected virtual void OnInserted(DataInsertContextBase context)
 		{
-			var e = this.Inserted;
-
-			if(e != null)
-				e(this, new DataInsertedEventArgs(context));
+			this.Inserted?.Invoke(this, new DataInsertedEventArgs(context));
 		}
 
 		protected virtual bool OnInserting(DataInsertContextBase context)
@@ -1179,12 +1253,26 @@ namespace Zongsoft.Data
 			return args.Cancel;
 		}
 
+		protected virtual void OnUpserted(DataUpsertContextBase context)
+		{
+			this.Upserted?.Invoke(this, new DataUpsertedEventArgs(context));
+		}
+
+		protected virtual bool OnUpserting(DataUpsertContextBase context)
+		{
+			var e = this.Upserting;
+
+			if(e == null)
+				return false;
+
+			var args = new DataUpsertingEventArgs(context);
+			e(this, args);
+			return args.Cancel;
+		}
+
 		protected virtual void OnUpdated(DataUpdateContextBase context)
 		{
-			var e = this.Updated;
-
-			if(e != null)
-				e(this, new DataUpdatedEventArgs(context));
+			this.Updated?.Invoke(this, new DataUpdatedEventArgs(context));
 		}
 
 		protected virtual bool OnUpdating(DataUpdateContextBase context)
@@ -1201,10 +1289,7 @@ namespace Zongsoft.Data
 
 		protected virtual void OnSelected(DataSelectContextBase context)
 		{
-			var e = this.Selected;
-
-			if(e != null)
-				e(this, new DataSelectedEventArgs(context));
+			this.Selected?.Invoke(this, new DataSelectedEventArgs(context));
 		}
 
 		protected virtual bool OnSelecting(DataSelectContextBase context)
