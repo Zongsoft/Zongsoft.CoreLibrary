@@ -49,6 +49,8 @@ namespace Zongsoft.Data
 		public event EventHandler<DataDeletingEventArgs> Deleting;
 		public event EventHandler<DataInsertedEventArgs> Inserted;
 		public event EventHandler<DataInsertingEventArgs> Inserting;
+		public event EventHandler<DataUpsertedEventArgs> Upserted;
+		public event EventHandler<DataUpsertingEventArgs> Upserting;
 		public event EventHandler<DataUpdatedEventArgs> Updated;
 		public event EventHandler<DataUpdatingEventArgs> Updating;
 		public event EventHandler<DataSelectedEventArgs> Selected;
@@ -872,6 +874,266 @@ namespace Zongsoft.Data
 		protected abstract void OnInsert(DataInsertContextBase context);
 		#endregion
 
+		#region 复写方法
+		public int Upsert<T>(T data)
+		{
+			if(data == null)
+				return 0;
+
+			return this.Upsert(this.GetName(data.GetType()), data, string.Empty, null, null, null);
+		}
+
+		public int Upsert<T>(T data, object state)
+		{
+			if(data == null)
+				return 0;
+
+			return this.Upsert(this.GetName(data.GetType()), data, string.Empty, state, null, null);
+		}
+
+		public int Upsert<T>(T data, string schema)
+		{
+			if(data == null)
+				return 0;
+
+			return this.Upsert(this.GetName(data.GetType()), data, schema, null, null, null);
+		}
+
+		public int Upsert<T>(T data, string schema, object state, Func<DataUpsertContextBase, bool> upserting = null, Action<DataUpsertContextBase> upserted = null)
+		{
+			if(data == null)
+				return 0;
+
+			return this.Upsert(this.GetName(data.GetType()), data, schema, state, upserting, upserted);
+		}
+
+		public int Upsert<T>(object data)
+		{
+			if(data == null)
+				return 0;
+
+			return this.Upsert(this.GetName(typeof(T)), data, string.Empty, null, null, null);
+		}
+
+		public int Upsert<T>(object data, object state)
+		{
+			if(data == null)
+				return 0;
+
+			return this.Upsert(this.GetName(typeof(T)), data, string.Empty, state, null, null);
+		}
+
+		public int Upsert<T>(object data, string schema)
+		{
+			if(data == null)
+				return 0;
+
+			return this.Upsert(this.GetName(typeof(T)), data, schema, null, null, null);
+		}
+
+		public int Upsert<T>(object data, string schema, object state, Func<DataUpsertContextBase, bool> upserting = null, Action<DataUpsertContextBase> upserted = null)
+		{
+			if(data == null)
+				return 0;
+
+			return this.Upsert(this.GetName(typeof(T)), data, schema, state, upserting, upserted);
+		}
+
+		public int Upsert(string name, object data)
+		{
+			return this.Upsert(name, data, string.Empty, null, null, null);
+		}
+
+		public int Upsert(string name, object data, object state)
+		{
+			return this.Upsert(name, data, string.Empty, state, null, null);
+		}
+
+		public int Upsert(string name, object data, string schema)
+		{
+			return this.Upsert(name, data, schema, null, null, null);
+		}
+
+		public int Upsert(string name, object data, string schema, object state, Func<DataUpsertContextBase, bool> upserting = null, Action<DataUpsertContextBase> upserted = null)
+		{
+			return this.Upsert(name, data, this.Schema.Parse(name, schema, data.GetType()), state, upserting, upserted);
+		}
+
+		public int Upsert(string name, object data, ISchema schema, object state, Func<DataUpsertContextBase, bool> upserting = null, Action<DataUpsertContextBase> upserted = null)
+		{
+			if(string.IsNullOrEmpty(name))
+				throw new ArgumentNullException(nameof(name));
+
+			if(data == null)
+				return 0;
+
+			//创建数据访问上下文对象
+			var context = this.CreateUpsertContext(name, false, data, schema, state);
+
+			//处理数据访问操作前的回调
+			if(upserting != null && upserting(context))
+				return context.Count;
+
+			//激发“Upserting”事件，如果被中断则返回
+			if(this.OnUpserting(context))
+				return context.Count;
+
+			//调用数据访问过滤器前事件
+			this.InvokeFilters(context, (filter, ctx) => filter.OnFiltering(ctx));
+
+			//执行数据插入操作
+			this.OnUpsert(context);
+
+			//调用数据访问过滤器后事件
+			this.InvokeFilters(context, (filter, ctx) => filter.OnFiltered(ctx));
+
+			//激发“Upserted”事件
+			this.OnUpserted(context);
+
+			//处理数据访问操作后的回调
+			if(upserted != null)
+				upserted(context);
+
+			var result = context.Count;
+
+			//处置上下文资源
+			context.Dispose();
+
+			//返回最终的结果
+			return result;
+		}
+
+		public int UpsertMany<T>(IEnumerable<T> items)
+		{
+			if(items == null)
+				return 0;
+
+			return this.UpsertMany(this.GetName<T>(), items, string.Empty, null, null, null);
+		}
+
+		public int UpsertMany<T>(IEnumerable<T> items, object state)
+		{
+			if(items == null)
+				return 0;
+
+			return this.UpsertMany(this.GetName<T>(), items, string.Empty, state, null, null);
+		}
+
+		public int UpsertMany<T>(IEnumerable<T> items, string schema)
+		{
+			if(items == null)
+				return 0;
+
+			return this.UpsertMany(this.GetName<T>(), items, schema, null, null, null);
+		}
+
+		public int UpsertMany<T>(IEnumerable<T> items, string schema, object state, Func<DataUpsertContextBase, bool> upserting = null, Action<DataUpsertContextBase> upserted = null)
+		{
+			if(items == null)
+				return 0;
+
+			return this.UpsertMany(this.GetName<T>(), items, schema, state, upserting, upserted);
+		}
+
+		public int UpsertMany<T>(IEnumerable items)
+		{
+			if(items == null)
+				return 0;
+
+			return this.UpsertMany(this.GetName<T>(), items, string.Empty, null, null, null);
+		}
+
+		public int UpsertMany<T>(IEnumerable items, object state)
+		{
+			if(items == null)
+				return 0;
+
+			return this.UpsertMany(this.GetName<T>(), items, string.Empty, state, null, null);
+		}
+
+		public int UpsertMany<T>(IEnumerable items, string schema)
+		{
+			if(items == null)
+				return 0;
+
+			return this.UpsertMany(this.GetName<T>(), items, schema, null, null, null);
+		}
+
+		public int UpsertMany<T>(IEnumerable items, string schema, object state, Func<DataUpsertContextBase, bool> upserting = null, Action<DataUpsertContextBase> upserted = null)
+		{
+			if(items == null)
+				return 0;
+
+			return this.UpsertMany(this.GetName<T>(), items, schema, state, upserting, upserted);
+		}
+
+		public int UpsertMany(string name, IEnumerable items)
+		{
+			return this.UpsertMany(name, items, string.Empty, null, null, null);
+		}
+
+		public int UpsertMany(string name, IEnumerable items, object state)
+		{
+			return this.UpsertMany(name, items, string.Empty, state, null, null);
+		}
+
+		public int UpsertMany(string name, IEnumerable items, string schema)
+		{
+			return this.UpsertMany(name, items, schema, null, null, null);
+		}
+
+		public int UpsertMany(string name, IEnumerable items, string schema, object state, Func<DataUpsertContextBase, bool> upserting = null, Action<DataUpsertContextBase> upserted = null)
+		{
+			return this.UpsertMany(name, items, this.Schema.Parse(name, schema, Common.TypeExtension.GetElementType(items.GetType())), state, upserting, upserted);
+		}
+
+		public int UpsertMany(string name, IEnumerable items, ISchema schema, object state, Func<DataUpsertContextBase, bool> upserting = null, Action<DataUpsertContextBase> upserted = null)
+		{
+			if(string.IsNullOrEmpty(name))
+				throw new ArgumentNullException(nameof(name));
+
+			if(items == null)
+				return 0;
+
+			//创建数据访问上下文对象
+			var context = this.CreateUpsertContext(name, true, items, schema, state);
+
+			//处理数据访问操作前的回调
+			if(upserting != null && upserting(context))
+				return context.Count;
+
+			//激发“Upserting”事件，如果被中断则返回
+			if(this.OnUpserting(context))
+				return context.Count;
+
+			//调用数据访问过滤器前事件
+			this.InvokeFilters(context, (filter, ctx) => filter.OnFiltering(ctx));
+
+			//执行数据插入操作
+			this.OnUpsert(context);
+
+			//调用数据访问过滤器后事件
+			this.InvokeFilters(context, (filter, ctx) => filter.OnFiltered(ctx));
+
+			//激发“Upserted”事件
+			this.OnUpserted(context);
+
+			//处理数据访问操作后的回调
+			if(upserted != null)
+				upserted(context);
+
+			var result = context.Count;
+
+			//处置上下文资源
+			context.Dispose();
+
+			//返回最终的结果
+			return result;
+		}
+
+		protected abstract void OnUpsert(DataUpsertContextBase context);
+		#endregion
+
 		#region 更新方法
 		public int Update<T>(T data)
 		{
@@ -1463,10 +1725,7 @@ namespace Zongsoft.Data
 
 		protected virtual void OnCounted(DataCountContextBase context)
 		{
-			var e = this.Counted;
-
-			if(e != null)
-				e(this, new DataCountedEventArgs(context));
+			this.Counted?.Invoke(this, new DataCountedEventArgs(context));
 		}
 
 		protected virtual bool OnCounting(DataCountContextBase context)
@@ -1483,10 +1742,7 @@ namespace Zongsoft.Data
 
 		protected virtual void OnExecuted(DataExecuteContextBase context)
 		{
-			var e = this.Executed;
-
-			if(e != null)
-				e(this, new DataExecutedEventArgs(context));
+			this.Executed?.Invoke(this, new DataExecutedEventArgs(context));
 		}
 
 		protected virtual bool OnExecuting(DataExecuteContextBase context)
@@ -1503,10 +1759,7 @@ namespace Zongsoft.Data
 
 		protected virtual void OnExisted(DataExistContextBase context)
 		{
-			var e = this.Existed;
-
-			if(e != null)
-				e(this, new DataExistedEventArgs(context));
+			this.Existed?.Invoke(this, new DataExistedEventArgs(context));
 		}
 
 		protected virtual bool OnExisting(DataExistContextBase context)
@@ -1523,10 +1776,7 @@ namespace Zongsoft.Data
 
 		protected virtual void OnIncremented(DataIncrementContextBase context)
 		{
-			var e = this.Incremented;
-
-			if(e != null)
-				e(this, new DataIncrementedEventArgs(context));
+			this.Incremented?.Invoke(this, new DataIncrementedEventArgs(context));
 		}
 
 		protected virtual bool OnIncrementing(DataIncrementContextBase context)
@@ -1543,10 +1793,7 @@ namespace Zongsoft.Data
 
 		protected virtual void OnDeleted(DataDeleteContextBase context)
 		{
-			var e = this.Deleted;
-
-			if(e != null)
-				e(this, new DataDeletedEventArgs(context));
+			this.Deleted?.Invoke(this, new DataDeletedEventArgs(context));
 		}
 
 		protected virtual bool OnDeleting(DataDeleteContextBase context)
@@ -1563,10 +1810,7 @@ namespace Zongsoft.Data
 
 		protected virtual void OnInserted(DataInsertContextBase context)
 		{
-			var e = this.Inserted;
-
-			if(e != null)
-				e(this, new DataInsertedEventArgs(context));
+			this.Inserted?.Invoke(this, new DataInsertedEventArgs(context));
 		}
 
 		protected virtual bool OnInserting(DataInsertContextBase context)
@@ -1581,12 +1825,26 @@ namespace Zongsoft.Data
 			return args.Cancel;
 		}
 
+		protected virtual void OnUpserted(DataUpsertContextBase context)
+		{
+			this.Upserted?.Invoke(this, new DataUpsertedEventArgs(context));
+		}
+
+		protected virtual bool OnUpserting(DataUpsertContextBase context)
+		{
+			var e = this.Upserting;
+
+			if(e == null)
+				return false;
+
+			var args = new DataUpsertingEventArgs(context);
+			e(this, args);
+			return args.Cancel;
+		}
+
 		protected virtual void OnUpdated(DataUpdateContextBase context)
 		{
-			var e = this.Updated;
-
-			if(e != null)
-				e(this, new DataUpdatedEventArgs(context));
+			this.Updated?.Invoke(this, new DataUpdatedEventArgs(context));
 		}
 
 		protected virtual bool OnUpdating(DataUpdateContextBase context)
@@ -1603,10 +1861,7 @@ namespace Zongsoft.Data
 
 		protected virtual void OnSelected(DataSelectContextBase context)
 		{
-			var e = this.Selected;
-
-			if(e != null)
-				e(this, new DataSelectedEventArgs(context));
+			this.Selected?.Invoke(this, new DataSelectedEventArgs(context));
 		}
 
 		protected virtual bool OnSelecting(DataSelectContextBase context)

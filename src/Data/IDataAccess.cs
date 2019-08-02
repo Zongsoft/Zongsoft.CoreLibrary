@@ -60,6 +60,8 @@ namespace Zongsoft.Data
 		event EventHandler<DataDeletingEventArgs> Deleting;
 		event EventHandler<DataInsertedEventArgs> Inserted;
 		event EventHandler<DataInsertingEventArgs> Inserting;
+		event EventHandler<DataUpsertedEventArgs> Upserted;
+		event EventHandler<DataUpsertingEventArgs> Upserting;
 		event EventHandler<DataUpdatedEventArgs> Updated;
 		event EventHandler<DataUpdatingEventArgs> Updating;
 		event EventHandler<DataSelectedEventArgs> Selected;
@@ -209,6 +211,40 @@ namespace Zongsoft.Data
 		int InsertMany(string name, IEnumerable items, string schema);
 		int InsertMany(string name, IEnumerable items, string schema, object state, Func<DataInsertContextBase, bool> inserting = null, Action<DataInsertContextBase> inserted = null);
 		int InsertMany(string name, IEnumerable items, ISchema schema, object state, Func<DataInsertContextBase, bool> inserting = null, Action<DataInsertContextBase> inserted = null);
+		#endregion
+
+		#region 复写方法
+		int Upsert<T>(T data);
+		int Upsert<T>(T data, object state);
+		int Upsert<T>(T data, string schema);
+		int Upsert<T>(T data, string schema, object state, Func<DataUpsertContextBase, bool> upserting = null, Action<DataUpsertContextBase> upserted = null);
+
+		int Upsert<T>(object data);
+		int Upsert<T>(object data, object state);
+		int Upsert<T>(object data, string schema);
+		int Upsert<T>(object data, string schema, object state, Func<DataUpsertContextBase, bool> upserting = null, Action<DataUpsertContextBase> upserted = null);
+
+		int Upsert(string name, object data);
+		int Upsert(string name, object data, object state);
+		int Upsert(string name, object data, string schema);
+		int Upsert(string name, object data, string schema, object state, Func<DataUpsertContextBase, bool> upserting = null, Action<DataUpsertContextBase> upserted = null);
+		int Upsert(string name, object data, ISchema schema, object state, Func<DataUpsertContextBase, bool> upserting = null, Action<DataUpsertContextBase> upserted = null);
+
+		int UpsertMany<T>(IEnumerable<T> items);
+		int UpsertMany<T>(IEnumerable<T> items, object state);
+		int UpsertMany<T>(IEnumerable<T> items, string schema);
+		int UpsertMany<T>(IEnumerable<T> items, string schema, object state, Func<DataUpsertContextBase, bool> upserting = null, Action<DataUpsertContextBase> upserted = null);
+
+		int UpsertMany<T>(IEnumerable items);
+		int UpsertMany<T>(IEnumerable items, object state);
+		int UpsertMany<T>(IEnumerable items, string schema);
+		int UpsertMany<T>(IEnumerable items, string schema, object state, Func<DataUpsertContextBase, bool> upserting = null, Action<DataUpsertContextBase> upserted = null);
+
+		int UpsertMany(string name, IEnumerable items);
+		int UpsertMany(string name, IEnumerable items, object state);
+		int UpsertMany(string name, IEnumerable items, string schema);
+		int UpsertMany(string name, IEnumerable items, string schema, object state, Func<DataUpsertContextBase, bool> upserting = null, Action<DataUpsertContextBase> upserted = null);
+		int UpsertMany(string name, IEnumerable items, ISchema schema, object state, Func<DataUpsertContextBase, bool> upserting = null, Action<DataUpsertContextBase> upserted = null);
 		#endregion
 
 		#region 更新方法
