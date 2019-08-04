@@ -375,6 +375,7 @@
     <Compile Include="Security\ICensorship.cs" />
     <Compile Include="Security\ISecretProvider.cs" />
     <Compile Include="Security\Membership\AuthenticatedEventArgs.cs" />
+    <Compile Include="Security\Membership\Authentication.cs" />
     <Compile Include="Security\Membership\AuthenticationException.cs" />
     <Compile Include="Security\Membership\AuthenticationReason.cs" />
     <Compile Include="Security\Membership\AuthorizationException.cs" />
