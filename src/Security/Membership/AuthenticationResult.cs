@@ -30,81 +30,33 @@ using System.Collections.Generic;
 namespace Zongsoft.Security.Membership
 {
 	/// <summary>
-	/// 表示验证通过的结果。
+	/// 表示验证方法结果的结构。
 	/// </summary>
-	[Serializable]
-	public class AuthenticationResult
+	public struct AuthenticationResult
 	{
-		#region 成员字段
-		private IUserIdentity _user;
-		private string _scene;
-		private IDictionary<string, object> _parameters;
-		#endregion
-
-		#region 构造函数
-		public AuthenticationResult(IUserIdentity user, string scene) : this(user, scene, null)
-		{
-		}
-
-		public AuthenticationResult(IUserIdentity user, string scene, IDictionary<string, object> parameters)
-		{
-			if(user == null)
-				throw new ArgumentNullException(nameof(user));
-
-			_user = user;
-			_scene = scene;
-
-			if(parameters != null && parameters.Count > 0)
-				_parameters = new Dictionary<string, object>(parameters, StringComparer.OrdinalIgnoreCase);
-		}
-		#endregion
-
-		#region 公共属性
+		#region 公共字段
 		/// <summary>
 		/// 获取验证通过后的用户对象，如果验证失败则返回空(null)。
 		/// </summary>
-		public IUserIdentity User
-		{
-			get
-			{
-				return _user;
-			}
-		}
+		public readonly IUserIdentity User;
 
 		/// <summary>
 		/// 获取身份验证的应用场景。
 		/// </summary>
-		public string Scene
-		{
-			get
-			{
-				return _scene;
-			}
-		}
-
-		/// <summary>
-		/// 获取一个值，指示扩展参数集是否有内容。
-		/// </summary>
-		public bool HasParameters
-		{
-			get
-			{
-				return _parameters != null && _parameters.Count > 0;
-			}
-		}
+		public readonly string Scene;
 
 		/// <summary>
 		/// 获取验证结果的扩展参数集。
 		/// </summary>
-		public IDictionary<string, object> Parameters
-		{
-			get
-			{
-				if(_parameters == null)
-					System.Threading.Interlocked.CompareExchange(ref _parameters, new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase), null);
+		public readonly IDictionary<string, object> Parameters;
+		#endregion
 
-				return _parameters;
-			}
+		#region 构造函数
+		public AuthenticationResult(IUserIdentity user, string scene, IDictionary<string, object> parameters = null)
+		{
+			this.User = user ?? throw new ArgumentNullException(nameof(user));
+			this.Scene = scene;
+			this.Parameters = parameters;
 		}
 		#endregion
 	}

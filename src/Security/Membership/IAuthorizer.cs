@@ -35,9 +35,9 @@ namespace Zongsoft.Security.Membership
 	public interface IAuthorizer
 	{
 		/// <summary>表示授权验证开始事件。</summary>
-		event EventHandler<AuthorizationEventArgs> Authorizing;
+		event EventHandler<AuthorizationContext> Authorizing;
 		/// <summary>表示授权验证完成事件。</summary>
-		event EventHandler<AuthorizationEventArgs> Authorized;
+		event EventHandler<AuthorizationContext> Authorized;
 
 		/// <summary>
 		/// 判断指定的用户对特定目标对象的特定行为是否具有授权。
@@ -47,7 +47,7 @@ namespace Zongsoft.Security.Membership
 		/// <param name="actionId">对应目标的特定行为。</param>
 		/// <returns>如果具有授权则返回真(true)，否则返回假(false)。</returns>
 		/// <remarks>
-		///		<para>该验证会对指定的用户所属角色进行逐级向上展开做授权判断，因此只需对本方法一次调用即可得知当前用户对指定目标的特定行为的最终授权计算结果。</para>
+		/// 	<para>该验证会对指定的用户所属角色进行逐级向上展开做授权判断，因此只需对本方法一次调用即可得知当前用户对指定目标的特定行为的最终授权计算结果。</para>
 		/// </remarks>
 		bool Authorize(uint userId, string schemaId, string actionId);
 
@@ -58,8 +58,8 @@ namespace Zongsoft.Security.Membership
 		/// <param name="memberType">指定要获取的最终授权状态集的成员类型，默认为用户。</param>
 		/// <returns>返回指定成员的最终授权状态集。注意：该集合仅包含了最终的已授权状态信息。</returns>
 		/// <remarks>
-		///		<para>注意：该集合仅包含了最终的已授权状态信息。</para>
-		///		<para>该方法对指定用户及其所属角色进行逐级向上展开做授权计算，因此只需对本方法一次调用即可得知指定成员的最终授权计算结果。</para>
+		/// 	<para>注意：该集合仅包含了最终的已授权状态信息。</para>
+		/// 	<para>该方法对指定用户及其所属角色进行逐级向上展开做授权计算，因此只需对本方法一次调用即可得知指定成员的最终授权计算结果。</para>
 		/// </remarks>
 		IEnumerable<AuthorizationState> Authorizes(uint memberId, MemberType memberType = MemberType.User);
 	}

@@ -1,8 +1,15 @@
 ﻿/*
- * Authors:
- *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
+ *   _____                                ______
+ *  /_   /  ____  ____  ____  _________  / __/ /_
+ *    / /  / __ \/ __ \/ __ \/ ___/ __ \/ /_/ __/
+ *   / /__/ /_/ / / / / /_/ /\_ \/ /_/ / __/ /_
+ *  /____/\____/_/ /_/\__  /____/\____/_/  \__/
+ *                   /____/
  *
- * Copyright (C) 2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Authors:
+ *   钟峰(Popeye Zhong) <zongsoft@qq.com>
+ *
+ * Copyright (C) 2018-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -29,48 +36,25 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Security.Membership
 {
-	[Serializable]
-	public class AuthorizationEventArgs : EventArgs
+	public class AuthorizationContext
 	{
-		#region 成员字段
-		private CredentialPrincipal _principal;
-		private uint _userId;
-		private string _schemaId;
-		private string _actionId;
-		private bool _isAuthorized;
-		#endregion
-
 		#region 构造函数
-		public AuthorizationEventArgs(uint userId, string schemaId, string actionId, bool isAuthorized)
+		public AuthorizationContext(uint userId, string schemaId, string actionId, bool isAuthorized)
 		{
-			_userId = userId;
-			_schemaId = schemaId;
-			_actionId = actionId;
-			_isAuthorized = isAuthorized;
-		}
-
-		public AuthorizationEventArgs(CredentialPrincipal principal, string schemaId, string actionId, bool isAuthorized)
-		{
-			if(principal == null)
-				throw new ArgumentNullException("principal");
-
-			_principal = principal;
-			_schemaId = schemaId;
-			_actionId = actionId;
-			_isAuthorized = isAuthorized;
+			this.UserId = userId;
+			this.SchemaId = schemaId;
+			this.ActionId = actionId;
+			this.IsAuthorized = isAuthorized;
 		}
 		#endregion
 
 		#region 公共属性
 		/// <summary>
-		/// 获取待授权的<seealso cref="CredentialPrincipal"/>凭证主体。
+		/// 获取授权的用户编号。
 		/// </summary>
-		public CredentialPrincipal Principal
+		public uint UserId
 		{
-			get
-			{
-				return _principal;
-			}
+			get;
 		}
 
 		/// <summary>
@@ -78,10 +62,7 @@ namespace Zongsoft.Security.Membership
 		/// </summary>
 		public string SchemaId
 		{
-			get
-			{
-				return _schemaId;
-			}
+			get;
 		}
 
 		/// <summary>
@@ -89,10 +70,7 @@ namespace Zongsoft.Security.Membership
 		/// </summary>
 		public string ActionId
 		{
-			get
-			{
-				return _actionId;
-			}
+			get;
 		}
 
 		/// <summary>
@@ -100,14 +78,7 @@ namespace Zongsoft.Security.Membership
 		/// </summary>
 		public bool IsAuthorized
 		{
-			get
-			{
-				return _isAuthorized;
-			}
-			set
-			{
-				_isAuthorized = value;
-			}
+			get; set;
 		}
 		#endregion
 	}
