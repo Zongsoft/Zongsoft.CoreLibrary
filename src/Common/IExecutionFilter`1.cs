@@ -36,7 +36,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Common
 {
-	public interface IExecutionFilter<in TContext>
+	public interface IExecutionFilter<in TContext> : IExecutionFilter
 	{
 		void OnFiltered(TContext context);
 		void OnFiltering(TContext context);
