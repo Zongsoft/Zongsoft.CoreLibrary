@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -10,7 +10,8 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Zongsoft</RootNamespace>
     <AssemblyName>Zongsoft.CoreLibrary</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -374,13 +375,14 @@
     <Compile Include="Security\CredentialRegisterEventArgs.cs" />
     <Compile Include="Security\ICensorship.cs" />
     <Compile Include="Security\ISecretProvider.cs" />
-    <Compile Include="Security\Membership\AuthenticatedEventArgs.cs" />
     <Compile Include="Security\Membership\Authentication.cs" />
+    <Compile Include="Security\Membership\AuthenticationContext.cs" />
     <Compile Include="Security\Membership\AuthenticationException.cs" />
     <Compile Include="Security\Membership\AuthenticationReason.cs" />
+    <Compile Include="Security\Membership\Authorization.cs" />
+    <Compile Include="Security\Membership\AuthorizationContext.cs" />
     <Compile Include="Security\Membership\AuthorizationException.cs" />
     <Compile Include="Security\Membership\AuthorizationMode.cs" />
-    <Compile Include="Security\Membership\AuthorizationEventArgs.cs" />
     <Compile Include="Security\Membership\IUserIdentity.cs" />
     <Compile Include="Security\Membership\IMemberProvider.cs" />
     <Compile Include="Security\Membership\IRole.cs" />
