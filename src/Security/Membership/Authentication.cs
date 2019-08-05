@@ -56,6 +56,7 @@ namespace Zongsoft.Security.Membership
 		{
 			var authenticators = new ObservableCollection<IAuthenticator>();
 			authenticators.CollectionChanged += OnCollectionChanged;
+
 			this.Authenticators = authenticators;
 			this.Filters = new List<IExecutionFilter>();
 		}
@@ -73,7 +74,7 @@ namespace Zongsoft.Security.Membership
 		/// <summary>
 		/// 获取一个身份验证的过滤器集合，该过滤器包含对身份验证的响应处理。
 		/// </summary>
-		public IList<IExecutionFilter> Filters
+		public ICollection<IExecutionFilter> Filters
 		{
 			get;
 		}
@@ -88,6 +89,7 @@ namespace Zongsoft.Security.Membership
 					for(int i=e.NewStartingIndex; i< e.NewItems.Count; i++)
 					{
 						((IAuthenticator)e.NewItems[i]).Authenticated += OnAuthenticated;
+						((IAuthenticator)e.NewItems[i]).Authenticating += OnAuthenticating;
 					}
 
 					break;
@@ -96,6 +98,7 @@ namespace Zongsoft.Security.Membership
 					for(int i = e.OldStartingIndex; i < e.OldItems.Count; i++)
 					{
 						((IAuthenticator)e.OldItems[i]).Authenticated -= OnAuthenticated;
+						((IAuthenticator)e.OldItems[i]).Authenticating -= OnAuthenticating;
 					}
 
 					break;
@@ -103,24 +106,32 @@ namespace Zongsoft.Security.Membership
 					for(int i = e.OldStartingIndex; i < e.OldItems.Count; i++)
 					{
 						((IAuthenticator)e.OldItems[i]).Authenticated -= OnAuthenticated;
+						((IAuthenticator)e.OldItems[i]).Authenticating -= OnAuthenticating;
 					}
 
 					for(int i = e.NewStartingIndex; i < e.NewItems.Count; i++)
 					{
 						((IAuthenticator)e.NewItems[i]).Authenticated += OnAuthenticated;
+						((IAuthenticator)e.NewItems[i]).Authenticating += OnAuthenticating;
 					}
 
 					break;
 			}
 		}
 
-		private void OnAuthenticated(object sender, AuthenticatedEventArgs args)
+		private void OnAuthenticating(object sender, AuthenticationContext context)
 		{
-			var filters = this.Filters;
-
-			for(int i = 0; i < filters.Count; i++)
+			foreach(var filter in this.Filters)
 			{
-				filters[i].OnFiltered(args);
+				filter.OnFiltering(context);
+			}
+		}
+
+		private void OnAuthenticated(object sender, AuthenticationContext context)
+		{
+			foreach(var filter in this.Filters)
+			{
+				filter.OnFiltered(context);
 			}
 		}
 		#endregion

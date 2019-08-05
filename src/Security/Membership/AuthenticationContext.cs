@@ -1,8 +1,15 @@
 ﻿/*
- * Authors:
- *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
+ *   _____                                ______
+ *  /_   /  ____  ____  ____  _________  / __/ /_
+ *    / /  / __ \/ __ \/ __ \/ ___/ __ \/ /_/ __/
+ *   / /__/ /_/ / / / / /_/ /\_ \/ /_/ / __/ /_
+ *  /____/\____/_/ /_/\__  /____/\____/_/  \__/
+ *                   /____/
  *
- * Copyright (C) 2003-2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Authors:
+ *   钟峰(Popeye Zhong) <zongsoft@qq.com>
+ *
+ * Copyright (C) 2018-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -29,38 +36,35 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Security.Membership
 {
-	[Serializable]
-	public class AuthenticatedEventArgs : EventArgs
+	public class AuthenticationContext
 	{
 		#region 成员字段
-		private bool _isAuthenticated;
-		private string _namespace;
-		private string _identity;
-		private string _scene;
 		private IUserIdentity _user;
 		private IDictionary<string, object> _parameters;
 		#endregion
 
 		#region 构造函数
-		public AuthenticatedEventArgs(string identity, string @namespace, IUserIdentity user, string scene, IDictionary<string, object> parameters = null)
+		public AuthenticationContext(IAuthenticator authenticator, string identity, string @namespace, IUserIdentity user, string scene, IDictionary<string, object> parameters = null)
 		{
-			_identity = identity;
-			_namespace = @namespace;
-			_isAuthenticated = true;
-			_user = user;
-			_scene = scene;
+			this.Authenticator = authenticator ?? throw new ArgumentNullException(nameof(authenticator));
+
+			this.Identity = identity;
+			this.Namespace = @namespace;
+			this.Scene = scene;
+			this.User = user;
 
 			if(parameters != null && parameters.Count > 0)
 				_parameters = new Dictionary<string, object>(parameters, StringComparer.OrdinalIgnoreCase);
 		}
 
-		public AuthenticatedEventArgs(string identity, string @namespace, string scene, IDictionary<string, object> parameters = null)
+		public AuthenticationContext(IAuthenticator authenticator, string identity, string @namespace, string scene, IDictionary<string, object> parameters = null)
 		{
-			_identity = identity;
-			_namespace = @namespace;
-			_isAuthenticated = false;
+			this.Authenticator = authenticator ?? throw new ArgumentNullException(nameof(authenticator));
+
+			this.Identity = identity;
+			this.Namespace = @namespace;
+			this.Scene = scene;
 			_user = null;
-			_scene = scene;
 
 			if(parameters != null && parameters.Count > 0)
 				_parameters = new Dictionary<string, object>(parameters, StringComparer.OrdinalIgnoreCase);
@@ -69,14 +73,19 @@ namespace Zongsoft.Security.Membership
 
 		#region 公共属性
 		/// <summary>
+		/// 获取激发的验证器对象。
+		/// </summary>
+		public IAuthenticator Authenticator
+		{
+			get;
+		}
+
+		/// <summary>
 		/// 获取身份验证是否通过。
 		/// </summary>
 		public bool IsAuthenticated
 		{
-			get
-			{
-				return _isAuthenticated;
-			}
+			get => _user != null && this.Exception == null;
 		}
 
 		/// <summary>
@@ -84,10 +93,7 @@ namespace Zongsoft.Security.Membership
 		/// </summary>
 		public string Identity
 		{
-			get
-			{
-				return _identity;
-			}
+			get;
 		}
 
 		/// <summary>
@@ -95,10 +101,7 @@ namespace Zongsoft.Security.Membership
 		/// </summary>
 		public string Namespace
 		{
-			get
-			{
-				return _namespace;
-			}
+			get;
 		}
 
 		/// <summary>
@@ -106,10 +109,7 @@ namespace Zongsoft.Security.Membership
 		/// </summary>
 		public string Scene
 		{
-			get
-			{
-				return _scene;
-			}
+			get;
 		}
 
 		/// <summary>
@@ -123,11 +123,16 @@ namespace Zongsoft.Security.Membership
 			}
 			set
 			{
-				if(value == null)
-					throw new ArgumentNullException();
-
-				_user = value;
+				_user = value ?? throw new ArgumentNullException();
 			}
+		}
+
+		/// <summary>
+		/// 获取或设置发生的错误异常。
+		/// </summary>
+		public Exception Exception
+		{
+			get; set;
 		}
 
 		/// <summary>

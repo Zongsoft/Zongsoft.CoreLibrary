@@ -45,7 +45,12 @@ namespace Zongsoft.Security.Membership
 		/// <summary>
 		/// 表示验证完成的事件。
 		/// </summary>
-		event EventHandler<AuthenticatedEventArgs> Authenticated;
+		event EventHandler<AuthenticationContext> Authenticated;
+
+		/// <summary>
+		/// 表示验证开始的事件。
+		/// </summary>
+		event EventHandler<AuthenticationContext> Authenticating;
 
 		/// <summary>
 		/// 验证指定名称的用户是否有效并且和指定的密码是否完全匹配。
