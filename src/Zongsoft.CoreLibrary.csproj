@@ -102,6 +102,7 @@
     <Compile Include="Common\RandomGenerator.cs" />
     <Compile Include="Common\TypeExtension.cs" />
     <Compile Include="Common\Buffer.cs" />
+    <Compile Include="Common\UriExtension.cs" />
     <Compile Include="Communication\ChannelAsyncEventArgs.cs" />
     <Compile Include="Communication\IChannelContext.cs" />
     <Compile Include="Communication\IPacketizerFactory.cs" />
