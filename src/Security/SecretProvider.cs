@@ -33,7 +33,6 @@ namespace Zongsoft.Security
 	public class SecretProvider : ISecretProvider
 	{
 		#region 常量定义
-		private const string NULL_VALUE = "*";
 		private static readonly DateTime EPOCH = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 		#endregion
 
@@ -132,12 +131,8 @@ namespace Zongsoft.Security
 			//从缓存容器中获取对应的内容
 			var text = cache.GetValue<string>(name);
 
-			if(text != null)
+			if(text != null && text.Length > 0)
 			{
-				//验证成功：则必须等待有效期过后才能重新生成
-				if(text.Length == 0 || text == NULL_VALUE)
-					throw new InvalidOperationException(Properties.Resources.Text_SecretGenerateTooFrequently_Message);
-
 				//尚未验证：则必须确保在最小时间间隔之后才能重新生成
 				if(_period > TimeSpan.Zero &&
 				   this.Unpack(text, out var cachedSecret, out var timestamp, out var cachedExtra) &&
@@ -188,10 +183,9 @@ namespace Zongsoft.Security
 			   string.Equals(secret, cachedSecret, StringComparison.OrdinalIgnoreCase))
 			{
 				/*
-				 * 注意：不删除缓存项，只设置其内容为空或特定文本！ 
-				 * 因为需要利用缓存项的过期时间来判定频繁的生成验证码。
+				 * 注意：不删除缓存项！
+				 * 在缓存的有效期内，都可以重复进行校验。
 				 */
-				cache.SetValue(name, NULL_VALUE, _expiry);
 
 				//返回校验成功
 				return true;
