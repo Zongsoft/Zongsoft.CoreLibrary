@@ -34,6 +34,16 @@ namespace Zongsoft.Security.Membership
 	/// </summary>
 	public interface IUserProvider
 	{
+		#region 属性定义
+		/// <summary>
+		/// 获取数据序号提供程序。
+		/// </summary>
+		Common.ISequence Sequence
+		{
+			get;
+		}
+		#endregion
+
 		#region 用户管理
 		/// <summary>
 		/// 获取指定编号对应的用户对象。

@@ -34,6 +34,17 @@ namespace Zongsoft.Security.Membership
 	/// </summary>
 	public interface IRoleProvider
 	{
+		#region 属性定义
+		/// <summary>
+		/// 获取数据序号提供程序。
+		/// </summary>
+		Common.ISequence Sequence
+		{
+			get;
+		}
+		#endregion
+
+		#region 方法定义
 		/// <summary>
 		/// 确定指定编号的角色是否存在。
 		/// </summary>
@@ -133,5 +144,6 @@ namespace Zongsoft.Security.Membership
 		/// <param name="roles">要创建的角色对象集。</param>
 		/// <returns>返回创建成功的角色数量。</returns>
 		int Create(IEnumerable<IRole> roles);
+		#endregion
 	}
 }
