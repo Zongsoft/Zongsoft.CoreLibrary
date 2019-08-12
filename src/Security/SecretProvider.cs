@@ -47,7 +47,7 @@ namespace Zongsoft.Security
 		public SecretProvider()
 		{
 			//设置属性的默认值
-			_expiry = TimeSpan.FromMinutes(30);
+			_expiry = TimeSpan.FromMinutes(10);
 			_period = TimeSpan.FromSeconds(60);
 		}
 
@@ -57,7 +57,7 @@ namespace Zongsoft.Security
 			_cache = cache ?? throw new ArgumentNullException(nameof(cache));
 
 			//设置属性的默认值
-			_expiry = TimeSpan.FromMinutes(30);
+			_expiry = TimeSpan.FromMinutes(10);
 			_period = TimeSpan.FromSeconds(60);
 		}
 		#endregion
@@ -79,7 +79,7 @@ namespace Zongsoft.Security
 		}
 
 		/// <summary>
-		/// 获取或设置秘密内容的默认过期时长（默认为10分钟）。
+		/// 获取或设置秘密内容的默认过期时长（默认为10分钟），不能设置为零。
 		/// </summary>
 		public TimeSpan Expiry
 		{
@@ -113,20 +113,10 @@ namespace Zongsoft.Security
 		#region 生成方法
 		public string Generate(string name, string extra = null)
 		{
-			return this.Generate(name, extra, _expiry);
+			return this.Generate(name, null, extra);
 		}
 
-		public string Generate(string name, TimeSpan expiry)
-		{
-			return this.Generate(name, null, expiry);
-		}
-
-		public string Generate(string name, string extra, TimeSpan expiry)
-		{
-			return this.Generate(name, null, extra, expiry);
-		}
-
-		public string Generate(string name, string pattern, string extra, TimeSpan expiry)
+		public string Generate(string name, string pattern, string extra)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
@@ -159,7 +149,7 @@ namespace Zongsoft.Security
 			var secret = this.GenerateSecret(name, pattern);
 
 			//将秘密内容保存到缓存容器中（如果指定的过期时长为零则采用默认过期时长）
-			if(!cache.SetValue(name, this.Pack(secret, extra), expiry > TimeSpan.Zero ? expiry : _expiry))
+			if(!cache.SetValue(name, this.Pack(secret, extra), _expiry))
 				throw new InvalidOperationException("The secret caching failed.");
 
 			return secret;
@@ -201,7 +191,7 @@ namespace Zongsoft.Security
 				 * 注意：不删除缓存项，只设置其内容为空或特定文本！ 
 				 * 因为需要利用缓存项的过期时间来判定频繁的生成验证码。
 				 */
-				cache.SetValue(name, NULL_VALUE);
+				cache.SetValue(name, NULL_VALUE, _expiry);
 
 				//返回校验成功
 				return true;
