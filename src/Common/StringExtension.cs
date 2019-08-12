@@ -162,6 +162,53 @@ namespace Zongsoft.Common
 			return collection.Any(item => string.Equals(item, text, comparisonType));
 		}
 
+		public static bool IsDigits(this string text)
+		{
+			return IsDigits(text, out _);
+		}
+
+		public static bool IsDigits(this string text, out string digits)
+		{
+			digits = null;
+
+			if(text == null || text.Length == 0)
+				return false;
+
+			int start = -1, count = 0;
+			var isDivied = false;
+
+			for(int i = 0; i < text.Length; i++)
+			{
+				if(char.IsWhiteSpace(text, i))
+				{
+					isDivied = start >= 0;
+					continue;
+				}
+
+				if(text[i] >= '0' && text[i] <= '9')
+				{
+					if(start < 0)
+						start = i;
+					else if(isDivied)
+						return false;
+
+					count++;
+				}
+				else
+				{
+					return false;
+				}
+			}
+
+			if(start >= 0)
+			{
+				digits = text.Substring(start, count);
+				return true;
+			}
+
+			return false;
+		}
+
 		public static IEnumerable<T> Slice<T>(this string text, char separator, TryParser<T> parser)
 		{
 			return Slice(text, chr => chr == separator, parser);

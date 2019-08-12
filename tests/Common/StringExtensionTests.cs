@@ -46,5 +46,21 @@ namespace Zongsoft.Common.Tests
 			Assert.Equal("PrefixPrefixContent", StringExtension.Trim("PrefixPrefixContentSuffix", "Suffix"));
 			Assert.Equal("Content", StringExtension.Trim("PrefixPrefixContentSuffix", "Prefix", "Suffix"));
 		}
+
+		[Fact]
+		public void TestIsDigits()
+		{
+			string digits;
+
+			Assert.True(StringExtension.IsDigits("123", out digits));
+			Assert.Equal("123", digits);
+
+			Assert.True(StringExtension.IsDigits(" \t123   ", out digits));
+			Assert.Equal("123", digits);
+
+			Assert.False(StringExtension.IsDigits("1 23"));
+			Assert.False(StringExtension.IsDigits("1#23"));
+			Assert.False(StringExtension.IsDigits("$123"));
+		}
 	}
 }
