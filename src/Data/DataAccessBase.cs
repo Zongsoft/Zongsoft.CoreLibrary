@@ -194,13 +194,13 @@ namespace Zongsoft.Data
 			}
 
 			//调用数据访问过滤器前事件
-			this.InvokeFilters(context, (filter, ctx) => filter.OnFiltering(ctx));
+			this.OnFiltering(context);
 
 			//执行数据操作方法
 			this.OnExecute(context);
 
 			//调用数据访问过滤器后事件
-			this.InvokeFilters(context, (filter, ctx) => filter.OnFiltered(ctx));
+			this.OnFiltered(context);
 
 			//激发“Executed”事件
 			this.OnExecuted(context);
@@ -256,13 +256,13 @@ namespace Zongsoft.Data
 			}
 
 			//调用数据访问过滤器前事件
-			this.InvokeFilters(context, (filter, ctx) => filter.OnFiltering(ctx));
+			this.OnFiltering(context);
 
 			//执行数据操作方法
 			this.OnExecute(context);
 
 			//调用数据访问过滤器后事件
-			this.InvokeFilters(context, (filter, ctx) => filter.OnFiltered(ctx));
+			this.OnFiltered(context);
 
 			//激发“Executed”事件
 			this.OnExecuted(context);
@@ -309,13 +309,13 @@ namespace Zongsoft.Data
 				return context.Result;
 
 			//调用数据访问过滤器前事件
-			this.InvokeFilters(context, (filter, ctx) => filter.OnFiltering(ctx));
+			this.OnFiltering(context);
 
 			//执行存在操作方法
 			this.OnExists(context);
 
 			//调用数据访问过滤器后事件
-			this.InvokeFilters(context, (filter, ctx) => filter.OnFiltered(ctx));
+			this.OnFiltered(context);
 
 			//激发“Existed”事件
 			this.OnExisted(context);
@@ -389,13 +389,13 @@ namespace Zongsoft.Data
 				return context.Result;
 
 			//调用数据访问过滤器前事件
-			this.InvokeFilters(context, (filter, ctx) => filter.OnFiltering(ctx));
+			this.OnFiltering(context);
 
 			//执行计数操作方法
 			this.OnCount(context);
 
 			//调用数据访问过滤器后事件
-			this.InvokeFilters(context, (filter, ctx) => filter.OnFiltered(ctx));
+			this.OnFiltered(context);
 
 			//激发“Counted”事件
 			this.OnCounted(context);
@@ -472,13 +472,13 @@ namespace Zongsoft.Data
 				return context.Result;
 
 			//调用数据访问过滤器前事件
-			this.InvokeFilters(context, (filter, ctx) => filter.OnFiltering(ctx));
+			this.OnFiltering(context);
 
 			//执行递增操作方法
 			this.OnIncrement(context);
 
 			//调用数据访问过滤器后事件
-			this.InvokeFilters(context, (filter, ctx) => filter.OnFiltered(ctx));
+			this.OnFiltered(context);
 
 			//激发“Incremented”事件
 			this.OnIncremented(context);
@@ -587,13 +587,13 @@ namespace Zongsoft.Data
 				return context.Count;
 
 			//调用数据访问过滤器前事件
-			this.InvokeFilters(context, (filter, ctx) => filter.OnFiltering(ctx));
+			this.OnFiltering(context);
 
 			//执行数据删除操作
 			this.OnDelete(context);
 
 			//调用数据访问过滤器后事件
-			this.InvokeFilters(context, (filter, ctx) => filter.OnFiltered(ctx));
+			this.OnFiltered(context);
 
 			//激发“Deleted”事件
 			this.OnDeleted(context);
@@ -719,13 +719,13 @@ namespace Zongsoft.Data
 				return context.Count;
 
 			//调用数据访问过滤器前事件
-			this.InvokeFilters(context, (filter, ctx) => filter.OnFiltering(ctx));
+			this.OnFiltering(context);
 
 			//执行数据插入操作
 			this.OnInsert(context);
 
 			//调用数据访问过滤器后事件
-			this.InvokeFilters(context, (filter, ctx) => filter.OnFiltered(ctx));
+			this.OnFiltered(context);
 
 			//激发“Inserted”事件
 			this.OnInserted(context);
@@ -847,13 +847,13 @@ namespace Zongsoft.Data
 				return context.Count;
 
 			//调用数据访问过滤器前事件
-			this.InvokeFilters(context, (filter, ctx) => filter.OnFiltering(ctx));
+			this.OnFiltering(context);
 
 			//执行数据插入操作
 			this.OnInsert(context);
 
 			//调用数据访问过滤器后事件
-			this.InvokeFilters(context, (filter, ctx) => filter.OnFiltered(ctx));
+			this.OnFiltered(context);
 
 			//激发“Inserted”事件
 			this.OnInserted(context);
@@ -979,13 +979,13 @@ namespace Zongsoft.Data
 				return context.Count;
 
 			//调用数据访问过滤器前事件
-			this.InvokeFilters(context, (filter, ctx) => filter.OnFiltering(ctx));
+			this.OnFiltering(context);
 
 			//执行数据插入操作
 			this.OnUpsert(context);
 
 			//调用数据访问过滤器后事件
-			this.InvokeFilters(context, (filter, ctx) => filter.OnFiltered(ctx));
+			this.OnFiltered(context);
 
 			//激发“Upserted”事件
 			this.OnUpserted(context);
@@ -1107,13 +1107,13 @@ namespace Zongsoft.Data
 				return context.Count;
 
 			//调用数据访问过滤器前事件
-			this.InvokeFilters(context, (filter, ctx) => filter.OnFiltering(ctx));
+			this.OnFiltering(context);
 
 			//执行数据插入操作
 			this.OnUpsert(context);
 
 			//调用数据访问过滤器后事件
-			this.InvokeFilters(context, (filter, ctx) => filter.OnFiltered(ctx));
+			this.OnFiltered(context);
 
 			//激发“Upserted”事件
 			this.OnUpserted(context);
@@ -1323,13 +1323,13 @@ namespace Zongsoft.Data
 				return context.Count;
 
 			//调用数据访问过滤器前事件
-			this.InvokeFilters(context, (filter, ctx) => filter.OnFiltering(ctx));
+			this.OnFiltering(context);
 
 			//执行数据更新操作
 			this.OnUpdate(context);
 
 			//调用数据访问过滤器后事件
-			this.InvokeFilters(context, (filter, ctx) => filter.OnFiltered(ctx));
+			this.OnFiltered(context);
 
 			//激发“Updated”事件
 			this.OnUpdated(context);
@@ -1427,13 +1427,13 @@ namespace Zongsoft.Data
 				return context.Count;
 
 			//调用数据访问过滤器前事件
-			this.InvokeFilters(context, (filter, ctx) => filter.OnFiltering(ctx));
+			this.OnFiltering(context);
 
 			//执行数据更新操作
 			this.OnUpdate(context);
 
 			//调用数据访问过滤器后事件
-			this.InvokeFilters(context, (filter, ctx) => filter.OnFiltered(ctx));
+			this.OnFiltered(context);
 
 			//激发“Updated”事件
 			this.OnUpdated(context);
@@ -1660,13 +1660,13 @@ namespace Zongsoft.Data
 				return context.Result as IEnumerable<T>;
 
 			//调用数据访问过滤器前事件
-			this.InvokeFilters(context, (filter, ctx) => filter.OnFiltering(ctx));
+			this.OnFiltering(context);
 
 			//执行数据查询操作
 			this.OnSelect(context);
 
 			//调用数据访问过滤器后事件
-			this.InvokeFilters(context, (filter, ctx) => filter.OnFiltered(ctx));
+			this.OnFiltered(context);
 
 			//激发“Selected”事件
 			this.OnSelected(context);
@@ -1701,6 +1701,16 @@ namespace Zongsoft.Data
 		protected virtual Common.ISequence CreateSequence(Common.ISequence sequence)
 		{
 			return sequence;
+		}
+
+		protected virtual void OnFiltering(IDataAccessContextBase context)
+		{
+			this.InvokeFilters(context, (filter, ctx) => filter.OnFiltering(ctx));
+		}
+
+		protected virtual void OnFiltered(IDataAccessContextBase context)
+		{
+			this.InvokeFilters(context, (filter, ctx) => filter.OnFiltered(ctx));
 		}
 		#endregion
 
@@ -1884,7 +1894,7 @@ namespace Zongsoft.Data
 			return this.GetName(typeof(T));
 		}
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 		private void InvokeFilters(IDataAccessContextBase context, Action<IDataAccessFilter, IDataAccessContextBase> invoke)
 		{
 			foreach(var filter in _filters)
