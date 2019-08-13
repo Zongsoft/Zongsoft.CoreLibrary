@@ -29,14 +29,13 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Runtime.Caching
 {
-	public class MemoryCache : ICache, Zongsoft.Common.IDisposableObject, Zongsoft.Common.ISequence
+	public class MemoryCache : ICache, Zongsoft.Common.ISequence
 	{
 		#region 单例字段
 		public static readonly MemoryCache Default = new MemoryCache("Zongsoft.Runtime.Caching.MemoryCache");
 		#endregion
 
 		#region 事件声明
-		public event EventHandler<Common.DisposedEventArgs> Disposed;
 		public event EventHandler<CacheChangedEventArgs> Changed;
 		#endregion
 
@@ -259,15 +258,8 @@ namespace Zongsoft.Runtime.Caching
 		{
 			var cache = System.Threading.Interlocked.Exchange(ref _innerCache, null);
 
-			if(cache == null)
-				return;
-
-			cache.Dispose();
-
-			var disposed = this.Disposed;
-
-			if(disposed != null)
-				disposed(this, new Common.DisposedEventArgs(disposing));
+			if(cache != null)
+				cache.Dispose();
 		}
 		#endregion
 

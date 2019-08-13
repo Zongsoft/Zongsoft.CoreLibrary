@@ -83,9 +83,8 @@
     <Compile Include="Common\ActivatorParameterDescriptor.cs" />
     <Compile Include="Common\BitVector32.cs" />
     <Compile Include="Common\ExecutionResult.cs" />
-    <Compile Include="Common\ExpressionUtility.cs" />
+    <Compile Include="Reflection\ExpressionUtility.cs" />
     <Compile Include="Common\IActivator.cs" />
-    <Compile Include="Common\IDisposableObject.cs" />
     <Compile Include="Common\IEventHandler.cs" />
     <Compile Include="Common\IEventHandler`1.cs" />
     <Compile Include="Common\IExecutionFilter.cs" />
@@ -93,12 +92,8 @@
     <Compile Include="Common\IExecutionHandler.cs" />
     <Compile Include="Common\IExecutionHandler`1.cs" />
     <Compile Include="Common\IExecutionResult.cs" />
-    <Compile Include="Common\IObjectReference.cs" />
-    <Compile Include="Common\IVerifier.cs" />
     <Compile Include="Common\ISequence.cs" />
     <Compile Include="Common\IValidator.cs" />
-    <Compile Include="Common\ModelBase.cs" />
-    <Compile Include="Common\ObjectReference.cs" />
     <Compile Include="Common\RandomGenerator.cs" />
     <Compile Include="Common\TypeExtension.cs" />
     <Compile Include="Common\Buffer.cs" />
