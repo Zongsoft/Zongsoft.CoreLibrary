@@ -646,14 +646,14 @@ namespace Zongsoft.Data
 		#region 公共方法
 		public bool Contains<TMember>(Expression<Func<T, TMember>> expression)
 		{
-			return this.Contains(Common.ExpressionUtility.GetMemberName(expression));
+			return this.Contains(Reflection.ExpressionUtility.GetMemberName(expression));
 		}
 
 		public bool Reset<TValue>(Expression<Func<T, TValue>> expression, out TValue value)
 		{
 			value = default(TValue);
 
-			if(this.Reset(Common.ExpressionUtility.GetMemberName(expression), out var result))
+			if(this.Reset(Reflection.ExpressionUtility.GetMemberName(expression), out var result))
 			{
 				value = (TValue)result;
 				return true;
@@ -664,44 +664,44 @@ namespace Zongsoft.Data
 
 		public TValue GetValue<TValue>(Expression<Func<T, TValue>> expression)
 		{
-			return (TValue)this.GetValue(Common.ExpressionUtility.GetMemberName(expression));
+			return (TValue)this.GetValue(Reflection.ExpressionUtility.GetMemberName(expression));
 		}
 
 		public TValue GetValue<TValue>(Expression<Func<T, TValue>> expression, TValue defaultValue)
 		{
-			return this.GetValue(Common.ExpressionUtility.GetMemberName(expression), defaultValue);
+			return this.GetValue(Reflection.ExpressionUtility.GetMemberName(expression), defaultValue);
 		}
 
 		public void SetValue<TValue>(Expression<Func<T, TValue>> expression, TValue value, Func<TValue, bool> predicate = null)
 		{
-			this.SetValue(Common.ExpressionUtility.GetMemberName(expression), value, predicate);
+			this.SetValue(Reflection.ExpressionUtility.GetMemberName(expression), value, predicate);
 		}
 
 		public void SetValue<TValue>(Expression<Func<T, TValue>> expression, Func<string, TValue> valueFactory, Func<TValue, bool> predicate = null)
 		{
-			var name = Common.ExpressionUtility.GetMemberName(expression);
+			var name = Reflection.ExpressionUtility.GetMemberName(expression);
 			this.SetValue(name, () => valueFactory(name), predicate);
 		}
 
 		public bool TryGetValue<TValue>(Expression<Func<T, TValue>> expression, out TValue value)
 		{
-			return this.TryGetValue(Common.ExpressionUtility.GetMemberName(expression), out value);
+			return this.TryGetValue(Reflection.ExpressionUtility.GetMemberName(expression), out value);
 		}
 
 		public bool TryGetValue<TValue>(Expression<Func<T, TValue>> expression, Action<string, TValue> got)
 		{
-			var name = Common.ExpressionUtility.GetMemberName(expression);
+			var name = Reflection.ExpressionUtility.GetMemberName(expression);
 			return this.TryGetValue<TValue>(name, value => got(name, value));
 		}
 
 		public bool TrySetValue<TValue>(Expression<Func<T, TValue>> expression, TValue value, Func<TValue, bool> predicate = null)
 		{
-			return this.TrySetValue(Common.ExpressionUtility.GetMemberName(expression), value, predicate);
+			return this.TrySetValue(Reflection.ExpressionUtility.GetMemberName(expression), value, predicate);
 		}
 
 		public bool TrySetValue<TValue>(Expression<Func<T, TValue>> expression, Func<string, TValue> valueFactory, Func<TValue, bool> predicate = null)
 		{
-			var name = Common.ExpressionUtility.GetMemberName(expression);
+			var name = Reflection.ExpressionUtility.GetMemberName(expression);
 			return this.TrySetValue(name, () => valueFactory(name), predicate);
 		}
 		#endregion
@@ -1094,14 +1094,14 @@ namespace Zongsoft.Data
 		#region 公共方法
 		public bool Contains<TMember>(Expression<Func<T, TMember>> expression)
 		{
-			return this.Contains(Common.ExpressionUtility.GetMemberName(expression));
+			return this.Contains(Reflection.ExpressionUtility.GetMemberName(expression));
 		}
 
 		public bool Reset<TValue>(Expression<Func<T, TValue>> expression, out TValue value)
 		{
 			value = default(TValue);
 
-			if(this.Reset(Common.ExpressionUtility.GetMemberName(expression), out var result))
+			if(this.Reset(Reflection.ExpressionUtility.GetMemberName(expression), out var result))
 			{
 				value = (TValue)result;
 				return true;
@@ -1112,44 +1112,44 @@ namespace Zongsoft.Data
 
 		public TValue GetValue<TValue>(Expression<Func<T, TValue>> expression)
 		{
-			return (TValue)this.GetValue(Common.ExpressionUtility.GetMemberName(expression));
+			return (TValue)this.GetValue(Reflection.ExpressionUtility.GetMemberName(expression));
 		}
 
 		public TValue GetValue<TValue>(Expression<Func<T, TValue>> expression, TValue defaultValue)
 		{
-			return this.GetValue(Common.ExpressionUtility.GetMemberName(expression), defaultValue);
+			return this.GetValue(Reflection.ExpressionUtility.GetMemberName(expression), defaultValue);
 		}
 
 		public void SetValue<TValue>(Expression<Func<T, TValue>> expression, TValue value, Func<TValue, bool> predicate = null)
 		{
-			this.SetValue(Common.ExpressionUtility.GetMemberName(expression), value, predicate);
+			this.SetValue(Reflection.ExpressionUtility.GetMemberName(expression), value, predicate);
 		}
 
 		public void SetValue<TValue>(Expression<Func<T, TValue>> expression, Func<string, TValue> valueFactory, Func<TValue, bool> predicate = null)
 		{
-			var name = Common.ExpressionUtility.GetMemberName(expression);
+			var name = Reflection.ExpressionUtility.GetMemberName(expression);
 			this.SetValue(name, () => valueFactory(name), predicate);
 		}
 
 		public bool TryGetValue<TValue>(Expression<Func<T, TValue>> expression, out TValue value)
 		{
-			return this.TryGetValue(Common.ExpressionUtility.GetMemberName(expression), out value);
+			return this.TryGetValue(Reflection.ExpressionUtility.GetMemberName(expression), out value);
 		}
 
 		public bool TryGetValue<TValue>(Expression<Func<T, TValue>> expression, Action<string, TValue> got)
 		{
-			var name = Common.ExpressionUtility.GetMemberName(expression);
+			var name = Reflection.ExpressionUtility.GetMemberName(expression);
 			return this.TryGetValue<TValue>(name, value => got(name, value));
 		}
 
 		public bool TrySetValue<TValue>(Expression<Func<T, TValue>> expression, TValue value, Func<TValue, bool> predicate = null)
 		{
-			return this.TrySetValue(Common.ExpressionUtility.GetMemberName(expression), value, predicate);
+			return this.TrySetValue(Reflection.ExpressionUtility.GetMemberName(expression), value, predicate);
 		}
 
 		public bool TrySetValue<TValue>(Expression<Func<T, TValue>> expression, Func<string, TValue> valueFactory, Func<TValue, bool> predicate = null)
 		{
-			var name = Common.ExpressionUtility.GetMemberName(expression);
+			var name = Reflection.ExpressionUtility.GetMemberName(expression);
 			return this.TrySetValue(name, () => valueFactory(name), predicate);
 		}
 		#endregion
@@ -1576,14 +1576,14 @@ namespace Zongsoft.Data
 		#region 公共方法
 		public bool Contains<TMember>(Expression<Func<T, TMember>> expression)
 		{
-			return this.Contains(Common.ExpressionUtility.GetMemberName(expression));
+			return this.Contains(Reflection.ExpressionUtility.GetMemberName(expression));
 		}
 
 		public bool Reset<TValue>(Expression<Func<T, TValue>> expression, out TValue value)
 		{
 			value = default(TValue);
 
-			if(this.Reset(Common.ExpressionUtility.GetMemberName(expression), out var result))
+			if(this.Reset(Reflection.ExpressionUtility.GetMemberName(expression), out var result))
 			{
 				value = (TValue)result;
 				return true;
@@ -1594,44 +1594,44 @@ namespace Zongsoft.Data
 
 		public TValue GetValue<TValue>(Expression<Func<T, TValue>> expression)
 		{
-			return (TValue)this.GetValue(Common.ExpressionUtility.GetMemberName(expression));
+			return (TValue)this.GetValue(Reflection.ExpressionUtility.GetMemberName(expression));
 		}
 
 		public TValue GetValue<TValue>(Expression<Func<T, TValue>> expression, TValue defaultValue)
 		{
-			return this.GetValue(Common.ExpressionUtility.GetMemberName(expression), defaultValue);
+			return this.GetValue(Reflection.ExpressionUtility.GetMemberName(expression), defaultValue);
 		}
 
 		public void SetValue<TValue>(Expression<Func<T, TValue>> expression, TValue value, Func<TValue, bool> predicate = null)
 		{
-			this.SetValue(Common.ExpressionUtility.GetMemberName(expression), value, predicate);
+			this.SetValue(Reflection.ExpressionUtility.GetMemberName(expression), value, predicate);
 		}
 
 		public void SetValue<TValue>(Expression<Func<T, TValue>> expression, Func<string, TValue> valueFactory, Func<TValue, bool> predicate = null)
 		{
-			var name = Common.ExpressionUtility.GetMemberName(expression);
+			var name = Reflection.ExpressionUtility.GetMemberName(expression);
 			this.SetValue(name, () => valueFactory(name), predicate);
 		}
 
 		public bool TryGetValue<TValue>(Expression<Func<T, TValue>> expression, out TValue value)
 		{
-			return this.TryGetValue(Common.ExpressionUtility.GetMemberName(expression), out value);
+			return this.TryGetValue(Reflection.ExpressionUtility.GetMemberName(expression), out value);
 		}
 
 		public bool TryGetValue<TValue>(Expression<Func<T, TValue>> expression, Action<string, TValue> got)
 		{
-			var name = Common.ExpressionUtility.GetMemberName(expression);
+			var name = Reflection.ExpressionUtility.GetMemberName(expression);
 			return this.TryGetValue<TValue>(name, value => got(name, value));
 		}
 
 		public bool TrySetValue<TValue>(Expression<Func<T, TValue>> expression, TValue value, Func<TValue, bool> predicate = null)
 		{
-			return this.TrySetValue(Common.ExpressionUtility.GetMemberName(expression), value, predicate);
+			return this.TrySetValue(Reflection.ExpressionUtility.GetMemberName(expression), value, predicate);
 		}
 
 		public bool TrySetValue<TValue>(Expression<Func<T, TValue>> expression, Func<string, TValue> valueFactory, Func<TValue, bool> predicate = null)
 		{
-			var name = Common.ExpressionUtility.GetMemberName(expression);
+			var name = Reflection.ExpressionUtility.GetMemberName(expression);
 			return this.TrySetValue(name, () => valueFactory(name), predicate);
 		}
 		#endregion
@@ -2028,14 +2028,14 @@ namespace Zongsoft.Data
 		#region 公共方法
 		public bool Contains<TMember>(Expression<Func<T, TMember>> expression)
 		{
-			return this.Contains(Common.ExpressionUtility.GetMemberName(expression));
+			return this.Contains(Reflection.ExpressionUtility.GetMemberName(expression));
 		}
 
 		public bool Reset<TValue>(Expression<Func<T, TValue>> expression, out TValue value)
 		{
 			value = default(TValue);
 
-			if(this.Reset(Common.ExpressionUtility.GetMemberName(expression), out var result))
+			if(this.Reset(Reflection.ExpressionUtility.GetMemberName(expression), out var result))
 			{
 				value = (TValue)result;
 				return true;
@@ -2046,44 +2046,44 @@ namespace Zongsoft.Data
 
 		public TValue GetValue<TValue>(Expression<Func<T, TValue>> expression)
 		{
-			return (TValue)this.GetValue(Common.ExpressionUtility.GetMemberName(expression));
+			return (TValue)this.GetValue(Reflection.ExpressionUtility.GetMemberName(expression));
 		}
 
 		public TValue GetValue<TValue>(Expression<Func<T, TValue>> expression, TValue defaultValue)
 		{
-			return this.GetValue(Common.ExpressionUtility.GetMemberName(expression), defaultValue);
+			return this.GetValue(Reflection.ExpressionUtility.GetMemberName(expression), defaultValue);
 		}
 
 		public void SetValue<TValue>(Expression<Func<T, TValue>> expression, TValue value, Func<TValue, bool> predicate = null)
 		{
-			this.SetValue(Common.ExpressionUtility.GetMemberName(expression), value, predicate);
+			this.SetValue(Reflection.ExpressionUtility.GetMemberName(expression), value, predicate);
 		}
 
 		public void SetValue<TValue>(Expression<Func<T, TValue>> expression, Func<string, TValue> valueFactory, Func<TValue, bool> predicate = null)
 		{
-			var name = Common.ExpressionUtility.GetMemberName(expression);
+			var name = Reflection.ExpressionUtility.GetMemberName(expression);
 			this.SetValue(name, () => valueFactory(name), predicate);
 		}
 
 		public bool TryGetValue<TValue>(Expression<Func<T, TValue>> expression, out TValue value)
 		{
-			return this.TryGetValue(Common.ExpressionUtility.GetMemberName(expression), out value);
+			return this.TryGetValue(Reflection.ExpressionUtility.GetMemberName(expression), out value);
 		}
 
 		public bool TryGetValue<TValue>(Expression<Func<T, TValue>> expression, Action<string, TValue> got)
 		{
-			var name = Common.ExpressionUtility.GetMemberName(expression);
+			var name = Reflection.ExpressionUtility.GetMemberName(expression);
 			return this.TryGetValue<TValue>(name, value => got(name, value));
 		}
 
 		public bool TrySetValue<TValue>(Expression<Func<T, TValue>> expression, TValue value, Func<TValue, bool> predicate = null)
 		{
-			return this.TrySetValue(Common.ExpressionUtility.GetMemberName(expression), value, predicate);
+			return this.TrySetValue(Reflection.ExpressionUtility.GetMemberName(expression), value, predicate);
 		}
 
 		public bool TrySetValue<TValue>(Expression<Func<T, TValue>> expression, Func<string, TValue> valueFactory, Func<TValue, bool> predicate = null)
 		{
-			var name = Common.ExpressionUtility.GetMemberName(expression);
+			var name = Reflection.ExpressionUtility.GetMemberName(expression);
 			return this.TrySetValue(name, () => valueFactory(name), predicate);
 		}
 		#endregion

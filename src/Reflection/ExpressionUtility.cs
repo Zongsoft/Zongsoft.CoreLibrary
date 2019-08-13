@@ -29,7 +29,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Zongsoft.Common
+namespace Zongsoft.Reflection
 {
 	internal static class ExpressionUtility
 	{

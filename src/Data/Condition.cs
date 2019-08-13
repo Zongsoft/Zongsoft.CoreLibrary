@@ -549,72 +549,72 @@ namespace Zongsoft.Data
 			#region 表达式版本
 			public static Condition Equal<TValue>(Expression<Func<T, TValue>> member, TValue value)
 			{
-				return Condition.Equal(Common.ExpressionUtility.GetMemberName(member), value);
+				return Condition.Equal(Reflection.ExpressionUtility.GetMemberName(member), value);
 			}
 
 			public static Condition NotEqual<TValue>(Expression<Func<T, TValue>> member, TValue value)
 			{
-				return Condition.NotEqual(Common.ExpressionUtility.GetMemberName(member), value);
+				return Condition.NotEqual(Reflection.ExpressionUtility.GetMemberName(member), value);
 			}
 
 			public static Condition GreaterThan<TValue>(Expression<Func<T, TValue>> member, TValue value)
 			{
-				return Condition.GreaterThan(Common.ExpressionUtility.GetMemberName(member), value);
+				return Condition.GreaterThan(Reflection.ExpressionUtility.GetMemberName(member), value);
 			}
 
 			public static Condition GreaterThanEqual<TValue>(Expression<Func<T, TValue>> member, TValue value)
 			{
-				return Condition.GreaterThanEqual(Common.ExpressionUtility.GetMemberName(member), value);
+				return Condition.GreaterThanEqual(Reflection.ExpressionUtility.GetMemberName(member), value);
 			}
 
 			public static Condition LessThan<TValue>(Expression<Func<T, TValue>> member, TValue value)
 			{
-				return Condition.LessThan(Common.ExpressionUtility.GetMemberName(member), value);
+				return Condition.LessThan(Reflection.ExpressionUtility.GetMemberName(member), value);
 			}
 
 			public static Condition LessThanEqual<TValue>(Expression<Func<T, TValue>> member, TValue value)
 			{
-				return Condition.LessThanEqual(Common.ExpressionUtility.GetMemberName(member), value);
+				return Condition.LessThanEqual(Reflection.ExpressionUtility.GetMemberName(member), value);
 			}
 
 			public static Condition Like(Expression<Func<T, string>> member, string value)
 			{
-				return Condition.Like(Common.ExpressionUtility.GetMemberName(member), value);
+				return Condition.Like(Reflection.ExpressionUtility.GetMemberName(member), value);
 			}
 
 			public static Condition Between<TValue>(Expression<Func<T, TValue>> member, Range<TValue> range) where TValue : struct, IComparable<TValue>
 			{
-				return Condition.Between<TValue>(Common.ExpressionUtility.GetMemberName(member), range);
+				return Condition.Between<TValue>(Reflection.ExpressionUtility.GetMemberName(member), range);
 			}
 
 			public static Condition Between<TValue>(Expression<Func<T, TValue>> member, TValue begin, TValue end) where TValue : struct, IComparable<TValue>
 			{
-				return Condition.Between(Common.ExpressionUtility.GetMemberName(member), begin, end);
+				return Condition.Between(Reflection.ExpressionUtility.GetMemberName(member), begin, end);
 			}
 
 			public static Condition Between<TValue>(Expression<Func<T, TValue>> member, TValue? begin, TValue? end) where TValue : struct, IComparable<TValue>
 			{
-				return Condition.Between(Common.ExpressionUtility.GetMemberName(member), begin, end);
+				return Condition.Between(Reflection.ExpressionUtility.GetMemberName(member), begin, end);
 			}
 
 			public static Condition In<TValue>(Expression<Func<T, TValue>> member, params TValue[] values) where TValue : IEquatable<TValue>
 			{
-				return Condition.In(Common.ExpressionUtility.GetMemberName(member), values);
+				return Condition.In(Reflection.ExpressionUtility.GetMemberName(member), values);
 			}
 
 			public static Condition In<TValue>(Expression<Func<T, TValue>> member, IEnumerable<TValue> values) where TValue : IEquatable<TValue>
 			{
-				return Condition.In(Common.ExpressionUtility.GetMemberName(member), values);
+				return Condition.In(Reflection.ExpressionUtility.GetMemberName(member), values);
 			}
 
 			public static Condition NotIn<TValue>(Expression<Func<T, TValue>> member, params TValue[] values) where TValue : IEquatable<TValue>
 			{
-				return Condition.NotIn(Common.ExpressionUtility.GetMemberName(member), values);
+				return Condition.NotIn(Reflection.ExpressionUtility.GetMemberName(member), values);
 			}
 
 			public static Condition NotIn<TValue>(Expression<Func<T, TValue>> member, IEnumerable<TValue> values) where TValue : IEquatable<TValue>
 			{
-				return Condition.NotIn(Common.ExpressionUtility.GetMemberName(member), values);
+				return Condition.NotIn(Reflection.ExpressionUtility.GetMemberName(member), values);
 			}
 			#endregion
 		}

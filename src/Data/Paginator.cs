@@ -42,7 +42,7 @@ namespace Zongsoft.Data
 		#region 公共方法
 		public static IEnumerable<TResult> Map<TSource, TResult>(this IEnumerable<TSource> source, System.Linq.Expressions.Expression<Func<TSource, TResult>> map)
 		{
-			return (IEnumerable<TResult>)Map(source, Common.ExpressionUtility.GetMemberName(map));
+			return (IEnumerable<TResult>)Map(source, Reflection.ExpressionUtility.GetMemberName(map));
 		}
 
 		public static IEnumerable Map<TSource>(this IEnumerable<TSource> source, string path)
@@ -63,7 +63,7 @@ namespace Zongsoft.Data
 				if(entity == null)
 					return null;
 
-				return Zongsoft.Reflection.Reflector.GetValue(entity, path);
+				return Reflection.Reflector.GetValue(entity, path);
 			}
 
 			var elementType = typeof(TSource).GetProperty(path)?.PropertyType ?? typeof(TSource).GetField(path).FieldType;
