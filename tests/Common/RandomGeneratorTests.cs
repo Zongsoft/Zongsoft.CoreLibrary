@@ -19,7 +19,7 @@ namespace Zongsoft.Common.Tests
 			{
 				for(int j = 1; j <= 128; j++)
 				{
-					data[i] = Zongsoft.Common.RandomGenerator.GenerateString(j);
+					data[i] = Zongsoft.Common.Randomizer.GenerateString(j);
 
 					Assert.True(!string.IsNullOrEmpty(data[i]) && data[i].Length == j);
 				}

@@ -1,7 +1,14 @@
 ﻿/*
+ *   _____                                ______
+ *  /_   /  ____  ____  ____  _________  / __/ /_
+ *    / /  / __ \/ __ \/ __ \/ ___/ __ \/ /_/ __/
+ *   / /__/ /_/ / / / / /_/ /\_ \/ /_/ / __/ /_
+ *  /____/\____/_/ /_/\__  /____/\____/_/  \__/
+ *                   /____/
+ *
  * Authors:
- *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
- *   喻星(Xing Yu) <yx@automao.cn>
+ *   钟峰(Popeye Zhong) <zongsoft@qq.com>
+ *   喻星(Xing Yu)      <yx@automao.cn>
  *
  * Copyright (C) 2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
@@ -26,14 +33,19 @@
  */
 
 using System;
-using System.Security.Cryptography;
 
 namespace Zongsoft.Common
 {
-	public static class RandomGenerator
+	/// <summary>
+	/// 提供随机数生成的静态类。
+	/// </summary>
+	public static class Randomizer
 	{
 		#region 常量定义
 		private const string Digits = "0123456789ABCDEFGHJKMNPRSTUVWXYZ";
+		#endregion
+
+		#region 静态字段
 		private static readonly System.Security.Cryptography.RandomNumberGenerator _random = System.Security.Cryptography.RandomNumberGenerator.Create();
 		#endregion
 

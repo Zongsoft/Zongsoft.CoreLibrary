@@ -94,7 +94,7 @@
     <Compile Include="Common\IExecutionResult.cs" />
     <Compile Include="Common\ISequence.cs" />
     <Compile Include="Common\IValidator.cs" />
-    <Compile Include="Common\RandomGenerator.cs" />
+    <Compile Include="Common\Randomizer.cs" />
     <Compile Include="Common\TypeExtension.cs" />
     <Compile Include="Common\Buffer.cs" />
     <Compile Include="Common\UriExtension.cs" />
