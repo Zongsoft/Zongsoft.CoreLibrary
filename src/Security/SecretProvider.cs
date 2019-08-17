@@ -200,7 +200,7 @@ namespace Zongsoft.Security
 		protected virtual string GenerateSecret(string name, string pattern = null)
 		{
 			if(string.IsNullOrWhiteSpace(pattern))
-				return Common.RandomGenerator.GenerateString(6, true);
+				return Common.Randomizer.GenerateString(6, true);
 
 			if(string.Equals(pattern, "guid", StringComparison.OrdinalIgnoreCase) || string.Equals(pattern, "uuid", StringComparison.OrdinalIgnoreCase))
 				return Guid.NewGuid().ToString("N");
@@ -208,7 +208,7 @@ namespace Zongsoft.Security
 			if(pattern.Length > 1 && (pattern[0] == '?' || pattern[0] == '*' || pattern[0] == '#'))
 			{
 				if(int.TryParse(pattern.Substring(1), out var count))
-					return Common.RandomGenerator.GenerateString(count, pattern[0] == '#');
+					return Common.Randomizer.GenerateString(count, pattern[0] == '#');
 
 				throw new ArgumentException("Invalid secret pattern.");
 			}

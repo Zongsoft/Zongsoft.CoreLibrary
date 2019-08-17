@@ -50,16 +50,16 @@ namespace Zongsoft.Text.Evaluation
 			switch(context.Text.ToLowerInvariant())
 			{
 				case "byte":
-					return Zongsoft.Common.RandomGenerator.Generate(1)[0].ToString();
+					return Zongsoft.Common.Randomizer.Generate(1)[0].ToString();
 				case "short":
 				case "int16":
-					return ((ushort)Zongsoft.Common.RandomGenerator.GenerateInt32()).ToString();
+					return ((ushort)Zongsoft.Common.Randomizer.GenerateInt32()).ToString();
 				case "int":
 				case "int32":
-					return ((uint)Zongsoft.Common.RandomGenerator.GenerateInt32()).ToString();
+					return ((uint)Zongsoft.Common.Randomizer.GenerateInt32()).ToString();
 				case "long":
 				case "int64":
-					return ((ulong)Zongsoft.Common.RandomGenerator.GenerateInt64()).ToString();
+					return ((ulong)Zongsoft.Common.Randomizer.GenerateInt64()).ToString();
 				case "guid":
 				case "uuid":
 					return Guid.NewGuid().ToString("n");
@@ -68,7 +68,7 @@ namespace Zongsoft.Text.Evaluation
 			int length;
 
 			if(Zongsoft.Common.Convert.TryConvertValue<int>(context.Text, out length))
-				return Zongsoft.Common.RandomGenerator.GenerateString(Math.Max(length, 1));
+				return Zongsoft.Common.Randomizer.GenerateString(Math.Max(length, 1));
 
 			return this.GetDefaultRandom();
 		}
@@ -77,7 +77,7 @@ namespace Zongsoft.Text.Evaluation
 		#region 私有方法
 		private string GetDefaultRandom()
 		{
-			return Zongsoft.Common.RandomGenerator.GenerateString(6);
+			return Zongsoft.Common.Randomizer.GenerateString(6);
 		}
 		#endregion
 	}

@@ -55,7 +55,7 @@ namespace Zongsoft.Security
 		/// <returns>返回生成的随机口令字符串。</returns>
 		public static string GeneratePassword(int length)
 		{
-			byte[] buffer = Zongsoft.Common.RandomGenerator.Generate(Math.Max(length, 6));
+			byte[] buffer = Zongsoft.Common.Randomizer.Generate(Math.Max(length, 6));
 			char[] password = new char[buffer.Length];
 
 			for(int i = 0; i < buffer.Length; i++)
@@ -83,7 +83,7 @@ namespace Zongsoft.Security
 		/// <returns>散列后的口令值。</returns>
 		public static byte[] HashPassword(string password, out long passwordSalt)
 		{
-			passwordSalt = Zongsoft.Common.RandomGenerator.GenerateInt64();
+			passwordSalt = Zongsoft.Common.Randomizer.GenerateInt64();
 			return HashPassword(password, BitConverter.GetBytes(passwordSalt));
 		}
 
@@ -95,7 +95,7 @@ namespace Zongsoft.Security
 		/// <returns>散列后的口令值。</returns>
 		public static byte[] HashPassword(string password, out byte[] passwordSalt)
 		{
-			passwordSalt = Zongsoft.Common.RandomGenerator.Generate(8);
+			passwordSalt = Zongsoft.Common.Randomizer.Generate(8);
 			return HashPassword(password, passwordSalt);
 		}
 
