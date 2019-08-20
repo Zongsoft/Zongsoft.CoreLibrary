@@ -60,8 +60,8 @@ namespace Zongsoft.Security.Membership
 		/// <param name="namespace">要验证的用户标识所属的命名空间。</param>
 		/// <param name="scene">指定的验证应用场景。</param>
 		/// <param name="parameters">指定的扩展参数集。</param>
-		/// <returns>如果验证成功则返回一个有效的<see cref="AuthenticationResult"/>对象。验证失败会抛出<seealso cref="Zongsoft.Security.Membership.AuthenticationException"/>异常。</returns>
+		/// <returns>如果验证成功则返回一个<see cref="IUserIdentity"/>对象。验证失败会抛出<seealso cref="Zongsoft.Security.Membership.AuthenticationException"/>异常。</returns>
 		/// <exception cref="Zongsoft.Security.Membership.AuthenticationException">当验证失败。</exception>
-		AuthenticationResult Authenticate(string identity, string password, string @namespace, string scene = null, IDictionary<string, object> parameters = null);
+		IUserIdentity Authenticate(string identity, string password, string @namespace, string scene, ref IDictionary<string, object> parameters);
 	}
 }

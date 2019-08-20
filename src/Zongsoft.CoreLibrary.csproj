@@ -385,7 +385,6 @@
     <Compile Include="Security\Membership\IUser.cs" />
     <Compile Include="Security\Membership\Member.cs" />
     <Compile Include="Security\Membership\UserIdentityType.cs" />
-    <Compile Include="Security\Membership\AuthenticationResult.cs" />
     <Compile Include="Security\Membership\AuthorizationAttribute.cs" />
     <Compile Include="Security\Membership\AuthorizationState.cs" />
     <Compile Include="Security\Credential.cs" />
