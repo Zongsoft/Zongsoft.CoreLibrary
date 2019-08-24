@@ -81,13 +81,6 @@ namespace Zongsoft.Security
 		bool Validate(string credentialId);
 
 		/// <summary>
-		/// 获取指定安全凭证号对应的应用编号。
-		/// </summary>
-		/// <param name="credentialId">指定的安全凭证号。</param>
-		/// <returns>返回对应的应用编号，如果为空(null)则表示该凭证号无效。</returns>
-		string GetNamespace(string credentialId);
-
-		/// <summary>
 		/// 获取指定安全凭证编号对应的<see cref="Credential"/>安全凭证对象。
 		/// </summary>
 		/// <param name="credentialId">指定要获取的安全凭证编号。</param>
