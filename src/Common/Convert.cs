@@ -1,8 +1,15 @@
 /*
- * Authors:
- *   钟峰(Popeye Zhong) <9555843@qq.com>
+ *   _____                                ______
+ *  /_   /  ____  ____  ____  _________  / __/ /_
+ *    / /  / __ \/ __ \/ __ \/ ___/ __ \/ /_/ __/
+ *   / /__/ /_/ / / / / /_/ /\_ \/ /_/ / __/ /_
+ *  /____/\____/_/ /_/\__  /____/\____/_/  \__/
+ *                   /____/
  *
- * Copyright (C) 2010-2017 Zongsoft Corporation <http://www.zongsoft.com>
+ * Authors:
+ *   钟峰(Popeye Zhong) <zongsoft@qq.com>
+ *
+ * Copyright (C) 2010-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,60 +32,159 @@
  */
 
 using System;
-using System.Collections;
+using System.Text;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Reflection;
-using System.Text;
 
 namespace Zongsoft.Common
 {
 	public static class Convert
 	{
+		#region 初始化器
+		static Convert()
+		{
+			TypeDescriptor.AddAttributes(typeof(Enum), new Attribute[] { new TypeConverterAttribute(typeof(Zongsoft.ComponentModel.EnumConverter)) });
+			TypeDescriptor.AddAttributes(typeof(Guid), new Attribute[] { new TypeConverterAttribute(typeof(Zongsoft.ComponentModel.GuidConverter)) });
+			TypeDescriptor.AddAttributes(typeof(Encoding), new Attribute[] { new TypeConverterAttribute(typeof(Zongsoft.ComponentModel.EncodingConverter)) });
+			TypeDescriptor.AddAttributes(typeof(System.Net.IPEndPoint), new Attribute[] { new TypeConverterAttribute(typeof(Zongsoft.Communication.IPEndPointConverter)) });
+		}
+		#endregion
+
 		#region 类型转换
 		public static T ConvertValue<T>(object value)
 		{
-			return (T)ConvertValue(value, typeof(T), () => default(T));
+			return (T)ConvertValue(value, typeof(T));
 		}
 
 		public static T ConvertValue<T>(object value, T defaultValue)
 		{
-			return (T)ConvertValue(value, typeof(T), () => defaultValue);
+			return (T)ConvertValue(value, typeof(T), defaultValue);
 		}
 
-		public static T ConvertValue<T>(object value, Func<object> defaultValueThunk)
+		public static T ConvertValue<T>(object value, Func<T> defaultValueThunk)
 		{
-			return (T)ConvertValue(value, typeof(T), defaultValueThunk);
+			if(TryConvertValue(value, typeof(T), out var result))
+				return (T)result;
+
+			if(defaultValueThunk != null)
+				return defaultValueThunk();
+
+			throw new InvalidOperationException($"Unable to convert {value} to {typeof(T)} type.");
+		}
+
+		public static T ConvertValue<T>(object value, Func<TypeConverter> converterFactory)
+		{
+			return (T)ConvertValue(value, typeof(T), converterFactory);
+		}
+
+		public static T ConvertValue<T>(object value, Func<TypeConverter> converterFactory, T defaultValue)
+		{
+			return (T)ConvertValue(value, typeof(T), converterFactory, defaultValue);
+		}
+
+		public static T ConvertValue<T>(object value, Func<TypeConverter> converterFactory, Func<T> defaultValueThunk)
+		{
+			if(TryConvertValue(value, typeof(T), converterFactory, out var result))
+				return (T)result;
+
+			if(defaultValueThunk != null)
+				return defaultValueThunk();
+
+			throw new InvalidOperationException($"Unable to convert {value} to {typeof(T)} type.");
 		}
 
 		public static object ConvertValue(object value, Type conversionType)
 		{
-			return ConvertValue(value, conversionType, () => TypeExtension.GetDefaultValue(conversionType));
+			if(TryConvertValue(value, conversionType, out var result))
+				return result;
+
+			throw new InvalidOperationException($"Unable to convert {value} to {conversionType} type.");
 		}
 
 		public static object ConvertValue(object value, Type conversionType, object defaultValue)
 		{
-			return ConvertValue(value, conversionType, () => defaultValue);
+			return TryConvertValue(value, conversionType, out var result) ? result : defaultValue;
 		}
 
 		public static object ConvertValue(object value, Type conversionType, Func<object> defaultValueThunk)
 		{
-			if(defaultValueThunk == null)
-				throw new ArgumentNullException(nameof(defaultValueThunk));
+			if(TryConvertValue(value, conversionType, out var result))
+				return result;
 
+			if(defaultValueThunk != null)
+				return defaultValueThunk();
+
+			throw new InvalidOperationException($"Unable to convert {value} to {conversionType} type.");
+		}
+
+		public static object ConvertValue(object value, Type conversionType, Func<TypeConverter> converterFactory)
+		{
+			if(TryConvertValue(value, conversionType, converterFactory, out var result))
+				return result;
+
+			throw new InvalidOperationException($"Unable to convert {value} to {conversionType} type.");
+		}
+
+		public static object ConvertValue(object value, Type conversionType, Func<TypeConverter> converterFactory, object defaultValue)
+		{
+			return TryConvertValue(value, conversionType, converterFactory, out var result) ? result : defaultValue;
+		}
+
+		public static object ConvertValue(object value, Type conversionType, Func<TypeConverter> converterFactory, Func<object> defaultValueThunk)
+		{
+			if(TryConvertValue(value, conversionType, converterFactory, out var result))
+				return result;
+
+			if(defaultValueThunk != null)
+				return defaultValueThunk();
+
+			throw new InvalidOperationException($"Unable to convert {value} to {conversionType} type.");
+		}
+
+		public static bool TryConvertValue<T>(object value, out T result)
+		{
+			return TryConvertValue<T>(value, null, out result);
+		}
+
+		public static bool TryConvertValue(object value, Type conversionType, out object result)
+		{
+			return TryConvertValue(value, conversionType, null, out result);
+		}
+
+		public static bool TryConvertValue<T>(object value, Func<TypeConverter> converterFactory, out T result)
+		{
+			if(TryConvertValue(value, typeof(T), converterFactory, out var obj))
+			{
+				result = (T)obj;
+				return true;
+			}
+
+			result = default(T);
+			return false;
+		}
+
+		public static bool TryConvertValue(object value, Type conversionType, Func<TypeConverter> converterFactory, out object result)
+		{
+			result = null;
+
+			//如果转换类型为空，则不进行类型转换处理
 			if(conversionType == null)
-				return value;
+			{
+				result = value;
+				return true;
+			}
 
 			//处理待转换值为空的情况
 			if(value == null || System.Convert.IsDBNull(value))
 			{
 				if(conversionType == typeof(DBNull))
-					return DBNull.Value;
+					result = DBNull.Value;
+				else if(conversionType.IsGenericType && conversionType.GetGenericTypeDefinition() == typeof(Nullable<>))
+					result = null;
+				else
+					result = conversionType.IsValueType ? Activator.CreateInstance(conversionType) : null;
 
-				if(conversionType.IsGenericType && conversionType.GetGenericTypeDefinition() == typeof(Nullable<>))
-					return null;
-
-				return conversionType.IsValueType ? defaultValueThunk() : null;
+				return true;
 			}
 
 			Type type = conversionType;
@@ -86,20 +192,31 @@ namespace Zongsoft.Common
 			if(conversionType.IsGenericType && (!conversionType.IsGenericTypeDefinition) && conversionType.GetGenericTypeDefinition() == typeof(Nullable<>))
 				type = conversionType.GetGenericArguments()[0];
 
+			//处理类型兼容的情况
 			if(type == value.GetType() || type.IsAssignableFrom(value.GetType()))
-				return value;
+			{
+				result = value;
+				return true;
+			}
 
 			try
 			{
 				//获取目标类型的转换器
-				var converter = GetTypeConverter(type);
+				var converter = converterFactory == null ? TypeDescriptor.GetConverter(type) : converterFactory();
 
 				if(converter != null)
 				{
 					if(converter.CanConvertFrom(value.GetType())) //尝试从源类型进行转换
-						return converter.ConvertFrom(value);
-					else if(converter.CanConvertTo(type)) //尝试从目标类型进行转换
-						return converter.ConvertTo(value, type);
+					{
+						result = converter.ConvertFrom(value);
+						return true;
+					}
+
+					if(converter.CanConvertTo(type)) //尝试从目标类型进行转换
+					{
+						result = converter.ConvertTo(value, type);
+						return true;
+					}
 				}
 
 				if(value is string)
@@ -109,77 +226,35 @@ namespace Zongsoft.Common
 					if(method != null && method.IsStatic)
 					{
 						var args = new object[] { value, null };
-						var result = method.Invoke(null, args);
+						var succeed = method.Invoke(null, args);
 
-						if(result.GetType() == typeof(bool))
-							return ((bool)result) ? args[1] : defaultValueThunk();
+						if(succeed.GetType() == typeof(bool))
+						{
+							if((bool)succeed)
+								result = args[1];
+
+							return (bool)succeed;
+						}
 					}
 					else
 					{
 						method = type.GetMethod("Parse", new Type[] { typeof(string) });
 
 						if(method != null && method.IsStatic)
-							return method.Invoke(null, new object[] { value });
+						{
+							result = method.Invoke(null, new object[] { value });
+							return true;
+						}
 					}
 				}
 
-				//处理字典序列化的情况
-				if(typeof(IDictionary).IsAssignableFrom(value.GetType()) && !typeof(IDictionary).IsAssignableFrom(type))
-					return Zongsoft.Runtime.Serialization.DictionarySerializer.Default.Deserialize((IDictionary)value, type);
-
-				return System.Convert.ChangeType(value, type);
+				result = System.Convert.ChangeType(value, type);
+				return true;
 			}
 			catch
 			{
-				return defaultValueThunk();
-			}
-		}
-
-		public static bool TryConvertValue<T>(object value, out T result)
-		{
-			bool b = true;
-
-			result = (T)ConvertValue(value, typeof(T), () =>
-			{
-				b = false;
-				return default(T);
-			});
-
-			return b;
-		}
-
-		public static bool TryConvertValue(object value, Type conversionType, out object result)
-		{
-			result = ConvertValue(value, conversionType, () => typeof(Convert));
-
-			if(object.ReferenceEquals(result, typeof(Convert)))
-			{
-				result = null;
 				return false;
 			}
-
-			return true;
-		}
-		#endregion
-
-		#region 获取转换器
-		private static int _initialized;
-		private static TypeConverter GetTypeConverter(Type type)
-		{
-			if(_initialized == 0)
-			{
-				var initialized = System.Threading.Interlocked.CompareExchange(ref _initialized, 1, 0);
-
-				if(initialized == 0)
-				{
-					TypeDescriptor.AddAttributes(typeof(System.Enum), new Attribute[] { new TypeConverterAttribute(typeof(Zongsoft.ComponentModel.EnumConverter)) });
-					TypeDescriptor.AddAttributes(typeof(System.Guid), new Attribute[] { new TypeConverterAttribute(typeof(Zongsoft.ComponentModel.GuidConverter)) });
-					TypeDescriptor.AddAttributes(typeof(Encoding), new Attribute[] { new TypeConverterAttribute(typeof(Zongsoft.ComponentModel.EncodingConverter)) });
-					TypeDescriptor.AddAttributes(typeof(System.Net.IPEndPoint), new Attribute[] { new TypeConverterAttribute(typeof(Zongsoft.Communication.IPEndPointConverter)) });
-				}
-			}
-
-			return TypeDescriptor.GetConverter(type);
 		}
 		#endregion
 

@@ -15,10 +15,10 @@ namespace Zongsoft.Common.Tests
 		[Fact]
 		public void ConvertValueTest()
 		{
-			Assert.Null(Zongsoft.Common.Convert.ConvertValue<int?>("", () => null));
-			Assert.Null(Zongsoft.Common.Convert.ConvertValue<int?>("x", () => null));
-			Assert.NotNull(Zongsoft.Common.Convert.ConvertValue<int?>("123", () => null));
-			Assert.Equal(123, Zongsoft.Common.Convert.ConvertValue<int?>("123", () => null));
+			Assert.Null(Zongsoft.Common.Convert.ConvertValue<int?>("", default(int?)));
+			Assert.Null(Zongsoft.Common.Convert.ConvertValue<int?>("x", () => default(int?)));
+			Assert.NotNull(Zongsoft.Common.Convert.ConvertValue<int?>("123", () => default(int?)));
+			Assert.Equal(123, Zongsoft.Common.Convert.ConvertValue<int?>("123", () => default(int?)));
 
 			Assert.Equal(123, Zongsoft.Common.Convert.ConvertValue<int>("123"));
 
