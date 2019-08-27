@@ -101,6 +101,14 @@ namespace Zongsoft.Services
 				_contract = value;
 			}
 		}
+
+		/// <summary>
+		/// 获取或设置注入的对象是否不能为空。
+		/// </summary>
+		public bool IsRequired
+		{
+			get; set;
+		}
 		#endregion
 	}
 }
