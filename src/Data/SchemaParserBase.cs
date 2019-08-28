@@ -124,7 +124,6 @@ namespace Zongsoft.Data
 			switch(context.Character)
 			{
 				case '*':
-					//context.Accept();
 					context.State = State.Asterisk;
 					return true;
 				case '!':
@@ -142,7 +141,7 @@ namespace Zongsoft.Data
 						return true;
 					}
 
-					context.OnError("");
+					context.OnError($"SyntaxError: Contains the illegal character '{context.Character}' in the data schema.");
 					return false;
 			}
 		}
@@ -164,7 +163,7 @@ namespace Zongsoft.Data
 					context.State = State.None;
 					return true;
 				default:
-					context.OnError($"Illegal character '{context.Character}' in the schema.");
+					context.OnError($"SyntaxError: Contains the illegal character '{context.Character}' in the data schema.");
 					return false;
 			}
 		}
@@ -188,14 +187,14 @@ namespace Zongsoft.Data
 						//如果首字符是数字，则激发错误
 						if(char.IsDigit(context.Character) && !context.HasBuffer())
 						{
-							context.OnError("");
+							context.OnError("SyntaxError: The identifier of the data schema cannot start with a digit.");
 							return false;
 						}
 
 						//判断标识中间是否含有空白字符
 						if(context.Flags.HasWhitespace())
 						{
-							context.OnError("");
+							context.OnError("SyntaxError: The identifier of the data schema contains whitespace characters.");
 							return false;
 						}
 
@@ -203,7 +202,7 @@ namespace Zongsoft.Data
 					}
 					else if(!context.IsWhitespace())
 					{
-						context.OnError("");
+						context.OnError($"SyntaxError: The identifier of the data schema contains '{context.Character}' illegal character.");
 						return false;
 					}
 
@@ -248,7 +247,7 @@ namespace Zongsoft.Data
 						//判断标识中间是否含有空白字符
 						if(context.Flags.HasWhitespace())
 						{
-							context.OnError("");
+							context.OnError("SyntaxError: The identifier of the data schema contains whitespace characters.");
 							return false;
 						}
 
@@ -256,7 +255,7 @@ namespace Zongsoft.Data
 					}
 					else if(!context.IsWhitespace())
 					{
-						context.OnError("");
+						context.OnError($"SyntaxError: The identifier of the data schema contains '{context.Character}' illegal character.");
 						return false;
 					}
 
@@ -278,7 +277,7 @@ namespace Zongsoft.Data
 				case '?':
 					if(context.HasBuffer())
 					{
-						context.OnError("");
+						context.OnError("SyntaxError: The pagination number format of the data schema is incorrect.");
 						return false;
 					}
 
@@ -288,7 +287,7 @@ namespace Zongsoft.Data
 				case '*':
 					if(context.HasBuffer())
 					{
-						context.OnError("");
+						context.OnError("SyntaxError: The pagination number format of the data schema is incorrect.");
 						return false;
 					}
 
@@ -298,7 +297,7 @@ namespace Zongsoft.Data
 				case '/':
 					if(!context.TryGetBuffer(out buffer))
 					{
-						context.OnError("");
+						context.OnError("SyntaxError: Expected pagination number in the data schema, but missing.");
 						return false;
 					}
 
@@ -309,7 +308,7 @@ namespace Zongsoft.Data
 				case '(':
 					if(!context.TryGetBuffer(out buffer))
 					{
-						context.OnError("");
+						context.OnError("SyntaxError: Expected pagination number in the data schema, but missing.");
 						return false;
 					}
 
@@ -319,7 +318,7 @@ namespace Zongsoft.Data
 				case '{':
 					if(!context.TryGetBuffer(out buffer))
 					{
-						context.OnError("");
+						context.OnError("SyntaxError: Expected pagination number in the data schema, but missing.");
 						return false;
 					}
 
@@ -334,7 +333,7 @@ namespace Zongsoft.Data
 						return true;
 					}
 
-					context.OnError("");
+					context.OnError($"SyntaxError: The pagination number of the data schema contains '{context.Character}' illegal character.");
 					return false;
 			}
 		}
@@ -348,7 +347,7 @@ namespace Zongsoft.Data
 				case '?':
 					if(context.HasBuffer())
 					{
-						context.OnError("");
+						context.OnError("SyntaxError: The pagination size format of the data schema is incorrect.");
 						return false;
 					}
 
@@ -358,7 +357,7 @@ namespace Zongsoft.Data
 				case ',':
 					if(!context.TryGetBuffer(out buffer))
 					{
-						context.OnError("");
+						context.OnError("SyntaxError: Expected pagination size in the data schema, but missing.");
 						return false;
 					}
 
@@ -368,7 +367,7 @@ namespace Zongsoft.Data
 				case '(':
 					if(!context.TryGetBuffer(out buffer))
 					{
-						context.OnError("");
+						context.OnError("SyntaxError: Expected pagination size in the data schema, but missing.");
 						return false;
 					}
 
@@ -380,7 +379,7 @@ namespace Zongsoft.Data
 				case '{':
 					if(!context.TryGetBuffer(out buffer))
 					{
-						context.OnError("");
+						context.OnError("SyntaxError: Expected pagination size in the data schema, but missing.");
 						return false;
 					}
 
@@ -397,7 +396,7 @@ namespace Zongsoft.Data
 						return true;
 					}
 
-					context.OnError("");
+					context.OnError($"SyntaxError: The pagination size of the data schema contains '{context.Character}' illegal character.");
 					return false;
 			}
 		}
@@ -410,7 +409,7 @@ namespace Zongsoft.Data
 				case '!':
 					if(context.HasBuffer())
 					{
-						context.OnError("");
+						context.OnError("SyntaxError: Expected sorting field in the data schema, but missing.");
 						return false;
 					}
 
@@ -439,7 +438,7 @@ namespace Zongsoft.Data
 						return true;
 					}
 
-					context.OnError("");
+					context.OnError($"SyntaxError: The sorting field of the data schema contains '{context.Character}' illegal character.");
 					return false;
 			}
 		}
@@ -456,7 +455,7 @@ namespace Zongsoft.Data
 				return true;
 			}
 
-			context.OnError("");
+			context.OnError($"SyntaxError: Contains the illegal character '{context.Character}' in the data schema.");
 			return false;
 		}
 		#endregion
@@ -582,7 +581,7 @@ namespace Zongsoft.Data
 			{
 				if(_stack == null || _stack.Count == 0)
 				{
-					_onError?.Invoke("");
+					_onError?.Invoke("ParsingError: The parsing stack is empty.");
 					return null;
 				}
 
@@ -677,7 +676,7 @@ namespace Zongsoft.Data
 
 				if(_bufferIndex == 0)
 				{
-					_onError?.Invoke("");
+					_onError?.Invoke("SyntaxError: Expected sorting fields in the data schema, but missing.");
 					return false;
 				}
 
@@ -685,12 +684,12 @@ namespace Zongsoft.Data
 				{
 					if(_buffer[0] == '~' || _buffer[0] == '!')
 					{
-						_onError?.Invoke("");
+						_onError?.Invoke("SyntaxError: Expected sorting descending field in the data schema, but missing.");
 						return false;
 					}
 					else if(char.IsDigit(_buffer[0]))
 					{
-						_onError?.Invoke("");
+						_onError?.Invoke("SyntaxError: The sorting field of the data schema cannot start with a digit.");
 						return false;
 					}
 				}
@@ -738,7 +737,7 @@ namespace Zongsoft.Data
 
 				if(_stack != null && _stack.Count > 0)
 				{
-					_onError?.Invoke("");
+					_onError?.Invoke("SyntaxError: The data schema is empty.");
 					return false;
 				}
 
@@ -761,7 +760,7 @@ namespace Zongsoft.Data
 					case State.PagingCount:
 						if(_bufferIndex == 0)
 						{
-							_onError?.Invoke("");
+							_onError?.Invoke("SyntaxError: Expected pagination number in the data schema, but missing.");
 							return false;
 						}
 
@@ -770,7 +769,7 @@ namespace Zongsoft.Data
 					case State.PagingSize:
 						if(_bufferIndex == 0)
 						{
-							_onError?.Invoke("");
+							_onError?.Invoke("SyntaxError: Expected pagination size in the data schema, but missing.");
 							return false;
 						}
 
@@ -781,7 +780,7 @@ namespace Zongsoft.Data
 
 						break;
 					default:
-						_onError?.Invoke("");
+						_onError?.Invoke($"SyntaxError: The data schema expression is incorrect({State}).");
 						return false;
 				}
 
