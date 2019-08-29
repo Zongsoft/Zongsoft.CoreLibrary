@@ -1054,7 +1054,7 @@ namespace Zongsoft.Data
 			condition = this.OnValidate(Method.Select(), condition);
 
 			//执行查询方法
-			return this.OnSelect<T>(grouping, condition, this.GetSchema(schema, typeof(TEntity)), paging, sortings, state);
+			return this.OnSelect<T>(grouping, condition, string.IsNullOrWhiteSpace(schema) ? null : this.GetSchema(schema, typeof(TEntity)), paging, sortings, state);
 		}
 
 		protected virtual IEnumerable<T> OnSelect<T>(Grouping grouping, ICondition condition, ISchema schema, Paging paging, Sorting[] sortings, object state)

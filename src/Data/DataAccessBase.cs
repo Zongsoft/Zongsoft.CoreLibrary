@@ -1454,7 +1454,7 @@ namespace Zongsoft.Data
 		protected abstract void OnUpdate(DataUpdateContextBase context);
 		#endregion
 
-		#region 查询方法
+		#region 普通查询
 		public IEnumerable<T> Select<T>(object state = null, params Sorting[] sortings)
 		{
 			return this.Select<T>(this.GetName<T>(), null, string.Empty, null, state, sortings, null, null);
@@ -1586,7 +1586,9 @@ namespace Zongsoft.Data
 			//执行查询方法
 			return this.Select<T>(context, selecting, selected);
 		}
+		#endregion
 
+		#region 分组查询
 		public IEnumerable<T> Select<T>(string name, Grouping grouping, params Sorting[] sortings)
 		{
 			return this.Select<T>(name, grouping, null, string.Empty, null, null, sortings, null, null);
@@ -1634,7 +1636,7 @@ namespace Zongsoft.Data
 
 		public IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, string schema, Paging paging, object state, Sorting[] sortings, Func<DataSelectContextBase, bool> selecting, Action<DataSelectContextBase> selected)
 		{
-			return this.Select<T>(name, grouping, condition, this.Schema.Parse(name, schema, typeof(T)), paging, state, sortings, selecting, selected);
+			return this.Select<T>(name, grouping, condition, string.IsNullOrWhiteSpace(schema) ? null : this.Schema.Parse(name, schema, typeof(T)), paging, state, sortings, selecting, selected);
 		}
 
 		public IEnumerable<T> Select<T>(string name, Grouping grouping, ICondition condition, ISchema schema, Paging paging, object state, Sorting[] sortings, Func<DataSelectContextBase, bool> selecting, Action<DataSelectContextBase> selected)
