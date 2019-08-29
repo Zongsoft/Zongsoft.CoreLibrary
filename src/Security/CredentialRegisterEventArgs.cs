@@ -32,86 +32,34 @@ namespace Zongsoft.Security
 	[Serializable]
 	public class CredentialRegisterEventArgs : EventArgs
 	{
-		#region 成员字段
-		private Membership.IUserIdentity _user;
-		private string _scene;
-		private Credential _credential;
-		private IDictionary<string, object> _parameters;
-		#endregion
-
 		#region 构造函数
-		public CredentialRegisterEventArgs(Membership.IUserIdentity user, string scene, IDictionary<string, object> parameters = null)
-		{
-			_user = user ?? throw new ArgumentNullException(nameof(user));
-			_scene = scene;
-			_parameters = parameters;
-		}
-
 		public CredentialRegisterEventArgs(Credential credential)
 		{
-			_credential = credential ?? throw new ArgumentNullException(nameof(credential));
+			this.Credential = credential ?? throw new ArgumentNullException(nameof(credential));
 		}
 		#endregion
 
 		#region 公共属性
 		/// <summary>
-		/// 获取注册的用户对象。
-		/// </summary>
-		public Membership.IUserIdentity User
-		{
-			get
-			{
-				return _user;
-			}
-		}
-
-		/// <summary>
 		/// 获取注册的应用场景。
 		/// </summary>
 		public string Scene
 		{
-			get
-			{
-				return _scene;
-			}
+			get => this.Credential.Scene;
+		}
+
+		/// <summary>
+		/// 获取凭证的有效时长。
+		/// </summary>
+		public TimeSpan Duration
+		{
+			get => this.Credential.Duration;
 		}
 
 		/// <summary>
 		/// 获取或设置注册成功的凭证对象。
 		/// </summary>
-		public Credential Credential
-		{
-			get
-			{
-				return _credential;
-			}
-			set
-			{
-				_credential = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取一个值，指示参数集是否存在并且有值。
-		/// </summary>
-		public bool HasParameters
-		{
-			get
-			{
-				return _parameters != null && _parameters.Count > 0;
-			}
-		}
-
-		/// <summary>
-		/// 获取注册操作传入的参数集。
-		/// </summary>
-		public IDictionary<string, object> Parameters
-		{
-			get
-			{
-				return _parameters;
-			}
-		}
+		public Credential Credential { get; set; }
 		#endregion
 	}
 }

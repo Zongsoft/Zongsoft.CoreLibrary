@@ -7,9 +7,9 @@
  *                   /____/
  *
  * Authors:
- *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
+ *   钟峰(Popeye Zhong) <zongsoft@qq.com>
  *
- * Copyright (C) 2003-2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -54,12 +54,10 @@ namespace Zongsoft.Security
 		event EventHandler<CredentialUnregisterEventArgs> Unregistering;
 
 		/// <summary>
-		/// 为指定的用户注册安全凭证。
+		/// 将指定的凭证对象注册到凭证容器中。
 		/// </summary>
-		/// <param name="user">指定的用户对象。</param>
-		/// <param name="scene">指定的应用场景，通常为“Web”、“Mobile”等。</param>
-		/// <param name="parameters">用户自定义的参数集，该参数集会与凭证一起被持久化到凭证缓存容器中。</param>
-		Credential Register(Membership.IUserIdentity user, string scene, IDictionary<string, object> parameters = null);
+		/// <param name="credential">指定要注册的凭证对象。</param>
+		void Register(Credential credential);
 
 		/// <summary>
 		/// 从安全凭证容器中注销指定的凭证。
@@ -74,13 +72,6 @@ namespace Zongsoft.Security
 		Credential Renew(string credentialId);
 
 		/// <summary>
-		/// 验证指定的安全凭证号是否有效。
-		/// </summary>
-		/// <param name="credentialId">指定的要验证的安全凭证号。</param>
-		/// <returns>如果验证成功则返回真(True)，否则返回假(False)。</returns>
-		bool Validate(string credentialId);
-
-		/// <summary>
 		/// 获取指定安全凭证编号对应的<see cref="Credential"/>安全凭证对象。
 		/// </summary>
 		/// <param name="credentialId">指定要获取的安全凭证编号。</param>
@@ -90,9 +81,9 @@ namespace Zongsoft.Security
 		/// <summary>
 		/// 获取指定用户及应用场景对应的<see cref="Credential"/>安全凭证对象。
 		/// </summary>
-		/// <param name="userId">指定要获取的安全凭证对应的用户编号。</param>
+		/// <param name="identity">指定要获取的安全凭证对应的用户唯一标识。</param>
 		/// <param name="scene">指定要获取的安全凭证对应的应用场景。</param>
 		/// <returns>返回成功的安全凭证对象，如果指定的用户及应用场景不存在对应的安全凭证则返回空(null)。</returns>
-		Credential GetCredential(uint userId, string scene);
+		Credential GetCredential(string identity, string scene);
 	}
 }

@@ -1,8 +1,8 @@
 ﻿/*
  * Authors:
- *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
+ *   钟峰(Popeye Zhong) <zongsoft@qq.com>
  *
- * Copyright (C) 2003-2019 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -32,14 +32,16 @@ namespace Zongsoft.Security
 	/// <summary>
 	/// 表示安全凭证的实体类。
 	/// </summary>
-	[Serializable]
-	public class Credential
+	public class Credential : IEquatable<Credential>
 	{
+		#region 常量定义
+		private static readonly DateTime EPOCH = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+		#endregion
+
 		#region 成员字段
 		private string _credentialId;
 		private string _scene;
-		private DateTime _timestamp;
-		private DateTime _issuedTime;
+		private DateTime _creation;
 		private TimeSpan _duration;
 		private Membership.IUserIdentity _user;
 		private IDictionary<string, object> _parameters;
@@ -47,21 +49,25 @@ namespace Zongsoft.Security
 		#endregion
 
 		#region 构造函数
-		public Credential(string credentialId, Membership.IUserIdentity user, string scene, TimeSpan duration) : this(credentialId, user, scene, duration, DateTime.Now, null)
+		public Credential(Membership.IUserIdentity user, string scene, TimeSpan duration, IDictionary<string, object> parameters = null) : this(null, user, scene, duration, DateTime.UtcNow, parameters)
 		{
 		}
 
-		public Credential(string credentialId, Membership.IUserIdentity user, string scene, TimeSpan duration, DateTime issuedTime, IDictionary<string, object> parameters = null)
+		public Credential(Membership.IUserIdentity user, string scene, TimeSpan duration, DateTime creation, IDictionary<string, object> parameters = null) : this(null, user, scene, duration, creation, parameters)
 		{
-			if(string.IsNullOrWhiteSpace(credentialId))
-				throw new ArgumentNullException(nameof(credentialId));
+		}
 
-			_credentialId = credentialId.Trim();
+		public Credential(string credentialId, Membership.IUserIdentity user, string scene, TimeSpan duration, IDictionary<string, object> parameters = null) : this(credentialId, user, scene, duration, DateTime.UtcNow, parameters)
+		{
+		}
+
+		public Credential(string credentialId, Membership.IUserIdentity user, string scene, TimeSpan duration, DateTime creation, IDictionary<string, object> parameters = null)
+		{
+			_credentialId = string.IsNullOrWhiteSpace(credentialId) ? this.GenerateId() : credentialId.Trim();
 			_user = user ?? throw new ArgumentNullException(nameof(user));
-			_scene = scene == null ? null : scene.Trim();
-			_duration = duration;
-			_issuedTime = issuedTime;
-			_timestamp = issuedTime;
+			_scene = string.IsNullOrWhiteSpace(scene) ? null : scene.Trim().ToLowerInvariant();
+			_duration = duration.TotalSeconds < 60 ? TimeSpan.FromSeconds(60) : duration;
+			_creation = creation.ToUniversalTime();
 
 			if(parameters != null && parameters.Count > 0)
 				_parameters = new Dictionary<string, object>(parameters, StringComparer.OrdinalIgnoreCase);
@@ -89,22 +95,7 @@ namespace Zongsoft.Security
 		}
 
 		/// <summary>
-		/// 获取安全凭证所属的命令空间。
-		/// </summary>
-		[Zongsoft.Runtime.Serialization.SerializationMember(Runtime.Serialization.SerializationMemberBehavior.Ignored)]
-		public string Namespace
-		{
-			get
-			{
-				if(_innerCredential != null)
-					return _innerCredential.Namespace;
-
-				return _user == null ? null : _user.Namespace;
-			}
-		}
-
-		/// <summary>
-		/// 获取安全凭证的应用场景，譬如：Web、Mobile 等。
+		/// 获取安全凭证的应用场景，譬如：Web、Mobile、Wechat、Facebook 等。
 		/// </summary>
 		public string Scene
 		{
@@ -132,42 +123,21 @@ namespace Zongsoft.Security
 		}
 
 		/// <summary>
-		/// 获取或设置安全凭证的最后活动时间。
+		/// 获取安全凭证的签发时间，该值始终为世界时(UTC)。
 		/// </summary>
-		public DateTime Timestamp
+		public DateTime Creation
 		{
 			get
 			{
 				if(_innerCredential != null)
-					return _innerCredential.Timestamp;
+					return _innerCredential.Creation;
 
-				return _timestamp;
-			}
-			set
-			{
-				if(_innerCredential != null)
-					_innerCredential.Timestamp = value;
-				else
-					_timestamp = value;
+				return _creation;
 			}
 		}
 
 		/// <summary>
-		/// 获取安全凭证的签发时间。
-		/// </summary>
-		public DateTime IssuedTime
-		{
-			get
-			{
-				if(_innerCredential != null)
-					return _innerCredential.IssuedTime;
-
-				return _issuedTime;
-			}
-		}
-
-		/// <summary>
-		/// 获取安全凭证的有效期限。
+		/// 获取安全凭证的有效时长，建议不能低于60秒。
 		/// </summary>
 		public TimeSpan Duration
 		{
@@ -177,24 +147,6 @@ namespace Zongsoft.Security
 					return _innerCredential.Duration;
 
 				return _duration;
-			}
-		}
-
-		/// <summary>
-		/// 获取安全凭证的过期时间。
-		/// </summary>
-		/// <remarks>
-		///		<para>该属性始终返回<see cref="Timestamp"/>属性加上<see cref="Duration"/>属性的值。</para>
-		/// </remarks>
-		[Zongsoft.Runtime.Serialization.SerializationMember(Runtime.Serialization.SerializationMemberBehavior.Ignored)]
-		public DateTime Expires
-		{
-			get
-			{
-				if(_innerCredential != null)
-					return _innerCredential.Expires;
-
-				return _timestamp + _duration;
 			}
 		}
 
@@ -243,35 +195,60 @@ namespace Zongsoft.Security
 		}
 		#endregion
 
+		#region 公共方法
+		/// <summary>
+		/// 续约凭证，以当前凭证构建一个新的凭证对象，新凭证除凭证编号和创建时间外其他属性值均相同。
+		/// </summary>
+		/// <returns>返回续约后的新凭证对象。</returns>
+		public virtual Credential Renew()
+		{
+			if(_innerCredential != null)
+				_innerCredential.Renew();
+
+			return new Credential(_user, _scene, _duration, DateTime.UtcNow, _parameters);
+		}
+		#endregion
+
+		#region 私有方法
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		private string GenerateId()
+		{
+			return ((ulong)(DateTime.UtcNow - EPOCH).TotalSeconds).ToString() + Zongsoft.Common.Randomizer.GenerateString(8);
+		}
+		#endregion
+
 		#region 重写方法
+		public bool Equals(Credential other)
+		{
+			if(other == null)
+				return false;
+
+			return string.Equals(other.CredentialId, this.CredentialId);
+		}
+
 		public override bool Equals(object obj)
 		{
 			if(obj == null || obj.GetType() != this.GetType())
 				return false;
 
-			var other = (Credential)obj;
-
-			return string.Equals(this.CredentialId, other.CredentialId, StringComparison.OrdinalIgnoreCase) &&
-				   string.Equals(this.Scene, other.Scene, StringComparison.OrdinalIgnoreCase);
+			return string.Equals(this.CredentialId, ((Credential)obj).CredentialId);
 		}
 
 		public override int GetHashCode()
 		{
-			return (this.CredentialId + ":" + this.Scene).ToLowerInvariant().GetHashCode();
+			return this.CredentialId.GetHashCode();
 		}
 
 		public override string ToString()
 		{
-			var user = this.User;
-			var text = "#" + this.CredentialId.ToString();
+			var text = string.IsNullOrEmpty(this.Scene) ?
+				this.CredentialId :
+				this.CredentialId + "!" + this.Scene;
 
-			if(!string.IsNullOrEmpty(this.Scene))
-				text += ":" + this.Scene;
-
-			if(user == null)
+			if(this.User == null)
 				return text;
-			else
-				return $"{text} [{user.Name}@{user.Namespace}]";
+
+			return text + " {" + this.User.ToString() + "}";
 		}
 		#endregion
 	}
