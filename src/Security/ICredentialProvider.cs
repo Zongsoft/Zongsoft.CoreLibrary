@@ -41,6 +41,7 @@ namespace Zongsoft.Security
 	/// </summary>
 	public interface ICredentialProvider
 	{
+		#region 事件定义
 		/// <summary>表示注册完成事件。</summary>
 		event EventHandler<CredentialRegisterEventArgs> Registered;
 
@@ -52,7 +53,9 @@ namespace Zongsoft.Security
 
 		/// <summary>表示准备注销事件。</summary>
 		event EventHandler<CredentialUnregisterEventArgs> Unregistering;
+		#endregion
 
+		#region 方法定义
 		/// <summary>
 		/// 将指定的凭证对象注册到凭证容器中。
 		/// </summary>
@@ -85,5 +88,6 @@ namespace Zongsoft.Security
 		/// <param name="scene">指定要获取的安全凭证对应的应用场景。</param>
 		/// <returns>返回成功的安全凭证对象，如果指定的用户及应用场景不存在对应的安全凭证则返回空(null)。</returns>
 		Credential GetCredential(string identity, string scene);
+		#endregion
 	}
 }

@@ -34,14 +34,7 @@ namespace Zongsoft.Security.Membership
 	/// </summary>
 	public interface IAuthenticator
 	{
-		/// <summary>
-		/// 获取验证器的名称。
-		/// </summary>
-		string Name
-		{
-			get;
-		}
-
+		#region 事件定义
 		/// <summary>
 		/// 表示验证完成的事件。
 		/// </summary>
@@ -51,7 +44,19 @@ namespace Zongsoft.Security.Membership
 		/// 表示验证开始的事件。
 		/// </summary>
 		event EventHandler<AuthenticationContext> Authenticating;
+		#endregion
 
+		#region 属性定义
+		/// <summary>
+		/// 获取验证器的名称。
+		/// </summary>
+		string Name
+		{
+			get;
+		}
+		#endregion
+
+		#region 方法定义
 		/// <summary>
 		/// 验证指定名称的用户是否有效并且和指定的密码是否完全匹配。
 		/// </summary>
@@ -82,5 +87,6 @@ namespace Zongsoft.Security.Membership
 		/// <param name="identity">要获取的用户标识，仅限用户的“Phone”或“Email”。</param>
 		/// <param name="namespace">指定用户标识所属的命名空间。</param>
 		void Secret(string identity, string @namespace);
+		#endregion
 	}
 }
