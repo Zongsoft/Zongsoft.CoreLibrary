@@ -219,6 +219,11 @@ namespace Zongsoft.Data
 			return null;
 		}
 
+		public static Condition Exists(string name)
+		{
+			return new Condition(name, null, ConditionOperator.Exists);
+		}
+
 		public static Condition In<T>(string name, IEnumerable<T> values) where T : IEquatable<T>
 		{
 			if(values == null)
@@ -523,6 +528,11 @@ namespace Zongsoft.Data
 			public static Condition Between<TValue>(string name, TValue? begin, TValue? end) where TValue : struct, IComparable<TValue>
 			{
 				return Condition.Between<TValue>(name, begin, end);
+			}
+
+			public static Condition Exists(string name)
+			{
+				return Condition.Exists(name);
 			}
 
 			public static Condition In<TValue>(string name, IEnumerable<TValue> values) where TValue : IEquatable<TValue>

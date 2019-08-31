@@ -63,6 +63,9 @@ namespace Zongsoft.Data
 		[Zongsoft.ComponentModel.Alias("~")]
 		Between,
 
+		/// <summary>存在(单目运算符)</summary>
+		Exists,
+
 		/// <summary>范围</summary>
 		[Zongsoft.ComponentModel.Alias("^")]
 		In,
