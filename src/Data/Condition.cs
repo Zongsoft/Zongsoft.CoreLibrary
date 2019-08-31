@@ -216,11 +216,6 @@ namespace Zongsoft.Data
 			return null;
 		}
 
-		public static Condition Exists(string name)
-		{
-			return new Condition(name, null, ConditionOperator.Exists);
-		}
-
 		public static Condition In<T>(string name, IEnumerable<T> values) where T : IEquatable<T>
 		{
 			if(values == null)
@@ -251,6 +246,16 @@ namespace Zongsoft.Data
 				throw new ArgumentNullException("values");
 
 			return new Condition(name, values, ConditionOperator.NotIn);
+		}
+
+		public static Condition Exists(string name)
+		{
+			return new Condition(name, null, ConditionOperator.Exists);
+		}
+
+		public static Condition NotExists(string name)
+		{
+			return new Condition(name, null, ConditionOperator.NotExists);
 		}
 
 		public static bool GetBetween(Condition condition, out object begin, out object end)
@@ -527,11 +532,6 @@ namespace Zongsoft.Data
 				return Condition.Between<TValue>(name, begin, end);
 			}
 
-			public static Condition Exists(string name)
-			{
-				return Condition.Exists(name);
-			}
-
 			public static Condition In<TValue>(string name, IEnumerable<TValue> values) where TValue : IEquatable<TValue>
 			{
 				return Condition.In<TValue>(name, values);
@@ -550,6 +550,16 @@ namespace Zongsoft.Data
 			public static Condition NotIn<TValue>(string name, params TValue[] values) where TValue : IEquatable<TValue>
 			{
 				return Condition.NotIn<TValue>(name, values);
+			}
+
+			public static Condition Exists(string name)
+			{
+				return Condition.Exists(name);
+			}
+
+			public static Condition NotExists(string name)
+			{
+				return Condition.NotExists(name);
 			}
 			#endregion
 
