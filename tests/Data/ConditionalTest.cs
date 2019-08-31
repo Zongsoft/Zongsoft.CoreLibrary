@@ -10,7 +10,7 @@ namespace Zongsoft.Data
 		[Fact]
 		public void Test()
 		{
-			var conditional = Entity.Build<IDummyConditional>();
+			var conditional = Model.Build<IDummyConditional>();
 
 			Assert.Null(conditional.CorporationId);
 			Assert.Null(conditional.DepartmentId);

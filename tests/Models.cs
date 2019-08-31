@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Tests
 {
-	public interface IPerson : Zongsoft.Data.IEntity
+	public interface IPerson : Zongsoft.Data.IModel
 	{
 		/// <summary>
 		/// 获取或设置人员姓名。
@@ -766,22 +766,22 @@ namespace Zongsoft.Tests
 		{
 		}
 
-		bool Zongsoft.Data.IEntity.HasChanges(params string[] names)
+		bool Zongsoft.Data.IModel.HasChanges(params string[] names)
 		{
 			return this.HasChanges(names);
 		}
 
-		IDictionary<string, object> Zongsoft.Data.IEntity.GetChanges()
+		IDictionary<string, object> Zongsoft.Data.IModel.GetChanges()
 		{
 			return this.GetChanges();
 		}
 
-		bool Zongsoft.Data.IEntity.TryGetValue(string name, out object value)
+		bool Zongsoft.Data.IModel.TryGetValue(string name, out object value)
 		{
 			return this.TryGetValue(name, out value);
 		}
 
-		bool Zongsoft.Data.IEntity.TrySetValue(string name, object value)
+		bool Zongsoft.Data.IModel.TrySetValue(string name, object value)
 		{
 			return this.TrySetValue(name, value);
 		}
@@ -1923,7 +1923,7 @@ namespace Zongsoft.Tests
 		{
 		}
 
-		bool Zongsoft.Data.IEntity.HasChanges(params string[] names)
+		bool Zongsoft.Data.IModel.HasChanges(params string[] names)
 		{
 			PropertyToken<SpecialEmployee> property;
 
@@ -1947,7 +1947,7 @@ namespace Zongsoft.Tests
 			return false;
 		}
 
-		IDictionary<string, object> Zongsoft.Data.IEntity.GetChanges()
+		IDictionary<string, object> Zongsoft.Data.IModel.GetChanges()
 		{
 			var dictionary = new Dictionary<string, object>(__NAMES__.Length);
 
@@ -1962,7 +1962,7 @@ namespace Zongsoft.Tests
 			return dictionary.Count == 0 ? null : dictionary;
 		}
 
-		bool Zongsoft.Data.IEntity.TryGetValue(string name, out object value)
+		bool Zongsoft.Data.IModel.TryGetValue(string name, out object value)
 		{
 			value = null;
 
@@ -1975,7 +1975,7 @@ namespace Zongsoft.Tests
 			return false;
 		}
 
-		bool Zongsoft.Data.IEntity.TrySetValue(string name, object value)
+		bool Zongsoft.Data.IModel.TrySetValue(string name, object value)
 		{
 			if(__TOKENS__.TryGetValue(name, out var property) && property.Setter != null)
 			{

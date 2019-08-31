@@ -52,8 +52,8 @@ namespace Zongsoft.Data
 
 			switch(data)
 			{
-				case IEntity entity:
-					return new EntityDictionary(entity);
+				case IModel model:
+					return new ModelDictionary(model);
 				case IDataDictionary dictionary:
 					return dictionary;
 				case IDictionary<string, object> dictionary:
@@ -65,12 +65,12 @@ namespace Zongsoft.Data
 			return new ObjectDictionary(data);
 		}
 
-		public static IDataDictionary GetDictionary(IEntity entity)
+		public static IDataDictionary GetDictionary(IModel model)
 		{
-			if(entity == null)
-				throw new ArgumentNullException(nameof(entity));
+			if(model == null)
+				throw new ArgumentNullException(nameof(model));
 
-			return new EntityDictionary(entity);
+			return new ModelDictionary(model);
 		}
 
 		public static IDataDictionary<T> GetDictionary<T>(object data)
@@ -80,8 +80,8 @@ namespace Zongsoft.Data
 
 			switch(data)
 			{
-				case IEntity entity:
-					return new EntityDictionary<T>(entity);
+				case IModel model:
+					return new ModelDictionary<T>(model);
 				case IDataDictionary<T> dictionary:
 					return dictionary;
 				case IDataDictionary dictionary:
@@ -95,12 +95,12 @@ namespace Zongsoft.Data
 			return new ObjectDictionary<T>(data);
 		}
 
-		public static IDataDictionary<T> GetDictionary<T>(IEntity entity)
+		public static IDataDictionary<T> GetDictionary<T>(IModel model)
 		{
-			if(entity == null)
-				throw new ArgumentNullException(nameof(entity));
+			if(model == null)
+				throw new ArgumentNullException(nameof(model));
 
-			return new EntityDictionary<T>(entity);
+			return new ModelDictionary<T>(model);
 		}
 
 		public static IEnumerable<IDataDictionary> GetDictionaries(IEnumerable items)
@@ -115,15 +115,15 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public static IEnumerable<IDataDictionary> GetDictionaries(IEnumerable<IEntity> entities)
+		public static IEnumerable<IDataDictionary> GetDictionaries(IEnumerable<IModel> models)
 		{
-			if(entities == null)
-				throw new ArgumentNullException(nameof(entities));
+			if(models == null)
+				throw new ArgumentNullException(nameof(models));
 
-			foreach(var entity in entities)
+			foreach(var model in models)
 			{
-				if(entity != null)
-					yield return GetDictionary(entity);
+				if(model != null)
+					yield return GetDictionary(model);
 			}
 		}
 
@@ -139,15 +139,15 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public static IEnumerable<IDataDictionary<T>> GetDictionaries<T>(IEnumerable<IEntity> entities)
+		public static IEnumerable<IDataDictionary<T>> GetDictionaries<T>(IEnumerable<IModel> models)
 		{
-			if(entities == null)
-				throw new ArgumentNullException(nameof(entities));
+			if(models == null)
+				throw new ArgumentNullException(nameof(models));
 
-			foreach(var entity in entities)
+			foreach(var model in models)
 			{
-				if(entity != null)
-					yield return GetDictionary<T>(entity);
+				if(model != null)
+					yield return GetDictionary<T>(model);
 			}
 		}
 		#endregion
@@ -1637,20 +1637,20 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
-	internal class EntityDictionary : IDataDictionary
+	internal class ModelDictionary : IDataDictionary
 	{
 		#region 私有常量
-		private const string KEYNOTFOUND_EXCEPTION_MESSAGE = "The specified '{0}' key does not exist in the entity dictionary.";
+		private const string KEYNOTFOUND_EXCEPTION_MESSAGE = "The specified '{0}' key does not exist in the model dictionary.";
 		#endregion
 
 		#region 成员字段
-		private readonly IEntity _entity;
+		private readonly IModel _model;
 		#endregion
 
 		#region 构造函数
-		public EntityDictionary(IEntity entity)
+		public ModelDictionary(IModel model)
 		{
-			_entity = entity ?? throw new ArgumentNullException(nameof(entity));
+			_model = model ?? throw new ArgumentNullException(nameof(model));
 		}
 		#endregion
 
@@ -1659,7 +1659,7 @@ namespace Zongsoft.Data
 		{
 			get
 			{
-				return _entity;
+				return _model;
 			}
 		}
 
@@ -1667,7 +1667,7 @@ namespace Zongsoft.Data
 		{
 			get
 			{
-				return _entity.Count();
+				return _model.Count();
 			}
 		}
 
@@ -1687,7 +1687,7 @@ namespace Zongsoft.Data
 		{
 			get
 			{
-				return _entity.GetChanges().Keys;
+				return _model.GetChanges().Keys;
 			}
 		}
 
@@ -1695,7 +1695,7 @@ namespace Zongsoft.Data
 		{
 			get
 			{
-				return _entity.GetChanges().Values;
+				return _model.GetChanges().Values;
 			}
 		}
 		#endregion
@@ -1703,27 +1703,27 @@ namespace Zongsoft.Data
 		#region 公共方法
 		public bool Contains(string name)
 		{
-			return _entity.HasChanges(name);
+			return _model.HasChanges(name);
 		}
 
 		public bool HasChanges(params string[] names)
 		{
-			return _entity.HasChanges(names);
+			return _model.HasChanges(names);
 		}
 
 		public bool Reset(string name, out object value)
 		{
-			return _entity.Reset(name, out value);
+			return _model.Reset(name, out value);
 		}
 
 		public void Reset(params string[] names)
 		{
-			_entity.Reset(names);
+			_model.Reset(names);
 		}
 
 		public object GetValue(string name)
 		{
-			if(_entity.TryGetValue(name, out var value))
+			if(_model.TryGetValue(name, out var value))
 				return value;
 
 			throw new KeyNotFoundException(string.Format(KEYNOTFOUND_EXCEPTION_MESSAGE, name));
@@ -1731,7 +1731,7 @@ namespace Zongsoft.Data
 
 		public TValue GetValue<TValue>(string name, TValue defaultValue)
 		{
-			if(_entity.TryGetValue(name, out var value))
+			if(_model.TryGetValue(name, out var value))
 				return Zongsoft.Common.Convert.ConvertValue<TValue>(value);
 
 			return defaultValue;
@@ -1749,19 +1749,19 @@ namespace Zongsoft.Data
 
 			if(predicate != null)
 			{
-				_entity.TryGetValue(name, out var raw);
+				_model.TryGetValue(name, out var raw);
 
 				if(!predicate(raw == null ? default(TValue) : (typeof(TValue).IsPrimitive ? (TValue)Convert.ChangeType(raw, typeof(TValue)) : (TValue)raw)))
 					return;
 			}
 
-			if(!_entity.TrySetValue(name, valueFactory()))
+			if(!_model.TrySetValue(name, valueFactory()))
 				throw new KeyNotFoundException(string.Format(KEYNOTFOUND_EXCEPTION_MESSAGE, name));
 		}
 
 		public bool TryGetValue<TValue>(string name, out TValue value)
 		{
-			if(_entity.TryGetValue(name, out var obj))
+			if(_model.TryGetValue(name, out var obj))
 			{
 				value = Common.Convert.ConvertValue<TValue>(obj);
 				return true;
@@ -1773,7 +1773,7 @@ namespace Zongsoft.Data
 
 		public bool TryGetValue<TValue>(string name, Action<TValue> got)
 		{
-			if(_entity.TryGetValue(name, out var value))
+			if(_model.TryGetValue(name, out var value))
 			{
 				got?.Invoke(Common.Convert.ConvertValue<TValue>(value));
 				return true;
@@ -1794,13 +1794,13 @@ namespace Zongsoft.Data
 
 			if(predicate != null)
 			{
-				_entity.TryGetValue(name, out var raw);
+				_model.TryGetValue(name, out var raw);
 
 				if(!predicate(raw == null ? default(TValue) : (typeof(TValue).IsPrimitive ? (TValue)Convert.ChangeType(raw, typeof(TValue)) : (TValue)raw)))
 					return false;
 			}
 
-			return _entity.TrySetValue(name, valueFactory());
+			return _model.TrySetValue(name, valueFactory());
 		}
 		#endregion
 
@@ -1849,7 +1849,7 @@ namespace Zongsoft.Data
 		{
 			get
 			{
-				return _entity.Count();
+				return _model.Count();
 			}
 		}
 
@@ -1904,7 +1904,7 @@ namespace Zongsoft.Data
 
 		void IDictionary.Clear()
 		{
-			_entity.Reset();
+			_model.Reset();
 		}
 
 		void IDictionary.Remove(object key)
@@ -1912,7 +1912,7 @@ namespace Zongsoft.Data
 			if(key == null)
 				return;
 
-			_entity.Reset(key.ToString());
+			_model.Reset(key.ToString());
 		}
 
 		void ICollection.CopyTo(Array array, int arrayIndex)
@@ -1933,7 +1933,7 @@ namespace Zongsoft.Data
 
 		bool IDictionary<string, object>.ContainsKey(string key)
 		{
-			return _entity.HasChanges(key);
+			return _model.HasChanges(key);
 		}
 
 		void IDictionary<string, object>.Add(string key, object value)
@@ -1943,12 +1943,12 @@ namespace Zongsoft.Data
 
 		bool IDictionary<string, object>.Remove(string key)
 		{
-			return _entity.Reset(key, out _);
+			return _model.Reset(key, out _);
 		}
 
 		bool IDictionary<string, object>.TryGetValue(string key, out object value)
 		{
-			return _entity.TryGetValue(key, out value);
+			return _model.TryGetValue(key, out value);
 		}
 
 		void ICollection<KeyValuePair<string, object>>.Add(KeyValuePair<string, object> item)
@@ -1958,7 +1958,7 @@ namespace Zongsoft.Data
 
 		void ICollection<KeyValuePair<string, object>>.Clear()
 		{
-			_entity.Reset();
+			_model.Reset();
 		}
 
 		bool ICollection<KeyValuePair<string, object>>.Contains(KeyValuePair<string, object> item)
@@ -1966,7 +1966,7 @@ namespace Zongsoft.Data
 			if(item.Key == null)
 				return false;
 
-			return _entity.HasChanges(item.Key);
+			return _model.HasChanges(item.Key);
 		}
 
 		void ICollection<KeyValuePair<string, object>>.CopyTo(KeyValuePair<string, object>[] array, int arrayIndex)
@@ -1987,12 +1987,12 @@ namespace Zongsoft.Data
 
 		bool ICollection<KeyValuePair<string, object>>.Remove(KeyValuePair<string, object> item)
 		{
-			return _entity.Reset(item.Key, out _);
+			return _model.Reset(item.Key, out _);
 		}
 
 		public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
 		{
-			var items = _entity.GetChanges();
+			var items = _model.GetChanges();
 
 			if(items == null)
 				return System.Linq.Enumerable.Empty<KeyValuePair<string, object>>().GetEnumerator();
@@ -2017,10 +2017,10 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
-	internal class EntityDictionary<T> : EntityDictionary, IDataDictionary<T>
+	internal class ModelDictionary<T> : ModelDictionary, IDataDictionary<T>
 	{
 		#region 构造函数
-		public EntityDictionary(IEntity entity) : base(entity)
+		public ModelDictionary(IModel model) : base(model)
 		{
 		}
 		#endregion

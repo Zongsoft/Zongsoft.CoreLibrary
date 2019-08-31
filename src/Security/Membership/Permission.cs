@@ -29,7 +29,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Security.Membership
 {
-	[Zongsoft.Data.Entity("Security.Permission")]
+	[Zongsoft.Data.Model("Security.Permission")]
 	public struct Permission : IEquatable<Permission>
 	{
 		#region 成员变量

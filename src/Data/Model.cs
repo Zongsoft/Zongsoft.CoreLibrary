@@ -43,12 +43,12 @@ using System.Collections.Generic;
 namespace Zongsoft.Data
 {
 	/// <summary>
-	/// 提供 <see cref="IEntity"/> 数据实体的动态编译及构建的静态类。
+	/// 提供 <see cref="IModel"/> 数据实体或其他模型的动态编译及构建的静态类。
 	/// </summary>
-	public static class Entity
+	public static class Model
 	{
 		#region 常量定义
-		private const string ASSEMBLY_NAME = "Zongsoft.Dynamics.Entities";
+		private const string ASSEMBLY_NAME = "Zongsoft.Dynamics.Models";
 
 		private const string MASK_VARIABLE = "$MASK$";
 		private const string PROPERTY_NAMES_VARIABLE = "$$PROPERTY_NAMES";
@@ -157,13 +157,13 @@ namespace Zongsoft.Data
 				return creator;
 
 			if(!type.IsInterface)
-				throw new ArgumentException($"The '{type.FullName}' type must be an interface.");
+				throw new ArgumentException($"The '{type.FullName}' model type must be an interface.");
 
 			if(type.GetEvents().Length > 0)
-				throw new ArgumentException($"The '{type.FullName}' interface cannot define any events.");
+				throw new ArgumentException($"The '{type.FullName}' model interface cannot define any events.");
 
 			if(type.GetMethods().Length > type.GetProperties().Length * 2)
-				throw new ArgumentException($"The '{type.FullName}' interface cannot define any methods.");
+				throw new ArgumentException($"The '{type.FullName}' model interface cannot define any methods.");
 
 			try
 			{
@@ -201,7 +201,7 @@ namespace Zongsoft.Data
 
 			//添加类型的实现接口声明
 			builder.AddInterfaceImplementation(type);
-			builder.AddInterfaceImplementation(typeof(IEntity));
+			builder.AddInterfaceImplementation(typeof(IModel));
 
 			//添加所有接口实现声明，并获取各接口的属性集，以及确认生成“INotifyPropertyChanged”接口
 			var properties = MakeInterfaces(type, builder, out var propertyChanged);
@@ -1035,13 +1035,13 @@ namespace Zongsoft.Data
 
 		private static void GenerateCountMethod(TypeBuilder builder, FieldBuilder mask, int count)
 		{
-			var method = builder.DefineMethod(typeof(Zongsoft.Data.IEntity).FullName + "." + nameof(IEntity.Count),
+			var method = builder.DefineMethod(typeof(Zongsoft.Data.IModel).FullName + "." + nameof(IModel.Count),
 				MethodAttributes.Private | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.NewSlot,
 				typeof(int),
 				Type.EmptyTypes);
 
 			//添加方法的实现标记
-			builder.DefineMethodOverride(method, typeof(Zongsoft.Data.IEntity).GetMethod(nameof(IEntity.Count)));
+			builder.DefineMethodOverride(method, typeof(Zongsoft.Data.IModel).GetMethod(nameof(IModel.Count)));
 
 			//获取代码生成器
 			var generator = method.GetILGenerator();
@@ -1163,13 +1163,13 @@ namespace Zongsoft.Data
 
 		private static void GenerateResetMethod(TypeBuilder builder, FieldBuilder mask, FieldBuilder tokens)
 		{
-			var method = builder.DefineMethod(typeof(Zongsoft.Data.IEntity).FullName + "." + nameof(IEntity.Reset),
+			var method = builder.DefineMethod(typeof(Zongsoft.Data.IModel).FullName + "." + nameof(IModel.Reset),
 				MethodAttributes.Private | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.NewSlot,
 				typeof(bool),
 				new Type[] { typeof(string), typeof(object).MakeByRefType() });
 
 			//添加方法的实现标记
-			builder.DefineMethodOverride(method, typeof(Zongsoft.Data.IEntity).GetMethod(nameof(IEntity.Reset), new[] { typeof(string), typeof(object).MakeByRefType() }));
+			builder.DefineMethodOverride(method, typeof(Zongsoft.Data.IModel).GetMethod(nameof(IModel.Reset), new[] { typeof(string), typeof(object).MakeByRefType() }));
 
 			//定义方法参数
 			method.DefineParameter(1, ParameterAttributes.None, "name");
@@ -1328,13 +1328,13 @@ namespace Zongsoft.Data
 
 		private static void GenerateResetManyMethod(TypeBuilder builder, FieldBuilder mask, FieldBuilder tokens)
 		{
-			var method = builder.DefineMethod(typeof(Zongsoft.Data.IEntity).FullName + "." + nameof(IEntity.Reset),
+			var method = builder.DefineMethod(typeof(Zongsoft.Data.IModel).FullName + "." + nameof(IModel.Reset),
 				MethodAttributes.Private | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.NewSlot,
 				null,
 				new Type[] { typeof(string[]) });
 
 			//添加方法的实现标记
-			builder.DefineMethodOverride(method, typeof(Zongsoft.Data.IEntity).GetMethod(nameof(IEntity.Reset), new[] { typeof(string[]) }));
+			builder.DefineMethodOverride(method, typeof(Zongsoft.Data.IModel).GetMethod(nameof(IModel.Reset), new[] { typeof(string[]) }));
 
 			//定义方法参数
 			method.DefineParameter(1, ParameterAttributes.None, "names").SetCustomAttribute(typeof(ParamArrayAttribute).GetConstructor(Type.EmptyTypes), new byte[0]);
@@ -1532,13 +1532,13 @@ namespace Zongsoft.Data
 
 		private static void GenerateHasChangesMethod(TypeBuilder builder, FieldBuilder mask, FieldBuilder names, FieldBuilder tokens)
 		{
-			var method = builder.DefineMethod(typeof(Zongsoft.Data.IEntity).FullName + "." + nameof(IEntity.HasChanges),
+			var method = builder.DefineMethod(typeof(Zongsoft.Data.IModel).FullName + "." + nameof(IModel.HasChanges),
 				MethodAttributes.Private | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.NewSlot,
 				typeof(bool),
 				new Type[] { typeof(string[]) });
 
 			//添加方法的实现标记
-			builder.DefineMethodOverride(method, typeof(Zongsoft.Data.IEntity).GetMethod(nameof(IEntity.HasChanges)));
+			builder.DefineMethodOverride(method, typeof(Zongsoft.Data.IModel).GetMethod(nameof(IModel.HasChanges)));
 
 			//定义方法参数
 			method.DefineParameter(1, ParameterAttributes.None, "names");
@@ -1719,13 +1719,13 @@ namespace Zongsoft.Data
 
 		private static void GenerateGetChangesMethod(TypeBuilder builder, FieldBuilder mask, FieldBuilder names, FieldBuilder tokens)
 		{
-			var method = builder.DefineMethod(typeof(Zongsoft.Data.IEntity).FullName + "." + nameof(IEntity.GetChanges),
+			var method = builder.DefineMethod(typeof(Zongsoft.Data.IModel).FullName + "." + nameof(IModel.GetChanges),
 				MethodAttributes.Private | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.NewSlot,
 				typeof(IDictionary<string, object>),
 				Type.EmptyTypes);
 
 			//添加方法的实现标记
-			builder.DefineMethodOverride(method, typeof(Zongsoft.Data.IEntity).GetMethod(nameof(IEntity.GetChanges)));
+			builder.DefineMethodOverride(method, typeof(Zongsoft.Data.IModel).GetMethod(nameof(IModel.GetChanges)));
 
 			//获取代码生成器
 			var generator = method.GetILGenerator();
@@ -1864,13 +1864,13 @@ namespace Zongsoft.Data
 
 		private static void GenerateTryGetValueMethod(TypeBuilder builder, FieldBuilder mask, FieldBuilder tokens)
 		{
-			var method = builder.DefineMethod(typeof(Zongsoft.Data.IEntity).FullName + "." + nameof(IEntity.TryGetValue),
+			var method = builder.DefineMethod(typeof(Zongsoft.Data.IModel).FullName + "." + nameof(IModel.TryGetValue),
 				MethodAttributes.Private | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.NewSlot,
 				typeof(bool),
 				new Type[] { typeof(string), typeof(object).MakeByRefType() });
 
 			//添加方法的实现标记
-			builder.DefineMethodOverride(method, typeof(Zongsoft.Data.IEntity).GetMethod(nameof(IEntity.TryGetValue)));
+			builder.DefineMethodOverride(method, typeof(Zongsoft.Data.IModel).GetMethod(nameof(IModel.TryGetValue)));
 
 			//定义方法参数
 			method.DefineParameter(1, ParameterAttributes.None, "name");
@@ -1965,13 +1965,13 @@ namespace Zongsoft.Data
 
 		private static void GenerateTrySetValueMethod(TypeBuilder builder, FieldBuilder tokens)
 		{
-			var method = builder.DefineMethod(typeof(Zongsoft.Data.IEntity).FullName + "." + nameof(IEntity.TrySetValue),
+			var method = builder.DefineMethod(typeof(Zongsoft.Data.IModel).FullName + "." + nameof(IModel.TrySetValue),
 				MethodAttributes.Private | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.NewSlot,
 				typeof(bool),
 				new Type[] { typeof(string), typeof(object) });
 
 			//添加方法的实现标记
-			builder.DefineMethodOverride(method, typeof(Zongsoft.Data.IEntity).GetMethod(nameof(IEntity.TrySetValue)));
+			builder.DefineMethodOverride(method, typeof(Zongsoft.Data.IModel).GetMethod(nameof(IModel.TrySetValue)));
 
 			//定义方法参数
 			method.DefineParameter(1, ParameterAttributes.None, "name");

@@ -37,9 +37,9 @@ using System.Collections.Generic;
 namespace Zongsoft.Data
 {
 	/// <summary>
-	/// 表示数据实体的接口。
+	/// 表示数据实体或业务模型的接口。
 	/// </summary>
-	public interface IEntity
+	public interface IModel
 	{
 		/// <summary>
 		/// 获取实体中变更的属性数。

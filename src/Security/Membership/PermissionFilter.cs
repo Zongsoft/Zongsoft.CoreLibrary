@@ -28,7 +28,7 @@ using System;
 
 namespace Zongsoft.Security.Membership
 {
-	[Zongsoft.Data.Entity("Security.PermissionFilter")]
+	[Zongsoft.Data.Model("Security.PermissionFilter")]
 	public struct PermissionFilter : IEquatable<PermissionFilter>
 	{
 		#region 成员变量

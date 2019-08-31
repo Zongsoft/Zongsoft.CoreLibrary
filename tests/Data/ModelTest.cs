@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Zongsoft.Data
 {
-	public class EntityTest
+	public class ModelTest
 	{
 		#region 常量定义
 		private static readonly string NOTEXISTS = "NotExists!";
@@ -26,7 +26,7 @@ namespace Zongsoft.Data
 		public void TestPerson()
 		{
 			// Dynamically build an instance of the IPerson interface.
-			var person = Entity.Build<Zongsoft.Tests.IPerson>();
+			var person = Model.Build<Zongsoft.Tests.IPerson>();
 			Assert.NotNull(person);
 			this.TestPerson(person);
 		}
@@ -35,7 +35,7 @@ namespace Zongsoft.Data
 		public void TestEmployee()
 		{
 			// Dynamically build an instance of the IEmployee interface.
-			var employee = Entity.Build<Zongsoft.Tests.IEmployee>();
+			var employee = Model.Build<Zongsoft.Tests.IEmployee>();
 			Assert.NotNull(employee);
 			this.TestEmployee(employee);
 		}
@@ -44,7 +44,7 @@ namespace Zongsoft.Data
 		public void TestCustomer()
 		{
 			// Dynamically build an instance of the ICustomer interface.
-			var customer = Entity.Build<Zongsoft.Tests.ICustomer>();
+			var customer = Model.Build<Zongsoft.Tests.ICustomer>();
 			Assert.NotNull(customer);
 			this.TestCustomer(customer);
 		}
@@ -53,7 +53,7 @@ namespace Zongsoft.Data
 		public void TestSpecialEmployee()
 		{
 			// Dynamically build an instance of the ISpecialEmployee interface.
-			var special = Entity.Build<Zongsoft.Tests.ISpecialEmployee>();
+			var special = Model.Build<Zongsoft.Tests.ISpecialEmployee>();
 			Assert.NotNull(special);
 			this.TestSpecialEmployee(special);
 		}

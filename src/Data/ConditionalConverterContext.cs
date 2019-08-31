@@ -32,7 +32,7 @@ namespace Zongsoft.Data
 	public class ConditionalConverterContext
 	{
 		#region 成员字段
-		private IEntity _conditional;
+		private IModel _conditional;
 		private ConditionalBehaviors _behaviors;
 		private string[] _names;
 		private Type _type;
@@ -41,7 +41,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public ConditionalConverterContext(IEntity conditional, ConditionalBehaviors behaviors, string[] names, Type type, object value, ConditionOperator? @operator = null)
+		public ConditionalConverterContext(IModel conditional, ConditionalBehaviors behaviors, string[] names, Type type, object value, ConditionOperator? @operator = null)
 		{
 			if(conditional == null)
 				throw new ArgumentNullException("conditional");
@@ -62,7 +62,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 公共属性
-		public IEntity Conditional
+		public IModel Conditional
 		{
 			get
 			{

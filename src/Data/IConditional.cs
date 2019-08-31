@@ -32,7 +32,7 @@ namespace Zongsoft.Data
 	/// 表示条件设置实体的接口。
 	/// </summary>
 	[Obsolete]
-	public interface IConditional : IEntity
+	public interface IConditional : IModel
 	{
 		/// <summary>
 		/// 获取或设置条件的组合方式。

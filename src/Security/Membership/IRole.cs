@@ -39,7 +39,7 @@ namespace Zongsoft.Security.Membership
 	/// <summary>
 	/// 表示权限系统角色的实体接口。
 	/// </summary>
-	[Zongsoft.Data.Entity("Security.Role")]
+	[Zongsoft.Data.Model("Security.Role")]
 	public interface IRole
 	{
 		/// <summary>

@@ -38,7 +38,7 @@ namespace Zongsoft.Security.Membership
 	/// <summary>
 	/// 表示权限系统用户实体的接口。
 	/// </summary>
-	[Zongsoft.Data.Entity("Security.User")]
+	[Zongsoft.Data.Model("Security.User")]
 	public interface IUser : IUserIdentity
 	{
 		/// <summary>

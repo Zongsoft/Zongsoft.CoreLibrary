@@ -130,7 +130,7 @@ namespace Zongsoft.Data
 
 			foreach(var attribute in type.CustomAttributes)
 			{
-				if(attribute.AttributeType == typeof(EntityAttribute))
+				if(attribute.AttributeType == typeof(ModelAttribute))
 				{
 					switch(attribute.ConstructorArguments.Count)
 					{
