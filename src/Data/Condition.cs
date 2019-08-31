@@ -1,8 +1,15 @@
 ﻿/*
- * Authors:
- *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
+ *   _____                                ______
+ *  /_   /  ____  ____  ____  _________  / __/ /_
+ *    / /  / __ \/ __ \/ __ \/ ___/ __ \/ /_/ __/
+ *   / /__/ /_/ / / / / /_/ /\_ \/ /_/ / __/ /_
+ *  /____/\____/_/ /_/\__  /____/\____/_/  \__/
+ *                   /____/
  *
- * Copyright (C) 2008-2016 Zongsoft Corporation <http://www.zongsoft.com>
+ * Authors:
+ *   钟峰(Popeye Zhong) <zongsoft@qq.com>
+ *
+ * Copyright (C) 2008-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -44,16 +51,6 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public Condition(Condition condition)
-		{
-			if(condition == null)
-				throw new ArgumentNullException(nameof(condition));
-
-			_name = condition.Name;
-			_value = condition.Value;
-			_operator = condition.Operator;
-		}
-
 		public Condition(string name, object value, ConditionOperator @operator = ConditionOperator.Equal)
 		{
 			if(string.IsNullOrWhiteSpace(name))
