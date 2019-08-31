@@ -383,6 +383,10 @@ namespace Zongsoft.Data
 					return string.Format("{0} IN [{1}]", _name, text);
 				case ConditionOperator.NotIn:
 					return string.Format("{0} NOT IN [{1}]", _name, text);
+				case ConditionOperator.Exists:
+					return "EXISTS " + _name;
+				case ConditionOperator.NotExists:
+					return "NOT EXISTS " + _name;
 			}
 
 			return "*** invalid condition ***" + Environment.NewLine +
