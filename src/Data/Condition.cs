@@ -384,17 +384,12 @@ namespace Zongsoft.Data
 				case ConditionOperator.NotIn:
 					return string.Format("{0} NOT IN [{1}]", _name, text);
 				case ConditionOperator.Exists:
-					return "EXISTS " + _name;
+					return "EXISTS " + _name + (value == null ? null : " (" + value.ToString() + ")");
 				case ConditionOperator.NotExists:
-					return "NOT EXISTS " + _name;
+					return "NOT EXISTS " + _name + (value == null ? null : " (" + value.ToString() + ")");
 			}
 
-			return "*** invalid condition ***" + Environment.NewLine +
-				   "{" + Environment.NewLine +
-				   "\tName : " + _name + "," + Environment.NewLine +
-				   "\tOperator : " + _operator + "," + Environment.NewLine +
-				   "\tValue : " + text + Environment.NewLine +
-				   "}";
+			return $"{_name} {_operator} {text}";
 		}
 		#endregion
 
