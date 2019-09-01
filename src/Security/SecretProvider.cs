@@ -65,6 +65,7 @@ namespace Zongsoft.Security
 		/// <summary>
 		/// 获取或设置秘密内容的缓存容器。
 		/// </summary>
+		[Services.ServiceDependency]
 		public ICache Cache
 		{
 			get
