@@ -248,14 +248,14 @@ namespace Zongsoft.Data
 			return new Condition(name, values, ConditionOperator.NotIn);
 		}
 
-		public static Condition Exists(string name)
+		public static Condition Exists(string name, ICondition filter = null)
 		{
-			return new Condition(name, null, ConditionOperator.Exists);
+			return new Condition(name, filter, ConditionOperator.Exists);
 		}
 
-		public static Condition NotExists(string name)
+		public static Condition NotExists(string name, ICondition filter = null)
 		{
-			return new Condition(name, null, ConditionOperator.NotExists);
+			return new Condition(name, filter, ConditionOperator.NotExists);
 		}
 
 		public static bool GetBetween(Condition condition, out object begin, out object end)
@@ -551,14 +551,14 @@ namespace Zongsoft.Data
 				return Condition.NotIn<TValue>(name, values);
 			}
 
-			public static Condition Exists(string name)
+			public static Condition Exists(string name, ICondition filter = null)
 			{
-				return Condition.Exists(name);
+				return Condition.Exists(name, filter);
 			}
 
-			public static Condition NotExists(string name)
+			public static Condition NotExists(string name, ICondition filter = null)
 			{
-				return Condition.NotExists(name);
+				return Condition.NotExists(name, filter);
 			}
 			#endregion
 
