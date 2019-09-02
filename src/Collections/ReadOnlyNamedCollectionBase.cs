@@ -139,7 +139,7 @@ namespace Zongsoft.Collections
 			if(_innerDictionary.TryGetValue(name, out value))
 				return value;
 
-			throw new KeyNotFoundException();
+			throw new KeyNotFoundException($"The specified '{name}' key is not in the dictionary.");
 		}
 
 		protected virtual bool TryGetItem(string name, out T value)
