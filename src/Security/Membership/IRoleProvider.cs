@@ -1,8 +1,15 @@
 ﻿/*
- * Authors:
- *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
+ *   _____                                ______
+ *  /_   /  ____  ____  ____  _________  / __/ /_
+ *    / /  / __ \/ __ \/ __ \/ ___/ __ \/ /_/ __/
+ *   / /__/ /_/ / / / / /_/ /\_ \/ /_/ / __/ /_
+ *  /____/\____/_/ /_/\__  /____/\____/_/  \__/
+ *                   /____/
  *
- * Copyright (C) 2003-2017 Zongsoft Corporation <http://www.zongsoft.com>
+ * Authors:
+ *   钟峰(Popeye Zhong) <zongsoft@qq.com>
+ *
+ * Copyright (C) 2015-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -34,6 +41,13 @@ namespace Zongsoft.Security.Membership
 	/// </summary>
 	public interface IRoleProvider
 	{
+		#region 事件定义
+		/// <summary>
+		/// 表示角色信息发生更改之后的事件。
+		/// </summary>
+		event EventHandler<ChangedEventArgs> Changed;
+		#endregion
+
 		#region 属性定义
 		/// <summary>
 		/// 获取数据序号提供程序。

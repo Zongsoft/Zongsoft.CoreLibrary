@@ -385,6 +385,7 @@
     <Compile Include="Security\Membership\IRole.cs" />
     <Compile Include="Security\Membership\IUser.cs" />
     <Compile Include="Security\Membership\Member.cs" />
+    <Compile Include="Security\Membership\ChangedEventArgs.cs" />
     <Compile Include="Security\Membership\UserIdentityType.cs" />
     <Compile Include="Security\Membership\AuthorizationAttribute.cs" />
     <Compile Include="Security\Membership\AuthorizationState.cs" />
