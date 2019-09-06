@@ -1,6 +1,13 @@
 ﻿/*
+ *   _____                                ______
+ *  /_   /  ____  ____  ____  _________  / __/ /_
+ *    / /  / __ \/ __ \/ __ \/ ___/ __ \/ /_/ __/
+ *   / /__/ /_/ / / / / /_/ /\_ \/ /_/ / __/ /_
+ *  /____/\____/_/ /_/\__  /____/\____/_/  \__/
+ *                   /____/
+ *
  * Authors:
- *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
+ *   钟峰(Popeye Zhong) <zongsoft@qq.com>
  *
  * Copyright (C) 2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
@@ -25,7 +32,6 @@
  */
 
 using System;
-using System.Collections.Generic;
 using System.Text;
 
 namespace Zongsoft.Diagnostics
