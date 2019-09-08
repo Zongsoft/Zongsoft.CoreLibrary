@@ -7,9 +7,9 @@
  *                   /____/
  *
  * Authors:
- *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
+ *   钟峰(Popeye Zhong) <zongsoft@qq.com>
  *
- * Copyright (C) 2010-2016 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2010-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -99,6 +99,14 @@ namespace Zongsoft.Data
 		Common.ISequence Sequence
 		{
 			get; set;
+		}
+
+		/// <summary>
+		/// 获取数据访问器的元数据容器。
+		/// </summary>
+		Metadata.IDataMetadataContainer Metadata
+		{
+			get;
 		}
 
 		/// <summary>
