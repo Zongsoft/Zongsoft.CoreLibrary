@@ -39,17 +39,9 @@ namespace Zongsoft.Data.Metadata
 	/// <summary>
 	/// 表示元数据的提供程序接口。
 	/// </summary>
-	public interface IDataMetadataProvider
+	public interface IDataMetadataProvider : IDataMetadataContainer
 	{
 		#region 属性定义
-		/// <summary>
-		/// 获取元数据提供程序所属的应用名。
-		/// </summary>
-		string Name
-		{
-			get;
-		}
-
 		/// <summary>
 		/// 获取元数据提供程序所属的管理器。
 		/// </summary>
@@ -62,7 +54,7 @@ namespace Zongsoft.Data.Metadata
 		/// <summary>
 		/// 获取元数据提供程序中的数据实体定义集。
 		/// </summary>
-		Collections.INamedCollection<IDataEntity> Entities
+		new Collections.INamedCollection<IDataEntity> Entities
 		{
 			get;
 		}
@@ -70,7 +62,7 @@ namespace Zongsoft.Data.Metadata
 		/// <summary>
 		/// 获取元数据提供程序中的数据命令定义集。
 		/// </summary>
-		Collections.INamedCollection<IDataCommand> Commands
+		new Collections.INamedCollection<IDataCommand> Commands
 		{
 			get;
 		}

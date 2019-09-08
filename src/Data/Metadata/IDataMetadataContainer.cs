@@ -37,29 +37,34 @@ using System.Collections.Generic;
 namespace Zongsoft.Data.Metadata
 {
 	/// <summary>
-	/// 表示数据应用的元数据管理的接口。
+	/// 表示元数据的容器接口。
 	/// </summary>
-	public interface IDataMetadataManager : IDataMetadataContainer
+	public interface IDataMetadataContainer
 	{
+		#region 属性定义
 		/// <summary>
-		/// 获取当前应用的元数据加载器。
+		/// 获取元数据容器所属的应用名。
 		/// </summary>
-		IDataMetadataLoader Loader
+		string Name
 		{
 			get;
 		}
 
 		/// <summary>
-		/// 获取元数据提供程序集合。
+		/// 获取元数据容器中的数据实体定义集。
 		/// </summary>
-		ICollection<IDataMetadataProvider> Providers
+		Collections.IReadOnlyNamedCollection<IDataEntity> Entities
 		{
 			get;
 		}
 
 		/// <summary>
-		/// 重新加载所有元数据。
+		/// 获取元数据容器中的数据命令定义集。
 		/// </summary>
-		void Reload();
+		Collections.IReadOnlyNamedCollection<IDataCommand> Commands
+		{
+			get;
+		}
+		#endregion
 	}
 }
