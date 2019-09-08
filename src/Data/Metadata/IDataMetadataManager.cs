@@ -76,7 +76,7 @@ namespace Zongsoft.Data.Metadata
 		/// <summary>
 		/// 获取元数据提供程序集合。
 		/// </summary>
-		ICollection<IDataMetadata> Metadatas
+		ICollection<IDataMetadataProvider> Providers
 		{
 			get;
 		}

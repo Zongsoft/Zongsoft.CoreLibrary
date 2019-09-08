@@ -95,7 +95,7 @@
     <Compile Include="Data\Metadata\IDataEntityProperty.cs" />
     <Compile Include="Data\Metadata\IDataEntityPropertyCollection.cs" />
     <Compile Include="Data\Metadata\IDataEntitySimplexProperty.cs" />
-    <Compile Include="Data\Metadata\IDataMetadata.cs" />
+    <Compile Include="Data\Metadata\IDataMetadataProvider.cs" />
     <Compile Include="Data\Metadata\IDataMetadataLoader.cs" />
     <Compile Include="Data\Metadata\IDataMetadataManager.cs" />
     <Compile Include="Data\Metadata\IDataSequence.cs" />

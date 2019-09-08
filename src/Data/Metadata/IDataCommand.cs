@@ -44,7 +44,7 @@ namespace Zongsoft.Data.Metadata
 		/// <summary>
 		/// 获取元数据所属的提供程序。
 		/// </summary>
-		IDataMetadata Metadata
+		IDataMetadataProvider Metadata
 		{
 			get;
 		}

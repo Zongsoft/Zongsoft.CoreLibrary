@@ -39,7 +39,7 @@ namespace Zongsoft.Data.Metadata
 	/// <summary>
 	/// 表示元数据的提供程序接口。
 	/// </summary>
-	public interface IDataMetadata
+	public interface IDataMetadataProvider
 	{
 		#region 属性定义
 		/// <summary>
