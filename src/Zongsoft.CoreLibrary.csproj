@@ -83,6 +83,22 @@
     <Compile Include="Common\ActivatorParameterDescriptor.cs" />
     <Compile Include="Common\BitVector32.cs" />
     <Compile Include="Common\ExecutionResult.cs" />
+    <Compile Include="Data\Metadata\DataAssociationConstraint.cs" />
+    <Compile Include="Data\Metadata\DataAssociationConstraintActor.cs" />
+    <Compile Include="Data\Metadata\DataAssociationLink.cs" />
+    <Compile Include="Data\Metadata\DataAssociationMultiplicity.cs" />
+    <Compile Include="Data\Metadata\DataCommandType.cs" />
+    <Compile Include="Data\Metadata\IDataCommand.cs" />
+    <Compile Include="Data\Metadata\IDataCommandParameter.cs" />
+    <Compile Include="Data\Metadata\IDataEntity.cs" />
+    <Compile Include="Data\Metadata\IDataEntityComplexProperty.cs" />
+    <Compile Include="Data\Metadata\IDataEntityProperty.cs" />
+    <Compile Include="Data\Metadata\IDataEntityPropertyCollection.cs" />
+    <Compile Include="Data\Metadata\IDataEntitySimplexProperty.cs" />
+    <Compile Include="Data\Metadata\IDataMetadata.cs" />
+    <Compile Include="Data\Metadata\IDataMetadataLoader.cs" />
+    <Compile Include="Data\Metadata\IDataMetadataManager.cs" />
+    <Compile Include="Data\Metadata\IDataSequence.cs" />
     <Compile Include="Reflection\ExpressionUtility.cs" />
     <Compile Include="Common\IActivator.cs" />
     <Compile Include="Common\IEventHandler.cs" />
@@ -623,9 +639,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Data\Common\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
