@@ -86,7 +86,7 @@ namespace Zongsoft.Data.Metadata
 		/// 获取一个值，指示是否为不可变实体，默认为否(False)。
 		/// </summary>
 		/// <remarks>
-		///		<para>不可变实体的记录只能新增和删除，不能被修改。</para>
+		/// 	<para>不可变实体只支持新增和删除操作。</para>
 		/// </remarks>
 		bool Immutable
 		{
