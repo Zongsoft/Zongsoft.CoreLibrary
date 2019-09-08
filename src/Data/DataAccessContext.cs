@@ -50,10 +50,19 @@ namespace Zongsoft.Data
 		{
 			_condition = condition;
 			_member = member;
+			this.Entity = DataContextUtility.GetEntity(name, dataAccess.Metadata);
 		}
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取数据访问对应的实体元数据。
+		/// </summary>
+		public Metadata.IDataEntity Entity
+		{
+			get;
+		}
+
 		/// <summary>
 		/// 获取或设置计数操作的结果。
 		/// </summary>
@@ -124,10 +133,19 @@ namespace Zongsoft.Data
 		protected DataExistContextBase(IDataAccess dataAccess, string name, ICondition condition, object state = null) : base(dataAccess, name, DataAccessMethod.Exists, state)
 		{
 			_condition = condition;
+			this.Entity = DataContextUtility.GetEntity(name, dataAccess.Metadata);
 		}
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取数据访问对应的实体元数据。
+		/// </summary>
+		public Metadata.IDataEntity Entity
+		{
+			get;
+		}
+
 		public ICondition Condition
 		{
 			get
@@ -175,17 +193,23 @@ namespace Zongsoft.Data
 		#region 构造函数
 		protected DataExecuteContextBase(IDataAccess dataAccess, string name, bool isScalar, Type resultType, IDictionary<string, object> inParameters, IDictionary<string, object> outParameters, object state = null) : base(dataAccess, name, DataAccessMethod.Execute, state)
 		{
-			if(resultType == null)
-				throw new ArgumentNullException(nameof(resultType));
-
 			_isScalar = isScalar;
-			_resultType = resultType;
+			_resultType = resultType ?? throw new ArgumentNullException(nameof(resultType));
 			_inParameters = inParameters;
 			_outParameters = outParameters;
+			this.Command = DataContextUtility.GetCommand(name, dataAccess.Metadata);
 		}
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取数据访问对应的命令元数据。
+		/// </summary>
+		public Metadata.IDataCommand Command
+		{
+			get;
+		}
+
 		/// <summary>
 		/// 获取一个值，指示是否为返回单值。
 		/// </summary>
@@ -424,10 +448,19 @@ namespace Zongsoft.Data
 			_schema = schema;
 			_paging = paging;
 			_sortings = sortings;
+			this.Entity = DataContextUtility.GetEntity(name, dataAccess.Metadata);
 		}
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取数据访问对应的实体元数据。
+		/// </summary>
+		public Metadata.IDataEntity Entity
+		{
+			get;
+		}
+
 		/// <summary>
 		/// 获取查询要返回的结果集元素类型。
 		/// </summary>
@@ -1056,6 +1089,14 @@ namespace Zongsoft.Data
 				return entity;
 
 			throw new DataException($"The specified '{name}' entity mapping does not exist.");
+		}
+
+		public static Metadata.IDataCommand GetCommand(string name, Metadata.IDataMetadataContainer metadata)
+		{
+			if(metadata.Commands.TryGet(name, out var command))
+				return command;
+
+			throw new DataException($"The specified '{name}' command mapping does not exist.");
 		}
 	}
 
