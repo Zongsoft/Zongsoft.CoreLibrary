@@ -1,8 +1,15 @@
 ﻿/*
- * Authors:
- *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
+ *   _____                                ______
+ *  /_   /  ____  ____  ____  _________  / __/ /_
+ *    / /  / __ \/ __ \/ __ \/ ___/ __ \/ /_/ __/
+ *   / /__/ /_/ / / / / /_/ /\_ \/ /_/ / __/ /_
+ *  /____/\____/_/ /_/\__  /____/\____/_/  \__/
+ *                   /____/
  *
- * Copyright (C) 2010-2017 Zongsoft Corporation <http://www.zongsoft.com>
+ * Authors:
+ *   钟峰(Popeye Zhong) <zongsoft@qq.com>
+ *
+ * Copyright (C) 2010-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -280,12 +287,21 @@ namespace Zongsoft.Data
 				throw new ArgumentNullException(nameof(condition));
 
 			_member = member;
-			_condition = condition;
 			_interval = interval;
+			_condition = condition ?? throw new ArgumentNullException(nameof(condition));
+			this.Entity = DataContextUtility.GetEntity(name, dataAccess.Metadata);
 		}
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取数据访问对应的实体元数据。
+		/// </summary>
+		public Metadata.IDataEntity Entity
+		{
+			get;
+		}
+
 		public int Count
 		{
 			get => _count;
@@ -590,10 +606,19 @@ namespace Zongsoft.Data
 		{
 			_condition = condition;
 			_schema = schema;
+			this.Entity = DataContextUtility.GetEntity(name, dataAccess.Metadata);
 		}
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取数据访问对应的实体元数据。
+		/// </summary>
+		public Metadata.IDataEntity Entity
+		{
+			get;
+		}
+
 		/// <summary>
 		/// 获取或设置删除操作的受影响记录数。
 		/// </summary>
@@ -681,10 +706,19 @@ namespace Zongsoft.Data
 			_data = data ?? throw new ArgumentNullException(nameof(data));
 			_schema = schema;
 			_isMultiple = isMultiple;
+			this.Entity = DataContextUtility.GetEntity(name, dataAccess.Metadata);
 		}
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取数据访问对应的实体元数据。
+		/// </summary>
+		public Metadata.IDataEntity Entity
+		{
+			get;
+		}
+
 		/// <summary>
 		/// 获取一个值，指示是否为批量新增操作。
 		/// </summary>
@@ -786,10 +820,19 @@ namespace Zongsoft.Data
 			_condition = condition;
 			_schema = schema;
 			_isMultiple = isMultiple;
+			this.Entity = DataContextUtility.GetEntity(name, dataAccess.Metadata);
 		}
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取数据访问对应的实体元数据。
+		/// </summary>
+		public Metadata.IDataEntity Entity
+		{
+			get;
+		}
+
 		/// <summary>
 		/// 获取一个值，指示是否为批量更新操作。
 		/// </summary>
@@ -908,10 +951,19 @@ namespace Zongsoft.Data
 			_data = data ?? throw new ArgumentNullException(nameof(data));
 			_schema = schema;
 			_isMultiple = isMultiple;
+			this.Entity = DataContextUtility.GetEntity(name, dataAccess.Metadata);
 		}
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取数据访问对应的实体元数据。
+		/// </summary>
+		public Metadata.IDataEntity Entity
+		{
+			get;
+		}
+
 		/// <summary>
 		/// 获取一个值，指示是否为批量操作。
 		/// </summary>
@@ -994,6 +1046,17 @@ namespace Zongsoft.Data
 			}
 		}
 		#endregion
+	}
+
+	internal static class DataContextUtility
+	{
+		public static Metadata.IDataEntity GetEntity(string name, Metadata.IDataMetadataContainer metadata)
+		{
+			if(metadata.Entities.TryGet(name, out var entity))
+				return entity;
+
+			throw new DataException($"The specified '{name}' entity mapping does not exist.");
+		}
 	}
 
 	#region 过滤遍历器类
