@@ -99,7 +99,7 @@
     <Compile Include="Data\Metadata\IDataMetadataProvider.cs" />
     <Compile Include="Data\Metadata\IDataMetadataLoader.cs" />
     <Compile Include="Data\Metadata\IDataMetadataManager.cs" />
-    <Compile Include="Data\Metadata\IDataSequence.cs" />
+    <Compile Include="Data\Metadata\IDataEntityPropertySequence.cs" />
     <Compile Include="Reflection\ExpressionUtility.cs" />
     <Compile Include="Common\IActivator.cs" />
     <Compile Include="Common\IEventHandler.cs" />

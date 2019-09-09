@@ -36,9 +36,9 @@ using System;
 namespace Zongsoft.Data.Metadata
 {
 	/// <summary>
-	/// 表示序号器的元数据接口。
+	/// 表示数据实体属性序号器的元数据接口。
 	/// </summary>
-	public interface IDataSequence
+	public interface IDataEntityPropertySequence
 	{
 		/// <summary>
 		/// 获取序号所属的数据属性元素。
