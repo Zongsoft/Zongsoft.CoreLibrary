@@ -111,7 +111,7 @@ namespace Zongsoft.Data.Metadata
 		#endregion
 
 		#region 方法定义
-		IDataSequence[] GetSequences();
+		IDataEntityPropertySequence[] GetSequences();
 		#endregion
 	}
 }

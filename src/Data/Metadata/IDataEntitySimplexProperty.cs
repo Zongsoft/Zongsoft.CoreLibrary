@@ -90,9 +90,9 @@ namespace Zongsoft.Data.Metadata
 		}
 
 		/// <summary>
-		/// 获取序号器元数据。
+		/// 获取数据序号器元数据。
 		/// </summary>
-		IDataSequence Sequence
+		IDataEntityPropertySequence Sequence
 		{
 			get;
 		}
