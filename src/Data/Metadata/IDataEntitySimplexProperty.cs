@@ -46,7 +46,7 @@ namespace Zongsoft.Data.Metadata
 		/// </summary>
 		object Value
 		{
-			get;
+			get; set;
 		}
 
 		/// <summary>
@@ -54,23 +54,7 @@ namespace Zongsoft.Data.Metadata
 		/// </summary>
 		int Length
 		{
-			get;
-		}
-
-		/// <summary>
-		/// 获取或设置属性是否允许为空。
-		/// </summary>
-		bool Nullable
-		{
-			get;
-		}
-
-		/// <summary>
-		/// 获取序号器元数据。
-		/// </summary>
-		IDataSequence Sequence
-		{
-			get;
+			get; set;
 		}
 
 		/// <summary>
@@ -78,13 +62,37 @@ namespace Zongsoft.Data.Metadata
 		/// </summary>
 		byte Precision
 		{
-			get;
+			get; set;
 		}
 
 		/// <summary>
 		/// 获取或设置数值属性的小数点位数。
 		/// </summary>
 		byte Scale
+		{
+			get; set;
+		}
+
+		/// <summary>
+		/// 获取或设置属性是否允许为空。
+		/// </summary>
+		bool Nullable
+		{
+			get; set;
+		}
+
+		/// <summary>
+		/// 获取或设置属性是否可以参与排序。
+		/// </summary>
+		bool Sortable
+		{
+			get; set;
+		}
+
+		/// <summary>
+		/// 获取序号器元数据。
+		/// </summary>
+		IDataSequence Sequence
 		{
 			get;
 		}
