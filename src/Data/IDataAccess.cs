@@ -118,17 +118,6 @@ namespace Zongsoft.Data
 		}
 		#endregion
 
-		#region 获取主键
-		string[] GetKey<T>();
-
-		/// <summary>
-		/// 获取指定名称的主键名数组。
-		/// </summary>
-		/// <param name="name">指定的数据映射名。</param>
-		/// <returns>返回的主键名数组。</returns>
-		string[] GetKey(string name);
-		#endregion
-
 		#region 执行方法
 		IEnumerable<T> Execute<T>(string name, IDictionary<string, object> inParameters, object state = null, Func<DataExecuteContextBase, bool> executing = null, Action<DataExecuteContextBase> executed = null);
 		IEnumerable<T> Execute<T>(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters, object state = null, Func<DataExecuteContextBase, bool> executing = null, Action<DataExecuteContextBase> executed = null);

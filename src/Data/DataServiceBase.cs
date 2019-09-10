@@ -690,10 +690,15 @@ namespace Zongsoft.Data
 			//如果指定了更新条件，则尝试将条件中的主键值同步设置到数据字典中
 			if(condition != null)
 			{
-				//遍历当前数据服务的实体主键名
-				foreach(var key in this.DataAccess.GetKey(this.Name))
+				//获取当前数据服务的实体主键集
+				var keys = this.DataAccess.Metadata.Entities.Get(this.Name).Key;
+
+				if(keys != null && keys.Length > 0)
 				{
-					condition.Match(key, c => dictionary.TrySetValue(c.Name, c.Value));
+					foreach(var key in keys)
+					{
+						condition.Match(key.Name, c => dictionary.TrySetValue(c.Name, c.Value));
+					}
 				}
 			}
 
@@ -1324,7 +1329,7 @@ namespace Zongsoft.Data
 				return null;
 
 			//获取当前数据服务对应的主键
-			var primaryKey = this.DataAccess.GetKey(this.Name);
+			var primaryKey = this.DataAccess.Metadata.Entities.Get(this.Name).Key;
 
 			//如果主键获取失败或主键未定义或主键项数量不等于传入的数组元素个数则返回空
 			if(primaryKey == null || primaryKey.Length == 0 || primaryKey.Length != values.Length)
@@ -1343,13 +1348,13 @@ namespace Zongsoft.Data
 					if(parts.Length > 1)
 					{
 						singleton = false;
-						return Condition.In(primaryKey[0], parts);
+						return Condition.In(primaryKey[0].Name, parts);
 					}
 
-					return Condition.Equal(primaryKey[0], parts[0]);
+					return Condition.Equal(primaryKey[0].Name, parts[0]);
 				}
 
-				return Condition.Equal(primaryKey[0], values[0]);
+				return Condition.Equal(primaryKey[0].Name, values[0]);
 			}
 
 			//创建返回的条件集（AND组合）
@@ -1357,7 +1362,7 @@ namespace Zongsoft.Data
 
 			for(int i = 0; i < primaryKey.Length; i++)
 			{
-				conditions.Add(Data.Condition.Equal(primaryKey[i], values[i]));
+				conditions.Add(Data.Condition.Equal(primaryKey[i].Name, values[i]));
 			}
 
 			return conditions;
@@ -1409,13 +1414,17 @@ namespace Zongsoft.Data
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 		private ICondition EnsureUpdateCondition(IDataDictionary dictionary)
 		{
-			var keys = this.DataAccess.GetKey(this.Name);
+			var keys = this.DataAccess.Metadata.Entities.Get(this.Name).Key;
+
+			if(keys == null || keys.Length == 0)
+				throw new DataException($"The specified '{this.Name}' data entity does not define a primary key and does not support update operation.");
+
 			var requires = new ICondition[keys.Length];
 
 			for(int i = 0; i < keys.Length; i++)
 			{
-				if(dictionary.TryGetValue(keys[i], out var value) && value != null)
-					requires[i] = Condition.Equal(keys[i], value);
+				if(dictionary.TryGetValue(keys[i].Name, out var value) && value != null)
+					requires[i] = Condition.Equal(keys[i].Name, value);
 				else
 					throw new DataException($"No required primary key field value is specified for the update '{this.Name}' entity data.");
 			}

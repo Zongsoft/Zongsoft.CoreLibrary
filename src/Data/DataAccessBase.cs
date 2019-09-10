@@ -164,15 +164,6 @@ namespace Zongsoft.Data
 		}
 		#endregion
 
-		#region 获取主键
-		public string[] GetKey<T>()
-		{
-			return this.GetKey(this.GetName<T>());
-		}
-
-		public abstract string[] GetKey(string name);
-		#endregion
-
 		#region 执行方法
 		public IEnumerable<T> Execute<T>(string name, IDictionary<string, object> inParameters, object state = null, Func<DataExecuteContextBase, bool> executing = null, Action<DataExecuteContextBase> executed = null)
 		{
