@@ -41,9 +41,17 @@ namespace Zongsoft.Data
 	public interface IDataAccessFilter : Zongsoft.Common.IExecutionFilter<IDataAccessContextBase>
 	{
 		/// <summary>
-		/// 获取数据过滤器的访问名，如果为空则表示不限定具体的访问实体或命令。
+		/// 获取数据过滤器的访问名，如果为空即全局过滤器，表示不限定具体的访问实体或命令。
 		/// </summary>
 		string Name
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取数据过滤器的方法集，如果为空则表示不限定具体的访问方法，否则只过滤指定的那些方法。
+		/// </summary>
+		DataAccessMethod[] Methods
 		{
 			get;
 		}

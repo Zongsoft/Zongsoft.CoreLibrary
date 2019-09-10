@@ -50,12 +50,19 @@ namespace Zongsoft.Data
 		protected DataAccessFilterBase(string name, params DataAccessMethod[] methods)
 		{
 			this.Name = name;
+			this.Methods = methods;
+
 			_flags = GetFlags(methods);
 		}
 		#endregion
 
 		#region 公共属性
 		public string Name
+		{
+			get;
+		}
+
+		public DataAccessMethod[] Methods
 		{
 			get;
 		}
@@ -79,9 +86,6 @@ namespace Zongsoft.Data
 				case DataAccessMethod.Count:
 					this.OnCounted((DataCountContextBase)context);
 					break;
-				case DataAccessMethod.Execute:
-					this.OnExecuted((DataExecuteContextBase)context);
-					break;
 				case DataAccessMethod.Exists:
 					this.OnExisted((DataExistContextBase)context);
 					break;
@@ -103,6 +107,9 @@ namespace Zongsoft.Data
 				case DataAccessMethod.Upsert:
 					this.OnUpserted((DataUpsertContextBase)context);
 					break;
+				case DataAccessMethod.Execute:
+					this.OnExecuted((DataExecuteContextBase)context);
+					break;
 			}
 		}
 
@@ -112,9 +119,6 @@ namespace Zongsoft.Data
 			{
 				case DataAccessMethod.Count:
 					this.OnCounting((DataCountContextBase)context);
-					break;
-				case DataAccessMethod.Execute:
-					this.OnExecuting((DataExecuteContextBase)context);
 					break;
 				case DataAccessMethod.Exists:
 					this.OnExisting((DataExistContextBase)context);
@@ -136,6 +140,9 @@ namespace Zongsoft.Data
 					break;
 				case DataAccessMethod.Upsert:
 					this.OnUpserting((DataUpsertContextBase)context);
+					break;
+				case DataAccessMethod.Execute:
+					this.OnExecuting((DataExecuteContextBase)context);
 					break;
 			}
 		}
