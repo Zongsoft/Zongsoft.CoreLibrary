@@ -47,11 +47,6 @@ namespace Zongsoft.Data
 		{
 		}
 
-		protected DataAccessFilterBase(string name)
-		{
-			this.Name = name;
-		}
-
 		protected DataAccessFilterBase(string name, params DataAccessMethod[] methods)
 		{
 			this.Name = name;
