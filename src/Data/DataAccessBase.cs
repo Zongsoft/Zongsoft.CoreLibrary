@@ -40,6 +40,7 @@ namespace Zongsoft.Data
 	/// <summary>
 	/// 表示数据访问的抽象基类。
 	/// </summary>
+	[System.Reflection.DefaultMember(nameof(Filters))]
 	public abstract class DataAccessBase : IDataAccess
 	{
 		#region 事件定义
