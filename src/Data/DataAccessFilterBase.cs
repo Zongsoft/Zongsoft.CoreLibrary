@@ -1,8 +1,15 @@
 ﻿/*
- * Authors:
- *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
+ *   _____                                ______
+ *  /_   /  ____  ____  ____  _________  / __/ /_
+ *    / /  / __ \/ __ \/ __ \/ ___/ __ \/ /_/ __/
+ *   / /__/ /_/ / / / / /_/ /\_ \/ /_/ / __/ /_
+ *  /____/\____/_/ /_/\__  /____/\____/_/  \__/
+ *                   /____/
  *
- * Copyright (C) 2010-2017 Zongsoft Corporation <http://www.zongsoft.com>
+ * Authors:
+ *   钟峰(Popeye Zhong) <zongsoft@qq.com>
+ *
+ * Copyright (C) 2010-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -31,53 +38,31 @@ namespace Zongsoft.Data
 {
 	public abstract class DataAccessFilterBase : IDataAccessFilter, Zongsoft.Services.IPredication<IDataAccessContextBase>
 	{
-		#region 成员字段
+		#region 私有变量
 		private readonly int _flags;
-		private readonly string[] _names;
 		#endregion
 
 		#region 构造函数
-		protected DataAccessFilterBase(params string[] names)
+		protected DataAccessFilterBase()
 		{
-			_names = names;
-
-			if(_names != null && _names.Length > 0)
-				Array.Sort(_names);
 		}
 
-		protected DataAccessFilterBase(params Type[] types)
+		protected DataAccessFilterBase(string name)
 		{
-			_names = GetNames(types);
+			this.Name = name;
 		}
 
-		protected DataAccessFilterBase(DataAccessMethod method, params string[] names)
+		protected DataAccessFilterBase(string name, params DataAccessMethod[] methods)
 		{
-			_flags = GetFlag(method);
-			_names = names;
-
-			if(_names != null && _names.Length > 0)
-				Array.Sort(_names);
-		}
-
-		protected DataAccessFilterBase(DataAccessMethod method, params Type[] types)
-		{
-			_flags = GetFlag(method);
-			_names = GetNames(types);
-		}
-
-		protected DataAccessFilterBase(IEnumerable<DataAccessMethod> methods, params string[] names)
-		{
+			this.Name = name;
 			_flags = GetFlags(methods);
-			_names = names;
-
-			if(_names != null && _names.Length > 0)
-				Array.Sort(_names);
 		}
+		#endregion
 
-		protected DataAccessFilterBase(IEnumerable<DataAccessMethod> methods, params Type[] types)
+		#region 公共属性
+		public string Name
 		{
-			_flags = GetFlags(methods);
-			_names = GetNames(types);
+			get;
 		}
 		#endregion
 
@@ -160,14 +145,26 @@ namespace Zongsoft.Data
 			}
 		}
 
-		void IDataAccessFilter.OnFiltered(IDataAccessContextBase context)
+		void Common.IExecutionFilter<IDataAccessContextBase>.OnFiltered(IDataAccessContextBase context)
 		{
 			this.OnFiltered(context);
 		}
 
-		void IDataAccessFilter.OnFiltering(IDataAccessContextBase context)
+		void Common.IExecutionFilter<IDataAccessContextBase>.OnFiltering(IDataAccessContextBase context)
 		{
 			this.OnFiltering(context);
+		}
+
+		void Common.IExecutionFilter.OnFiltered(object context)
+		{
+			if(context is IDataAccessContextBase ctx)
+				this.OnFiltered(ctx);
+		}
+
+		void Common.IExecutionFilter.OnFiltering(object context)
+		{
+			if(context is IDataAccessContextBase ctx)
+				this.OnFiltering(ctx);
 		}
 		#endregion
 
@@ -256,20 +253,14 @@ namespace Zongsoft.Data
 					return false;
 			}
 
-			if(_names != null && _names.Length > 0)
-				return Array.Exists(_names, name => context.Name.EndsWith(name, StringComparison.OrdinalIgnoreCase));
-
-			return true;
+			//如果当前过滤器的数据访问名为空即表示不限具体实体访问
+			return string.IsNullOrWhiteSpace(this.Name) ||
+			       string.Equals(this.Name, context.Name, StringComparison.OrdinalIgnoreCase);
 		}
 
 		bool Zongsoft.Services.IPredication.Predicate(object parameter)
 		{
-			var context = parameter as IDataAccessContextBase;
-
-			if(context == null)
-				return false;
-			else
-				return this.Predicate(context);
+			return (parameter is IDataAccessContextBase context) ? this.Predicate(context) : false;
 		}
 		#endregion
 
@@ -294,26 +285,6 @@ namespace Zongsoft.Data
 			}
 
 			return flags;
-		}
-
-		private static string[] GetNames(Type[] types)
-		{
-			if(types == null || types.Length == 0)
-				return null;
-
-			var names = new List<string>(types.Length);
-
-			for(int i = 0; i < types.Length; i++)
-			{
-				var name = DataAccessNaming.GetName(types[i]);
-
-				if(!string.IsNullOrEmpty(name))
-					names.Add(name);
-			}
-
-			names.Sort();
-
-			return names.ToArray();
 		}
 		#endregion
 	}
