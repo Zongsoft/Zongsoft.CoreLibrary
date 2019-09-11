@@ -36,12 +36,8 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
-	public abstract class DataAccessFilterBase : IDataAccessFilter, Zongsoft.Services.IPredication<IDataAccessContextBase>
+	public abstract class DataAccessFilterBase : IDataAccessFilter
 	{
-		#region 私有变量
-		private readonly int _flags;
-		#endregion
-
 		#region 构造函数
 		protected DataAccessFilterBase()
 		{
@@ -51,8 +47,6 @@ namespace Zongsoft.Data
 		{
 			this.Name = name;
 			this.Methods = methods;
-
-			_flags = GetFlags(methods);
 		}
 		#endregion
 
@@ -73,7 +67,7 @@ namespace Zongsoft.Data
 		{
 			get
 			{
-				return Services.ApplicationContext.Current.Principal as Zongsoft.Security.CredentialPrincipal;
+				return Services.ApplicationContext.Current?.Principal as Zongsoft.Security.CredentialPrincipal;
 			}
 		}
 		#endregion
@@ -241,52 +235,6 @@ namespace Zongsoft.Data
 
 		protected virtual void OnUpserted(DataUpsertContextBase context)
 		{
-		}
-		#endregion
-
-		#region 断言方法
-		public virtual bool Predicate(IDataAccessContextBase context)
-		{
-			if(_flags != 0)
-			{
-				var flag = GetFlag(context.Method);
-
-				if((_flags & flag) != flag)
-					return false;
-			}
-
-			//如果当前过滤器的数据访问名为空即表示不限具体实体访问
-			return string.IsNullOrWhiteSpace(this.Name) ||
-			       string.Equals(this.Name, context.Name, StringComparison.OrdinalIgnoreCase);
-		}
-
-		bool Zongsoft.Services.IPredication.Predicate(object parameter)
-		{
-			return (parameter is IDataAccessContextBase context) ? this.Predicate(context) : false;
-		}
-		#endregion
-
-		#region 静态方法
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-		private static int GetFlag(DataAccessMethod method)
-		{
-			return (int)Math.Pow(2, (int)method);
-		}
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-		private static int GetFlags(IEnumerable<DataAccessMethod> methods)
-		{
-			if(methods == null)
-				return 0;
-
-			int flags = 0;
-
-			foreach(var method in methods)
-			{
-				flags |= (int)Math.Pow(2, (int)method);
-			}
-
-			return flags;
 		}
 		#endregion
 	}
