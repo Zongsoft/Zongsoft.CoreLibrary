@@ -9,7 +9,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@qq.com>
  *
- * Copyright (C) 2015-2019 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2016-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -37,72 +37,20 @@ using System.Collections.Generic;
 namespace Zongsoft.Data.Metadata
 {
 	/// <summary>
-	/// 表示数据实体单值属性的元数据类。
+	/// 表示绑定数据值提供程序功能的接口。
 	/// </summary>
-	public interface IDataEntitySimplexProperty : IDataEntityProperty
+	public interface IDataValueProviderBinder
 	{
 		/// <summary>
-		/// 获取或设置默认值。
+		/// 绑定数据值提供程序。
 		/// </summary>
-		object Value
-		{
-			get; set;
-		}
+		/// <param name="metadata">绑定的元数据容器。</param>
+		void Bind(IDataMetadataContainer metadata);
 
 		/// <summary>
-		/// 获取或设置文本或数组属性的最大长度，单位：字节。
+		/// 解除绑定数据值提供程序。
 		/// </summary>
-		int Length
-		{
-			get; set;
-		}
-
-		/// <summary>
-		/// 获取或设置数值属性的精度。
-		/// </summary>
-		byte Precision
-		{
-			get; set;
-		}
-
-		/// <summary>
-		/// 获取或设置数值属性的小数点位数。
-		/// </summary>
-		byte Scale
-		{
-			get; set;
-		}
-
-		/// <summary>
-		/// 获取或设置属性是否允许为空。
-		/// </summary>
-		bool Nullable
-		{
-			get; set;
-		}
-
-		/// <summary>
-		/// 获取或设置属性是否可以参与排序。
-		/// </summary>
-		bool Sortable
-		{
-			get; set;
-		}
-
-		/// <summary>
-		/// 获取数据序号器元数据。
-		/// </summary>
-		IDataEntityPropertySequence Sequence
-		{
-			get;
-		}
-
-		/// <summary>
-		/// 获取或设置属性值提供程序。
-		/// </summary>
-		IDataValueProvider ValueProvider
-		{
-			get; set;
-		}
+		/// <param name="metadata">解绑的元数据容器。</param>
+		void Unbind(IDataMetadataContainer metadata);
 	}
 }

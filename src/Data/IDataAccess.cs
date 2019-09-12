@@ -110,6 +110,14 @@ namespace Zongsoft.Data
 		}
 
 		/// <summary>
+		/// 获取或设置数据提供程序绑定器。
+		/// </summary>
+		Metadata.IDataValueProviderBinder Binder
+		{
+			get; set;
+		}
+
+		/// <summary>
 		/// 获取数据访问的过滤器集合。
 		/// </summary>
 		ICollection<IDataAccessFilter> Filters
