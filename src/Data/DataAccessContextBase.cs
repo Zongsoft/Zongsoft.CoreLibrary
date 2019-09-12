@@ -47,43 +47,19 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 成员字段
-		private string _name;
-		private DataAccessMethod _method;
-		private IDataAccess _dataAccess;
 		private IDictionary<string, object> _states;
 		#endregion
 
 		#region 构造函数
 		protected DataAccessContextBase(IDataAccess dataAccess, string name, DataAccessMethod method, object state)
 		{
-			if(dataAccess == null)
-				throw new ArgumentNullException(nameof(dataAccess));
-
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
-			_name = name;
-			_method = method;
-			_dataAccess = dataAccess;
-
-			if(state != null)
-				_states = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase) { { string.Empty, state } };
-		}
-
-		protected DataAccessContextBase(IDataAccess dataAccess, string name, DataAccessMethod method, IDictionary<string, object> states)
-		{
-			if(dataAccess == null)
-				throw new ArgumentNullException(nameof(dataAccess));
-
-			if(string.IsNullOrEmpty(name))
-				throw new ArgumentNullException(nameof(name));
-
-			_name = name;
-			_method = method;
-			_dataAccess = dataAccess;
-
-			if(states != null && states.Count > 0)
-				_states = new Dictionary<string, object>(states, StringComparer.OrdinalIgnoreCase);
+			this.Name = name;
+			this.Method = method;
+			this.DataAccess = dataAccess ?? throw new ArgumentNullException(nameof(dataAccess));
+			this.State = state;
 		}
 		#endregion
 
@@ -93,10 +69,7 @@ namespace Zongsoft.Data
 		/// </summary>
 		public string Name
 		{
-			get
-			{
-				return _name;
-			}
+			get;
 		}
 
 		/// <summary>
@@ -104,10 +77,7 @@ namespace Zongsoft.Data
 		/// </summary>
 		public DataAccessMethod Method
 		{
-			get
-			{
-				return _method;
-			}
+			get;
 		}
 
 		/// <summary>
@@ -115,10 +85,7 @@ namespace Zongsoft.Data
 		/// </summary>
 		public IDataAccess DataAccess
 		{
-			get
-			{
-				return _dataAccess;
-			}
+			get;
 		}
 
 		/// <summary>
@@ -130,6 +97,14 @@ namespace Zongsoft.Data
 			{
 				return Services.ApplicationContext.Current.Principal as Zongsoft.Security.CredentialPrincipal;
 			}
+		}
+
+		/// <summary>
+		/// 获取或设置数据访问的附加数据。
+		/// </summary>
+		public object State
+		{
+			get; set;
 		}
 
 		/// <summary>
@@ -177,6 +152,13 @@ namespace Zongsoft.Data
 		protected virtual void OnPropertyChanged(string propertyName)
 		{
 			this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+		}
+		#endregion
+
+		#region 重写方法
+		public override string ToString()
+		{
+			return $"[{this.Method.ToString()}] {this.Name}";
 		}
 		#endregion
 	}

@@ -36,6 +36,9 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
+	/// <summary>
+	/// 提供数据访问过滤功能的过滤器基类。
+	/// </summary>
 	public abstract class DataAccessFilterBase : IDataAccessFilter
 	{
 		#region 构造函数
