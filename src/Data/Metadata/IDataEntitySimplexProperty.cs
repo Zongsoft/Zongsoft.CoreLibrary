@@ -44,7 +44,7 @@ namespace Zongsoft.Data.Metadata
 		/// <summary>
 		/// 获取或设置默认值。
 		/// </summary>
-		object Value
+		object DefaultValue
 		{
 			get; set;
 		}
