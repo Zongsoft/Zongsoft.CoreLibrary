@@ -39,6 +39,7 @@ namespace Zongsoft.Data.Metadata
 	/// <summary>
 	/// 表示绑定数据值提供程序功能的接口。
 	/// </summary>
+	[Obsolete]
 	public interface IDataValueProviderBinder
 	{
 		/// <summary>

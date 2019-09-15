@@ -36,6 +36,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Metadata
 {
+	[Obsolete]
 	public interface IDataValueContext
 	{
 		IDataMutateContextBase Context

@@ -39,6 +39,7 @@ namespace Zongsoft.Data.Metadata
 	/// <summary>
 	/// 提供数据实体属性值的接口。
 	/// </summary>
+	[Obsolete]
 	public interface IDataValueProvider
 	{
 		/// <summary>

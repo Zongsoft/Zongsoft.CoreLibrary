@@ -157,6 +157,7 @@ namespace Zongsoft.Data
 		/// <summary>
 		/// 获取或设置数据提供程序绑定器。
 		/// </summary>
+		[Obsolete]
 		public Metadata.IDataValueProviderBinder Binder
 		{
 			get
@@ -173,6 +174,11 @@ namespace Zongsoft.Data
 
 				_binder = value;
 			}
+		}
+
+		public Metadata.IDataRequiredValueProvider Validator
+		{
+			get; set;
 		}
 
 		/// <summary>
