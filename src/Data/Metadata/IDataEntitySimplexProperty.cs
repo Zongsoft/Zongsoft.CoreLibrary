@@ -96,13 +96,5 @@ namespace Zongsoft.Data.Metadata
 		{
 			get;
 		}
-
-		/// <summary>
-		/// 获取或设置属性值提供程序。
-		/// </summary>
-		IDataValueProvider ValueProvider
-		{
-			get; set;
-		}
 	}
 }

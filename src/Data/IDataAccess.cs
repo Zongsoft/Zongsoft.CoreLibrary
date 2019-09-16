@@ -110,9 +110,9 @@ namespace Zongsoft.Data
 		}
 
 		/// <summary>
-		/// 获取或设置数据提供程序绑定器。
+		/// 获取或设置数据写入值提供程序。
 		/// </summary>
-		Metadata.IDataValueProviderBinder Binder
+		Metadata.IDataValueProvider ValueProvider
 		{
 			get; set;
 		}

@@ -740,6 +740,7 @@ namespace Zongsoft.Data
 			_schema = schema;
 			_isMultiple = isMultiple;
 			this.Entity = DataContextUtility.GetEntity(name, dataAccess.Metadata);
+			this.ValueProvider = dataAccess.ValueProvider;
 		}
 		#endregion
 
@@ -750,6 +751,14 @@ namespace Zongsoft.Data
 		public Metadata.IDataEntity Entity
 		{
 			get;
+		}
+
+		/// <summary>
+		/// 获取或设置当前新增操作的写入值提供程序。
+		/// </summary>
+		public Metadata.IDataValueProvider ValueProvider
+		{
+			get; set;
 		}
 
 		/// <summary>
@@ -834,6 +843,24 @@ namespace Zongsoft.Data
 			}
 		}
 		#endregion
+
+		#region 公共方法
+		public bool TryGetRequiredValue(Metadata.IDataEntityProperty property, out object value)
+		{
+			return this.TryGetRequiredValue(DataAccessMethod.Insert, property, out value);
+		}
+
+		public bool TryGetRequiredValue(DataAccessMethod method, Metadata.IDataEntityProperty property, out object value)
+		{
+			var provider = this.ValueProvider;
+
+			if(provider != null)
+				return provider.TryGetValue(this, method, property, out value);
+
+			value = null;
+			return false;
+		}
+		#endregion
 	}
 
 	public class DataUpdateContextBase : DataAccessContextBase, IDataMutateContextBase
@@ -854,6 +881,7 @@ namespace Zongsoft.Data
 			_schema = schema;
 			_isMultiple = isMultiple;
 			this.Entity = DataContextUtility.GetEntity(name, dataAccess.Metadata);
+			this.ValueProvider = dataAccess.ValueProvider;
 		}
 		#endregion
 
@@ -864,6 +892,14 @@ namespace Zongsoft.Data
 		public Metadata.IDataEntity Entity
 		{
 			get;
+		}
+
+		/// <summary>
+		/// 获取或设置当前更新操作的写入值提供程序。
+		/// </summary>
+		public Metadata.IDataValueProvider ValueProvider
+		{
+			get; set;
 		}
 
 		/// <summary>
@@ -967,6 +1003,24 @@ namespace Zongsoft.Data
 			}
 		}
 		#endregion
+
+		#region 公共方法
+		public bool TryGetRequiredValue(Metadata.IDataEntityProperty property, out object value)
+		{
+			return this.TryGetRequiredValue(DataAccessMethod.Update, property, out value);
+		}
+
+		public bool TryGetRequiredValue(DataAccessMethod method, Metadata.IDataEntityProperty property, out object value)
+		{
+			var provider = this.ValueProvider;
+
+			if(provider != null)
+				return provider.TryGetValue(this, method, property, out value);
+
+			value = null;
+			return false;
+		}
+		#endregion
 	}
 
 	public class DataUpsertContextBase : DataAccessContextBase, IDataMutateContextBase
@@ -985,6 +1039,7 @@ namespace Zongsoft.Data
 			_schema = schema;
 			_isMultiple = isMultiple;
 			this.Entity = DataContextUtility.GetEntity(name, dataAccess.Metadata);
+			this.ValueProvider = dataAccess.ValueProvider;
 		}
 		#endregion
 
@@ -995,6 +1050,14 @@ namespace Zongsoft.Data
 		public Metadata.IDataEntity Entity
 		{
 			get;
+		}
+
+		/// <summary>
+		/// 获取或设置当前新增或更新操作的写入值提供程序。
+		/// </summary>
+		public Metadata.IDataValueProvider ValueProvider
+		{
+			get; set;
 		}
 
 		/// <summary>
@@ -1077,6 +1140,24 @@ namespace Zongsoft.Data
 				_schema = value;
 				this.OnPropertyChanged(nameof(Schema));
 			}
+		}
+		#endregion
+
+		#region 公共方法
+		public bool TryGetRequiredValue(Metadata.IDataEntityProperty property, out object value)
+		{
+			return this.TryGetRequiredValue(DataAccessMethod.Upsert, property, out value);
+		}
+
+		public bool TryGetRequiredValue(DataAccessMethod method, Metadata.IDataEntityProperty property, out object value)
+		{
+			var provider = this.ValueProvider;
+
+			if(provider != null)
+				return provider.TryGetValue(this, method, property, out value);
+
+			value = null;
+			return false;
 		}
 		#endregion
 	}

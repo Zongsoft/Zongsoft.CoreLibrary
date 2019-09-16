@@ -71,7 +71,6 @@ namespace Zongsoft.Data
 		private Common.ISequence _sequence;
 		private IDataAccessNaming _naming;
 		private FilterCollection _filters;
-		private Metadata.IDataValueProviderBinder _binder;
 		#endregion
 
 		#region 构造函数
@@ -155,28 +154,9 @@ namespace Zongsoft.Data
 		}
 
 		/// <summary>
-		/// 获取或设置数据提供程序绑定器。
+		/// 获取或设置数据写入值提供程序。
 		/// </summary>
-		[Obsolete]
-		public Metadata.IDataValueProviderBinder Binder
-		{
-			get
-			{
-				return _binder;
-			}
-			set
-			{
-				if(_binder != null)
-					_binder.Unbind(this.Metadata);
-
-				if(value != null)
-					value.Bind(this.Metadata);
-
-				_binder = value;
-			}
-		}
-
-		public Metadata.IDataRequiredValueProvider Validator
+		public Metadata.IDataValueProvider ValueProvider
 		{
 			get; set;
 		}

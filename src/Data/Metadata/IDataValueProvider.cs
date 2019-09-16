@@ -37,16 +37,18 @@ using System.Collections.Generic;
 namespace Zongsoft.Data.Metadata
 {
 	/// <summary>
-	/// 提供数据实体属性值的接口。
+	/// 提供数据实体属性写入值的接口。
 	/// </summary>
-	[Obsolete]
 	public interface IDataValueProvider
 	{
 		/// <summary>
-		/// 为指定写入数据的提供绑定值。
+		/// 尝试获取数据写入时指定属性的值。
 		/// </summary>
-		/// <param name="context">当前数据提供程序上下文对象。</param>
-		/// <returns>返回绑定的值。</returns>
-		object GetValue(IDataValueContext context);
+		/// <param name="context">当前数据访问上下文对象。</param>
+		/// <param name="method">当前数据写入的方法。</param>
+		/// <param name="property">尝试要写入的属性。</param>
+		/// <param name="value">输出参数，尝试写入的属性值。</param>
+		/// <returns>如果指定的属性有必须要写入数据则返回真(True)，否则返回假(False)。</returns>
+		bool TryGetValue(IDataMutateContextBase context, DataAccessMethod method, IDataEntityProperty property, out object value);
 	}
 }
