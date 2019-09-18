@@ -845,12 +845,12 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 公共方法
-		public bool TryGetRequiredValue(Metadata.IDataEntityProperty property, out object value)
+		public bool TryGetProvidedValue(Metadata.IDataEntityProperty property, out object value)
 		{
-			return this.TryGetRequiredValue(DataAccessMethod.Insert, property, out value);
+			return this.TryGetProvidedValue(DataAccessMethod.Insert, property, out value);
 		}
 
-		public bool TryGetRequiredValue(DataAccessMethod method, Metadata.IDataEntityProperty property, out object value)
+		public bool TryGetProvidedValue(DataAccessMethod method, Metadata.IDataEntityProperty property, out object value)
 		{
 			var provider = this.ValueProvider;
 
@@ -1005,12 +1005,12 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 公共方法
-		public bool TryGetRequiredValue(Metadata.IDataEntityProperty property, out object value)
+		public bool TryGetProvidedValue(Metadata.IDataEntityProperty property, out object value)
 		{
-			return this.TryGetRequiredValue(DataAccessMethod.Update, property, out value);
+			return this.TryGetProvidedValue(DataAccessMethod.Update, property, out value);
 		}
 
-		public bool TryGetRequiredValue(DataAccessMethod method, Metadata.IDataEntityProperty property, out object value)
+		public bool TryGetProvidedValue(DataAccessMethod method, Metadata.IDataEntityProperty property, out object value)
 		{
 			var provider = this.ValueProvider;
 
@@ -1144,12 +1144,12 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 公共方法
-		public bool TryGetRequiredValue(Metadata.IDataEntityProperty property, out object value)
+		public bool TryGetProvidedValue(Metadata.IDataEntityProperty property, out object value)
 		{
-			return this.TryGetRequiredValue(DataAccessMethod.Upsert, property, out value);
+			return this.TryGetProvidedValue(DataAccessMethod.Upsert, property, out value);
 		}
 
-		public bool TryGetRequiredValue(DataAccessMethod method, Metadata.IDataEntityProperty property, out object value)
+		public bool TryGetProvidedValue(DataAccessMethod method, Metadata.IDataEntityProperty property, out object value)
 		{
 			var provider = this.ValueProvider;
 
