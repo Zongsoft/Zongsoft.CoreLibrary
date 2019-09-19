@@ -1144,11 +1144,6 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 公共方法
-		public bool TryGetProvidedValue(Metadata.IDataEntityProperty property, out object value)
-		{
-			return this.TryGetProvidedValue(DataAccessMethod.Upsert, property, out value);
-		}
-
 		public bool TryGetProvidedValue(DataAccessMethod method, Metadata.IDataEntityProperty property, out object value)
 		{
 			var provider = this.ValueProvider;
