@@ -252,10 +252,12 @@ namespace Zongsoft.Security
 				this.CredentialId :
 				this.CredentialId + "!" + this.Scene;
 
-			if(this.User == null)
+			var user = this.User;
+
+			if(user == null)
 				return text;
 
-			return text + " {" + this.User.ToString() + "}";
+			return text + $" ({(string.IsNullOrEmpty(user.Namespace) ? string.Empty : user.Namespace + ":")}{user.Name}#{user.UserId.ToString()})";
 		}
 		#endregion
 	}
