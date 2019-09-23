@@ -59,22 +59,6 @@ namespace Zongsoft.Data.Metadata
 		}
 
 		/// <summary>
-		/// 获取数据实体属性的别名（字段名）。
-		/// </summary>
-		string Alias
-		{
-			get;
-		}
-
-		/// <summary>
-		/// 获取或设置数据实体属性的数据类型。
-		/// </summary>
-		System.Data.DbType Type
-		{
-			get;
-		}
-
-		/// <summary>
 		/// 获取一个值，指示数据实体属性是否为不可变属性，默认为假(False)。
 		/// </summary>
 		/// <remarks>

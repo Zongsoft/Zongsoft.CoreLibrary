@@ -42,11 +42,19 @@ namespace Zongsoft.Data.Metadata
 	public interface IDataEntitySimplexProperty : IDataEntityProperty
 	{
 		/// <summary>
-		/// 获取或设置默认值。
+		/// 获取数据实体属性的别名（字段名）。
 		/// </summary>
-		object DefaultValue
+		string Alias
 		{
-			get; set;
+			get;
+		}
+
+		/// <summary>
+		/// 获取或设置数据实体属性的数据类型。
+		/// </summary>
+		System.Data.DbType Type
+		{
+			get;
 		}
 
 		/// <summary>
@@ -69,6 +77,14 @@ namespace Zongsoft.Data.Metadata
 		/// 获取或设置数值属性的小数点位数。
 		/// </summary>
 		byte Scale
+		{
+			get; set;
+		}
+
+		/// <summary>
+		/// 获取或设置默认值。
+		/// </summary>
+		object DefaultValue
 		{
 			get; set;
 		}
