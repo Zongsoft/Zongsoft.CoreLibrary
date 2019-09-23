@@ -50,7 +50,7 @@ namespace Zongsoft.Data.Metadata
 		}
 
 		/// <summary>
-		/// 获取或设置数据实体属性的数据类型。
+		/// 获取数据实体属性的数据类型。
 		/// </summary>
 		System.Data.DbType Type
 		{
