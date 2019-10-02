@@ -84,7 +84,7 @@ namespace Zongsoft.Data
 		/// <param name="value">输出参数，指定属性名对应的变更后的值。</param>
 		/// <returns>如果指定名称的属性是存在的并且发生过变更，则返回真(True)，否则返回假(False)。</returns>
 		/// <remarks>
-		///		<para>注意：即使指定名称的属性是存在的，但只要其值未被更改过，也会返回假(False)。</para>
+		/// 	<para>注意：即使指定名称的属性是存在的，但只要其值未被更改过，也会返回假(False)。</para>
 		/// </remarks>
 		bool TryGetValue(string name, out object value);
 
