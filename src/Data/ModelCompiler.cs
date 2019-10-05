@@ -2257,14 +2257,9 @@ namespace Zongsoft.Data
 		{
 			var @prefix = string.IsNullOrEmpty(type.Namespace) ? string.Empty : type.Namespace + ".";
 
-			if(type.IsInterface)
-			{
-				return prefix +
-					(type.Name.Length > 1 && type.Name[0] == 'I' && char.IsUpper(type.Name[1]) ? type.Name.Substring(1) : type.Name) +
-					"!Implement";
-			}
-
-			return prefix + type.Name + "!Derive";
+			return type.IsInterface ?
+				prefix + type.Name + "!Contract" :
+				prefix + type.Name + "!Abstract";
 		}
 		#endregion
 
