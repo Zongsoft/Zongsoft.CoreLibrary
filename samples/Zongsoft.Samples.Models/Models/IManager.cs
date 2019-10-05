@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Zongsoft.Samples.Entities.Models
+namespace Zongsoft.Samples.Models
 {
-	[Zongsoft.Data.Entity("Manager")]
+	[Zongsoft.Data.Model("Manager")]
 	public interface IManager : IEmployee
 	{
 		bool IsAdvance

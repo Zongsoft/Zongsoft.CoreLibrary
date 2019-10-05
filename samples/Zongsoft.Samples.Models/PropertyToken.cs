@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Zongsoft.Samples.Entities
+namespace Zongsoft.Samples.Models
 {
 	internal struct PropertyToken<T>
 	{

@@ -2,9 +2,9 @@
 using System.ComponentModel;
 using System.Collections.Generic;
 
-namespace Zongsoft.Samples.Entities.Models
+namespace Zongsoft.Samples.Models
 {
-	[Zongsoft.Data.Entity("Security.User")]
+	[Zongsoft.Data.Model("Security.User")]
 	public interface IUserEntity : IPerson
 	{
 		[Zongsoft.Data.Conditional(ConverterType = typeof(object))]
@@ -29,14 +29,14 @@ namespace Zongsoft.Samples.Entities.Models
 			get; set;
 		}
 
-		[Zongsoft.Data.Entity.Property(Data.Entity.PropertyImplementationMode.Extension, typeof(UserExtension))]
+		[Zongsoft.Data.Model.Property(Data.Model.PropertyImplementationMode.Extension, typeof(UserExtension))]
 		string Avatar
 		{
 			get; set;
 		}
 
 		//[DefaultValue("xoxo")]
-		[Zongsoft.Data.Entity.Property(Data.Entity.PropertyImplementationMode.Extension, typeof(UserExtension))]
+		[Zongsoft.Data.Model.Property(Data.Model.PropertyImplementationMode.Extension, typeof(UserExtension))]
 		string AvatarUrl
 		{
 			get;

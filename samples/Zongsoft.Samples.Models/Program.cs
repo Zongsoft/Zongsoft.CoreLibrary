@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Diagnostics;
 
-namespace Zongsoft.Samples.Entities
+namespace Zongsoft.Samples.Models
 {
 	public class Program
 	{
@@ -12,8 +12,8 @@ namespace Zongsoft.Samples.Entities
 		{
 			//TestChanges();
 
-			Performance(COUNT);
-			PerformanceDynamic(COUNT);
+			//Performance(COUNT);
+			//PerformanceDynamic(COUNT);
 
 			BuildTest();
 
@@ -27,19 +27,19 @@ namespace Zongsoft.Samples.Entities
 
 		private static void BuildTest()
 		{
-			//Data.Entity.Build<Models.IManager>();
-			//Data.Entity.Save();
+			//Data.Model.Build<Models.IManager>();
+			//Data.Model.Save();
 
 			//return;
 
-			var person = Data.Entity.Build<Models.IPerson>();
-			var person1 = Data.Entity.Build<Models.IPerson>();
-			var user = Data.Entity.Build<Models.IUserEntity>();
-			var myentity = Data.Entity.Build<Models.IMyEntity>();
-			var employee = Data.Entity.Build<Models.IEmployee>();
-			var manager = Data.Entity.Build<Models.IManager>();
+			var person = Data.Model.Build<Models.IPerson>();
+			var person1 = Data.Model.Build<Models.Person>();
+			var user = Data.Model.Build<Models.IUserEntity>();
+			var myentity = Data.Model.Build<Models.IMyEntity>();
+			var employee = Data.Model.Build<Models.EmployeeBase>();
+			var manager = Data.Model.Build<Models.IManager>();
 
-			Data.Entity.Save();
+			Data.Model.Save();
 
 			//验证实体属性变更计数方法
 			TestCount();
@@ -167,8 +167,8 @@ namespace Zongsoft.Samples.Entities
 
 		private static void PerformanceDynamic(int count)
 		{
-			var creator = Data.Entity.GetCreator(typeof(Models.IUserEntity)); //预先编译
-			Data.Entity.Build<Models.IUserEntity>(); //预热（预先编译）
+			var creator = Data.Model.GetCreator(typeof(Models.IUserEntity)); //预先编译
+			Data.Model.Build<Models.IUserEntity>(); //预热（预先编译）
 
 			var stopwatch = new Stopwatch();
 
@@ -263,11 +263,11 @@ namespace Zongsoft.Samples.Entities
 			DisplayChanges(entity);
 		}
 
-		private static void DisplayChanges(Zongsoft.Data.IEntity entity)
+		private static void DisplayChanges(Zongsoft.Data.IModel model)
 		{
 			int index = 0;
 
-			foreach(var entry in entity.GetChanges())
+			foreach(var entry in model.GetChanges())
 			{
 				Console.WriteLine($"\t[{++index}] {entry.Key} = {entry.Value}");
 			}
@@ -275,7 +275,7 @@ namespace Zongsoft.Samples.Entities
 
 		private static void TestCount()
 		{
-			var result = Data.Entity.Build<Models.IMyEntity>(entity =>
+			var result = Data.Model.Build<Models.IMyEntity>(entity =>
 			{
 				entity.P1 = 100;
 				entity.P2 = "xxx";

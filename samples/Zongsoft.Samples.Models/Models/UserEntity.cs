@@ -2,8 +2,88 @@
 using System.ComponentModel;
 using System.Collections.Generic;
 
-namespace Zongsoft.Samples.Entities.Models
+namespace Zongsoft.Samples.Models
 {
+	public abstract class UserEntityBase : IUserEntity
+	{
+		public abstract uint UserId
+		{
+			get;
+			set;
+		}
+		public abstract string Namespace
+		{
+			get;
+			set;
+		}
+		public abstract string Email
+		{
+			get;
+			set;
+		}
+		public abstract string PhoneNumber
+		{
+			get;
+			set;
+		}
+		public abstract string Avatar
+		{
+			get;
+			set;
+		}
+		public abstract string AvatarUrl
+		{
+			get;
+		}
+		public abstract ICollection<object> Assets
+		{
+			get;
+		}
+		public abstract byte Status
+		{
+			get;
+			set;
+		}
+		public abstract DateTime? StatusTimestamp
+		{
+			get;
+			set;
+		}
+		public abstract string PrincipalId
+		{
+			get;
+			set;
+		}
+		public abstract DateTime CreatedTime
+		{
+			get;
+			set;
+		}
+		public abstract string Description
+		{
+			get;
+			set;
+		}
+		public abstract string Name
+		{
+			get;
+			set;
+		}
+		public abstract string FullName
+		{
+			get;
+			set;
+		}
+
+		public abstract int Count();
+		public abstract IDictionary<string, object> GetChanges();
+		public abstract bool HasChanges(params string[] names);
+		public abstract bool Reset(string name, out object value);
+		public abstract void Reset(params string[] names);
+		public abstract bool TryGetValue(string name, out object value);
+		public abstract bool TrySetValue(string name, object value);
+	}
+
 	public class UserEntity : IUserEntity, INotifyPropertyChanged
 	{
 		#region 静态字段
@@ -126,7 +206,7 @@ namespace Zongsoft.Samples.Entities.Models
 			}
 		}
 
-		[Zongsoft.Data.Entity.Property(Data.Entity.PropertyImplementationMode.Extension, typeof(UserExtension))]
+		[Zongsoft.Data.Model.Property(Data.Model.PropertyImplementationMode.Extension, typeof(UserExtension))]
 		public string Avatar
 		{
 			get => _avatar;
@@ -447,7 +527,7 @@ namespace Zongsoft.Samples.Entities.Models
 			return false;
 		}
 
-		bool Zongsoft.Data.IEntity.HasChanges(params string[] names)
+		bool Zongsoft.Data.IModel.HasChanges(params string[] names)
 		{
 			PropertyToken<UserEntity> property;
 
@@ -478,7 +558,7 @@ namespace Zongsoft.Samples.Entities.Models
 			return dictionary.Count == 0 ? null : dictionary;
 		}
 
-		IDictionary<string, object> Zongsoft.Data.IEntity.GetChanges()
+		IDictionary<string, object> Zongsoft.Data.IModel.GetChanges()
 		{
 			if(_MASK_ == 0)
 				return null;
@@ -509,7 +589,7 @@ namespace Zongsoft.Samples.Entities.Models
 			return false;
 		}
 
-		bool Zongsoft.Data.IEntity.TryGetValue(string name, out object value)
+		bool Zongsoft.Data.IModel.TryGetValue(string name, out object value)
 		{
 			value = null;
 
@@ -522,7 +602,7 @@ namespace Zongsoft.Samples.Entities.Models
 			return false;
 		}
 
-		bool Zongsoft.Data.IEntity.TrySetValue(string name, object value)
+		bool Zongsoft.Data.IModel.TrySetValue(string name, object value)
 		{
 			if(__TOKENS__.TryGetValue(name, out var property) && property.Setter != null)
 			{

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Zongsoft.Samples.Entities.Models
+namespace Zongsoft.Samples.Models
 {
 	public static class UserExtension
 	{

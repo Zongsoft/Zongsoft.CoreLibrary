@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Zongsoft.Samples.Entities.Models
+namespace Zongsoft.Samples.Models
 {
-	public interface IMyEntity : Data.IEntity
+	public interface IMyEntity : Data.IModel
 	{
 		int P1
 		{
