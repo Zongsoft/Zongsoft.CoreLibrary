@@ -268,7 +268,7 @@ namespace Zongsoft.Data
 		}
 		#endregion
 
-		#region 保护方法
+		#region 生成方法
 		private void GenerateProperties(TypeBuilder builder, FieldBuilder mask, IList<PropertyMetadata> properties, MemberInfo propertyChanged, out MethodToken[] methods)
 		{
 			//生成嵌套匿名委托静态类
@@ -801,7 +801,8 @@ namespace Zongsoft.Data
 			timesReadOnly = 0;
 
 			var DictionaryAddMethod = tokens.FieldType.GetMethod("Add");
-			generator.Emit(OpCodes.Newobj, tokens.FieldType.GetConstructor(Type.EmptyTypes));
+			generator.Emit(OpCodes.Ldc_I4, properties.Count);
+			generator.Emit(OpCodes.Newobj, tokens.FieldType.GetConstructor(new Type[] { typeof(int) }));
 
 			for(int i = 0; i < properties.Count; i++)
 			{
@@ -952,49 +953,6 @@ namespace Zongsoft.Data
 					}
 				}
 			}
-		}
-
-		protected static CustomAttributeBuilder GetAnnotation(CustomAttributeData attribute)
-		{
-			var arguments = new object[attribute.ConstructorArguments.Count];
-
-			if(arguments.Length > 0)
-			{
-				for(int i = 0; i < attribute.ConstructorArguments.Count; i++)
-				{
-					if(attribute.ConstructorArguments[i].Value == null)
-						arguments[i] = null;
-					else
-					{
-						if(Zongsoft.Common.TypeExtension.IsEnumerable(attribute.ConstructorArguments[i].Value.GetType()) &&
-						   Zongsoft.Common.TypeExtension.GetElementType(attribute.ConstructorArguments[i].Value.GetType()) == typeof(CustomAttributeTypedArgument))
-						{
-							var args = new List<object>();
-
-							foreach(CustomAttributeTypedArgument arg in (System.Collections.IEnumerable)attribute.ConstructorArguments[i].Value)
-							{
-								args.Add(arg.Value);
-							}
-
-							arguments[i] = args.ToArray();
-						}
-						else
-							arguments[i] = attribute.ConstructorArguments[i].Value;
-					}
-				}
-			}
-
-			if(attribute.NamedArguments.Count == 0)
-				return new CustomAttributeBuilder(attribute.Constructor, arguments);
-
-			var properties = attribute.NamedArguments.Where(p => !p.IsField).ToArray();
-			var fields = attribute.NamedArguments.Where(p => p.IsField).ToArray();
-
-			return new CustomAttributeBuilder(attribute.Constructor, arguments,
-											  properties.Select(p => (PropertyInfo)p.MemberInfo).ToArray(),
-											  properties.Select(p => p.TypedValue.Value).ToArray(),
-											  fields.Select(p => (FieldInfo)p.MemberInfo).ToArray(),
-											  fields.Select(p => p.TypedValue.Value).ToArray());
 		}
 
 		private void GeneratePropertyTokenClass()
@@ -1969,6 +1927,49 @@ namespace Zongsoft.Data
 			//return false;
 			generator.Emit(OpCodes.Ldc_I4_0);
 			generator.Emit(OpCodes.Ret);
+		}
+
+		protected static CustomAttributeBuilder GetAnnotation(CustomAttributeData attribute)
+		{
+			var arguments = new object[attribute.ConstructorArguments.Count];
+
+			if(arguments.Length > 0)
+			{
+				for(int i = 0; i < attribute.ConstructorArguments.Count; i++)
+				{
+					if(attribute.ConstructorArguments[i].Value == null)
+						arguments[i] = null;
+					else
+					{
+						if(Zongsoft.Common.TypeExtension.IsEnumerable(attribute.ConstructorArguments[i].Value.GetType()) &&
+						   Zongsoft.Common.TypeExtension.GetElementType(attribute.ConstructorArguments[i].Value.GetType()) == typeof(CustomAttributeTypedArgument))
+						{
+							var args = new List<object>();
+
+							foreach(CustomAttributeTypedArgument arg in (System.Collections.IEnumerable)attribute.ConstructorArguments[i].Value)
+							{
+								args.Add(arg.Value);
+							}
+
+							arguments[i] = args.ToArray();
+						}
+						else
+							arguments[i] = attribute.ConstructorArguments[i].Value;
+					}
+				}
+			}
+
+			if(attribute.NamedArguments.Count == 0)
+				return new CustomAttributeBuilder(attribute.Constructor, arguments);
+
+			var properties = attribute.NamedArguments.Where(p => !p.IsField).ToArray();
+			var fields = attribute.NamedArguments.Where(p => p.IsField).ToArray();
+
+			return new CustomAttributeBuilder(attribute.Constructor, arguments,
+											  properties.Select(p => (PropertyInfo)p.MemberInfo).ToArray(),
+											  properties.Select(p => p.TypedValue.Value).ToArray(),
+											  fields.Select(p => (FieldInfo)p.MemberInfo).ToArray(),
+											  fields.Select(p => p.TypedValue.Value).ToArray());
 		}
 		#endregion
 
