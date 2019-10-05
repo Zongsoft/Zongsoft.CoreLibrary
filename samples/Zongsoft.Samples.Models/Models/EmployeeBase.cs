@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Samples.Models
 {
+	[Zongsoft.Data.Model("Employee")]
 	public abstract class EmployeeBase : IEmployee
 	{
 		protected EmployeeBase()
