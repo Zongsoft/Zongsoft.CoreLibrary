@@ -47,19 +47,9 @@ namespace Zongsoft.Data
 	{
 		#region 常量定义
 		private const string ASSEMBLY_NAME = "Zongsoft.Dynamics.Models";
-
-		private const string MASK_VARIABLE = "$MASK$";
-		private const string PROPERTY_NAMES_VARIABLE = "$$PROPERTY_NAMES";
-		private const string PROPERTY_TOKENS_VARIABLE = "$$PROPERTY_TOKENS";
 		#endregion
 
 		#region 成员字段
-		private static Type PROPERTY_TOKEN_TYPE = null;
-		private static FieldInfo PROPERTY_TOKEN_GETTER_FIELD;
-		private static FieldInfo PROPERTY_TOKEN_SETTER_FIELD;
-		private static FieldInfo PROPERTY_TOKEN_ORDINAL_FIELD;
-		private static ConstructorBuilder PROPERTY_TOKEN_CONSTRUCTOR;
-
 		private static readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
 		private static readonly Dictionary<Type, Func<object>> _cache = new Dictionary<Type, Func<object>>();
 

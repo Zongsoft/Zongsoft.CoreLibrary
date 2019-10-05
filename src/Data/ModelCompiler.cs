@@ -65,7 +65,7 @@ namespace Zongsoft.Data
 		#region 构造函数
 		protected ModelCompilerBase(ModuleBuilder module)
 		{
-			_module = module;
+			_module = module ?? throw new ArgumentNullException(nameof(module));
 		}
 		#endregion
 
