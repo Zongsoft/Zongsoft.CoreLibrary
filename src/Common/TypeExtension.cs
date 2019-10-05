@@ -1,8 +1,15 @@
 ﻿/*
- * Authors:
- *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
+ *   _____                                ______
+ *  /_   /  ____  ____  ____  _________  / __/ /_
+ *    / /  / __ \/ __ \/ __ \/ ___/ __ \/ /_/ __/
+ *   / /__/ /_/ / / / / /_/ /\_ \/ /_/ / __/ /_
+ *  /____/\____/_/ /_/\__  /____/\____/_/  \__/
+ *                   /____/
  *
- * Copyright (C) 2013-2014 Zongsoft Corporation <http://www.zongsoft.com>
+ * Authors:
+ *   钟峰(Popeye Zhong) <zongsoft@qq.com>
+ *
+ * Copyright (C) 2013-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -26,6 +33,7 @@
 
 using System;
 using System.Linq;
+using System.Reflection;
 using System.ComponentModel;
 using System.Collections;
 using System.Collections.Generic;
@@ -330,6 +338,46 @@ namespace Zongsoft.Common
 			}
 
 			return System.Activator.CreateInstance(type);
+		}
+
+		public static MethodInfo GetMethod(this Type type, string name, Type[] parameterTypes)
+		{
+			return GetMethod(type, name, parameterTypes, BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static);
+		}
+
+		public static MethodInfo GetMethod(this Type type, string name, Type[] parameterTypes, BindingFlags bindingFlags)
+		{
+			var members = type.FindMembers(MemberTypes.Method, bindingFlags, (m, _) =>
+			{
+				if(parameterTypes == null || parameterTypes.Length == 0)
+					return m.Name == name;
+
+				if(m.Name == name)
+				{
+					var parameters = ((MethodInfo)m).GetParameters();
+
+					if(parameters.Length == parameterTypes.Length)
+					{
+						for(int i = 0; i < parameters.Length; i++)
+						{
+							if(parameters[i].ParameterType != parameterTypes[i])
+								return false;
+						}
+
+						return true;
+					}
+				}
+
+				return false;
+			}, null);
+
+			if(members == null || members.Length == 0)
+				return null;
+
+			if(members.Length > 1)
+				throw new System.Reflection.AmbiguousMatchException();
+
+			return (MethodInfo)members[0];
 		}
 
 		public static string GetTypeAlias<T>()
