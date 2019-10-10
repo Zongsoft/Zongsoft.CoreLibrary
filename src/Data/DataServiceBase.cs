@@ -1317,9 +1317,6 @@ namespace Zongsoft.Data
 		/// <param name="values">指定的查询值数组。</param>
 		/// <param name="singular">输出一个值，指示返回的查询条件执行后的结果是否为单个对象。</param>
 		/// <returns>返回对应的查询<see cref="ICondition"/>条件。</returns>
-		/// <remarks>
-		///		<para>基类的实现始终返回当前数据服务对应的主键的键值对数组。</para>
-		/// </remarks>
 		protected virtual ICondition GetKey(object[] values, out bool singular)
 		{
 			//设置输出参数默认值
@@ -1331,12 +1328,12 @@ namespace Zongsoft.Data
 			//获取当前数据服务对应的主键
 			var primaryKey = this.DataAccess.Metadata.Entities.Get(this.Name).Key;
 
-			//如果主键获取失败或主键未定义或主键项数量不等于传入的数组元素个数则返回空
-			if(primaryKey == null || primaryKey.Length == 0 || primaryKey.Length != values.Length)
+			//如果主键获取失败或主键未定义或主键项数量小于传入的数组元素个数则返回空
+			if(primaryKey == null || primaryKey.Length == 0 || primaryKey.Length < values.Length)
 				return null;
 
-			//匹配主键，故查询结果为单一项
-			singular = true;
+			//只有传入参数值数量与主键数匹配其结果才为单个项
+			singular = primaryKey.Length == values.Length;
 
 			//如果主键成员只有一个则返回单个条件
 			if(primaryKey.Length == 1)
