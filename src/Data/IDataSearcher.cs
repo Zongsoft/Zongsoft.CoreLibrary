@@ -33,6 +33,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
@@ -57,15 +58,15 @@ namespace Zongsoft.Data
 			get;
 		}
 
-		int Count(string keyword, object state = null);
-		bool Exists(string keyword, object state = null);
+		int Count(string keyword, IDictionary<string, object> states = null);
+		bool Exists(string keyword, IDictionary<string, object> states = null);
 
 		IEnumerable Search(string keyword, params Sorting[] sortings);
-		IEnumerable Search(string keyword, object state, params Sorting[] sortings);
+		IEnumerable Search(string keyword, IDictionary<string, object> states, params Sorting[] sortings);
 		IEnumerable Search(string keyword, Paging paging, params Sorting[] sortings);
 		IEnumerable Search(string keyword, string schema, params Sorting[] sortings);
-		IEnumerable Search(string keyword, string schema, object state, params Sorting[] sortings);
+		IEnumerable Search(string keyword, string schema, IDictionary<string, object> states, params Sorting[] sortings);
 		IEnumerable Search(string keyword, string schema, Paging paging, params Sorting[] sortings);
-		IEnumerable Search(string keyword, string schema, Paging paging, object state, params Sorting[] sortings);
+		IEnumerable Search(string keyword, string schema, Paging paging, IDictionary<string, object> states, params Sorting[] sortings);
 	}
 }

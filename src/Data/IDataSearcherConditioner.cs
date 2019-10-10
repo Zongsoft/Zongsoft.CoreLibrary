@@ -38,6 +38,6 @@ namespace Zongsoft.Data
 {
 	public interface IDataSearcherConditioner
 	{
-		ICondition Resolve(string method, string keyword, object state);
+		ICondition Resolve(string method, string keyword, IDictionary<string, object> states);
 	}
 }

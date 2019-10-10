@@ -43,11 +43,11 @@ namespace Zongsoft.Data
 	public interface IDataSearcher<TEntity> : IDataSearcher
 	{
 		new IEnumerable<TEntity> Search(string keyword, params Sorting[] sortings);
-		new IEnumerable<TEntity> Search(string keyword, object state, params Sorting[] sortings);
+		new IEnumerable<TEntity> Search(string keyword, IDictionary<string, object> states, params Sorting[] sortings);
 		new IEnumerable<TEntity> Search(string keyword, Paging paging, params Sorting[] sortings);
 		new IEnumerable<TEntity> Search(string keyword, string schema, params Sorting[] sortings);
-		new IEnumerable<TEntity> Search(string keyword, string schema, object state, params Sorting[] sortings);
+		new IEnumerable<TEntity> Search(string keyword, string schema, IDictionary<string, object> states, params Sorting[] sortings);
 		new IEnumerable<TEntity> Search(string keyword, string schema, Paging paging, params Sorting[] sortings);
-		new IEnumerable<TEntity> Search(string keyword, string schema, Paging paging, object state, params Sorting[] sortings);
+		new IEnumerable<TEntity> Search(string keyword, string schema, Paging paging, IDictionary<string, object> states, params Sorting[] sortings);
 	}
 }

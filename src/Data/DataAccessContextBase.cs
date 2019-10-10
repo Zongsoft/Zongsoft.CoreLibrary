@@ -51,7 +51,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		protected DataAccessContextBase(IDataAccess dataAccess, string name, DataAccessMethod method, object state)
+		protected DataAccessContextBase(IDataAccess dataAccess, string name, DataAccessMethod method, IDictionary<string, object> states)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
@@ -59,7 +59,7 @@ namespace Zongsoft.Data
 			this.Name = name;
 			this.Method = method;
 			this.DataAccess = dataAccess ?? throw new ArgumentNullException(nameof(dataAccess));
-			this.State = state;
+			_states = states;
 		}
 		#endregion
 
@@ -97,14 +97,6 @@ namespace Zongsoft.Data
 			{
 				return Services.ApplicationContext.Current.Principal as Zongsoft.Security.CredentialPrincipal;
 			}
-		}
-
-		/// <summary>
-		/// 获取或设置数据访问的附加数据。
-		/// </summary>
-		public object State
-		{
-			get; set;
 		}
 
 		/// <summary>
