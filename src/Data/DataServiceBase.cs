@@ -200,7 +200,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 授权验证
-		protected virtual void Authorize(Method method, IDictionary<string, object> states)
+		protected virtual void Authorize(Method method, ref IDictionary<string, object> states)
 		{
 			var credential = this.Credential;
 
@@ -218,7 +218,7 @@ namespace Zongsoft.Data
 		public IEnumerable<T> Execute<T>(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters, IDictionary<string, object> states = null)
 		{
 			//进行授权验证
-			this.Authorize(Method.Execute(), states);
+			this.Authorize(Method.Execute(), ref states);
 
 			return this.OnExecute<T>(name, inParameters, out outParameters, states);
 		}
@@ -236,7 +236,7 @@ namespace Zongsoft.Data
 		public object ExecuteScalar(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters, IDictionary<string, object> states = null)
 		{
 			//进行授权验证
-			this.Authorize(Method.Execute(), states);
+			this.Authorize(Method.Execute(), ref states);
 
 			return this.OnExecuteScalar(name, inParameters, out outParameters, states);
 		}
@@ -266,7 +266,7 @@ namespace Zongsoft.Data
 		public bool Exists(ICondition condition, IDictionary<string, object> states = null)
 		{
 			//进行授权验证
-			this.Authorize(Method.Exists(), states);
+			this.Authorize(Method.Exists(), ref states);
 
 			//修整查询条件
 			condition = this.OnValidate(Method.Exists(), condition);
@@ -295,7 +295,7 @@ namespace Zongsoft.Data
 		public int Count(ICondition condition, string member = null, IDictionary<string, object> states = null)
 		{
 			//进行授权验证
-			this.Authorize(Method.Count(), states);
+			this.Authorize(Method.Count(), ref states);
 
 			//修整查询条件
 			condition = this.OnValidate(Method.Count(), condition);
@@ -339,7 +339,7 @@ namespace Zongsoft.Data
 		public long Increment(string member, ICondition condition, int interval = 1, IDictionary<string, object> states = null)
 		{
 			//进行授权验证
-			this.Authorize(Method.Increment(), states);
+			this.Authorize(Method.Increment(), ref states);
 
 			//修整查询条件
 			condition = this.OnValidate(Method.Increment(), condition);
@@ -366,7 +366,7 @@ namespace Zongsoft.Data
 			this.EnsureDelete();
 
 			//进行授权验证
-			this.Authorize(Method.Delete(), states);
+			this.Authorize(Method.Delete(), ref states);
 
 			//将删除键转换成条件对象，并进行修整
 			var condition = this.OnValidate(Method.Delete(), this.ConvertKey(key, out _));
@@ -386,7 +386,7 @@ namespace Zongsoft.Data
 			this.EnsureDelete();
 
 			//进行授权验证
-			this.Authorize(Method.Delete(), states);
+			this.Authorize(Method.Delete(), ref states);
 
 			//将删除键转换成条件对象，并进行修整
 			var condition = this.OnValidate(Method.Delete(), this.ConvertKey(key1, key2, out _));
@@ -406,7 +406,7 @@ namespace Zongsoft.Data
 			this.EnsureDelete();
 
 			//进行授权验证
-			this.Authorize(Method.Delete(), states);
+			this.Authorize(Method.Delete(), ref states);
 
 			//将删除键转换成条件对象，并进行修整
 			var condition = this.OnValidate(Method.Delete(), this.ConvertKey(key1, key2, key3, out _));
@@ -426,7 +426,7 @@ namespace Zongsoft.Data
 			this.EnsureDelete();
 
 			//进行授权验证
-			this.Authorize(Method.Delete(), states);
+			this.Authorize(Method.Delete(), ref states);
 
 			//修整删除条件
 			condition = this.OnValidate(Method.Delete(), condition);
@@ -466,7 +466,7 @@ namespace Zongsoft.Data
 			this.EnsureInsert();
 
 			//进行授权验证
-			this.Authorize(Method.Insert(), states);
+			this.Authorize(Method.Insert(), ref states);
 
 			if(data == null)
 				return 0;
@@ -510,7 +510,7 @@ namespace Zongsoft.Data
 			this.EnsureInsert();
 
 			//进行授权验证
-			this.Authorize(Method.InsertMany(), states);
+			this.Authorize(Method.InsertMany(), ref states);
 
 			if(items == null)
 				return 0;
@@ -559,7 +559,7 @@ namespace Zongsoft.Data
 			this.EnsureInsert();
 
 			//进行授权验证
-			this.Authorize(Method.Upsert(), states);
+			this.Authorize(Method.Upsert(), ref states);
 
 			if(data == null)
 				return 0;
@@ -603,7 +603,7 @@ namespace Zongsoft.Data
 			this.EnsureInsert();
 
 			//进行授权验证
-			this.Authorize(Method.UpsertMany(), states);
+			this.Authorize(Method.UpsertMany(), ref states);
 
 			if(items == null)
 				return 0;
@@ -682,7 +682,7 @@ namespace Zongsoft.Data
 			this.EnsureUpdate();
 
 			//进行授权验证
-			this.Authorize(Method.Update(), states);
+			this.Authorize(Method.Update(), ref states);
 
 			//将当前更新数据对象转换成数据字典
 			var dictionary = DataDictionary.GetDictionary<TEntity>(data);
@@ -731,7 +731,7 @@ namespace Zongsoft.Data
 			this.EnsureUpdate();
 
 			//进行授权验证
-			this.Authorize(Method.UpdateMany(), states);
+			this.Authorize(Method.UpdateMany(), ref states);
 
 			if(items == null)
 				return 0;
@@ -802,7 +802,7 @@ namespace Zongsoft.Data
 			if(singular)
 			{
 				//进行授权验证
-				this.Authorize(Method.Get(), states);
+				this.Authorize(Method.Get(), ref states);
 
 				//修整查询条件
 				condition = this.OnValidate(Method.Get(), condition);
@@ -860,7 +860,7 @@ namespace Zongsoft.Data
 			if(singular)
 			{
 				//进行授权验证
-				this.Authorize(Method.Get(), states);
+				this.Authorize(Method.Get(), ref states);
 
 				//修整查询条件
 				condition = this.OnValidate(Method.Get(), condition);
@@ -918,7 +918,7 @@ namespace Zongsoft.Data
 			if(singular)
 			{
 				//进行授权验证
-				this.Authorize(Method.Get(), states);
+				this.Authorize(Method.Get(), ref states);
 
 				//修整查询条件
 				condition = this.OnValidate(Method.Get(), condition);
@@ -994,7 +994,7 @@ namespace Zongsoft.Data
 		public IEnumerable<TEntity> Select(ICondition condition, string schema, Paging paging, IDictionary<string, object> states, params Sorting[] sortings)
 		{
 			//进行授权验证
-			this.Authorize(Method.Select(), states);
+			this.Authorize(Method.Select(), ref states);
 
 			//修整查询条件
 			condition = this.OnValidate(Method.Select(), condition);
@@ -1053,7 +1053,7 @@ namespace Zongsoft.Data
 		public IEnumerable<T> Select<T>(Grouping grouping, ICondition condition, string schema, Paging paging, IDictionary<string, object> states = null, params Sorting[] sortings)
 		{
 			//进行授权验证
-			this.Authorize(Method.Select(), states);
+			this.Authorize(Method.Select(), ref states);
 
 			//修整查询条件
 			condition = this.OnValidate(Method.Select(), condition);
