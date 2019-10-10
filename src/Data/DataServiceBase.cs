@@ -1315,15 +1315,15 @@ namespace Zongsoft.Data
 		/// 根据指定的查询参数值获取对应的查询<see cref="ICondition"/>条件。
 		/// </summary>
 		/// <param name="values">指定的查询值数组。</param>
-		/// <param name="singleton">输出一个值，指示返回的查询条件执行后的结果是否为单个对象。</param>
+		/// <param name="singular">输出一个值，指示返回的查询条件执行后的结果是否为单个对象。</param>
 		/// <returns>返回对应的查询<see cref="ICondition"/>条件。</returns>
 		/// <remarks>
 		///		<para>基类的实现始终返回当前数据服务对应的主键的键值对数组。</para>
 		/// </remarks>
-		protected virtual ICondition GetKey(object[] values, out bool singleton)
+		protected virtual ICondition GetKey(object[] values, out bool singular)
 		{
 			//设置输出参数默认值
-			singleton = false;
+			singular = false;
 
 			if(values == null || values.Length == 0)
 				return null;
@@ -1336,7 +1336,7 @@ namespace Zongsoft.Data
 				return null;
 
 			//匹配主键，故查询结果为单一项
-			singleton = true;
+			singular = true;
 
 			//如果主键成员只有一个则返回单个条件
 			if(primaryKey.Length == 1)
@@ -1347,7 +1347,7 @@ namespace Zongsoft.Data
 
 					if(parts.Length > 1)
 					{
-						singleton = false;
+						singular = false;
 						return Condition.In(primaryKey[0].Name, parts);
 					}
 
