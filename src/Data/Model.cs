@@ -59,8 +59,8 @@ namespace Zongsoft.Data
 		private static readonly AssemblyBuilder _assembly = AppDomain.CurrentDomain.DefineDynamicAssembly(new AssemblyName(ASSEMBLY_NAME), AssemblyBuilderAccess.RunAndSave);
 		private static readonly ModuleBuilder _module = _assembly.DefineDynamicModule(ASSEMBLY_NAME, ASSEMBLY_NAME + ".dll");
 
-		private static readonly ModelAbstractCompiler _abstractCompiler = new ModelAbstractCompiler(_module);
-		private static readonly ModelContractCompiler _contractCompiler = new ModelContractCompiler(_module);
+		private static readonly ModelAbstractEmitter _abstractEmitter = new ModelAbstractEmitter(_module);
+		private static readonly ModelContractEmitter _contractEmitter = new ModelContractEmitter(_module);
 		#endregion
 
 		#region 公共方法
@@ -165,7 +165,7 @@ namespace Zongsoft.Data
 				_locker.EnterWriteLock();
 
 				if(!_cache.TryGetValue(type, out creator))
-					creator = _cache[type] = type.IsInterface ? _contractCompiler.Compile(type) : _abstractCompiler.Compile(type);
+					creator = _cache[type] = type.IsInterface ? _contractEmitter.Compile(type) : _abstractEmitter.Compile(type);
 
 				return creator;
 			}

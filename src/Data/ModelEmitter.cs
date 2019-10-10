@@ -42,7 +42,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
-	internal abstract class ModelCompilerBase
+	internal abstract class ModelEmitterBase
 	{
 		#region 常量定义
 		private const string MASK_VARIABLE = "$MASK$";
@@ -63,7 +63,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		protected ModelCompilerBase(ModuleBuilder module)
+		protected ModelEmitterBase(ModuleBuilder module)
 		{
 			_module = module ?? throw new ArgumentNullException(nameof(module));
 		}
@@ -2470,10 +2470,10 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
-	internal class ModelContractCompiler : ModelCompilerBase
+	internal class ModelContractEmitter : ModelEmitterBase
 	{
 		#region 构造函数
-		public ModelContractCompiler(ModuleBuilder module) : base(module)
+		public ModelContractEmitter(ModuleBuilder module) : base(module)
 		{
 		}
 		#endregion
@@ -2752,10 +2752,10 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
-	internal class ModelAbstractCompiler : ModelCompilerBase
+	internal class ModelAbstractEmitter : ModelEmitterBase
 	{
 		#region 构造函数
-		public ModelAbstractCompiler(ModuleBuilder module) : base(module)
+		public ModelAbstractEmitter(ModuleBuilder module) : base(module)
 		{
 		}
 		#endregion
