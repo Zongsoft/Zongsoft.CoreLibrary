@@ -32,7 +32,7 @@ namespace Zongsoft.Services.Commands
 	public abstract class WorkerCommandBase : CommandBase<CommandContext>
 	{
 		#region 事件定义
-		public event EventHandler<Zongsoft.ComponentModel.PropertyChangedEventArgs> PropertyChanged;
+		public new event EventHandler<Zongsoft.ComponentModel.PropertyChangedEventArgs> PropertyChanged;
 		#endregion
 
 		#region 成员字段
