@@ -84,7 +84,8 @@
     <Compile Include="Common\BitVector32.cs" />
     <Compile Include="Common\ExecutionResult.cs" />
     <Compile Include="Data\DataAccessFilterCollection.cs" />
-    <Compile Include="Data\Metadata\IDataValueProvider.cs" />
+    <Compile Include="Data\IDataValueBinder.cs" />
+    <Compile Include="Data\IDataValueProvider.cs" />
     <Compile Include="Data\Metadata\DataAssociationConstraint.cs" />
     <Compile Include="Data\Metadata\DataAssociationConstraintActor.cs" />
     <Compile Include="Data\Metadata\DataAssociationLink.cs" />

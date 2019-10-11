@@ -34,7 +34,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Zongsoft.Data.Metadata
+namespace Zongsoft.Data
 {
 	/// <summary>
 	/// 提供数据实体属性写入值的接口。
@@ -49,6 +49,6 @@ namespace Zongsoft.Data.Metadata
 		/// <param name="property">尝试要写入的属性。</param>
 		/// <param name="value">输出参数，尝试写入的属性值。</param>
 		/// <returns>如果指定的属性有必须要写入数据则返回真(True)，否则返回假(False)。</returns>
-		bool TryGetValue(IDataMutateContextBase context, DataAccessMethod method, IDataEntityProperty property, out object value);
+		bool TryGetValue(IDataMutateContextBase context, DataAccessMethod method, Metadata.IDataEntityProperty property, out object value);
 	}
 }

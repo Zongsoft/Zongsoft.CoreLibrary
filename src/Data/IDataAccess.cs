@@ -112,7 +112,7 @@ namespace Zongsoft.Data
 		/// <summary>
 		/// 获取或设置数据写入值提供程序。
 		/// </summary>
-		Metadata.IDataValueProvider ValueProvider
+		IDataValueProvider ValueProvider
 		{
 			get; set;
 		}

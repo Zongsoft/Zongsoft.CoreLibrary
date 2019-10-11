@@ -756,7 +756,7 @@ namespace Zongsoft.Data
 		/// <summary>
 		/// 获取或设置当前新增操作的写入值提供程序。
 		/// </summary>
-		public Metadata.IDataValueProvider ValueProvider
+		public IDataValueProvider ValueProvider
 		{
 			get; set;
 		}
@@ -897,7 +897,7 @@ namespace Zongsoft.Data
 		/// <summary>
 		/// 获取或设置当前更新操作的写入值提供程序。
 		/// </summary>
-		public Metadata.IDataValueProvider ValueProvider
+		public IDataValueProvider ValueProvider
 		{
 			get; set;
 		}
@@ -1055,7 +1055,7 @@ namespace Zongsoft.Data
 		/// <summary>
 		/// 获取或设置当前新增或更新操作的写入值提供程序。
 		/// </summary>
-		public Metadata.IDataValueProvider ValueProvider
+		public IDataValueProvider ValueProvider
 		{
 			get; set;
 		}
