@@ -130,6 +130,9 @@ namespace Zongsoft.Runtime.Serialization
 
 		private void WriteScalarValue(object value, IDictionary dictionary, string prefix)
 		{
+			if(value == null)
+				return;
+
 			if(value.GetType().IsArray)
 			{
 				var index = 0;
