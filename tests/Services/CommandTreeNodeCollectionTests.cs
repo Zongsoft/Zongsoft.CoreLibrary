@@ -26,11 +26,10 @@ namespace Zongsoft.Services.Tests
 			Assert.NotNull(nodes["StronglyDummy"].Command);
 			Assert.Same(typeof(DummyCommand), nodes["StronglyDummy"].Command.GetType());
 
-			var list = (System.Collections.IList)nodes;
+			var commands = (ICollection<ICommand>)nodes;
 
-			//以弱类型的方式添加命令到命令树节点集合中
-			Assert.NotNull(list.Add(new DummyCommand("WeaklyDummy")));
-			Assert.Equal(3, list.Count);
+			commands.Add(new DummyCommand("WeaklyDummy"));
+			Assert.Equal(3, commands.Count);
 
 			Assert.NotNull(nodes["WeaklyDummy"]);
 			Assert.Same(typeof(CommandTreeNode), nodes["WeaklyDummy"].GetType());

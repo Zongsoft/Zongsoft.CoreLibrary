@@ -34,7 +34,7 @@ namespace Zongsoft.Runtime.Caching.Tests
 		{
 			_cache.Changed += Cache_Changed;
 
-			_cache.SetValue("Key1", "Value #1", TimeSpan.FromSeconds(5));
+			_cache.SetValue("Key1", "Value #1", TimeSpan.FromSeconds(60));
 			_cache.SetValue("Key2", "Value #2");
 			_cache.SetValue("Key3", "Value #3");
 

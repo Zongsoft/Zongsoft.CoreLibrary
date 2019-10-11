@@ -128,13 +128,14 @@ namespace Zongsoft.Reflection
 			public ClassEntity(int id)
 			{
 				this.Id = id;
+				this.Birthdate = null;
 			}
 
 			public readonly int Id;
 			public string Name;
 			public DateTime? Birthdate;
 
-			public static ClassEntity Instance;
+			public static ClassEntity Instance = null;
 		}
 
 		private struct ValueEntity
