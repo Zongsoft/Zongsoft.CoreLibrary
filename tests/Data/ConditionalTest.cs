@@ -26,16 +26,16 @@ namespace Zongsoft.Data
 			Assert.Null(conditional.DepartmentId);
 			Assert.Equal(0, conditional.CorporationId);
 
-			conditional.CreatedTime = new ConditionalRange<DateTime>(new DateTime(2010, 1, 1), null);
+			conditional.CreatedTime = new Range<DateTime>(new DateTime(2010, 1, 1), null);
 			Assert.NotNull(conditional.CreatedTime);
-			Assert.Equal(new DateTime(2010, 1, 1), conditional.CreatedTime.From);
+			Assert.Equal(new DateTime(2010, 1, 1), conditional.CreatedTime.Value.Minimum);
 
 			var conditions = conditional.ToConditions();
 			Assert.NotNull(conditions);
 			Assert.True(conditions.Count > 0);
 		}
 
-		public interface IDummyConditional : IConditional
+		public interface IDummyConditional : IModel
 		{
 			int? CorporationId
 			{
@@ -53,7 +53,7 @@ namespace Zongsoft.Data
 				get; set;
 			}
 
-			ConditionalRange<DateTime> CreatedTime
+			Range<DateTime>? CreatedTime
 			{
 				get; set;
 			}
