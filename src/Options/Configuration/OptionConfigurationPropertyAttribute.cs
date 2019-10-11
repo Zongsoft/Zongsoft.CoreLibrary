@@ -43,7 +43,6 @@ namespace Zongsoft.Options.Configuration
 		private string _elementName;
 		private Type _type;
 		private object _defaultValue;
-		private TypeConverter _converter;
 		private OptionConfigurationPropertyBehavior _behavior;
 		#endregion
 
