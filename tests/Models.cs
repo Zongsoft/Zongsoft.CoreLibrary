@@ -1581,173 +1581,479 @@ namespace Zongsoft.Tests
 		}
 		public int Property21
 		{
-			get => throw new NotImplementedException();
-			set => throw new NotImplementedException();
+			get => _property21;
+			set
+			{
+				if(_property21 == value)
+					return;
+
+				_property21 = value;
+				//_MASK_[20 / 8] |= (byte)Math.Pow(2, 20 % 8);
+				_MASKS_[2] |= 16;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property21)));
+			}
 		}
 		public int Property22
 		{
-			get => throw new NotImplementedException();
-			set => throw new NotImplementedException();
+			get => _property22;
+			set
+			{
+				if(_property22 == value)
+					return;
+
+				_property22 = value;
+				//_MASK_[21 / 8] |= (byte)Math.Pow(2, 21 % 8);
+				_MASKS_[2] |= 32;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property22)));
+			}
 		}
 		public int Property23
 		{
-			get => throw new NotImplementedException();
-			set => throw new NotImplementedException();
+			get => _property23;
+			set
+			{
+				if(_property23 == value)
+					return;
+
+				_property23 = value;
+				//_MASK_[22 / 8] |= (byte)Math.Pow(2, 22 % 8);
+				_MASKS_[2] |= 64;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property23)));
+			}
 		}
 		public int Property24
 		{
-			get => throw new NotImplementedException();
-			set => throw new NotImplementedException();
+			get => _property24;
+			set
+			{
+				if(_property24 == value)
+					return;
+
+				_property24 = value;
+				//_MASK_[23 / 8] |= (byte)Math.Pow(2, 23 % 8);
+				_MASKS_[2] |= 128;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property24)));
+			}
 		}
 		public int Property25
 		{
-			get => throw new NotImplementedException();
-			set => throw new NotImplementedException();
+			get => _property25;
+			set
+			{
+				if(_property25 == value)
+					return;
+
+				_property25 = value;
+				//_MASK_[24 / 8] |= (byte)Math.Pow(2, 24 % 8);
+				_MASKS_[3] |= 1;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property25)));
+			}
 		}
 		public int Property26
 		{
-			get => throw new NotImplementedException();
-			set => throw new NotImplementedException();
+			get => _property26;
+			set
+			{
+				if(_property26 == value)
+					return;
+
+				_property26 = value;
+				//_MASK_[25 / 8] |= (byte)Math.Pow(2, 25 % 8);
+				_MASKS_[3] |= 2;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property26)));
+			}
 		}
 		public int Property27
 		{
-			get => throw new NotImplementedException();
-			set => throw new NotImplementedException();
+			get => _property27;
+			set
+			{
+				if(_property27 == value)
+					return;
+
+				_property27 = value;
+				//_MASK_[26 / 8] |= (byte)Math.Pow(2, 26 % 8);
+				_MASKS_[3] |= 4;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property27)));
+			}
 		}
 		public int Property28
 		{
-			get => throw new NotImplementedException();
-			set => throw new NotImplementedException();
+			get => _property28;
+			set
+			{
+				if(_property28 == value)
+					return;
+
+				_property28 = value;
+				//_MASK_[27 / 8] |= (byte)Math.Pow(2, 27 % 8);
+				_MASKS_[3] |= 8;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property28)));
+			}
 		}
 		public int Property29
 		{
-			get => throw new NotImplementedException();
-			set => throw new NotImplementedException();
+			get => _property29;
+			set
+			{
+				if(_property29 == value)
+					return;
+
+				_property29 = value;
+				//_MASK_[28 / 8] |= (byte)Math.Pow(2, 28 % 8);
+				_MASKS_[3] |= 16;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property29)));
+			}
 		}
 		public int Property30
 		{
-			get => throw new NotImplementedException();
-			set => throw new NotImplementedException();
+			get => _property30;
+			set
+			{
+				if(_property30 == value)
+					return;
+
+				_property30 = value;
+				//_MASK_[29 / 8] |= (byte)Math.Pow(2, 29 % 8);
+				_MASKS_[3] |= 32;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property30)));
+			}
 		}
 		public int Property31
 		{
-			get => throw new NotImplementedException();
-			set => throw new NotImplementedException();
+			get => _property31;
+			set
+			{
+				if(_property31 == value)
+					return;
+
+				_property31 = value;
+				//_MASK_[30 / 8] |= (byte)Math.Pow(2, 30 % 8);
+				_MASKS_[3] |= 64;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property31)));
+			}
 		}
 		public int Property32
 		{
-			get => throw new NotImplementedException();
-			set => throw new NotImplementedException();
+			get => _property32;
+			set
+			{
+				if(_property32 == value)
+					return;
+
+				_property32 = value;
+				//_MASK_[31 / 8] |= (byte)Math.Pow(2, 31 % 8);
+				_MASKS_[3] |= 128;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property32)));
+			}
 		}
 		public int Property33
 		{
-			get => throw new NotImplementedException();
-			set => throw new NotImplementedException();
+			get => _property33;
+			set
+			{
+				if(_property33 == value)
+					return;
+
+				_property33 = value;
+				//_MASK_[32 / 8] |= (byte)Math.Pow(2, 32 % 8);
+				_MASKS_[4] |= 1;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property33)));
+			}
 		}
 		public int Property34
 		{
-			get => throw new NotImplementedException();
-			set => throw new NotImplementedException();
+			get => _property34;
+			set
+			{
+				if(_property34 == value)
+					return;
+
+				_property34 = value;
+				//_MASK_[33 / 8] |= (byte)Math.Pow(2, 33 % 8);
+				_MASKS_[4] |= 2;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property34)));
+			}
 		}
 		public int Property35
 		{
-			get => throw new NotImplementedException();
-			set => throw new NotImplementedException();
+			get => _property35;
+			set
+			{
+				if(_property35 == value)
+					return;
+
+				_property35 = value;
+				//_MASK_[34 / 8] |= (byte)Math.Pow(2, 34 % 8);
+				_MASKS_[4] |= 4;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property35)));
+			}
 		}
 		public int Property36
 		{
-			get => throw new NotImplementedException();
-			set => throw new NotImplementedException();
+			get => _property36;
+			set
+			{
+				if(_property36 == value)
+					return;
+
+				_property36 = value;
+				//_MASK_[35 / 8] |= (byte)Math.Pow(2, 35 % 8);
+				_MASKS_[4] |= 8;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property36)));
+			}
 		}
 		public int Property37
 		{
-			get => throw new NotImplementedException();
-			set => throw new NotImplementedException();
+			get => _property37;
+			set
+			{
+				if(_property37 == value)
+					return;
+
+				_property37 = value;
+				//_MASK_[36 / 8] |= (byte)Math.Pow(2, 36 % 8);
+				_MASKS_[4] |= 16;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property37)));
+			}
 		}
 		public int Property38
 		{
-			get => throw new NotImplementedException();
-			set => throw new NotImplementedException();
+			get => _property38;
+			set
+			{
+				if(_property38 == value)
+					return;
+
+				_property38 = value;
+				//_MASK_[37 / 8] |= (byte)Math.Pow(2, 37 % 8);
+				_MASKS_[4] |= 32;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property38)));
+			}
 		}
 		public int Property39
 		{
-			get => throw new NotImplementedException();
-			set => throw new NotImplementedException();
+			get => _property39;
+			set
+			{
+				if(_property39 == value)
+					return;
+
+				_property39 = value;
+				//_MASK_[38 / 8] |= (byte)Math.Pow(2, 38 % 8);
+				_MASKS_[4] |= 64;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property39)));
+			}
 		}
 		public int Property40
 		{
-			get => throw new NotImplementedException();
-			set => throw new NotImplementedException();
+			get => _property40;
+			set
+			{
+				if(_property40 == value)
+					return;
+
+				_property40 = value;
+				//_MASK_[39 / 8] |= (byte)Math.Pow(2, 39 % 8);
+				_MASKS_[4] |= 128;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property40)));
+			}
 		}
 		public int Property41
 		{
-			get => throw new NotImplementedException();
-			set => throw new NotImplementedException();
+			get => _property41;
+			set
+			{
+				if(_property41 == value)
+					return;
+
+				_property41 = value;
+				//_MASK_[40 / 8] |= (byte)Math.Pow(2, 40 % 8);
+				_MASKS_[5] |= 1;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property41)));
+			}
 		}
 		public int Property42
 		{
-			get => throw new NotImplementedException();
-			set => throw new NotImplementedException();
+			get => _property42;
+			set
+			{
+				if(_property42 == value)
+					return;
+
+				_property42 = value;
+				//_MASK_[41 / 8] |= (byte)Math.Pow(2, 41 % 8);
+				_MASKS_[5] |= 2;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property42)));
+			}
 		}
 		public int Property43
 		{
-			get => throw new NotImplementedException();
-			set => throw new NotImplementedException();
+			get => _property43;
+			set
+			{
+				if(_property43 == value)
+					return;
+
+				_property43 = value;
+				//_MASK_[42 / 8] |= (byte)Math.Pow(2, 42 % 8);
+				_MASKS_[5] |= 4;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property43)));
+			}
 		}
 		public int Property44
 		{
-			get => throw new NotImplementedException();
-			set => throw new NotImplementedException();
+			get => _property44;
+			set
+			{
+				if(_property44 == value)
+					return;
+
+				_property44 = value;
+				//_MASK_[43 / 8] |= (byte)Math.Pow(2, 43 % 8);
+				_MASKS_[5] |= 8;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property44)));
+			}
 		}
 		public int Property45
 		{
-			get => throw new NotImplementedException();
-			set => throw new NotImplementedException();
+			get => _property45;
+			set
+			{
+				if(_property45 == value)
+					return;
+
+				_property45 = value;
+				//_MASK_[44 / 8] |= (byte)Math.Pow(2, 44 % 8);
+				_MASKS_[5] |= 16;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property45)));
+			}
 		}
 		public int Property46
 		{
-			get => throw new NotImplementedException();
-			set => throw new NotImplementedException();
+			get => _property46;
+			set
+			{
+				if(_property46 == value)
+					return;
+
+				_property46 = value;
+				//_MASK_[45 / 8] |= (byte)Math.Pow(2, 45 % 8);
+				_MASKS_[5] |= 32;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property46)));
+			}
 		}
 		public int Property47
 		{
-			get => throw new NotImplementedException();
-			set => throw new NotImplementedException();
+			get => _property47;
+			set
+			{
+				if(_property47 == value)
+					return;
+
+				_property47 = value;
+				//_MASK_[46 / 8] |= (byte)Math.Pow(2, 46 % 8);
+				_MASKS_[5] |= 64;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property47)));
+			}
 		}
 		public int Property48
 		{
-			get => throw new NotImplementedException();
-			set => throw new NotImplementedException();
+			get => _property48;
+			set
+			{
+				if(_property48 == value)
+					return;
+
+				_property48 = value;
+				//_MASK_[47 / 8] |= (byte)Math.Pow(2, 47 % 8);
+				_MASKS_[5] |= 128;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property48)));
+			}
 		}
 		public int Property49
 		{
-			get => throw new NotImplementedException();
-			set => throw new NotImplementedException();
+			get => _property49;
+			set
+			{
+				if(_property49 == value)
+					return;
+
+				_property49 = value;
+				//_MASK_[48 / 8] |= (byte)Math.Pow(2, 48 % 8);
+				_MASKS_[6] |= 1;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property49)));
+			}
 		}
 		public int Property50
 		{
-			get => throw new NotImplementedException();
-			set => throw new NotImplementedException();
+			get => _property50;
+			set
+			{
+				if(_property50 == value)
+					return;
+
+				_property50 = value;
+				//_MASK_[49 / 8] |= (byte)Math.Pow(2, 49 % 8);
+				_MASKS_[6] |= 2;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property50)));
+			}
 		}
 		public int Property51
 		{
-			get => throw new NotImplementedException();
-			set => throw new NotImplementedException();
+			get => _property51;
+			set
+			{
+				if(_property51 == value)
+					return;
+
+				_property51 = value;
+				//_MASK_[50 / 8] |= (byte)Math.Pow(2, 50 % 8);
+				_MASKS_[6] |= 4;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property51)));
+			}
 		}
 		public int Property52
 		{
-			get => throw new NotImplementedException();
-			set => throw new NotImplementedException();
+			get => _property52;
+			set
+			{
+				if(_property52 == value)
+					return;
+
+				_property52 = value;
+				//_MASK_[51 / 8] |= (byte)Math.Pow(2, 51 % 8);
+				_MASKS_[6] |= 8;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property52)));
+			}
 		}
 		public int Property53
 		{
-			get => throw new NotImplementedException();
-			set => throw new NotImplementedException();
+			get => _property53;
+			set
+			{
+				if(_property53 == value)
+					return;
+
+				_property53 = value;
+				//_MASK_[52 / 8] |= (byte)Math.Pow(2, 52 % 8);
+				_MASKS_[6] |= 16;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property53)));
+			}
 		}
 		public int Property54
 		{
-			get => throw new NotImplementedException();
-			set => throw new NotImplementedException();
+			get => _property54;
+			set
+			{
+				if(_property54 == value)
+					return;
+
+				_property54 = value;
+				//_MASK_[53 / 8] |= (byte)Math.Pow(2, 53 % 8);
+				_MASKS_[6] |= 32;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property54)));
+			}
 		}
 		public int Property55
 		{
