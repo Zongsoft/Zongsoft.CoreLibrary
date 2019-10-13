@@ -38,22 +38,6 @@ namespace Zongsoft.Reflection
 {
 	public static class Reflector
 	{
-		public static object GetValue(this MemberInfo member, ref object target, params object[] parameters)
-		{
-			if(member == null)
-				throw new ArgumentNullException(nameof(member));
-
-			switch(member.MemberType)
-			{
-				case MemberTypes.Field:
-					return GetValue((FieldInfo)member, ref target);
-				case MemberTypes.Property:
-					return GetValue((PropertyInfo)member, ref target, parameters);
-				default:
-					throw new NotSupportedException($"The {member.MemberType.ToString()} of member that is not supported.");
-			}
-		}
-
 		public static object GetValue(this FieldInfo field, ref object target)
 		{
 			return field.GetGetter().Invoke(ref target);
@@ -67,23 +51,30 @@ namespace Zongsoft.Reflection
 			return property.GetGetter().Invoke(ref target, parameters);
 		}
 
+		public static object GetValue(this MemberInfo member, ref object target, params object[] parameters)
+		{
+			if(member == null)
+				throw new ArgumentNullException(nameof(member));
+
+			return TryGetValue(member, ref target, parameters, out var value) ? value :
+			       throw new NotSupportedException($"The {member.MemberType.ToString()} of member that is not supported.");
+		}
+
 		public static object GetValue(object target, string name, params object[] parameters)
 		{
 			if(target == null)
 				throw new ArgumentNullException(nameof(target));
 
-			var type = (target as Type) ?? target.GetType();
-			var members = string.IsNullOrEmpty(name) ?
-				type.GetDefaultMembers() :
-				type.GetMember(name, MemberTypes.Property | MemberTypes.Field, BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static);
-
-			if(members == null || members.Length == 0)
-				throw new ArgumentException($"A member named '{name}' does not exist in the '{type.FullName}' type.");
-
-			return GetValue(members[0], ref target, parameters);
+			return TryGetValue(target, name, parameters, out var value) ? value :
+			       throw new ArgumentException($"A member named '{name}' does not exist in the '{target.ToString()}'.");
 		}
 
-		public static void SetValue(this MemberInfo member, ref object target, object value, params object[] parameters)
+		public static bool TryGetValue(this MemberInfo member, ref object target, out object value)
+		{
+			return TryGetValue(member, ref target, Array.Empty<object>(), out value);
+		}
+
+		public static bool TryGetValue(this MemberInfo member, ref object target, object[] parameters, out object value)
 		{
 			if(member == null)
 				throw new ArgumentNullException(nameof(member));
@@ -91,14 +82,39 @@ namespace Zongsoft.Reflection
 			switch(member.MemberType)
 			{
 				case MemberTypes.Field:
-					SetValue((FieldInfo)member, ref target, value);
-					break;
+					value = GetValue((FieldInfo)member, ref target);
+					return true;
 				case MemberTypes.Property:
-					SetValue((PropertyInfo)member, ref target, value, parameters);
-					break;
-				default:
-					throw new NotSupportedException($"The {member.MemberType.ToString()} of member that is not supported.");
+					value = GetValue((PropertyInfo)member, ref target, parameters);
+					return true;
 			}
+
+			value = null;
+			return false;
+		}
+
+		public static bool TryGetValue(object target, string name, out object value)
+		{
+			return TryGetValue(target, name, Array.Empty<object>(), out value);
+		}
+
+		public static bool TryGetValue(object target, string name, object[] parameters, out object value)
+		{
+			if(target == null)
+				throw new ArgumentNullException(nameof(target));
+
+			value = null;
+
+			var type = (target as Type) ?? target.GetType();
+			var members = string.IsNullOrEmpty(name) ?
+				type.GetDefaultMembers() :
+				type.GetMember(name, MemberTypes.Property | MemberTypes.Field, BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static);
+
+			if(members == null || members.Length == 0)
+				return false;
+
+			value = GetValue(members[0], ref target, parameters);
+			return true;
 		}
 
 		public static void SetValue(this FieldInfo field, ref object target, object value)
@@ -114,7 +130,43 @@ namespace Zongsoft.Reflection
 			property.GetSetter().Invoke(ref target, value, parameters);
 		}
 
+		public static void SetValue(this MemberInfo member, ref object target, object value, params object[] parameters)
+		{
+			if(member == null)
+				throw new ArgumentNullException(nameof(member));
+
+			if(!TrySetValue(member, ref target, value, parameters))
+				throw new NotSupportedException($"The {member.MemberType.ToString()} of member that is not supported.");
+		}
+
 		public static void SetValue(ref object target, string name, object value, params object[] parameters)
+		{
+			if(target == null)
+				throw new ArgumentNullException(nameof(target));
+
+			if(!TrySetValue(ref target, name, value, parameters))
+				throw new ArgumentException($"A member named '{name}' does not exist in the '{target.ToString()}'.");
+		}
+
+		public static bool TrySetValue(this MemberInfo member, ref object target, object value, params object[] parameters)
+		{
+			if(member == null)
+				throw new ArgumentNullException(nameof(member));
+
+			switch(member.MemberType)
+			{
+				case MemberTypes.Field:
+					SetValue((FieldInfo)member, ref target, value);
+					return true;
+				case MemberTypes.Property:
+					SetValue((PropertyInfo)member, ref target, value, parameters);
+					return true;
+			}
+
+			return false;
+		}
+
+		public static bool TrySetValue(ref object target, string name, object value, params object[] parameters)
 		{
 			if(target == null)
 				throw new ArgumentNullException(nameof(target));
@@ -125,9 +177,9 @@ namespace Zongsoft.Reflection
 				type.GetMember(name, MemberTypes.Property | MemberTypes.Field, BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static);
 
 			if(members == null || members.Length == 0)
-				throw new ArgumentException($"A member named '{name}' does not exist in the '{type.FullName}' type.");
+				return false;
 
-			SetValue(members[0], ref target, value, parameters);
+			return TrySetValue(members[0], ref target, value, parameters);
 		}
 	}
 }
