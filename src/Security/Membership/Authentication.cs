@@ -78,6 +78,14 @@ namespace Zongsoft.Security.Membership
 		{
 			get;
 		}
+
+		/// <summary>
+		/// 获取或设置命名空间提供程序。
+		/// </summary>
+		public INamespaceProvider Namespaces
+		{
+			get; set;
+		}
 		#endregion
 
 		#region 事件响应
