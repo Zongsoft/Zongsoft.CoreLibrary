@@ -68,10 +68,7 @@ namespace Zongsoft.Security
 		/// </summary>
 		public virtual CredentialIdentity Identity
 		{
-			get
-			{
-				return _identity ?? CredentialIdentity.Empty;
-			}
+			get => _identity;
 		}
 
 		/// <summary>
@@ -86,7 +83,7 @@ namespace Zongsoft.Security
 				if(identity != null && string.Equals(identity.Name, "Administrator", StringComparison.OrdinalIgnoreCase))
 					return true;
 
-				return _roles != null && _roles.Count > 0 && _roles.Contains("Administrators");
+				return _roles != null && _roles.Contains("Administrators");
 			}
 		}
 		#endregion
@@ -94,7 +91,7 @@ namespace Zongsoft.Security
 		#region 公共方法
 		public bool InRole(string roleName)
 		{
-			if(string.IsNullOrEmpty(roleName) || _roles == null || _roles.Count == 0)
+			if(_roles == null || string.IsNullOrEmpty(roleName))
 				return false;
 
 			return _roles.Contains(roleName);
@@ -119,12 +116,8 @@ namespace Zongsoft.Security
 		#region 重写方法
 		public override string ToString()
 		{
-			var identity = _identity;
-
-			if(identity == null)
-				return this.GetType().Name + ":<Empty>";
-
-			return this.GetType().Name + ":{" + identity.ToString() + "}";
+			var identity = this.Identity;
+			return identity == null ? string.Empty : identity.ToString();
 		}
 		#endregion
 	}

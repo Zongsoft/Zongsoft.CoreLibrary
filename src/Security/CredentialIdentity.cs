@@ -84,7 +84,7 @@ namespace Zongsoft.Security
 		{
 			get
 			{
-				if(string.IsNullOrWhiteSpace(_credentialId))
+				if(string.IsNullOrEmpty(_credentialId))
 					return false;
 
 				//获取当前凭证对象
@@ -105,14 +105,13 @@ namespace Zongsoft.Security
 
 		public virtual Credential Credential
 		{
-			[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
 			get
 			{
-				if(string.IsNullOrWhiteSpace(_credentialId))
-					return null;
-
 				if(_credential == null)
 				{
+					if(string.IsNullOrEmpty(_credentialId))
+						return null;
+
 					var provider = this.Provider;
 
 					if(provider != null)
@@ -149,12 +148,9 @@ namespace Zongsoft.Security
 		#region 重写方法
 		public override string ToString()
 		{
-			var credential = this.Credential;
-
-			if(credential == null)
-				return "[NoAuthenticated] " + _credentialId;
-			else
-				return "[Authenticated] " + credential.ToString();
+			return this.IsAuthenticated ?
+				"Authenticated:" + this.CredentialId :
+				"Not Authenticated";
 		}
 		#endregion
 	}
