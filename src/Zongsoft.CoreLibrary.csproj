@@ -87,6 +87,7 @@
     <Compile Include="Data\DataAccessFilterCollection.cs" />
     <Compile Include="Data\IDataValueBinder.cs" />
     <Compile Include="Data\IDataValueProvider.cs" />
+    <Compile Include="Data\Interval.cs" />
     <Compile Include="Data\Metadata\DataAssociationConstraint.cs" />
     <Compile Include="Data\Metadata\DataAssociationConstraintActor.cs" />
     <Compile Include="Data\Metadata\DataAssociationLink.cs" />
