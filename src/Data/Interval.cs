@@ -32,36 +32,43 @@
  */
 
 using System;
-using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
 	/// <summary>
-	/// 表示数据写入的递增(减)的数据量。
+	/// 表示数据写入的递增(减)的步长值。
 	/// </summary>
-	public struct Interval : IEquatable<Interval>
+	public struct Interval : IConvertible, IComparable<Interval>, IEquatable<Interval>
 	{
+		#region 静态字段
+		/// <summary>表示递增一的步长。</summary>
+		public static readonly Interval Increment = new Interval(1);
+
+		/// <summary>表示递减一的步长。</summary>
+		public static readonly Interval Decrement = new Interval(-1);
+		#endregion
+
 		#region 公共字段
 		/// <summary>递增(减)的步长值。</summary>
 		public readonly int Value;
-
-		/// <summary>递增(减)的初始值。</summary>
-		public readonly int Seed;
 		#endregion
 
 		#region 构造函数
-		public Interval(int value = 1, int seed = 0)
+		public Interval(int value)
 		{
 			this.Value = value;
-			this.Seed = seed;
 		}
 		#endregion
 
 		#region 重写方法
+		public int CompareTo(Interval other)
+		{
+			return this.Value.CompareTo(other.Value);
+		}
+
 		public bool Equals(Interval other)
 		{
-			return this.Value == other.Value &&
-			       this.Seed == other.Seed;
+			return this.Value == other.Value;
 		}
 
 		public override bool Equals(object obj)
@@ -74,12 +81,106 @@ namespace Zongsoft.Data
 
 		public override int GetHashCode()
 		{
-			return EqualityComparer<Interval>.Default.GetHashCode(this);
+			return this.Value.GetHashCode();
+		}
+		#endregion
+
+		#region 转换方法
+		public TypeCode GetTypeCode()
+		{
+			return this.Value.GetTypeCode();
 		}
 
-		public override string ToString()
+		object IConvertible.ToType(Type conversionType, IFormatProvider provider)
 		{
-			return this.Value.ToString() + "/" + this.Seed.ToString();
+			return ((IConvertible)Value).ToType(conversionType, provider);
+		}
+
+		bool IConvertible.ToBoolean(IFormatProvider provider)
+		{
+			return ((IConvertible)Value).ToBoolean(provider);
+		}
+
+		byte IConvertible.ToByte(IFormatProvider provider)
+		{
+			return ((IConvertible)Value).ToByte(provider);
+		}
+
+		char IConvertible.ToChar(IFormatProvider provider)
+		{
+			return ((IConvertible)Value).ToChar(provider);
+		}
+
+		DateTime IConvertible.ToDateTime(IFormatProvider provider)
+		{
+			return ((IConvertible)Value).ToDateTime(provider);
+		}
+
+		decimal IConvertible.ToDecimal(IFormatProvider provider)
+		{
+			return ((IConvertible)Value).ToDecimal(provider);
+		}
+
+		double IConvertible.ToDouble(IFormatProvider provider)
+		{
+			return ((IConvertible)Value).ToDouble(provider);
+		}
+
+		short IConvertible.ToInt16(IFormatProvider provider)
+		{
+			return ((IConvertible)Value).ToInt16(provider);
+		}
+
+		int IConvertible.ToInt32(IFormatProvider provider)
+		{
+			return ((IConvertible)Value).ToInt32(provider);
+		}
+
+		long IConvertible.ToInt64(IFormatProvider provider)
+		{
+			return ((IConvertible)Value).ToInt64(provider);
+		}
+
+		sbyte IConvertible.ToSByte(IFormatProvider provider)
+		{
+			return ((IConvertible)Value).ToSByte(provider);
+		}
+
+		float IConvertible.ToSingle(IFormatProvider provider)
+		{
+			return ((IConvertible)Value).ToSingle(provider);
+		}
+
+		string IConvertible.ToString(IFormatProvider provider)
+		{
+			return Value.ToString(provider);
+		}
+
+		ushort IConvertible.ToUInt16(IFormatProvider provider)
+		{
+			return ((IConvertible)Value).ToUInt16(provider);
+		}
+
+		uint IConvertible.ToUInt32(IFormatProvider provider)
+		{
+			return ((IConvertible)Value).ToUInt32(provider);
+		}
+
+		ulong IConvertible.ToUInt64(IFormatProvider provider)
+		{
+			return ((IConvertible)Value).ToUInt64(provider);
+		}
+		#endregion
+
+		#region 类型转换
+		public static implicit operator int(Interval interval)
+		{
+			return interval.Value;
+		}
+
+		public static implicit operator Interval(int value)
+		{
+			return new Interval(value);
 		}
 		#endregion
 	}
