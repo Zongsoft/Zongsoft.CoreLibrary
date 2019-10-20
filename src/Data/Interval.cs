@@ -38,7 +38,7 @@ namespace Zongsoft.Data
 	/// <summary>
 	/// 表示数据写入的递增(减)的步长值。
 	/// </summary>
-	public struct Interval : IConvertible, IComparable<Interval>, IEquatable<Interval>
+	public struct Interval : IConvertible, IComparable<Interval>, IEquatable<Interval>, IFormattable
 	{
 		#region 静态字段
 		/// <summary>表示递增一的步长。</summary>
@@ -82,6 +82,16 @@ namespace Zongsoft.Data
 		public override int GetHashCode()
 		{
 			return this.Value.GetHashCode();
+		}
+
+		public override string ToString()
+		{
+			return Value.ToString();
+		}
+
+		public string ToString(string format, IFormatProvider provider)
+		{
+			return Value.ToString(format, provider);
 		}
 		#endregion
 
@@ -172,7 +182,37 @@ namespace Zongsoft.Data
 		}
 		#endregion
 
-		#region 类型转换
+		#region 运算符号
+		public static bool operator ==(Interval a, Interval b)
+		{
+			return a.Value == b.Value;
+		}
+
+		public static bool operator !=(Interval a, Interval b)
+		{
+			return a.Value != b.Value;
+		}
+
+		public static bool operator <(Interval a, Interval b)
+		{
+			return a.Value < b.Value;
+		}
+
+		public static bool operator <=(Interval a, Interval b)
+		{
+			return a.Value <= b.Value;
+		}
+
+		public static bool operator >(Interval a, Interval b)
+		{
+			return a.Value > b.Value;
+		}
+
+		public static bool operator >=(Interval a, Interval b)
+		{
+			return a.Value >= b.Value;
+		}
+
 		public static implicit operator int(Interval interval)
 		{
 			return interval.Value;
