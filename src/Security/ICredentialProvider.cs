@@ -72,6 +72,7 @@ namespace Zongsoft.Security
 		/// 续约指定的安全凭证。
 		/// </summary>
 		/// <param name="credentialId">指定要续约的安全凭证编号。</param>
+		/// <remarks>注：续约操作会依次激发“Unregistered”和“Registered”事件。</remarks>
 		Credential Renew(string credentialId);
 
 		/// <summary>
