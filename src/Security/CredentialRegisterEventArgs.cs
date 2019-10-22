@@ -1,4 +1,11 @@
 ﻿/*
+ *   _____                                ______
+ *  /_   /  ____  ____  ____  _________  / __/ /_
+ *    / /  / __ \/ __ \/ __ \/ ___/ __ \/ /_/ __/
+ *   / /__/ /_/ / / / / /_/ /\_ \/ /_/ / __/ /_
+ *  /____/\____/_/ /_/\__  /____/\____/_/  \__/
+ *                   /____/
+ *
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
@@ -33,8 +40,9 @@ namespace Zongsoft.Security
 	public class CredentialRegisterEventArgs : EventArgs
 	{
 		#region 构造函数
-		public CredentialRegisterEventArgs(Credential credential)
+		public CredentialRegisterEventArgs(Credential credential, bool renewal = false)
 		{
+			this.IsRenewal = renewal;
 			this.Credential = credential ?? throw new ArgumentNullException(nameof(credential));
 		}
 		#endregion
@@ -59,7 +67,18 @@ namespace Zongsoft.Security
 		/// <summary>
 		/// 获取或设置注册成功的凭证对象。
 		/// </summary>
-		public Credential Credential { get; set; }
+		public Credential Credential
+		{
+			get; set;
+		}
+
+		/// <summary>
+		/// 获取一个值，指示当前注册是否为续约引发。
+		/// </summary>
+		public bool IsRenewal
+		{
+			get;
+		}
 		#endregion
 	}
 }

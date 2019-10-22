@@ -1,4 +1,11 @@
 ﻿/*
+ *   _____                                ______
+ *  /_   /  ____  ____  ____  _________  / __/ /_
+ *    / /  / __ \/ __ \/ __ \/ ___/ __ \/ /_/ __/
+ *   / /__/ /_/ / / / / /_/ /\_ \/ /_/ / __/ /_
+ *  /____/\____/_/ /_/\__  /____/\____/_/  \__/
+ *                   /____/
+ *
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
@@ -32,23 +39,19 @@ namespace Zongsoft.Security
 	[Serializable]
 	public class CredentialUnregisterEventArgs : EventArgs
 	{
-		#region 成员字段
-		private string _credentialId;
-		private Credential _credential;
-		#endregion
-
 		#region 构造函数
 		public CredentialUnregisterEventArgs(string credentialId)
 		{
-			_credentialId = credentialId;
+			this.CredentialId = credentialId;
 		}
 
-		public CredentialUnregisterEventArgs(Credential credential)
+		public CredentialUnregisterEventArgs(Credential credential, bool renewal = false)
 		{
-			_credential = credential;
+			this.IsRenewal = renewal;
+			this.Credential = credential;
 
 			if(credential != null)
-				_credentialId = credential.CredentialId;
+				this.CredentialId = credential.CredentialId;
 		}
 		#endregion
 
@@ -58,10 +61,7 @@ namespace Zongsoft.Security
 		/// </summary>
 		public string CredentialId
 		{
-			get
-			{
-				return _credentialId;
-			}
+			get;
 		}
 
 		/// <summary>
@@ -69,10 +69,15 @@ namespace Zongsoft.Security
 		/// </summary>
 		public Credential Credential
 		{
-			get
-			{
-				return _credential;
-			}
+			get;
+		}
+
+		/// <summary>
+		/// 获取一个值，指示当前注销是否为续约引发。
+		/// </summary>
+		public bool IsRenewal
+		{
+			get;
 		}
 		#endregion
 	}
