@@ -632,7 +632,7 @@ namespace Zongsoft.Data
 			if(data == null)
 				return 0;
 
-			return this.Insert(this.GetName(data.GetType()), data, string.Empty, null, null, null);
+			return this.Insert(this.GetName<T>(), data, string.Empty, null, null, null);
 		}
 
 		public int Insert<T>(T data, IDictionary<string, object> states)
@@ -640,7 +640,7 @@ namespace Zongsoft.Data
 			if(data == null)
 				return 0;
 
-			return this.Insert(this.GetName(data.GetType()), data, string.Empty, states, null, null);
+			return this.Insert(this.GetName<T>(), data, string.Empty, states, null, null);
 		}
 
 		public int Insert<T>(T data, string schema)
@@ -648,7 +648,7 @@ namespace Zongsoft.Data
 			if(data == null)
 				return 0;
 
-			return this.Insert(this.GetName(data.GetType()), data, schema, null, null, null);
+			return this.Insert(this.GetName<T>(), data, schema, null, null, null);
 		}
 
 		public int Insert<T>(T data, string schema, IDictionary<string, object> states, Func<DataInsertContextBase, bool> inserting = null, Action<DataInsertContextBase> inserted = null)
@@ -656,7 +656,7 @@ namespace Zongsoft.Data
 			if(data == null)
 				return 0;
 
-			return this.Insert(this.GetName(data.GetType()), data, schema, states, inserting, inserted);
+			return this.Insert(this.GetName<T>(), data, schema, states, inserting, inserted);
 		}
 
 		public int Insert<T>(object data)
@@ -664,7 +664,7 @@ namespace Zongsoft.Data
 			if(data == null)
 				return 0;
 
-			return this.Insert(this.GetName(typeof(T)), data, string.Empty, null, null, null);
+			return this.Insert(this.GetName<T>(), data, string.Empty, null, null, null);
 		}
 
 		public int Insert<T>(object data, IDictionary<string, object> states)
@@ -672,7 +672,7 @@ namespace Zongsoft.Data
 			if(data == null)
 				return 0;
 
-			return this.Insert(this.GetName(typeof(T)), data, string.Empty, states, null, null);
+			return this.Insert(this.GetName<T>(), data, string.Empty, states, null, null);
 		}
 
 		public int Insert<T>(object data, string schema)
@@ -680,7 +680,7 @@ namespace Zongsoft.Data
 			if(data == null)
 				return 0;
 
-			return this.Insert(this.GetName(typeof(T)), data, schema, null, null, null);
+			return this.Insert(this.GetName<T>(), data, schema, null, null, null);
 		}
 
 		public int Insert<T>(object data, string schema, IDictionary<string, object> states, Func<DataInsertContextBase, bool> inserting = null, Action<DataInsertContextBase> inserted = null)
@@ -688,7 +688,7 @@ namespace Zongsoft.Data
 			if(data == null)
 				return 0;
 
-			return this.Insert(this.GetName(typeof(T)), data, schema, states, inserting, inserted);
+			return this.Insert(this.GetName<T>(), data, schema, states, inserting, inserted);
 		}
 
 		public int Insert(string name, object data)
@@ -892,7 +892,7 @@ namespace Zongsoft.Data
 			if(data == null)
 				return 0;
 
-			return this.Upsert(this.GetName(data.GetType()), data, string.Empty, null, null, null);
+			return this.Upsert(this.GetName<T>(), data, string.Empty, null, null, null);
 		}
 
 		public int Upsert<T>(T data, IDictionary<string, object> states)
@@ -900,7 +900,7 @@ namespace Zongsoft.Data
 			if(data == null)
 				return 0;
 
-			return this.Upsert(this.GetName(data.GetType()), data, string.Empty, states, null, null);
+			return this.Upsert(this.GetName<T>(), data, string.Empty, states, null, null);
 		}
 
 		public int Upsert<T>(T data, string schema)
@@ -908,7 +908,7 @@ namespace Zongsoft.Data
 			if(data == null)
 				return 0;
 
-			return this.Upsert(this.GetName(data.GetType()), data, schema, null, null, null);
+			return this.Upsert(this.GetName<T>(), data, schema, null, null, null);
 		}
 
 		public int Upsert<T>(T data, string schema, IDictionary<string, object> states, Func<DataUpsertContextBase, bool> upserting = null, Action<DataUpsertContextBase> upserted = null)
@@ -916,7 +916,7 @@ namespace Zongsoft.Data
 			if(data == null)
 				return 0;
 
-			return this.Upsert(this.GetName(data.GetType()), data, schema, states, upserting, upserted);
+			return this.Upsert(this.GetName<T>(), data, schema, states, upserting, upserted);
 		}
 
 		public int Upsert<T>(object data)
@@ -924,7 +924,7 @@ namespace Zongsoft.Data
 			if(data == null)
 				return 0;
 
-			return this.Upsert(this.GetName(typeof(T)), data, string.Empty, null, null, null);
+			return this.Upsert(this.GetName<T>(), data, string.Empty, null, null, null);
 		}
 
 		public int Upsert<T>(object data, IDictionary<string, object> states)
@@ -932,7 +932,7 @@ namespace Zongsoft.Data
 			if(data == null)
 				return 0;
 
-			return this.Upsert(this.GetName(typeof(T)), data, string.Empty, states, null, null);
+			return this.Upsert(this.GetName<T>(), data, string.Empty, states, null, null);
 		}
 
 		public int Upsert<T>(object data, string schema)
@@ -940,7 +940,7 @@ namespace Zongsoft.Data
 			if(data == null)
 				return 0;
 
-			return this.Upsert(this.GetName(typeof(T)), data, schema, null, null, null);
+			return this.Upsert(this.GetName<T>(), data, schema, null, null, null);
 		}
 
 		public int Upsert<T>(object data, string schema, IDictionary<string, object> states, Func<DataUpsertContextBase, bool> upserting = null, Action<DataUpsertContextBase> upserted = null)
@@ -948,7 +948,7 @@ namespace Zongsoft.Data
 			if(data == null)
 				return 0;
 
-			return this.Upsert(this.GetName(typeof(T)), data, schema, states, upserting, upserted);
+			return this.Upsert(this.GetName<T>(), data, schema, states, upserting, upserted);
 		}
 
 		public int Upsert(string name, object data)
@@ -1152,7 +1152,7 @@ namespace Zongsoft.Data
 			if(data == null)
 				return 0;
 
-			return this.Update(this.GetName(data.GetType()), data, null, string.Empty, null, null, null);
+			return this.Update(this.GetName<T>(), data, null, string.Empty, null, null, null);
 		}
 
 		public int Update<T>(T data, IDictionary<string, object> states)
@@ -1160,7 +1160,7 @@ namespace Zongsoft.Data
 			if(data == null)
 				return 0;
 
-			return this.Update(this.GetName(data.GetType()), data, null, string.Empty, states, null, null);
+			return this.Update(this.GetName<T>(), data, null, string.Empty, states, null, null);
 		}
 
 		public int Update<T>(T data, string schema)
@@ -1168,7 +1168,7 @@ namespace Zongsoft.Data
 			if(data == null)
 				return 0;
 
-			return this.Update(this.GetName(data.GetType()), data, null, schema, null, null, null);
+			return this.Update(this.GetName<T>(), data, null, schema, null, null, null);
 		}
 
 		public int Update<T>(T data, string schema, IDictionary<string, object> states)
@@ -1176,7 +1176,7 @@ namespace Zongsoft.Data
 			if(data == null)
 				return 0;
 
-			return this.Update(this.GetName(data.GetType()), data, null, schema, states, null, null);
+			return this.Update(this.GetName<T>(), data, null, schema, states, null, null);
 		}
 
 		public int Update<T>(T data, ICondition condition)
@@ -1184,7 +1184,7 @@ namespace Zongsoft.Data
 			if(data == null)
 				return 0;
 
-			return this.Update(this.GetName(data.GetType()), data, condition, string.Empty, null, null, null);
+			return this.Update(this.GetName<T>(), data, condition, string.Empty, null, null, null);
 		}
 
 		public int Update<T>(T data, ICondition condition, IDictionary<string, object> states)
@@ -1192,7 +1192,7 @@ namespace Zongsoft.Data
 			if(data == null)
 				return 0;
 
-			return this.Update(this.GetName(data.GetType()), data, condition, string.Empty, states, null, null);
+			return this.Update(this.GetName<T>(), data, condition, string.Empty, states, null, null);
 		}
 
 		public int Update<T>(T data, ICondition condition, string schema)
@@ -1200,7 +1200,7 @@ namespace Zongsoft.Data
 			if(data == null)
 				return 0;
 
-			return this.Update(this.GetName(data.GetType()), data, condition, schema, null, null, null);
+			return this.Update(this.GetName<T>(), data, condition, schema, null, null, null);
 		}
 
 		public int Update<T>(T data, ICondition condition, string schema, IDictionary<string, object> states, Func<DataUpdateContextBase, bool> updating = null, Action<DataUpdateContextBase> updated = null)
@@ -1208,7 +1208,7 @@ namespace Zongsoft.Data
 			if(data == null)
 				return 0;
 
-			return this.Update(this.GetName(data.GetType()), data, condition, schema, states, updating, updated);
+			return this.Update(this.GetName<T>(), data, condition, schema, states, updating, updated);
 		}
 
 		public int Update<T>(object data)
@@ -1216,7 +1216,7 @@ namespace Zongsoft.Data
 			if(data == null)
 				return 0;
 
-			return this.Update(this.GetName(typeof(T)), data, null, string.Empty, null, null, null);
+			return this.Update(this.GetName<T>(), data, null, string.Empty, null, null, null);
 		}
 
 		public int Update<T>(object data, IDictionary<string, object> states)
@@ -1224,7 +1224,7 @@ namespace Zongsoft.Data
 			if(data == null)
 				return 0;
 
-			return this.Update(this.GetName(typeof(T)), data, null, string.Empty, states, null, null);
+			return this.Update(this.GetName<T>(), data, null, string.Empty, states, null, null);
 		}
 
 		public int Update<T>(object data, string schema)
@@ -1232,7 +1232,7 @@ namespace Zongsoft.Data
 			if(data == null)
 				return 0;
 
-			return this.Update(this.GetName(typeof(T)), data, null, schema, null, null, null);
+			return this.Update(this.GetName<T>(), data, null, schema, null, null, null);
 		}
 
 		public int Update<T>(object data, string schema, IDictionary<string, object> states)
@@ -1240,7 +1240,7 @@ namespace Zongsoft.Data
 			if(data == null)
 				return 0;
 
-			return this.Update(this.GetName(typeof(T)), data, null, schema, states, null, null);
+			return this.Update(this.GetName<T>(), data, null, schema, states, null, null);
 		}
 
 		public int Update<T>(object data, ICondition condition)
@@ -1248,7 +1248,7 @@ namespace Zongsoft.Data
 			if(data == null)
 				return 0;
 
-			return this.Update(this.GetName(typeof(T)), data, condition, string.Empty, null, null, null);
+			return this.Update(this.GetName<T>(), data, condition, string.Empty, null, null, null);
 		}
 
 		public int Update<T>(object data, ICondition condition, IDictionary<string, object> states)
@@ -1256,7 +1256,7 @@ namespace Zongsoft.Data
 			if(data == null)
 				return 0;
 
-			return this.Update(this.GetName(typeof(T)), data, condition, string.Empty, states, null, null);
+			return this.Update(this.GetName<T>(), data, condition, string.Empty, states, null, null);
 		}
 
 		public int Update<T>(object data, ICondition condition, string schema)
@@ -1264,7 +1264,7 @@ namespace Zongsoft.Data
 			if(data == null)
 				return 0;
 
-			return this.Update(this.GetName(typeof(T)), data, condition, schema, null, null, null);
+			return this.Update(this.GetName<T>(), data, condition, schema, null, null, null);
 		}
 
 		public int Update<T>(object data, ICondition condition, string schema, IDictionary<string, object> states, Func<DataUpdateContextBase, bool> updating = null, Action<DataUpdateContextBase> updated = null)
@@ -1272,7 +1272,7 @@ namespace Zongsoft.Data
 			if(data == null)
 				return 0;
 
-			return this.Update(this.GetName(typeof(T)), data, condition, schema, states, updating, updated);
+			return this.Update(this.GetName<T>(), data, condition, schema, states, updating, updated);
 		}
 
 		public int Update(string name, object data)
