@@ -70,7 +70,7 @@ namespace Zongsoft.Security.Membership
 		IUserIdentity Authenticate(string identity, string password, string @namespace, string scene, ref IDictionary<string, object> parameters);
 
 		/// <summary>
-		/// 验证指定名称的用户是否有效并且和指定的密码是否完全匹配。
+		/// 验证指定名称的用户是否有效并且和指定的验证码是否有效。
 		/// </summary>
 		/// <param name="identity">要验证的用户标识，仅限用户的“Phone”或“Email”。</param>
 		/// <param name="secret">指定用户的验证码，首先需要通过<see cref="Secret(string, string)"/>方法获得验证码。</param>
