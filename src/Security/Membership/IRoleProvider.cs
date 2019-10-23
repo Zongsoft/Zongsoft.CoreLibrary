@@ -148,6 +148,16 @@ namespace Zongsoft.Security.Membership
 		/// <summary>
 		/// 创建一个角色。
 		/// </summary>
+		/// <param name="name">指定的新建角色的名称。</param>
+		/// <param name="namespace">新建角色所属的命名空间。</param>
+		/// <param name="fullName">指定的新建角色的全称。</param>
+		/// <param name="description">指定的新建角色的描述信息。</param>
+		/// <returns>返回创建成功的角色对象，如果为空(null)则表示创建失败。</returns>
+		IRole Create(string name, string @namespace, string fullName = null, string description = null);
+
+		/// <summary>
+		/// 创建一个角色。
+		/// </summary>
 		/// <param name="role">要创建的角色对象。</param>
 		/// <returns>如果创建成功则返回真(true)，否则返回假(false)。</returns>
 		bool Create(IRole role);

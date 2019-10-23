@@ -170,12 +170,33 @@ namespace Zongsoft.Security.Membership
 		int Delete(params uint[] ids);
 
 		/// <summary>
+		/// 创建一个用户。
+		/// </summary>
+		/// <param name="identity">要创建的用户标识（用户名、手机号、邮箱地址）。</param>
+		/// <param name="namespace">新建用户所属的命名空间。</param>
+		/// <param name="status">指定的新建用户的状态。</param>
+		/// <param name="description">指定的新建用户的描述信息。</param>
+		/// <returns>返回创建成功的用户对象，如果为空(null)则表示创建失败。</returns>
+		IUser Create(string identity, string @namespace, UserStatus status = UserStatus.Active, string description = null);
+
+		/// <summary>
+		/// 创建一个用户。
+		/// </summary>
+		/// <param name="identity">要创建的用户标识（用户名、手机号、邮箱地址）。</param>
+		/// <param name="namespace">新建用户所属的命名空间。</param>
+		/// <param name="password">为新创建用户的设置的密码。</param>
+		/// <param name="status">指定的新建用户的状态。</param>
+		/// <param name="description">指定的新建用户的描述信息。</param>
+		/// <returns>返回创建成功的用户对象，如果为空(null)则表示创建失败。</returns>
+		IUser Create(string identity, string @namespace, string password, UserStatus status = UserStatus.Active, string description = null);
+
+		/// <summary>
 		/// 创建一个用户，并为其设置密码。
 		/// </summary>
 		/// <param name="user">要创建的<seealso cref="IUser"/>用户对象。</param>
 		/// <param name="password">为新创建用户的设置的密码。</param>
 		/// <returns>如果创建成功则返回真(true)，否则返回假(false)。</returns>
-		bool Create(IUser user, string password);
+		bool Create(IUser user, string password = null);
 
 		/// <summary>
 		/// 创建单个或者多个用户。
