@@ -50,13 +50,19 @@ namespace Zongsoft.Security
 			_credentialId = string.Empty;
 		}
 
-		public CredentialIdentity(string credentialId, ICredentialProvider provider = null)
+		public CredentialIdentity(Credential credential)
+		{
+			_credential = credential ?? throw new ArgumentNullException(nameof(credential));
+			_credentialId = credential.CredentialId;
+		}
+
+		public CredentialIdentity(string credentialId, ICredentialProvider provider)
 		{
 			if(string.IsNullOrWhiteSpace(credentialId))
-				throw new ArgumentNullException("credentialId");
+				throw new ArgumentNullException(nameof(credentialId));
 
 			_credentialId = credentialId;
-			_provider = provider;
+			_provider = provider ?? throw new ArgumentNullException(nameof(provider));
 		}
 		#endregion
 
@@ -125,10 +131,7 @@ namespace Zongsoft.Security
 			}
 			set
 			{
-				if(value == null)
-					throw new ArgumentNullException();
-
-				_provider = value;
+				_provider = value ?? throw new ArgumentNullException();
 			}
 		}
 		#endregion

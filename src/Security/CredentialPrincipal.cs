@@ -52,6 +52,14 @@ namespace Zongsoft.Security
 			if(roles != null && roles.Length > 0)
 				_roles = new HashSet<string>(roles, StringComparer.OrdinalIgnoreCase);
 		}
+
+		public CredentialPrincipal(Credential credential, params string[] roles)
+		{
+			_identity = new CredentialIdentity(credential);
+
+			if(roles != null && roles.Length > 0)
+				_roles = new HashSet<string>(roles, StringComparer.OrdinalIgnoreCase);
+		}
 		#endregion
 
 		#region 公共属性
