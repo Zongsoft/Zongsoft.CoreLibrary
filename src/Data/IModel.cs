@@ -42,12 +42,6 @@ namespace Zongsoft.Data
 	public interface IModel
 	{
 		/// <summary>
-		/// 获取实体中变更的属性数。
-		/// </summary>
-		/// <returns>返回变更的属性数。</returns>
-		int Count();
-
-		/// <summary>
 		/// 重置变更属性，并获取重置之前的值。
 		/// </summary>
 		/// <param name="name">指定要重置的属性名，如果为空(null)或空字符串则返回假(False)。</param>
@@ -60,6 +54,12 @@ namespace Zongsoft.Data
 		/// </summary>
 		/// <param name="names">指定要重置的属性名数组，如果为空或空数组则表示重置所有。</param>
 		void Reset(params string[] names);
+
+		/// <summary>
+		/// 获取实体中变更的属性数。
+		/// </summary>
+		/// <returns>返回变更的属性数。</returns>
+		int GetCount();
 
 		/// <summary>
 		/// 判断指定的属性或任意属性是否被变更过。

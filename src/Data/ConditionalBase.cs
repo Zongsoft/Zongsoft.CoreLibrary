@@ -48,7 +48,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 抽象方法
-		protected abstract int Count();
+		protected abstract int GetCount();
 		protected abstract bool HasChanges(string[] names);
 		protected abstract IDictionary<string, object> GetChanges();
 		protected abstract void Reset(string[] names);
@@ -58,9 +58,9 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 显式实现
-		int IModel.Count()
+		int IModel.GetCount()
 		{
-			return this.Count();
+			return this.GetCount();
 		}
 
 		bool IModel.HasChanges(params string[] names)

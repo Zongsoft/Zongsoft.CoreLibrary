@@ -751,7 +751,7 @@ namespace Zongsoft.Tests
 		#endregion
 
 		#region 接口实现
-		public int Count()
+		public int GetCount()
 		{
 			return 0;
 		}
@@ -2214,7 +2214,7 @@ namespace Zongsoft.Tests
 		#endregion
 
 		#region 接口实现
-		public int Count()
+		public int GetCount()
 		{
 			return 0;
 		}

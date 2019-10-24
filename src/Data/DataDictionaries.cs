@@ -1667,7 +1667,7 @@ namespace Zongsoft.Data
 		{
 			get
 			{
-				return _model.Count();
+				return _model.GetCount();
 			}
 		}
 
@@ -1849,7 +1849,7 @@ namespace Zongsoft.Data
 		{
 			get
 			{
-				return _model.Count();
+				return _model.GetCount();
 			}
 		}
 

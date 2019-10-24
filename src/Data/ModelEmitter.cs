@@ -158,19 +158,6 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 虚拟方法
-		protected virtual MethodBuilder DefineCountMethod(TypeBuilder builder)
-		{
-			var method = builder.DefineMethod(typeof(Zongsoft.Data.IModel).FullName + "." + nameof(IModel.Count),
-				MethodAttributes.Private | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.NewSlot,
-				typeof(int),
-				Type.EmptyTypes);
-
-			//添加方法的实现标记
-			builder.DefineMethodOverride(method, typeof(Zongsoft.Data.IModel).GetMethod(nameof(IModel.Count)));
-
-			return method;
-		}
-
 		protected virtual MethodBuilder DefineResetMethod(TypeBuilder builder)
 		{
 			var method = builder.DefineMethod(typeof(Zongsoft.Data.IModel).FullName + "." + nameof(IModel.Reset),
@@ -200,6 +187,19 @@ namespace Zongsoft.Data
 
 			//定义方法参数
 			method.DefineParameter(1, ParameterAttributes.None, "names").SetCustomAttribute(typeof(ParamArrayAttribute).GetConstructor(Type.EmptyTypes), new byte[0]);
+
+			return method;
+		}
+
+		protected virtual MethodBuilder DefineGetCountMethod(TypeBuilder builder)
+		{
+			var method = builder.DefineMethod(typeof(Zongsoft.Data.IModel).FullName + "." + nameof(IModel.GetCount),
+				MethodAttributes.Private | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.NewSlot,
+				typeof(int),
+				Type.EmptyTypes);
+
+			//添加方法的实现标记
+			builder.DefineMethodOverride(method, typeof(Zongsoft.Data.IModel).GetMethod(nameof(IModel.GetCount)));
 
 			return method;
 		}
@@ -987,7 +987,7 @@ namespace Zongsoft.Data
 
 		private void GenerateCountMethod(TypeBuilder builder, FieldBuilder mask, int count)
 		{
-			var method = this.DefineCountMethod(builder);
+			var method = this.DefineGetCountMethod(builder);
 
 			if(method == null)
 				return;
@@ -2860,13 +2860,6 @@ namespace Zongsoft.Data
 			return propertyBuilder;
 		}
 
-		protected override MethodBuilder DefineCountMethod(TypeBuilder builder)
-		{
-			return IsImplement<IModel>(builder.BaseType) ?
-				this.DefineOverrideMethod(builder, nameof(IModel.Count)) :
-				base.DefineCountMethod(builder);
-		}
-
 		protected override MethodBuilder DefineResetMethod(TypeBuilder builder)
 		{
 			return IsImplement<IModel>(builder.BaseType) ? 
@@ -2879,6 +2872,13 @@ namespace Zongsoft.Data
 			return IsImplement<IModel>(builder.BaseType) ? 
 				this.DefineOverrideMethod(builder, nameof(IModel.Reset), new Type[] { typeof(string[]) }) :
 				base.DefineResetManyMethod(builder);
+		}
+
+		protected override MethodBuilder DefineGetCountMethod(TypeBuilder builder)
+		{
+			return IsImplement<IModel>(builder.BaseType) ?
+				this.DefineOverrideMethod(builder, nameof(IModel.GetCount)) :
+				base.DefineGetCountMethod(builder);
 		}
 
 		protected override MethodBuilder DefineHasChangesMethod(TypeBuilder builder)
