@@ -117,8 +117,8 @@ namespace Zongsoft.Data
 			//生成静态构造函数
 			GenerateTypeInitializer(builder, properties, methods, out var names, out var tokens);
 
-			//生成“Count”方法
-			GenerateCountMethod(builder, mask, countWritable);
+			//生成“GetCount”方法
+			GenerateGetCountMethod(builder, mask, countWritable);
 
 			//生成“Reset”方法
 			GenerateResetMethod(builder, mask, tokens);
@@ -985,7 +985,7 @@ namespace Zongsoft.Data
 			PROPERTY_TOKEN_TYPE = builder.CreateType();
 		}
 
-		private void GenerateCountMethod(TypeBuilder builder, FieldBuilder mask, int count)
+		private void GenerateGetCountMethod(TypeBuilder builder, FieldBuilder mask, int count)
 		{
 			var method = this.DefineGetCountMethod(builder);
 
