@@ -227,7 +227,7 @@ namespace Zongsoft.Common
 			if(separator == null)
 				throw new ArgumentNullException(nameof(separator));
 
-			if(parser == null)
+			if(parser == null && typeof(T) != typeof(string))
 				throw new ArgumentNullException(nameof(parser));
 
 			if(string.IsNullOrEmpty(text))
@@ -244,8 +244,16 @@ namespace Zongsoft.Common
 					part = text.Substring(++index, i - index);
 					index = i;
 
-					if(part.Length > 0 && parser(part, out value))
-						yield return value;
+					//if(part.Length > 0 && parser(part, out value))
+					//	yield return value;
+
+					if(part.Length > 0)
+					{
+						if(parser == null)
+							yield return (T)(object)part;
+						else if(parser(part, out value))
+							yield return value;
+					}
 				}
 			}
 
@@ -253,7 +261,12 @@ namespace Zongsoft.Common
 			{
 				part = text.Substring(++index);
 
-				if(parser(part, out value))
+				//if(parser(part, out value))
+				//	yield return value;
+
+				if(parser == null)
+					yield return (T)(object)part;
+				else if(parser(part, out value))
 					yield return value;
 			}
 		}
