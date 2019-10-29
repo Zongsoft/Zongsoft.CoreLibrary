@@ -1,8 +1,15 @@
 ﻿/*
- * Authors:
- *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
+ *   _____                                ______
+ *  /_   /  ____  ____  ____  _________  / __/ /_
+ *    / /  / __ \/ __ \/ __ \/ ___/ __ \/ /_/ __/
+ *   / /__/ /_/ / / / / /_/ /\_ \/ /_/ / __/ /_
+ *  /____/\____/_/ /_/\__  /____/\____/_/  \__/
+ *                   /____/
  *
- * Copyright (C) 2003-2016 Zongsoft Corporation <http://www.zongsoft.com>
+ * Authors:
+ *   钟峰(Popeye Zhong) <zongsoft@qq.com>
+ *
+ * Copyright (C) 2015-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -34,22 +41,6 @@ namespace Zongsoft.Security.Membership
 	/// </summary>
 	public interface IMemberProvider
 	{
-		/// <summary>
-		/// 确定指定的用户是否属于指定的角色。
-		/// </summary>
-		/// <param name="userId">要检查的用户编号。</param>
-		/// <param name="roleId">要确认的角色编号。</param>
-		/// <returns>如果指定的用户是指定角色的成员则返回真(true)；否则返回假(false)。</returns>
-		bool InRole(uint userId, uint roleId);
-
-		/// <summary>
-		/// 确定指定的用户是否属于指定的角色。
-		/// </summary>
-		/// <param name="userId">要检查的用户编号。</param>
-		/// <param name="roleNames">要确认的角色名称数组。</param>
-		/// <returns>如果指定的用户是指定角色名称中的任一成员则返回真(true)；否则返回假(false)。</returns>
-		bool InRoles(uint userId, params string[] roleNames);
-
 		/// <summary>
 		/// 获取指定成员的父级角色集。
 		/// </summary>
