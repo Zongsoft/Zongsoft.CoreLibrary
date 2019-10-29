@@ -1,8 +1,15 @@
 ﻿/*
- * Authors:
- *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
+ *   _____                                ______
+ *  /_   /  ____  ____  ____  _________  / __/ /_
+ *    / /  / __ \/ __ \/ __ \/ ___/ __ \/ /_/ __/
+ *   / /__/ /_/ / / / / /_/ /\_ \/ /_/ / __/ /_
+ *  /____/\____/_/ /_/\__  /____/\____/_/  \__/
+ *                   /____/
  *
- * Copyright (C) 2003-2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Authors:
+ *   钟峰(Popeye Zhong) <zongsoft@qq.com>
+ *
+ * Copyright (C) 2015-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,22 +32,12 @@
  */
 
 using System;
-using System.ComponentModel;
+using System.Security.Principal;
 
 namespace Zongsoft.Security.Membership
 {
-	/// <summary>
-	/// 表示在授权验证模块中对当前用户的操作行为进行授权处理的方式。
-	/// </summary>
-	public enum AuthorizationMode
+	public interface IChallenger
 	{
-		/// <summary>不验证，即匿名用户均可通过。</summary>
-		Anonymous,
-
-		/// <summary>仅限身份验证，即当前调用为非匿名调用即通过。</summary>
-		Identity,
-
-		/// <summary>必须授权验证通过。</summary>
-		Requires,
+		IPrincipal Challenge(IPrincipal principal);
 	}
 }

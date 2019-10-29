@@ -402,7 +402,7 @@
     <Compile Include="Security\Membership\Authorization.cs" />
     <Compile Include="Security\Membership\AuthorizationContext.cs" />
     <Compile Include="Security\Membership\AuthorizationException.cs" />
-    <Compile Include="Security\Membership\AuthorizationMode.cs" />
+    <Compile Include="Security\Membership\IChallenger.cs" />
     <Compile Include="Security\Membership\INamespaceProvider.cs" />
     <Compile Include="Security\Membership\IUserIdentity.cs" />
     <Compile Include="Security\Membership\IMemberProvider.cs" />

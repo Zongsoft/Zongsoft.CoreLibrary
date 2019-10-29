@@ -1,8 +1,15 @@
 ﻿/*
- * Authors:
- *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
+ *   _____                                ______
+ *  /_   /  ____  ____  ____  _________  / __/ /_
+ *    / /  / __ \/ __ \/ __ \/ ___/ __ \/ /_/ __/
+ *   / /__/ /_/ / / / / /_/ /\_ \/ /_/ / __/ /_
+ *  /____/\____/_/ /_/\__  /____/\____/_/  \__/
+ *                   /____/
  *
- * Copyright (C) 2003-2016 Zongsoft Corporation <http://www.zongsoft.com>
+ * Authors:
+ *   钟峰(Popeye Zhong) <zongsoft@qq.com>
+ *
+ * Copyright (C) 2015-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -25,6 +32,7 @@
  */
 
 using System;
+using System.Linq;
 using System.ComponentModel;
 
 namespace Zongsoft.Security.Membership
@@ -32,137 +40,79 @@ namespace Zongsoft.Security.Membership
 	[AttributeUsage((AttributeTargets.Class | AttributeTargets.Method), AllowMultiple = false, Inherited = true)]
 	public class AuthorizationAttribute : Attribute
 	{
-		#region 成员变量
-		private string _schemaId;
-		private string _actionId;
-		private string[] _roles;
-		private AuthorizationMode _mode;
-		private Type _validatorType;
-		private Common.IValidator<Credential> _validator;
-		#endregion
-
 		#region 构造函数
-		public AuthorizationAttribute(AuthorizationMode mode)
-		{
-			_mode = mode;
-		}
-
-		public AuthorizationAttribute(string[] roles)
-		{
-			if(roles == null || roles.Length == 0)
-				throw new ArgumentNullException("roles");
-
-			_roles = roles;
-			_mode = AuthorizationMode.Identity;
-		}
-
-		public AuthorizationAttribute(string schemaId) : this(schemaId, (string)null)
+		public AuthorizationAttribute()
 		{
 		}
 
-		public AuthorizationAttribute(string schemaId, string actionId)
+		public AuthorizationAttribute(string schema)
 		{
-			_actionId = actionId ?? string.Empty;
-			_schemaId = schemaId ?? string.Empty;
+			this.Schema = schema;
+			this.Action = null;
+		}
 
-			_mode = AuthorizationMode.Requires;
+		public AuthorizationAttribute(string schema, string action)
+		{
+			this.Schema = schema;
+			this.Action = action;
 		}
 		#endregion
 
 		#region 公共属性
 		/// <summary>
-		/// 获取授权验证的方式。
+		/// 获取或设置一个值，指示是否禁止验证。
 		/// </summary>
-		public AuthorizationMode Mode
+		public bool Suppressed
 		{
-			get
-			{
-				return _mode;
-			}
+			get; set;
 		}
 
 		/// <summary>
-		/// 获取操作编号。
+		/// 获取或设置当前身份必须所属角色集（注：多个角色名之间以逗号分隔）。
 		/// </summary>
-		public string ActionId
+		public string Roles
 		{
-			get
-			{
-				return _actionId;
-			}
+			get; set;
 		}
 
 		/// <summary>
-		/// 获取模式编号。
+		/// 获取或设置身份验证的质询器类型。
 		/// </summary>
-		public string SchemaId
+		public Type ChallengerType
 		{
-			get
-			{
-				return _schemaId;
-			}
+			get; set;
 		}
 
 		/// <summary>
-		/// 获取验证的所属角色名数组。
+		/// 获取或设置操作名。
 		/// </summary>
-		public string[] Roles
+		public string Action
 		{
-			get
-			{
-				return _roles;
-			}
+			get; set;
 		}
 
 		/// <summary>
-		/// 获取或设置凭证验证器的类型。
+		/// 获取或设置模式名。
 		/// </summary>
-		public Type ValidatorType
+		public string Schema
 		{
-			get
-			{
-				return _validatorType;
-			}
-			set
-			{
-				if(_validatorType == value)
-					return;
-
-				if(value != null && !typeof(Common.IValidator<Credential>).IsAssignableFrom(value))
-					throw new ArgumentException();
-
-				_validatorType = value;
-				_validator = null;
-			}
+			get; set;
 		}
 		#endregion
 
 		#region 公共方法
-		/// <summary>
-		/// 获取凭证验证器实例。
-		/// </summary>
-		public virtual Common.IValidator<Credential> GetValidator(Func<Type, Common.IValidator<Credential>> creator = null)
+		public bool TryGetRoles(out string[] roles)
 		{
-			if(_validator == null)
+			var text = this.Roles;
+
+			if(string.IsNullOrEmpty(text))
 			{
-				var type = this.ValidatorType;
-
-				if(type == null)
-					return null;
-
-				if(creator == null)
-					creator = _ => Activator.CreateInstance(_) as Common.IValidator<Credential>;
-
-				lock(type)
-				{
-					if(_validator == null)
-					{
-						_validator = creator(type);
-					}
-				}
+				roles = Array.Empty<string>();
+				return false;
 			}
 
-			return _validator;
+			roles = Zongsoft.Common.StringExtension.Slice<string>(text, separator => separator == ',' || separator == ';' || separator == '|', null).ToArray();
+			return roles.Length > 0;
 		}
 		#endregion
 	}
