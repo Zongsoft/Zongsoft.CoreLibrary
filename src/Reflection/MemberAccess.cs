@@ -349,17 +349,17 @@ namespace Zongsoft.Reflection
 			return GetMemberType(memberInfo);
 		}
 
-		public static bool TryGetMemberType(object origin, string path, out Type memberType)
+		public static bool TryGetMemberType(object origin, string path, out Type memberType, out string converterType)
 		{
 			if(origin == null)
 				throw new ArgumentNullException(nameof(origin));
 			if(string.IsNullOrWhiteSpace(path))
 				throw new ArgumentNullException(nameof(path));
 
-			return TryGetMemberType(origin, Resolve(path), out memberType);
+			return TryGetMemberType(origin, Resolve(path), out memberType, out converterType);
 		}
 
-		public static bool TryGetMemberType(object origin, MemberPathSegment[] members, out Type memberType)
+		public static bool TryGetMemberType(object origin, MemberPathSegment[] members, out Type memberType, out string converterType)
 		{
 			if(origin == null)
 				throw new ArgumentNullException(nameof(origin));
@@ -380,6 +380,7 @@ namespace Zongsoft.Reflection
 				{
 					//将输出参数置空
 					memberType = null;
+					converterType = null;
 
 					//返回失败
 					return false;
@@ -388,6 +389,8 @@ namespace Zongsoft.Reflection
 
 			//获取最后一个成员的成员类型
 			memberType = GetMemberType(memberInfo);
+			//获取最后一个成员的类型转换器
+			converterType = memberInfo.GetCustomAttribute<System.ComponentModel.TypeConverterAttribute>(true)?.ConverterTypeName;
 
 			//返回执行结果
 			return memberType != null;
