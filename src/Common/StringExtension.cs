@@ -227,19 +227,27 @@ namespace Zongsoft.Common
 			if(string.IsNullOrEmpty(text))
 				yield break;
 
-			int index = -1;
-			string part = null;
-			T value = default(T);
+			int index = -1; //分隔符的位置
+			int tails = 0;  //尾巴空白字符数
+			string part;
+			T value;
 
 			for(int i = 0; i < text.Length; i++)
 			{
+				if(char.IsWhiteSpace(text, i))
+				{
+					if(i == index + 1)
+						index++;
+					else
+						tails++;
+
+					continue;
+				}
+
 				if(separator(text[i]))
 				{
-					part = text.Substring(++index, i - index);
+					part = text.Substring(++index, i - index - tails);
 					index = i;
-
-					//if(part.Length > 0 && parser(part, out value))
-					//	yield return value;
 
 					if(part.Length > 0)
 					{
@@ -249,14 +257,13 @@ namespace Zongsoft.Common
 							yield return value;
 					}
 				}
+
+				tails = 0;
 			}
 
 			if(index < text.Length - 1)
 			{
-				part = text.Substring(++index);
-
-				//if(parser(part, out value))
-				//	yield return value;
+				part = text.Substring(++index, text.Length - index - tails);
 
 				if(parser == null)
 					yield return (T)(object)part;
