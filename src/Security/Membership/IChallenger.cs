@@ -36,8 +36,16 @@ using System.Security.Principal;
 
 namespace Zongsoft.Security.Membership
 {
+	/// <summary>
+	/// 表示身份验证质询器的接口。
+	/// </summary>
 	public interface IChallenger
 	{
+		/// <summary>
+		/// 身份验证质询方法。
+		/// </summary>
+		/// <param name="principal">待质询的用户主体。</param>
+		/// <returns>返回质询后的用户主体。</returns>
 		IPrincipal Challenge(IPrincipal principal);
 	}
 }

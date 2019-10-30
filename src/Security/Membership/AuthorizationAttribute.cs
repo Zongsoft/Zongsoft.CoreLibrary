@@ -101,6 +101,11 @@ namespace Zongsoft.Security.Membership
 		#endregion
 
 		#region 公共方法
+		/// <summary>
+		/// 尝试获取设置的待验证的角色名数组。
+		/// </summary>
+		/// <param name="roles">输出参数，返回待验证的角色名数组。</param>
+		/// <returns>如果<see cref="Roles"/>属性不为空或空字符串则返回真(True)，否则返回假(False)。</returns>
 		public bool TryGetRoles(out string[] roles)
 		{
 			var text = this.Roles;
@@ -111,7 +116,7 @@ namespace Zongsoft.Security.Membership
 				return false;
 			}
 
-			roles = Zongsoft.Common.StringExtension.Slice<string>(text, separator => separator == ',' || separator == ';' || separator == '|', null).ToArray();
+			roles = Common.StringExtension.Slice(text, separator => separator == ',' || separator == ';' || separator == '|').ToArray();
 			return roles.Length > 0;
 		}
 		#endregion
