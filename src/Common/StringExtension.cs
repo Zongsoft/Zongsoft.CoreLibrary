@@ -1,8 +1,15 @@
 ﻿/*
+ *   _____                                ______
+ *  /_   /  ____  ____  ____  _________  / __/ /_
+ *    / /  / __ \/ __ \/ __ \/ ___/ __ \/ /_/ __/
+ *   / /__/ /_/ / / / / /_/ /\_ \/ /_/ / __/ /_
+ *  /____/\____/_/ /_/\__  /____/\____/_/  \__/
+ *                   /____/
+ *
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2008-2013 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2008-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -33,37 +40,6 @@ namespace Zongsoft.Common
 	public static class StringExtension
 	{
 		public delegate bool TryParser<T>(string text, out T value);
-
-		public static int GetStringHashCode(string text)
-		{
-			if(text == null || text.Length < 1)
-				return 0;
-
-			unsafe
-			{
-				fixed(char* src = text)
-				{
-					int hash1 = 5381;
-					int hash2 = hash1;
-
-					int c;
-					char* s = src;
-					while((c = s[0]) != 0)
-					{
-						hash1 = ((hash1 << 5) + hash1) ^ c;
-						c = s[1];
-
-						if(c == 0)
-							break;
-
-						hash2 = ((hash2 << 5) + hash2) ^ c;
-						s += 2;
-					}
-
-					return hash1 + (hash2 * 1566083941);
-				}
-			}
-		}
 
 		public static string RemoveAny(this string text, params char[] characters)
 		{
@@ -207,6 +183,24 @@ namespace Zongsoft.Common
 			}
 
 			return false;
+		}
+
+		public static IEnumerable<string> Slice(this string text, char separator)
+		{
+			return Slice<string>(text, chr => chr == separator, null);
+		}
+
+		public static IEnumerable<string> Slice(this string text, params char[] separators)
+		{
+			if(separators == null || separators.Length == 0)
+				return null;
+
+			return Slice<string>(text, chr => separators.Contains(chr), null);
+		}
+
+		public static IEnumerable<string> Slice(this string text, Func<char, bool> separator)
+		{
+			return Slice<string>(text, separator, null);
 		}
 
 		public static IEnumerable<T> Slice<T>(this string text, char separator, TryParser<T> parser)
