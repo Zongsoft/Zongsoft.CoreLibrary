@@ -202,7 +202,7 @@ namespace Zongsoft.Common
 			try
 			{
 				//获取目标类型的转换器
-				var converter = converterFactory == null ? TypeDescriptor.GetConverter(type) : converterFactory();
+				var converter = converterFactory?.Invoke() ?? TypeDescriptor.GetConverter(type);
 
 				if(converter != null)
 				{
