@@ -25,7 +25,9 @@
  */
 
 using System;
-using System.Collections.Generic;
+using System.Linq;
+using System.ComponentModel;
+using System.Globalization;
 
 namespace Zongsoft.ComponentModel
 {
@@ -36,6 +38,7 @@ namespace Zongsoft.ComponentModel
 		private string _title;
 		private string _description;
 		private bool _visible;
+		private string[] _alias;
 		#endregion
 
 		#region 构造函数
@@ -73,6 +76,13 @@ namespace Zongsoft.ComponentModel
 
 				_name = value.Trim();
 			}
+		}
+
+		[TypeConverter(typeof(AliasConverter))]
+		public string[] Alias
+		{
+			get => _alias;
+			set => _alias = value;
 		}
 
 		public string Title
@@ -143,6 +153,43 @@ namespace Zongsoft.ComponentModel
 				return string.Empty;
 
 			return _name;
+		}
+		#endregion
+
+		#region 嵌套子类
+		private class AliasConverter : TypeConverter
+		{
+			public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
+			{
+				if(sourceType == typeof(string))
+					return true;
+
+				return base.CanConvertFrom(context, sourceType);
+			}
+
+			public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
+			{
+				if(destinationType == typeof(string))
+					return true;
+
+				return base.CanConvertTo(context, destinationType);
+			}
+
+			public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
+			{
+				if(value is string text)
+					return Zongsoft.Common.StringExtension.Slice(text, chr => chr == ',' || chr == ';' || chr == '|').ToArray();
+
+				return base.ConvertFrom(context, culture, value);
+			}
+
+			public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
+			{
+				if(destinationType == typeof(string))
+					return value == null ? null : string.Join(",", (string[])value);
+
+				return base.ConvertTo(context, culture, value, destinationType);
+			}
 		}
 		#endregion
 	}
