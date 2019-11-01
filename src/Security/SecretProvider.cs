@@ -37,23 +37,19 @@ namespace Zongsoft.Security
 		#endregion
 
 		#region 成员字段
-		private ICache _cache;
 		private TimeSpan _expiry;
 		private TimeSpan _period;
 		#endregion
 
 		#region 构造函数
-		public SecretProvider()
+		public SecretProvider() : this(null)
 		{
-			//设置属性的默认值
-			_expiry = TimeSpan.FromMinutes(10);
-			_period = TimeSpan.FromSeconds(60);
 		}
 
 		public SecretProvider(ICache cache)
 		{
 			//设置缓存容器
-			_cache = cache ?? throw new ArgumentNullException(nameof(cache));
+			this.Cache = cache;
 
 			//设置属性的默认值
 			_expiry = TimeSpan.FromMinutes(10);
@@ -68,14 +64,7 @@ namespace Zongsoft.Security
 		[Services.ServiceDependency]
 		public ICache Cache
 		{
-			get
-			{
-				return _cache;
-			}
-			set
-			{
-				_cache = value ?? throw new ArgumentNullException();
-			}
+			get; set;
 		}
 
 		/// <summary>
