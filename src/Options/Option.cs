@@ -25,8 +25,6 @@
  */
 
 using System;
-using System.Reflection;
-using System.Configuration;
 using System.ComponentModel;
 using System.Collections.Generic;
 
@@ -46,42 +44,32 @@ namespace Zongsoft.Options
 		private OptionNode _node;
 		private object _optionObject;
 		private bool _isDirty;
-		private IOptionProvider _provider;
 		private IOptionView _view;
 		private IOptionViewBuilder _viewBuilder;
+		private readonly ICollection<IOptionProvider> _providers;
 		#endregion
 
 		#region 构造函数
-		public Option(OptionNode node)
+		public Option(OptionNode node) : this(node, null, (IOptionView)null)
 		{
-			this.Initialize(node, null, null, null);
 		}
 
-		public Option(OptionNode node, IOptionProvider provider)
+		public Option(OptionNode node, IOptionProvider provider) : this(node, provider, (IOptionView)null)
 		{
-			this.Initialize(node, provider, null, null);
 		}
 
 		public Option(OptionNode node, IOptionProvider provider, IOptionView view)
 		{
-			this.Initialize(node, provider, view, null);
+			_node = node ?? throw new ArgumentNullException(nameof(node));
+			_providers = new List<IOptionProvider>() { provider };
+			_view = view;
+			_isDirty = false;
 		}
 
 		public Option(OptionNode node, IOptionProvider provider, IOptionViewBuilder viewBuilder)
 		{
-			this.Initialize(node, provider, null, viewBuilder);
-		}
-		#endregion
-
-		#region 初始化器
-		private void Initialize(OptionNode node, IOptionProvider provider, IOptionView view, IOptionViewBuilder viewBuilder)
-		{
-			if(node == null)
-				throw new ArgumentNullException("node");
-
-			_node = node;
-			_provider = provider;
-			_view = view;
+			_node = node ?? throw new ArgumentNullException(nameof(node));
+			_providers = new List<IOptionProvider>() { provider };
 			_viewBuilder = viewBuilder;
 			_isDirty = false;
 		}
@@ -140,15 +128,11 @@ namespace Zongsoft.Options
 			}
 		}
 
-		public IOptionProvider Provider
+		public ICollection<IOptionProvider> Providers
 		{
 			get
 			{
-				return _provider;
-			}
-			protected set
-			{
-				_provider = value;
+				return _providers;
 			}
 		}
 
@@ -156,13 +140,19 @@ namespace Zongsoft.Options
 		{
 			get
 			{
-				if(_optionObject == null && _provider != null)
+				if(_optionObject == null && _providers != null)
 				{
 					INotifyPropertyChanged notifiable = _optionObject as INotifyPropertyChanged;
 					if(notifiable != null)
 						notifiable.PropertyChanged -= new PropertyChangedEventHandler(OptionObject_PropertyChanged);
 
-					_optionObject = _provider.GetOptionValue(_node.FullPath);
+					foreach(var provider in _providers)
+					{
+						_optionObject = provider.GetOptionValue(_node.FullPath);
+
+						if(_optionObject != null)
+							break;
+					}
 
 					notifiable = _optionObject as INotifyPropertyChanged;
 					if(notifiable != null)
@@ -238,8 +228,8 @@ namespace Zongsoft.Options
 
 		protected virtual void OnApply()
 		{
-			if(_provider != null)
-				_provider.SetOptionValue(_node.FullPath, _optionObject);
+			foreach(var provider in _providers)
+				provider.SetOptionValue(_node.FullPath, _optionObject);
 		}
 		#endregion
 

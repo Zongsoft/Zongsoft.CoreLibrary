@@ -96,6 +96,8 @@ namespace Zongsoft.Options.Configuration
 					{
 						if(elementNode.Option == null)
 							elementNode.Option = new Option(elementNode, configuration);
+						else
+							elementNode.Option.Providers.Add(configuration);
 					}
 					else
 					{
@@ -120,14 +122,8 @@ namespace Zongsoft.Options.Configuration
 					{
 						var option = node.Option;
 
-						if(option != null && option.Provider == configuration)
-						{
-							node.Option = null;
-
-							var parent = node.Parent;
-							if(parent != null)
-								parent.Children.Remove(node.Name);
-						}
+						if(option != null && option.Providers != null)
+							option.Providers.Remove(configuration);
 					}
 				}
 			}

@@ -170,8 +170,13 @@ namespace Zongsoft.Options
 			var expression = Collections.HierarchicalExpression.Parse(text);
 			var node = this.Find(expression.Segments);
 
-			if(node != null && node.Option != null && node.Option.Provider != null)
-				node.Option.Provider.SetOptionValue(text, value);
+			if(node != null && node.Option != null && node.Option.Providers != null)
+			{
+				foreach(var provider in node.Option.Providers)
+				{
+					provider.SetOptionValue(text, value);
+				}
+			}
 		}
 
 		public OptionNode Find(string path)

@@ -62,7 +62,7 @@ namespace Zongsoft.Options
 			set;
 		}
 
-		IOptionProvider Provider
+		ICollection<IOptionProvider> Providers
 		{
 			get;
 		}
