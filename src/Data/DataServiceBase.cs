@@ -202,10 +202,6 @@ namespace Zongsoft.Data
 		#region 授权验证
 		protected virtual void Authorize(Method method, ref IDictionary<string, object> states)
 		{
-			var credential = this.Credential;
-
-			if(credential == null || credential.User == null)
-				throw new Security.Membership.AuthorizationException();
 		}
 		#endregion
 
