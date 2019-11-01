@@ -40,7 +40,7 @@ using Zongsoft.Options.Configuration;
 
 namespace Zongsoft.Services
 {
-	[System.ComponentModel.DefaultProperty(nameof(Modules))]
+	[System.Reflection.DefaultMember(nameof(Modules))]
 	public class ApplicationContext : IApplicationContext, IApplicationModule
 	{
 		#region 单例字段

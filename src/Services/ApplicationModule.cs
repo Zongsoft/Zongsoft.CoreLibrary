@@ -40,7 +40,7 @@ using Zongsoft.Collections;
 
 namespace Zongsoft.Services
 {
-	[System.ComponentModel.DefaultProperty(nameof(Schemas))]
+	[System.Reflection.DefaultMember(nameof(Schemas))]
 	public class ApplicationModule : IApplicationModule
 	{
 		#region 构造函数

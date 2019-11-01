@@ -29,7 +29,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.ComponentModel
 {
-	[System.ComponentModel.DefaultProperty("Schemas")]
+	[System.Reflection.DefaultMember(nameof(Schemas))]
 	public class SchemaCategory : Zongsoft.Collections.HierarchicalNode<SchemaCategory>
 	{
 		#region 静态字段

@@ -29,7 +29,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.ComponentModel
 {
-	[System.ComponentModel.DefaultProperty("Actions")]
+	[System.Reflection.DefaultMember(nameof(Actions))]
 	public class Schema : IEquatable<Schema>
 	{
 		#region 成员变量

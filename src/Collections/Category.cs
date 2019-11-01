@@ -25,12 +25,11 @@
  */
 
 using System;
-using System.ComponentModel;
 
 namespace Zongsoft.Collections
 {
 	[Serializable]
-	[System.ComponentModel.DefaultProperty("Children")]
+	[System.Reflection.DefaultMember(nameof(Children))]
 	public class Category : HierarchicalNode<Category>
 	{
 		#region 成员字段
@@ -59,7 +58,6 @@ namespace Zongsoft.Collections
 		#endregion
 
 		#region 公共属性
-		[DefaultValue(true)]
 		public bool Visible
 		{
 			get
