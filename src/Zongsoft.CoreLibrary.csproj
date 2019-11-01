@@ -635,9 +635,6 @@
     <None Include="..\README.md">
       <Link>README.md</Link>
     </None>
-    <None Include="Options\Option.option">
-      <SubType>Designer</SubType>
-    </None>
     <None Include="Options\Profiles\Profile.ini" />
   </ItemGroup>
   <ItemGroup>
