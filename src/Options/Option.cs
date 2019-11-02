@@ -25,8 +25,10 @@
  */
 
 using System;
+using System.Linq;
 using System.ComponentModel;
 using System.Collections.Generic;
+using System.Collections;
 
 namespace Zongsoft.Options
 {
@@ -140,19 +142,63 @@ namespace Zongsoft.Options
 		{
 			get
 			{
-				if(_optionObject == null && _providers != null)
+				if(_providers.Count > 1)
+				{
+					Type contractType = null, collectionType = null;
+					IList<object> list = new List<object>(_providers.Count);
+
+					foreach(var provider in _providers)
+					{
+						var option = provider.GetOptionValue(_node.FullPath);
+
+						if(option == null)
+							continue;
+
+						list.Add(option);
+
+						if(collectionType == null)
+						{
+							var contracts = option.GetType().GetInterfaces()
+								.Where(type => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IReadOnlyDictionary<,>) && type.GetGenericArguments()[0] == typeof(string))
+								.ToArray();
+
+							if(contracts == null || contracts.Length == 0)
+								throw new InvalidOperationException($"The '{_node.FullPath}' option has multiple providers, but the option objects for the provider are not dictionary, so they cannot be combined.");
+
+							if(contracts.Length == 1)
+								contractType = contracts[0];
+							else
+							{
+								foreach(var contract in contracts)
+								{
+									if(contractType == null || contractType.GetGenericArguments()[1].IsAssignableFrom(contract.GetGenericArguments()[1]))
+										contractType = contract;
+								}
+							}
+
+							collectionType = typeof(MultiresultDictionary<>).MakeGenericType(contractType.GetGenericArguments()[1]);
+						}
+						else
+						{
+							if(!contractType.IsAssignableFrom(option.GetType()))
+								throw new InvalidOperationException($"The '{_node.FullPath}' option has multiple providers, but these providers have different option object types, so they cannot be combined.");
+						}
+					}
+
+					return Activator.CreateInstance(collectionType, new object[] { _node, list });
+				}
+
+				if(_optionObject == null)
 				{
 					INotifyPropertyChanged notifiable = _optionObject as INotifyPropertyChanged;
 					if(notifiable != null)
 						notifiable.PropertyChanged -= new PropertyChangedEventHandler(OptionObject_PropertyChanged);
 
-					foreach(var provider in _providers)
-					{
-						_optionObject = provider.GetOptionValue(_node.FullPath);
+					if(_providers.Count == 0)
+						return _optionObject = null;
 
-						if(_optionObject != null)
-							break;
-					}
+					if(_providers.Count == 1)
+						_optionObject = _providers.FirstOrDefault().GetOptionValue(_node.FullPath);
 
 					notifiable = _optionObject as INotifyPropertyChanged;
 					if(notifiable != null)
@@ -273,6 +319,125 @@ namespace Zongsoft.Options
 
 			//激发“Changed”事件
 			this.OnChanged(EventArgs.Empty);
+		}
+		#endregion
+
+		#region 嵌套子类
+		private class MultiresultDictionary<T> : IReadOnlyDictionary<string, T>, Collections.IReadOnlyNamedCollection<T>, IEnumerable<T>
+		{
+			private readonly OptionNode _node;
+			private readonly IEnumerable<IReadOnlyDictionary<string, T>> _items;
+
+			public MultiresultDictionary(OptionNode node, IEnumerable items)
+			{
+				_node = node;
+				_items = items.Cast<IReadOnlyDictionary<string, T>>();
+			}
+
+			public int Count
+			{
+				get => _items.Sum(p => p.Count);
+			}
+
+			public IEnumerable<string> Keys
+			{
+				get
+				{
+					foreach(var item in _items)
+					{
+						foreach(var key in item.Keys)
+							yield return key;
+					}
+				}
+			}
+
+			public IEnumerable<T> Values
+			{
+				get
+				{
+					foreach(var item in _items)
+					{
+						foreach(var value in item.Values)
+							yield return value;
+					}
+				}
+			}
+
+			public T this[string key]
+			{
+				get => this.Get(key);
+			}
+
+			public bool Contains(string key)
+			{
+				return this.ContainsKey(key);
+			}
+
+			public bool ContainsKey(string key)
+			{
+				foreach(var item in _items)
+				{
+					if(item.ContainsKey(key))
+						return true;
+				}
+
+				return false;
+			}
+
+			public T Get(string name)
+			{
+				foreach(var item in _items)
+				{
+					if(item.TryGetValue(name, out var value))
+						return value;
+				}
+
+				throw new KeyNotFoundException($"The specified '{name}' key does not exist in the '{_node.FullPath}' option.");
+			}
+
+			public bool TryGet(string name, out T value)
+			{
+				return this.TryGetValue(name, out value);
+			}
+
+			public bool TryGetValue(string key, out T value)
+			{
+				foreach(var item in _items)
+				{
+					if(item.TryGetValue(key, out value))
+						return true;
+				}
+
+				value = default(T);
+				return false;
+			}
+
+			public IEnumerator<KeyValuePair<string, T>> GetEnumerator()
+			{
+				foreach(var item in _items)
+				{
+					var iterator = item.GetEnumerator();
+
+					while(iterator.MoveNext())
+					{
+						yield return iterator.Current;
+					}
+				}
+			}
+
+			IEnumerator IEnumerable.GetEnumerator()
+			{
+				return this.GetEnumerator();
+			}
+
+			IEnumerator<T> IEnumerable<T>.GetEnumerator()
+			{
+				foreach(var item in _items)
+				{
+					foreach(var value in item.Values)
+						yield return value;
+				}
+			}
 		}
 		#endregion
 	}
