@@ -402,6 +402,7 @@
     <Compile Include="Security\Membership\Authorization.cs" />
     <Compile Include="Security\Membership\AuthorizationContext.cs" />
     <Compile Include="Security\Membership\AuthorizationException.cs" />
+    <Compile Include="Security\Membership\AuthorizationToken.cs" />
     <Compile Include="Security\Membership\IChallenger.cs" />
     <Compile Include="Security\Membership\INamespaceProvider.cs" />
     <Compile Include="Security\Membership\IUserIdentity.cs" />
@@ -412,7 +413,6 @@
     <Compile Include="Security\Membership\ChangedEventArgs.cs" />
     <Compile Include="Security\Membership\UserIdentityType.cs" />
     <Compile Include="Security\Membership\AuthorizationAttribute.cs" />
-    <Compile Include="Security\Membership\AuthorizationState.cs" />
     <Compile Include="Security\Credential.cs" />
     <Compile Include="Security\CredentialException.cs" />
     <Compile Include="Security\Membership\IAuthenticator.cs" />

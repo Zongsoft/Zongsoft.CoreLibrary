@@ -50,13 +50,47 @@ namespace Zongsoft.Security.Membership
 		/// 判断指定的用户对特定目标对象的特定行为是否具有授权。
 		/// </summary>
 		/// <param name="userId">指定的用户编号。</param>
-		/// <param name="schemaId">指定是否授权的资源。</param>
-		/// <param name="actionId">对应目标的特定行为。</param>
+		/// <param name="schema">指定是否授权的资源。</param>
+		/// <param name="action">对应目标的特定行为。</param>
 		/// <returns>如果具有授权则返回真(true)，否则返回假(false)。</returns>
 		/// <remarks>
 		/// 	<para>该验证会对指定的用户所属角色进行逐级向上展开做授权判断，因此只需对本方法一次调用即可得知当前用户对指定目标的特定行为的最终授权计算结果。</para>
 		/// </remarks>
-		bool Authorize(uint userId, string schemaId, string actionId);
+		bool Authorize(uint userId, string schema, string action);
+
+		/// <summary>
+		/// 判断指定的用户对特定目标对象的特定行为是否具有授权。
+		/// </summary>
+		/// <param name="user">指定的用户对象。</param>
+		/// <param name="schema">指定是否授权的资源。</param>
+		/// <param name="action">对应目标的特定行为。</param>
+		/// <returns>如果具有授权则返回真(true)，否则返回假(false)。</returns>
+		/// <remarks>
+		/// 	<para>该验证会对指定的用户所属角色进行逐级向上展开做授权判断，因此只需对本方法一次调用即可得知当前用户对指定目标的特定行为的最终授权计算结果。</para>
+		/// </remarks>
+		bool Authorize(IUserIdentity user, string schema, string action);
+
+		/// <summary>
+		/// 获取指定用户的最终授权状态集。
+		/// </summary>
+		/// <param name="user">指定要获取的最终授权状态集的用户对象。</param>
+		/// <returns>返回指定用户的最终授权状态集。注意：该集合仅包含了最终的已授权状态信息。</returns>
+		/// <remarks>
+		/// 	<para>注意：该集合仅包含了最终的已授权状态信息。</para>
+		/// 	<para>该方法对指定用户及其所属角色进行逐级向上展开做授权计算，因此只需对本方法一次调用即可得知指定用户的最终授权计算结果。</para>
+		/// </remarks>
+		IEnumerable<AuthorizationToken> Authorizes(IUserIdentity user);
+
+		/// <summary>
+		/// 获取指定角色的最终授权状态集。
+		/// </summary>
+		/// <param name="role">指定要获取的最终授权状态集的角色对象。</param>
+		/// <returns>返回指定角色的最终授权状态集。注意：该集合仅包含了最终的已授权状态信息。</returns>
+		/// <remarks>
+		/// 	<para>注意：该集合仅包含了最终的已授权状态信息。</para>
+		/// 	<para>该方法对指定角色及其所属角色进行逐级向上展开做授权计算，因此只需对本方法一次调用即可得知指定角色的最终授权计算结果。</para>
+		/// </remarks>
+		IEnumerable<AuthorizationToken> Authorizes(IRole role);
 
 		/// <summary>
 		/// 获取指定用户或角色的最终授权状态集。
@@ -68,7 +102,7 @@ namespace Zongsoft.Security.Membership
 		/// 	<para>注意：该集合仅包含了最终的已授权状态信息。</para>
 		/// 	<para>该方法对指定用户及其所属角色进行逐级向上展开做授权计算，因此只需对本方法一次调用即可得知指定成员的最终授权计算结果。</para>
 		/// </remarks>
-		IEnumerable<AuthorizationState> Authorizes(uint memberId, MemberType memberType = MemberType.User);
+		IEnumerable<AuthorizationToken> Authorizes(uint memberId, MemberType memberType = MemberType.User);
 
 		/// <summary>
 		/// 确定指定的用户是否属于指定的角色。
@@ -82,16 +116,16 @@ namespace Zongsoft.Security.Membership
 		/// 确定指定的用户是否属于指定的角色。
 		/// </summary>
 		/// <param name="userId">要检查的用户编号。</param>
-		/// <param name="roleName">要确认的角色名称。</param>
-		/// <returns>如果指定的用户是指定角色的成员则返回真(true)；否则返回假(false)。</returns>
-		bool InRole(uint userId, string roleName);
+		/// <param name="roleNames">要确认的角色名称数组。</param>
+		/// <returns>如果指定的用户是指定角色名称中的任一成员则返回真(true)；否则返回假(false)。</returns>
+		bool InRoles(uint userId, params string[] roleNames);
 
 		/// <summary>
 		/// 确定指定的用户是否属于指定的角色。
 		/// </summary>
-		/// <param name="userId">要检查的用户编号。</param>
+		/// <param name="user">要检查的用户对象。</param>
 		/// <param name="roleNames">要确认的角色名称数组。</param>
 		/// <returns>如果指定的用户是指定角色名称中的任一成员则返回真(true)；否则返回假(false)。</returns>
-		bool InRoles(uint userId, params string[] roleNames);
+		bool InRoles(IUserIdentity user, params string[] roleNames);
 	}
 }

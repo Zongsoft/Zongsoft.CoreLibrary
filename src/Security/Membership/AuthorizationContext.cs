@@ -39,20 +39,20 @@ namespace Zongsoft.Security.Membership
 	public class AuthorizationContext
 	{
 		#region 构造函数
-		public AuthorizationContext(uint userId, string schemaId, string actionId, bool isAuthorized)
+		public AuthorizationContext(IUserIdentity user, string schema, string action, bool isAuthorized)
 		{
-			this.UserId = userId;
-			this.SchemaId = schemaId;
-			this.ActionId = actionId;
+			this.User = user;
+			this.Schema = schema;
+			this.Action = action;
 			this.IsAuthorized = isAuthorized;
 		}
 		#endregion
 
 		#region 公共属性
 		/// <summary>
-		/// 获取授权的用户编号。
+		/// 获取授权的用户对象。
 		/// </summary>
-		public uint UserId
+		public IUserIdentity User
 		{
 			get;
 		}
@@ -60,7 +60,7 @@ namespace Zongsoft.Security.Membership
 		/// <summary>
 		/// 获取待授权的资源标识。
 		/// </summary>
-		public string SchemaId
+		public string Schema
 		{
 			get;
 		}
@@ -68,7 +68,7 @@ namespace Zongsoft.Security.Membership
 		/// <summary>
 		/// 获取待授权的行为标识。
 		/// </summary>
-		public string ActionId
+		public string Action
 		{
 			get;
 		}
