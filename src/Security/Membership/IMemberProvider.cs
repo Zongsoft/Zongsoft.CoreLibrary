@@ -61,7 +61,7 @@ namespace Zongsoft.Security.Membership
 		/// 设置更新指定角色下的成员。
 		/// </summary>
 		/// <param name="roleId">指定要更新的角色编号。</param>
-		/// <param name="members">要更新的角色成员集。</param>
+		/// <param name="members">要更新的角色成员集，如果为空则表示清空指定角色的成员集。</param>
 		/// <param name="shouldResetting">指示是否以重置的方式更新角色成员，即是否在更新角色成员之前先清空指定角色下的所有成员。默认值为假(False)。</param>
 		/// <returns>如果更新成功则返回更新的数量，否则返回零。</returns>
 		int SetMembers(uint roleId, IEnumerable<Member> members, bool shouldResetting = false);
@@ -73,13 +73,6 @@ namespace Zongsoft.Security.Membership
 		/// <param name="memberId">指定要删除的成员编号。</param>
 		/// <param name="memberType">指定要删除的成员类型。</param>
 		/// <returns>如果删除成功则返回真(True)，否则返回假(False)。</returns>
-		bool Delete(uint roleId, uint memberId, MemberType memberType);
-
-		/// <summary>
-		/// 清空指定角色的成员设置。
-		/// </summary>
-		/// <param name="roleId">指定要清空的角色编号。</param>
-		/// <returns>返回清空的成员数。</returns>
-		int Delete(uint roleId);
+		bool RemoveMember(uint roleId, uint memberId, MemberType memberType);
 	}
 }

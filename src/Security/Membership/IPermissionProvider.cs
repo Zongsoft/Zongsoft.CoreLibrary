@@ -1,8 +1,15 @@
 ﻿/*
+ *   _____                                ______
+ *  /_   /  ____  ____  ____  _________  / __/ /_
+ *    / /  / __ \/ __ \/ __ \/ ___/ __ \/ /_/ __/
+ *   / /__/ /_/ / / / / /_/ /\_ \/ /_/ / __/ /_
+ *  /____/\____/_/ /_/\__  /____/\____/_/  \__/
+ *                   /____/
+ *
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2003-2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.CoreLibrary.
  *
@@ -48,11 +55,10 @@ namespace Zongsoft.Security.Membership
 		/// </summary>
 		/// <param name="memberId">指定的要设置的权限集的成员编号(用户或角色)。</param>
 		/// <param name="memberType">指定的要设置的权限集的成员类型。</param>
-		/// <param name="permissions">要设置更新的权限集。</param>
-		/// <remarks>
-		///		<para>该方法默认以覆盖方式进行更新。即先清空指定成员的所有权限设置项，然后再将<paramref name="permissions"/>参数指定的权限项插入其中。</para>
-		/// </remarks>
-		void SetPermissions(uint memberId, MemberType memberType, IEnumerable<Permission> permissions);
+		/// <param name="permissions">要设置更新的权限集，如果为空则表示清空指定成员的权限集。</param>
+		/// <param name="shouldResetting">指示是否以重置的方式更新权限集。如果为真表示写入之前先清空指定成员下的所有权限设置；否则如果指定的权限项存在则更新它，不存在则新增。</param>
+		/// <returns>返回设置成功的记录数。</returns>
+		int SetPermissions(uint memberId, MemberType memberType, IEnumerable<Permission> permissions, bool shouldResetting = false);
 
 		/// <summary>
 		/// 设置指定用户或角色的权限集。
@@ -60,11 +66,20 @@ namespace Zongsoft.Security.Membership
 		/// <param name="memberId">指定的要设置的权限集的成员编号(用户或角色)。</param>
 		/// <param name="memberType">指定的要设置的权限集的成员类型。</param>
 		/// <param name="schemaId">指定的要设置的权限集的目标标识，如果为空(null)或空字符串则忽略该参数。</param>
-		/// <param name="permissions">要设置更新的权限集。</param>
-		/// <remarks>
-		///		<para>该方法默认以覆盖方式进行更新。即先清空指定成员下的目标权限设置项，然后再将<paramref name="permissions"/>参数指定的权限项插入其中。</para>
-		/// </remarks>
-		void SetPermissions(uint memberId, MemberType memberType, string schemaId, IEnumerable<Permission> permissions);
+		/// <param name="permissions">要设置更新的权限集，如果为空则表示清空指定成员的权限集。</param>
+		/// <param name="shouldResetting">指示是否以重置的方式更新权限集。如果为真表示写入之前先清空指定成员下的所有权限设置；否则如果指定的权限项存在则更新它，不存在则新增。</param>
+		/// <returns>返回设置成功的记录数。</returns>
+		int SetPermissions(uint memberId, MemberType memberType, string schemaId, IEnumerable<Permission> permissions, bool shouldResetting = false);
+
+		/// <summary>
+		/// 移除单个权限设置项。
+		/// </summary>
+		/// <param name="memberId">指定的要移除的权限成员编号(用户或角色)。</param>
+		/// <param name="memberType">指定的要移除的权限成员类型。</param>
+		/// <param name="schemaId">指定的要移除的权限目标标识。</param>
+		/// <param name="actionId">指定的要移除的权限操作标识。</param>
+		/// <returns>如果移除成功则返回真(True)，否则返回假(False)。</returns>
+		bool RemovePermission(uint memberId, MemberType memberType, string schemaId, string actionId);
 
 		/// <summary>
 		/// 获取指定用户或角色的权限过滤集。
@@ -80,11 +95,10 @@ namespace Zongsoft.Security.Membership
 		/// </summary>
 		/// <param name="memberId">指定的要设置的权限过滤集的成员编号(用户或角色)。</param>
 		/// <param name="memberType">指定的要设置的权限过滤集的成员类型。</param>
-		/// <param name="permissionFilters">要设置更新的权限过滤集。</param>
-		/// <remarks>
-		///		<para>该方法默认以覆盖方式进行更新。即先清空指定成员的所有权限过滤设置项，然后再将<paramref name="permissionFilters"/>参数指定的权限过滤项插入其中。</para>
-		/// </remarks>
-		void SetPermissionFilters(uint memberId, MemberType memberType, IEnumerable<PermissionFilter> permissionFilters);
+		/// <param name="permissionFilters">要设置更新的权限过滤集，如果为空则表示清空指定成员的权限过滤集。</param>
+		/// <param name="shouldResetting">指示是否以重置的方式更新权限过滤集。如果为真表示写入之前先清空指定成员下的所有权限过滤设置；否则如果指定的权限过滤项存在则更新它，不存在则新增。</param>
+		/// <returns>返回设置成功的记录数。</returns>
+		int SetPermissionFilters(uint memberId, MemberType memberType, IEnumerable<PermissionFilter> permissionFilters, bool shouldResetting = false);
 
 		/// <summary>
 		/// 设置指定用户或角色的权限过滤集。
@@ -92,10 +106,19 @@ namespace Zongsoft.Security.Membership
 		/// <param name="memberId">指定的要设置的权限过滤集的成员编号(用户或角色)。</param>
 		/// <param name="memberType">指定的要设置的权限过滤集的成员类型。</param>
 		/// <param name="schemaId">指定的要设置的权限过滤集的目标标识，如果为空(null)或空字符串则忽略该参数。</param>
-		/// <param name="permissionFilters">要设置更新的权限过滤集。</param>
-		/// <remarks>
-		///		<para>该方法默认以覆盖方式进行更新。即先清空指定成员下的目标权限过滤设置项，然后再将<paramref name="permissionFilters"/>参数指定的权限过滤项插入其中。</para>
-		/// </remarks>
-		void SetPermissionFilters(uint memberId, MemberType memberType, string schemaId, IEnumerable<PermissionFilter> permissionFilters);
+		/// <param name="permissionFilters">要设置更新的权限过滤集，如果为空则表示清空指定成员的权限过滤集。</param>
+		/// <param name="shouldResetting">指示是否以重置的方式更新权限过滤集。如果为真表示写入之前先清空指定成员下的所有权限过滤设置；否则如果指定的权限过滤项存在则更新它，不存在则新增。</param>
+		/// <returns>返回设置成功的记录数。</returns>
+		int SetPermissionFilters(uint memberId, MemberType memberType, string schemaId, IEnumerable<PermissionFilter> permissionFilters, bool shouldResetting = false);
+
+		/// <summary>
+		/// 移除单个权限过滤设置项。
+		/// </summary>
+		/// <param name="memberId">指定的要移除的权限成员编号(用户或角色)。</param>
+		/// <param name="memberType">指定的要移除的权限成员类型。</param>
+		/// <param name="schemaId">指定的要移除的权限目标标识。</param>
+		/// <param name="actionId">指定的要移除的权限操作标识。</param>
+		/// <returns>如果移除成功则返回真(True)，否则返回假(False)。</returns>
+		bool RemovePermissionFilter(uint memberId, MemberType memberType, string schemaId, string actionId);
 	}
 }
