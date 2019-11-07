@@ -75,7 +75,7 @@ namespace Zongsoft.Samples.Models
 			set;
 		}
 
-		public abstract int Count();
+		public abstract int GetCount();
 		public abstract IDictionary<string, object> GetChanges();
 		public abstract bool HasChanges(params string[] names);
 		public abstract bool Reset(string name, out object value);
@@ -310,7 +310,7 @@ namespace Zongsoft.Samples.Models
 		#endregion
 
 		#region 接口方法
-		public int Count()
+		public int GetCount()
 		{
 			int count = 0;
 			var mask = _MASK_;

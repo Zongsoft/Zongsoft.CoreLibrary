@@ -122,7 +122,7 @@ namespace Zongsoft.Samples.Models
 		#endregion
 
 		#region 公共方法
-		public int Count()
+		public int GetCount()
 		{
 			return 0;
 		}

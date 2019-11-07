@@ -30,7 +30,7 @@ namespace Zongsoft.Samples.Models
 			this.PropertyChanged?.Invoke(this, args);
 		}
 
-		//protected abstract int Count();
+		//protected abstract int GetCount();
 		//protected abstract IDictionary<string, object> GetChanges();
 		//protected abstract bool HasChanges(string[] names);
 		//protected abstract bool Reset(string name, out object value);
@@ -39,7 +39,7 @@ namespace Zongsoft.Samples.Models
 		//protected abstract bool TrySetValue(string name, object value);
 
 		#region 显式实现
-		int IModel.Count()
+		int IModel.GetCount()
 		{
 			//return this.Count();
 			throw new NotImplementedException();

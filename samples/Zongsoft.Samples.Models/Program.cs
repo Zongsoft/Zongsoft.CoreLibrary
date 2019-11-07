@@ -27,7 +27,7 @@ namespace Zongsoft.Samples.Models
 
 		private static void BuildTest()
 		{
-			//Data.Model.Build<Models.IManager>();
+			//Data.Model.Build<Models.IPerson>();
 			//Data.Model.Save();
 
 			//return;
@@ -311,7 +311,7 @@ namespace Zongsoft.Samples.Models
 				entity.P32 = "xxx";
 			});
 
-			if(result.Count() != 32)
+			if(result.GetCount() != 32)
 			{
 				Console.WriteLine();
 				Console.WriteLine($"***** The Count method of the '{result.GetType().Name}' entity is validation failed. *****");
@@ -319,7 +319,7 @@ namespace Zongsoft.Samples.Models
 			}
 
 			result.Reset("P10", "No exists");
-			if(result.Count() != 31)
+			if(result.GetCount() != 31)
 			{
 				Console.WriteLine();
 				Console.WriteLine($"***** The Reset method of the '{result.GetType().Name}' entity is validation failed. *****");

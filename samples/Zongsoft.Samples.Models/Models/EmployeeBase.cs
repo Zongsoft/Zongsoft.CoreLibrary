@@ -340,7 +340,7 @@ namespace Zongsoft.Samples.Models
 			set;
 		}
 
-		public abstract int Count();
+		public abstract int GetCount();
 		public abstract IDictionary<string, object> GetChanges();
 		public abstract bool HasChanges(params string[] names);
 		public abstract bool Reset(string name, out object value);
