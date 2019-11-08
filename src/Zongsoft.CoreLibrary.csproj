@@ -85,6 +85,7 @@
     <Compile Include="Common\ExecutionResult.cs" />
     <Compile Include="Data\ConditionalBase.cs" />
     <Compile Include="Data\DataAccessFilterCollection.cs" />
+    <Compile Include="Data\IDataCorrector.cs" />
     <Compile Include="Data\IDataValueBinder.cs" />
     <Compile Include="Data\IDataValueProvider.cs" />
     <Compile Include="Data\Interval.cs" />
@@ -550,7 +551,6 @@
     <Compile Include="Services\ServiceResolvingEventArgs.cs" />
     <Compile Include="Services\WorkerState.cs" />
     <Compile Include="Data\IDataAccess.cs" />
-    <Compile Include="Data\DataAccessExtension.cs" />
     <Compile Include="Services\ICommand.cs" />
     <Compile Include="Collections\IMatchable.cs" />
     <Compile Include="Services\IServiceProvider.cs" />
