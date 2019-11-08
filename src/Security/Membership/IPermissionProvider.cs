@@ -72,14 +72,14 @@ namespace Zongsoft.Security.Membership
 		int SetPermissions(uint memberId, MemberType memberType, string schemaId, IEnumerable<Permission> permissions, bool shouldResetting = false);
 
 		/// <summary>
-		/// 移除单个权限设置项。
+		/// 移除单个或多个权限设置项。
 		/// </summary>
 		/// <param name="memberId">指定的要移除的权限成员编号(用户或角色)。</param>
 		/// <param name="memberType">指定的要移除的权限成员类型。</param>
-		/// <param name="schemaId">指定的要移除的权限目标标识。</param>
-		/// <param name="actionId">指定的要移除的权限操作标识。</param>
-		/// <returns>如果移除成功则返回真(True)，否则返回假(False)。</returns>
-		bool RemovePermission(uint memberId, MemberType memberType, string schemaId, string actionId);
+		/// <param name="schemaId">指定的要移除的权限目标标识，为空表示忽略该条件。</param>
+		/// <param name="actionId">指定的要移除的权限操作标识，为空表示忽略该条件。</param>
+		/// <returns>如果移除成功则返回受影响的记录数，否则返回零。</returns>
+		int RemovePermissions(uint memberId, MemberType memberType, string schemaId = null, string actionId = null);
 
 		/// <summary>
 		/// 获取指定用户或角色的权限过滤集。
@@ -116,9 +116,9 @@ namespace Zongsoft.Security.Membership
 		/// </summary>
 		/// <param name="memberId">指定的要移除的权限成员编号(用户或角色)。</param>
 		/// <param name="memberType">指定的要移除的权限成员类型。</param>
-		/// <param name="schemaId">指定的要移除的权限目标标识。</param>
-		/// <param name="actionId">指定的要移除的权限操作标识。</param>
-		/// <returns>如果移除成功则返回真(True)，否则返回假(False)。</returns>
-		bool RemovePermissionFilter(uint memberId, MemberType memberType, string schemaId, string actionId);
+		/// <param name="schemaId">指定的要移除的权限目标标识，为空表示忽略该条件。</param>
+		/// <param name="actionId">指定的要移除的权限操作标识，为空表示忽略该条件。</param>
+		/// <returns>如果移除成功则返回受影响的记录数，否则返回零。</returns>
+		int RemovePermissionFilters(uint memberId, MemberType memberType, string schemaId = null, string actionId = null);
 	}
 }

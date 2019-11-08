@@ -74,5 +74,12 @@ namespace Zongsoft.Security.Membership
 		/// <param name="memberType">指定要删除的成员类型。</param>
 		/// <returns>如果删除成功则返回真(True)，否则返回假(False)。</returns>
 		bool RemoveMember(uint roleId, uint memberId, MemberType memberType);
+
+		/// <summary>
+		/// 删除多个角色成员。
+		/// </summary>
+		/// <param name="roleId">指定要删除成员所属的角色编号。</param>
+		/// <returns>如果删除成功则返回删除的数量，否则返回零。</returns>
+		int RemoveMembers(uint roleId);
 	}
 }
