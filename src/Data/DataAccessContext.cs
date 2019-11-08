@@ -51,6 +51,7 @@ namespace Zongsoft.Data
 			_condition = condition;
 			_member = member;
 			this.Entity = DataContextUtility.GetEntity(name, dataAccess.Metadata);
+			this.Corrector = dataAccess.Corrector;
 		}
 		#endregion
 
@@ -102,6 +103,14 @@ namespace Zongsoft.Data
 		}
 
 		/// <summary>
+		/// 获取当前计数操作条件的调节器。
+		/// </summary>
+		public IDataCorrector Corrector
+		{
+			get;
+		}
+
+		/// <summary>
 		/// 获取或设置计数操作的包含成员。
 		/// </summary>
 		public string Member
@@ -134,6 +143,7 @@ namespace Zongsoft.Data
 		{
 			_condition = condition;
 			this.Entity = DataContextUtility.GetEntity(name, dataAccess.Metadata);
+			this.Corrector = dataAccess.Corrector;
 		}
 		#endregion
 
@@ -146,6 +156,9 @@ namespace Zongsoft.Data
 			get;
 		}
 
+		/// <summary>
+		/// 获取或设置判断操作的条件。
+		/// </summary>
 		public ICondition Condition
 		{
 			get
@@ -162,6 +175,17 @@ namespace Zongsoft.Data
 			}
 		}
 
+		/// <summary>
+		/// 获取当前判断操作条件的调节器。
+		/// </summary>
+		public IDataCorrector Corrector
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取判断操作的结果，即指定条件的数据是否存在。
+		/// </summary>
 		public bool Result
 		{
 			get
@@ -314,6 +338,7 @@ namespace Zongsoft.Data
 			_interval = interval;
 			_condition = condition ?? throw new ArgumentNullException(nameof(condition));
 			this.Entity = DataContextUtility.GetEntity(name, dataAccess.Metadata);
+			this.Corrector = dataAccess.Corrector;
 		}
 		#endregion
 
@@ -372,6 +397,14 @@ namespace Zongsoft.Data
 				_condition = value ?? throw new ArgumentNullException();
 				this.OnPropertyChanged(nameof(Condition));
 			}
+		}
+
+		/// <summary>
+		/// 获取当前递增(减)操作条件的调节器。
+		/// </summary>
+		public IDataCorrector Corrector
+		{
+			get;
 		}
 
 		public int Interval
@@ -449,6 +482,7 @@ namespace Zongsoft.Data
 			_paging = paging;
 			_sortings = sortings;
 			this.Entity = DataContextUtility.GetEntity(name, dataAccess.Metadata);
+			this.Corrector = dataAccess.Corrector;
 		}
 		#endregion
 
@@ -549,6 +583,14 @@ namespace Zongsoft.Data
 		}
 
 		/// <summary>
+		/// 获取当前查询操作条件的调节器。
+		/// </summary>
+		public IDataCorrector Corrector
+		{
+			get;
+		}
+
+		/// <summary>
 		/// 获取或设置查询操作的结果数据模式（即查询结果的形状结构）。
 		/// </summary>
 		public ISchema Schema
@@ -640,6 +682,7 @@ namespace Zongsoft.Data
 			_condition = condition;
 			_schema = schema;
 			this.Entity = DataContextUtility.GetEntity(name, dataAccess.Metadata);
+			this.Corrector = dataAccess.Corrector;
 		}
 		#endregion
 
@@ -688,6 +731,14 @@ namespace Zongsoft.Data
 				_condition = value;
 				this.OnPropertyChanged(nameof(Condition));
 			}
+		}
+
+		/// <summary>
+		/// 获取当前删除操作条件的调节器。
+		/// </summary>
+		public IDataCorrector Corrector
+		{
+			get;
 		}
 
 		/// <summary>
@@ -881,6 +932,7 @@ namespace Zongsoft.Data
 			_schema = schema;
 			_isMultiple = isMultiple;
 			this.Entity = DataContextUtility.GetEntity(name, dataAccess.Metadata);
+			this.Corrector = dataAccess.Corrector;
 			this.ValueProvider = dataAccess.ValueProvider;
 		}
 		#endregion
@@ -982,6 +1034,14 @@ namespace Zongsoft.Data
 				_condition = value;
 				this.OnPropertyChanged(nameof(Condition));
 			}
+		}
+
+		/// <summary>
+		/// 获取当前更新操作条件的调节器。
+		/// </summary>
+		public IDataCorrector Corrector
+		{
+			get;
 		}
 
 		/// <summary>

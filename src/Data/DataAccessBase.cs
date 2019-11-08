@@ -154,6 +154,14 @@ namespace Zongsoft.Data
 		}
 
 		/// <summary>
+		/// 获取或设置数据访问条件的调节器。
+		/// </summary>
+		public IDataCorrector Corrector
+		{
+			get; set;
+		}
+
+		/// <summary>
 		/// 获取或设置数据写入值提供程序。
 		/// </summary>
 		public IDataValueProvider ValueProvider

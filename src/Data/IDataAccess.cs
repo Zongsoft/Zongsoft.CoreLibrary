@@ -110,6 +110,14 @@ namespace Zongsoft.Data
 		}
 
 		/// <summary>
+		/// 获取或设置数据条件调节器。
+		/// </summary>
+		IDataCorrector Corrector
+		{
+			get; set;
+		}
+
+		/// <summary>
 		/// 获取或设置数据写入值提供程序。
 		/// </summary>
 		IDataValueProvider ValueProvider
