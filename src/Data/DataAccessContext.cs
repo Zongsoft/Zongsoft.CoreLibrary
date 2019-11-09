@@ -51,7 +51,7 @@ namespace Zongsoft.Data
 			_condition = condition;
 			_member = member;
 			this.Entity = DataContextUtility.GetEntity(name, dataAccess.Metadata);
-			this.Corrector = dataAccess.Corrector;
+			this.Validator = dataAccess.Validator;
 		}
 		#endregion
 
@@ -103,9 +103,9 @@ namespace Zongsoft.Data
 		}
 
 		/// <summary>
-		/// 获取当前计数操作条件的调节器。
+		/// 获取当前计数操作的验证器。
 		/// </summary>
-		public IDataCorrector Corrector
+		public IDataValidator Validator
 		{
 			get;
 		}
@@ -129,6 +129,17 @@ namespace Zongsoft.Data
 			}
 		}
 		#endregion
+
+		#region 公共方法
+		public ICondition Validate(ICondition criteria = null)
+		{
+			var validator = this.Validator;
+
+			return validator == null ?
+				criteria ?? this.Condition :
+				validator.Validate(this, criteria ?? this.Condition);
+		}
+		#endregion
 	}
 
 	public class DataExistContextBase : DataAccessContextBase
@@ -143,7 +154,7 @@ namespace Zongsoft.Data
 		{
 			_condition = condition;
 			this.Entity = DataContextUtility.GetEntity(name, dataAccess.Metadata);
-			this.Corrector = dataAccess.Corrector;
+			this.Validator = dataAccess.Validator;
 		}
 		#endregion
 
@@ -176,9 +187,9 @@ namespace Zongsoft.Data
 		}
 
 		/// <summary>
-		/// 获取当前判断操作条件的调节器。
+		/// 获取当前判断操作的验证器。
 		/// </summary>
-		public IDataCorrector Corrector
+		public IDataValidator Validator
 		{
 			get;
 		}
@@ -200,6 +211,17 @@ namespace Zongsoft.Data
 				_result = value;
 				this.OnPropertyChanged(nameof(Result));
 			}
+		}
+		#endregion
+
+		#region 公共方法
+		public ICondition Validate(ICondition criteria = null)
+		{
+			var validator = this.Validator;
+
+			return validator == null ?
+				criteria ?? this.Condition :
+				validator.Validate(this, criteria ?? this.Condition);
 		}
 		#endregion
 	}
@@ -338,7 +360,7 @@ namespace Zongsoft.Data
 			_interval = interval;
 			_condition = condition ?? throw new ArgumentNullException(nameof(condition));
 			this.Entity = DataContextUtility.GetEntity(name, dataAccess.Metadata);
-			this.Corrector = dataAccess.Corrector;
+			this.Validator = dataAccess.Validator;
 		}
 		#endregion
 
@@ -400,9 +422,9 @@ namespace Zongsoft.Data
 		}
 
 		/// <summary>
-		/// 获取当前递增(减)操作条件的调节器。
+		/// 获取当前递增(减)操作的验证器。
 		/// </summary>
-		public IDataCorrector Corrector
+		public IDataValidator Validator
 		{
 			get;
 		}
@@ -437,6 +459,17 @@ namespace Zongsoft.Data
 				_result = value;
 				this.OnPropertyChanged(nameof(Result));
 			}
+		}
+		#endregion
+
+		#region 公共方法
+		public ICondition Validate(ICondition criteria = null)
+		{
+			var validator = this.Validator;
+
+			return validator == null ?
+				criteria ?? this.Condition :
+				validator.Validate(this, criteria ?? this.Condition);
 		}
 		#endregion
 
@@ -482,7 +515,7 @@ namespace Zongsoft.Data
 			_paging = paging;
 			_sortings = sortings;
 			this.Entity = DataContextUtility.GetEntity(name, dataAccess.Metadata);
-			this.Corrector = dataAccess.Corrector;
+			this.Validator = dataAccess.Validator;
 		}
 		#endregion
 
@@ -583,9 +616,9 @@ namespace Zongsoft.Data
 		}
 
 		/// <summary>
-		/// 获取当前查询操作条件的调节器。
+		/// 获取当前查询操作的验证器。
 		/// </summary>
-		public IDataCorrector Corrector
+		public IDataValidator Validator
 		{
 			get;
 		}
@@ -666,6 +699,17 @@ namespace Zongsoft.Data
 			}
 		}
 		#endregion
+
+		#region 公共方法
+		public ICondition Validate(ICondition criteria = null)
+		{
+			var validator = this.Validator;
+
+			return validator == null ?
+				criteria ?? this.Condition :
+				validator.Validate(this, criteria ?? this.Condition);
+		}
+		#endregion
 	}
 
 	public class DataDeleteContextBase : DataAccessContextBase, IDataMutateContextBase
@@ -682,7 +726,7 @@ namespace Zongsoft.Data
 			_condition = condition;
 			_schema = schema;
 			this.Entity = DataContextUtility.GetEntity(name, dataAccess.Metadata);
-			this.Corrector = dataAccess.Corrector;
+			this.Validator = dataAccess.Validator;
 		}
 		#endregion
 
@@ -734,9 +778,9 @@ namespace Zongsoft.Data
 		}
 
 		/// <summary>
-		/// 获取当前删除操作条件的调节器。
+		/// 获取当前删除操作的验证器。
 		/// </summary>
-		public IDataCorrector Corrector
+		public IDataValidator Validator
 		{
 			get;
 		}
@@ -758,6 +802,17 @@ namespace Zongsoft.Data
 				_schema = value;
 				this.OnPropertyChanged(nameof(Schema));
 			}
+		}
+		#endregion
+
+		#region 公共方法
+		public ICondition Validate(ICondition criteria = null)
+		{
+			var validator = this.Validator;
+
+			return validator == null ?
+				criteria ?? this.Condition :
+				validator.Validate(this, criteria ?? this.Condition);
 		}
 		#endregion
 
@@ -791,7 +846,7 @@ namespace Zongsoft.Data
 			_schema = schema;
 			_isMultiple = isMultiple;
 			this.Entity = DataContextUtility.GetEntity(name, dataAccess.Metadata);
-			this.ValueProvider = dataAccess.ValueProvider;
+			this.Validator = dataAccess.Validator;
 		}
 		#endregion
 
@@ -805,11 +860,11 @@ namespace Zongsoft.Data
 		}
 
 		/// <summary>
-		/// 获取或设置当前新增操作的写入值提供程序。
+		/// 获取当前新增操作的验证器。
 		/// </summary>
-		public IDataValueProvider ValueProvider
+		public IDataValidator Validator
 		{
-			get; set;
+			get;
 		}
 
 		/// <summary>
@@ -896,17 +951,25 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 公共方法
-		public bool TryGetProvidedValue(Metadata.IDataEntityProperty property, out object value)
+		public bool Validate(Metadata.IDataEntityProperty property, out object value)
 		{
-			return this.TryGetProvidedValue(DataAccessMethod.Insert, property, out value);
+			return this.Validate(DataAccessMethod.Insert, property, out value);
 		}
 
-		public bool TryGetProvidedValue(DataAccessMethod method, Metadata.IDataEntityProperty property, out object value)
+		public bool Validate(DataAccessMethod method, Metadata.IDataEntityProperty property, out object value)
 		{
-			var provider = this.ValueProvider;
+			var validator = this.Validator;
 
-			if(provider != null)
-				return provider.TryGetValue(this, method, property, out value);
+			if(validator != null)
+			{
+				switch(method)
+				{
+					case DataAccessMethod.Insert:
+						return validator.OnInsert(this, property, out value);
+					case DataAccessMethod.Update:
+						return validator.OnUpdate(this, property, out value);
+				}
+			}
 
 			value = null;
 			return false;
@@ -932,8 +995,7 @@ namespace Zongsoft.Data
 			_schema = schema;
 			_isMultiple = isMultiple;
 			this.Entity = DataContextUtility.GetEntity(name, dataAccess.Metadata);
-			this.Corrector = dataAccess.Corrector;
-			this.ValueProvider = dataAccess.ValueProvider;
+			this.Validator = dataAccess.Validator;
 		}
 		#endregion
 
@@ -944,14 +1006,6 @@ namespace Zongsoft.Data
 		public Metadata.IDataEntity Entity
 		{
 			get;
-		}
-
-		/// <summary>
-		/// 获取或设置当前更新操作的写入值提供程序。
-		/// </summary>
-		public IDataValueProvider ValueProvider
-		{
-			get; set;
 		}
 
 		/// <summary>
@@ -1037,9 +1091,9 @@ namespace Zongsoft.Data
 		}
 
 		/// <summary>
-		/// 获取当前更新操作条件的调节器。
+		/// 获取当前更新操作的验证器。
 		/// </summary>
-		public IDataCorrector Corrector
+		public IDataValidator Validator
 		{
 			get;
 		}
@@ -1065,17 +1119,34 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 公共方法
-		public bool TryGetProvidedValue(Metadata.IDataEntityProperty property, out object value)
+		public ICondition Validate(ICondition criteria = null)
 		{
-			return this.TryGetProvidedValue(DataAccessMethod.Update, property, out value);
+			var validator = this.Validator;
+
+			return validator == null ?
+				criteria ?? this.Condition :
+				validator.Validate(this, criteria ?? this.Condition);
 		}
 
-		public bool TryGetProvidedValue(DataAccessMethod method, Metadata.IDataEntityProperty property, out object value)
+		public bool Validate(Metadata.IDataEntityProperty property, out object value)
 		{
-			var provider = this.ValueProvider;
+			return this.Validate(DataAccessMethod.Update, property, out value);
+		}
 
-			if(provider != null)
-				return provider.TryGetValue(this, method, property, out value);
+		public bool Validate(DataAccessMethod method, Metadata.IDataEntityProperty property, out object value)
+		{
+			var validator = this.Validator;
+
+			if(validator != null)
+			{
+				switch(method)
+				{
+					case DataAccessMethod.Insert:
+						return validator.OnInsert(this, property, out value);
+					case DataAccessMethod.Update:
+						return validator.OnUpdate(this, property, out value);
+				}
+			}
 
 			value = null;
 			return false;
@@ -1099,7 +1170,7 @@ namespace Zongsoft.Data
 			_schema = schema;
 			_isMultiple = isMultiple;
 			this.Entity = DataContextUtility.GetEntity(name, dataAccess.Metadata);
-			this.ValueProvider = dataAccess.ValueProvider;
+			this.Validator = dataAccess.Validator;
 		}
 		#endregion
 
@@ -1113,11 +1184,11 @@ namespace Zongsoft.Data
 		}
 
 		/// <summary>
-		/// 获取或设置当前新增或更新操作的写入值提供程序。
+		/// 获取当前写入操作的验证器。
 		/// </summary>
-		public IDataValueProvider ValueProvider
+		public IDataValidator Validator
 		{
-			get; set;
+			get;
 		}
 
 		/// <summary>
@@ -1204,12 +1275,20 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 公共方法
-		public bool TryGetProvidedValue(DataAccessMethod method, Metadata.IDataEntityProperty property, out object value)
+		public bool Validate(DataAccessMethod method, Metadata.IDataEntityProperty property, out object value)
 		{
-			var provider = this.ValueProvider;
+			var validator = this.Validator;
 
-			if(provider != null)
-				return provider.TryGetValue(this, method, property, out value);
+			if(validator != null)
+			{
+				switch(method)
+				{
+					case DataAccessMethod.Insert:
+						return validator.OnInsert(this, property, out value);
+					case DataAccessMethod.Update:
+						return validator.OnUpdate(this, property, out value);
+				}
+			}
 
 			value = null;
 			return false;
