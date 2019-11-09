@@ -41,11 +41,8 @@ namespace Zongsoft.Data
 	public struct Interval : IConvertible, IComparable<Interval>, IEquatable<Interval>, IFormattable
 	{
 		#region 静态字段
-		/// <summary>表示递增一的步长。</summary>
-		public static readonly Interval Increment = new Interval(1);
-
-		/// <summary>表示递减一的步长。</summary>
-		public static readonly Interval Decrement = new Interval(-1);
+		/// <summary>表示一个步长单位。</summary>
+		public static readonly Interval One = new Interval(1);
 		#endregion
 
 		#region 公共字段
@@ -183,6 +180,16 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 运算符号
+		public static Interval operator -(Interval interval)
+		{
+			return new Interval(-interval.Value);
+		}
+
+		public static Interval operator !(Interval interval)
+		{
+			return new Interval(-interval.Value);
+		}
+
 		public static bool operator ==(Interval a, Interval b)
 		{
 			return a.Value == b.Value;
