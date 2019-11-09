@@ -32,6 +32,7 @@
  */
 
 using System;
+using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -493,28 +494,30 @@ namespace Zongsoft.Data
 
 	public class DataSelectContextBase : DataAccessContextBase
 	{
+		#region 委托定义
+		public delegate bool FilterDelegate(DataSelectContextBase context, ref object data);
+		#endregion
+
 		#region 成员字段
-		private Type _entityType;
 		private IEnumerable _result;
-		private IEnumerable _filteringResult;
 		private ICondition _condition;
 		private ISchema _schema;
 		private Paging _paging;
 		private Grouping _grouping;
 		private Sorting[] _sortings;
-		private Func<DataSelectContextBase, object, bool> _resultFilter;
+		private FilterDelegate _resultFilter;
 		#endregion
 
 		#region 构造函数
 		protected DataSelectContextBase(IDataAccess dataAccess, string name, Type entityType, Grouping grouping, ICondition condition, ISchema schema, Paging paging, Sorting[] sortings, IDictionary<string, object> states = null) : base(dataAccess, name, DataAccessMethod.Select, states)
 		{
-			_entityType = entityType ?? typeof(object);
 			_grouping = grouping;
 			_condition = condition;
 			_schema = schema;
 			_paging = paging;
 			_sortings = sortings;
 			this.Entity = DataContextUtility.GetEntity(name, dataAccess.Metadata);
+			this.EntityType = entityType ?? typeof(object);
 			this.Validator = dataAccess.Validator;
 		}
 		#endregion
@@ -533,10 +536,7 @@ namespace Zongsoft.Data
 		/// </summary>
 		public Type EntityType
 		{
-			get
-			{
-				return _entityType;
-			}
+			get;
 		}
 
 		/// <summary>
@@ -546,24 +546,15 @@ namespace Zongsoft.Data
 		{
 			get
 			{
-				var filter = _resultFilter;
-
-				if(filter == null)
-					return _result;
-
-				if(_filteringResult == null)
+				bool OnFilter(ref object data)
 				{
-					lock(this)
-					{
-						if(_filteringResult == null)
-						{
-							var type = typeof(DataFilterEnumerable<,>).MakeGenericType(this.GetType(), _entityType);
-							_filteringResult = (IEnumerable)System.Activator.CreateInstance(type, new object[] { this, _result, _resultFilter });
-						}
-					}
+					return _resultFilter(this, ref data);
 				}
 
-				return _filteringResult;
+				if(_resultFilter != null && _result is IPageable source)
+					Pageable.Filter(source, this.EntityType, OnFilter);
+
+				return _result;
 			}
 			set
 			{
@@ -571,7 +562,6 @@ namespace Zongsoft.Data
 					return;
 
 				_result = value ?? throw new ArgumentNullException();
-				_filteringResult = null;
 				this.OnPropertyChanged(nameof(Result));
 			}
 		}
@@ -579,7 +569,7 @@ namespace Zongsoft.Data
 		/// <summary>
 		/// 获取或设置查询结果的过滤器。
 		/// </summary>
-		public Func<DataSelectContextBase, object, bool> ResultFilter
+		public FilterDelegate ResultFilter
 		{
 			get
 			{
@@ -591,7 +581,6 @@ namespace Zongsoft.Data
 					return;
 
 				_resultFilter = value;
-				_filteringResult = null;
 				this.OnPropertyChanged(nameof(ResultFilter));
 			}
 		}
