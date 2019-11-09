@@ -206,7 +206,7 @@ namespace Zongsoft.Data
 		object Get<TKey>(TKey key, string schema, IDictionary<string, object> states, params Sorting[] sortings);
 		object Get<TKey>(TKey key, string schema, Paging paging, params Sorting[] sortings);
 		object Get<TKey>(TKey key, string schema, Paging paging, IDictionary<string, object> states, params Sorting[] sortings);
-		object Get<TKey>(TKey key, string schema, Paging paging, IDictionary<string, object> states, out IPaginator paginator, params Sorting[] sortings);
+		object Get<TKey>(TKey key, string schema, Paging paging, IDictionary<string, object> states, out IPageable pageable, params Sorting[] sortings);
 
 		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, params Sorting[] sortings);
 		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, IDictionary<string, object> states, params Sorting[] sortings);
@@ -215,7 +215,7 @@ namespace Zongsoft.Data
 		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string schema, IDictionary<string, object> states, params Sorting[] sortings);
 		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string schema, Paging paging, params Sorting[] sortings);
 		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string schema, Paging paging, IDictionary<string, object> states, params Sorting[] sortings);
-		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string schema, Paging paging, IDictionary<string, object> states, out IPaginator paginator, params Sorting[] sortings);
+		object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string schema, Paging paging, IDictionary<string, object> states, out IPageable pageable, params Sorting[] sortings);
 
 		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, params Sorting[] sortings);
 		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, IDictionary<string, object> states, params Sorting[] sortings);
@@ -224,7 +224,7 @@ namespace Zongsoft.Data
 		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string schema, IDictionary<string, object> states, params Sorting[] sortings);
 		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string schema, Paging paging, params Sorting[] sortings);
 		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string schema, Paging paging, IDictionary<string, object> states, params Sorting[] sortings);
-		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string schema, Paging paging, IDictionary<string, object> states, out IPaginator paginator, params Sorting[] sortings);
+		object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string schema, Paging paging, IDictionary<string, object> states, out IPageable pageable, params Sorting[] sortings);
 
 		IEnumerable Select(IDictionary<string, object> states = null, params Sorting[] sortings);
 		IEnumerable Select(ICondition condition, params Sorting[] sortings);

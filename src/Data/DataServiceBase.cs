@@ -791,7 +791,7 @@ namespace Zongsoft.Data
 			return this.Get(key, schema, paging, states, out _, sortings);
 		}
 
-		public object Get<TKey>(TKey key, string schema, Paging paging, IDictionary<string, object> states, out IPaginator paginator, params Sorting[] sortings)
+		public object Get<TKey>(TKey key, string schema, Paging paging, IDictionary<string, object> states, out IPageable pageable, params Sorting[] sortings)
 		{
 			var condition = this.ConvertKey(key, out var singular);
 
@@ -804,11 +804,11 @@ namespace Zongsoft.Data
 				condition = this.OnValidate(Method.Get(), condition);
 
 				//执行单条查询方法
-				return this.OnGet(condition, this.GetSchema(schema), states, out paginator);
+				return this.OnGet(condition, this.GetSchema(schema), states, out pageable);
 			}
 
 			var result = this.Select(condition, schema, paging, states, sortings);
-			paginator = result as IPaginator;
+			pageable = result as IPageable;
 			return result;
 		}
 		#endregion
@@ -849,7 +849,7 @@ namespace Zongsoft.Data
 			return this.Get(key1, key2, schema, paging, states, out _, sortings);
 		}
 
-		public object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string schema, Paging paging, IDictionary<string, object> states, out IPaginator paginator, params Sorting[] sortings)
+		public object Get<TKey1, TKey2>(TKey1 key1, TKey2 key2, string schema, Paging paging, IDictionary<string, object> states, out IPageable pageable, params Sorting[] sortings)
 		{
 			var condition = this.ConvertKey(key1, key2, out var singular);
 
@@ -862,11 +862,11 @@ namespace Zongsoft.Data
 				condition = this.OnValidate(Method.Get(), condition);
 
 				//执行单条查询方法
-				return this.OnGet(condition, this.GetSchema(schema), states, out paginator);
+				return this.OnGet(condition, this.GetSchema(schema), states, out pageable);
 			}
 
 			var result = this.Select(condition, schema, paging, states, sortings);
-			paginator = result as IPaginator;
+			pageable = result as IPageable;
 			return result;
 		}
 		#endregion
@@ -907,7 +907,7 @@ namespace Zongsoft.Data
 			return this.Get(key1, key2, key3, schema, paging, states, out _, sortings);
 		}
 
-		public object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string schema, Paging paging, IDictionary<string, object> states, out IPaginator paginator, params Sorting[] sortings)
+		public object Get<TKey1, TKey2, TKey3>(TKey1 key1, TKey2 key2, TKey3 key3, string schema, Paging paging, IDictionary<string, object> states, out IPageable pageable, params Sorting[] sortings)
 		{
 			var condition = this.ConvertKey(key1, key2, key3, out var singular);
 
@@ -920,18 +920,18 @@ namespace Zongsoft.Data
 				condition = this.OnValidate(Method.Get(), condition);
 
 				//执行单条查询方法
-				return this.OnGet(condition, this.GetSchema(schema), states, out paginator);
+				return this.OnGet(condition, this.GetSchema(schema), states, out pageable);
 			}
 
 			var result = this.Select(condition, schema, paging, states, sortings);
-			paginator = result as IPaginator;
+			pageable = result as IPageable;
 			return result;
 		}
 
-		protected virtual TEntity OnGet(ICondition condition, ISchema schema, IDictionary<string, object> states, out IPaginator paginator)
+		protected virtual TEntity OnGet(ICondition condition, ISchema schema, IDictionary<string, object> states, out IPageable pageable)
 		{
 			var result = this.DataAccess.Select<TEntity>(this.Name, condition, schema, null, states, null, ctx => this.OnGetting(ctx), ctx => this.OnGetted(ctx));
-			paginator = result as IPaginator;
+			pageable = result as IPageable;
 			return result.FirstOrDefault();
 		}
 		#endregion

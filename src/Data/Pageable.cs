@@ -32,14 +32,49 @@
  */
 
 using System;
+using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
-	public static class Paginator
+	public static class Pageable
 	{
+		#region 委托定义
+		public delegate bool FilterDelegate(ref object data);
+		#endregion
+
+		#region 静态字段
+		private static readonly MethodInfo FilterMethod = typeof(Pageable).GetMethod(
+				nameof(Filter),
+				BindingFlags.Public | BindingFlags.Static,
+				null,
+				CallingConventions.Standard,
+				new Type[] { typeof(IPageable), typeof(FilterDelegate) },
+				null);
+		#endregion
+
 		#region 公共方法
+		public static IEnumerable Filter(this IPageable source, Type elementType, FilterDelegate predicate)
+		{
+			if(elementType == null)
+				throw new ArgumentNullException(nameof(elementType));
+
+			var method = FilterMethod.MakeGenericMethod(elementType);
+			return (IEnumerable)method.Invoke(null, new object[] { source, predicate });
+		}
+
+		public static IEnumerable<T> Filter<T>(this IPageable source, FilterDelegate predicate)
+		{
+			if(source == null)
+				throw new ArgumentNullException(nameof(source));
+
+			if(predicate == null)
+				throw new ArgumentNullException(nameof(predicate));
+
+			return new FilteredCollection<T>(source, predicate);
+		}
+
 		public static IEnumerable<TResult> Map<TSource, TResult>(this IEnumerable<TSource> source, System.Linq.Expressions.Expression<Func<TSource, TResult>> map)
 		{
 			return (IEnumerable<TResult>)Map(source, Reflection.ExpressionUtility.GetMemberName(map));
@@ -53,10 +88,10 @@ namespace Zongsoft.Data
 			if(string.IsNullOrEmpty(path))
 				return source;
 
-			var paginator = source as IPaginator;
+			var pageable = source as IPageable;
 
-			if(paginator == null)
-				throw new ArgumentException($"The specified data source does not implement the '{nameof(IPaginator)}' interface.");
+			if(pageable == null)
+				throw new ArgumentException($"The specified data source does not implement the '{nameof(IPageable)}' interface.");
 
 			object Map(TSource entity)
 			{
@@ -73,7 +108,103 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 嵌套子类
-		private class MappedCollection<TSource, TResult> : IEnumerable<TResult>, IEnumerable, IPaginator
+		private class FilteredCollection<T> : IEnumerable<T>, IEnumerable, IPageable
+		{
+			#region 事件声明
+			public event EventHandler<PagingEventArgs> Paginated;
+			#endregion
+
+			#region 私有变量
+			private IEnumerable _source;
+			private FilterDelegate _filter;
+			#endregion
+
+			#region 构造函数
+			public FilteredCollection(IEnumerable source, FilterDelegate filter)
+			{
+				_filter = filter;
+				_source = source;
+				((IPageable)_source).Paginated += this.OnPaginated;
+			}
+			#endregion
+
+			#region 枚举遍历
+			public IEnumerator<T> GetEnumerator()
+			{
+				return new FilteredIterator(_source.GetEnumerator(), _filter, this.OnExit);
+			}
+
+			IEnumerator IEnumerable.GetEnumerator()
+			{
+				return this.GetEnumerator();
+			}
+			#endregion
+
+			#region 私有方法
+			private void OnPaginated(object sender, PagingEventArgs e)
+			{
+				this.Paginated?.Invoke(sender, e);
+			}
+
+			private void OnExit()
+			{
+				((IPageable)_source).Paginated -= this.OnPaginated;
+			}
+			#endregion
+
+			#region 数据迭代
+			private class FilteredIterator : IEnumerator<T>, IEnumerator, IDisposable
+			{
+				private IEnumerator _iterator;
+				private FilterDelegate _filter;
+				private Action _exit;
+				private object _current;
+
+				public FilteredIterator(IEnumerator iterator, FilterDelegate filter, Action exit)
+				{
+					_iterator = iterator;
+					_filter = filter;
+					_exit = exit;
+				}
+
+				public T Current
+				{
+					get => (T)_current;
+				}
+
+				object IEnumerator.Current
+				{
+					get => _current;
+				}
+
+				public bool MoveNext()
+				{
+					if(_iterator.MoveNext())
+					{
+						_current = _iterator.Current;
+						return _filter(ref _current);
+					}
+
+					return false;
+				}
+
+				public void Reset()
+				{
+					_iterator.Reset();
+				}
+
+				public void Dispose()
+				{
+					if(_iterator is IDisposable disposable)
+						disposable.Dispose();
+
+					_exit();
+				}
+			}
+			#endregion
+		}
+
+		private class MappedCollection<TSource, TResult> : IEnumerable<TResult>, IEnumerable, IPageable
 		{
 			#region 事件声明
 			public event EventHandler<PagingEventArgs> Paginated;
@@ -89,7 +220,7 @@ namespace Zongsoft.Data
 			{
 				_map = map;
 				_source = source;
-				((IPaginator)_source).Paginated += this.Paginator_Paginated;
+				((IPageable)_source).Paginated += this.OnPaginated;
 			}
 			#endregion
 
@@ -106,14 +237,14 @@ namespace Zongsoft.Data
 			#endregion
 
 			#region 私有方法
-			private void Paginator_Paginated(object sender, PagingEventArgs e)
+			private void OnPaginated(object sender, PagingEventArgs e)
 			{
 				this.Paginated?.Invoke(sender, e);
 			}
 
 			private void OnExit()
 			{
-				((IPaginator)_source).Paginated -= this.Paginator_Paginated;
+				((IPageable)_source).Paginated -= this.OnPaginated;
 			}
 			#endregion
 

@@ -29,9 +29,9 @@ using System;
 namespace Zongsoft.Data
 {
 	/// <summary>
-	/// 表示分页驱动器的接口。
+	/// 表示支持分页的接口。
 	/// </summary>
-	public interface IPaginator
+	public interface IPageable : System.Collections.IEnumerable
 	{
 		/// <summary>
 		/// 表示完成分页的事件。
