@@ -231,8 +231,6 @@ namespace Zongsoft.Data
 		IEnumerable Select(ICondition condition, IDictionary<string, object> states, params Sorting[] sortings);
 		IEnumerable Select(ICondition condition, Paging paging, params Sorting[] sortings);
 		IEnumerable Select(ICondition condition, Paging paging, IDictionary<string, object> states, params Sorting[] sortings);
-		IEnumerable Select(ICondition condition, Paging paging, string schema, params Sorting[] sortings);
-		IEnumerable Select(ICondition condition, Paging paging, string schema, IDictionary<string, object> states, params Sorting[] sortings);
 		IEnumerable Select(ICondition condition, string schema, params Sorting[] sortings);
 		IEnumerable Select(ICondition condition, string schema, IDictionary<string, object> states, params Sorting[] sortings);
 		IEnumerable Select(ICondition condition, string schema, Paging paging, params Sorting[] sortings);

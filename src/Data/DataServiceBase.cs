@@ -962,16 +962,6 @@ namespace Zongsoft.Data
 			return this.Select(condition, string.Empty, paging, states, sortings);
 		}
 
-		public IEnumerable<TEntity> Select(ICondition condition, Paging paging, string schema, params Sorting[] sortings)
-		{
-			return this.Select(condition, schema, paging, null, sortings);
-		}
-
-		public IEnumerable<TEntity> Select(ICondition condition, Paging paging, string schema, IDictionary<string, object> states, params Sorting[] sortings)
-		{
-			return this.Select(condition, schema, paging, states, sortings);
-		}
-
 		public IEnumerable<TEntity> Select(ICondition condition, string schema, params Sorting[] sortings)
 		{
 			return this.Select(condition, schema, null, null, sortings);
@@ -1108,16 +1098,6 @@ namespace Zongsoft.Data
 		IEnumerable IDataService.Select(ICondition condition, Paging paging, IDictionary<string, object> states, params Sorting[] sortings)
 		{
 			return this.Select(condition, paging, states, sortings);
-		}
-
-		IEnumerable IDataService.Select(ICondition condition, Paging paging, string schema, params Sorting[] sortings)
-		{
-			return this.Select(condition, paging, schema, sortings);
-		}
-
-		IEnumerable IDataService.Select(ICondition condition, Paging paging, string schema, IDictionary<string, object> states, params Sorting[] sortings)
-		{
-			return this.Select(condition, paging, schema, states, sortings);
 		}
 		#endregion
 

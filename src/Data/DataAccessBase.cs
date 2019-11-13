@@ -1492,16 +1492,6 @@ namespace Zongsoft.Data
 			return this.Select<T>(this.GetName<T>(), condition, string.Empty, paging, states, sortings, null, null);
 		}
 
-		public IEnumerable<T> Select<T>(ICondition condition, Paging paging, string schema, params Sorting[] sortings)
-		{
-			return this.Select<T>(this.GetName<T>(), condition, schema, paging, null, sortings, null, null);
-		}
-
-		public IEnumerable<T> Select<T>(ICondition condition, Paging paging, string schema, IDictionary<string, object> states, params Sorting[] sortings)
-		{
-			return this.Select<T>(this.GetName<T>(), condition, schema, paging, states, sortings, null, null);
-		}
-
 		public IEnumerable<T> Select<T>(ICondition condition, string schema, params Sorting[] sortings)
 		{
 			return this.Select<T>(this.GetName<T>(), condition, schema, null, null, sortings, null, null);
@@ -1550,16 +1540,6 @@ namespace Zongsoft.Data
 		public IEnumerable<T> Select<T>(string name, ICondition condition, Paging paging, IDictionary<string, object> states, params Sorting[] sortings)
 		{
 			return this.Select<T>(name, condition, string.Empty, paging, states, sortings, null, null);
-		}
-
-		public IEnumerable<T> Select<T>(string name, ICondition condition, Paging paging, string schema, params Sorting[] sortings)
-		{
-			return this.Select<T>(name, condition, schema, paging, null, sortings, null, null);
-		}
-
-		public IEnumerable<T> Select<T>(string name, ICondition condition, Paging paging, string schema, IDictionary<string, object> states, params Sorting[] sortings)
-		{
-			return this.Select<T>(name, condition, schema, paging, states, sortings, null, null);
 		}
 
 		public IEnumerable<T> Select<T>(string name, ICondition condition, string schema, params Sorting[] sortings)
