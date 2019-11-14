@@ -39,7 +39,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 静态字段
-		public static readonly Paging Disable = new Paging(1, 0);
+		public static readonly Paging Disabled = new Paging(1, 0);
 		#endregion
 
 		#region 成员字段

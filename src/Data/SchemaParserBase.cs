@@ -291,7 +291,7 @@ namespace Zongsoft.Data
 						return false;
 					}
 
-					context.Current.Paging = Paging.Disable;
+					context.Current.Paging = Paging.Disabled;
 					context.State = State.Include;
 					return true;
 				case '/':
