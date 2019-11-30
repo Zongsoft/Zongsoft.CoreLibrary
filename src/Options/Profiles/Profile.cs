@@ -158,9 +158,6 @@ namespace Zongsoft.Options.Profiles
 
 							break;
 						case LineType.Entry:
-							//if(section == null)
-							//	throw new ProfileException("Invalid format of the profile.");
-
 							var index = content.IndexOf('=');
 
 							if(section == null)
@@ -502,9 +499,6 @@ namespace Zongsoft.Options.Profiles
 			result = text;
 			return LineType.Entry;
 		}
-		#endregion
-
-		#region 嵌套子类
 		#endregion
 	}
 }
