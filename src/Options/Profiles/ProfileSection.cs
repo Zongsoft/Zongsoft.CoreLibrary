@@ -32,7 +32,7 @@ namespace Zongsoft.Options.Profiles
 	public class ProfileSection : ProfileItem, ISettingsProvider
 	{
 		#region 静态常量
-		private static readonly char[] IllegalCharacters = new char[] { '.', '/', '\\', '*', '?', '!', '@', '#', '$', '%', '^', '&' };
+		private static readonly char[] IllegalCharacters = new char[] { '.', '/', '\\', '*', '?', '!', '@', '#', '%', '^', '&' };
 		#endregion
 
 		#region 成员字段
@@ -50,7 +50,7 @@ namespace Zongsoft.Options.Profiles
 				throw new ArgumentNullException(nameof(name));
 
 			if(name.IndexOfAny(IllegalCharacters) >= 0)
-				throw new ArgumentException("The name contains illegal character(s).");
+				throw new ArgumentException($"The specified '{name}' section name contains illegal characters.");
 
 			_name = name.Trim();
 			_items = new ProfileItemCollection(this);
