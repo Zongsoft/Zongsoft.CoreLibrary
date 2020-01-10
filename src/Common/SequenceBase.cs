@@ -80,6 +80,21 @@ namespace Zongsoft.Common
         #endregion
 
         #region 公共方法
+        public bool TryGetValue(string key, out long value)
+        {
+            if(string.IsNullOrEmpty(key))
+                throw new ArgumentNullException(nameof(key));
+
+            if(_map.TryGetValue(key, out var index))
+            {
+                value = _entries[index].Value;
+                return true;
+            }
+
+            value = 0;
+            return false;
+        }
+
         public virtual long Decrement(string key, int interval = 1, int seed = 0)
         {
             return this.Increment(key, -interval, seed);
@@ -87,7 +102,12 @@ namespace Zongsoft.Common
 
         public virtual long Increment(string key, int interval = 1, int seed = 0)
         {
-            if(!_map.TryGetValue(key, out var index))
+            if(string.IsNullOrEmpty(key))
+                throw new ArgumentNullException(nameof(key));
+
+            int index;
+
+            if(!_map.TryGetValue(key, out index))
             {
                 lock(_map)
                 {
@@ -137,6 +157,9 @@ namespace Zongsoft.Common
 
         public virtual void Reset(string key, int value = 0)
         {
+            if(string.IsNullOrEmpty(key))
+                throw new ArgumentNullException(nameof(key));
+
             if(_map.TryGetValue(key, out var index))
             {
                 unsafe

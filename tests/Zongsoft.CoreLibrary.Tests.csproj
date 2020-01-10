@@ -61,6 +61,7 @@
     <Compile Include="Common\BufferTests.cs" />
     <Compile Include="Common\ConvertTests.cs" />
     <Compile Include="Common\EnumUtilityTests.cs" />
+    <Compile Include="Common\SequenceTests.cs" />
     <Compile Include="Data\RangeTest.cs" />
     <Compile Include="Data\ConditionalTest.cs" />
     <Compile Include="Data\ConditionCollectionTest.cs" />
