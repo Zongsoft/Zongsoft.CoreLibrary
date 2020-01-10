@@ -83,6 +83,7 @@
     <Compile Include="Common\ActivatorParameterDescriptor.cs" />
     <Compile Include="Common\BitVector32.cs" />
     <Compile Include="Common\ExecutionResult.cs" />
+    <Compile Include="Common\SequenceBase.cs" />
     <Compile Include="Data\ConditionalBase.cs" />
     <Compile Include="Data\DataAccessFilterCollection.cs" />
     <Compile Include="Data\IDataValidator.cs" />
