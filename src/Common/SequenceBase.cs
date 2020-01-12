@@ -30,7 +30,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Common
 {
-    public abstract class SequenceBase : ISequence
+    public abstract class SequenceBase : ISequence, IDisposable
     {
         #region 内部结构
         [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
@@ -39,18 +39,8 @@ namespace Zongsoft.Common
             public long Value;      //当前序号值
             public long Threshold;  //本地递增的上限值
             public long Timestamp;  //最后更新时间，频率为秒
-            public int Count;       //成长因子，自小为10
+            public int Count;       //成长因子，最小值为10
             public int Flags;       //同步锁标记
-
-            public bool TrySet(int interval, out long value)
-            {
-                value = Interlocked.Add(ref Value, interval);
-
-                if(interval > 0)
-                    return value <= this.Threshold;
-                else
-                    return value >= this.Threshold;
-            }
         }
         #endregion
 
@@ -60,6 +50,7 @@ namespace Zongsoft.Common
         #endregion
 
         #region 成员字段
+        private ReaderWriterLockSlim _locker;
         private Dictionary<string, int> _map;
         private Entry[] _entries;
         #endregion
@@ -76,6 +67,7 @@ namespace Zongsoft.Common
 
             _map = new Dictionary<string, int>(capacity);
             _entries = new Entry[capacity];
+            _locker = new ReaderWriterLockSlim();
         }
         #endregion
 
@@ -105,52 +97,68 @@ namespace Zongsoft.Common
             if(string.IsNullOrEmpty(key))
                 throw new ArgumentNullException(nameof(key));
 
-            int index;
+            if(_map.TryGetValue(key, out var index))
+                _locker.EnterReadLock();
+            else
+                _locker.EnterUpgradeableReadLock();
 
-            if(!_map.TryGetValue(key, out index))
+            try
             {
-                lock(_map)
+                if(_locker.IsUpgradeableReadLockHeld && !_map.TryGetValue(key, out index))
                 {
-                    if(!_map.TryGetValue(key, out index))
+                    try
                     {
+                        _locker.EnterWriteLock();
+
                         index = _map.Count;
                         _map.Add(key, index);
 
                         if(index == _entries.Length)
                             Expand();
                     }
-                }
-            }
-
-            unsafe
-            {
-                fixed(Entry* entry = &_entries[index])
-                {
-                    var result = Interlocked.Increment(ref entry->Value);
-
-                    if(result >= entry->Threshold)
+                    finally
                     {
-                        var hold = Interlocked.CompareExchange(ref entry->Flags, LOCKED_FLAG, UNLOCK_FLAG);
+                        _locker.ExitWriteLock();
+                    }
+                }
 
-                        if(hold == UNLOCK_FLAG)
+                unsafe
+                {
+                    fixed(Entry* entry = &_entries[index])
+                    {
+                        var result = Interlocked.Increment(ref entry->Value);
+
+                        if(result >= entry->Threshold)
                         {
-                            try
+                            var hold = Interlocked.CompareExchange(ref entry->Flags, LOCKED_FLAG, UNLOCK_FLAG);
+
+                            if(hold == UNLOCK_FLAG)
                             {
-                                if(result >= entry->Threshold)
+                                try
                                 {
-                                    entry->Threshold = this.Reserve(key, entry->Timestamp, ref entry->Count, seed);
-                                    entry->Timestamp = GetTimestamp();
+                                    if(result >= entry->Threshold)
+                                    {
+                                        entry->Threshold = this.Reserve(key, entry->Timestamp, ref entry->Count, seed);
+                                        entry->Timestamp = GetTimestamp();
+                                    }
+                                }
+                                finally
+                                {
+                                    Interlocked.Exchange(ref entry->Flags, UNLOCK_FLAG);
                                 }
                             }
-                            finally
-                            {
-                                Interlocked.Exchange(ref entry->Flags, UNLOCK_FLAG);
-                            }
                         }
-                    }
 
-                    return result;
+                        return result;
+                    }
                 }
+            }
+            finally
+            {
+                if(_locker.IsReadLockHeld)
+                    _locker.ExitReadLock();
+                else
+                    _locker.ExitUpgradeableReadLock();
             }
         }
 
@@ -159,32 +167,41 @@ namespace Zongsoft.Common
             if(string.IsNullOrEmpty(key))
                 throw new ArgumentNullException(nameof(key));
 
-            if(_map.TryGetValue(key, out var index))
+            _locker.EnterWriteLock();
+
+            try
             {
-                unsafe
+                if(_map.TryGetValue(key, out var index))
                 {
-                    fixed(Entry* entry = &_entries[index])
+                    unsafe
                     {
-                        var hold = Interlocked.CompareExchange(ref entry->Flags, LOCKED_FLAG, UNLOCK_FLAG);
-
-                        if(hold == 0)
+                        fixed(Entry* entry = &_entries[index])
                         {
-                            try
-                            {
-                                entry->Value = value;
-                                entry->Count = 10;
-                                entry->Threshold = value + 10;
-                                entry->Timestamp = GetTimestamp();
+                            var hold = Interlocked.CompareExchange(ref entry->Flags, LOCKED_FLAG, UNLOCK_FLAG);
 
-                                this.OnReset(key, value);
-                            }
-                            finally
+                            if(hold == 0)
                             {
-                                Interlocked.Exchange(ref entry->Flags, UNLOCK_FLAG);
+                                try
+                                {
+                                    entry->Value = value;
+                                    entry->Count = 10;
+                                    entry->Threshold = value + 10;
+                                    entry->Timestamp = GetTimestamp();
+
+                                    this.OnReset(key, value);
+                                }
+                                finally
+                                {
+                                    Interlocked.Exchange(ref entry->Flags, UNLOCK_FLAG);
+                                }
                             }
                         }
                     }
                 }
+            }
+            finally
+            {
+                _locker.ExitWriteLock();
             }
         }
         #endregion
@@ -226,6 +243,25 @@ namespace Zongsoft.Common
         private long GetTimestamp()
         {
             return System.Diagnostics.Stopwatch.GetTimestamp() / System.Diagnostics.Stopwatch.Frequency;
+        }
+        #endregion
+
+        #region 处置方法
+        protected virtual void Dispose(bool disposing)
+        {
+            if(disposing)
+            {
+                _map.Clear();
+                Array.Resize(ref _entries, 0);
+            }
+
+            _locker.Dispose();
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
         #endregion
     }
