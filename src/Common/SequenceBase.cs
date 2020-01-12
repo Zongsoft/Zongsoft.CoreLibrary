@@ -113,11 +113,10 @@ namespace Zongsoft.Common
                 {
                     if(!_map.TryGetValue(key, out index))
                     {
-                        var count = _map.Count;
+                        index = _map.Count;
+                        _map.Add(key, index);
 
-                        _map.Add(key, count);
-
-                        if(count == _entries.Length)
+                        if(index == _entries.Length)
                             Expand();
                     }
                 }
@@ -133,7 +132,7 @@ namespace Zongsoft.Common
                     {
                         var hold = Interlocked.CompareExchange(ref entry->Flags, LOCKED_FLAG, UNLOCK_FLAG);
 
-                        if(hold == 0)
+                        if(hold == UNLOCK_FLAG)
                         {
                             try
                             {
