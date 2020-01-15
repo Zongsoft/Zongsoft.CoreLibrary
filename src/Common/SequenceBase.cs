@@ -45,6 +45,9 @@ namespace Zongsoft.Common
         #endregion
 
         #region 常量定义
+        private const int MINIMUM_FACTOR = 10;
+        private const int MAXIMUM_FACTOR = 10000;
+
         private const int LOCKED_FLAG = 1;
         private const int UNLOCK_FLAG = 0;
         #endregion
@@ -126,9 +129,9 @@ namespace Zongsoft.Common
                 {
                     fixed(Entry* entry = &_entries[index])
                     {
-                        var result = Interlocked.Increment(ref entry->Value);
+                        var value = Interlocked.Increment(ref entry->Value);
 
-                        if(result >= entry->Threshold)
+                        if(value >= entry->Threshold)
                         {
                             var hold = Interlocked.CompareExchange(ref entry->Flags, LOCKED_FLAG, UNLOCK_FLAG);
 
@@ -136,11 +139,8 @@ namespace Zongsoft.Common
                             {
                                 try
                                 {
-                                    if(result >= entry->Threshold)
-                                    {
-                                        entry->Threshold = this.Reserve(key, entry->Timestamp, ref entry->Count, seed);
-                                        entry->Timestamp = GetTimestamp();
-                                    }
+                                    entry->Threshold = this.Reserve(key, ref *entry, value, seed);
+                                    entry->Timestamp = GetTimestamp();
                                 }
                                 finally
                                 {
@@ -149,7 +149,7 @@ namespace Zongsoft.Common
                             }
                         }
 
-                        return result;
+                        return value;
                     }
                 }
             }
@@ -184,8 +184,8 @@ namespace Zongsoft.Common
                                 try
                                 {
                                     entry->Value = value;
-                                    entry->Count = 10;
-                                    entry->Threshold = value + 10;
+                                    entry->Count = MINIMUM_FACTOR;
+                                    entry->Threshold = value + MINIMUM_FACTOR;
                                     entry->Timestamp = GetTimestamp();
 
                                     this.OnReset(key, value);
@@ -232,10 +232,23 @@ namespace Zongsoft.Common
         }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        private long Reserve(string key, long lastest, ref int count, int seed)
+        private long Reserve(string key, ref Entry entry, long value, int seed)
         {
-            var duration = GetTimestamp() - lastest;
-            count = (int)Math.Max(10, count * Math.Max(0.1, 2 - (duration / 300)));
+            int Bound(int min, int max, double number)
+            {
+                return (int)Math.Min(max, Math.Max(min, number));
+            }
+
+            var duration = Math.Max(0, GetTimestamp() - entry.Timestamp);
+            var count = entry.Count = Bound(
+                MINIMUM_FACTOR,
+                MAXIMUM_FACTOR,
+                entry.Count * Math.Max(0.1, 2 - (duration / 300))
+            );
+
+            if(value < entry.Value && count < MAXIMUM_FACTOR)
+                count += (int)(entry.Value - value);
+
             return this.OnReserve(key, count, seed);
         }
 
