@@ -5,6 +5,8 @@
 README: [English](https://github.com/Zongsoft/Zongsoft.CoreLibrary/blob/master/README.md) | [简体中文](https://github.com/Zongsoft/Zongsoft.CoreLibrary/blob/master/README-zh_CN.md)
 
 -----
+注：该项目已归档，对应的替代版本请参考：https://github.com/Zongsoft/Framework/blob/master/Zongsoft.Core
+-----
 
 [Zongsoft.CoreLibrary](https://github.com/Zongsoft/Zongsoft.CoreLibrary) 是 [**Zongsoft**](https://github.com/Zongsoft) 开源项目集的核心类库，除 .NET 核心库外不依赖任何其他类库。
 
